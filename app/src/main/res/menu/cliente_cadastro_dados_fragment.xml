@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    
+    <item
+        android:id="@+id/menu_cliente_cadastro_dados_fragemnt_salvar"
+        android:icon="@drawable/ic_action_save"
+        android:orderInCategory="100"
+        app:showAsAction="always"
+        android:title="@string/salvar"/>
+
+    <item
+        android:id="@+id/menu_cliente_cadastro_dados_fragemnt_enviar"
+        android:icon="@drawable/ic_send"
+        android:orderInCategory="101"
+        app:showAsAction="ifRoom"
+        android:title="@string/enviar"/>
+
+</menu>

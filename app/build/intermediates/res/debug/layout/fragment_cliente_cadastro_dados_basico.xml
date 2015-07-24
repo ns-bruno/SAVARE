@@ -1,0 +1,445 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/cinza_platina"
+    android:padding="10dp" >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="fill_parent"
+        android:gravity="center_horizontal"
+        android:orientation="vertical" >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center_horizontal"
+            android:orientation="horizontal" >
+
+            <TextView
+                android:id="@+id/fragment_cliente_cadastro_dados_basico_text_codigo_pessoa"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@color/branco"
+                android:text="@string/codigo"
+                android:textAppearance="?android:attr/textAppearanceLarge" />
+
+            <TextView
+                android:id="@+id/fragment_cliente_cadastro_dados_basico_text_status"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@color/branco"
+                android:text="@string/status"
+                android:textAppearance="?android:attr/textAppearanceLarge" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center_horizontal"
+            android:orientation="horizontal" >
+
+            <RadioGroup
+                android:id="@+id/fragment_cliente_cadastro_dados_basico_radioGroup_fisica_juridica"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/branco"
+                android:gravity="center_horizontal"
+                android:orientation="horizontal" >
+
+                <RadioButton
+                    android:id="@+id/fragment_cliente_cadastro_dados_basico_radioButton_fisica"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@color/branco"
+                    android:checked="true"
+                    android:text="@string/fisica" />
+
+                <RadioButton
+                    android:id="@+id/fragment_cliente_cadastro_dados_basico_radioButton_juridica"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@color/branco"
+                    android:text="@string/juridica" />
+            </RadioGroup>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="5dp"
+            android:background="@color/branco"
+            android:gravity="center_horizontal"
+            android:orientation="vertical" >
+
+            <EditText
+                android:id="@+id/fragment_cliente_cadastro_dados_basico_text_razao"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/branco"
+                android:hint="@string/razao_social"
+                android:inputType="text|textCapCharacters"
+                android:maxLines="3"
+                android:textColor="@color/azul_escuro"
+                android:textAppearance="?android:attr/textAppearanceLarge" />
+
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="5dp"
+            android:background="@color/branco"
+            android:gravity="center_horizontal"
+            android:orientation="vertical" >
+
+            <EditText
+                android:id="@+id/fragment_cliente_cadastro_dados_basico_text_fantasia"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/branco"
+                android:hint="@string/fantasia"
+                android:inputType="text|textCapCharacters" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:background="@color/branco"
+            android:orientation="vertical">
+
+            <EditText
+                android:id="@+id/fragment_cliente_cadastro_dados_basico_text_cnpj_cpf"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="5"
+                android:hint="@string/cnpj_cpf"
+                android:inputType="number" />
+
+            <EditText
+                android:id="@+id/fragment_cliente_cadastro_dados_basico_text_inscricao_estadual"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/incricao_estadual"
+                android:inputType="number"
+                android:textAppearance="?android:attr/textAppearanceLarge" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="5dp"
+            android:background="@color/branco"
+            android:gravity="center_horizontal"
+            android:orientation="vertical" >
+
+            <Spinner
+                android:id="@+id/fragment_cliente_cadastro_dados_basico_spinner_estado"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1" />
+
+            <Spinner
+                android:id="@+id/fragment_cliente_cadastro_dados_basico_spinner_cidade"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="5dp"
+            android:background="@color/branco"
+            android:gravity="center_horizontal"
+            android:orientation="vertical" >
+
+            <EditText
+                android:id="@+id/fragment_cliente_cadastro_dados_basico_text_cep"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/cep"
+                android:inputType="number"
+                android:maxLength="9" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="5dp"
+            android:background="@color/branco"
+            android:gravity="center_horizontal"
+            android:orientation="vertical" >
+
+            <EditText
+                android:id="@+id/fragment_cliente_cadastro_dados_basico_text_bairro"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/bairro"
+                android:inputType="text|textCapCharacters" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="5dp"
+            android:background="@color/branco"
+            android:orientation="horizontal" >
+
+            <EditText
+                android:id="@+id/fragment_cliente_cadastro_dados_basico_text_endereco"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="7"
+                android:hint="@string/endereco"
+                android:inputType="textCapCharacters" />
+
+            <EditText
+                android:id="@+id/fragment_cliente_cadastro_dados_basico_text_numero"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="@string/numero" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="5dp"
+            android:background="@color/branco"
+            android:orientation="vertical" >
+
+            <EditText
+                android:id="@+id/fragment_cliente_cadastro_dados_basico_text_complemento"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="@string/complemento"
+                android:inputType="textCapCharacters|text" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="5dp"
+            android:background="@color/branco"
+            android:orientation="vertical" >
+
+            <EditText
+                android:id="@+id/fragment_cliente_cadastro_dados_basico_text_email"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="@string/email"
+                android:inputType="textEmailAddress" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="5dp"
+            android:background="@color/branco"
+            android:orientation="vertical" >
+
+            <Spinner
+                android:id="@+id/fragment_cliente_cadastro_dados_basico_spinner_status"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1" />
+
+            <Spinner
+                android:id="@+id/fragment_cliente_cadastro_dados_basico_spinner_ramo_atividade"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1" />
+
+            <Spinner
+                android:id="@+id/fragment_cliente_cadastro_dados_basico_spinner_tipo_cliente"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1" />
+
+            <Spinner
+                android:id="@+id/fragment_cliente_cadastro_dados_basico_spinner_tipo_documento"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1" />
+
+            <Spinner
+                android:id="@+id/fragment_cliente_cadastro_dados_basico_spinner_portador_banco"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1" />
+
+            <Spinner
+                android:id="@+id/fragment_cliente_cadastro_dados_basico_spinner_plano_pagamento"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/branco"
+            android:orientation="horizontal" >
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="5dp"
+            android:background="@color/branco"
+            android:orientation="horizontal" >
+
+            <TextView
+                android:id="@+id/text_capital_social"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center_horizontal"
+                android:text="@string/capital_social" />
+
+            <TextView
+                android:id="@+id/text_limite_compras"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center_horizontal"
+                android:text="@string/limite_compras" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/branco"
+            android:orientation="horizontal" >
+
+            <EditText
+                android:id="@+id/fragment_cliente_cadastro_dados_basico_editText_capital_social"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:ems="10"
+                android:gravity="center_horizontal"
+                android:inputType="numberDecimal" >
+            </EditText>
+
+            <EditText
+                android:id="@+id/fragment_cliente_cadastro_dados_basico_editText_limite_compras"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:ems="10"
+                android:gravity="center_horizontal"
+                android:inputType="numberDecimal" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="5dp"
+            android:background="@color/branco"
+            android:orientation="horizontal" >
+
+            <TextView
+                android:id="@+id/text_desconto_atacado_vista"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center_horizontal"
+                android:text="@string/desconto_atacado_vista" />
+
+            <TextView
+                android:id="@+id/text_desconto_atacado_prazo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center_horizontal"
+                android:text="@string/desconto_atacado_prazo" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/branco"
+            android:orientation="horizontal" >
+
+            <EditText
+                android:id="@+id/fragment_cliente_cadastro_dados_basico_editText_desconto_atacado_vista"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:ems="10"
+                android:gravity="center_horizontal"
+                android:inputType="numberDecimal" >
+            </EditText>
+
+            <EditText
+                android:id="@+id/fragment_cliente_cadastro_dados_basico_editText_desconto_atacado_prazo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:ems="10"
+                android:gravity="center_horizontal"
+                android:inputType="numberDecimal" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="5dp"
+            android:background="@color/branco"
+            android:orientation="horizontal" >
+
+            <TextView
+                android:id="@+id/text_desconto_varejo_vista"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center_horizontal"
+                android:text="@string/desconto_varejo_vista" />
+
+            <TextView
+                android:id="@+id/text_desconto_varejo_prazo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center_horizontal"
+                android:text="@string/desconto_varejo_prazo" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/branco"
+            android:orientation="horizontal" >
+
+            <EditText
+                android:id="@+id/fragment_cliente_cadastro_dados_basico_editText_desconto_varejo_vista"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:ems="10"
+                android:gravity="center_horizontal"
+                android:inputType="numberDecimal" >
+            </EditText>
+
+            <EditText
+                android:id="@+id/fragment_cliente_cadastro_dados_basico_editText_desconto_varejo_prazo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:ems="10"
+                android:gravity="center_horizontal"
+                android:inputType="numberDecimal" />
+        </LinearLayout>
+    </LinearLayout>
+
+</ScrollView><!-- From: file:/D:/Dropbox/Forca%20de%20Venda%20Movel/Codigo%20Fonte/SAVARE_Studio/app/src/main/res/layout/fragment_cliente_cadastro_dados_basico.xml -->

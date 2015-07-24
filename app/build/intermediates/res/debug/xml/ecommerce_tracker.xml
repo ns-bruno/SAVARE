@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <integer name="ga_sessionTimeout">60</integer>
+    <!--  The following value should be replaced with correct property id. -->
+    <string name="ga_trackingId">UA-60876416-1</string>
+</resources>
+<!-- From: file:/D:/Dropbox/Forca%20de%20Venda%20Movel/Codigo%20Fonte/SAVARE_Studio/app/src/main/res/xml/ecommerce_tracker.xml -->

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <item
+        android:id="@+id/menu_orcamento_plano_pagamento_fragment_salvar"
+        android:orderInCategory="100"
+        android:title="@string/salvar"
+        android:icon="@drawable/ic_action_save"
+        android:showAsAction="always">
+    </item>
+
+</menu>

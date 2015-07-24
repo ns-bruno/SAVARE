@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <!-- Search Widget -->
+    <item
+        android:id="@+id/menu_cliente_lista_pesquisa"
+        android:actionViewClass="android.widget.SearchView"
+        android:icon="@drawable/ic_action_search"
+        android:showAsAction="always"
+        android:title="@string/pesquisar"/>
+    
+    <item
+        android:id="@+id/menu_cliente_novo_cliente"
+        android:icon="@drawable/ic_action_new"
+        android:showAsAction="always"
+        android:title="@string/novo_cliente"/>
+
+</menu>

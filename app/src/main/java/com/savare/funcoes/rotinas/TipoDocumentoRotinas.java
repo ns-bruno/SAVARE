@@ -1,0 +1,72 @@
+package com.savare.funcoes.rotinas;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import android.content.ContentValues;
+import android.content.Context;
+import android.database.Cursor;
+
+import com.savare.banco.funcoesSql.PlanoPagamentoSql;
+import com.savare.banco.funcoesSql.TipoDocumentoSql;
+import com.savare.beans.PlanoPagamentoBeans;
+import com.savare.beans.TipoDocumentoBeans;
+import com.savare.funcoes.FuncoesPersonalizadas;
+import com.savare.funcoes.Rotinas;
+
+public class TipoDocumentoRotinas extends Rotinas {
+
+	public TipoDocumentoRotinas(Context context) {
+		super(context);
+	}
+	
+	
+	/**
+	 * Funcao para retornar todas os tipos de documentos cadastrado.
+	 * 
+	 * @param where
+	 * @return
+	 */
+	public List<TipoDocumentoBeans> listaTipoDocumento(String where){
+		List<TipoDocumentoBeans> listaTipoDocumento = null;
+		
+		// Instancia a classe de funcoes
+		FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
+		
+		if(where != null){
+			where = " (" + where + ") AND (ID_SMAEMPRE = " + funcoes.getValorXml("CodigoEmpresa") + ") ";
+		} else {
+			where = "(ID_SMAEMPRE = " + funcoes.getValorXml("CodigoEmpresa") + ") ";
+		}
+		
+		// Instancia a classe para manipular os dados do banco de dados
+		TipoDocumentoSql tipoDocumentoSql = new TipoDocumentoSql(context);
+		// Executa o sql e armazena os dados recuperados em um Cursor
+		Cursor cursor = tipoDocumentoSql.query(where, "DESCRICAO");
+		
+		// Instancia a classe para salvar os dados que foi recuperando no banco
+		listaTipoDocumento = new ArrayList<TipoDocumentoBeans>();
+		
+		if ( (cursor != null) && (cursor.getCount() > 0) ){
+			
+			while(cursor.moveToNext()){
+				// Pega os dados recuperado do banco de dados
+				TipoDocumentoBeans tipoDocumento = new TipoDocumentoBeans();
+				tipoDocumento.setIdTipoDocumento(cursor.getInt(cursor.getColumnIndex("ID_CFATPDOC")));
+				tipoDocumento.setCodigoTipoDocumento(cursor.getInt(cursor.getColumnIndex("CODIGO")));
+				tipoDocumento.setIdEmpresa(cursor.getInt(cursor.getColumnIndex("ID_SMAEMPRE")));
+				tipoDocumento.setDescricaoTipoDocumento(cursor.getString(cursor.getColumnIndex("DESCRICAO")));
+				tipoDocumento.setSiglaTipoDocumento(cursor.getString(cursor.getColumnIndex("SIGLA")));
+				tipoDocumento.setTipoVenda(cursor.getString(cursor.getColumnIndex("TIPO")).charAt(0));
+				
+				listaTipoDocumento.add(tipoDocumento);
+			}
+		}
+		// Retorna uma lista de documentos
+		return listaTipoDocumento;
+	}
+	
+	
+	
+
+} // Fim da classe

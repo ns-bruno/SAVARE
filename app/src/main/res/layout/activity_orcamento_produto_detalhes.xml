@@ -1,0 +1,311 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="5dp" >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" >
+
+        <TextView
+            android:id="@+id/activity_orcamento_produto_detalhes_text_descricao_produto"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/descricao"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" >
+
+            <TextView
+                android:id="@+id/activity_orcamento_produto_detalhes_text_ultimo_preco"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentTop="true"
+                android:text="@string/ultimo_preco"
+                android:textAppearance="?android:attr/textAppearanceSmall" />
+
+            <TextView
+                android:id="@+id/activity_orcamento_produto_detalhes_text_desconto_maximo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentTop="true"
+                android:text="@string/desconto_maximo"
+                android:textAppearance="?android:attr/textAppearanceSmall" />
+
+            <TextView
+                android:id="@+id/activity_orcamento_produto_detalhes_text_estoque"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_centerHorizontal="true"
+                android:text="@string/estoque" />
+        </RelativeLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+             >
+
+            <TextView
+                android:id="@+id/activity_orcamento_produto_detalhes_text_embalagem"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="right"
+                android:text="@string/embalagem"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textColor="@color/cinza_escuro" />
+
+            <TextView
+                android:id="@+id/activity_orcamento_produto_detalhes_text_quantidade"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="right"
+                android:text="@string/quantidade"
+                android:textColor="@color/cinza_escuro" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:background="@color/cinza_platina" >
+
+            <Spinner
+                android:id="@+id/activity_orcamento_produto_detalhes_spinner_embalagem"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1" />
+
+            <EditText
+                android:id="@+id/activity_orcamento_produto_detalhes_edit_quantidade"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:layout_weight="1"
+                android:digits="0123456789,"
+                android:ems="10"
+                android:gravity="right"
+                android:hint="@string/quantidade"
+                android:inputType="numberDecimal" >
+
+                <requestFocus />
+            </EditText>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal" >
+
+            <TextView
+                android:id="@+id/activity_orcamento_produto_detalhes_text_tabela_preco_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="right"
+                android:text="@string/tabela_preco"
+                android:textColor="@color/cinza_escuro" />
+
+            <TextView
+                android:id="@+id/activity_orcamento_produto_detalhes_text_valor_unitario_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1.5"
+                android:gravity="right"
+                android:text="@string/unitario_liquido"
+                android:textColor="@color/cinza_escuro" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:background="@color/cinza_platina" >
+
+            <Spinner
+                android:id="@+id/activity_orcamento_produto_detalhes_spinner_unitario_tabela"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right"
+                android:layout_weight="1"
+                android:gravity="right" />
+
+            <EditText
+                android:id="@+id/activity_orcamento_produto_detalhes_edit_unitario_liquido"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:layout_weight="1"
+                android:digits="0123456789,-"
+                android:ems="10"
+                android:gravity="right"
+                android:hint="@string/unitario_liquido"
+                android:inputType="numberDecimal|numberSigned" >
+            </EditText>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal" >
+
+            <TextView
+                android:id="@+id/activity_orcamento_produto_detalhes_text_estoque_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="right"
+                android:text="@string/estoque"
+                android:textColor="@color/cinza_escuro" />
+
+            <TextView
+                android:id="@+id/activity_orcamento_produto_detalhes_text_desconto_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1.5"
+                android:gravity="right"
+                android:text="@string/desconto_percentual"
+                android:textColor="@color/cinza_escuro" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:background="@color/cinza_platina" >
+
+            <Spinner
+                android:id="@+id/activity_orcamento_produto_detalhes_spinner_estoque"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right"
+                android:layout_weight="1"
+                android:gravity="right" />
+
+            <EditText
+                android:id="@+id/activity_orcamento_produto_detalhes_edit_desconto"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:layout_weight="1"
+                android:digits="0123456789,-"
+                android:ems="10"
+                android:gravity="right"
+                android:hint="@string/desconto"
+                android:inputType="numberDecimal|numberSigned" >
+            </EditText>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal" >
+
+            <TextView
+                android:id="@+id/activity_orcamento_produto_detalhes_text_valor_desconto_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="right"
+                android:text="@string/valor_desconto"
+                android:textColor="@color/cinza_escuro" />
+
+            <TextView
+                android:id="@+id/activity_orcamento_produto_detalhes_text_total_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1.5"
+                android:gravity="right"
+                android:text="@string/total_liquido"
+                android:textColor="@color/cinza_escuro" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:background="@color/cinza_platina" >
+
+            <EditText
+                android:id="@+id/activity_orcamento_produto_detalhes_edit_valor_desconto"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:digits="0123456789,-"
+                android:ems="10"
+                android:gravity="right"
+                android:hint="@string/valor_desconto"
+                android:inputType="numberDecimal|numberSigned" >
+            </EditText>
+
+            <EditText
+                android:id="@+id/activity_orcamento_produto_detalhes_edit_total"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:digits="0123456789,"
+                android:ems="10"
+                android:gravity="right"
+                android:hint="@string/total_liquido"
+                android:inputType="numberDecimal" >
+            </EditText>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="right"
+            android:orientation="vertical"
+            android:background="@color/cinza_platina" >
+
+            <EditText
+                android:id="@+id/activity_orcamento_produto_detalhes_edit_observacao"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:hint="@string/observacao"
+                android:inputType="textMultiLine"
+                android:lines="4"
+                android:scrollHorizontally="false" >
+            </EditText>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:orientation="horizontal" >
+
+                <TextView
+                    android:id="@+id/activity_orcamento_produto_detalhes_text_sequencial"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="left"
+                    android:text="@string/sequencial"
+                    android:textColor="@color/preto" />
+
+                <TextView
+                    android:id="@+id/activity_orcamento_produto_detalhes_text_codigo_unico"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="right"
+                    android:text="@string/codigo_unico"
+                    android:textColor="@color/preto" />
+            </LinearLayout>
+
+        </LinearLayout>
+    </LinearLayout>
+
+</ScrollView>

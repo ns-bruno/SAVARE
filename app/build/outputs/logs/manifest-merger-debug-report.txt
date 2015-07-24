@@ -1,0 +1,237 @@
+-- Merging decision tree log ---
+manifest
+ADDED from AndroidManifest.xml:1:1
+	package
+		ADDED from AndroidManifest.xml:2:5
+		INJECTED from AndroidManifest.xml:0:0
+		INJECTED from AndroidManifest.xml:0:0
+	android:versionName
+		ADDED from AndroidManifest.xml:4:5
+	android:versionCode
+		ADDED from AndroidManifest.xml:3:5
+		INJECTED from AndroidManifest.xml:0:0
+		INJECTED from AndroidManifest.xml:0:0
+	xmlns:android
+		ADDED from AndroidManifest.xml:1:11
+uses-sdk
+ADDED from AndroidManifest.xml:6:5
+MERGED from com.android.support:appcompat-v7:19.1.0:18:5
+	android:targetSdkVersion
+		ADDED from AndroidManifest.xml:8:9
+		INJECTED from AndroidManifest.xml:0:0
+		INJECTED from AndroidManifest.xml:0:0
+	android:minSdkVersion
+		ADDED from AndroidManifest.xml:7:9
+		INJECTED from AndroidManifest.xml:0:0
+		INJECTED from AndroidManifest.xml:0:0
+uses-permission#android.permission.WRITE_EXTERNAL_STORAGE
+ADDED from AndroidManifest.xml:10:5
+	android:name
+		ADDED from AndroidManifest.xml:10:22
+uses-permission#android.permission.READ_EXTERNAL_STORAGE
+ADDED from AndroidManifest.xml:11:5
+	android:name
+		ADDED from AndroidManifest.xml:11:22
+uses-permission#android.permission.INTERNET
+ADDED from AndroidManifest.xml:12:5
+	android:name
+		ADDED from AndroidManifest.xml:12:22
+uses-permission#android.permission.ACCESS_NETWORK_STATE
+ADDED from AndroidManifest.xml:13:5
+	android:name
+		ADDED from AndroidManifest.xml:13:22
+uses-permission#android.permission.READ_PHONE_STATE
+ADDED from AndroidManifest.xml:14:5
+	android:name
+		ADDED from AndroidManifest.xml:14:22
+uses-permission#android.permission.RECEIVE_BOOT_COMPLETED
+ADDED from AndroidManifest.xml:15:5
+	android:name
+		ADDED from AndroidManifest.xml:15:22
+permission#android.permission.WRITE_EXTERNAL_STORAGE
+ADDED from AndroidManifest.xml:16:5
+	android:name
+		ADDED from AndroidManifest.xml:16:17
+uses-permission#android.permission.ACCESS_FINE_LOCATION
+ADDED from AndroidManifest.xml:17:5
+	android:name
+		ADDED from AndroidManifest.xml:17:22
+uses-permission#android.permission.ACCESS_COARSE_LOCATION
+ADDED from AndroidManifest.xml:18:5
+	android:name
+		ADDED from AndroidManifest.xml:18:22
+application
+ADDED from AndroidManifest.xml:20:2
+MERGED from com.android.support:appcompat-v7:19.1.0:19:5
+	android:label
+		ADDED from AndroidManifest.xml:23:9
+	android:allowBackup
+		ADDED from AndroidManifest.xml:21:9
+	android:icon
+		ADDED from AndroidManifest.xml:22:9
+	android:theme
+		ADDED from AndroidManifest.xml:24:9
+meta-data#com.google.android.gms.analytics.globalConfigResource
+ADDED from AndroidManifest.xml:27:2
+	android:resource
+		ADDED from AndroidManifest.xml:27:82
+	android:name
+		ADDED from AndroidManifest.xml:27:13
+activity#com.savare.activity.LoginActivity
+ADDED from AndroidManifest.xml:29:9
+	android:label
+		ADDED from AndroidManifest.xml:30:13
+	android:name
+		ADDED from AndroidManifest.xml:29:19
+intent-filter#android.intent.action.MAIN+android.intent.category.LAUNCHER
+ADDED from AndroidManifest.xml:31:13
+action#android.intent.action.MAIN
+ADDED from AndroidManifest.xml:32:17
+	android:name
+		ADDED from AndroidManifest.xml:32:25
+category#android.intent.category.LAUNCHER
+ADDED from AndroidManifest.xml:33:17
+	android:name
+		ADDED from AndroidManifest.xml:33:27
+activity#com.savare.activity.CadastroUsuarioActivity
+ADDED from AndroidManifest.xml:37:9
+	android:name
+		ADDED from AndroidManifest.xml:37:19
+activity#com.savare.activity.InicioActivity
+ADDED from AndroidManifest.xml:39:9
+	android:name
+		ADDED from AndroidManifest.xml:39:19
+activity#com.savare.activity.ClienteListaActivity
+ADDED from AndroidManifest.xml:41:9
+	android:name
+		ADDED from AndroidManifest.xml:41:19
+intent-filter#android.intent.action.SEARCH
+ADDED from AndroidManifest.xml:42:13
+action#android.intent.action.SEARCH
+ADDED from AndroidManifest.xml:43:17
+	android:name
+		ADDED from AndroidManifest.xml:43:25
+meta-data#android.app.searchable
+ADDED from AndroidManifest.xml:46:13
+	android:resource
+		ADDED from AndroidManifest.xml:48:17
+	android:name
+		ADDED from AndroidManifest.xml:47:17
+activity#com.savare.activity.ClienteDetalhesActivity
+ADDED from AndroidManifest.xml:51:9
+	android:name
+		ADDED from AndroidManifest.xml:51:19
+activity#com.savare.activity.OrcamentoActivity
+ADDED from AndroidManifest.xml:55:9
+	android:uiOptions
+		ADDED from AndroidManifest.xml:56:16
+	android:name
+		ADDED from AndroidManifest.xml:55:19
+meta-data#android.support.UI_OPTIONS
+ADDED from AndroidManifest.xml:64:10
+	android:value
+		ADDED from AndroidManifest.xml:66:17
+	android:name
+		ADDED from AndroidManifest.xml:65:14
+activity#com.savare.activity.ProdutoListaActivity
+ADDED from AndroidManifest.xml:69:9
+	android:name
+		ADDED from AndroidManifest.xml:69:19
+activity#com.savare.activity.OrcamentoProdutoDetalhesActivity
+ADDED from AndroidManifest.xml:71:9
+	android:name
+		ADDED from AndroidManifest.xml:71:19
+activity#com.savare.activity.OrcamentoPlanoPagamentoActivity
+ADDED from AndroidManifest.xml:72:9
+	android:name
+		ADDED from AndroidManifest.xml:72:19
+activity#com.savare.activity.ListaOrcamentoPedidoActivity
+ADDED from AndroidManifest.xml:73:9
+	android:name
+		ADDED from AndroidManifest.xml:73:19
+activity#com.savare.activity.ListaTitulosActivity
+ADDED from AndroidManifest.xml:74:9
+	android:name
+		ADDED from AndroidManifest.xml:74:19
+activity#com.savare.activity.SincronizacaoActivity
+ADDED from AndroidManifest.xml:75:9
+	android:name
+		ADDED from AndroidManifest.xml:75:19
+activity#com.savare.activity.ConfiguracoesActivity
+ADDED from AndroidManifest.xml:76:9
+	android:name
+		ADDED from AndroidManifest.xml:76:19
+receiver#com.savare.funcoes.rotinas.receptor.ReceptorAlarmeEnviarOrcamentoBroadcastRotinas
+ADDED from AndroidManifest.xml:76:77
+	android:label
+		ADDED from AndroidManifest.xml:76:184
+	android:name
+		ADDED from AndroidManifest.xml:76:87
+intent-filter#ENVIAR_ORCAMENTO_SAVARE+android.intent.category.DEFAULT
+ADDED from AndroidManifest.xml:77:13
+action#ENVIAR_ORCAMENTO_SAVARE
+ADDED from AndroidManifest.xml:78:17
+	android:name
+		ADDED from AndroidManifest.xml:78:25
+category#android.intent.category.DEFAULT
+ADDED from AndroidManifest.xml:79:17
+	android:name
+		ADDED from AndroidManifest.xml:79:27
+receiver#com.savare.funcoes.rotinas.receptor.ReceptorNotificarAparelhoRotinas
+ADDED from AndroidManifest.xml:82:9
+	android:label
+		ADDED from AndroidManifest.xml:82:19
+	android:name
+		ADDED from AndroidManifest.xml:82:68
+intent-filter#NOTIFICACAO_SAVARE+android.intent.category.DEFAULT
+ADDED from AndroidManifest.xml:83:13
+action#NOTIFICACAO_SAVARE
+ADDED from AndroidManifest.xml:85:17
+	android:name
+		ADDED from AndroidManifest.xml:85:25
+receiver#com.savare.funcoes.rotinas.receptor.ReceptorCriarAlarmeRebootRotinas
+ADDED from AndroidManifest.xml:88:9
+	android:label
+		ADDED from AndroidManifest.xml:88:19
+	android:name
+		ADDED from AndroidManifest.xml:88:68
+intent-filter#android.intent.action.BOOT_COMPLETED+android.intent.action.REBOOT+android.intent.category.DEFAULT
+ADDED from AndroidManifest.xml:89:13
+action#android.intent.action.BOOT_COMPLETED
+ADDED from AndroidManifest.xml:90:17
+	android:name
+		ADDED from AndroidManifest.xml:90:25
+action#android.intent.action.REBOOT
+ADDED from AndroidManifest.xml:92:17
+	android:name
+		ADDED from AndroidManifest.xml:92:25
+receiver#com.savare.funcoes.rotinas.receptor.ReceptorAlarmeReceberDadosBroadcastRotinas
+ADDED from AndroidManifest.xml:95:9
+	android:label
+		ADDED from AndroidManifest.xml:95:19
+	android:name
+		ADDED from AndroidManifest.xml:95:78
+intent-filter#RECEBER_DADOS_SAVARE+android.intent.category.DEFAULT
+ADDED from AndroidManifest.xml:96:13
+action#RECEBER_DADOS_SAVARE
+ADDED from AndroidManifest.xml:98:17
+	android:name
+		ADDED from AndroidManifest.xml:98:25
+activity#com.savare.activity.fragment.OrcamentoTabulacaoFragment
+ADDED from AndroidManifest.xml:101:9
+	android:uiOptions
+		ADDED from AndroidManifest.xml:102:13
+	android:name
+		ADDED from AndroidManifest.xml:101:19
+activity#com.savare.activity.ProdutoDetalhesActivity
+ADDED from AndroidManifest.xml:104:9
+	android:name
+		ADDED from AndroidManifest.xml:104:19
+activity#com.savare.activity.LogActivity
+ADDED from AndroidManifest.xml:105:9
+	android:name
+		ADDED from AndroidManifest.xml:105:19
+activity#com.savare.activity.fragment.ClienteCadastroFragment
+ADDED from AndroidManifest.xml:106:9
+	android:name
+		ADDED from AndroidManifest.xml:106:19

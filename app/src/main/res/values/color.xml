@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    
+    <item name="azul" type="color">#FF33B5E5</item>
+    <item name="azul_medio_500" type="color">#03A9F4</item>
+    <item name="azul_medio_200" type="color">#81D4FA</item>
+    <item name="rosa" type="color">#FFAA66CC</item>
+    <item name="verde" type="color">#FF99CC00</item>
+    <item name="laranja" type="color">#FFFFBB33</item>
+    <item name="vermelho" type="color">#FFFF4444</item>
+    <item name="azul_escuro" type="color">#FF0099CC</item>
+    <item name="rosa_escuro" type="color">#FF9933CC</item>
+    <item name="verde_escuro" type="color">#669900</item>
+    <item name="verde_escuro_900" type="color">#1B5E20</item>
+    <item name="laranja_escuro" type="color">#FFFF8800</item>
+    <item name="vermelho_escuro" type="color">#FFCC0000</item>
+    <item name="branco" type="color">#FFFFFF</item>
+    <item name="amarelo" type="color">#FF8800</item>
+    <item name="cinza_platina" type="color">#d6d6d6</item>
+    <item name="cinza_escuro" type="color">#727272</item>
+    <item name="lilas_escuro" type="color">#9933CC</item>
+    <item name="lilas" type="color">#AA66CC</item>
+    <item name="preto" type="color">#000000</item>
+
+    <item name="colorPrimary" type="color">#3F51B5</item>
+    <item name="colorPrimaryDark" type="color">#303F9F</item>
+    <item name="colorAccent" type="color">#03A9F4</item>
+
+
+    
+</resources>

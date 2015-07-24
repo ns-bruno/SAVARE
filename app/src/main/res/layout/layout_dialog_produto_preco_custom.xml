@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="5dp" >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal" >
+
+        <TextView
+            android:id="@+id/layout_dialog_produto_preco_custom_text_unitario_tabela"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right"
+            android:text="@string/unitario"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
+
+        <TextView
+            android:id="@+id/layout_dialog_produto_preco_custom_text_embalagem"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left"
+            android:layout_marginLeft="5dp"
+            android:text="@string/unidade"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+
+        <TextView
+            android:id="@+id/layout_dialog_produto_preco_custom_text_quantidade"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:ems="10"
+            android:gravity="right"
+            android:hint="@string/quantidade"
+            android:textAppearance="?android:attr/textAppearanceLarge" >
+
+        </TextView>
+
+        <View
+            android:id="@+id/view1"
+            android:layout_width="5dp"
+            android:layout_height="match_parent"
+            android:background="@color/azul_escuro" />
+
+        <EditText
+            android:id="@+id/layout_dialog_produto_preco_custom_edit_unitario_Liquido_venda"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="right"
+            android:layout_weight="1"
+            android:ems="10"
+            android:hint="@string/unitario"
+            android:inputType="number" >
+
+        </EditText>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+
+        <EditText
+            android:id="@+id/layout_dialog_produto_preco_custom_edit_total"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:hint="@string/total"
+            android:inputType="number"
+            android:gravity="right" />
+    </LinearLayout>
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:gravity="center_horizontal" >
+
+        <Button
+            android:id="@+id/layout_dialog_produto_preco_custom_button_sete"
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:text="7" />
+
+        <Button
+            android:id="@+id/layout_dialog_produto_preco_custom_button_oito"
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_toRightOf="@+id/layout_dialog_produto_preco_custom_button_sete"
+            android:text="8" />
+
+        <Button
+            android:id="@+id/layout_dialog_produto_preco_custom_button_nove"
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_toRightOf="@+id/layout_dialog_produto_preco_custom_button_oito"
+            android:text="9" />
+
+        <Button
+            android:id="@+id/layout_dialog_produto_preco_custom_button_clean"
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_toRightOf="@+id/layout_dialog_produto_preco_custom_button_nove"
+            android:text="C" />
+
+        <Button
+            android:id="@+id/layout_dialog_produto_preco_custom_button_quatro"
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_below="@+id/layout_dialog_produto_preco_custom_button_sete"
+            android:text="4" />
+
+        <Button
+            android:id="@+id/layout_dialog_produto_preco_custom_button_cinco"
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@+id/layout_dialog_produto_preco_custom_button_quatro"
+            android:layout_toRightOf="@+id/layout_dialog_produto_preco_custom_button_quatro"
+            android:text="5" />
+
+        <Button
+            android:id="@+id/layout_dialog_produto_preco_custom_button_seis"
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/layout_dialog_produto_preco_custom_button_nove"
+            android:layout_alignTop="@+id/layout_dialog_produto_preco_custom_button_cinco"
+            android:text="6" />
+
+        <Button
+            android:id="@+id/layout_dialog_produto_preco_custom_button_backspace"
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/layout_dialog_produto_preco_custom_button_clean"
+            android:layout_alignTop="@+id/layout_dialog_produto_preco_custom_button_seis"
+            android:text=" ← " />
+
+        <Button
+            android:id="@+id/layout_dialog_produto_preco_custom_button_um"
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_below="@+id/layout_dialog_produto_preco_custom_button_quatro"
+            android:text="1" />
+
+        <Button
+            android:id="@+id/layout_dialog_produto_preco_custom_button_dois"
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/layout_dialog_produto_preco_custom_button_cinco"
+            android:layout_alignTop="@+id/layout_dialog_produto_preco_custom_button_um"
+            android:text="2" />
+
+        <Button
+            android:id="@+id/layout_dialog_produto_preco_custom_button_tres"
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@+id/layout_dialog_produto_preco_custom_button_dois"
+            android:layout_alignBottom="@+id/layout_dialog_produto_preco_custom_button_dois"
+            android:layout_alignLeft="@+id/layout_dialog_produto_preco_custom_button_seis"
+            android:text="3" />
+
+        <Button
+            android:id="@+id/layout_dialog_produto_preco_custom_button_zero"
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignRight="@+id/layout_dialog_produto_preco_custom_button_dois"
+            android:layout_below="@+id/layout_dialog_produto_preco_custom_button_um"
+            android:text="0" />
+
+        <Button
+            android:id="@+id/layout_dialog_produto_preco_custom_button_virgula"
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@+id/layout_dialog_produto_preco_custom_button_zero"
+            android:layout_alignBottom="@+id/layout_dialog_produto_preco_custom_button_zero"
+            android:layout_alignLeft="@+id/layout_dialog_produto_preco_custom_button_tres"
+            android:text="," />
+
+        <Button
+            android:id="@+id/layout_dialog_produto_preco_custom_button_ok"
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@+id/layout_dialog_produto_preco_custom_button_virgula"
+            android:layout_alignLeft="@+id/layout_dialog_produto_preco_custom_button_backspace"
+            android:layout_alignRight="@+id/layout_dialog_produto_preco_custom_button_backspace"
+            android:layout_alignTop="@+id/layout_dialog_produto_preco_custom_button_tres"
+            android:text="Ok" />
+
+    </RelativeLayout>
+
+</LinearLayout>

@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+     <!-- Search Widget -->
+    <item
+        android:id="@+id/menu_orcamento_fragment_pesquisa"
+        android:actionViewClass="android.widget.SearchView"
+        android:icon="@drawable/ic_action_search"
+        android:showAsAction="always"
+        android:title="@string/pesquisar"/>
+    
+    <item
+        android:id="@+id/menu_orcamento_fragment_adicionar"
+        android:orderInCategory="1"
+        android:title="@string/adicionar_produto"
+        android:icon="@drawable/ic_action_new"
+        android:showAsAction="always">
+    </item>
+    
+    <item
+        android:id="@+id/menu_orcamento_fragment_atualizar"
+        android:orderInCategory="2"
+        android:title="@string/atualizar"
+        android:icon="@drawable/ic_action_refresh"
+        android:showAsAction="always">
+    </item>
+    
+    <item
+        android:id="@+id/menu_orcamento_fragment_observacao"
+        android:orderInCategory="3"
+        android:title="@string/observacao"
+        android:icon="@drawable/ic_action_view_as_list"
+        android:showAsAction="always">
+    </item>
+    
+    <item
+        android:id="@+id/menu_orcamento_fragment_salvar"
+        android:orderInCategory="4"
+        android:title="@string/salvar"
+        android:icon="@drawable/ic_action_save"
+        android:showAsAction="always">
+    </item>
+
+    
+    
+    <item
+        android:id="@+id/menu_orcamento_fragment_rateio_preco"
+        android:orderInCategory="101"
+        android:title="@string/rateio_preco"
+        android:showAsAction="never">
+    </item>
+    
+    <item
+        android:id="@+id/menu_orcamento_fragment_enviar_email"
+        android:orderInCategory="103"
+        android:title="@string/enviar_email"
+        android:showAsAction="never">
+    </item>
+    
+    
+    <item
+        android:id="@+id/menu_orcamento_fragment_transformar_pedido"
+        android:orderInCategory="104"
+        android:title="@string/transformar_pedido"
+        android:showAsAction="never">
+    </item>
+    
+    <item
+        android:id="@+id/menu_orcamento_fragment_trocar_cliente"
+        android:orderInCategory="105"
+        android:title="@string/trocar_cliente"
+        android:showAsAction="never">
+    </item>
+    
+    <item
+        android:id="@+id/menu_orcamento_fragment_visualizar_logs"
+        android:orderInCategory="999"
+        android:title="@string/visualizar_logs"
+        android:showAsAction="never">
+    </item>
+    
+</menu>

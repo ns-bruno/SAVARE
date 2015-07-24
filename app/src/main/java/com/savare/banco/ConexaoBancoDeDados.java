@@ -1,0 +1,245 @@
+package com.savare.banco;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+
+import android.content.ContentValues;
+import android.content.Context;
+import android.content.pm.PackageManager;
+import android.database.SQLException;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
+import android.os.Environment;
+
+import com.itextpdf.text.log.Logger;
+import com.itextpdf.text.log.LoggerFactory;
+import com.savare.funcoes.FuncoesPersonalizadas;
+
+public class ConexaoBancoDeDados extends SQLiteOpenHelper {
+
+	private Context context;
+
+	private static String[] SQL_TABELAS = {
+			"CREATE TABLE IF NOT EXISTS USUARIO_USUA (ID_USUA INTEGER NOT NULL, DATA_ALTERACAO_USUA DATETIME, CHAVE_USUA VARCHAR( 254 ), NOME_USUA VARCHAR( 200 ), LOGIN_USUA VARCHAR( 50 ) NOT NULL, SENHA_USUA VARCHAR( 45 ) NOT NULL, EMAIL_USUA VARCHAR NOT NULL, EMPRESA_USUA VARCHAR, VENDE_ATACADO_USUA BOOLEAN DEFAULT '1', VENDE_VAREJO_USUA BOOLEAN DEFAULT '0', ATIVO_USUA BOOLEAN, IP_SERVIDOR_USUA VARCHAR, USUARIO_SERVIDOR_USUA VARCHAR, SENHA_SERVIDOR_USUA VARCHAR); ",
+			"CREATE TABLE IF NOT EXISTS CFACIDAD (ID_CFACIDAD INTEGER NOT NULL, ID_CFAESTAD INTEGER, DT_ALT DMDATETIME, DESCRICAO VARCHAR( 40 ), CEP CHAR( 9 ), DDD INTEGER, COD_IBGE INTEGER ); ",
+			"CREATE TABLE IF NOT EXISTS CFAESTAD (ID_CFAESTAD INTEGER UNIQUE, DT_ALT DATETIME, ID_CFAPAISE  INTEGER, UF CHAR( 2 ), DESCRICAO VARCHAR( 40 ), DDD INTEGER, ICMS_ENT DOUBLE PRECISION NOT NULL DEFAULT '0',  ICMS_SAI DOUBLE PRECISION NOT NULL DEFAULT '0', TIPO_IPI_ENT CHAR( 1 ), TIPO_IPI_SAI CHAR( 1 ), IPI_ENT DOUBLE PRECISION NOT NULL DEFAULT '0', IPI_SAI DOUBLE PRECISION NOT NULL DEFAULT '0', COD_IBGE INTEGER); ",
+			"CREATE TABLE IF NOT EXISTS SMAEMPRE (ID_SMAEMPRE INTEGER NOT NULL, DT_ALT DATETIME, NOME_RAZAO VARCHAR( 60 ), NOME_FANTASIA VARCHAR( 60 ), CPF_CGC VARCHAR( 18 )); ",
+			"CREATE TABLE IF NOT EXISTS CFAENDER (ID_CFAENDER INTEGER NOT NULL UNIQUE, ID_CFAESTAD INTEGER, ID_CFACIDAD INTEGER, ID_SMAEMPRE INTEGER, ID_CFACLIFO INTEGER, DT_ALT DATETIME, TIPO CHAR( 1 ) NOT NULL, CEP CHAR( 9 ), BAIRRO VARCHAR( 60 ), LOGRADOURO VARCHAR( 60 ), NUMERO CHAR( 6 ), COMPLEMENTO TEXT, EMAIL VARCHAR( 128 ), LETRA_CX_POSTAL CHAR( 1 ), CAIXA_POSTAL INTEGER); ",
+			"CREATE TABLE IF NOT EXISTS CFAPARAM (ID_CFAPARAM INTEGER NOT NULL, ID_CFACLIFO INTEGER, ID_SMAEMPRE INTEGER, ID_CFACLIFO_VENDE INTEGER, ID_CFAMOEDA INTEGER, ID_CFATPCOB INTEGER, ID_CFAPORTA INTEGER, ID_CFATPDOC INTEGER, ID_AEAPLPGT INTEGER, DT_ALT DATETIME, VENDE_ATRAZADO CHAR( 1 ), DEBITO_EM_CONTA CHAR( 1 ), LIMITE REAL, DESC_ATAC_VISTA REAL DEFAULT 0 NOT NULL, DESC_ATAC_PRAZO REAL DEFAULT 0 NOT NULL, DESC_VARE_VISTA REAL DEFAULT 0 NOT NULL, DESC_VARE_PRAZO REAL DEFAULT 0 NOT NULL, DESC_SERV_VISTA REAL DEFAULT 0 NOT NULL, DESC_SERV_PRAZO REAL DEFAULT 0 NOT NULL, DESC_PROMOCAO CHAR( 1 ), DIA_VENCTO1 INTEGER DEFAULT 0 NOT NULL, DIA_VENCTO2 INTEGER DEFAULT 0 NOT NULL, DIA_VENCTO3 INTEGER DEFAULT 0 NOT NULL, DIA_VENCTO4 INTEGER DEFAULT 0 NOT NULL, DIA_VENCTO_SEMANA1 INTEGER DEFAULT -1,  DIA_VENCTO_SEMANA2 INTEGER DEFAULT -1, ROTEIRO INTEGER DEFAULT -1, FREQUENCIA INTEGER DEFAULT -1, DT_ULT_COMPRA DATETIME, DT_ULT_VISITA DATETIME, DT_ULT_ENVIO DATETIME, DT_ULT_RECEBTO DATETIME,  DT_PROXIMO_CONTATO DATETIME, PERC_REDUC_FAT_ATAC REAL DEFAULT 0 NOT NULL, PERC_REDUC_FAT_VARE REAL DEFAULT 0 NOT NULL, DIAS_ATRAZO INTEGER DEFAULT 0 NOT NULL, DIAS_CARENCIA INTEGER DEFAULT 0 NOT NULL, JUROS_DIARIO REAL DEFAULT 0 NOT NULL, ATACADO_VAREJO CHAR( 1 ), VISTA_PRAZO CHAR( 1 ), FATURA_VL_MIN CHAR( 1 ), PARCELA_EM_ABERTO CHAR( 1 )); ",
+			"CREATE TABLE IF NOT EXISTS CFACLIFO (ID_CFACLIFO INTEGER NOT NULL, ID_CFAPROFI INTEGER, ID_CFATPFOR INTEGER, ID_CFAATIVI INTEGER, ID_CFAAREAS INTEGER, ID_CFATPCLI INTEGER, ID_CFASTATU INTEGER, ID_CFACCRED INTEGER, ID_SMAEMPRE INTEGER, ID_SMADEPTO INTEGER, DT_ALT DATETIME, CPF_CGC VARCHAR( 18 ), IE_RG VARCHAR( 18 ), NOME_RAZAO VARCHAR( 60 ), NOME_FANTASIA VARCHAR( 60 ), DT_NASCIMENTO DATETIME, CODIGO_CLI INTEGER, CODIGO_FOR INTEGER, CODIGO_FUN INTEGER, CODIGO_USU INTEGER, CODIGO_REP INTEGER, CODIGO_CON INTEGER, CODIGO_TRA INTEGER, CLIENTE CHAR( 1 ), FORNECEDOR CHAR( 1 ), FUNCIONARIO CHAR( 1 ), USUARIO CHAR( 1 ), REPRESENTANTE CHAR( 1 ), CONCORRENTE CHAR( 1 ), TRANSPORTADORA CHAR( 1 ), SEXO CHAR( 1 ), INSC_JUNTA VARCHAR( 18 ), INSC_SUFRAMA VARCHAR( 18 ), INSC_MUNICIPAL VARCHAR( 18 ),  INSC_PRODUTOR VARCHAR( 18 ), RENDA_MES_GIRO REAL NOT NULL DEFAULT '0', CAPITAL_SOCIAL REAL NOT NULL DEFAULT '0', EST_MERCADORIAS REAL NOT NULL DEFAULT '0', EST_MAT_PRIMA REAL NOT NULL DEFAULT '0',  MOVTO_VENDAS REAL NOT NULL DEFAULT '0', DESPESAS REAL NOT NULL DEFAULT '0', EMPRESA_TRAB VARCHAR( 60 ), OBS TEXT, PESSOA CHAR( 1 ), CIVIL CHAR( 1 ), CONJUGE VARCHAR( 60 ), CPF_CONJUGE VARCHAR( 18 ), DT_NASC_CONJ DATETIME, QTDE_FUNCIONARIOS INTEGER NOT NULL DEFAULT '0', OUTRAS_RENDAS REAL NOT NULL DEFAULT '0', NUM_DEP_MAIOR INTEGER NOT NULL DEFAULT '0', NUM_DEP_MENOR INTEGER NOT NULL DEFAULT '0', COMPLEMENTO_CARGO_CONJ TEXT, RG_CONJUGE VARCHAR( 18 ), ORGAO_EMISSOR_CONJ CHAR( 3 ), LIMITE_CONJUGE REAL NOT NULL DEFAULT '0', EMPRESA_CONJUGE VARCHAR( 60 ), ADMISSAO_CONJUGE DATETIME, RENDA_CONJUGE REAL NOT NULL DEFAULT '0', ATIVO CHAR( 1 ) NOT NULL DEFAULT '1', ENVIAR_EXTRATO CHAR( 1 ), TIPO_EXTRATO CHAR( 1 ), CONJ_PODE_COMPRAR CHAR( 1 ), DT_ULT_COMPRA DATETIME, DT_RENOVACAO DATETIME); ",
+			"CREATE TABLE IF NOT EXISTS CFAPROFI (ID_CFAPROFI INTEGER NOT NULL, DT_ALT DATETIME, CODIGO INTEGER NOT NULL, DESCRICAO VARCHAR(40) NOT NULL, CBO INTEGER, DESC_ATAC_VISTA  REAL DEFAULT 0 NOT NULL, DESC_ATAC_PRAZO REAL DEFAULT 0 NOT NULL, DESC_VARE_VISTA  REAL DEFAULT 0 NOT NULL, DESC_VARE_PRAZO  REAL DEFAULT 0 NOT NULL, DESC_SERV_VISTA  REAL DEFAULT 0 NOT NULL, DESC_SERV_PRAZO  REAL DEFAULT 0 NOT NULL,  DESC_PROMOCAO CHAR(1)); ",
+			"CREATE TABLE IF NOT EXISTS CFATPFOR (ID_CFATPFOR INTEGER NOT NULL, DT_ALT DATETIME, CODIGO INTEGER NOT NULL, DESCRICAO VARCHAR(40) NOT NULL); ",
+			"CREATE TABLE IF NOT EXISTS CFAATIVI (ID_CFAATIVI INTEGER NOT NULL, DT_ALT DATETIME, CODIGO INTEGER NOT NULL, DESCRICAO VARCHAR(40) NOT NULL, DESC_ATAC_VISTA DOUBLE PRECISION DEFAULT 0 NOT NULL, DESC_ATAC_PRAZO DOUBLE PRECISION DEFAULT 0 NOT NULL, DESC_VARE_VISTA DOUBLE PRECISION DEFAULT 0 NOT NULL, DESC_VARE_PRAZO  DOUBLE PRECISION DEFAULT 0 NOT NULL, DESC_SERV_VISTA  DOUBLE PRECISION DEFAULT 0 NOT NULL, DESC_SERV_PRAZO DOUBLE PRECISION DEFAULT 0 NOT NULL, DESC_PROMOCAO CHAR(1), IND_ATIV CHAR(1)); ",
+			"CREATE TABLE IF NOT EXISTS CFAAREAS (ID_CFAAREAS INTEGER NOT NULL, DT_ALT DATETIME, CODIGO INTEGER NOT NULL, DESCRICAO VARCHAR(40) NOT NULL, DESC_ATAC_VISTA REAL DEFAULT 0 NOT NULL, DESC_ATAC_PRAZO REAL DEFAULT 0 NOT NULL, DESC_VARE_VISTA REAL DEFAULT 0 NOT NULL, DESC_VARE_PRAZO REAL DEFAULT 0 NOT NULL, DESC_SERV_VISTA REAL DEFAULT 0 NOT NULL, DESC_SERV_PRAZO REAL DEFAULT 0 NOT NULL, DESC_PROMOCAO CHAR(1), PERC_REDUC_FAT_ATAC REAL DEFAULT 0 NOT NULL, PERC_REDUC_FAT_VARE REAL DEFAULT 0 NOT NULL); ",
+			"CREATE TABLE IF NOT EXISTS CFATPCLI (ID_CFATPCLI INTEGER NOT NULL, DT_ALT DATETIME, CODIGO INTEGER NOT NULL, DESCRICAO VARCHAR(40) NOT NULL, DESC_ATAC_VISTA REAL DEFAULT 0 NOT NULL, DESC_ATAC_PRAZO REAL DEFAULT 0 NOT NULL, DESC_VARE_VISTA REAL DEFAULT 0 NOT NULL, DESC_VARE_PRAZO REAL DEFAULT 0 NOT NULL, DESC_SERV_VISTA REAL DEFAULT 0 NOT NULL, DESC_SERV_PRAZO REAL DEFAULT 0 NOT NULL, DESC_PROMOCAO CHAR(1), VENDE_ATAC_VAREJO CHAR(1)); ",
+			"CREATE TABLE IF NOT EXISTS CFASTATU (ID_CFASTATU INTEGER NOT NULL, DT_ALT DATETIME, CODIGO INTEGER NOT NULL, DESCRICAO VARCHAR(40), MENSAGEM TEXT, BLOQUEIA CHAR(1), DESC_ATAC_VISTA REAL DEFAULT 0 NOT NULL, DESC_ATAC_PRAZO REAL DEFAULT 0 NOT NULL, DESC_VARE_VISTA REAL DEFAULT 0 NOT NULL, DESC_VARE_PRAZO REAL DEFAULT 0 NOT NULL, DESC_SERV_VISTA REAL DEFAULT 0 NOT NULL, DESC_SERV_PRAZO REAL DEFAULT 0 NOT NULL, DESC_PROMOCAO CHAR(1), PARCELA_EM_ABERTO  CHAR(1), VISTA_PRAZO CHAR(1)); ",
+			"CREATE TABLE IF NOT EXISTS CFACCRED (ID_CFACCRED INTEGER NOT NULL, DT_ALT DATETIME, CODIGO INTEGER NOT NULL, DESCRICAO VARCHAR(40) NOT NULL); ",
+			"CREATE TABLE IF NOT EXISTS CFATPDOC (ID_CFATPDOC INTEGER NOT NULL, ID_SMAEMPRE INTEGER NOT NULL, GUID VARCHAR(16) NOT NULL, DT_ALT DATETIME, CODIGO INTEGER NOT NULL, DESCRICAO VARCHAR(40), SIGLA VARCHAR(18), TIPO CHAR(1));",
+
+			"CREATE INDEX IF NOT EXISTS  INDEX_CFAENDER_ID_CFAESTAD ON CFAENDER (ID_CFAESTAD); ",
+			"CREATE INDEX IF NOT EXISTS  INDEX_CFAENDER_ID_CFACIDAD ON CFAENDER (ID_CFACIDAD); ",
+			"CREATE INDEX IF NOT EXISTS  INDEX_CFAENDER_ID_SMAEMPRE ON CFAENDER (ID_SMAEMPRE); ",
+			"CREATE INDEX IF NOT EXISTS  INDEX_CFAENDER_ID_CFACLIFO ON CFAENDER (ID_CFACLIFO); ",
+			"CREATE INDEX IF NOT EXISTS  INDEX_CFAENDER_ID_CFAENDER ON CFAENDER (ID_CFAENDER); ",
+			"CREATE INDEX IF NOT EXISTS  INDEX_CFACIDAD_DESCRICAO ON CFACIDAD (DESCRICAO); ",
+			"CREATE INDEX IF NOT EXISTS  INDEX_CFAESTAD_ID_CFAESTAD ON CFAESTAD (ID_CFAESTAD); ",
+			"CREATE INDEX IF NOT EXISTS  INDEX_SMAEMPRE_ID_SMAEMPRE ON SMAEMPRE (ID_SMAEMPRE); ",
+			"CREATE INDEX IF NOT EXISTS  INDEX_USUARIO_USUA_LOGIN_USUA ON USUARIO_USUA (LOGIN_USUA); ",
+			"CREATE INDEX IF NOT EXISTS  INDEX_CFACLIFO_ID_CFACLIFO ON CFACLIFO (ID_CFACLIFO); ",
+			"CREATE INDEX IF NOT EXISTS  INDEX_CFACLIFO_NOME_RAZAO ON CFACLIFO (NOME_RAZAO); ",
+			"CREATE INDEX IF NOT EXISTS  INDEX_CFACLIFO_NOME_FANTASIA ON CFACLIFO (NOME_FANTASIA); ",
+			"CREATE INDEX IF NOT EXISTS  INDEX_CFACLIFO_CODIGO_CLI_DESC ON CFACLIFO (CODIGO_CLI DESC); ",
+			"CREATE INDEX IF NOT EXISTS  INDEX_CFACLIFO_CODIGO_CLI_ASC ON CFACLIFO (CODIGO_CLI ASC); ",
+			"CREATE INDEX IF NOT EXISTS  INDEX_CFACLIFO_CODIGO_TRA_ASC ON CFACLIFO (CODIGO_TRA ASC); ",
+			"CREATE INDEX IF NOT EXISTS  INDEX_CFACLIFO_CODIGO_TRA_DESC ON CFACLIFO (CODIGO_TRA DESC); ",
+			"CREATE INDEX IF NOT EXISTS  INDEX_CFACLIFO_CONJUGUE ON CFACLIFO (CONJUGE); ",
+			"CREATE INDEX IF NOT EXISTS  INDEX_CFAPARAM_ID_CFAPARAM ON CFAPARAM (ID_CFAPARAM); ",
+			"CREATE INDEX IF NOT EXISTS  INDEX_CFAPARAM_ID_CFACLIFO_ID_SMAEMPRE ON CFAPARAM (ID_CFACLIFO ASC, ID_SMAEMPRE ASC); ",
+			"CREATE INDEX IF NOT EXISTS  INDEX_USUARIO_USUA_ID_USUA ON USUARIO_USUA (ID_USUA); ",
+			"CREATE INDEX IF NOT EXISTS  INDEX_CFAPROFI_ID_CFAPROFI ON CFAPROFI (ID_CFAPROFI); ",
+			"CREATE INDEX IF NOT EXISTS  INDEX_CFATPFOR_ID_CFATPFOR ON CFATPFOR (ID_CFATPFOR); ",
+			"CREATE INDEX IF NOT EXISTS  INDEX_CFATPFOR_CODIGO ON CFATPFOR (CODIGO); ",
+			"CREATE INDEX IF NOT EXISTS  INDEX_CFAATIVI_ID_CFAATIVI ON CFAATIVI (ID_CFAATIVI); ",
+			"CREATE INDEX IF NOT EXISTS  INDEX_CFAATIVI_CODIGO ON CFAATIVI (CODIGO); ",
+			"CREATE INDEX IF NOT EXISTS  INDEX_CFAAREAS_ID_CFAAREAS ON CFAAREAS (ID_CFAAREAS); ",
+			"CREATE INDEX IF NOT EXISTS  INDEX_CFAAREAS_CODIGO ON CFAAREAS (CODIGO); ",
+			"CREATE INDEX IF NOT EXISTS  INDEX_CFATPCLI_ID_CFATPCLI ON CFATPCLI (ID_CFATPCLI); ",
+			"CREATE INDEX IF NOT EXISTS  INDEX_CFATPCLI_CODIGO ON CFATPCLI (CODIGO); ",
+			"CREATE INDEX IF NOT EXISTS  INDEX_CFASTATU_ID_CFASTATU ON CFASTATU (ID_CFASTATU); ",
+			"CREATE INDEX IF NOT EXISTS  INDEX_CFASTATU_CODIGO ON CFASTATU (CODIGO); ",
+			"CREATE INDEX IF NOT EXISTS  INDEX_CFACCRED_ID_CFACCRED ON CFACCRED (ID_CFACCRED); ",
+			"CREATE INDEX IF NOT EXISTS  INDEX_CFACCRED_CODIGO ON CFACCRED (CODIGO);"
+
+	};
+
+	private static String[] SQL_PRODUTOS = { "INSERT INTO [PRODUTO_PRO] ([NOME_PRO]) VALUES (' ');" };
+
+	private static final Logger log = LoggerFactory.getLogger(ConexaoBancoDeDados.class);
+
+	private static final String SQL_DIR = "sql" ;
+
+	private static final String CREATEFILE = "create.sql";
+
+	private static final String UPGRADEFILE_PREFIX = "upgrade-";
+
+	private static final String UPGRADEFILE_SUFFIX = ".sql";
+
+	private static int VERSAO = 1;
+	private static String NOME_BANCO = "DadosSavare.db";
+	private static String PATH_BANCO = Environment.getExternalStorageDirectory() + "/SAVARE/BancoDeDados/";
+	private SQLiteDatabase bancoSavare;
+
+	public ConexaoBancoDeDados(Context context, int versao) {
+		//super(context, PATH_BANCO + NOME_BANCO, null, VERSAO);
+		super(context, PATH_BANCO + NOME_BANCO, null, versao);
+		new File(Environment.getExternalStorageDirectory().toString() + "/SAVARE/BancoDeDados").mkdirs();
+		this.context = context;
+		abrirBanco();
+	}
+
+	@Override
+	public void onCreate(SQLiteDatabase bd) {
+		try {
+			//bd.execSQL(SQL_TABELAS[i]);
+			log.info("create database");
+			execSqlFile(CREATEFILE, bd );
+
+		} catch (SQLException e) {
+			// Armazena as informacoes para para serem exibidas e enviadas
+			ContentValues contentValues = new ContentValues();
+			contentValues.put("comando", 0);
+			contentValues.put("tela", "ConexaoBancoDeDados");
+			contentValues.put("mensagem", "Não foi possível criar as tabelas do banco de dados. \n" + e.getMessage());
+			contentValues.put("dados", e.toString());
+			// Pega os dados do usuario
+			FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas( this.context);
+			contentValues.put("usuario", funcoes.getValorXml("Usuario"));
+			contentValues.put("empresa", funcoes.getValorXml("ChaveEmpresa"));
+			contentValues.put("email", funcoes.getValorXml("Email"));
+
+			funcoes.menssagem(contentValues);
+
+		} catch (IOException e) {
+			//e.printStackTrace();
+			// Armazena as informacoes para para serem exibidas e enviadas
+			ContentValues contentValues = new ContentValues();
+			contentValues.put("comando", 0);
+			contentValues.put("tela", "ConexaoBancoDeDados");
+			contentValues.put("mensagem", "Erro ao tentar pegar o arquivo com as instruções SQL. \n" + e.getMessage());
+			contentValues.put("dados", e.toString());
+			// Pega os dados do usuario
+			FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas( this.context);
+			contentValues.put("usuario", funcoes.getValorXml("Usuario"));
+			contentValues.put("empresa", funcoes.getValorXml("ChaveEmpresa"));
+			contentValues.put("email", funcoes.getValorXml("Email"));
+
+			funcoes.menssagem(contentValues);
+		}
+	} // Fim onCreate
+
+	
+	@Override
+	public void onUpgrade(SQLiteDatabase bd, int versaoAntiga, int versaoNova) {
+		try {
+			log.info("upgrade database from " + versaoAntiga + " to " + versaoNova);
+			for( String sqlFile : AssetUtils.list(SQL_DIR, this.context.getAssets())) {
+				if ( sqlFile.startsWith(UPGRADEFILE_PREFIX)) {
+					int fileVersion = Integer.parseInt(sqlFile.substring( UPGRADEFILE_PREFIX.length(),  sqlFile.length() - UPGRADEFILE_SUFFIX.length()));
+					if ( fileVersion > versaoAntiga && fileVersion <= versaoNova ) {
+						execSqlFile( sqlFile, bd );
+					}
+				}
+			}
+		} catch( IOException exception ) {
+			// Armazena as informacoes para para serem exibidas e enviadas
+			ContentValues contentValues = new ContentValues();
+			contentValues.put("comando", 0);
+			contentValues.put("tela", "ConexaoBancoDeDados");
+			contentValues.put("mensagem", "Falha na atualização do Banco de Dados. \n" + exception.getMessage());
+			contentValues.put("dados", exception.toString());
+			// Pega os dados do usuario
+			FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas( this.context);
+			contentValues.put("usuario", funcoes.getValorXml("Usuario"));
+			contentValues.put("empresa", funcoes.getValorXml("ChaveEmpresa"));
+			contentValues.put("email", funcoes.getValorXml("Email"));
+
+			funcoes.menssagem(contentValues);
+		}
+		//onCreate(bd);
+	} // Fim onUpgrade
+
+	
+	
+	/**
+	 * Funcao responsavel por abrir o banco de dados
+	 * 
+	 * @return
+	 */
+	public SQLiteDatabase abrirBanco() {
+
+		String bancoDados = PATH_BANCO + NOME_BANCO;
+		
+		File s = context.getExternalFilesDir(null);
+
+		if (bancoSavare == null || !bancoSavare.isOpen()) {
+			/*bancoSavare = SQLiteDatabase.openDatabase(bancoDados, null, SQLiteDatabase.ENABLE_WRITE_AHEAD_LOGGING| 
+																		SQLiteDatabase.OPEN_READONLY|
+																		SQLiteDatabase.NO_LOCALIZED_COLLATORS|
+																		SQLiteDatabase.CREATE_IF_NECESSARY);*/
+			
+			bancoSavare = getWritableDatabase();
+			//bancoSavare = SQLiteDatabase.openDatabase(bancoDados, null, 0);
+			// bancoSavare = getWritableDatabase();
+		}
+
+		return bancoSavare;
+	}
+
+	/**
+	 * Funcao responsavel por fechar o banco de dados
+	 */
+	public void fechar() {
+
+		if (bancoSavare != null && bancoSavare.isOpen()) {
+			bancoSavare.close();
+		}
+	}
+
+	/*private void importDatabase(String inputFileName) throws IOException {
+		InputStream mInput = new FileInputStream(inputFileName);
+		String outFileName = Environment.getExternalStorageDirectory().toString();
+		OutputStream mOutput = new FileOutputStream(outFileName);
+		byte[] mBuffer = new byte[1024];
+		int mLength;
+		while ((mLength = mInput.read(mBuffer)) > 0) {
+			mOutput.write(mBuffer, 0, mLength);
+		}
+		mOutput.flush();
+		mOutput.close();
+		mInput.close();
+	}*/
+
+	public static String[] getSQL_PRODUTOS() {
+		return SQL_PRODUTOS;
+	}
+
+	public static String getSQL_PRODUTOID(int posicao) {
+		return SQL_PRODUTOS[posicao];
+	}
+
+	public static void setSQL_PRODUTOS(String[] sQL_PRODUTOS) {
+		SQL_PRODUTOS = sQL_PRODUTOS;
+	}
+
+	protected void execSqlFile(String sqlFile, SQLiteDatabase db ) throws SQLException, IOException {
+		log.info("  exec sql file: {}" + sqlFile);
+		for(String sqlInstruction : SqlParser.parseSqlFile( SQL_DIR + "/" + sqlFile, this.context.getAssets())) {
+			log.trace("    sql: " + sqlInstruction );
+			db.execSQL(sqlInstruction);
+		}
+	}
+}

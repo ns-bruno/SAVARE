@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    
+    <string name="nao_possivel_enviar">Não foi possível enviar</string>
+    <string name="nenhum_valor_encontrado">Nenhum valor encontrado</string>
+    <string name="operacao_cancelada">Operação Cancelada.</string>
+    <string name="nao_existe_conexao_internet">Não existe conexão com a internet.</string>
+    <string name="erro_sqlite_code_2067">Já existe no banco de dados.</string>
+    <string name="erro_sqlite_code_1811">Abortamos a operação. Confira os detalhes da mensagem.</string>
+    <string name="erro_sqlite_code_1299">Existe campos que são obrigatórios. Verifique quais.</string>
+
+    
+</resources>

@@ -1,0 +1,39 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 16
+    buildToolsVersion "23.0.0 rc2"
+    compileOptions.encoding = 'UTF-8'
+
+    defaultConfig {
+        applicationId "com.savare"
+        minSdkVersion 11
+        targetSdkVersion 21
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
+        }
+    }
+
+    packagingOptions {
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/NOTICE.txt'
+    }
+}
+
+dependencies {
+    compile 'com.android.support:support-v4:18.0.0'
+    compile 'com.android.support:appcompat-v7:19.1.0'
+    //compile 'com.android.support:appcompat-v7:22.0.0'
+    compile files('libs/commons-net-3.3.jar')
+    compile files('libs/itextpdf-5.5.4.jar')
+    compile files('libs/jasypt-1.9.2.jar')
+    compile files('libs/jdom-2.0.5.jar')
+    compile files('libs/libGoogleAnalyticsServices.jar')
+    compile files('libs/mpandroidchartlibrary-2-0-9.jar')
+
+
+}

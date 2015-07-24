@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" xmlns:tools="http://schemas.android.com/tools">
+
+    <ScrollView
+        android:id="@+id/scrollView1"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="15dp"
+        tools:ignore="UselessParent" >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" >
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:layout_marginTop="15dp" >
+
+                <Button
+                    android:id="@+id/activity_configuracoes_button_tamanho_fonte"
+                    style="?android:attr/buttonStyleSmall"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@android:color/transparent"
+                    android:text="@string/tamanho_texto"
+                    android:textAppearance="?android:attr/textAppearanceLarge" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:layout_marginTop="15dp" >
+
+                <CheckBox
+                    android:id="@+id/activity_configuracoes_checkBox_enviar_automatico"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/enviar_automatico" />
+            </LinearLayout>
+            
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:layout_marginTop="15dp" >
+
+                <CheckBox
+                    android:id="@+id/activity_configuracoes_checkBox_receber_automatico"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/receber_automatico" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" >
+
+                    <TextView
+                        android:id="@+id/activity_configuracoes_text_casas_decimais"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/quantidade_casas_decimais" />
+
+                    <EditText
+                        android:id="@+id/activity_configuracoes_edit_quantidade_casas_decimais"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="100"
+                        android:ems="10"
+                        android:gravity="center_vertical|right"
+                        android:inputType="number"
+                        android:digits="0123456789."
+                        android:maxLines="1"
+                        android:maxLength="1" >
+                    </EditText>
+
+                </LinearLayout>
+                
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" >
+
+                    <TextView
+                        android:id="@+id/activity_configuracoes_text_percentual_mark_up_atacado_label"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:layout_weight="10"
+                        android:text="@string/percentual_mark_up_atacado" />
+
+                    <EditText
+                        android:id="@+id/activity_configuracoes_edit_percentual_mark_up_atacado"
+                        android:layout_width="100dp"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="right"
+                        android:layout_weight="1"
+                        android:ems="10"
+                        android:gravity="center_vertical|right"
+                        android:inputType="numberDecimal"
+                        android:digits="0123456789."
+                        android:maxLines="1" >
+                    </EditText>
+                </LinearLayout>
+                
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" >
+
+                    <TextView
+                        android:id="@+id/activity_configuracoes_text_percentual_mark_up_varejo_label"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:layout_weight="10"
+                        android:text="@string/percentual_mark_up_varejo" />
+
+                    <EditText
+                        android:id="@+id/activity_configuracoes_edit_percentual_mark_up_varejo"
+                        android:layout_width="100dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:ems="10"
+                        android:gravity="right"
+                        android:inputType="numberDecimal"
+                        android:digits="0123456789."
+                        android:maxLines="1" >
+                    </EditText>
+                </LinearLayout>
+
+            </LinearLayout>
+            
+        </LinearLayout>
+    </ScrollView>
+
+</LinearLayout>

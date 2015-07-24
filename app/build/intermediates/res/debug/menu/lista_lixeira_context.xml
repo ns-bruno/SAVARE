@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+    
+    <item
+        android:id="@+id/menu_lista_lixeira_context_restaurar_orcamento"
+        android:orderInCategory="100"
+        android:title="@string/restaurar_orcamento"
+        android:showAsAction="never">
+    </item> 
+    
+    <item
+        android:id="@+id/menu_lista_lixeira_context_enviar_email"
+        android:orderInCategory="101"
+        android:title="@string/enviar_email"
+        android:showAsAction="never">
+    </item> 
+
+</menu>
+<!-- From: file:/D:/Dropbox/Forca%20de%20Venda%20Movel/Codigo%20Fonte/SAVARE_Studio/app/src/main/res/menu/lista_lixeira_context.xml -->
