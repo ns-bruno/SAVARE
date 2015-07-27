@@ -270,7 +270,7 @@ public class ClienteListaActivity extends Activity implements OnNavigationListen
 				(!adapterCidade.getLista().get(itemPosition).getTextoPrincipal().equalsIgnoreCase("Todas as Cidades"))){
 			
 			// Monta a clausula where do sql
-			where = "CFACIDAD.DESCRICAO = '" + adapterCidade.getLista().get(itemPosition).getTextoPrincipal() + "'";
+			where = "CFACIDAD.DESCRICAO = '" + adapterCidade.getLista().get(itemPosition).getTextoPrincipal().replace("'", "%") + "'";
 			// Cria a lista com as pessoas de acordo com a cidade selecionada
 			listaPessoas = pessoaRotinas.listaPessoaResumido(where, "cliente");
 			

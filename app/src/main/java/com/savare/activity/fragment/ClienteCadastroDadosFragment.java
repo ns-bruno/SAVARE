@@ -174,24 +174,39 @@ public class ClienteCadastroDadosFragment extends Fragment {
 
 			case R.id.menu_cliente_cadastro_dados_fragemnt_enviar:
 				String where = "";
-					// Checa se foi passado algum parametro
-					if (idPessoaTemporario != null){
-						// Especifica uma pessoa
-						where += " (CFACLIFO.ID_CFACLIFO = " + idPessoaTemporario + ")";
-					} else {
-						// Pega todos os cadastro temporarios
-						where += " (CFACLIFO.ID_CFACLIFO < 0) AND (CFACLIFO.STATUS_CADASTRO_NOVO = N) ";
-					}
+				// Checa se foi passado algum parametro
+				if (idPessoaTemporario != null){
+					// Especifica uma pessoa
+					where += " (CFACLIFO.ID_CFACLIFO = " + idPessoaTemporario + ")";
+				} else {
+					// Pega todos os cadastro temporarios
+					where += " (CFACLIFO.ID_CFACLIFO < 0) AND (CFACLIFO.STATUS_CADASTRO_NOVO = N) ";
+				}
 
-					PessoaRotinas pessoaRotinas = new PessoaRotinas(getActivity());
+				PessoaRotinas pessoaRotinas = new PessoaRotinas(getActivity());
 
-					List<PessoaBeans> listaPessoasCadastro = new ArrayList<PessoaBeans>();
-					// Pega a lista de pessoa a serem enviadas os dados
-					listaPessoasCadastro = pessoaRotinas.listaPessoaCompleta(PessoaRotinas.KEY_TIPO_CLIENTE, where);
+				List<PessoaBeans> listaPessoasCadastro = new ArrayList<PessoaBeans>();
+				// Pega a lista de pessoa a serem enviadas os dados
+				listaPessoasCadastro = pessoaRotinas.listaPessoaCompleta(PessoaRotinas.KEY_TIPO_CLIENTE, where);
+				// Checa se retornou alguma lista
+				if (listaPessoasCadastro != null && listaPessoasCadastro.size() > 0){
+					EnviarCadastroClienteFtpAsyncRotinas enviarCadastro = new EnviarCadastroClienteFtpAsyncRotinas(getActivity(), EnviarCadastroClienteFtpAsyncRotinas.TELA_CLIENTE_CADASTRO_DADOS_FRAGMENT);
+					// Executa o envio do cadastro em segundo plano
+					enviarCadastro.execute(listaPessoasCadastro);
+				} else {
+					// Dados da mensagem
+					ContentValues mensagem = new ContentValues();
+					mensagem.put("comando", 0);
+					mensagem.put("tela", "ClienteCadastroDadosFragment");
+					mensagem.put("mensagem", "Não achamos nenhum cadastro.");
+					// Instancia a classe  de funcoes para mostra a mensagem
+					FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(getActivity());
+					funcoes.menssagem(mensagem);
+				}
 
-				EnviarCadastroClienteFtpAsyncRotinas enviarCadastro = new EnviarCadastroClienteFtpAsyncRotinas(getActivity(), EnviarCadastroClienteFtpAsyncRotinas.TELA_CLIENTE_CADASTRO_DADOS_FRAGMENT);
-				// Executa o envio do cadastro em segundo plano
-				enviarCadastro.execute(listaPessoasCadastro);
+
+
+
 				break;
 
 		default:
@@ -336,77 +351,126 @@ public class ClienteCadastroDadosFragment extends Fragment {
 	} // Fim da funcao carregarDadosPessoa
 
 	private void salvar(){
-		ContentValues dadosCliente = new ContentValues();
-		
-		RamoAtividadeBeans atividade = (RamoAtividadeBeans) spinnerRamoAtividade.getSelectedItem();
-		TipoClienteBeans tipoCliente = (TipoClienteBeans) spinnerTipoCliente.getSelectedItem();
-		TipoDocumentoBeans documento = (TipoDocumentoBeans) spinnerTipoDocumento.getSelectedItem();
-		PortadorBancoBeans portador = (PortadorBancoBeans) spinnerPortadorBanco.getSelectedItem();
-		PlanoPagamentoBeans planoPagamento = (PlanoPagamentoBeans) spinnerPlanoPagamento.getSelectedItem();
-		EstadoBeans estado = (EstadoBeans) spinnerEstado.getSelectedItem();
-		CidadeBeans cidade = (CidadeBeans) spinnerCidade.getSelectedItem();
+		// Valida os dados
+		if (validarDados()) {
 
-		FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(getActivity());
+			ContentValues dadosCliente = new ContentValues();
 
-		dadosCliente.put("ID_CFACLIFO", idPessoaTemporario);
-		dadosCliente.put("ID_CFAATIVI", atividade.getIdRamoAtividade());
-		dadosCliente.put("ID_CFATPCLI", tipoCliente.getIdTipoCliente());
-		dadosCliente.put("NOME_RAZAO", editRazaoSocial.getText().toString());
-		dadosCliente.put("NOME_FANTASIA", editFantasia.getText().toString());
-		dadosCliente.put("CPF_CNPJ", editCnpjCpf.getText().toString());
-		dadosCliente.put("IE_RG", editInscricaoEstadual.getText().toString());
-		dadosCliente.put("CAPITAL_SOCIAL", editCapitalSocial.getText().toString());
-		dadosCliente.put("CLIENTE", "1");
-		dadosCliente.put("ID_SMAEMPRE", funcoes.getValorXml("CodigoEmpresa"));
-		dadosCliente.put("STATUS_CADASTRO_NOVO", "N");
+			RamoAtividadeBeans atividade = (RamoAtividadeBeans) spinnerRamoAtividade.getSelectedItem();
+			TipoClienteBeans tipoCliente = (TipoClienteBeans) spinnerTipoCliente.getSelectedItem();
+			TipoDocumentoBeans documento = (TipoDocumentoBeans) spinnerTipoDocumento.getSelectedItem();
+			PortadorBancoBeans portador = (PortadorBancoBeans) spinnerPortadorBanco.getSelectedItem();
+			PlanoPagamentoBeans planoPagamento = (PlanoPagamentoBeans) spinnerPlanoPagamento.getSelectedItem();
+			EstadoBeans estado = (EstadoBeans) spinnerEstado.getSelectedItem();
+			CidadeBeans cidade = (CidadeBeans) spinnerCidade.getSelectedItem();
 
-		PessoaSql pessoaSql = new PessoaSql(getActivity());
-		long idPessoa = pessoaSql.insert(dadosCliente);
+			FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(getActivity());
 
-		if(idPessoa > 0){
+			dadosCliente.put("ID_CFACLIFO", idPessoaTemporario);
+			dadosCliente.put("ID_CFAATIVI", atividade.getIdRamoAtividade());
+			dadosCliente.put("ID_CFATPCLI", tipoCliente.getIdTipoCliente());
+			dadosCliente.put("NOME_RAZAO", editRazaoSocial.getText().toString());
+			dadosCliente.put("NOME_FANTASIA", editFantasia.getText().toString());
+			dadosCliente.put("CPF_CNPJ", editCnpjCpf.getText().toString());
+			dadosCliente.put("IE_RG", editInscricaoEstadual.getText().toString());
+			dadosCliente.put("CAPITAL_SOCIAL", editCapitalSocial.getText().toString());
+			dadosCliente.put("CLIENTE", "1");
+			dadosCliente.put("ID_SMAEMPRE", funcoes.getValorXml("CodigoEmpresa"));
+			dadosCliente.put("STATUS_CADASTRO_NOVO", "N");
 
-			textCodigoPessoa.setText("" + idPessoaTemporario);
-			ContentValues dadosEndereco = new ContentValues();
-			dadosEndereco.put("ID_CFAENDER", idPessoaTemporario);
-			dadosEndereco.put("ID_CFACLIFO", idPessoaTemporario);
-			dadosEndereco.put("ID_SMAEMPRE", funcoes.getValorXml("CodigoEmpresa"));
-			dadosEndereco.put("ID_CFAESTAD", estado.getIdEstado());
-			dadosEndereco.put("ID_CFACIDAD", cidade.getIdCidade());
-			if (radioButtonJuridica.isChecked()){
-				dadosEndereco.put("TIPO", "1");
+			if (radioGroupFisicaJuridica.getCheckedRadioButtonId() == radioButtonFisica.getId()){
+				dadosCliente.put("PESSOA", "0");
 			} else {
-				dadosEndereco.put("TIPO", "0");
+				dadosCliente.put("PESSOA", "1");
 			}
-			dadosEndereco.put("CEP", editCep.getText().toString());
-			dadosEndereco.put("BAIRRO", editBairro.getText().toString());
-			dadosEndereco.put("LOGRADOURO", editEndereco.getText().toString());
-			dadosEndereco.put("NUMERO", editNumero.getText().toString());
-			dadosEndereco.put("COMPLEMENTO", editComplemento.getText().toString());
-			dadosEndereco.put("EMAIL", editEmail.getText().toString());
-			
-			EnderecoSql enderecoSql = new EnderecoSql(getActivity());
-			enderecoSql.insert(dadosEndereco);
-			// Instancia a classe para pegar os dados do usuario
-			PessoaRotinas pessoaRotinas = new PessoaRotinas(getActivity());
-			// Pega os dados do usuario
-			PessoaBeans dadosUsuario = pessoaRotinas.listaPessoaResumido("CFACLIFO.CODIGO_USU = " + funcoes.getValorXml("CodigoUsuario"), PessoaRotinas.KEY_TIPO_USUARIO).get(0);
 
-			ContentValues dadosParametro = new ContentValues();
-			dadosParametro.put("ID_CFAPARAM", idPessoaTemporario);
-			dadosParametro.put("ID_CFACLIFO", idPessoaTemporario);
-			dadosParametro.put("ID_SMAEMPRE", funcoes.getValorXml("CodigoEmpresa"));
-			dadosParametro.put("ID_CFAPORTA", portador.getIdPortadorBanco());
-			dadosParametro.put("ID_CFATPDOC", documento.getIdTipoDocumento());
-			dadosParametro.put("ID_AEAPLPGT", planoPagamento.getIdPlanoPagamento());
-			dadosParametro.put("ID_CFACLIFO_VENDE", dadosUsuario.getIdPessoa());
-			dadosParametro.put("LIMITE", editLimiteCompra.getText().toString());
-			dadosParametro.put("DESC_ATAC_VISTA", editDescontoAtacadoVista.getText().toString());
-			dadosParametro.put("DESC_ATAC_PRAZO", editDescontoAtacadoPrazo.getText().toString());
-			dadosParametro.put("DESC_VARE_VISTA", editDescontoVarejoVista.getText().toString());
-			dadosParametro.put("DESC_VARE_PRAZO", editDescontoVarejoPrazo.getText().toString());
-			
-			ParametrosSql parametrosSql = new ParametrosSql(getActivity());
-			parametrosSql.insert(dadosParametro);
+			PessoaSql pessoaSql = new PessoaSql(getActivity());
+			long idPessoa = pessoaSql.insert(dadosCliente);
+
+			if (idPessoa > 0) {
+
+				textCodigoPessoa.setText("" + idPessoaTemporario);
+				ContentValues dadosEndereco = new ContentValues();
+				dadosEndereco.put("ID_CFAENDER", idPessoaTemporario);
+				dadosEndereco.put("ID_CFACLIFO", idPessoaTemporario);
+				dadosEndereco.put("ID_SMAEMPRE", funcoes.getValorXml("CodigoEmpresa"));
+				dadosEndereco.put("ID_CFAESTAD", estado.getIdEstado());
+				dadosEndereco.put("ID_CFACIDAD", cidade.getIdCidade());
+				if (radioButtonJuridica.isChecked()) {
+					dadosEndereco.put("TIPO", "1");
+				} else {
+					dadosEndereco.put("TIPO", "0");
+				}
+				dadosEndereco.put("CEP", editCep.getText().toString());
+				dadosEndereco.put("BAIRRO", editBairro.getText().toString());
+				dadosEndereco.put("LOGRADOURO", editEndereco.getText().toString());
+				dadosEndereco.put("NUMERO", editNumero.getText().toString());
+				dadosEndereco.put("COMPLEMENTO", editComplemento.getText().toString());
+				dadosEndereco.put("EMAIL", editEmail.getText().toString());
+
+				EnderecoSql enderecoSql = new EnderecoSql(getActivity());
+				enderecoSql.insert(dadosEndereco);
+				// Instancia a classe para pegar os dados do usuario
+				PessoaRotinas pessoaRotinas = new PessoaRotinas(getActivity());
+				// Pega os dados do usuario
+				PessoaBeans dadosUsuario = pessoaRotinas.listaPessoaResumido("CFACLIFO.CODIGO_USU = " + funcoes.getValorXml("CodigoUsuario"), PessoaRotinas.KEY_TIPO_USUARIO).get(0);
+
+				ContentValues dadosParametro = new ContentValues();
+				dadosParametro.put("ID_CFAPARAM", idPessoaTemporario);
+				dadosParametro.put("ID_CFACLIFO", idPessoaTemporario);
+				dadosParametro.put("ID_SMAEMPRE", funcoes.getValorXml("CodigoEmpresa"));
+				dadosParametro.put("ID_CFAPORTA", portador.getIdPortadorBanco());
+				dadosParametro.put("ID_CFATPDOC", documento.getIdTipoDocumento());
+				dadosParametro.put("ID_AEAPLPGT", planoPagamento.getIdPlanoPagamento());
+				dadosParametro.put("ID_CFACLIFO_VENDE", dadosUsuario.getIdPessoa());
+				dadosParametro.put("LIMITE", editLimiteCompra.getText().toString());
+				dadosParametro.put("DESC_ATAC_VISTA", editDescontoAtacadoVista.getText().toString());
+				dadosParametro.put("DESC_ATAC_PRAZO", editDescontoAtacadoPrazo.getText().toString());
+				dadosParametro.put("DESC_VARE_VISTA", editDescontoVarejoVista.getText().toString());
+				dadosParametro.put("DESC_VARE_PRAZO", editDescontoVarejoPrazo.getText().toString());
+
+				ParametrosSql parametrosSql = new ParametrosSql(getActivity());
+				parametrosSql.insert(dadosParametro);
+			}
 		}
 	} // Fim salvar
+
+	private boolean validarDados(){
+		boolean retorno = false;
+
+		FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(getActivity());
+		// Checa se eh um cnpj
+		if ((editCnpjCpf.getText().toString().replace(".", "").replace("-", "").replace("/", "")).length() == 14){
+			// Checa se o cnpj eh valido
+			if (!funcoes.validaCNPJ(editCnpjCpf.getText().toString())){
+
+				// Cria uma variavem para inserir as propriedades da mensagem
+				ContentValues mensagem = new ContentValues();
+				mensagem.put("comando", 2);
+				mensagem.put("tela", "ClienteCadastroDadosFragment");
+				mensagem.put("mensagem", "CNPJ Inválido.");
+
+				// Executa a mensagem passando por parametro as propriedades
+				funcoes.menssagem(mensagem);
+			} else {
+				retorno = true;
+			}
+			// Checa se eh um CPF
+		} else if ((editCnpjCpf.getText().toString().replace(".", "").replace("-", "").replace("/", "")).length() == 11){
+			// Checa se eh um cpf valido
+			if (!funcoes.validaCPF(editCnpjCpf.getText().toString())){
+				// Cria uma variavem para inserir as propriedades da mensagem
+				ContentValues mensagem = new ContentValues();
+				mensagem.put("comando", 2);
+				mensagem.put("tela", "ClienteCadastroDadosFragment");
+				mensagem.put("mensagem", "CPF Inválido.");
+
+				// Executa a mensagem passando por parametro as propriedades
+				funcoes.menssagem(mensagem);
+			} else {
+				retorno = true;
+			}
+		}
+		return retorno;
+	}
 }

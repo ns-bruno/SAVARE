@@ -100,9 +100,17 @@ public class ClienteDetalhesActivity extends Activity implements OnChartGestureL
 		 * Pega valores passados por parametro de outra Activity
 		 */
 		Bundle intentParametro = getIntent().getExtras();
+		// Checa se foi passado algum parametro
 		if (intentParametro != null) {
-			// Seta o campo codigo consumo total com o que foi passado por parametro
-			textCodigoPessoa.setText(intentParametro.getString("ID_CFACLIFO"));
+
+			if (Integer.parseInt(intentParametro.getString("ID_CFACLIFO")) > 99000000){
+				// Seta o campo codigo consumo total com o que foi passado por parametro
+				textCodigoPessoa.setText("*" + intentParametro.getString("ID_CFACLIFO"));
+				textCodigoPessoa.setTextColor(getResources().getColor(R.color.vermelho_escuro));
+			}else {
+				// Seta o campo codigo consumo total com o que foi passado por parametro
+				textCodigoPessoa.setText(intentParametro.getString("ID_CFACLIFO"));
+			}
 			carregarDadosPessoa();
 			
 		} else {

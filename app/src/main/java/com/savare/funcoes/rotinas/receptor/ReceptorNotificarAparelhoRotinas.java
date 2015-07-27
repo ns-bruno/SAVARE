@@ -26,11 +26,11 @@ public class ReceptorNotificarAparelhoRotinas extends BroadcastReceiver {
 		String mensagem = intent.getExtras().getString("MENSAGEM");
 		
 		if((ticker == null) || (ticker.length() <= 0)){
-			ticker = "Notificação SAVARE";
+			ticker = "NotificaÃ§Ã£o SAVARE";
 		}
 		
 		if((titulo == null) || (titulo.length() <= 0)){
-			titulo = "Nova Notificação do SAVARE";
+			titulo = "Nova NotificaÃ§Ã£o do SAVARE";
 		}
 		
 		if((mensagem == null) || (mensagem.length() <= 0)){

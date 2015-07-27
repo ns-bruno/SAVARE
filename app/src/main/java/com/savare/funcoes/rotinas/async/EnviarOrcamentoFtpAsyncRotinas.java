@@ -380,7 +380,6 @@ public class EnviarOrcamentoFtpAsyncRotinas extends AsyncTask<String, String, In
 			} else {
 				dadosMensagem.put("mensagem", mensagemErro);
 			}
-	
 			funcoes.menssagem(dadosMensagem);
 	
 			// Fecha progressDialogo
@@ -392,7 +391,7 @@ public class EnviarOrcamentoFtpAsyncRotinas extends AsyncTask<String, String, In
 		} else {
 			// Cria a intent com identificacao do alarme
 			Intent intent = new Intent("NOTIFICACAO_SAVARE");
-			intent.putExtra("TICKER", "Nova Mensagem do Envio de Or�amento");
+			intent.putExtra("TICKER", "Nova Mensagem do Envio de Orçamento");
 			intent.putExtra("TITULO", "SAVARE");
 			intent.putExtra("MENSAGEM", mensagemErro);
 			

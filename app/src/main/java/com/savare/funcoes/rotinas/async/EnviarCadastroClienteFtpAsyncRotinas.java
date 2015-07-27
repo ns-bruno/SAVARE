@@ -46,9 +46,9 @@ public class EnviarCadastroClienteFtpAsyncRotinas extends AsyncTask<List<PessoaB
     private ProgressDialog progress;
     private FTPClient conexaoFtp = new FTPClient();
     private CopyStreamAdapter streamListener;
-    private int orientacaoTela;
     private String mensagemErro;
     private int telaChamada;
+    private String idPessoaTemporario;
 
 
     public EnviarCadastroClienteFtpAsyncRotinas(Context context, int telaChamada) {
@@ -90,22 +90,6 @@ public class EnviarCadastroClienteFtpAsyncRotinas extends AsyncTask<List<PessoaB
                     // Passa por todos os registro do parametro
                     for (int i = 0; i < params.length; i++) {
 
-                        /*String where = "";
-                        // Checa se foi passado algum parametro
-                        if (params[i] != null){
-                            // Especifica uma pessoa
-                            where += "CFACLIFO.ID_CFACLIFO = " + params[i];
-                        } else {
-                            // Pega todos os cadastro temporarios
-                            where += "CFACLIFO.ID_CFACLIFO < 0 ";
-                        }
-
-                        PessoaRotinas pessoaRotinas = new PessoaRotinas(context);
-
-                        List<PessoaBeans> listaPessoasCadastro = new ArrayList<PessoaBeans>();
-                        // Pega a lista de pessoa a serem enviadas os dados
-                        listaPessoasCadastro = pessoaRotinas.listaPessoaCompleta(PessoaRotinas.KEY_TIPO_CLIENTE, where);*/
-
                         // Envia o arquivo de acordo com o passado por parametro
                         enviarArquivoXmlFtp(params[i]);
                     }
@@ -134,8 +118,10 @@ public class EnviarCadastroClienteFtpAsyncRotinas extends AsyncTask<List<PessoaB
 
 
     @Override
-    protected void onPostExecute(Integer integer) {
-        super.onPostExecute(integer);
+    protected void onPostExecute(Integer result) {
+        super.onPostExecute(result);
+
+        FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
 
         // Atualiza mensagem
         if(telaChamada == TELA_CLIENTE_CADASTRO_DADOS_FRAGMENT) {
@@ -143,6 +129,23 @@ public class EnviarCadastroClienteFtpAsyncRotinas extends AsyncTask<List<PessoaB
             if (progress.isShowing()) {
                 progress.dismiss();
             }
+
+            ContentValues dadosMensagem = new ContentValues();
+            dadosMensagem.put("comando", 0);
+            dadosMensagem.put("tela", "EnviarOrcamentoFtpAsyncRotinas");
+            dadosMensagem.put("dados", mensagemErro);
+            dadosMensagem.put("usuario", funcoes.getValorXml("Usuario"));
+            dadosMensagem.put("empresa", funcoes.getValorXml("Empresa"));
+            dadosMensagem.put("email", funcoes.getValorXml("Email"));
+
+            if (result > 0) {
+                dadosMensagem.put("comando", 1);
+                dadosMensagem.put("mensagem", "Foram enviados " + result + " arquivos.");
+            } else {
+                dadosMensagem.put("mensagem", mensagemErro);
+            }
+
+            funcoes.menssagem(dadosMensagem);
         }
     }
 
@@ -170,22 +173,6 @@ public class EnviarCadastroClienteFtpAsyncRotinas extends AsyncTask<List<PessoaB
             publishProgress("Vamor gerar os arquivos para ser enviado, aguarde...");
         }
 
-        /*String where = "";
-        // Checa se foi passado algum parametro
-        if (idClienteTemporario != null){
-            // Especifica uma pessoa
-            where += "CFACLIFO.ID_CFACLIFO = " + idClienteTemporario;
-        } else {
-            // Pega todos os cadastro temporarios
-            where += "CFACLIFO.ID_CFACLIFO < 0 ";
-        }
-
-        PessoaRotinas pessoaRotinas = new PessoaRotinas(context);
-
-        List<PessoaBeans> listaPessoasCadastro = new ArrayList<PessoaBeans>();
-        // Pega a lista de pessoa a serem enviadas os dados
-        listaPessoasCadastro = pessoaRotinas.listaPessoaCompleta(PessoaRotinas.KEY_TIPO_CLIENTE, where);*/
-
         final List<File> listaLocalXml = new ArrayList<File>(gerarXml.criarArquivoXml(listaPessoasCadastro));
 
         // Checa se retornou alguma coisa
@@ -194,9 +181,11 @@ public class EnviarCadastroClienteFtpAsyncRotinas extends AsyncTask<List<PessoaB
             // Passa por todos os arquivos
             for (int j = 0; j < listaLocalXml.size(); j++) {
 
+                idPessoaTemporario = "" + listaPessoasCadastro.get(j).getIdPessoa();
+
                 // Checa se quem chamou esta operacao foi alguma tela
                 if (telaChamada == TELA_CLIENTE_CADASTRO_DADOS_FRAGMENT){
-                    publishProgress("Foi gerado " + listaLocalXml.size() + " arquivos. Estamos conectando com o servidor em nuvem, aguarde mais um pouco...");
+                    publishProgress("Foi gerado " + listaLocalXml.size() + " arquivo(s). Estamos conectando com o servidor em nuvem, aguarde mais um pouco...");
                 }
                 try{
                     conexaoFtp.setConnectTimeout(10 * 1000);
@@ -307,10 +296,10 @@ public class EnviarCadastroClienteFtpAsyncRotinas extends AsyncTask<List<PessoaB
                                         if(telaChamada == TELA_CLIENTE_CADASTRO_DADOS_FRAGMENT){
                                             publishProgress("Arquvio temporario eliminado com sucesso, vamos passar para a próxima etapa.");
                                         }
-                                        //Criamos uma classe SAXBuilder que vai processar o XML4
+                                        /*//Criamos uma classe SAXBuilder que vai processar o XML4
                                         SAXBuilder builder = new SAXBuilder();
                                         //Este documento agora possui toda a estrutura do arquivo.
-                                        Document documento = builder.build(listaLocalXml.get(j));
+                                        Document documento = builder.build(localNovoDiretorio.getPath() + "/" + listaLocalXml.get(j).getName());
                                         //Recuperamos o elemento root
                                         // Cria o elemento(tag) raiz
                                         Element tagCadastroProc = (Element) documento.getRootElement();
@@ -321,25 +310,31 @@ public class EnviarCadastroClienteFtpAsyncRotinas extends AsyncTask<List<PessoaB
                                         //Iteramos com os elementos filhos, e filhos do dos filhos
                                         Element pessoa = (Element) iterator.next();
                                         // Pega o id do elemento
-                                        String idPessoa = pessoa.getChildText("idPessoa");
+                                        String idPessoa = pessoa.getChildText("idPessoa");*/
 
-                                        PessoaSql pessoaSql = new PessoaSql(context);
+                                        final PessoaSql pessoaSql = new PessoaSql(context);
 
-                                        ContentValues atualizaPessoa = new ContentValues();
+                                        final ContentValues atualizaPessoa = new ContentValues();
                                         atualizaPessoa.put("STATUS_CADASTRO_NOVO", "E");
-                                        // Atualiza os dados da pessoa
-                                        if ((pessoaSql.update(atualizaPessoa, "CFACLIFO.ID_CFACLIFO = " + idPessoa)) > 0){
-                                            // Atualiza a mensagem do progresso
-                                            if(telaChamada == TELA_CLIENTE_CADASTRO_DADOS_FRAGMENT){
-                                                publishProgress("Pronto, enviamos e marcamos o cadastro como enviado. Só aguardar o retorno da empresa. Vamos para próxima faze.");
+
+                                        ((Activity) context).runOnUiThread(new Runnable() {
+                                            public void run() {
+                                                // Atualiza os dados da pessoa
+                                                if ((pessoaSql.update(atualizaPessoa, "CFACLIFO.ID_CFACLIFO = " + idPessoaTemporario)) > 0){
+                                                    // Atualiza a mensagem do progresso
+                                                    if(telaChamada == TELA_CLIENTE_CADASTRO_DADOS_FRAGMENT){
+                                                        publishProgress("Pronto! Enviamos e marcamos o cadastro como enviado. Só aguardar o retorno da empresa. Vamos para próxima faze.");
+                                                    }
+                                                } else {
+                                                    // Atualiza a mensagem do progresso
+                                                    if(telaChamada == TELA_CLIENTE_CADASTRO_DADOS_FRAGMENT){
+                                                        publishProgress("Não conseguimos marca o cadastro como enviado.");
+                                                    }
+                                                    mensagemErro += "Não conseguimos marca o cadastro como enviado.";
+                                                }
                                             }
-                                        } else {
-                                            // Atualiza a mensagem do progresso
-                                            if(telaChamada == TELA_CLIENTE_CADASTRO_DADOS_FRAGMENT){
-                                                publishProgress("Não conseguimos marca o cadastro como enviado.");
-                                            }
-                                            mensagemErro += "Não conseguimos marca o cadastro como enviado.";
-                                        }
+                                        });
+
                                     } else {
                                         mensagemErro += "Erro ao mover o arquivo enviado para a pasta ENVIADOS. " + listaLocalXml.get(j).getPath() + "\n";
                                     }

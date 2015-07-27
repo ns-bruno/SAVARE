@@ -9,6 +9,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Locale;
 import java.util.Scanner;
@@ -783,5 +784,137 @@ public class FuncoesPersonalizadas {
 		}
 
 		return erro;
+	} // Fim tratamentoErroBancoDados
+
+	public boolean validaCNPJ(String CNPJ) {
+		CNPJ = CNPJ.replace(".", "").replace("-","").replace("/", "");
+// considera-se erro CNPJ's formados por uma sequencia de numeros iguais
+		if (CNPJ.equals("00000000000000") || CNPJ.equals("11111111111111")
+				|| CNPJ.equals("22222222222222") || CNPJ.equals("33333333333333")
+				|| CNPJ.equals("44444444444444") || CNPJ.equals("55555555555555")
+				|| CNPJ.equals("66666666666666") || CNPJ.equals("77777777777777")
+				|| CNPJ.equals("88888888888888") || CNPJ.equals("99999999999999")
+				|| (CNPJ.length() != 14)) {
+			return (false);
+		}
+
+		char verificador13, verificador14;
+		int soma, controle, resto, num, valores_defenidos;
+
+// "try" - protege o código para eventuais erros de conversao de tipo (int)
+		try {
+// Calculo do 1o. Digito Verificador
+			soma = 0;
+			valores_defenidos = 2;
+			for (controle = 11; controle >= 0; controle--) {
+// converte o i-ésimo caractere do CNPJ em um número:
+// por exemplo, transforma o caractere '0' no inteiro 0
+// (48 eh a posição de '0' na tabela ASCII)
+				num = (int) (CNPJ.charAt(controle) - 48);
+				soma = soma + (num * valores_defenidos);
+				valores_defenidos = valores_defenidos + 1;
+				if (valores_defenidos == 10) {
+					valores_defenidos = 2;
+				}
+			}
+
+			resto = soma % 11;
+			if ((resto == 0) || (resto == 1)) {
+				verificador13 = '0';
+			} else {
+				verificador13 = (char) ((11 - resto) + 48);
+			}
+
+// Calculo do 2o. Digito Verificador
+			soma = 0;
+			valores_defenidos = 2;
+			for (controle = 12; controle >= 0; controle--) {
+				num = (int) (CNPJ.charAt(controle) - 48);
+				soma = soma + (num * valores_defenidos);
+				valores_defenidos = valores_defenidos + 1;
+				if (valores_defenidos == 10) {
+					valores_defenidos = 2;
+				}
+			}
+
+			resto = soma % 11;
+			if ((resto == 0) || (resto == 1)) {
+				verificador14 = '0';
+			} else {
+				verificador14 = (char) ((11 - resto) + 48);
+			}
+
+// Verifica se os dígitos calculados conferem com os dígitos informados.
+			if ((verificador13 == CNPJ.charAt(12)) && (verificador14 == CNPJ.charAt(13))) {
+				return (true);
+			} else {
+				return (false);
+			}
+		} catch (InputMismatchException erro) {
+			return (false);
+		}
 	}
+
+	public boolean validaCPF(String CPF) {
+		CPF = CPF.replace(".", "").replace("-","");
+// considera-se erro CPF's formados por uma sequencia de numeros iguais
+		if (CPF.equals("00000000000") || CPF.equals("11111111111")
+				|| CPF.equals("22222222222") || CPF.equals("33333333333")
+				|| CPF.equals("44444444444") || CPF.equals("55555555555")
+				|| CPF.equals("66666666666") || CPF.equals("77777777777")
+				|| CPF.equals("88888888888") || CPF.equals("99999999999")
+				|| (CPF.length() != 11)) {
+			return (false);
+		}
+
+		char verificador10, verificador11;
+		int soma, controle, resto, num, valores_defenidos;
+
+// "try" - protege o codigo para eventuais erros de conversao de tipo (int)
+		try {
+// Calculo do 1o. Digito Verificador
+			soma = 0;
+			valores_defenidos = 10;
+			for (controle = 0; controle < 9; controle++) {
+// converte o i-esimo caractere do CPF em um numero:
+// por exemplo, transforma o caractere '0' no inteiro 0
+// (48 eh a posicao de '0' na tabela ASCII)
+				num = (int) (CPF.charAt(controle) - 48);
+				soma = soma + (num * valores_defenidos);
+				valores_defenidos = valores_defenidos - 1;
+			}
+
+			resto = 11 - (soma % 11);
+			if ((resto == 10) || (resto == 11)) {
+				verificador10 = '0';
+			} else {
+				verificador10 = (char) (resto + 48); // converte no respectivo caractere numerico
+			}
+// Calculo do 2o. Digito Verificador
+			soma = 0;
+			valores_defenidos = 11;
+			for (controle = 0; controle < 10; controle++) {
+				num = (int) (CPF.charAt(controle) - 48);
+				soma = soma + (num * valores_defenidos);
+				valores_defenidos = valores_defenidos - 1;
+			}
+
+			resto = 11 - (soma % 11);
+			if ((resto == 10) || (resto == 11)) {
+				verificador11 = '0';
+			} else {
+				verificador11 = (char) (resto + 48);
+			}
+
+// Verifica se os digitos calculados conferem com os digitos informados.
+			if ((verificador10 == CPF.charAt(9)) && (verificador11 == CPF.charAt(10))) {
+				return (true);
+			} else {
+				return (false);
+			}
+		} catch (InputMismatchException erro) {
+			return (false);
+		}
+	}
+
 } // Fecha classe

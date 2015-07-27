@@ -62,7 +62,7 @@ public class GerarXmlCadastroClienteRotinas {
 
                     FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
 
-                    arquivoXml = new File(pasta, "/CD_" + listaPessoasCadastro.get(i).getCpfCnpj() + funcoes.getValorXml("ChaveEmpresa") + ".xml");
+                    arquivoXml = new File(pasta, "/CD_" + listaPessoasCadastro.get(i).getCpfCnpj().replace(".", "").replace("-", "").replace("/", "") + "_" + funcoes.getValorXml("ChaveEmpresa") + ".xml");
 
                     Writer saida = new OutputStreamWriter(new FileOutputStream(arquivoXml));
 
@@ -154,7 +154,7 @@ public class GerarXmlCadastroClienteRotinas {
         // Inseri os dados entro do elemento
         ieRg.setText(""+pessoa.getIeRg());
         // Adiciona o elemento a tag Pai
-        tagIdentificacaoPessoa.addContent(ieRg);
+        tagIdentificacaoPessoa.addContent(""+ieRg);
 
         // Cria os elementos que vai entro de identificacaoPessoa
         Element capitalSocial = new Element("capitalSocial");

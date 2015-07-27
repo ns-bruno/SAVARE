@@ -955,8 +955,8 @@ public class ImportarDadosTxtRotinas {
 		dadosPessoa.put("DT_ALT", dtAlt);
 		dadosPessoa.put("CPF_CNPJ", cpfCnpj);
 		dadosPessoa.put("IE_RG", ieRg);
-		dadosPessoa.put("NOME_RAZAO", nomeRazao);
-		dadosPessoa.put("NOME_FANTASIA", nomeFantasia);
+		dadosPessoa.put("NOME_RAZAO", nomeRazao.replace("'", " "));
+		dadosPessoa.put("NOME_FANTASIA", nomeFantasia.replace(",", " "));
 		dadosPessoa.put("DT_NASCIMENTO", dtNascimento);
 		dadosPessoa.put("CODIGO_CLI", codigoCli);
 		dadosPessoa.put("CODIGO_FUN", codigoFun);
@@ -1674,7 +1674,7 @@ public class ImportarDadosTxtRotinas {
 		dadosCidade.put("ID_CFACIDAD", idCidade);
 		dadosCidade.put("ID_CFAESTAD", idEstad);
 		dadosCidade.put("DT_ALT", dtAlt);
-		dadosCidade.put("DESCRICAO", descricao);
+		dadosCidade.put("DESCRICAO", descricao.replace("'", " "));
 		dadosCidade.put("COD_IBGE",codIbge);
 		
 		final CidadeSql cidadeSql = new CidadeSql(context);
@@ -1750,7 +1750,7 @@ public class ImportarDadosTxtRotinas {
 		dadosEndereco.put("DT_ALT", dtAlt);
 		dadosEndereco.put("TIPO", tipo);
 		dadosEndereco.put("CEP", cep);
-		dadosEndereco.put("BAIRRO", bairro);
+		dadosEndereco.put("BAIRRO", bairro.replace("'", " "));
 		dadosEndereco.put("LOGRADOURO", logradouro);
 		dadosEndereco.put("NUMERO", numero);
 		dadosEndereco.put("COMPLEMENTO", complemento);

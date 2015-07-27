@@ -44,8 +44,8 @@ public class PessoaRotinas extends Rotinas {
 		List<DescricaoSimplesBeans> lista = new ArrayList<DescricaoSimplesBeans>();
 
 		String sql = "SELECT CFACIDAD.DESCRICAO AS DESCRICAO_CIDAD FROM CFAENDER "
-				   + "INNER JOIN CFACIDAD ON CFAENDER.ID_CFACIDAD = CFACIDAD.ID_CFACIDAD "
-				   + "INNER JOIN CFACLIFO ON CFAENDER.ID_CFACLIFO = CFACLIFO.ID_CFACLIFO "
+				   + "LEFT OUTER JOIN CFACIDAD ON CFAENDER.ID_CFACIDAD = CFACIDAD.ID_CFACIDAD "
+				   + "LEFT OUTER JOIN CFACLIFO ON CFAENDER.ID_CFACLIFO = CFACLIFO.ID_CFACLIFO "
 				   + "WHERE (CFACIDAD.DESCRICAO IS NOT NULL) ";
 		
 		// Verifica qual opcao foi passado por parametro
@@ -90,16 +90,16 @@ public class PessoaRotinas extends Rotinas {
 	 */
 	public List<PessoaBeans> listaPessoaResumido(String where, String tipoPessoa) {
 		String sql = "SELECT CFACLIFO.ID_CFACLIFO, CFACLIFO.CODIGO_CLI, CFACLIFO.CODIGO_FUN, CFACLIFO.CODIGO_USU, "
-					+"CFACLIFO.CODIGO_TRA, "
+					+"CFACLIFO.CODIGO_TRA, CFACLIFO.CLIENTE, "
 					+"CFACLIFO.NOME_RAZAO, CFACLIFO.NOME_FANTASIA, CFACLIFO.PESSOA, CFACLIFO.DT_ULT_COMPRA, "
 					+"CFASTATU.ID_CFASTATU, CFASTATU.DESCRICAO AS DESCRICAO_STATU, CFASTATU.BLOQUEIA, CFASTATU.PARCELA_EM_ABERTO, CFASTATU.VISTA_PRAZO, CPF_CNPJ, CFACLIFO.IE_RG, "
 					+"CFACIDAD.ID_CFACIDAD, CFACIDAD.DESCRICAO AS DESCRICAO_CIDAD, CFAESTAD.UF, CFAESTAD.ID_CFAESTAD, "
-					+"CFAENDER.CEP, CFAENDER.BAIRRO, CFAENDER.LOGRADOURO, CFAENDER.NUMERO, CFAENDER.COMPLEMENTO, CFAENDER.EMAIL "
+					+"CFAENDER.TIPO, CFAENDER.CEP, CFAENDER.BAIRRO, CFAENDER.LOGRADOURO, CFAENDER.NUMERO, CFAENDER.COMPLEMENTO, CFAENDER.EMAIL "
 					+"FROM CFACLIFO "
-					+"INNER JOIN CFASTATU ON (CFACLIFO.ID_CFASTATU = CFASTATU.ID_CFASTATU) "
-					+"INNER JOIN CFAENDER ON (CFAENDER.ID_CFAENDER = (SELECT CFAENDER.ID_CFAENDER FROM CFAENDER WHERE (CFAENDER.ID_CFACLIFO = CFACLIFO.ID_CFACLIFO) LIMIT 1)) "
-					+"INNER JOIN CFAESTAD ON (CFAESTAD.ID_CFAESTAD = CFAENDER.ID_CFAESTAD) "
-					+"INNER JOIN CFACIDAD ON (CFACIDAD.ID_CFACIDAD = CFAENDER.ID_CFACIDAD) ";
+					+"LEFT OUTER JOIN CFASTATU ON (CFACLIFO.ID_CFASTATU = CFASTATU.ID_CFASTATU) "
+					+"LEFT OUTER JOIN CFAENDER ON (CFAENDER.ID_CFAENDER = (SELECT CFAENDER.ID_CFAENDER FROM CFAENDER WHERE (CFAENDER.ID_CFACLIFO = CFACLIFO.ID_CFACLIFO) LIMIT 1)) "
+					+"LEFT OUTER JOIN CFAESTAD ON (CFAESTAD.ID_CFAESTAD = CFAENDER.ID_CFAESTAD) "
+					+"LEFT OUTER JOIN CFACIDAD ON (CFACIDAD.ID_CFACIDAD = CFAENDER.ID_CFACIDAD) ";
 		
 		// Verifica se eh para retornar apenas os clientes
 		if(tipoPessoa.equalsIgnoreCase(KEY_TIPO_CLIENTE)){
@@ -113,12 +113,10 @@ public class PessoaRotinas extends Rotinas {
 		} else if (tipoPessoa.equalsIgnoreCase(KEY_TIPO_USUARIO)){
 			sql = sql + "WHERE (CFACLIFO.USUARIO = 1) ";
 		}
-		
 		// Adiciona a clausula where passada por parametro no sql
 		if(where != null){
 			sql = sql + " AND ( " + where +" ) ";
 		}
-		
 		// Adiciona a ordem no sql
 		sql = sql + "ORDER BY CFACLIFO.NOME_RAZAO, CFACLIFO.CPF_CNPJ, CFACIDAD.DESCRICAO ";
 		
@@ -130,7 +128,7 @@ public class PessoaRotinas extends Rotinas {
 		
 		Cursor dadosPessoa = pessoaSql.sqlSelect(sql);
 		// Se o cursor tiver algum valor entra no laco
-		if(dadosPessoa.getCount() > 0){
+		if (dadosPessoa != null && dadosPessoa.getCount() > 0){
 			// Cria a variavel para salvar os dados da pesso
 			PessoaBeans pessoa;
 			
@@ -155,7 +153,13 @@ public class PessoaRotinas extends Rotinas {
 				pessoa.setDataUltimaCompra(funcoes.formataData(dadosPessoa.getString(dadosPessoa.getColumnIndex("DT_ULT_COMPRA"))));
 				pessoa.setCpfCnpj(dadosPessoa.getString(dadosPessoa.getColumnIndex("CPF_CNPJ")));
 				pessoa.setIeRg(dadosPessoa.getString(dadosPessoa.getColumnIndex("IE_RG")));
-				pessoa.setPessoa(dadosPessoa.getString(dadosPessoa.getColumnIndex("PESSOA")).charAt(0));
+				if ((dadosPessoa.getString(dadosPessoa.getColumnIndex("CLIENTE")) != null) && (dadosPessoa.getString(dadosPessoa.getColumnIndex("CLIENTE")).length() > 0)) {
+					pessoa.setCliente(dadosPessoa.getString(dadosPessoa.getColumnIndex("CLIENTE")).charAt(0));
+				}
+				// Checa se retornou algum valor
+				if ((dadosPessoa.getString(dadosPessoa.getColumnIndex("PESSOA")) != null) && (!dadosPessoa.getString(dadosPessoa.getColumnIndex("PESSOA")).equals(""))) {
+					pessoa.setPessoa(dadosPessoa.getString(dadosPessoa.getColumnIndex("PESSOA")).charAt(0));
+				}
 
 				// Instancia a classe de cidade
 				CidadeBeans cidade = new CidadeBeans();
@@ -175,14 +179,24 @@ public class PessoaRotinas extends Rotinas {
 				StatusBeans status = new StatusBeans();
 				status.setIdStatus(dadosPessoa.getInt(dadosPessoa.getColumnIndex("ID_CFASTATU")));
 				status.setDescricao(dadosPessoa.getString(dadosPessoa.getColumnIndex("DESCRICAO_STATU")));
-				status.setBloqueia(dadosPessoa.getString(dadosPessoa.getColumnIndex("BLOQUEIA")).charAt(0));
-				status.setParcelaEmAberto(dadosPessoa.getString(dadosPessoa.getColumnIndex("PARCELA_EM_ABERTO")).charAt(0));
-				status.setVistaPrazo(dadosPessoa.getString(dadosPessoa.getColumnIndex("VISTA_PRAZO")).charAt(0));
+				// Checa se tem algum dados
+				if ((dadosPessoa.getString(dadosPessoa.getColumnIndex("BLOQUEIA")) != null) && (!dadosPessoa.getString(dadosPessoa.getColumnIndex("BLOQUEIA")).equals(""))) {
+					status.setBloqueia(dadosPessoa.getString(dadosPessoa.getColumnIndex("BLOQUEIA")).charAt(0));
+				}
+				if ((dadosPessoa.getString(dadosPessoa.getColumnIndex("PARCELA_EM_ABERTO")) != null) && (!dadosPessoa.getString(dadosPessoa.getColumnIndex("PARCELA_EM_ABERTO")).equals(""))) {
+					status.setParcelaEmAberto(dadosPessoa.getString(dadosPessoa.getColumnIndex("PARCELA_EM_ABERTO")).charAt(0));
+				}
+				if ((dadosPessoa.getString(dadosPessoa.getColumnIndex("VISTA_PRAZO")) != null) && (!dadosPessoa.getString(dadosPessoa.getColumnIndex("VISTA_PRAZO")).equals(""))) {
+					status.setVistaPrazo(dadosPessoa.getString(dadosPessoa.getColumnIndex("VISTA_PRAZO")).charAt(0));
+				}
 				// Adiciona o status na pessoa
 				pessoa.setStatusPessoa(status);
 				
 				// Instancia a classe de endereco
 				EnderecoBeans endereco = new EnderecoBeans();
+				if ((dadosPessoa.getString(dadosPessoa.getColumnIndex("TIPO")) != null) && (dadosPessoa.getString(dadosPessoa.getColumnIndex("TIPO")).length() > 0)) {
+					endereco.setTipoEndereco(dadosPessoa.getString(dadosPessoa.getColumnIndex("TIPO")).charAt(0));
+				}
 				endereco.setBairro(dadosPessoa.getString(dadosPessoa.getColumnIndex("BAIRRO")));
 				endereco.setCep(dadosPessoa.getString(dadosPessoa.getColumnIndex("CEP")));
 				endereco.setLogradouro(dadosPessoa.getString(dadosPessoa.getColumnIndex("LOGRADOURO")));
@@ -225,7 +239,6 @@ public class PessoaRotinas extends Rotinas {
 		// Cria uma lista para armazenar todas as pessoas retornadas do banco
 		PessoaBeans dadosPessoaCompleto = new PessoaBeans();
 		try{
-			
 			String where = "CFACLIFO.ID_CFACLIFO = " + idPessoa;
 			
 			dadosPessoaCompleto = listaPessoaResumido(where, tipoPessoa).get(0);
@@ -316,7 +329,6 @@ public class PessoaRotinas extends Rotinas {
 				// Limpa a lista
 				listaTele.clear();
 			}
-			
 			sql = "SELECT CFAPARAM.ID_CFACLIFO, CFAPARAM.ID_SMAEMPRE, CFAPARAM.LIMITE, CFAPARAM.DESC_ATAC_VISTA AS DESC_ATAC_VISTA_PARAM, CFAPARAM.DESC_ATAC_PRAZO AS DESC_ATAC_PRAZO_PARAM, "
 				+ "CFAPARAM.DESC_VARE_VISTA AS DESC_VARE_VISTA_PARAM, CFAPARAM.DESC_VARE_PRAZO AS DESC_VARE_PRAZO_PARAM, CFAPARAM.DT_ULT_VISITA AS DT_ULT_VISITA_PARAM, "
 				+ "CFATPDOC.ID_CFATPDOC, CFATPDOC.CODIGO AS CODIGO_TPDOC, CFATPDOC.DESCRICAO AS DESCRICAO_TPDOC, CFATPDOC.SIGLA AS SIGLA_TPDOC, CFATPDOC.TIPO AS TIPO_TPDOC, "
@@ -393,8 +405,7 @@ public class PessoaRotinas extends Rotinas {
 				dadosPessoaCompleto.setPlanoPagamentoPessoa(planoPagamentoBeans);
 				
 			}
-			
-			
+
 			sql = "SELECT SUM(RPAPARCE.FC_VL_RESTANTE) AS TOTAL_CREDITO FROM RPAPARCE WHERE (RPAPARCE.ID_CFACLIFO = " + idPessoa + ") AND (RPAPARCE.TIPO = 1) "
 				+ " AND (RPAPARCE.DT_BAIXA IS NULL)";
 			
@@ -510,7 +521,7 @@ public class PessoaRotinas extends Rotinas {
 	
 	public String emailPessoa(String idPessoa){
 		String sql = "SELECT CFAENDER.EMAIL FROM CFACLIFO "
-				   + "INNER JOIN CFAENDER ON (CFAENDER.ID_CFAENDER = (SELECT CFAENDER.ID_CFAENDER FROM CFAENDER WHERE (CFAENDER.ID_CFACLIFO = CFACLIFO.ID_CFACLIFO) LIMIT 1)) "
+				   + "LEFT OUTER JOIN CFAENDER ON (CFAENDER.ID_CFAENDER = (SELECT CFAENDER.ID_CFAENDER FROM CFAENDER WHERE (CFAENDER.ID_CFACLIFO = CFACLIFO.ID_CFACLIFO) LIMIT 1)) "
 				   + "WHERE CFACLIFO.ID_CFACLIFO = " + idPessoa;
 		
 		// Instancia a classe para manipular o banco de dados
