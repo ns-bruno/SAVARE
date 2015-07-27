@@ -538,4 +538,23 @@ public class PessoaRotinas extends Rotinas {
 		}
 		return email;
 	} // fIM emailPessoa
+
+
+	public double quantidadeCadastroPessoaNovo(){
+		double qtd = 0;
+		String sql = "SELECT COUNT(*) AS QTD FROM CFACLIFO WHERE (CFACLIFO.STATUS_CADASTRO_NOVO = 'N') AND (CFACLIFO.ID_CFACLIFO < 0)";
+
+		// Instancia a classe para manipular o banco de dados
+		PessoaSql clienteSql = new PessoaSql(context);
+		// Executa a funcao para retornar os registro do banco de dados
+		Cursor cursor = clienteSql.sqlSelect(sql);
+
+		if ((cursor != null) && (cursor.getCount() > 0)){
+			// Move o cursor para o primeiro registro
+			cursor.moveToFirst();
+
+			qtd = cursor.getDouble(cursor.getColumnIndex("QTD"));
+		}
+		return qtd;
+	} // Fim quantidadeCadastroPessoaNovo
 }

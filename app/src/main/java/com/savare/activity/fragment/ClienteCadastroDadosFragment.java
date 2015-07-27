@@ -204,9 +204,6 @@ public class ClienteCadastroDadosFragment extends Fragment {
 					funcoes.menssagem(mensagem);
 				}
 
-
-
-
 				break;
 
 		default:
