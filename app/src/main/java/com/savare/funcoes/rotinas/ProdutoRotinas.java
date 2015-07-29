@@ -198,10 +198,10 @@ public class ProdutoRotinas extends Rotinas {
 							// Preenche os dados da embalagem
 							embalagem.setIdEmbalagem(cursorEmbalagem.getInt(cursorEmbalagem.getColumnIndex("ID_AEAEMBAL")));
 							embalagem.setIdUnidadeVenda(cursorEmbalagem.getInt(cursorEmbalagem.getColumnIndex("ID_AEAUNVEN")));
-							if(cursorEmbalagem.getString(cursorEmbalagem.getColumnIndex("ATIVO")).length() > 0){
+							if((cursorEmbalagem.getString(cursorEmbalagem.getColumnIndex("ATIVO")) != null) && (cursorEmbalagem.getString(cursorEmbalagem.getColumnIndex("ATIVO")).length() > 0)){
 								embalagem.setAtivo(cursorEmbalagem.getString(cursorEmbalagem.getColumnIndex("ATIVO")).charAt(0));
 							}
-							if(cursorEmbalagem.getString(cursorEmbalagem.getColumnIndex("PRINCIPAL")).length() > 0){
+							if((cursorEmbalagem.getString(cursorEmbalagem.getColumnIndex("PRINCIPAL")) != null) && (cursorEmbalagem.getString(cursorEmbalagem.getColumnIndex("PRINCIPAL")).length() > 0)){
 								embalagem.setPrincipal(cursorEmbalagem.getString(cursorEmbalagem.getColumnIndex("PRINCIPAL")).charAt(0));
 							}
 							embalagem.setDescricaoEmbalagem(cursorEmbalagem.getString(cursorEmbalagem.getColumnIndex("DESCRICAO")));

@@ -490,7 +490,7 @@ public class FuncoesPersonalizadas {
 				// Activity for abaerta
 				tempoInicio.add(Calendar.SECOND, 3);
 				// Cria um intervalo de quanto em quanto tempo o alarme vai repetir
-				long intervalo = 1 * 1000; // 5 Minutos
+				long intervalo = 1 * 1000; // 1 Minutos
 				
 				AlarmManager alarmeEnviarOrcamento = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 				alarmeEnviarOrcamento.setRepeating(AlarmManager.RTC_WAKEUP, tempoInicio.getTimeInMillis(), intervalo, alarmIntent);

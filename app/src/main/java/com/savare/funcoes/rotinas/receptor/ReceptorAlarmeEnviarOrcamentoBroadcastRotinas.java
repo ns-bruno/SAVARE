@@ -10,6 +10,7 @@ import com.savare.funcoes.rotinas.PessoaRotinas;
 import com.savare.funcoes.rotinas.async.EnviarCadastroClienteFtpAsyncRotinas;
 import com.savare.funcoes.rotinas.async.EnviarOrcamentoFtpAsyncRotinas;
 
+import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -33,8 +34,8 @@ public class ReceptorAlarmeEnviarOrcamentoBroadcastRotinas extends BroadcastRece
 		
 		double quatidadeOrcamentoEnviar = funcoes.desformatarValor(orcamentoRotinas.quantidadeListaOrcamento("P", null, null));
 
-		PessoaRotinas pessoaRotinas = new PessoaRotinas(context);
-		double quantidadeCadastroNovo = pessoaRotinas.quantidadeCadastroPessoaNovo();
+		//final PessoaRotinas pessoaRotinas = new PessoaRotinas(context);
+		//double quantidadeCadastroNovo = pessoaRotinas.quantidadeCadastroPessoaNovo();
 		
 		// Checa se existe algum orcamento a ser enviado
 		if(quatidadeOrcamentoEnviar > 0){
@@ -53,8 +54,7 @@ public class ReceptorAlarmeEnviarOrcamentoBroadcastRotinas extends BroadcastRece
 			// Excuta tarefa em segundo plano e passa paramento com a lista de orcamento
 			enviarOrcamentoFtpAsync.execute(listaOrcamento);
 		}
-
-		if (quantidadeCadastroNovo > 0){
+		/*if (quantidadeCadastroNovo > 0){
 
 			String where = " (CFACLIFO.ID_CFACLIFO < 0) AND (CFACLIFO.STATUS_CADASTRO_NOVO = N) ";
 
@@ -62,12 +62,12 @@ public class ReceptorAlarmeEnviarOrcamentoBroadcastRotinas extends BroadcastRece
 			// Pega a lista de pessoa a serem enviadas os dados
 			listaPessoasCadastro = pessoaRotinas.listaPessoaCompleta(PessoaRotinas.KEY_TIPO_CLIENTE, where);
 			// Checa se retornou alguma lista
-			if (listaPessoasCadastro != null && listaPessoasCadastro.size() > 0){
+			if (listaPessoasCadastro != null && listaPessoasCadastro.size() > 0) {
 				EnviarCadastroClienteFtpAsyncRotinas enviarCadastro = new EnviarCadastroClienteFtpAsyncRotinas(context, EnviarCadastroClienteFtpAsyncRotinas.TELA_RECEPTOR_ALARME);
 				// Executa o envio do cadastro em segundo plano
 				enviarCadastro.execute(listaPessoasCadastro);
 			}
-		}
+		}*/
 	}
 
 }

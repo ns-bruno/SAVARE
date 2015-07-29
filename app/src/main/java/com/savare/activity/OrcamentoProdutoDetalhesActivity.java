@@ -784,6 +784,20 @@ public class OrcamentoProdutoDetalhesActivity extends Activity {
 				}
 			}
 		}
+
+		if ((adapterEstoque.getListaEstoque().get(spinnerEstoque.getSelectedItemPosition()) == null) || (adapterEstoque.getListaEstoque().size() <= 0)){
+			// Dados da mensagem
+			ContentValues mensagem = new ContentValues();
+			mensagem.put("comando", 1);
+			mensagem.put("tela", "OrcamentoProdutoDetalhesActivity");
+			mensagem.put("mensagem", "Não tem estoque selecionado." + casasDecimais
+					+ "\n Favor, entrar em contato com o administrador da empresa para que possa enviar os dados corretos do produto.");
+
+			FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(OrcamentoProdutoDetalhesActivity.this);
+			funcoes.menssagem(mensagem);
+
+			dadosValidos = false;
+		}
 		return dadosValidos;
 	} // Fim validarDados
 	
@@ -828,7 +842,7 @@ public class OrcamentoProdutoDetalhesActivity extends Activity {
 			valorDesconto = funcoes.desformatarValor(editValorDesconto.getText().toString());
 		}
 		
-		// Checa se o campo que esta chamando esta funcao eh o campo quantidade ou desconto
+		// Checa se o campo que esta chamando esta funcao eh o campo quantidade
 		if(campoChamada == editQuantidade.getId()){
 			valorUnitarioLiquido = (this.valorUnitarioVendaAux - (this.valorUnitarioVendaAux * (percentualDesconto / 100)));
 			totalLiquido = (valorUnitarioLiquido * quantidade);
@@ -844,10 +858,12 @@ public class OrcamentoProdutoDetalhesActivity extends Activity {
 		if(campoChamada == editDesconto.getId()){
 			valorUnitarioLiquido = (this.valorUnitarioVendaAux - (this.valorUnitarioVendaAux * (percentualDesconto / 100)));
 			totalLiquido = (valorUnitarioLiquido * quantidade);
+			valorDesconto = ((this.valorUnitarioVendaAux * quantidade) - totalLiquido);
 
-			editQuantidade.setText(""+quantidade);
+			editQuantidade.setText(funcoes.arredondarValor(quantidade));
 			editUnitarioLiquidoVenda.setText(funcoes.arredondarValor(valorUnitarioLiquido));
 			editTotal.setText(funcoes.arredondarValor(totalLiquido));
+			editValorDesconto.setText(funcoes.arredondarValor(valorDesconto));
 		}
 		
 		if(campoChamada == editValorDesconto.getId()){
@@ -867,7 +883,7 @@ public class OrcamentoProdutoDetalhesActivity extends Activity {
 			valorDesconto = ((this.valorUnitarioVendaAux * quantidade) - totalLiquido);
 			
 			// Seta os campos com os novos valores
-			editQuantidade.setText(""+quantidade);
+			editQuantidade.setText(funcoes.arredondarValor(quantidade));
 			editDesconto.setText(funcoes.arredondarValor(percentualDesconto));
 			editValorDesconto.setText(funcoes.arredondarValor(valorDesconto));
 			editTotal.setText(funcoes.arredondarValor(totalLiquido));
@@ -880,7 +896,7 @@ public class OrcamentoProdutoDetalhesActivity extends Activity {
 			valorDesconto = ((this.valorUnitarioVendaAux * quantidade) - totalLiquido);
 			
 			// Seta os campos com os novos valores
-			editQuantidade.setText(""+quantidade);
+			editQuantidade.setText(funcoes.arredondarValor(quantidade));
 			editUnitarioLiquidoVenda.setText(funcoes.arredondarValor(valorUnitarioLiquido));
 			editDesconto.setText(funcoes.arredondarValor(percentualDesconto));
 			editValorDesconto.setText(funcoes.arredondarValor(valorDesconto));

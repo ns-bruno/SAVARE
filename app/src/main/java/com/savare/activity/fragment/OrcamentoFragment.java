@@ -450,8 +450,8 @@ public class OrcamentoFragment extends Fragment {
 				ContentValues mensagem = new ContentValues();
 				mensagem.put("comando", 2);
 				mensagem.put("tela", "OrcamentoActivity");
-				mensagem.put("mensagem", "N�o � um or�amento. \n"
-						   + "N�o pode ser inserido novos produtos.");
+				mensagem.put("mensagem", "Não � um orçamento. \n"
+						   + "Não pode ser inserido novos produtos.");
 				// Executa a mensagem passando por parametro as propriedades
 				funcoes.menssagem(mensagem);
 			}

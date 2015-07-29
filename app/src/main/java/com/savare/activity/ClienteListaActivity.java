@@ -105,10 +105,14 @@ public class ClienteListaActivity extends Activity implements OnNavigationListen
 					returnIntent.putExtra("NOME_CLIENTE", pessoa.getNomeRazao());
 					returnIntent.putExtra("IE_RG_CLIENTE", pessoa.getIeRg());
 					returnIntent.putExtra("CPF_CGC_CLIENTE", pessoa.getCpfCnpj());
+					returnIntent.putExtra("CODIGO_CLI", String.valueOf(pessoa.getCodigoCliente()));
+					returnIntent.putExtra("CODIGO_USU", String.valueOf(pessoa.getCodigoUsuario()));
+					returnIntent.putExtra("CODIGO_TRA", String.valueOf(pessoa.getCodigoTransportadora()));
+					returnIntent.putExtra("CODIGO_FUN", String.valueOf(pessoa.getCodigoFuncionario()));
 					returnIntent.putExtra("ENDERECO_CLIENTE", pessoa.getEnderecoPessoa().getLogradouro() + ", " + pessoa.getEnderecoPessoa().getNumero());
 					returnIntent.putExtra("BAIRRO_CLIENTE", pessoa.getEnderecoPessoa().getBairro());
 					returnIntent.putExtra("CEP_CLIENTE", pessoa.getEnderecoPessoa().getCep());
-					
+
 					setResult(ListaOrcamentoPedidoActivity.RETORNA_CLIENTE, returnIntent);
 					// Fecha a tela de detalhes de produto
 					finish();
@@ -143,6 +147,10 @@ public class ClienteListaActivity extends Activity implements OnNavigationListen
 						Intent returnIntent = new Intent();
 						returnIntent.putExtra("NOME_CLIENTE", pessoa.getNomeRazao());
 						returnIntent.putExtra("ID_CFACLIFO", String.valueOf(pessoa.getIdPessoa()));
+						returnIntent.putExtra("CODIGO_CLI", String.valueOf(pessoa.getCodigoCliente()));
+						returnIntent.putExtra("CODIGO_USU", String.valueOf(pessoa.getCodigoUsuario()));
+						returnIntent.putExtra("CODIGO_TRA", String.valueOf(pessoa.getCodigoTransportadora()));
+						returnIntent.putExtra("CODIGO_FUN", String.valueOf(pessoa.getCodigoFuncionario()));
 						
 						setResult(OrcamentoFragment.RETORNA_CLIENTE, returnIntent);
 						// Fecha a tela de detalhes de produto
@@ -161,6 +169,10 @@ public class ClienteListaActivity extends Activity implements OnNavigationListen
 					// Abre a tela inicial do sistema
 					Intent intent = new Intent(ClienteListaActivity.this, ClienteDetalhesActivity.class);
 					intent.putExtra("ID_CFACLIFO", String.valueOf(pessoa.getIdPessoa()));
+					intent.putExtra("CODIGO_CLI", String.valueOf(pessoa.getCodigoCliente()));
+					intent.putExtra("CODIGO_USU", String.valueOf(pessoa.getCodigoUsuario()));
+					intent.putExtra("CODIGO_TRA", String.valueOf(pessoa.getCodigoTransportadora()));
+					intent.putExtra("CODIGO_FUN", String.valueOf(pessoa.getCodigoFuncionario()));
 					startActivity(intent);
 				}
 			}

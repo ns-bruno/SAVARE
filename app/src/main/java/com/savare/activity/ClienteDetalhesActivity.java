@@ -77,6 +77,11 @@ public class ClienteDetalhesActivity extends Activity implements OnChartGestureL
 					 editDescontoVarejoPrazo,
 					 editUltimaVisita;
 	FuncoesPersonalizadas funcoes;
+	private String codigoCli,
+				   codigoFun,
+				   codigoUsu,
+				   codigoTra,
+				   idCliente;
 	
 	private ItemUniversalAdapter adapterRamoAtividade,
 								 adapterTipoCliente,
@@ -102,14 +107,23 @@ public class ClienteDetalhesActivity extends Activity implements OnChartGestureL
 		Bundle intentParametro = getIntent().getExtras();
 		// Checa se foi passado algum parametro
 		if (intentParametro != null) {
+			// Pega os codigo internos da pessoa
+			codigoCli = intentParametro.getString("CODIGO_CLI");
+			codigoFun = intentParametro.getString("CODIGO_FUN");
+			codigoTra = intentParametro.getString("CODIGO_TRA");
+			codigoUsu = intentParametro.getString("CODIGO_USU");
 
-			if (Integer.parseInt(intentParametro.getString("ID_CFACLIFO")) > 99000000){
-				// Seta o campo codigo consumo total com o que foi passado por parametro
-				textCodigoPessoa.setText("*" + intentParametro.getString("ID_CFACLIFO"));
+			// Checa se eh um cadastro novo feito na aplicacao
+			if (Integer.parseInt(intentParametro.getString("ID_CFACLIFO")) < 0){
+				// Pega o id do cliente
+				idCliente = intentParametro.getString("ID_CFACLIFO");
+
+				// Seta o campo codigo da pessoa com o que foi passado por parametro
+				textCodigoPessoa.setText("*" + intentParametro.getString("CODIGO_CLI"));
 				textCodigoPessoa.setTextColor(getResources().getColor(R.color.vermelho_escuro));
 			}else {
 				// Seta o campo codigo consumo total com o que foi passado por parametro
-				textCodigoPessoa.setText(intentParametro.getString("ID_CFACLIFO"));
+				textCodigoPessoa.setText(intentParametro.getString("CODIGO_CLI"));
 			}
 			carregarDadosPessoa();
 			
@@ -158,7 +172,7 @@ public class ClienteDetalhesActivity extends Activity implements OnChartGestureL
 			// Instancia a classe de funcoes sql para pessoa
 			PessoaRotinas pessoaRotinas = new PessoaRotinas(ClienteDetalhesActivity.this);
 			// Pega os dados de uma pessoa especifica
-			final PessoaBeans pessoa = pessoaRotinas.listaPessoaResumido("CODIGO_CLI = " + textCodigoPessoa.getText().toString(), "cliente").get(0);
+			final PessoaBeans pessoa = pessoaRotinas.listaPessoaResumido("CODIGO_CLI = " + codigoCli, PessoaRotinas.KEY_TIPO_CLIENTE).get(0);
 			
 			// Cria um dialog para selecionar atacado ou varejo
 			AlertDialog.Builder mensagemAtacadoVarejo = new AlertDialog.Builder(ClienteDetalhesActivity.this);
@@ -293,7 +307,7 @@ public class ClienteDetalhesActivity extends Activity implements OnChartGestureL
 		// Instancia a classe de rotinas
 		PessoaRotinas pessoaRotinas = new PessoaRotinas(ClienteDetalhesActivity.this);
 		// Pega os dados da pessoa de acordo com o ID
-		PessoaBeans pessoa = pessoaRotinas.pessoaCompleta(textCodigoPessoa.getText().toString(), "cliente");
+		PessoaBeans pessoa = pessoaRotinas.pessoaCompleta(idCliente, "cliente");
 		//PessoaBeans pessoa = pessoaRotinas.listaPessoaResumido("CFACLIFO.ID_CFACLIFO = " + textCodigoPessoa.getText().toString(), "cliente").get(0);
 		
 		FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(ClienteDetalhesActivity.this);
@@ -455,7 +469,7 @@ public class ClienteDetalhesActivity extends Activity implements OnChartGestureL
 																										 OrcamentoRotinas.PEDIDO_RETORNADO_BLOQUEADO,
 																										 OrcamentoRotinas.PEDIDO_RETORNADO_LIBERADO}, 
 																										 
-																										 "AEAORCAM.ID_CFACLIFO = " + textCodigoPessoa.getText().toString(), 
+																										 "AEAORCAM.ID_CFACLIFO = " + idCliente,
 																										 
 																										 OrcamentoRotinas.ORDEM_CRESCENTE);
 		if(listaTotalVendasCliente.size() > 0){

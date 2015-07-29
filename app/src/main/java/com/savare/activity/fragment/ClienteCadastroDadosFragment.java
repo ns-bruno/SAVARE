@@ -372,6 +372,7 @@ public class ClienteCadastroDadosFragment extends Fragment {
 			dadosCliente.put("IE_RG", editInscricaoEstadual.getText().toString());
 			dadosCliente.put("CAPITAL_SOCIAL", editCapitalSocial.getText().toString());
 			dadosCliente.put("CLIENTE", "1");
+			dadosCliente.put("CODIGO_CLI" , idPessoaTemporario);
 			dadosCliente.put("ID_SMAEMPRE", funcoes.getValorXml("CodigoEmpresa"));
 			dadosCliente.put("STATUS_CADASTRO_NOVO", "N");
 

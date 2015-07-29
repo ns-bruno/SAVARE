@@ -73,18 +73,22 @@
         <activity android:name=".activity.ListaOrcamentoPedidoActivity"></activity>
         <activity android:name=".activity.ListaTitulosActivity"></activity>
         <activity android:name=".activity.SincronizacaoActivity"></activity>
-        <activity android:name=".activity.ConfiguracoesActivity"></activity><receiver android:name="com.savare.funcoes.rotinas.receptor.ReceptorAlarmeEnviarOrcamentoBroadcastRotinas" android:label="ReceptorAlarmeEnviarOrcamentoBroadcastRotinas">
-            <intent-filter>
-                <action android:name="ENVIAR_ORCAMENTO_SAVARE" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
+        <activity android:name=".activity.ConfiguracoesActivity"></activity>
+
+        <receiver android:name="com.savare.funcoes.rotinas.receptor.ReceptorAlarmeEnviarOrcamentoBroadcastRotinas" android:label="ReceptorAlarmeEnviarOrcamentoBroadcastRotinas">
+        <intent-filter>
+            <action android:name="ENVIAR_ORCAMENTO_SAVARE" />
+            <category android:name="android.intent.category.DEFAULT" />
+        </intent-filter>
         </receiver>
+
         <receiver android:label="ReceptorNotificarAparelhoRotinas" android:name="com.savare.funcoes.rotinas.receptor.ReceptorNotificarAparelhoRotinas">
             <intent-filter>
                 <category android:name="android.intent.category.DEFAULT"/>
                 <action android:name="NOTIFICACAO_SAVARE"/>
             </intent-filter>
         </receiver>
+
         <receiver android:label="ReceptorCriarAlarmeRebootRotinas" android:name="com.savare.funcoes.rotinas.receptor.ReceptorCriarAlarmeRebootRotinas">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
@@ -98,6 +102,14 @@
                 <action android:name="RECEBER_DADOS_SAVARE"/>
             </intent-filter>
         </receiver>
+
+        <!--<receiver android:name="com.savare.funcoes.rotinas.receptor.ReceptorAlarmeEnviarCadastroPessoaBroadcastRotinas" android:label="ReceptorAlarmeEnviarCadastroPessoaBroadcastRotinas">
+            <intent-filter>
+                <action android:name="ENVIAR_ORCAMENTO_SAVARE" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </receiver>-->
+
         <activity android:name=".activity.fragment.OrcamentoTabulacaoFragment"
             android:uiOptions="splitActionBarWhenNarrow">
         </activity>

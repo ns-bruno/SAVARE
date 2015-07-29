@@ -115,6 +115,15 @@
             </intent-filter>
         </receiver>
 
+        <!--
+        <receiver android:name="com.savare.funcoes.rotinas.receptor.ReceptorAlarmeEnviarCadastroPessoaBroadcastRotinas" android:label="ReceptorAlarmeEnviarCadastroPessoaBroadcastRotinas">
+            <intent-filter>
+                <action android:name="ENVIAR_ORCAMENTO_SAVARE" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </receiver>
+        -->
+
         <activity
             android:name="com.savare.activity.fragment.OrcamentoTabulacaoFragment"
             android:uiOptions="splitActionBarWhenNarrow" >
