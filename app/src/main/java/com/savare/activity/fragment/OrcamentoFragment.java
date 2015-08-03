@@ -484,7 +484,8 @@ public class OrcamentoFragment extends Fragment {
 					PessoaRotinas pessoaRotinas = new PessoaRotinas(getActivity());
 					
 					Intent dadosEmail = new Intent(Intent.ACTION_SEND);
-					dadosEmail.setType("message/rfc822");
+					//dadosEmail.setType("message/rfc822");
+					dadosEmail.setType("message/*");
 					dadosEmail.putExtra(Intent.EXTRA_EMAIL  , new String[]{pessoaRotinas.emailPessoa(idPessoa)});
 					dadosEmail.putExtra(Intent.EXTRA_SUBJECT, "Or�amento/Pedido de N� " + textCodigoOrcamento.getText());
 					dadosEmail.putExtra(Intent.EXTRA_STREAM, Uri.parse("file://"+arquivo));
@@ -532,7 +533,7 @@ public class OrcamentoFragment extends Fragment {
 			// Preenche o dialog com os dados do banco de dados
 			editObservacao.setText(obs);
 			// Altera o titulo da observacao
-			dialogoObservacao.setTitle("Observa��o");
+			dialogoObservacao.setTitle(getActivity().getResources().getText(R.string.observacao));
 			dialogoObservacao.setPositiveButton("OK", new DialogInterface.OnClickListener() {
 				@Override
 				public void onClick(DialogInterface dialog, int which) {

@@ -112,12 +112,11 @@ public class ClienteDetalhesActivity extends Activity implements OnChartGestureL
 			codigoFun = intentParametro.getString("CODIGO_FUN");
 			codigoTra = intentParametro.getString("CODIGO_TRA");
 			codigoUsu = intentParametro.getString("CODIGO_USU");
+			// Pega o id do cliente
+			idCliente = intentParametro.getString("ID_CFACLIFO");
 
 			// Checa se eh um cadastro novo feito na aplicacao
 			if (Integer.parseInt(intentParametro.getString("ID_CFACLIFO")) < 0){
-				// Pega o id do cliente
-				idCliente = intentParametro.getString("ID_CFACLIFO");
-
 				// Seta o campo codigo da pessoa com o que foi passado por parametro
 				textCodigoPessoa.setText("*" + intentParametro.getString("CODIGO_CLI"));
 				textCodigoPessoa.setTextColor(getResources().getColor(R.color.vermelho_escuro));

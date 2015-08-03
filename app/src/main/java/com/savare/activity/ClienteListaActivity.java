@@ -6,6 +6,7 @@ import java.util.UUID;
 import android.app.ActionBar;
 import android.app.ActionBar.OnNavigationListener;
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.app.SearchManager;
 import android.content.ContentValues;
 import android.content.Context;
@@ -16,6 +17,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.SearchView;
 import android.widget.SearchView.OnQueryTextListener;
 import android.widget.Spinner;
@@ -40,7 +42,7 @@ public class ClienteListaActivity extends Activity implements OnNavigationListen
 	private ActionBar actionBar;
 	private String telaChamou,
 				   idOrcamento;
-	
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -70,7 +72,7 @@ public class ClienteListaActivity extends Activity implements OnNavigationListen
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
         
 		listViewPessoa = (ListView) findViewById(R.id.activity_cliente_lista_list_pessoa);
-		
+
 		// Instancia a classe
 		pessoaRotinas = new PessoaRotinas(ClienteListaActivity.this);
 		
@@ -81,7 +83,6 @@ public class ClienteListaActivity extends Activity implements OnNavigationListen
 		
 		// Posiciona o spinner na primeira posicao da lista
 		actionBar.setSelectedNavigationItem(0);
-		
 
 		// Pega o clique do listViewPessoa
 		listViewPessoa.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -203,7 +204,7 @@ public class ClienteListaActivity extends Activity implements OnNavigationListen
 			 */
 			@Override
 			public boolean onQueryTextSubmit(String query) {
-				
+
 				String where = "CFACLIFO.NOME_RAZAO LIKE '%" + query + "%' OR "
 						     + "CFACLIFO.NOME_FANTASIA LIKE '%" + query + "%' OR "
 						     + "CFACLIFO.CPF_CNPJ LIKE '%" + query + "%' OR "
@@ -217,7 +218,7 @@ public class ClienteListaActivity extends Activity implements OnNavigationListen
 				adapterPessoa = new PessoaAdapter(ClienteListaActivity.this, listaPessoas, 0);
 				// Seta o listView com o novo adapter que ja esta com a nova lista
 				listViewPessoa.setAdapter(adapterPessoa);
-				
+
 				return false;
 			} // Fim do onQueryTextSubmit
 
@@ -258,19 +259,12 @@ public class ClienteListaActivity extends Activity implements OnNavigationListen
 			Intent intentNovo = new Intent(ClienteListaActivity.this, ClienteCadastroFragment.class);
 			startActivity(intentNovo);
 			break;
-			
+
 		default:
 			break;
 		}
 			return true;
 	} // Fim do onOptionsItemSelected
-	
-	
-	@Override
-	protected void onPostCreate(Bundle savedInstanceState) {
-		super.onPostCreate(savedInstanceState);
-		
-	}
 	
 
 	@Override
@@ -298,8 +292,6 @@ public class ClienteListaActivity extends Activity implements OnNavigationListen
 		}
 
 		return false;
-	}
-	
-
+	} // Fim onNavigationItemSelected
 
 }

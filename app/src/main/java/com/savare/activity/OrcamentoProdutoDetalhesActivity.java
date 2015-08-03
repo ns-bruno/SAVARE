@@ -16,6 +16,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -52,6 +53,7 @@ public class OrcamentoProdutoDetalhesActivity extends Activity {
 					 editValorDesconto,
 					 editTotal,
 					 editObservacao;
+
 	private ActionBar actionBar;
 	private ItemUniversalAdapter adapterEmbalagem;
 	private ItemUniversalAdapter adapterPlanoPagamentoPreco;
