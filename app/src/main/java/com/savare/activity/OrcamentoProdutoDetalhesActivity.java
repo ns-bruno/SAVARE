@@ -65,7 +65,8 @@ public class OrcamentoProdutoDetalhesActivity extends Activity {
 	private OrcamentoBeans orcamento;
 	private ProdutoListaBeans produto;
 	private long idItemOrcamento = 0;
-	private String telaChamada = "";
+	private String telaChamada = "",
+				   idProduto;
 	private int orientacaoTela;
 	
 	//TODO: Metodo onCreate da Activity
@@ -91,9 +92,22 @@ public class OrcamentoProdutoDetalhesActivity extends Activity {
 		try{
 			//Pega os dados do produto da outra activity
 			telaChamada = getIntent().getExtras().getString("TELA_CHAMADA");
-			produto = (ProdutoListaBeans) getIntent().getParcelableExtra("AEAPLOJA");	
 			orcamento = (OrcamentoBeans) getIntent().getParcelableExtra("AEAORCAM");
-			
+			idProduto = getIntent().getExtras().getString("ID_AEAPRODU");
+
+			// Checa se foi passado algum id de produto
+			if (idProduto != null){
+				ProdutoRotinas produtoRotinas = new ProdutoRotinas(OrcamentoProdutoDetalhesActivity.this);
+				if (orcamento != null) {
+
+					produto = produtoRotinas.listaProduto("AEAPRODU.ID_AEAPRODU = " + idProduto, null, ""+orcamento.getIdOrcamento()).get(0);
+				} else {
+					produto = produtoRotinas.listaProduto("AEAPRODU.ID_AEAPRODU = " + idProduto, null, null).get(0);
+				}
+			}
+			// Pega se a venda eh no atacado ou varejo
+			produto.setAtacadoVarejo(getIntent().getExtras().getChar("ATAC_VARE"));
+
 			// Checa se as variaveis nao estao vazias
 			if ((produto != null) && (produto.getProduto() != null) && (orcamento != null)) {
 				
@@ -473,9 +487,11 @@ public class OrcamentoProdutoDetalhesActivity extends Activity {
 					produto.put("VL_CUSTO", vlCusto);
 					produto.put("VL_BRUTO", vlBruto);
 					if(this.orcamento.getTipoVenda() == '0'){
-						produto.put("VL_TABELA", this.produto.getValorTabelaAtacado());
+						produto.put("VL_TABELA", this.produto.getValorTabelaAtacado() * quantidade);
+						produto.put("VL_TABELA_UN", this.produto.getValorTabelaAtacado());
 					} else {
-						produto.put("VL_TABELA", this.produto.getValorTabelaVarejo());
+						produto.put("VL_TABELA", this.produto.getValorTabelaVarejo() * quantidade);
+						produto.put("VL_TABELA_UN", this.produto.getValorTabelaVarejo());
 					}
 					produto.put("VL_DESCONTO", vlDesconto);
 					produto.put("FC_DESCONTO_UN", (vlDesconto / quantidade));
@@ -787,13 +803,27 @@ public class OrcamentoProdutoDetalhesActivity extends Activity {
 			}
 		}
 
-		if ((adapterEstoque.getListaEstoque().get(spinnerEstoque.getSelectedItemPosition()) == null) || (adapterEstoque.getListaEstoque().size() <= 0)){
+		if ((adapterEstoque.getListaEstoque() == null) || (adapterEstoque.getListaEstoque().size() <= 0)){
 			// Dados da mensagem
 			ContentValues mensagem = new ContentValues();
 			mensagem.put("comando", 1);
 			mensagem.put("tela", "OrcamentoProdutoDetalhesActivity");
-			mensagem.put("mensagem", "Não tem estoque selecionado." + casasDecimais
-					+ "\n Favor, entrar em contato com o administrador da empresa para que possa enviar os dados corretos do produto.");
+			mensagem.put("mensagem", "Não tem estoque selecionado."
+					+ "\n Favor, entrar em contato com o administrador de TI da empresa para que possa enviar os dados corretos do produto.");
+
+			FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(OrcamentoProdutoDetalhesActivity.this);
+			funcoes.menssagem(mensagem);
+
+			dadosValidos = false;
+		}
+
+		if ((listaPlanoPagamentoPreco == null) || (listaPlanoPagamentoPreco.get(spinnerPlanoPagamentoPreco.getSelectedItemPosition()) == null)){
+			// Dados da mensagem
+			ContentValues mensagem = new ContentValues();
+			mensagem.put("comando", 1);
+			mensagem.put("tela", "OrcamentoProdutoDetalhesActivity");
+			mensagem.put("mensagem", "Não tem plano de pagamento selecionado."
+					+ "\n Favor, entrar em contato com o administrador de TI da empresa para que possa enviar os dados corretos do produto.");
 
 			FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(OrcamentoProdutoDetalhesActivity.this);
 			funcoes.menssagem(mensagem);

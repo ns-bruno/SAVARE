@@ -24,6 +24,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.savare.R;
@@ -33,9 +34,13 @@ import com.savare.activity.fragment.ResumoFragment;
 import com.savare.adapter.CustomDrawerAdapter;
 import com.savare.banco.funcoesSql.UsuarioSQL;
 import com.savare.beans.DrawerItem;
+import com.savare.beans.EmpresaBeans;
 import com.savare.beans.TitulosListaBeans;
+import com.savare.beans.UsuarioBeans;
 import com.savare.funcoes.FuncoesPersonalizadas;
+import com.savare.funcoes.rotinas.EmpresaRotinas;
 import com.savare.funcoes.rotinas.OrcamentoRotinas;
+import com.savare.funcoes.rotinas.UsuarioRotinas;
 
 public class InicioActivity extends Activity {
 
@@ -46,7 +51,13 @@ public class InicioActivity extends Activity {
     private CharSequence mTitle;
     private List<DrawerItem> dataList;
     private CustomDrawerAdapter adapter;
-    
+    private TextView textTipoAcumuloAtacado,
+                     textValorAcumuladoAtacado,
+                     textPrazoAcumuloAtacado,
+                     textTipoAcumuloVarejo,
+                     textValorAcumuladoVarejo,
+                     textPrazoAcumuloVarejo;
+
 	@SuppressLint("NewApi")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -116,10 +127,85 @@ public class InicioActivity extends Activity {
         if (savedInstanceState == null) {
             selectItem(0);
         }
+
+        recuperarCampos();
 	} // Fim do onCreate
-	
-	
-	@Override
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(InicioActivity.this);
+
+        EmpresaRotinas empresaRotinas = new EmpresaRotinas(InicioActivity.this);
+        // Pega os dados da empresa
+        EmpresaBeans dadosEmpresa = empresaRotinas.empresa(funcoes.getValorXml("CodigoEmpresa"));
+
+        UsuarioRotinas usuarioRotinas = new UsuarioRotinas(InicioActivity.this);
+        // Pega os dados do usuario(vendedor)
+        UsuarioBeans dadosUsuario = usuarioRotinas.usuarioCompleto("ID_USUA = " + funcoes.getValorXml("CodigoUsuario"));
+        //
+        if (dadosEmpresa != null && dadosUsuario != null) {
+
+            // Checa se o tipo eh por valor para vendas no atacado
+            if (dadosEmpresa.getTitpoAcumuloCreditoAtacado().equalsIgnoreCase("V")) {
+                textTipoAcumuloAtacado.setText("Por Valor");
+                textValorAcumuladoAtacado.setText("R$ " + funcoes.arredondarValor(dadosUsuario.getValorCreditoAtacado()));
+
+                // Checa se o tipo eh por percentual para vendas no atacado
+            } else if (dadosEmpresa.getTitpoAcumuloCreditoAtacado().equalsIgnoreCase("P")) {
+                textTipoAcumuloAtacado.setText("Por Percentual");
+                textValorAcumuladoAtacado.setText(funcoes.arredondarValor(dadosUsuario.getPercentualCreditoAtacado())+"%");
+            }
+
+            // Checa os periodo que vai ser acumulado os creditos para vendas no atacado
+            if (dadosEmpresa.getPeriodocrceditoAtacado().equalsIgnoreCase("M")) {
+                textPrazoAcumuloAtacado.setText("Mensal");
+
+            } else if (dadosEmpresa.getPeriodocrceditoAtacado().equalsIgnoreCase("Q")) {
+                textPrazoAcumuloAtacado.setText("Quinzenal");
+
+            } else if (dadosEmpresa.getPeriodocrceditoAtacado().equalsIgnoreCase("S")) {
+                textPrazoAcumuloAtacado.setText("Semanal");
+
+            } else if (dadosEmpresa.getPeriodocrceditoAtacado().equalsIgnoreCase("T")) {
+                textPrazoAcumuloAtacado.setText("Semestral");
+
+            } else if (dadosEmpresa.getPeriodocrceditoAtacado().equalsIgnoreCase("A")) {
+                textPrazoAcumuloAtacado.setText("Anual");
+            }
+
+            // Checa se o tipo eh por valor para vendas no varejo
+            if (dadosEmpresa.getTitpoAcumuloCreditoVarejo().equalsIgnoreCase("V")) {
+                textTipoAcumuloVarejo.setText("Por Valor");
+                textValorAcumuladoVarejo.setText(funcoes.arredondarValor(dadosUsuario.getValorCreditoVarejo()));
+
+                // Checa se o tipo eh por percentual para vendas no atacado
+            } else if (dadosEmpresa.getTitpoAcumuloCreditoVarejo().equalsIgnoreCase("P")) {
+                textTipoAcumuloVarejo.setText("Por Percentual");
+                textValorAcumuladoVarejo.setText(funcoes.arredondarValor(dadosUsuario.getPercentualCreditoVarejo()));
+            }
+
+            // Checa os periodo que vai ser acumulado os creditos para vendas no atacado
+            if (dadosEmpresa.getPeriodocrceditoVarejo().equalsIgnoreCase("M")) {
+                textPrazoAcumuloVarejo.setText("Mensal");
+
+            } else if (dadosEmpresa.getPeriodocrceditoVarejo().equalsIgnoreCase("Q")) {
+                textPrazoAcumuloVarejo.setText("Quinzenal");
+
+            } else if (dadosEmpresa.getPeriodocrceditoVarejo().equalsIgnoreCase("S")) {
+                textPrazoAcumuloVarejo.setText("Semanal");
+
+            } else if (dadosEmpresa.getPeriodocrceditoVarejo().equalsIgnoreCase("T")) {
+                textPrazoAcumuloVarejo.setText("Semestral");
+
+            } else if (dadosEmpresa.getPeriodocrceditoVarejo().equalsIgnoreCase("A")) {
+                textPrazoAcumuloVarejo.setText("Anual");
+            }
+        }
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.inicio, menu);
@@ -131,6 +217,7 @@ public class InicioActivity extends Activity {
     public boolean onPrepareOptionsMenu(Menu menu) {
         // If the nav drawer is open, hide action items related to the content view
         boolean drawerOpen = mDrawerLayout.isDrawerOpen(mDrawerList);
+
         return super.onPrepareOptionsMenu(menu);
     }
 
@@ -296,5 +383,14 @@ public class InicioActivity extends Activity {
         super.onConfigurationChanged(newConfig);
         // Pass any configuration change to the drawer toggls
         mDrawerToggle.onConfigurationChanged(newConfig);
+    }
+
+    private void recuperarCampos() {
+        textTipoAcumuloAtacado = (TextView) findViewById(R.id.activity_inicio_text_tipo_acumulo);
+        textValorAcumuladoAtacado = (TextView) findViewById(R.id.activity_inicio_text_valor_acumulado);
+        textPrazoAcumuloAtacado = (TextView) findViewById(R.id.activity_inicio_text_prazo_acumulado);
+        textTipoAcumuloVarejo = (TextView) findViewById(R.id.activity_inicio_text_tipo_acumulo_varejo);
+        textValorAcumuladoVarejo = (TextView) findViewById(R.id.activity_inicio_text_valor_acumulado_varejo);
+        textPrazoAcumuloVarejo = (TextView) findViewById(R.id.activity_inicio_text_prazo_acumulado_varejo);
     }
 }

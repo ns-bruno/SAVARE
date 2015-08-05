@@ -134,6 +134,12 @@
     <string name="sistema_auxiliar_venda_atacado_varejo">Sistema Auxiliar de Vendas no Atacado e vaREjo</string>
     <string name="ddd">DDD</string>
     <string name="numero_telefone">Nº Telefone</string>
+    <string name="tipo_acumulo_atacado">Tipo de Acúmulo Atacado</string>
+    <string name="valor_acumulado_atacado">Valor Acumulado Atacado</string>
+    <string name="prazo_acumulo_atacado">Prazo para Acumulo Atacado</string>
+    <string name="tipo_acumulo_varejo">Tipo de Acúmulo Varejo</string>
+    <string name="valor_acumulado_varejo">Valor Acumulado Varejo</string>
+    <string name="prazo_acumulo_varejo">Prazo para Acumulo Varejo</string>
 
 
 </resources>

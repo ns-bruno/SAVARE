@@ -19,6 +19,8 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
 import android.widget.Filter;
 import android.widget.Filterable;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 
@@ -653,6 +655,7 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 		TextView textBottonDireito = (TextView) view.findViewById(R.id.layout_item_universal_text_botton_direito);
 		View viewTopo = (View) view.findViewById(R.id.layout_item_universal_view_topo);
 		View viewRodape = (View) view.findViewById(R.id.layout_item_universal_view_rodape);
+		ImageView imageOpcao = (ImageView) view.findViewById(R.id.layout_item_universal_imageView_opcao);
 		
 		funcoes = new FuncoesPersonalizadas(context);
 		
@@ -815,6 +818,8 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 				textBottonEsquerdo.setTypeface(null, Typeface.BOLD);
 				textBottonEsquerdoDois.setTypeface(null, Typeface.BOLD);
 			}
+			// Visualiza o botão de opcao
+			imageOpcao.setVisibility(View.VISIBLE);
 			
 		} else if(this.tipoItem == RATEIO_ITEM_ORCAMENTO){
 			/**
@@ -1325,7 +1330,7 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 		// Checa se quem esta chamando este adapter eh a lista de produtos
 		if(this.tipoItem == PRODUTO){
 		
-			textDescricao.setOnClickListener(new View.OnClickListener() {
+			imageOpcao.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View v) {
 					// Checa se eh uma lista de produtos

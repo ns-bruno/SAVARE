@@ -450,8 +450,8 @@ public class OrcamentoFragment extends Fragment {
 				ContentValues mensagem = new ContentValues();
 				mensagem.put("comando", 2);
 				mensagem.put("tela", "OrcamentoActivity");
-				mensagem.put("mensagem", "Não � um orçamento. \n"
-						   + "Não pode ser inserido novos produtos.");
+				mensagem.put("mensagem", getActivity().getResources().getString(R.string.nao_orcamento) + "n"
+									   + getActivity().getResources().getString(R.string.nao_pode_ser_inserido_novos_produtos));
 				// Executa a mensagem passando por parametro as propriedades
 				funcoes.menssagem(mensagem);
 			}
@@ -487,7 +487,7 @@ public class OrcamentoFragment extends Fragment {
 					//dadosEmail.setType("message/rfc822");
 					dadosEmail.setType("message/*");
 					dadosEmail.putExtra(Intent.EXTRA_EMAIL  , new String[]{pessoaRotinas.emailPessoa(idPessoa)});
-					dadosEmail.putExtra(Intent.EXTRA_SUBJECT, "Or�amento/Pedido de N� " + textCodigoOrcamento.getText());
+					dadosEmail.putExtra(Intent.EXTRA_SUBJECT, "Orçamento/Pedido de N� " + textCodigoOrcamento.getText());
 					dadosEmail.putExtra(Intent.EXTRA_STREAM, Uri.parse("file://"+arquivo));
 					dadosEmail.putExtra(Intent.EXTRA_TEXT   , "E-Mail enviado pelo App SAVARE.");
 					
@@ -553,8 +553,8 @@ public class OrcamentoFragment extends Fragment {
 						ContentValues mensagem = new ContentValues();
 						mensagem.put("comando", 2);
 						mensagem.put("tela", "OrcamentoActivity");
-						mensagem.put("mensagem", "N�o � um or�amento. \n"
-								   + "N�o pode ser inserido/atualizado a observa��o.");
+						mensagem.put("mensagem", getActivity().getResources().getString(R.string.nao_orcamento) + "\n" +
+								   				 getActivity().getResources().getString(R.string.nao_pode_ser_inserido_atualizado_alguma_observacao));
 						// Executa a mensagem passando por parametro as propriedades
 						funcoes.menssagem(mensagem);
 					}
@@ -589,7 +589,7 @@ public class OrcamentoFragment extends Fragment {
 				ContentValues mensagem = new ContentValues();
 				mensagem.put("comando", 0);
 				mensagem.put("tela", "OrcamentoActivity");
-				mensagem.put("mensagem", "N�o Foi poss�vel salvar o orcamento em PDF.");
+				mensagem.put("mensagem", getActivity().getResources().getString(R.string.nao_foi_possivel_salvar_orcamento_pdf));
 				mensagem.put("dados", e.toString());
 				mensagem.put("usuario", funcoes.getValorXml("Usuario"));
 				mensagem.put("empresa", funcoes.getValorXml("ChaveEmpresa"));
@@ -625,7 +625,7 @@ public class OrcamentoFragment extends Fragment {
 					// Instancia a classe de funcoes
 					FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(getActivity());
 					// Seta o campo com o total da diferenca
-					textTotal.setText("Diferen�a: " + funcoes.arredondarValor(String.valueOf(totalDiferenca * (-1))));
+					textTotal.setText("Diferença: " + funcoes.arredondarValor(String.valueOf(totalDiferenca * (-1))));
 				}
 			} else {
 				FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(getActivity());
@@ -633,7 +633,7 @@ public class OrcamentoFragment extends Fragment {
 				ContentValues mensagem = new ContentValues();
 				mensagem.put("comando", 2);
 				mensagem.put("tela", "OrcamentoActivity");
-				mensagem.put("mensagem", "N�o existe produtos na lista de orcamento. \n");
+				mensagem.put("mensagem", "Não existe produtos na lista de orcamento. \n");
 				// Executa a mensagem passando por parametro as propriedades
 				funcoes.menssagem(mensagem);
 			}

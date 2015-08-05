@@ -7,6 +7,7 @@ import android.database.Cursor;
 import com.savare.banco.funcoesSql.PessoaSql;
 import com.savare.banco.funcoesSql.UsuarioSQL;
 import com.savare.beans.StatusBeans;
+import com.savare.beans.UsuarioBeans;
 import com.savare.funcoes.FuncoesPersonalizadas;
 import com.savare.funcoes.Rotinas;
 
@@ -117,4 +118,44 @@ public class UsuarioRotinas extends Rotinas {
 
         return dtUltimoRecebimento;
     } // Fim dataUltimoEnvio
+
+
+    public UsuarioBeans usuarioCompleto(String where){
+        // Cria uma vareavel para salvar os dados do usuario
+        UsuarioBeans usuario = new UsuarioBeans();
+
+        UsuarioSQL usuarioSQL = new UsuarioSQL(context);
+        // Executa o sql para pegar os dados do usuario
+        Cursor dadosUsuario = usuarioSQL.query(where);
+
+        if (dadosUsuario != null && dadosUsuario.getCount() > 0){
+            dadosUsuario.moveToFirst();
+
+            usuario.setIdUsuario(dadosUsuario.getInt(dadosUsuario.getColumnIndex("ID_USUA")));
+            usuario.setIdEmpresa(dadosUsuario.getInt(dadosUsuario.getColumnIndex("ID_SMAEMPRE")));
+            usuario.setChave(dadosUsuario.getString(dadosUsuario.getColumnIndex("CHAVE_USUA")));
+            usuario.setNomeUsuario(dadosUsuario.getString(dadosUsuario.getColumnIndex("NOME_USUA")));
+            usuario.setLoginUsuario(dadosUsuario.getString(dadosUsuario.getColumnIndex("LOGIN_USUA")));
+            usuario.setSenhaUsuario(dadosUsuario.getString(dadosUsuario.getColumnIndex("SENHA_USUA")));
+            usuario.setEmail(dadosUsuario.getString(dadosUsuario.getColumnIndex("EMAIL_USUA")));
+            usuario.setEmpresaUsuario(dadosUsuario.getString(dadosUsuario.getColumnIndex("EMPRESA_USUA")));
+            usuario.setVendeAtacadoUsuario(dadosUsuario.getString(dadosUsuario.getColumnIndex("VENDE_ATACADO_USUA")).charAt(0));
+            usuario.setVendeVarejoUsuario(dadosUsuario.getString(dadosUsuario.getColumnIndex("VENDE_VAREJO_USUA")).charAt(0));
+            if ((dadosUsuario.getString(dadosUsuario.getColumnIndex("ATIVO_USUA")) != null) && (dadosUsuario.getString(dadosUsuario.getColumnIndex("ATIVO_USUA")).length() > 0)) {
+                usuario.setAtivoUsuario(dadosUsuario.getString(dadosUsuario.getColumnIndex("ATIVO_USUA")).charAt(0));
+            }
+            usuario.setIpServidor(dadosUsuario.getString(dadosUsuario.getColumnIndex("IP_SERVIDOR_USUA")));
+            usuario.setUsuarioServidor(dadosUsuario.getString(dadosUsuario.getColumnIndex("USUARIO_SERVIDOR_USUA")));
+            usuario.setSenhaServidor(dadosUsuario.getString(dadosUsuario.getColumnIndex("SENHA_SERVIDOR_USUA")));
+            usuario.setPastaServidor(dadosUsuario.getString(dadosUsuario.getColumnIndex("PASTA_SERVIDOR_USUA")));
+            usuario.setDataUltimoRecebimento(dadosUsuario.getString(dadosUsuario.getColumnIndex("DT_ULTIMO_RECEBIMENTO")));
+            usuario.setDataUltimoEnvio(dadosUsuario.getString(dadosUsuario.getColumnIndex("DT_ULTIMO_ENVIO")));
+            usuario.setValorCreditoAtacado(dadosUsuario.getDouble(dadosUsuario.getColumnIndex("VALOR_CREDITO_ATACADO")));
+            usuario.setValorCreditoVarejo(dadosUsuario.getDouble(dadosUsuario.getColumnIndex("VALOR_CREDITO_VAREJO")));
+            usuario.setPercentualCreditoAtacado(dadosUsuario.getDouble(dadosUsuario.getColumnIndex("PERCENTUAL_CREDITO_ATACADO")));
+            usuario.setPercentualCreditoVarejo(dadosUsuario.getDouble(dadosUsuario.getColumnIndex("PERCENTUAL_CREDITO_VAREJO")));
+        }
+
+        return usuario;
+    }
 }

@@ -5,7 +5,11 @@ public class EmpresaBeans {
 	private int idEmpresa;
 	private String nomeRazao,
 				   nomeFantasia,
-				   CpfCnpj;
+				   CpfCnpj,
+				   titpoAcumuloCreditoAtacado,
+				   titpoAcumuloCreditoVarejo,
+				   periodocrceditoAtacado,
+				   periodocrceditoVarejo;
 	/**
 	 * @return the idEmpresa
 	 */
@@ -54,6 +58,37 @@ public class EmpresaBeans {
 	public void setCpfCnpj(String cpfCnpj) {
 		CpfCnpj = cpfCnpj;
 	}
-	
-	
+
+
+	public String getTitpoAcumuloCreditoAtacado() {
+		return titpoAcumuloCreditoAtacado;
+	}
+
+	public void setTitpoAcumuloCreditoAtacado(String titpoAcumuloCreditoAtacado) {
+		this.titpoAcumuloCreditoAtacado = titpoAcumuloCreditoAtacado;
+	}
+
+	public String getTitpoAcumuloCreditoVarejo() {
+		return titpoAcumuloCreditoVarejo;
+	}
+
+	public void setTitpoAcumuloCreditoVarejo(String titpoAcumuloCreditoVarejo) {
+		this.titpoAcumuloCreditoVarejo = titpoAcumuloCreditoVarejo;
+	}
+
+	public String getPeriodocrceditoAtacado() {
+		return periodocrceditoAtacado;
+	}
+
+	public void setPeriodocrceditoAtacado(String periodocrceditoAtacado) {
+		this.periodocrceditoAtacado = periodocrceditoAtacado;
+	}
+
+	public String getPeriodocrceditoVarejo() {
+		return periodocrceditoVarejo;
+	}
+
+	public void setPeriodocrceditoVarejo(String periodocrceditoVarejo) {
+		this.periodocrceditoVarejo = periodocrceditoVarejo;
+	}
 }

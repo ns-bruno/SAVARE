@@ -24,7 +24,7 @@ public class Rotinas {
 		UsuarioSQL usuarioSQL = new UsuarioSQL(context);
 		Cursor cursor = usuarioSQL.query(null);
 		
-		if(cursor.getCount() > 0){
+		if((cursor != null) && (cursor.getCount() > 0)){
 			resultado = true;
 		}
 		

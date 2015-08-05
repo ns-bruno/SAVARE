@@ -126,11 +126,13 @@ public class ProdutoListaActivity extends Activity implements OnNavigationListen
 					produtoVenda.setAtacadoVarejo(textAtacadoVarejo.getText().charAt(0));
 					
 					Bundle bundle = new Bundle();
-					bundle.putParcelable("AEAPLOJA", produtoVenda);
 					bundle.putParcelable("AEAORCAM", preencheDadosOrcamento());
+					bundle.putString("ID_AEAPRODU", ""+produtoVenda.getProduto().getIdProduto());
+					bundle.putChar("ATAC_VARE", textAtacadoVarejo.getText().charAt(0));
 					//bundle.putString("TELA_CHAMADA", "ProdutoListaActivity");
 					bundle.putInt("POSICAO", position);
 					bundle.putLong("ID_AEAITORC", idItemOrcamento);
+
 					// Abre a tela de detalhes do produto
 					Intent intent = new Intent(ProdutoListaActivity.this, OrcamentoProdutoDetalhesActivity.class);
 					intent.putExtras(bundle);
@@ -234,7 +236,7 @@ public class ProdutoListaActivity extends Activity implements OnNavigationListen
 		return super.onCreateOptionsMenu(menu);
 	} // Fim do onCreateOptionsMenu
 	
-	
+
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		
@@ -400,7 +402,7 @@ public class ProdutoListaActivity extends Activity implements OnNavigationListen
 			}
 			
 		// Lista todos os produtos, para o Campo de Pesquisa(actionBar)
-		}else if(tipo == 1){
+		} else if(tipo == 1){
 			
 			// Verifica se a listagem de produto pertence a um orcamento
 			if((textCodigoOrcamento != null) && (textCodigoOrcamento.getText().length() > 0)){

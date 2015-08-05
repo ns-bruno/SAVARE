@@ -2,7 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="5dp" >
+    android:padding="5dp">
 
     <TextView
         android:id="@+id/layout_item_universal_text_descricao"
@@ -11,7 +11,8 @@
         android:layout_alignTop="@+id/layout_item_universal_view_topo"
         android:layout_toRightOf="@+id/layout_item_universal_view_topo"
         android:layout_marginLeft="2dp"
-        android:text="@string/descricao"/>
+        android:text="@string/descricao"
+        android:layout_toLeftOf="@+id/layout_item_universal_imageView_opcao" />
 
     <TextView
         android:id="@+id/layout_item_universal_text_abaixo_descricao_esquerda"
@@ -79,7 +80,15 @@
         android:gravity="right"
         android:text="@string/estoque" />
 
-    >
-
+    <ImageView
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:id="@+id/layout_item_universal_imageView_opcao"
+        android:layout_alignParentRight="true"
+        android:background="@drawable/ic_information_outline"
+        android:visibility="gone"
+        android:adjustViewBounds="true"
+        android:scaleType="fitCenter"
+        android:layout_alignTop="@+id/layout_item_universal_text_descricao" />
 </RelativeLayout>
 <!-- From: file:/D:/Dropbox/Forca%20de%20Venda%20Movel/Codigo%20Fonte/SAVARE_Studio/app/src/main/res/layout/layout_item_universal.xml -->
