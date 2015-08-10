@@ -74,11 +74,11 @@
         android:id="@+id/layout_item_universal_text_botton_direito"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/layout_item_universal_text_botton_esquerdo_dois"
-        android:layout_alignBottom="@+id/layout_item_universal_text_botton_esquerdo_dois"
-        android:layout_alignParentRight="true"
         android:gravity="right"
-        android:text="@string/estoque" />
+        android:text="@string/estoque"
+        android:layout_alignTop="@+id/layout_item_universal_text_botton_esquerdo_dois"
+        android:layout_toRightOf="@+id/layout_item_universal_text_botton_esquerdo_dois"
+        android:layout_alignParentRight="true" />
 
     <ImageView
         android:layout_width="20dp"

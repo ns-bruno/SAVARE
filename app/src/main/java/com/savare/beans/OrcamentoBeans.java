@@ -21,7 +21,10 @@ public class OrcamentoBeans implements Parcelable {
 	private char tipoVenda;
 	
 	private double totalOrcamento,
-				   totalOrcamentoBruto;
+				   totalOrcamentoFaturado,
+				   totalOrcamentoBruto,
+				   totalTabela,
+				   totalTabelaFaturado;
 	
 	private boolean tagSelectContext;
 
@@ -222,6 +225,30 @@ public class OrcamentoBeans implements Parcelable {
 	 */
 	public void setTotalOrcamentoBruto(double totalOrcamentoBruto) {
 		this.totalOrcamentoBruto = totalOrcamentoBruto;
+	}
+
+	public double getTotalTabela() {
+		return totalTabela;
+	}
+
+	public void setTotalTabela(double totalTabela) {
+		this.totalTabela = totalTabela;
+	}
+
+	public double getTotalOrcamentoFaturado() {
+		return totalOrcamentoFaturado;
+	}
+
+	public void setTotalOrcamentoFaturado(double totalOrcamentoFaturado) {
+		this.totalOrcamentoFaturado = totalOrcamentoFaturado;
+	}
+
+	public double getTotalTabelaFaturado() {
+		return totalTabelaFaturado;
+	}
+
+	public void setTotalTabelaFaturado(double totalTabelaFaturado) {
+		this.totalTabelaFaturado = totalTabelaFaturado;
 	}
 
 	/**

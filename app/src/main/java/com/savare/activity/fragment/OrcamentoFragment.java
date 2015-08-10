@@ -148,7 +148,7 @@ public class OrcamentoFragment extends Fragment {
 					ContentValues mensagem = new ContentValues();
 					mensagem.put("comando", 2);
 					mensagem.put("tela", "ListaOrcamentoPedidoActivity");
-					mensagem.put("mensagem", "N�o � um or�amento. \n");
+					mensagem.put("mensagem", getActivity().getResources().getString(R.string.nao_orcamento) + "\n");
 					// Executa a mensagem passando por parametro as propriedades
 					funcoes.menssagem(mensagem);
 				}
@@ -185,8 +185,8 @@ public class OrcamentoFragment extends Fragment {
 				
 				return true;
 			}
-			
-			
+
+
 			@Override
 			public boolean onActionItemClicked(final ActionMode mode, MenuItem item) {
 				
@@ -366,7 +366,7 @@ public class OrcamentoFragment extends Fragment {
 				//adapterItemOrcamento.notifyDataSetChanged();
 			}
 		}
-		
+		// Pega os status do orcamento, para checar se eh um orcamento ou pedido
 		this.tipoOrcamentoPedido = orcamentoRotinas.statusOrcamento(textCodigoOrcamento.getText().toString());
 		
 		
@@ -450,7 +450,7 @@ public class OrcamentoFragment extends Fragment {
 				ContentValues mensagem = new ContentValues();
 				mensagem.put("comando", 2);
 				mensagem.put("tela", "OrcamentoActivity");
-				mensagem.put("mensagem", getActivity().getResources().getString(R.string.nao_orcamento) + "n"
+				mensagem.put("mensagem", getActivity().getResources().getString(R.string.nao_orcamento) + "\n"
 									   + getActivity().getResources().getString(R.string.nao_pode_ser_inserido_novos_produtos));
 				// Executa a mensagem passando por parametro as propriedades
 				funcoes.menssagem(mensagem);
@@ -487,7 +487,7 @@ public class OrcamentoFragment extends Fragment {
 					//dadosEmail.setType("message/rfc822");
 					dadosEmail.setType("message/*");
 					dadosEmail.putExtra(Intent.EXTRA_EMAIL  , new String[]{pessoaRotinas.emailPessoa(idPessoa)});
-					dadosEmail.putExtra(Intent.EXTRA_SUBJECT, "Orçamento/Pedido de N� " + textCodigoOrcamento.getText());
+					dadosEmail.putExtra(Intent.EXTRA_SUBJECT, "Orçamento/Pedido # " + textCodigoOrcamento.getText());
 					dadosEmail.putExtra(Intent.EXTRA_STREAM, Uri.parse("file://"+arquivo));
 					dadosEmail.putExtra(Intent.EXTRA_TEXT   , "E-Mail enviado pelo App SAVARE.");
 					
@@ -514,54 +514,6 @@ public class OrcamentoFragment extends Fragment {
 			
 		case R.id.menu_orcamento_fragment_atualizar:
 			onResume();
-			break;
-			
-		case R.id.menu_orcamento_fragment_observacao:
-			
-			OrcamentoRotinas orcamentoRotinas = new OrcamentoRotinas(getActivity());
-			// Pega a obs do banco de dados
-			String obs = orcamentoRotinas.selectObservacaoOrcamento(textCodigoOrcamento.getText().toString());
-			
-			AlertDialogTextoCustom.Builder dialogoObservacao = new AlertDialogTextoCustom.Builder(getActivity());
-			
-			LayoutInflater li = LayoutInflater.from(dialogoObservacao.getContext());
-			View promptsView = li.inflate(R.layout.layout_dialog_texto, null);
-			
-			dialogoObservacao.setView(promptsView);
-			
-			final EditText editObservacao = (EditText) promptsView.findViewById(R.id.layout_dialog_texto_edit_texo);
-			// Preenche o dialog com os dados do banco de dados
-			editObservacao.setText(obs);
-			// Altera o titulo da observacao
-			dialogoObservacao.setTitle(getActivity().getResources().getText(R.string.observacao));
-			dialogoObservacao.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-				@Override
-				public void onClick(DialogInterface dialog, int which) {
-					// Checa se eh um orcamento
-					if (tipoOrcamentoPedido.equals("O")){
-						// Preenche os dados para salvar no banco de dados
-						ContentValues dadosObservacao = new ContentValues();
-						dadosObservacao.put("OBS", editObservacao.getText().toString());
-						
-						OrcamentoRotinas orcamentoRotinas = new OrcamentoRotinas(getActivity());
-						// Inseri a obs no banco de dados
-						orcamentoRotinas.updateOrcamento(dadosObservacao, textCodigoOrcamento.getText().toString());
-					
-					} else {
-						FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(getActivity());
-						// Cria uma variavem para inserir as propriedades da mensagem
-						ContentValues mensagem = new ContentValues();
-						mensagem.put("comando", 2);
-						mensagem.put("tela", "OrcamentoActivity");
-						mensagem.put("mensagem", getActivity().getResources().getString(R.string.nao_orcamento) + "\n" +
-								   				 getActivity().getResources().getString(R.string.nao_pode_ser_inserido_atualizado_alguma_observacao));
-						// Executa a mensagem passando por parametro as propriedades
-						funcoes.menssagem(mensagem);
-					}
-				}
-			});
-			dialogoObservacao.create();
-			dialogoObservacao.show();
 			break;
 			
 		case R.id.menu_orcamento_fragment_salvar:
@@ -607,8 +559,8 @@ public class OrcamentoFragment extends Fragment {
 				if(adapterItemOrcamento.getTipoItem() == adapterItemOrcamento.RATEIO_ITEM_ORCAMENTO){
 					adapterItemOrcamento.setTipoItem(adapterItemOrcamento.ITEM_ORCAMENTO);
 					((BaseAdapter) listViewItemOrcamento.getAdapter()).notifyDataSetChanged();
-					
-					orcamentoRotinas = new OrcamentoRotinas(getActivity());
+
+					OrcamentoRotinas orcamentoRotinas = new OrcamentoRotinas(getActivity());
 					
 					textTotal.setText("Total: " + orcamentoRotinas.totalOrcamentoLiquido(textCodigoOrcamento.getText().toString()));
 					
@@ -620,7 +572,7 @@ public class OrcamentoFragment extends Fragment {
 					double totalDiferenca = 0;
 					// Passa por toda a lista de itens
 					for(int i = 0; i < listaItemOrcamento.size(); i++){
-						totalDiferenca = totalDiferenca + (listaItemOrcamento.get(i).getValorBruto() - listaItemOrcamento.get(i).getValorLiquido());
+						totalDiferenca = totalDiferenca + (listaItemOrcamento.get(i).getValorTabela() - listaItemOrcamento.get(i).getValorLiquido());
 					}
 					// Instancia a classe de funcoes
 					FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(getActivity());
@@ -632,8 +584,8 @@ public class OrcamentoFragment extends Fragment {
 				// Cria uma variavem para inserir as propriedades da mensagem
 				ContentValues mensagem = new ContentValues();
 				mensagem.put("comando", 2);
-				mensagem.put("tela", "OrcamentoActivity");
-				mensagem.put("mensagem", "Não existe produtos na lista de orcamento. \n");
+				mensagem.put("tela", "OrcamentoFragment");
+				mensagem.put("mensagem", getActivity().getResources().getString(R.string.nao_existe_produto_lista_orcamento) + "\n");
 				// Executa a mensagem passando por parametro as propriedades
 				funcoes.menssagem(mensagem);
 			}
@@ -658,7 +610,7 @@ public class OrcamentoFragment extends Fragment {
 				// Dados da mensagem
 				ContentValues mensagem = new ContentValues();
 				mensagem.put("comando", 2);
-				mensagem.put("tela", "OrcamentoActivity");
+				mensagem.put("tela", "OrcamentoFragment");
 				
 				// Verifica se foi deletado algum registro
 				if(totalAtualizado > 0){
@@ -678,7 +630,7 @@ public class OrcamentoFragment extends Fragment {
 					//finish();
 					
 				}else {
-					mensagem.put("mensagem", "N�O FOI POSS�VEL TRANSFORMAR O(S) OR�AMENTO(S) EM PEDIDO(S). \n");
+					mensagem.put("mensagem", "NÃO CONSEGUIMOS TRANSFORMAR O(S) ORÇAMENTO(S) EM PEDIDO(S). \n");
 				}
 				
 				// Instancia a classe  de funcoes para mostra a mensagem
@@ -689,7 +641,7 @@ public class OrcamentoFragment extends Fragment {
 				ContentValues mensagem = new ContentValues();
 				mensagem.put("comando", 2);
 				mensagem.put("tela", "OrcamentoActivity");
-				mensagem.put("mensagem", " N�o � um or�amento. \n");
+				mensagem.put("mensagem", getActivity().getResources().getString(R.string.nao_orcamento) + "\n");
 				
 				funcoes = new FuncoesPersonalizadas(getActivity());
 				funcoes.menssagem(mensagem);
@@ -710,7 +662,7 @@ public class OrcamentoFragment extends Fragment {
 				ContentValues mensagem = new ContentValues();
 				mensagem.put("comando", 2);
 				mensagem.put("tela", "OrcamentoFragment");
-				mensagem.put("mensagem", " N�o � um or�amento. \n");
+				mensagem.put("mensagem", getActivity().getResources().getString(R.string.nao_orcamento) + "\n");
 				
 				funcoes = new FuncoesPersonalizadas(getActivity());
 				funcoes.menssagem(mensagem);
@@ -751,7 +703,7 @@ public class OrcamentoFragment extends Fragment {
 				ContentValues mensagem = new ContentValues();
 				mensagem.put("comando", 0);
 				mensagem.put("tela", "OrcamentoFragment");
-				mensagem.put("mensagem", "N�o foi poss�vel trocar o cliente deste or�amento. \n");
+				mensagem.put("mensagem", "Não conseguimos trocar o cliente deste orçamento. \n");
 				// Instancia a classe  de funcoes para mostra a mensagem
 				FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(getActivity());
 				funcoes.menssagem(mensagem);
@@ -783,7 +735,7 @@ public class OrcamentoFragment extends Fragment {
 		// Pega a obs do banco de dados
 		orcamento.setObservacao(orcamentoRotinas.selectObservacaoOrcamento(textCodigoOrcamento.getText().toString()));
 		// Pega o total do orcamento no banco de dados
-		double total = Double.parseDouble(orcamentoRotinas.totalOrcamentoLiquido(textCodigoOrcamento.getText().toString()).replace(",", "").replace(".", "")) / 1000;
+		double total = funcoes.desformatarValor(orcamentoRotinas.totalOrcamentoLiquido(textCodigoOrcamento.getText().toString()));
 		// Insere o total do orcamento varaviavel orcamento
 		orcamento.setTotalOrcamento(total);
 		orcamento.setDataCadastro(orcamentoRotinas.dataCadastroOrcamento(textCodigoOrcamento.getText().toString()));

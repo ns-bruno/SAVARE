@@ -26,14 +26,6 @@
     </item>
     
     <item
-        android:id="@+id/menu_orcamento_fragment_observacao"
-        android:orderInCategory="3"
-        android:title="@string/observacao"
-        android:icon="@drawable/ic_action_view_as_list"
-        android:showAsAction="always">
-    </item>
-    
-    <item
         android:id="@+id/menu_orcamento_fragment_salvar"
         android:orderInCategory="4"
         android:title="@string/salvar"

@@ -43,7 +43,7 @@ public class OrcamentoRotinas extends Rotinas {
 	 * Cria o cabecalho do orcamento no banco de dados.
 	 * Tem que ser passado os dados do cliente por um @ContentValues.
 	 * \n
-	 * @param values
+	 * @param dadosCliente
 	 * @return
 	 */
 	public long insertOrcamento(ContentValues dadosCliente){
@@ -63,7 +63,7 @@ public class OrcamentoRotinas extends Rotinas {
 		
 		String sql = "SELECT AEAITORC.ID_AEAITORC, AEAITORC.ID_AEAORCAM, AEAPRODU.DESCRICAO AS DESCRICAO_PRODU, AEAMARCA.DESCRICAO AS DESCRICAO_MARCA, "
 				   + "AEAPRODU.ID_AEAPRODU, AEAPRODU.CODIGO_ESTRUTURAL, AEAITORC.QUANTIDADE, AEAITORC.FC_LIQUIDO_UN, (AEAITORC.VL_BRUTO / AEAITORC.QUANTIDADE) AS VL_BRUTO_UN, "
-				   + "AEAITORC.VL_BRUTO, AEAITORC.FC_LIQUIDO, AEAITORC.VL_DESCONTO, AEAITORC.FC_DESCONTO_UN, AEAITORC.COMPLEMENTO, "
+				   + "AEAITORC.VL_BRUTO, AEAITORC.VL_TABELA, AEAITORC.FC_LIQUIDO, AEAITORC.VL_DESCONTO, AEAITORC.FC_DESCONTO_UN, AEAITORC.COMPLEMENTO, "
 				   + "AEAUNVEN.SIGLA SIGLA_EMBALAGEM "
 				   + "FROM AEAITORC AEAITORC "
 				   + "LEFT OUTER JOIN AEAUNVEN AEAUNVEN "
@@ -106,6 +106,7 @@ public class OrcamentoRotinas extends Rotinas {
 				item.setValorLiquido(cursor.getDouble(cursor.getColumnIndex("FC_LIQUIDO")));
 				item.setValorBrutoUnitario(cursor.getDouble(cursor.getColumnIndex("VL_BRUTO_UN")));
 				item.setValorBruto(cursor.getDouble(cursor.getColumnIndex("VL_BRUTO")));
+				item.setValorTabela(cursor.getDouble(cursor.getColumnIndex("VL_TABELA")));
 				item.setValorDesconto(cursor.getDouble(cursor.getColumnIndex("VL_DESCONTO")));
 				item.setValorDescontoUnitario(cursor.getDouble(cursor.getColumnIndex("FC_DESCONTO_UN")));
 				item.setComplemento(cursor.getString(cursor.getColumnIndex("COMPLEMENTO")));
@@ -292,8 +293,8 @@ public class OrcamentoRotinas extends Rotinas {
 		
 		try {
 			// Constroi um sql
-			String sql = "SELECT AEAORCAM.ID_AEAORCAM, AEAORCAM.DT_CAD, AEAORCAM.ID_CFACLIFO, AEAORCAM.NOME_CLIENTE, AEAORCAM.FC_VL_TOTAL, AEAORCAM.ATAC_VAREJO, "
-					   + "AEAORCAM.VL_MERC_BRUTO, AEAORCAM.STATUS, CFAESTAD.UF, CFACIDAD.DESCRICAO, AEAORCAM.STATUS_RETORNO "
+			String sql = "SELECT AEAORCAM.ID_AEAORCAM, AEAORCAM.DT_CAD, AEAORCAM.ID_CFACLIFO, AEAORCAM.NOME_CLIENTE, AEAORCAM.FC_VL_TOTAL, AEAORCAM.FC_VL_TOTAL_FATURADO, AEAORCAM.ATAC_VAREJO, "
+					   + "AEAORCAM.VL_MERC_BRUTO, AEAORCAM.VL_TABELA, AEAORCAM.VL_TABELA_FATURADO, AEAORCAM.STATUS, CFAESTAD.UF, CFACIDAD.DESCRICAO, AEAORCAM.STATUS_RETORNO "
 					   + "FROM AEAORCAM "
 					   + "LEFT OUTER JOIN CFAESTAD CFAESTAD ON(AEAORCAM.ID_CFAESTAD = CFAESTAD.ID_CFAESTAD) "
 					   + "LEFT OUTER JOIN CFACIDAD CFACIDAD ON(AEAORCAM.ID_CFACIDAD = CFACIDAD.ID_CFACIDAD) ";
@@ -333,10 +334,10 @@ public class OrcamentoRotinas extends Rotinas {
 			// Adiciona um ordem no sql
 			sql = sql + " ORDER BY AEAORCAM.DT_CAD ";
 			
-			if((tipoOrdem != null) && (tipoOrdem.equals(ORDEM_DECRESCENTE))){
-				sql += " DESC, AEAORCAM.ID_AEAORCAM DESC";
-			} else {
+			if((tipoOrdem != null) && (tipoOrdem.equals(ORDEM_CRESCENTE))){
 				sql += " ASC, AEAORCAM.ID_AEAORCAM ASC";
+			} else {
+				sql += " DESC, AEAORCAM.ID_AEAORCAM DESC";
 			}
 			
 			OrcamentoSql orcamentoSql = new OrcamentoSql(context);
@@ -355,7 +356,10 @@ public class OrcamentoRotinas extends Rotinas {
 					orcamento.setNomeRazao(cursor.getString(cursor.getColumnIndex("NOME_CLIENTE")));
 					orcamento.setDataCadastro(funcoes.formataDataHora(cursor.getString(cursor.getColumnIndex("DT_CAD"))));
 					orcamento.setTotalOrcamento(cursor.getDouble(cursor.getColumnIndex("FC_VL_TOTAL")));
+					orcamento.setTotalOrcamentoFaturado(cursor.getDouble(cursor.getColumnIndex("FC_VL_TOTAL_FATURADO")));
 					orcamento.setTotalOrcamentoBruto(cursor.getDouble(cursor.getColumnIndex("VL_MERC_BRUTO")));
+					orcamento.setTotalTabela(cursor.getDouble(cursor.getColumnIndex("VL_TABELA")));
+					orcamento.setTotalTabelaFaturado(cursor.getDouble(cursor.getColumnIndex("VL_TABELA_FATURADO")));
 					orcamento.setTipoVenda(cursor.getString(cursor.getColumnIndex("ATAC_VAREJO")).charAt(0));
 					orcamento.setStatus(cursor.getString(cursor.getColumnIndex("STATUS")));
 					orcamento.setSiglaEstado(cursor.getString(cursor.getColumnIndex("UF")));
@@ -428,7 +432,7 @@ public class OrcamentoRotinas extends Rotinas {
 				sql = sql + " AND ( " + where + " )";
 			}
 			// Adiciona um ordem no sql
-			sql = sql + " GROUP BY AEAORCAM.FC_VL_TOTAL, STRFTIME('%m/%Y', AEAORCAM.DT_CAD), STRFTIME('%m', AEAORCAM.DT_CAD), STRFTIME('%Y', AEAORCAM.DT_CAD) ORDER BY AEAORCAM.DT_CAD ";
+			sql = sql + " GROUP BY STRFTIME('%m/%Y', AEAORCAM.DT_CAD), STRFTIME('%m', AEAORCAM.DT_CAD), STRFTIME('%Y', AEAORCAM.DT_CAD) ORDER BY AEAORCAM.DT_CAD ";
 			
 			if((tipoOrdem != null) && (tipoOrdem.equals(ORDEM_DECRESCENTE))){
 				sql += " DESC ";

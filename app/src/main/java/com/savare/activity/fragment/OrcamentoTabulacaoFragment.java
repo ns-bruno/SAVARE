@@ -67,18 +67,17 @@ public class OrcamentoTabulacaoFragment extends FragmentActivity {
 		Bundle intentParametro = getIntent().getExtras();
 		if (intentParametro != null) {
 			// Seta o campo codigo consumo total com o que foi passado por parametro
-			
 			idOrcamento = intentParametro.getString(KEY_ID_ORCAMENTO);
 			//textTotal.setText("Total");
 			idPessoa = intentParametro.getString(KEY_ID_PESSOA);
 			razaoSocial = intentParametro.getString(KEY_NOME_RAZAO);
 			atacadoVarejo = intentParametro.getString(KEY_ATACADO_VAREJO);
 			
-			// Seta o titulo da action bar com a raz�o do cliente
+			// Seta o titulo da action bar com a razao do cliente
 			getActionBar().setTitle(intentParametro.getString(KEY_ID_PESSOA) + " - " + intentParametro.getString(KEY_NOME_RAZAO));
 			
 		} else {
-			// Seta o titulo da action bar com a raz�o do cliente
+			// Seta o titulo da action bar com a razao do cliente
 			getActionBar().setTitle("Selecione um Cliente");
 			
 		}
@@ -126,7 +125,9 @@ public class OrcamentoTabulacaoFragment extends FragmentActivity {
         	
         };
         actionBar.addTab(actionBar.newTab().setText("Orçamento").setTabListener(tabListener));
-        actionBar.addTab(actionBar.newTab().setText("Prazo").setTabListener(tabListener));
+        actionBar.addTab(actionBar.newTab().setText("Desconto").setTabListener(tabListener));
+		actionBar.addTab(actionBar.newTab().setText("Prazo").setTabListener(tabListener));
+		actionBar.addTab(actionBar.newTab().setText("Observação").setTabListener(tabListener));
         
 	} // Fim do onCreate
 	

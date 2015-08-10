@@ -19,6 +19,7 @@ public class ItemOrcamentoBeans implements Parcelable {
 				   valorBruto,
 				   ValorDesconto,
 				   valorLiquido,
+				   valorTabela,
 				   valorCustoUnitario,
 				   valorBrutoUnitario,
 				   valorDescontoUnitario,
@@ -397,7 +398,14 @@ public class ItemOrcamentoBeans implements Parcelable {
 	public void setEstoqueVenda(EstoqueBeans estoqueVenda) {
 		this.estoqueVenda = estoqueVenda;
 	}
-	
+
+	public double getValorTabela() {
+		return valorTabela;
+	}
+
+	public void setValorTabela(double valorTabela) {
+		this.valorTabela = valorTabela;
+	}
 
 	/**
 	 * @return the idItemOrcamento

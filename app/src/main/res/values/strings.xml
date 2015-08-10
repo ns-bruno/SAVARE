@@ -140,6 +140,7 @@
     <string name="tipo_acumulo_varejo">Tipo de Acúmulo Varejo</string>
     <string name="valor_acumulado_varejo">Valor Acumulado Varejo</string>
     <string name="prazo_acumulo_varejo">Prazo para Acumulo Varejo</string>
+    <string name="tipo_documento">Tipo de Documento</string>
 
 
 </resources>

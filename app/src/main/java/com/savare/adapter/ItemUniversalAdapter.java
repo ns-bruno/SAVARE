@@ -819,6 +819,7 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 				textBottonEsquerdoDois.setTypeface(null, Typeface.BOLD);
 			}
 			// Visualiza o botão de opcao
+
 			imageOpcao.setVisibility(View.VISIBLE);
 			
 		} else if(this.tipoItem == RATEIO_ITEM_ORCAMENTO){
@@ -834,11 +835,11 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 			// Instancia a classe de funcoes
 			this.funcoes = new FuncoesPersonalizadas(context);
 			
-			textBottonEsquerdo.setText("Tab.: " + funcoes.arredondarValor(String.valueOf(item.getValorBrutoUnitario())) + 
-									   " - Venda: " + funcoes.arredondarValor(String.valueOf(item.getValorLiquidoUnitario())));
+			textBottonEsquerdo.setText("Tab.: " + funcoes.arredondarValor(item.getValorTabela()) +
+									   " - Venda: " + funcoes.arredondarValor(item.getValorLiquido()));
 			textBottonEsquerdoDois.setText(" | " + item.getUnidadeVenda().getSiglaUnidadeVenda());
 			// Calcula a diferenca de preco entre o preco de tabela e o de venda
-			double diferenca = (item.getValorBruto() - item.getValorLiquido());
+			double diferenca = (item.getValorTabela() - item.getValorLiquido());
 			
 			textBottonDireito.setText("Dife.: " + funcoes.arredondarValor(String.valueOf(diferenca * -1)));
 			// Muda a cor da View de acordo com o resultado da diferenca
@@ -928,7 +929,7 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 			textDescricao.setText(orcamento.getNomeRazao()); 
 			textAbaixoDescricaoEsqueda.setText("Nº " +  orcamento.getIdOrcamento());
 			textAbaixoDescricaoDireita.setText(orcamento.getSiglaEstado() + " - " + orcamento.getCidade());
-			textBottonDireito.setText("" + orcamento.getTotalOrcamento());
+			textBottonDireito.setText(funcoes.arredondarValor(orcamento.getTotalOrcamento()));
 			
 			if(orcamento.getTipoVenda() == '0'){
 				textBottonEsquerdo.setText("A");
@@ -1018,22 +1019,39 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 			textDescricao.setText(orcamento.getNomeRazao());
 			textAbaixoDescricaoEsqueda.setText("Nº " +  orcamento.getIdOrcamento());
 			textAbaixoDescricaoDireita.setText(orcamento.getSiglaEstado() + " - " + orcamento.getCidade());
-			
+
+			// Instancia a classe de funcoes universal
+			funcoes = new FuncoesPersonalizadas(context);
+
 			// Instancia a classe para manipular dados de orcamento
 			OrcamentoRotinas orcamentoRotinas = new OrcamentoRotinas(context);
-			double totalBruto = Double.parseDouble(orcamentoRotinas.totalOrcamentoBruto(String.valueOf(orcamento.getIdOrcamento())).replace(".", "").replace(",", "")) / 1000,
-				   totalLiquido = Double.parseDouble(orcamentoRotinas.totalOrcamentoLiquido(String.valueOf(orcamento.getIdOrcamento())).replace(".", "").replace(",", "")) / 1000;
-			
-			textBottonEsquerdo.setText("Tab.: " + totalBruto + 
-									   " - Ven.: " + totalLiquido);
+
+			double totalTabela = 0,
+				   totalLiquido = 0;
+			// Checa se o pedido ja foi faturado e retornado
+			if (orcamento.getTotalOrcamentoFaturado() > 0){
+				totalLiquido = orcamento.getTotalOrcamentoFaturado();
+
+			} else {
+				totalTabela = orcamento.getTotalTabela(); //Double.parseDouble(orcamentoRotinas.totalOrcamentoBruto(String.valueOf(orcamento.getIdOrcamento())).replace(".", "").replace(",", "")) / 1000,
+			}
+			// Checa se o pedido ja foi faturado e retornado
+			if (orcamento.getTotalTabelaFaturado() > 0){
+				totalTabela = orcamento.getTotalTabelaFaturado();
+
+			} else{
+				totalLiquido = orcamento.getTotalOrcamento(); //Double.parseDouble(orcamentoRotinas.totalOrcamentoLiquido(String.valueOf(orcamento.getIdOrcamento())).replace(".", "").replace(",", "")) / 1000;
+			}
+
+			textBottonEsquerdo.setText("Tab.: " + funcoes.arredondarValor(totalTabela) +
+									   " - Ven.: " + funcoes.arredondarValor(totalLiquido));
 			
 			textBottonEsquerdoDois.setVisibility(View.INVISIBLE);
 			
 			// Calcula a diferenca de preco entre o preco de tabela e o de venda
-			double diferenca = (totalBruto - totalLiquido);
+			double diferenca = (totalTabela - totalLiquido);
 			
-			// Instancia a classe de funcoes universal
-			funcoes = new FuncoesPersonalizadas(context);
+
 			
 			textBottonDireito.setText("Dif.: " + funcoes.arredondarValor(String.valueOf(diferenca * -1)));
 			// Muda a cor da View de acordo com o resultado da diferenca

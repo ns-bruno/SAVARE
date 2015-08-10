@@ -74,7 +74,7 @@ public class OrcamentoPrazoFragment extends Fragment {
             ContentValues mensagem = new ContentValues();
             mensagem.put("comando", 1);
             mensagem.put("tela", "OrcamentoPlanoPagamentoActivity");
-            mensagem.put("mensagem", "Não foi carregar os dados do orçamento.\n");
+            mensagem.put("mensagem", "Não conseguimos carregar os dados do orçamento.\n");
 
             FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(getActivity());
             funcoes.menssagem(mensagem);

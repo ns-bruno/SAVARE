@@ -8,8 +8,6 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import com.savare.activity.fragment.ClienteCadastroDadosFragment;
 import com.savare.activity.fragment.ClienteCadastroFragment;
 import com.savare.activity.fragment.ClienteCadastroTelefoneFragment;
-import com.savare.activity.fragment.OrcamentoFragment;
-import com.savare.activity.fragment.OrcamentoPlanoPagamentoFragment;
 
 public class ClienteCadastroFragmentAdapter extends FragmentStatePagerAdapter {
 

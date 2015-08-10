@@ -241,6 +241,11 @@
     <string name="estado">Estado</string>
     <string name="estoque">Estoque</string>
     <string name="fantasia">Fantasia</string>
+    <!-- From: file:/D:/Dropbox/Forca%20de%20Venda%20Movel/Codigo%20Fonte/SAVARE_Studio/app/src/main/res/values/strings_erro.xml -->
+    <eat-comment/>
+    <string name="favor_entrar_contato_responsavel_ti">Favor, entrar em contato com o responsável de T.I.</string>
+    <!-- From: file:/D:/Dropbox/Forca%20de%20Venda%20Movel/Codigo%20Fonte/SAVARE_Studio/app/src/main/res/values/strings.xml -->
+    <eat-comment/>
     <string name="fechar_orcamento">Fechar Orçamento</string>
     <string name="filtrar">Filtrar</string>
     <string name="filtrar_periodo">Filtrar Por Período</string>
@@ -265,11 +270,13 @@
     <!-- From: file:/D:/Dropbox/Forca%20de%20Venda%20Movel/Codigo%20Fonte/SAVARE_Studio/app/src/main/res/values/strings_erro.xml -->
     <eat-comment/>
     <string name="nao_existe_conexao_internet">Não existe conexão com a internet.</string>
+    <string name="nao_existe_produto_lista_orcamento">Não existe Produtos na lista do Orçamento/Pedido</string>
     <string name="nao_foi_possivel_salvar_orcamento_pdf">Não foi possível salvar orçamento de PDF</string>
     <string name="nao_orcamento">Não é um orçamento.</string>
     <string name="nao_pode_ser_inserido_atualizado_alguma_observacao">Não pode ser inserido e nem atualizado o campo de observação.</string>
     <string name="nao_pode_ser_inserido_novos_produtos">Não pode ser inserido novos produtos.</string>
     <string name="nao_possivel_enviar">Não foi possível enviar</string>
+    <string name="nao_possivel_inserir_alterar_orcamento">Não é possível Inserir/Alterar o Orçamento</string>
     <!-- From: file:/D:/Dropbox/Forca%20de%20Venda%20Movel/Codigo%20Fonte/SAVARE_Studio/app/src/main/res/values/strings.xml -->
     <eat-comment/>
     <string name="navigation_drawer_close">Close navigation drawer</string>
@@ -328,6 +335,7 @@
     <string name="tipo_acumulo_atacado">Tipo de Acúmulo Atacado</string>
     <string name="tipo_acumulo_varejo">Tipo de Acúmulo Varejo</string>
     <string name="tipo_cliente">Tipo de Cliente</string>
+    <string name="tipo_documento">Tipo de Documento</string>
     <string name="titulos_aberto">Títulos Em Aberto</string>
     <string name="titulos_baixados">Títulos Baixados</string>
     <string name="titulos_cliente">Títulos do Cliente</string>
