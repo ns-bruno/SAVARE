@@ -1,6 +1,7 @@
 package com.savare.activity.fragment;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.List;
 
 import android.app.ActionBar;
@@ -32,6 +33,7 @@ import com.savare.adapter.OrcamentoTabulacaoFragmentAdapter;
 import com.savare.banco.funcoesSql.OrcamentoSql;
 import com.savare.beans.ItemOrcamentoBeans;
 import com.savare.funcoes.FuncoesPersonalizadas;
+import com.savare.funcoes.GPSTracker;
 import com.savare.funcoes.LocalizacaoFuncoes;
 import com.savare.funcoes.rotinas.GerarPdfRotinas;
 import com.savare.funcoes.rotinas.OrcamentoRotinas;
@@ -94,6 +96,28 @@ public class OrcamentoTabulacaoFragment extends FragmentActivity {
 			}
 		});
 		viewPagerOrcamentoMain.setAdapter(adapterOrcamentoTabulacao);
+
+		// Checa se tem algum numero de orcamento
+		if (idOrcamento != null && idOrcamento.length() > 0){
+			// Instancia a classe para pegar os dados de localizacao
+			GPSTracker gps = new GPSTracker(OrcamentoTabulacaoFragment.this);
+
+			if (gps.canGetLocation()){
+				ContentValues dadosLocalizacao = new ContentValues();
+
+				dadosLocalizacao.put("LATITUDE", gps.getLatitude());
+				dadosLocalizacao.put("LONGITUDE", gps.getLongitude());
+				dadosLocalizacao.put("ALTITUDE", gps.getAltitude());
+				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"); // Crica um formato de data e hora
+				dadosLocalizacao.put("HORARIO_LOCALIZACAO", sdf.format(gps.getHorarioLocalizacao()));
+				dadosLocalizacao.put("TIPO_LOCALIZACAO", gps.getTipoLocalizacao());
+				dadosLocalizacao.put("PRECISAO", gps.getPrecisao());
+
+				OrcamentoSql orcamentoSql = new OrcamentoSql(OrcamentoTabulacaoFragment.this);
+				orcamentoSql.update(dadosLocalizacao, "(ID_AEAORCAM = " + idOrcamento + ") AND (LATITUDE IS NULL) AND (LONGITUDE IS NULL)");
+
+			}
+		}
 		
 		// Pega os parametros para passar para os fragmets
 		Bundle parametros = new Bundle();

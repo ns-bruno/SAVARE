@@ -22,6 +22,7 @@ import com.savare.beans.OrcamentoBeans;
 import com.savare.beans.ProdutoListaBeans;
 import com.savare.custom.AlertDialogTextoCustom;
 import com.savare.funcoes.FuncoesPersonalizadas;
+import com.savare.funcoes.GPSTracker;
 import com.savare.funcoes.LocalizacaoFuncoes;
 import com.savare.funcoes.rotinas.GerarPdfRotinas;
 import com.savare.funcoes.rotinas.OrcamentoRotinas;
@@ -37,6 +38,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -106,20 +108,20 @@ public class OrcamentoFragment extends Fragment {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 				// Checa se eh orcamento
-				if(tipoOrcamentoPedido.equals("O")){
-					
+				if (tipoOrcamentoPedido.equals("O")) {
+
 					ItemOrcamentoBeans itemOrcamento = (ItemOrcamentoBeans) parent.getItemAtPosition(position);
-					
+
 					ProdutoListaBeans produtoVenda = new ProdutoListaBeans();
 					// Instancia a classe de rotinas de produtos
 					ProdutoRotinas produtoRotinas = new ProdutoRotinas(getActivity());
 					// Pega os dados do produto
 					produtoVenda = produtoRotinas.listaProduto("AEAPRODU.ID_AEAPRODU = " + itemOrcamento.getProduto().getIdProduto(), null, textCodigoOrcamento.getText().toString()).get(0);
 					produtoVenda.setAtacadoVarejo(textAtacadoVarejo.getText().charAt(0));
-					
+
 					// Checa se nao esta vazio
-					if( (produtoVenda != null) && (produtoVenda.getProduto() != null)){
-						
+					if ((produtoVenda != null) && (produtoVenda.getProduto() != null)) {
+
 						Bundle bundle = new Bundle();
 						bundle.putParcelable("AEAPLOJA", produtoVenda);
 						bundle.putParcelable("AEAORCAM", preencheDadosOrcamento());
@@ -129,7 +131,7 @@ public class OrcamentoFragment extends Fragment {
 						// Abre a tela de detalhes do produto
 						Intent intent = new Intent(getActivity(), OrcamentoProdutoDetalhesActivity.class);
 						intent.putExtras(bundle);
-						
+
 						startActivityForResult(intent, 1);
 					} else {
 						// Dados da mensagem
@@ -141,7 +143,7 @@ public class OrcamentoFragment extends Fragment {
 						FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(getActivity());
 						funcoes.menssagem(mensagem);
 					}
-				
+
 				} else {
 					FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(getActivity());
 					// Cria uma variavem para inserir as propriedades da mensagem
@@ -159,139 +161,140 @@ public class OrcamentoFragment extends Fragment {
 		listViewItemOrcamento.setMultiChoiceModeListener(new MultiChoiceModeListener() {
 			@Override
 			public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-				
+
 				return false;
 			}
+
 			@Override
 			public void onDestroyActionMode(ActionMode mode) {
-				
+
 				// Passa por todos os itens da lista
 				for (int i = 0; i < adapterItemOrcamento.getListaItemOrcamento().size(); i++) {
 					// Mar o adapter para mudar a cor do fundo
 					adapterItemOrcamento.getListaItemOrcamento().get(i).setTagSelectContext(false);
 				}
-				
+
 				adapterItemOrcamento.notifyDataSetChanged();
 				listaItemOrcamentoSelecionado = null;
 				totalItemSelecionado = 0;
 			}
-			
-			
+
+
 			@Override
 			public boolean onCreateActionMode(ActionMode mode, Menu menu) {
 				// Cria a variavel para inflar o menu de contexto
 				MenuInflater menuContext = mode.getMenuInflater();
 				menuContext.inflate(R.menu.orcamento_context, menu);
-				
+
 				return true;
 			}
 
 
 			@Override
 			public boolean onActionItemClicked(final ActionMode mode, MenuItem item) {
-				
-				switch (item.getItemId()) {
-				
-				case R.id.menu_orcamento_context_deletar:
-					// Checa se eh um orcamento
-					if (tipoOrcamentoPedido.equals("O")){
-						
-						AlertDialog.Builder builderConfirmacao = new AlertDialog.Builder(getActivity());
-				        builderConfirmacao.setMessage("Tem certeza que deseja excluir o(s) item(ns)?")
-				               .setPositiveButton("Sim", new DialogInterface.OnClickListener() {
-				                   public void onClick(DialogInterface dialog, int id) {
-										
-				                	   // Instancia a classe para manipular os produto no banco de dados
-										ItemOrcamentoSql itemOrcamentoSql = new ItemOrcamentoSql(getActivity());
-										int totalDeletado = 0;
-										for(int i = 0; i < listaItemOrcamentoSelecionado.size(); i++){
-											// Deleta o item da lista de item original
-											if((itemOrcamentoSql.delete("AEAITORC.ID_AEAITORC = " + listaItemOrcamento.get(listaItemOrcamentoSelecionado.get(i)).getIdItemOrcamento())) > 0){
-												totalDeletado ++;
-											}
-										} // Fim for
-										
-										// Dados da mensagem
-										final ContentValues mensagem = new ContentValues();
-										mensagem.put("comando", 2);
-										mensagem.put("tela", "OrcamentoActivity");
-										
-										// Verifica se foi deletado algum registro
-										if(totalDeletado > 0){
-											mensagem.put("mensagem", totalDeletado + " Deletado(s). \n");
-											
-											// Atualiza a lista de produtos
-											onResume();
-											
-										}else {
-											mensagem.put("mensagem", "N�O FOI POSS�VEL DELETAR OS ITENS SELECIONADOS. \n");
-										}
-										
-										// Instancia a classe  de funcoes para mostra a mensagem
-										FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(getActivity());
-										funcoes.menssagem(mensagem);
-										
-										mode.finish();
-				                	   
-				                   }
-			                   })
-					               .setNegativeButton("N�o", new DialogInterface.OnClickListener() {
-					                   public void onClick(DialogInterface dialog, int id) {
-					                	   	// Fecha o menu context
-											mode.finish();
-					                   }
-					               });
-				        // Create the AlertDialog object and return it
-				        builderConfirmacao.create();
-						builderConfirmacao.show();
-						
-						//return true;
-						
-					}	else {
-						
-						FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(getActivity());
-						// Cria uma variavem para inserir as propriedades da mensagem
-						ContentValues mensagem = new ContentValues();
-						mensagem.put("comando", 2);
-						mensagem.put("tela", "OrcamentoActivity");
-						mensagem.put("mensagem", "N�o � um or�amento. \n"
-								   + "N�o pode ser deletado.");
-						// Executa a mensagem passando por parametro as propriedades
-						funcoes.menssagem(mensagem);
-					}
-								
-					
-				break;
-					
 
-				default:
-					//return false;
+				switch (item.getItemId()) {
+
+					case R.id.menu_orcamento_context_deletar:
+						// Checa se eh um orcamento
+						if (tipoOrcamentoPedido.equals("O")) {
+
+							AlertDialog.Builder builderConfirmacao = new AlertDialog.Builder(getActivity());
+							builderConfirmacao.setMessage("Tem certeza que deseja excluir o(s) item(ns)?")
+									.setPositiveButton("Sim", new DialogInterface.OnClickListener() {
+										public void onClick(DialogInterface dialog, int id) {
+
+											// Instancia a classe para manipular os produto no banco de dados
+											ItemOrcamentoSql itemOrcamentoSql = new ItemOrcamentoSql(getActivity());
+											int totalDeletado = 0;
+											for (int i = 0; i < listaItemOrcamentoSelecionado.size(); i++) {
+												// Deleta o item da lista de item original
+												if ((itemOrcamentoSql.delete("AEAITORC.ID_AEAITORC = " + listaItemOrcamento.get(listaItemOrcamentoSelecionado.get(i)).getIdItemOrcamento())) > 0) {
+													totalDeletado++;
+												}
+											} // Fim for
+
+											// Dados da mensagem
+											final ContentValues mensagem = new ContentValues();
+											mensagem.put("comando", 2);
+											mensagem.put("tela", "OrcamentoActivity");
+
+											// Verifica se foi deletado algum registro
+											if (totalDeletado > 0) {
+												mensagem.put("mensagem", totalDeletado + " Deletado(s). \n");
+
+												// Atualiza a lista de produtos
+												onResume();
+
+											} else {
+												mensagem.put("mensagem", "N�O FOI POSS�VEL DELETAR OS ITENS SELECIONADOS. \n");
+											}
+
+											// Instancia a classe  de funcoes para mostra a mensagem
+											FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(getActivity());
+											funcoes.menssagem(mensagem);
+
+											mode.finish();
+
+										}
+									})
+									.setNegativeButton("N�o", new DialogInterface.OnClickListener() {
+										public void onClick(DialogInterface dialog, int id) {
+											// Fecha o menu context
+											mode.finish();
+										}
+									});
+							// Create the AlertDialog object and return it
+							builderConfirmacao.create();
+							builderConfirmacao.show();
+
+							//return true;
+
+						} else {
+
+							FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(getActivity());
+							// Cria uma variavem para inserir as propriedades da mensagem
+							ContentValues mensagem = new ContentValues();
+							mensagem.put("comando", 2);
+							mensagem.put("tela", "OrcamentoActivity");
+							mensagem.put("mensagem", "N�o � um or�amento. \n"
+									+ "N�o pode ser deletado.");
+							// Executa a mensagem passando por parametro as propriedades
+							funcoes.menssagem(mensagem);
+						}
+
+
+						break;
+
+
+					default:
+						//return false;
 				} // Fim switch
 				return true;
 			}
-			
+
 			@Override
 			public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
 				// Checa se a lista de selecionado eh nula
-				if(listaItemOrcamentoSelecionado == null){
+				if (listaItemOrcamentoSelecionado == null) {
 					listaItemOrcamentoSelecionado = new ArrayList<Integer>();
 				}
 				// Checa se o comando eh de selecao ou descelecao
-				if(checked){
+				if (checked) {
 					// Incrementa o totalizador
-					totalItemSelecionado = totalItemSelecionado + 1; 
+					totalItemSelecionado = totalItemSelecionado + 1;
 					//listaItemOrcamentoSelecionado.add(listaItemOrcamento.get(position));
 					listaItemOrcamentoSelecionado.add(position);
 					// Mar o adapter para mudar a cor do fundo
 					adapterItemOrcamento.getListaItemOrcamento().get(position).setTagSelectContext(true);
 					adapterItemOrcamento.notifyDataSetChanged();
-					
-				}else {
+
+				} else {
 					int i = 0;
-					while(i < listaItemOrcamentoSelecionado.size()){
-						
+					while (i < listaItemOrcamentoSelecionado.size()) {
+
 						// Checar se a posicao desmacada esta na lista
-						if(listaItemOrcamentoSelecionado.get(i) == position){
+						if (listaItemOrcamentoSelecionado.get(i) == position) {
 							// Remove a posicao da lista de selecao
 							listaItemOrcamentoSelecionado.remove(i);
 							// Diminui o total de itens selecionados
@@ -305,39 +308,20 @@ public class OrcamentoFragment extends Fragment {
 					}
 				}
 				// Checa se tem mais de um item selecionados
-				if(totalItemSelecionado > 1){
+				if (totalItemSelecionado > 1) {
 					// Muda o titulo do menu de contexto quando seleciona os itens
 					mode.setTitle(totalItemSelecionado + " itens selecionados");
 				} else {
 					// Muda o titulo do menu de contexto quando seleciona os itens
 					mode.setTitle(totalItemSelecionado + " item selecionado");
 				}
-			
+
 			}
 		});
 		
 		// Ativa a opcao de menus para este fragment
 		setHasOptionsMenu(true);
-		
 
-		LocalizacaoFuncoes localizacao = new LocalizacaoFuncoes(getActivity());
-		
-		if(localizacao.isGpsAtivo() || localizacao.isNetworkAtivo()){
-
-			ContentValues dadosLocalizacao = new ContentValues();
-			
-			dadosLocalizacao.put("LATITUDE", localizacao.getLatitude());
-			dadosLocalizacao.put("LONGITUDE", localizacao.getLongitude());
-			dadosLocalizacao.put("ALTITUDE", localizacao.getAltitude());
-			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"); // Crica um formato de data e hora
-			dadosLocalizacao.put("HORARIO_LOCALIZACAO", sdf.format(localizacao.getHorarioLocalizacao()));
-			dadosLocalizacao.put("TIPO_LOCALIZACAO", localizacao.getTipoLocalizacao());
-			dadosLocalizacao.put("PRECISAO", localizacao.getPrecisao());
-			
-			OrcamentoSql orcamentoSql = new OrcamentoSql(getActivity());
-			orcamentoSql.update(dadosLocalizacao, "(ID_AEAORCAM = " + idOrcamento + ") AND (LATITUDE IS NULL) AND (LONGITUDE IS NULL)");
-		}
-		
 		return viewOrcamento;
 	} // Fim do onCreate
 	
@@ -388,7 +372,7 @@ public class OrcamentoFragment extends Fragment {
  		
  		searchView.setSearchableInfo(searchManager.getSearchableInfo(getActivity().getComponentName()));
  		searchView.setSubmitButtonEnabled(true);
- 		
+
  		searchView.setOnQueryTextListener(new OnQueryTextListener() {
 
  			/**
@@ -485,7 +469,7 @@ public class OrcamentoFragment extends Fragment {
 					
 					Intent dadosEmail = new Intent(Intent.ACTION_SEND);
 					//dadosEmail.setType("message/rfc822");
-					dadosEmail.setType("message/*");
+					dadosEmail.setType("text/plain");
 					dadosEmail.putExtra(Intent.EXTRA_EMAIL  , new String[]{pessoaRotinas.emailPessoa(idPessoa)});
 					dadosEmail.putExtra(Intent.EXTRA_SUBJECT, "Orçamento/Pedido # " + textCodigoOrcamento.getText());
 					dadosEmail.putExtra(Intent.EXTRA_STREAM, Uri.parse("file://"+arquivo));

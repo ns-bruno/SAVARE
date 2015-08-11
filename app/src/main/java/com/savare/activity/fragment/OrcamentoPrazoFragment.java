@@ -163,7 +163,7 @@ public class OrcamentoPrazoFragment extends Fragment {
 
         switch (item.getItemId()) {
 
-            case R.id.menu_orcamento_plano_pagamento_fragment_salvar:
+            case R.id.menu_orcamento_prazo_fragment_salvar:
                 // Checa se eh um orcamento
                 if (this.tipoOrcamentoPedido.equals("O")){
 
@@ -199,7 +199,7 @@ public class OrcamentoPrazoFragment extends Fragment {
 
         // Salva o plano de pagamento em todos os itens do orcamento
         ContentValues valoresItemOrcamento = new ContentValues();
-        valoresItemOrcamento.put("ID_AEAPLPGT", adapterPlanoPagamento.getListaPlanoPagamento().get(spinnerTipoDocumento.getSelectedItemPosition()).getIdPlanoPagamento());
+        valoresItemOrcamento.put("ID_AEAPLPGT", adapterPlanoPagamento.getListaPlanoPagamento().get(spinnerPlanoPagamento.getSelectedItemPosition()).getIdPlanoPagamento());
         // Salva o plano de pagamento nos itens do orcamento
         orcamentoRotinas.updatePlanoPagamentoItemOrcamento(valoresItemOrcamento, textCodigoOrcamento.getText().toString());
     }

@@ -68,7 +68,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:id="@+id/fragment_orcamento_observacao_edit_observacao"
-                android:inputType="textMultiLine" />
+                android:inputType="textMultiLine"
+                android:hint="@string/observacao" />
         </LinearLayout>
     </LinearLayout>
 

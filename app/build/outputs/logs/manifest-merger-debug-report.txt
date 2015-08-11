@@ -48,10 +48,6 @@ uses-permission#android.permission.RECEIVE_BOOT_COMPLETED
 ADDED from AndroidManifest.xml:15:5
 	android:name
 		ADDED from AndroidManifest.xml:15:22
-permission#android.permission.WRITE_EXTERNAL_STORAGE
-ADDED from AndroidManifest.xml:16:5
-	android:name
-		ADDED from AndroidManifest.xml:16:17
 uses-permission#android.permission.ACCESS_FINE_LOCATION
 ADDED from AndroidManifest.xml:17:5
 	android:name
