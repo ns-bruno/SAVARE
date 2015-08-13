@@ -93,6 +93,26 @@ public class OrcamentoTabulacaoFragment extends FragmentActivity {
 				super.onPageSelected(position);
 				actionBar = getActionBar();
 				actionBar.setSelectedNavigationItem(position);
+
+				// Checa se a aba clicada eh da lista de produtos (orcamento)
+				if (position == 0){
+					// Pega a tela da aba de lista de produtos para manipular
+					OrcamentoFragment fragemntOrcamento = (OrcamentoFragment) adapterOrcamentoTabulacao.getRegisteredFragments(position);
+					// Checa se retornou a tela
+					if (fragemntOrcamento != null){
+						// Executa onResume da classe OrcamentoFragment
+						fragemntOrcamento.onResume();
+					}
+				// Checa se a aba clicada eh a de desconto
+				} else if (position == 1){
+					// Pega a tela da aba de desconto para manipular
+					OrcamentoDescontoFragment fragmentOrcamentoDesconto = (OrcamentoDescontoFragment) adapterOrcamentoTabulacao.getRegisteredFragments(position);
+					// Checa se retornou a tela
+					if (fragmentOrcamentoDesconto != null){
+						// Executa onResume da classe OrcamentoDescontoFragment
+						fragmentOrcamentoDesconto.onResume();
+					}
+				}
 			}
 		});
 		viewPagerOrcamentoMain.setAdapter(adapterOrcamentoTabulacao);

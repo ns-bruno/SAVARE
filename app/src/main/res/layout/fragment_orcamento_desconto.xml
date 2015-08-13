@@ -68,7 +68,7 @@
             android:layout_weight="1"
             android:ems="10"
             android:gravity="right"
-            android:digits="0123456789,"
+            android:digits="0123456789,-"
             android:hint="@string/desconto_percentual"
             android:inputType="numberDecimal|numberSigned" >
         </EditText>

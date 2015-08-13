@@ -1,11 +1,8 @@
 package com.savare.activity.fragment;
 
 import com.savare.R;
-import com.savare.adapter.ItemUniversalAdapter;
 import com.savare.funcoes.FuncoesPersonalizadas;
 import com.savare.funcoes.rotinas.OrcamentoRotinas;
-import com.savare.funcoes.rotinas.PlanoPagamentoRotinas;
-import com.savare.funcoes.rotinas.TipoDocumentoRotinas;
 
 import android.content.ContentValues;
 import android.os.Bundle;
@@ -21,7 +18,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.View.OnTouchListener;
 import android.widget.EditText;
-import android.widget.Spinner;
 import android.widget.TextView;
 
 public class OrcamentoDescontoFragment extends Fragment {
@@ -37,7 +33,7 @@ public class OrcamentoDescontoFragment extends Fragment {
 	//   			   razaoSocial;
 	private String tipoOrcamentoPedido;
 	private double totalBruto = 0,
-			   	   totalLiquido = 0,
+			   	   totalLiquidoAuxiliar = 0,
 			   	   descontoPercentual = 0,
 			   	   totalBrutoAuxiliar;
 	private int idTipoDocumento,
@@ -68,7 +64,7 @@ public class OrcamentoDescontoFragment extends Fragment {
 				textAtacadoVarejo.setText("Varejo");
 			}
 			
-			// Instancia a classe de rotinas
+			/*// Instancia a classe de rotinas
 			OrcamentoRotinas orcamentoRotinas = new OrcamentoRotinas(getActivity());
 			
 			FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(getActivity());
@@ -80,7 +76,7 @@ public class OrcamentoDescontoFragment extends Fragment {
 			editTotalLiquido.setText(orcamentoRotinas.totalOrcamentoLiquido(textCodigoOrcamento.getText().toString()));
 			
 			// Pega o percentual de desconto aplicado no total do orcamento
-			editDescontoPercentual.setText(orcamentoRotinas.descontoPercentual(textCodigoOrcamento.getText().toString()));
+			editDescontoPercentual.setText(orcamentoRotinas.descontoPercentualOrcamento(textCodigoOrcamento.getText().toString()));
 			
 			// Move o cursor para o final do campo
 			editDescontoPercentual.setSelection(editDescontoPercentual.getText().length());
@@ -90,10 +86,10 @@ public class OrcamentoDescontoFragment extends Fragment {
 			totalBrutoAuxiliar = totalBruto;
 			
 			// Pega o percentual de desconto concedido
-			descontoPercentual = funcoes.desformatarValor(editDescontoPercentual.getText().toString()); // Double.parseDouble(editDescontoPercentual.getText().toString().replace(".", "").replace(",", "")) / 1000;
+			descontoPercentualOrcamento = funcoes.desformatarValor(editDescontoPercentual.getText().toString()); // Double.parseDouble(editDescontoPercentual.getText().toString().replace(".", "").replace(",", "")) / 1000;
 			
 			// Pega o valor total liquido
-			totalLiquido = funcoes.desformatarValor(editTotalLiquido.getText().toString()); // Double.parseDouble(editTotalLiquido.getText().toString().replace(".", "").replace(",", "")) / 1000;
+			totalLiquidoAuxiliar = funcoes.desformatarValor(editTotalLiquido.getText().toString()); // Double.parseDouble(editTotalLiquido.getText().toString().replace(".", "").replace(",", "")) / 1000;*/
 			
 		} else {
 			// Dados da mensagem
@@ -134,7 +130,7 @@ public class OrcamentoDescontoFragment extends Fragment {
 					mensagem.put("tela", "OrcamentoPlanoPagamentoActivity");
 					mensagem.put("mensagem", "Erro grave ao executar o addTextChangedListener do editDescontoPercentual. \n"
 							   + e.getMessage() +"\n"
-							   + "Favor, entrar em contato com o respons�vel de T.I.");
+							   + getActivity().getResources().getString(R.string.favor_entrar_contato_responsavel_ti));
 					mensagem.put("dados", e.getMessage());
 					mensagem.put("usuario", funcoes.getValorXml("Usuario"));
 					mensagem.put("empresa", funcoes.getValorXml("ChaveEmpresa"));
@@ -166,36 +162,16 @@ public class OrcamentoDescontoFragment extends Fragment {
 		editTotalLiquido.addTextChangedListener(new TextWatcher() {
 			@Override
 			public void onTextChanged(CharSequence s, int start, int before, int count) {
-				
-				// Instancia a classe da mensagem
-				FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(getActivity());
-				
 				try {
 					if(editTotalLiquido.isFocused()){
-						
+						// Calcula os totais de acordo com o digitado
 						calculaTodosCampos(editTotalLiquido.getId());
-						
-						/*// Checa se foi digitado
-						if((editTotalLiquido.getText().length() <= 0) || (editTotalLiquido.getText().equals(""))){
-							s = "0";
-						}
-						// Formata o valor digitado
-						s = funcoes.arredondarValor(s.toString());
-						
-						// Tira os ponto e a virgula
-						s = s.toString().replace(".", "").replace(",", "");
-						
-						s = String.valueOf(Double.parseDouble(s.toString()) / 1000);
-						
-						totalLiquido = Double.parseDouble(s.toString());
-						// Calcula o percentual de desconto utilizado
-						descontoPercentual = (((totalLiquido / totalBrutoAuxiliar) * 100) - 100) * -1;
-						
-						editDescontoPercentual.setText(funcoes.arredondarValor(descontoPercentual));*/
 					}
 					
 				} catch (Exception e) {
-					
+					// Instancia a classe da mensagem
+					FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(getActivity());
+
 					// Dados da mensagem
 					ContentValues mensagem = new ContentValues();
 					mensagem.put("comando", 0);
@@ -222,6 +198,7 @@ public class OrcamentoDescontoFragment extends Fragment {
 				
 			}
 		});
+
 		// Ativa a opcao de menus para este fragment
 		setHasOptionsMenu(true);
 		
@@ -232,8 +209,33 @@ public class OrcamentoDescontoFragment extends Fragment {
 	@Override
 	public void onResume() {
 		super.onResume();
-		
+
+		// Instancia a classe de rotinas
 		OrcamentoRotinas orcamentoRotinas = new OrcamentoRotinas(getActivity());
+
+		FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(getActivity());
+
+		// Pega o valor total bruto do orcamento
+		totalBruto = funcoes.desformatarValor(orcamentoRotinas.totalOrcamentoBruto(textCodigoOrcamento.getText().toString()));
+		totalBrutoAuxiliar = totalBruto;
+
+		// Mostra o total bruto na tela
+		textTotalBruto.setText(funcoes.arredondarValor(totalBruto));
+
+		// Pega o percentual de desconto aplicado no total do orcamento
+		descontoPercentual = funcoes.desformatarValor(orcamentoRotinas.descontoPercentualOrcamento(textCodigoOrcamento.getText().toString()));
+
+		// Mostra o percentual de desconto na tela
+		editDescontoPercentual.setText(funcoes.arredondarValor(descontoPercentual));
+
+		// Move o cursor para o final do campo
+		editDescontoPercentual.setSelection(editDescontoPercentual.getText().length());
+
+		// Pega o valor total liquido
+		totalLiquidoAuxiliar = funcoes.desformatarValor(orcamentoRotinas.totalOrcamentoLiquido(textCodigoOrcamento.getText().toString()));
+
+		// Montra o total liquido na tela
+		editTotalLiquido.setText(funcoes.arredondarValor(totalLiquidoAuxiliar));
 
 		// Pega o status do orcamento
 		this.tipoOrcamentoPedido = orcamentoRotinas.statusOrcamento(textCodigoOrcamento.getText().toString());
@@ -286,7 +288,7 @@ public class OrcamentoDescontoFragment extends Fragment {
 	private void salvarDesconto(){
 		OrcamentoRotinas orcamentoRotinas = new OrcamentoRotinas(getActivity());
 		
-		if(orcamentoRotinas.distribuiDescontoItemOrcamento(textCodigoOrcamento.getText().toString(), (totalBrutoAuxiliar - totalLiquido))){
+		if(orcamentoRotinas.distribuiDescontoItemOrcamento(textCodigoOrcamento.getText().toString(), totalLiquidoAuxiliar, totalBrutoAuxiliar)){
 
 			ContentValues mensagem = new ContentValues();
 			mensagem.put("comando", 2);
@@ -295,6 +297,8 @@ public class OrcamentoDescontoFragment extends Fragment {
 
 			FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(getActivity());
 			funcoes.menssagem(mensagem);
+			// Executa o onResume (todos os campos de valores)
+			onResume();
 			
 		} else {
 			ContentValues mensagem = new ContentValues();
@@ -344,7 +348,10 @@ public class OrcamentoDescontoFragment extends Fragment {
 		if(campoChamada == editDescontoPercentual.getId()){
 			// Calcula o total liquido
 			totalLiquido = totalBrutoAuxiliar - (totalBrutoAuxiliar * (percentualDesconto / 100));
-			
+
+			// Armazena o total liquido em uma vareavel auxiliar
+			this.totalLiquidoAuxiliar = totalLiquido;
+
 			// Seta o valor do campo total liquido com o valor calculao com o desconto
 			editTotalLiquido.setText(funcoes.arredondarValor(totalLiquido));
 			textValorDesconto.setText(funcoes.arredondarValor(totalBrutoAuxiliar - totalLiquido));
@@ -354,6 +361,8 @@ public class OrcamentoDescontoFragment extends Fragment {
 		if(campoChamada == editTotalLiquido.getId()){
 			// Calcula o percentual de desconto utilizado
 			percentualDesconto = (((totalLiquido / totalBrutoAuxiliar) * 100) - 100) * -1;
+
+			this.totalLiquidoAuxiliar = totalLiquido;
 			
 			editDescontoPercentual.setText(funcoes.arredondarValor(percentualDesconto));
 			textValorDesconto.setText(funcoes.arredondarValor(totalBrutoAuxiliar - totalLiquido));

@@ -32,6 +32,7 @@ import android.widget.SearchView.OnQueryTextListener;
 import android.widget.TextView;
 
 import com.savare.R;
+import com.savare.activity.fragment.OrcamentoFragment;
 import com.savare.adapter.DescricaoSimplesAdapter;
 import com.savare.adapter.ItemUniversalAdapter;
 import com.savare.beans.OrcamentoBeans;
@@ -50,6 +51,7 @@ public class ProdutoListaActivity extends Activity implements OnNavigationListen
 	private long idItemOrcamento = 0;
 	private ProdutoListaBeans produtoVendaClicado;
 	private ProgressDialog progressoTela;
+	public static final String KEY_TELA_PRODUTO_LISTA_ACTIVITY = "ProdutoListaActivity";
 	
 	
 	@Override
@@ -336,19 +338,30 @@ public class ProdutoListaActivity extends Activity implements OnNavigationListen
 					
 					textCodigoOrcamento.setText(""+orcamento.getIdOrcamento());
 					textNomeRazao.setText(orcamento.getNomeRazao());
-					textCodigoPessoa.setText(""+orcamento.getIdPessoa());
-					textAtacadoVarejo.setText(""+orcamento.getTipoVenda());
-					
-					Bundle bundle = new Bundle();
+					textCodigoPessoa.setText("" + orcamento.getIdPessoa());
+					textAtacadoVarejo.setText("" + orcamento.getTipoVenda());
+
+					Intent dadosParametro = new Intent(ProdutoListaActivity.this, OrcamentoProdutoDetalhesActivity.class);
+					// Pega os dados para enviar para outra tela
+					dadosParametro.putExtra("ID_AEAPRODU", "" + produtoVendaClicado.getProduto().getIdProduto());
+					dadosParametro.putExtra("ID_AEAORCAM", textCodigoOrcamento.getText().toString());
+					dadosParametro.putExtra("ID_CFACLIFO", "" + orcamento.getIdPessoa());
+					dadosParametro.putExtra("RAZAO_SOCIAL", orcamento.getNomeRazao());
+					//dadosParametro.putExtra("POSICAO", position);
+					dadosParametro.putExtra("ID_AEAITORC", "" + produtoVendaClicado.getProduto().getIdProduto());
+					dadosParametro.putExtra("ATAC_VARE", textAtacadoVarejo.getText().toString());
+					dadosParametro.putExtra(OrcamentoFragment.KEY_TELA_CHAMADA, KEY_TELA_PRODUTO_LISTA_ACTIVITY);
+
+					/*Bundle bundle = new Bundle();
 					bundle.putParcelable("AEAPLOJA", produtoVendaClicado);
 					bundle.putParcelable("AEAORCAM", preencheDadosOrcamento());
 					bundle.putString("TELA_CHAMADA", "ProdutoListaActivity");
 					bundle.putLong("ID_AEAITORC", produtoVendaClicado.getProduto().getIdProduto());
 					// Abre a tela de detalhes do produto
 					Intent intent = new Intent(ProdutoListaActivity.this, OrcamentoProdutoDetalhesActivity.class);
-					intent.putExtras(bundle);
+					intent.putExtras(bundle);*/
 					
-					startActivityForResult(intent, 1);
+					startActivityForResult(dadosParametro, 1);
 				}
 				
 		    } else if(resultCode == 101){

@@ -172,17 +172,6 @@ public class ListaOrcamentoPedidoActivity extends Activity implements OnNavigati
 					//Pega os dados da pessoa que foi clicado
 					OrcamentoBeans orcamento = (OrcamentoBeans) parent.getItemAtPosition(position);
 					
-					/*// Cria uma intent para abrir uma nova activity
-					Intent intentOrcamento = new Intent(ListaOrcamentoPedidoActivity.this, OrcamentoActivity.class);
-					// Tira a acitivity da pilha e inicia uma nova
-					//intentOrcamento.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-					// Passa para outra activity o numero do orcamento
-					intentOrcamento.putExtra("ID_AEAORCAM", String.valueOf(orcamento.getIdOrcamento()));
-					intentOrcamento.putExtra("NOME_RAZAO", String.valueOf(orcamento.getNomeRazao()));
-					intentOrcamento.putExtra("ID_CFACLIFO", String.valueOf(orcamento.getIdPessoa()));
-					intentOrcamento.putExtra("ATAC_VAREJO", String.valueOf(orcamento.getTipoVenda()));
-					startActivity(intentOrcamento);*/
-					
 					// Cria uma intent para abrir uma nova activity
 					Bundle bundle = new Bundle();
 					bundle.putString(OrcamentoTabulacaoFragment.KEY_ID_ORCAMENTO, String.valueOf(orcamento.getIdOrcamento()));

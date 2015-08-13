@@ -112,7 +112,32 @@ public class OrcamentoFragment extends Fragment {
 
 					ItemOrcamentoBeans itemOrcamento = (ItemOrcamentoBeans) parent.getItemAtPosition(position);
 
-					ProdutoListaBeans produtoVenda = new ProdutoListaBeans();
+					if ((itemOrcamento != null) && (itemOrcamento.getProduto() != null)){
+						// Abre a tela de detalhes do produto
+						Intent intent = new Intent(getActivity(), OrcamentoProdutoDetalhesActivity.class);
+
+						intent.putExtra("ID_AEAPRODU", ""+itemOrcamento.getProduto().getIdProduto());
+						intent.putExtra("ID_AEAORCAM", idOrcamento);
+						intent.putExtra("ID_CFACLIFO", idPessoa);
+						intent.putExtra("RAZAO_SOCIAL", razaoSocial);
+						intent.putExtra("POSICAO", position);
+						intent.putExtra("ID_AEAITORC", itemOrcamento.getIdItemOrcamento());
+						intent.putExtra("ATAC_VARE", textAtacadoVarejo.getText().toString());
+						intent.putExtra(KEY_TELA_CHAMADA, KEY_TELA_ORCAMENTO_FRAGMENTO);
+
+						startActivityForResult(intent, 1);
+					} else {
+						// Dados da mensagem
+						ContentValues mensagem = new ContentValues();
+						mensagem.put("comando", 0);
+						mensagem.put("tela", "OrcamentoFragment");
+						mensagem.put("mensagem", "Não foi possível carregar os dados do produto. \n");
+						// Instancia a classe  de funcoes para mostra a mensagem
+						FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(getActivity());
+						funcoes.menssagem(mensagem);
+					}
+
+					/*ProdutoListaBeans produtoVenda = new ProdutoListaBeans();
 					// Instancia a classe de rotinas de produtos
 					ProdutoRotinas produtoRotinas = new ProdutoRotinas(getActivity());
 					// Pega os dados do produto
@@ -142,14 +167,14 @@ public class OrcamentoFragment extends Fragment {
 						// Instancia a classe  de funcoes para mostra a mensagem
 						FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(getActivity());
 						funcoes.menssagem(mensagem);
-					}
+					}*/
 
 				} else {
 					FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(getActivity());
 					// Cria uma variavem para inserir as propriedades da mensagem
 					ContentValues mensagem = new ContentValues();
 					mensagem.put("comando", 2);
-					mensagem.put("tela", "ListaOrcamentoPedidoActivity");
+					mensagem.put("tela", "OrcamentoFragment");
 					mensagem.put("mensagem", getActivity().getResources().getString(R.string.nao_orcamento) + "\n");
 					// Executa a mensagem passando por parametro as propriedades
 					funcoes.menssagem(mensagem);
@@ -217,7 +242,7 @@ public class OrcamentoFragment extends Fragment {
 											// Dados da mensagem
 											final ContentValues mensagem = new ContentValues();
 											mensagem.put("comando", 2);
-											mensagem.put("tela", "OrcamentoActivity");
+											mensagem.put("tela", "OrcamentoFragment");
 
 											// Verifica se foi deletado algum registro
 											if (totalDeletado > 0) {
@@ -227,7 +252,7 @@ public class OrcamentoFragment extends Fragment {
 												onResume();
 
 											} else {
-												mensagem.put("mensagem", "N�O FOI POSS�VEL DELETAR OS ITENS SELECIONADOS. \n");
+												mensagem.put("mensagem", getActivity().getResources().getString(R.string.nao_conseguimos_deletar_itens) + "\n");
 											}
 
 											// Instancia a classe  de funcoes para mostra a mensagem

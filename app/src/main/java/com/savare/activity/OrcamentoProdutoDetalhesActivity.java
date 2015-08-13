@@ -21,6 +21,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.savare.R;
+import com.savare.activity.fragment.OrcamentoFragment;
 import com.savare.adapter.DescricaoDuplaAdapter;
 import com.savare.adapter.DescricaoSimplesAdapter;
 import com.savare.adapter.ItemUniversalAdapter;
@@ -66,9 +67,12 @@ public class OrcamentoProdutoDetalhesActivity extends Activity {
 	private ProdutoListaBeans produto;
 	private long idItemOrcamento = 0;
 	private String telaChamada = "",
-				   idProduto;
-	private int orientacaoTela;
-	
+				   idProduto,
+				   idOrcamento,
+				   idPessoa,
+				   razaoSocial;
+	private boolean telaCarregada = false;
+
 	//TODO: Metodo onCreate da Activity
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -90,23 +94,36 @@ public class OrcamentoProdutoDetalhesActivity extends Activity {
 		 * Pega valores passados por parametro de outra Activity
 		 */
 		try{
-			//Pega os dados do produto da outra activity
+			// Pega os dados passado por paramentro
+			idProduto = getIntent().getExtras().getString("ID_AEAPRODU");
+			idOrcamento = getIntent().getExtras().getString("ID_AEAORCAM");
+			idPessoa = getIntent().getExtras().getString("ID_CFACLIFO");
+			telaChamada = getIntent().getExtras().getString(OrcamentoFragment.KEY_TELA_CHAMADA);
+			razaoSocial = getIntent().getExtras().getString("RAZAO_SOCIAL");
+			/*//Pega os dados do produto da outra activity
 			telaChamada = getIntent().getExtras().getString("TELA_CHAMADA");
 			orcamento = (OrcamentoBeans) getIntent().getParcelableExtra("AEAORCAM");
-			idProduto = getIntent().getExtras().getString("ID_AEAPRODU");
+			idProduto = getIntent().getExtras().getString("ID_AEAPRODU");*/
 
 			// Checa se foi passado algum id de produto
 			if (idProduto != null){
 				ProdutoRotinas produtoRotinas = new ProdutoRotinas(OrcamentoProdutoDetalhesActivity.this);
-				if (orcamento != null) {
+				// Checa se passou algum numero de orcamento
+				if (idOrcamento != null) {
 
-					produto = produtoRotinas.listaProduto("AEAPRODU.ID_AEAPRODU = " + idProduto, null, ""+orcamento.getIdOrcamento()).get(0);
+					produto = produtoRotinas.listaProduto("AEAPRODU.ID_AEAPRODU = " + idProduto, null, idOrcamento).get(0);
+
+					orcamento = new OrcamentoBeans();
+					// Pega os dados do orcamento
+					orcamento = preencheDadosOrcamento();
+
 				} else {
+					// Pega lista sem associar com um orcamento
 					produto = produtoRotinas.listaProduto("AEAPRODU.ID_AEAPRODU = " + idProduto, null, null).get(0);
 				}
 			}
 			// Pega se a venda eh no atacado ou varejo
-			produto.setAtacadoVarejo(getIntent().getExtras().getChar("ATAC_VARE"));
+			produto.setAtacadoVarejo(getIntent().getExtras().getString("ATAC_VARE").charAt(0));
 
 			// Checa se as variaveis nao estao vazias
 			if ((produto != null) && (produto.getProduto() != null) && (orcamento != null)) {
@@ -390,26 +407,16 @@ public class OrcamentoProdutoDetalhesActivity extends Activity {
 		spinnerPlanoPagamentoPreco.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
 			@Override
 			public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-				/*
-				DescricaoDublaBeans descricaoPlanoDupla = new DescricaoDublaBeans();
-				// Pega os valores do spinner
-				descricaoPlanoDupla = (DescricaoDublaBeans) parent.getAdapter().getItem(position);
-				
-				FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(OrcamentoProdutoDetalhesActivity.this);
-				
-				// Muda os valores dos campos de acordo com o selecionado
-				valorUnitarioVendaAux =  funcoes.desformatarValor(String.valueOf(descricaoPlanoDupla.getTextoPrincipal()));*/
-				
 				// Muda os valores dos campos de acordo com o selecionado
 				valorUnitarioVendaAux = adapterPlanoPagamentoPreco.getListaPlanoPagamento().get(position).getPrecoProduto();
 				
 				FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(OrcamentoProdutoDetalhesActivity.this);
 				
-				if(produto.getEstaNoOrcamento() != '1'){
+				if((produto.getEstaNoOrcamento() != '1') || (telaCarregada == true)){
 					editUnitarioLiquidoVenda.setText(funcoes.arredondarValor(valorUnitarioVendaAux));
 				}
 				calculaTodosCampos(spinnerPlanoPagamentoPreco.getId());
-				
+				telaCarregada = true;
 			}
 			@Override
 			public void onNothingSelected(AdapterView<?> parent) {
@@ -609,7 +616,8 @@ public class OrcamentoProdutoDetalhesActivity extends Activity {
 			
 			// Armazena o valor final do produto de acordo com o plano de pagamento selecionado
 			valorUnitarioVendaAux = carregarDadosPlanoPagamento(produtoVenda.getValorUnitarioAtacado(), produtoVenda.getValorPromocaoAtacado(), '0');
-			
+
+
 			// Preence o campo com o valor do produto
 			editUnitarioLiquidoVenda.setText(funcoes.arredondarValor(valorUnitarioVendaAux));
 			
@@ -644,13 +652,14 @@ public class OrcamentoProdutoDetalhesActivity extends Activity {
 			// Pega os dados de um determinado produto no orcamento usando o idProduto e o idOrcamento 
 			itemOrcamentoBeans = orcamentoRotinas.selectItemOrcamento(String.valueOf(orcamento.getIdOrcamento()), String.valueOf(produto.getProduto().getIdProduto()));
 			// Preenche o campo com a quantidade que foi comprado
-			editQuantidade.setText(""+itemOrcamentoBeans.getQuantidade());
+			editQuantidade.setText(funcoes.arredondarValor(itemOrcamentoBeans.getQuantidade()));
 			// Move o cursor para o final do campo
 			editQuantidade.setSelection(editQuantidade.length());
-			editUnitarioLiquidoVenda.setText(funcoes.arredondarValor(valorUnitarioVenda));
-			editTotal.setText(funcoes.arredondarValor(String.valueOf(itemOrcamentoBeans.getValorLiquido())));
+			editUnitarioLiquidoVenda.setText(funcoes.arredondarValor(itemOrcamentoBeans.getValorLiquido() / itemOrcamentoBeans.getQuantidade()));
+			editTotal.setText(funcoes.arredondarValor(itemOrcamentoBeans.getValorLiquido()));
 			editObservacao.setText(itemOrcamentoBeans.getComplemento());
-			editDesconto.setText(funcoes.arredondarValor("" + ((valorUnitarioVenda / valorUnitarioTabela) * 100)));
+			editDesconto.setText(funcoes.arredondarValor(((((itemOrcamentoBeans.getValorLiquido() / itemOrcamentoBeans.getValorBruto())*100)-100)* -1)));
+			editValorDesconto.setText(funcoes.arredondarValor(itemOrcamentoBeans.getValorDesconto()));
 			textSequencial.setText(""+itemOrcamentoBeans.getSeguencia());
 			textCodigoUnico.setText(itemOrcamentoBeans.getGuid());
 			this.idItemOrcamento = itemOrcamentoBeans.getIdItemOrcamento();
@@ -685,8 +694,8 @@ public class OrcamentoProdutoDetalhesActivity extends Activity {
 		
 		double precoVenda = 0;
 		// Checa se retornou alguma coisa para lista de pagamentos
-		if(this.listaPlanoPagamentoPreco != null){
-			
+		if((this.listaPlanoPagamentoPreco != null) && (this.listaPlanoPagamentoPreco.size() > 0)){
+			// Passa por todos os planos
 			for (int i = 0; i < this.listaPlanoPagamentoPreco.size(); i++) {
 				
 				// Checa se eh uma venda para o atacado
@@ -945,6 +954,27 @@ public class OrcamentoProdutoDetalhesActivity extends Activity {
 		}
 		
 	} // Fim calculaTodosCampos
+
+	protected OrcamentoBeans preencheDadosOrcamento(){
+		OrcamentoBeans orcamento = new OrcamentoBeans();
+		FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(OrcamentoProdutoDetalhesActivity.this);
+
+		orcamento.setIdOrcamento(Integer.valueOf(idOrcamento));
+		orcamento.setIdEmpresa(Integer.valueOf(funcoes.getValorXml("CodigoEmpresa")));
+		orcamento.setIdPessoa(Integer.valueOf(idPessoa));
+		orcamento.setNomeRazao(razaoSocial);
+		// Instancia a classe de rotinas do orcamento para manipular os dados com o banco
+		OrcamentoRotinas orcamentoRotinas = new OrcamentoRotinas(OrcamentoProdutoDetalhesActivity.this);
+		// Pega a obs do banco de dados
+		orcamento.setObservacao(orcamentoRotinas.selectObservacaoOrcamento(idOrcamento));
+		// Pega o total do orcamento no banco de dados
+		double total = funcoes.desformatarValor(orcamentoRotinas.totalOrcamentoLiquido(idOrcamento));
+		// Insere o total do orcamento varaviavel orcamento
+		orcamento.setTotalOrcamento(total);
+		orcamento.setDataCadastro(orcamentoRotinas.dataCadastroOrcamento(idOrcamento));
+
+		return orcamento;
+	}
 	
 	
 }

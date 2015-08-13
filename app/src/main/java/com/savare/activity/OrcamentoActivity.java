@@ -46,7 +46,7 @@ import com.savare.funcoes.rotinas.OrcamentoRotinas;
 import com.savare.funcoes.rotinas.PessoaRotinas;
 import com.savare.funcoes.rotinas.ProdutoRotinas;
 import com.savare.funcoes.rotinas.async.GerarPdfAsyncRotinas;
-
+@Deprecated
 public class OrcamentoActivity extends Activity {
 	
 	private TextView textCodigoOrcamento, textCodigoPessoa, textTotal, textAtacadoVarejo;

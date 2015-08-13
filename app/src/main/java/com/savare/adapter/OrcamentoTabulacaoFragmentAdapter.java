@@ -9,10 +9,12 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
+import android.util.SparseArray;
 
 public class OrcamentoTabulacaoFragmentAdapter extends FragmentStatePagerAdapter{
 	
 	Bundle paramentros;
+	private SparseArray<Fragment> registeredFragments = new SparseArray<Fragment>();
 
 	public OrcamentoTabulacaoFragmentAdapter(FragmentManager fm) {
 		super(fm);
@@ -60,6 +62,7 @@ public class OrcamentoTabulacaoFragmentAdapter extends FragmentStatePagerAdapter
 				fragment.setArguments(paramentros);
 				break;
 		}
+		registeredFragments.put(i, fragment);
 		return fragment;
 	}
 
@@ -67,5 +70,8 @@ public class OrcamentoTabulacaoFragmentAdapter extends FragmentStatePagerAdapter
 	public int getCount() {
 		return 4;
 	}
-	
+
+	public Fragment getRegisteredFragments(int position) {
+		return registeredFragments.get(position);
+	}
 }

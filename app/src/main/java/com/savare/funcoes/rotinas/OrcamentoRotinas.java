@@ -681,6 +681,9 @@ public class OrcamentoRotinas extends Rotinas {
 		itemOrcamentoBeans.setSeguencia(cursor.getInt(cursor.getColumnIndex("SEQUENCIA")));
 		itemOrcamentoBeans.setGuid(cursor.getString(cursor.getColumnIndex("GUID")));
 		itemOrcamentoBeans.setValorLiquido(cursor.getDouble(cursor.getColumnIndex("FC_LIQUIDO")));
+		itemOrcamentoBeans.setValorBruto(cursor.getDouble(cursor.getColumnIndex("VL_BRUTO")));
+		itemOrcamentoBeans.setValorTabela(cursor.getDouble(cursor.getColumnIndex("VL_TABELA")));
+		itemOrcamentoBeans.setValorDesconto(cursor.getDouble(cursor.getColumnIndex("VL_DESCONTO")));
 		// Instancia a classe de rotinas de embalagem
 		EmbalagemRotinas embalagemRotinas = new EmbalagemRotinas(context);
 		// Instancia a classe de produto para salvar a embalagem dentro do produto
@@ -998,7 +1001,7 @@ public class OrcamentoRotinas extends Rotinas {
 	 * @param idOrcamento
 	 * @return
 	 */
-	public String descontoPercentual(String idOrcamento){
+	public String descontoPercentualOrcamento(String idOrcamento){
 		double percentualDesconto = 0;
 		// Instancia a classe para manipular a tabela no banco de dados
 		ItemOrcamentoSql itemOrcamentoSql = new ItemOrcamentoSql(context);
@@ -1021,60 +1024,59 @@ public class OrcamentoRotinas extends Rotinas {
 		FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
 		
 		return funcoes.arredondarValor(percentualDesconto);
-	} // Fim descontoPercentual
+	} // Fim descontoPercentualOrcamento
 	
 	
 	
-	public boolean distribuiDescontoItemOrcamento(String idOrcamento, double totalDescontoOrcamento){
+	public boolean distribuiDescontoItemOrcamento(String idOrcamento, double totalLiquido, double totalBruto){
 		boolean deuCerto = false;
-		// Checa se o desconto concedido eh negativo
-		if(totalDescontoOrcamento < 0){
-			totalDescontoOrcamento = 0;
-		}
-		
+
+		// Instancia a clase de funcoes personalizadas
 		FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
 		
-		double totalBrutoOrcamento = funcoes.desformatarValor(totalOrcamentoBruto(idOrcamento));
-		
-		// Checa se o desconto eh maior que zero
-		if( (totalDescontoOrcamento == 0) || (totalBrutoOrcamento == 0) ){
+		// Checa se o desconto eh igual a zero
+		if( (totalBruto - totalLiquido == 0) || (totalBruto == 0) ){
 			
 			ContentValues dadosProduto = new ContentValues();
 			dadosProduto.put("VL_DESCONTO", 0);
 			dadosProduto.put("FC_DESCONTO_UN", 0);
-			
+
 			ItemOrcamentoSql itemOrcamentoSql = new ItemOrcamentoSql(context);
 			// Atualiza os dados de um determinado orcamento
 			if(itemOrcamentoSql.update(dadosProduto, "ID_AEAORCAM = " + idOrcamento) > 0 ){
 				deuCerto = true;
 			}
-		
 		} else {
 			List<ItemOrcamentoBeans> listaItemOrcamento = new ArrayList<ItemOrcamentoBeans>();
-			
+
 			listaItemOrcamento = listaItemOrcamentoResumida(null, idOrcamento);
 			// Checa se a lista foi preenchida com algum valor
 			if( (listaItemOrcamento != null) && (listaItemOrcamento.size() > 0) ){
 				// Pega o fator de desconto utilizado
-				double fatorDesconto = (totalBrutoOrcamento - totalDescontoOrcamento) / totalBrutoOrcamento;
-				
+				double fatorDesconto = (totalLiquido / totalBruto);
+
+				int qtdAtualizado = 0;
 				// Passa por todos os produtos para ratear o desconto
 				for(int i = 0; i < listaItemOrcamento.size(); i++){
-					
-					double vlDesconto = ((listaItemOrcamento.get(i).getValorBruto() * fatorDesconto) - listaItemOrcamento.get(i).getValorBruto()) * -1,
-						   vlLiquido = listaItemOrcamento.get(i).getValorBruto() * fatorDesconto;
+
+					double	vlLiquido = listaItemOrcamento.get(i).getValorBruto() * fatorDesconto,
+							vlDesconto = listaItemOrcamento.get(i).getValorBruto() - vlLiquido;
 					
 					ContentValues dadosProduto = new ContentValues();
-					dadosProduto.put("VL_DESCONTO", funcoes.arredondarValor(vlDesconto));
-					dadosProduto.put("FC_DESCONTO_UN", funcoes.arredondarValor(vlDesconto / listaItemOrcamento.get(i).getQuantidade()));
-					dadosProduto.put("FC_LIQUIDO", funcoes.arredondarValor(vlLiquido));
-					dadosProduto.put("FC_LIQUIDO_UN", funcoes.arredondarValor(vlLiquido / listaItemOrcamento.get(i).getQuantidade()));
+					dadosProduto.put("VL_DESCONTO", funcoes.desformatarValor(funcoes.arredondarValor(vlDesconto)));
+					dadosProduto.put("FC_DESCONTO_UN", funcoes.desformatarValor(funcoes.arredondarValor(vlDesconto / listaItemOrcamento.get(i).getQuantidade())));
+					dadosProduto.put("FC_LIQUIDO", funcoes.desformatarValor(funcoes.arredondarValor(vlLiquido)));
+					dadosProduto.put("FC_LIQUIDO_UN", funcoes.desformatarValor(funcoes.arredondarValor(vlLiquido / listaItemOrcamento.get(i).getQuantidade())));
 					
 					ItemOrcamentoSql itemOrcamentoSql = new ItemOrcamentoSql(context);
 					// Atualiza os dados de um determinado orcamento
-					if(itemOrcamentoSql.update(dadosProduto, "ID_AEAORCAM = " + idOrcamento) > 0){
-						deuCerto = true;
+					if(itemOrcamentoSql.update(dadosProduto, "ID_AEAITORC = " + listaItemOrcamento.get(i).getIdItemOrcamento()) > 0){
+						qtdAtualizado ++;
 					}
+				}
+				// Checa se todos os produtos do orcamento foi atualizado
+				if (qtdAtualizado == listaItemOrcamento.size()){
+					deuCerto = true;
 				}
 			}
 		}

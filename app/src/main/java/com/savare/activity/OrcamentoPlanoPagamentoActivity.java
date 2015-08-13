@@ -21,6 +21,7 @@ import com.savare.funcoes.rotinas.OrcamentoRotinas;
 import com.savare.funcoes.rotinas.PlanoPagamentoRotinas;
 import com.savare.funcoes.rotinas.TipoDocumentoRotinas;
 
+@Deprecated
 public class OrcamentoPlanoPagamentoActivity extends Activity {
 	
 	private TextView textCodigoOrcamento,
@@ -75,7 +76,7 @@ public class OrcamentoPlanoPagamentoActivity extends Activity {
 			// Pega o total liquido do orcamento
 			editTotalLiquido.setText(orcamentoRotinas.totalOrcamentoLiquido(textCodigoOrcamento.getText().toString()));
 			// Pega o percentual de desconto aplicado no total do orcamento
-			editDescontoPercentual.setText(orcamentoRotinas.descontoPercentual(textCodigoOrcamento.getText().toString()));
+			editDescontoPercentual.setText(orcamentoRotinas.descontoPercentualOrcamento(textCodigoOrcamento.getText().toString()));
 			// Move o cursor para o final do campo
 			editDescontoPercentual.setSelection(editDescontoPercentual.getText().length());
 			
@@ -346,7 +347,7 @@ public class OrcamentoPlanoPagamentoActivity extends Activity {
 	private void salvarDesconto(){
 		OrcamentoRotinas orcamentoRotinas = new OrcamentoRotinas(OrcamentoPlanoPagamentoActivity.this);
 		
-		if(orcamentoRotinas.distribuiDescontoItemOrcamento(textCodigoOrcamento.getText().toString(), (totalBrutoAuxiliar - totalLiquido))){
+		if(orcamentoRotinas.distribuiDescontoItemOrcamento(textCodigoOrcamento.getText().toString(), totalLiquido, totalBrutoAuxiliar)){
 			
 			ContentValues valoresOrcamento = new ContentValues();
 			valoresOrcamento.put("ID_CFATPDOC", adapterTipoDocumento.getListaTipoDocumento().get(spinnerTipoDocumento.getSelectedItemPosition()).getIdTipoDocumento());

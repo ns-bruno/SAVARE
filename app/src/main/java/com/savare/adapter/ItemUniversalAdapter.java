@@ -692,7 +692,7 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 			textDescricao.setText(item.getProduto().getDescricaoProduto() + " - " + item.getProduto().getDescricaoMarca());
 			textAbaixoDescricaoEsqueda.setText("Código: " + item.getProduto().getCodigoEstrutural());
 			textAbaixoDescricaoDireita.setText("Qtd.: " + (item.getQuantidade()));
-			textBottonEsquerdo.setText("Unitário: " + funcoes.arredondarValor(String.valueOf(item.getValorLiquidoUnitario())));
+			textBottonEsquerdo.setText("Unitário: " + funcoes.arredondarValor(item.getValorLiquidoUnitario()));
 			textBottonEsquerdoDois.setText(" | " + item.getUnidadeVenda().getSiglaUnidadeVenda());
 			textBottonDireito.setText("Total: " + funcoes.arredondarValor(String.valueOf(item.getValorLiquido())));
 			

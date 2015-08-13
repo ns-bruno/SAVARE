@@ -67,7 +67,7 @@ public class OrcamentoPrazoFragment extends Fragment {
 
             FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(getActivity());
             // Pega o total liquido do orcamento
-            textTotalLiquido.setText(funcoes.arredondarValor(orcamentoRotinas.totalOrcamentoLiquido(textCodigoOrcamento.getText().toString())));
+            textTotalLiquido.setText(orcamentoRotinas.totalOrcamentoLiquido(textCodigoOrcamento.getText().toString()));
 
         } else {
             // Dados da mensagem

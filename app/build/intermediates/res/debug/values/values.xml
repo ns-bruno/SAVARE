@@ -266,6 +266,11 @@
     <string name="limite_compras">Limite de Compras</string>
     <string name="lista_creditos">Lista de Creditos</string>
     <string name="login_progress_signing_in">Signing in…</string>
+    <!-- From: file:/D:/Dropbox/Forca%20de%20Venda%20Movel/Codigo%20Fonte/SAVARE_Studio/app/src/main/res/values/strings_erro.xml -->
+    <eat-comment/>
+    <string name="nao_conseguimos_deletar_itens">Não conseguimos deletar o(s) item(ns) selecionados.</string>
+    <!-- From: file:/D:/Dropbox/Forca%20de%20Venda%20Movel/Codigo%20Fonte/SAVARE_Studio/app/src/main/res/values/strings.xml -->
+    <eat-comment/>
     <string name="nao_enviados">Não Enviados</string>
     <!-- From: file:/D:/Dropbox/Forca%20de%20Venda%20Movel/Codigo%20Fonte/SAVARE_Studio/app/src/main/res/values/strings_erro.xml -->
     <eat-comment/>
