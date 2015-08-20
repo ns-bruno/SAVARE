@@ -7,8 +7,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
-public class ReceptorAlarmeReceberDadosBroadcastRotinas extends
-		BroadcastReceiver {
+public class ReceptorAlarmeReceberDadosBroadcastRotinas extends BroadcastReceiver {
 
 	@Override
 	public void onReceive(Context context, Intent intent) {

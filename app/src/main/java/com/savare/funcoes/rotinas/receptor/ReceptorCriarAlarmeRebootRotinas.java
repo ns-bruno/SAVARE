@@ -13,7 +13,7 @@ public class ReceptorCriarAlarmeRebootRotinas extends BroadcastReceiver {
 		
 		FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
 		
-		funcoes.criarAlarmeEnviarOrcamento();
+		funcoes.criarAlarmeEnviarReceberDadosAutomatico();
 
 	}
 

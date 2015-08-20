@@ -130,7 +130,8 @@ public class ReceberArquivoTxtServidorFtpRotinas {
 		String hostFtp = dadosUsuario.getString(dadosUsuario.getColumnIndex("IP_SERVIDOR_USUA"));
 		String usuarioFtp = dadosUsuario.getString(dadosUsuario.getColumnIndex("USUARIO_SERVIDOR_USUA"));
 		String senhaFtp = dadosUsuario.getString(dadosUsuario.getColumnIndex("SENHA_SERVIDOR_USUA"));
-		final String nomeDiretorioFtp = dadosUsuario.getString(dadosUsuario.getColumnIndex("LOGIN_USUA"));
+		final String nomeLogin = dadosUsuario.getString(dadosUsuario.getColumnIndex("LOGIN_USUA"));
+		String nomeDiretorioFtp = dadosUsuario.getString(dadosUsuario.getColumnIndex("PASTA_SERVIDOR_USUA"));
 		
 		File pastaTemp = new File(Environment.getExternalStorageDirectory() + "/SAVARE/TEMP");
         
@@ -360,323 +361,11 @@ public class ReceberArquivoTxtServidorFtpRotinas {
                             });
                             progressDownloads.setIndeterminate(true);
 
-                        } else {
+                        } /*else {
                             mensagemErro = mensagemErro + "Não achamos nenhum arquivo para fazer downloads.";
-                        }
+                        }*/
                     }
-                    // Checa se eh para receber todos os blocos
-                    /*if(blocoReceber == null){
-	                    // Passa por todos os blocos
-                    	for (int i = 0; i < ImportarDadosTxtRotinas.BLOCOS.length; i++) {
-                    		// Pega a posicao do array
-                    		final int posicao = i;
-                    		
-                    		if(telaChamou != TELA_RECEPTOR_ALARME){
-	                    		((Activity) context).runOnUiThread(new Runnable() {
-		        					  public void run() {
-		        						  // Atualiza a mensagem na tela de sincronizacao
-		        						  textMensagemRetorno.setText("Verificando se existe " + nomeDiretorioFtp + "_" + ImportarDadosTxtRotinas.BLOCOS[posicao] + ".txt");
-		        					  }
-		                      	});
-                    		}
-                    		
-	                    	// Pega os dados do arquivo no servidor FTP
-	                    	final FTPFile dadosArquivoFtp = dadosArquivoReceber(nomeDiretorioFtp + "_" + ImportarDadosTxtRotinas.BLOCOS[i] + ".txt");
-	                    	
-	                    	if(dadosArquivoFtp != null){
-	                    		// Checa qual classe chamou esta
-	                    		if(telaChamou != TELA_RECEPTOR_ALARME){
-	                    			
-	                    			progressDownloads.setIndeterminate(false);
-			                    	progressDownloads.setProgress(0);
-			                    	
-		                    		((Activity) context).runOnUiThread(new Runnable() {
-		          					  public void run() {
-		          						  // Atualiza a mensagem na tela de sincronizacao
-		          						  textMensagemRetorno.setText("Achamos o " + nomeDiretorioFtp + "_" + ImportarDadosTxtRotinas.BLOCOS[posicao] + ".txt");
-		          					  }
-		                    		});
-		                    		
-		                    		// Seta um tamanho maximo da barra de progresso
-		        	            	progressDownloads.setMax((int)dadosArquivoFtp.getSize());
-	                    		}
-	                    		
-	                    		tamanhoArquivo = (double) dadosArquivoFtp.getSize();
-	                    		
-	                    		// Cria o nome do arquivo a ser baixado
-		                    	String nomeAquivo = nomeDiretorioFtp + "_" + ImportarDadosTxtRotinas.BLOCOS[i] + ".txt";
-		                    	
-		                    	// Faz o download do bloco no servidor ftp e pega o caminho
-		                    	localArquivoRecebido.add(downloadFtp(nomeAquivo, pastaTemp, nomeDiretorioFtp));
-	                    		
-	                    	} else {
-	                    		if(telaChamou != TELA_RECEPTOR_ALARME){
-		                    		*//*((Activity) context).runOnUiThread(new Runnable() {
-		            					  public void run() {
-		            						  // Atualiza a mensagem na tela de sincronizacao
-		            						  textMensagemRetorno.setText("N�o achamos o " + nomeDiretorioFtp + "_" + ImportarDadosTxtRotinas.BLOCOS[posicao] + ".txt");
-		            					  }
-		                    		});*//*
-		                    		progressDownloads.setIndeterminate(true);
-	                    		}
-	                    		mensagemErro = mensagemErro + "Não achamos o " + nomeDiretorioFtp + "_" + ImportarDadosTxtRotinas.BLOCOS[posicao] + ".txt \n";
-	        	            	
-	                    	}
-	                    } // Fim for
-                    	
-                	// Checa se eh para receber apenas o bloco S
-                    }else if(blocoReceber.equalsIgnoreCase(ImportarDadosTxtRotinas.BLOCO_S)){
-                    	
-                    	if(telaChamou != TELA_RECEPTOR_ALARME){
-	                    	((Activity) context).runOnUiThread(new Runnable() {
-	      					  public void run() {
-	      						  // Atualiza a mensagem na tela de sincronizacao
-	      						  textMensagemRetorno.setText("Verificando se existe " + nomeDiretorioFtp + "_" + ImportarDadosTxtRotinas.BLOCO_S + ".txt");
-	      					  }
-	                    	});
-                    	}
-                    	// Pega os dados do arquivo no servidor FTP
-                    	final FTPFile dadosArquivoFtp = dadosArquivoReceber(nomeDiretorioFtp + "_" + ImportarDadosTxtRotinas.BLOCO_S + ".txt");
-                    
-	                    // Checa se existe algum arquivo no servidor FTP
-	                    if (dadosArquivoFtp != null) {
-	                    	// Marca a barra de progresso como finita
-                        	progressDownloads.setIndeterminate(false);
-                        	// Atualiza a barra de progresso para comecar do zero
-                        	progressDownloads.setProgress(0);
-                        	
-                        	if(telaChamou != TELA_RECEPTOR_ALARME){
-	                        	((Activity) context).runOnUiThread(new Runnable() {
-	            					  public void run() {
-	            						  // Atualiza a mensagem na tela de sincronizacao
-	            						  textMensagemRetorno.setText("Achamos o " + nomeDiretorioFtp + "_" + ImportarDadosTxtRotinas.BLOCO_S + ".txt");
-	            					  }
-	                      		});
-                        	}
-                        	// Pega o nome do arquivo
-	                    	String nomeAquivo = nomeDiretorioFtp + "_" + ImportarDadosTxtRotinas.BLOCO_S + ".txt";
-	                    	
-	                    	// Seta um tamanho maximo da barra de progresso
-        	            	progressDownloads.setMax((int)dadosArquivoFtp.getSize());
-        	            	
-        	            	tamanhoArquivo = (double) dadosArquivoFtp.getSize();
-	                    	
-	                    	// Faz o download do bloco no servidor ftp e pega o caminho
-	                    	localArquivoRecebido.add(downloadFtp(nomeAquivo, pastaTemp, nomeDiretorioFtp));
-						
-	                    } else {
-	                    	if(telaChamou != TELA_RECEPTOR_ALARME){
-								((Activity) context).runOnUiThread(new Runnable() {
-	          					  public void run() {
-	          						  // Atualiza a mensagem na tela de sincronizacao
-	          						  textMensagemRetorno.setText("N�o achamos o " + nomeDiretorioFtp + "_" + ImportarDadosTxtRotinas.BLOCO_S + ".txt");
-	          					  }
-								});
-	                    	}
-	                    	
-							mensagemErro += "N�o achamos o arquivo " + nomeDiretorioFtp + "_" + ImportarDadosTxtRotinas.BLOCO_S + " no servidor em nuvem \n";
-						}
-	                    
-                    // Checa se eh para receber apenas o bloco C
-                    } else if(blocoReceber.equalsIgnoreCase(ImportarDadosTxtRotinas.BLOCO_C)){
-                    	((Activity) context).runOnUiThread(new Runnable() {
-        					  public void run() {
-        						  // Atualiza a mensagem na tela de sincronizacao
-        						  textMensagemRetorno.setText("Verificando se existe " + nomeDiretorioFtp + "_" + ImportarDadosTxtRotinas.BLOCO_C + ".txt");
-        					  }
-                      	});
-      	            	
-                    	// Pega os dados do arquivo no servidor FTP
-                    	final FTPFile dadosArquivoFtp = dadosArquivoReceber(nomeDiretorioFtp + "_" + ImportarDadosTxtRotinas.BLOCO_C + ".txt");
-                    	
-                    	
-                    	if(dadosArquivoFtp != null){
-                    		// Marca a barra de progresso como finita
-                        	progressDownloads.setIndeterminate(false);
-                        	// Atualiza a barra de progresso para comecar do zero
-                        	progressDownloads.setProgress(0);
-                        	
-                    		((Activity) context).runOnUiThread(new Runnable() {
-          					  public void run() {
-          						  // Atualiza a mensagem na tela de sincronizacao
-          						  textMensagemRetorno.setText("Achamos o " + nomeDiretorioFtp + "_" + ImportarDadosTxtRotinas.BLOCO_C + ".txt");
-          					  }
-                    		});
-        	            	
-                    		// Seta um tamanho maximo da barra de progresso
-        	            	progressDownloads.setMax((int)dadosArquivoFtp.getSize());
-        	            	
-        	            	tamanhoArquivo = (double) dadosArquivoFtp.getSize();
-        	            	
-        	            	String nomeAquivo = nomeDiretorioFtp + "_" + ImportarDadosTxtRotinas.BLOCO_C + ".txt";
-	                    	
-	                    	// Faz o download do bloco no servidor ftp e pega o caminho
-	                    	localArquivoRecebido.add(downloadFtp(nomeAquivo, pastaTemp, nomeDiretorioFtp));
-                    	
-                    	} else {
-                    		((Activity) context).runOnUiThread(new Runnable() {
-            					  public void run() {
-            						  // Atualiza a mensagem na tela de sincronizacao
-            						  textMensagemRetorno.setText("N�o achamos o " + nomeDiretorioFtp + "_" + ImportarDadosTxtRotinas.BLOCO_C + ".txt");
-            					  }
-                    		});
-                    		
-        	            	progressDownloads.setIndeterminate(true);
-                    	}
-	                    
-                	// Checa se eh para receber apenas o bloco A	                    
-                    } else if(blocoReceber.equalsIgnoreCase(ImportarDadosTxtRotinas.BLOCO_A)){
-                    	((Activity) context).runOnUiThread(new Runnable() {
-      					  public void run() {
-      						  // Atualiza a mensagem na tela de sincronizacao
-      						  textMensagemRetorno.setText("Verificando se existe " + nomeDiretorioFtp + "_" + ImportarDadosTxtRotinas.BLOCO_A + ".txt");
-      					  }
-                    	});
-    	            	
-                    	// Pega os dados do arquivo no servidor FTP
-                    	final FTPFile dadosArquivoFtp = dadosArquivoReceber(nomeDiretorioFtp + "_" + ImportarDadosTxtRotinas.BLOCO_A + ".txt");
-                    	
-                    	if(dadosArquivoFtp != null){
-                    		// Marca a barra de progresso como finita
-                        	progressDownloads.setIndeterminate(false);
-                        	// Atualiza a barra de progresso para comecar do zero
-                        	progressDownloads.setProgress(0);
-                        	
-                    		((Activity) context).runOnUiThread(new Runnable() {
-          					  public void run() {
-          						  // Atualiza a mensagem na tela de sincronizacao
-          						  textMensagemRetorno.setText("Achamos o " + nomeDiretorioFtp + "_" + ImportarDadosTxtRotinas.BLOCO_A + ".txt");
-          					  }
-                    		});
-                    		// Seta um tamanho maximo da barra de progresso
-        	            	progressDownloads.setMax((int)dadosArquivoFtp.getSize());
-        	            	// Pega o tamanho total do arquivo
-        	            	tamanhoArquivo = (double) dadosArquivoFtp.getSize();
-        	            	
-        	            	String nomeAquivo = nomeDiretorioFtp + "_" + ImportarDadosTxtRotinas.BLOCO_A + ".txt";
-	                    	
-	                    	// Faz o download do bloco no servidor ftp e pega o caminho
-	                    	localArquivoRecebido.add(downloadFtp(nomeAquivo, pastaTemp, nomeDiretorioFtp));
-	                    	
-                    	} else {
-                    		((Activity) context).runOnUiThread(new Runnable() {
-            					  public void run() {
-            						  // Atualiza a mensagem na tela de sincronizacao
-            						  textMensagemRetorno.setText("N�o achamos o " + nomeDiretorioFtp + "_" + ImportarDadosTxtRotinas.BLOCO_A + ".txt");
-            					  }
-                    		});
-                    		
-        	            	progressDownloads.setIndeterminate(true);
-        	            	
-        	            	mensagemErro += "Não foi encontrado o arquivo " + nomeDiretorioFtp + "_" + ImportarDadosTxtRotinas.BLOCO_A + " no servidor em nuvem \n";
-                    	}
-	                    
-                	// Checa se eh para receber apenas o bloco R
-                    } else if(blocoReceber.equalsIgnoreCase(ImportarDadosTxtRotinas.BLOCO_R)){
-                    	((Activity) context).runOnUiThread(new Runnable() {
-        					  public void run() {
-        						  // Atualiza a mensagem na tela de sincronizacao
-        						  textMensagemRetorno.setText("Verificando se existe " + nomeDiretorioFtp + "_" + ImportarDadosTxtRotinas.BLOCO_R + ".txt");
-        					  }
-                      	});
-      	            	
-                    	// Pega os dados do arquivo no servidor FTP
-                    	final FTPFile dadosArquivoFtp = dadosArquivoReceber(nomeDiretorioFtp + "_" + ImportarDadosTxtRotinas.BLOCO_R + ".txt");
-                    	
-                    	
-                    	if(dadosArquivoFtp != null){
-                    		// Marca a barra de progresso como finita
-                        	progressDownloads.setIndeterminate(false);
-                        	// Atualiza a barra de progresso para comecar do zero
-                        	progressDownloads.setProgress(0);
-                        	((Activity) context).runOnUiThread(new Runnable() {
-            					  public void run() {
-            						  // Atualiza a mensagem na tela de sincronizacao
-            						  textMensagemRetorno.setText("Achamos o " + nomeDiretorioFtp + "_" + ImportarDadosTxtRotinas.BLOCO_R + ".txt");
-            					  }
-                      		});
-                        	// Seta um tamanho maximo da barra de progresso
-        	            	progressDownloads.setMax((int)dadosArquivoFtp.getSize());
-        	            	// Pega o tamanho total do arquivo
-        	            	tamanhoArquivo = (double) dadosArquivoFtp.getSize();
-        	            	
-                        	String nomeAquivo = nomeDiretorioFtp + "_" + ImportarDadosTxtRotinas.BLOCO_R + ".txt";
-	                    	
-	                    	// Faz o download do bloco no servidor ftp e pega o caminho
-	                    	localArquivoRecebido.add(downloadFtp(nomeAquivo, pastaTemp, nomeDiretorioFtp));
-	                    	
-                    		((Activity) context).runOnUiThread(new Runnable() {
-          					  public void run() {
-          						  // Atualiza a mensagem na tela de sincronizacao
-          						  textMensagemRetorno.setText("Achamos o " + nomeDiretorioFtp + "_" + ImportarDadosTxtRotinas.BLOCO_R + ".txt");
-          					  }
-                    		});
-        	            	
-                    		// Seta um tamanho maximo da barra de progresso
-        	            	progressDownloads.setMax((int)dadosArquivoFtp.getSize());
-        	            	
-        	            	tamanhoArquivo = (double) dadosArquivoFtp.getSize();
-                    	}else {
-                    		((Activity) context).runOnUiThread(new Runnable() {
-            					  public void run() {
-            						  // Atualiza a mensagem na tela de sincronizacao
-            						  textMensagemRetorno.setText("N�o achamos o " + nomeDiretorioFtp + "_" + ImportarDadosTxtRotinas.BLOCO_R + ".txt");
-            					  }
-                    		});
-                    		
-        	            	progressDownloads.setIndeterminate(true);
-        	            	
-        	            	mensagemErro += "N�o localizamos o arquivo " + nomeDiretorioFtp + "_" + ImportarDadosTxtRotinas.BLOCO_R + " no servidor em nuvem \n";
-                    	}
-                    } else if(blocoReceber.equalsIgnoreCase(ImportarDadosTxtRotinas.BLOCO_COMPLETO)){
-                    	((Activity) context).runOnUiThread(new Runnable() {
-      					  public void run() {
-      						  // Atualiza a mensagem na tela de sincronizacao
-      						  textMensagemRetorno.setText("Verificando se existe " + nomeDiretorioFtp + "_" + ImportarDadosTxtRotinas.BLOCO_COMPLETO + ".txt");
-      					  }
-                    	});
-    	            	
-                    	// Pega os dados do arquivo no servidor FTP
-                    	final FTPFile dadosArquivoFtp = dadosArquivoReceber(nomeDiretorioFtp + "_" + ImportarDadosTxtRotinas.BLOCO_COMPLETO + ".txt");
-                    	
-                    	
-                    	if(dadosArquivoFtp != null){
-                    		
-                    		// Marca a barra de progresso como finita
-                        	progressDownloads.setIndeterminate(false);
-                        	// Atualiza a barra de progresso para comecar do zero
-                        	progressDownloads.setProgress(0);
-                        	
-                        	String nomeAquivo = nomeDiretorioFtp + "_" + ImportarDadosTxtRotinas.BLOCO_COMPLETO + ".txt";
-	                    	
-	                    	// Faz o download do bloco no servidor ftp e pega o caminho onde foi salvo o arquivo txt
-	                    	localArquivoRecebido.add(downloadFtp(nomeAquivo, pastaTemp, nomeDiretorioFtp));
-	                    	
-                    		((Activity) context).runOnUiThread(new Runnable() {
-          					  public void run() {
-          						  // Atualiza a mensagem na tela de sincronizacao
-          						  textMensagemRetorno.setText("Achamos o " + nomeDiretorioFtp + "_" + ImportarDadosTxtRotinas.BLOCO_COMPLETO + ".txt");
-          					  }
-                    		});
-        	            	
-                    		// Seta um tamanho maximo da barra de progresso
-        	            	progressDownloads.setMax((int)dadosArquivoFtp.getSize());
-        	            	
-        	            	tamanhoArquivo = (double) dadosArquivoFtp.getSize();
-                    	} else {
-                    		((Activity) context).runOnUiThread(new Runnable() {
-            					  public void run() {
-            						  // Atualiza a mensagem na tela de sincronizacao
-            						  textMensagemRetorno.setText("Não achamos o " + nomeDiretorioFtp + "_" + ImportarDadosTxtRotinas.BLOCO_COMPLETO + ".txt");
-            					  }
-                    		});
-                    		
-        	            	progressDownloads.setIndeterminate(true);
-        	            	
-        	            	mensagemErro += "N�o foi encontado o arquivo " + nomeDiretorioFtp + "_" + ImportarDadosTxtRotinas.BLOCO_COMPLETO + " no servidor em nuvem \n";
-                    	}
-	                   
-                    } // Fecha o bloco completo*/
+
                     
 	            } else { // Fim if status
 	            	mensagemErro += "Usuário ou Senha incorretos";
@@ -733,7 +422,7 @@ public class ReceberArquivoTxtServidorFtpRotinas {
 						funcoes.menssagem(dadosMensagem);
 					  }
 				});
-			} else {
+			} /*else {
 				// Cria a intent com identificacao do alarme
 				Intent intent = new Intent("NOTIFICACAO_SAVARE");
 				intent.putExtra("TICKER", "Recebimento de Dados do SAVARE");
@@ -741,7 +430,7 @@ public class ReceberArquivoTxtServidorFtpRotinas {
 				intent.putExtra("MENSAGEM", mensagemErro);
 				
 				context.sendBroadcast(intent);
-			}
+			}*/
 		}
 		
 		return localArquivoRecebido;

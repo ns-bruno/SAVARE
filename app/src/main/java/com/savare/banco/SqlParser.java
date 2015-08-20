@@ -80,17 +80,36 @@ public class SqlParser {
         StringBuilder sb = new StringBuilder();
         boolean inLiteral = false;
         char[] content = script.toCharArray();
+        char delimTrigger = '~';
+        String endDelim = "";
         for (int i = 0; i < script.length(); i++) {
+
             if (content[i] == '\'') {
             inLiteral = !inLiteral;
-        }
-        if (content[i] == delim && !inLiteral) {
+            }
+            // Checa se vai formar a palavra END;
+            if (content[i] == 'E' || content[i] == 'N' || content[i] == 'D' || content[i] == ';'){
+                endDelim += content[i];
+            } else {
+                endDelim = "";
+            }
+
+            if (content[i] == '^'){
+                content[i] = ' ';
+            }
+
+        if (((content[i] == delim) && (!inLiteral) && (!endDelim.equalsIgnoreCase("END;"))) || ((content[i] == delimTrigger) && (!inLiteral) && (!endDelim.equalsIgnoreCase("END;")))) {
             if (sb.length() > 0) {
                 statements.add(sb.toString().trim());
                 sb = new StringBuilder();
             }
         } else {
-            sb.append(content[i]);
+            // Checa se tem o delimitador
+            if (content[i] == '$'){
+                sb.append(';');
+            } else {
+                sb.append(content[i]);
+            }
         }
     }
     if (sb.length() > 0) {

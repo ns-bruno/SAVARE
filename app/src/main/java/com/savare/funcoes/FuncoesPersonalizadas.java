@@ -29,7 +29,9 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.pm.ActivityInfo;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.text.Editable;
@@ -39,7 +41,9 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.savare.R;
+import com.savare.banco.ConexaoBancoDeDados;
 import com.savare.banco.ConexaoTask;
+import com.savare.banco.VersionUtils;
 import com.savare.configuracao.ServicosWeb;
 
 public class FuncoesPersonalizadas {
@@ -466,7 +470,7 @@ public class FuncoesPersonalizadas {
 	}
 	
 	
-	public void criarAlarmeEnviarOrcamento(){
+	public void criarAlarmeEnviarReceberDadosAutomatico(){
 		
 		// Checa se o alarme nao foi criado
 		boolean alarmeEnviarDesativado =  (PendingIntent.getBroadcast(context, 0, new Intent(ENVIAR_ORCAMENTO_SAVARE), PendingIntent.FLAG_NO_CREATE) == null);
@@ -486,9 +490,8 @@ public class FuncoesPersonalizadas {
 				Calendar tempoInicio = Calendar.getInstance();
 				// Pega a hora atual do sistema em milesegundo
 				tempoInicio.setTimeInMillis(System.currentTimeMillis());
-				// Adiciona mais alguns segundo para executar o alarme depois de alguns segundo que esta
-				// Activity for abaerta
-				tempoInicio.add(Calendar.SECOND, 3);
+				// Adiciona mais alguns segundo para executar o alarme depois de alguns segundo que esta Activity for abaerta
+				tempoInicio.add(Calendar.SECOND, 10);
 				// Cria um intervalo de quanto em quanto tempo o alarme vai repetir
 				long intervalo = 1 * 1000; // 1 Minutos
 				
@@ -520,14 +523,13 @@ public class FuncoesPersonalizadas {
 				Calendar tempoInicio = Calendar.getInstance();
 				// Pega a hora atual do sistema em milesegundo
 				tempoInicio.setTimeInMillis(System.currentTimeMillis());
-				// Adiciona mais alguns segundo para executar o alarme depois de alguns segundo que esta
-				// Activity for abaerta
-				tempoInicio.add(Calendar.SECOND, 3);
+				// Adiciona mais alguns segundo para executar o alarme depois de alguns segundo que esta Activity for abaerta
+				tempoInicio.add(Calendar.SECOND, 10);
 				
-				//long intervalo = 300 * 1000;
+				long intervalo = 2 * 1000;
 				
 				AlarmManager alarmeReceberOrcamento = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-				alarmeReceberOrcamento.setRepeating(AlarmManager.RTC_WAKEUP, tempoInicio.getTimeInMillis(), 2 * 1000, alarmIntent);
+				alarmeReceberOrcamento.setRepeating(AlarmManager.RTC_WAKEUP, tempoInicio.getTimeInMillis(), intervalo, alarmIntent);
 			}
 		} else {
 			// Checa se o alarme foi criado para podermos desativalo
@@ -783,9 +785,30 @@ public class FuncoesPersonalizadas {
 			erro = context.getResources().getString(R.string.erro_sqlite_code_1299) + "\n" + erro + "\n";
 		}
 
+		if (erro.toLowerCase().contains("no such table")){
+			erro = context.getResources().getString(R.string.nao_existe_tabela_banco_dados)  + "\n" + erro + "\n" + context.getResources().getString(R.string.vamos_executar_processo_criar_tabelas);
+			try {
+				ConexaoBancoDeDados conexaoBancoDeDados = new ConexaoBancoDeDados(context, VersionUtils.getVersionCode(context));
+				// Pega o banco de dados do SAVARE
+				SQLiteDatabase bancoDados = conexaoBancoDeDados.abrirBanco();
+				// Executa o onCreate para criar todas as tabelas do banco de dados
+				conexaoBancoDeDados.onCreate(bancoDados);
+
+			} catch (PackageManager.NameNotFoundException e) {
+				erro = e.getMessage() + "\n" + erro;
+			}
+		}
+
 		return erro;
 	} // Fim tratamentoErroBancoDados
 
+	/**
+	 * Valida o CNPJ, retornando apenas se é um CNPJ válido ou não.
+	 * Pode ser passado apenas numero ou com a formatação padrão do Brasil.
+	 *
+	 * @param CNPJ
+	 * @return
+	 */
 	public boolean validaCNPJ(String CNPJ) {
 		CNPJ = CNPJ.replace(".", "").replace("-","").replace("/", "");
 // considera-se erro CNPJ's formados por uma sequencia de numeros iguais
@@ -855,6 +878,13 @@ public class FuncoesPersonalizadas {
 		}
 	}
 
+	/**
+	 * Valida o CPF, retornando apenas se é um CPF válido ou não.
+	 * Pode ser passado apenas numero ou com a formatação padrão do Brasil.
+	 *
+	 * @param CPF
+	 * @return
+	 */
 	public boolean validaCPF(String CPF) {
 		CPF = CPF.replace(".", "").replace("-","");
 // considera-se erro CPF's formados por uma sequencia de numeros iguais

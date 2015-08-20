@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.savare"
-    android:versionCode="1"
-    android:versionName="1.0" >
+    android:versionCode="1002"
+    android:versionName="1.0.0.2" >
 
     <uses-sdk
         android:minSdkVersion="11"
@@ -13,10 +13,9 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
-    <!--<permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"></permission>-->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
-    
+
 	<application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"

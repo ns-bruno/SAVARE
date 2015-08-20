@@ -1,15 +1,10 @@
 package com.savare.activity;
 
-import java.util.Calendar;
-
 import android.app.Activity;
-import android.app.AlarmManager;
-import android.app.PendingIntent;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -135,7 +130,7 @@ public class LoginActivity extends Activity {
 			}
 		}
 		// Cria o alarme se nao existir para enviar e receber dados
-		funcoes.criarAlarmeEnviarOrcamento();
+		funcoes.criarAlarmeEnviarReceberDadosAutomatico();
 		
 	}
 	

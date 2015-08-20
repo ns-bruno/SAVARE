@@ -6,8 +6,6 @@ import android.app.AlertDialog;
 import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -18,7 +16,6 @@ import android.widget.EditText;
 
 import com.savare.R;
 import com.savare.banco.funcoesSql.EmpresaSql;
-import com.savare.banco.funcoesSql.ParametrosSql;
 import com.savare.banco.funcoesSql.PercentualSql;
 import com.savare.funcoes.FuncoesPersonalizadas;
 import com.savare.funcoes.rotinas.PercentualRotinas;
@@ -155,7 +152,7 @@ public class ConfiguracoesActivity extends Activity {
 					funcoesP.setValorXml("EnviarAutomatico", "N");
 				}
 				
-				funcoesP.criarAlarmeEnviarOrcamento();
+				funcoesP.criarAlarmeEnviarReceberDadosAutomatico();
 			}
 		});
 		
@@ -174,7 +171,7 @@ public class ConfiguracoesActivity extends Activity {
 					funcoesP.setValorXml("ReceberAutomatico", "N");
 				}
 				
-				funcoesP.criarAlarmeEnviarOrcamento();
+				funcoesP.criarAlarmeEnviarReceberDadosAutomatico();
 			}
 		});
 	
