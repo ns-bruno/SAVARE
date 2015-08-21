@@ -127,7 +127,7 @@ public class ReceberDadosFtpAsyncRotinas extends AsyncTask<String, String, Integ
 						dadosMensagem.put("comando", 0);
 						dadosMensagem.put("tela", "ReceberDadosFtpAsyncRotinas");
 						dadosMensagem.put("mensagem", "Erro gravíssimo. Não foi possível pegar os dados do arquivo. \n"
-										+ "Possivelmente o layou do arquivo esta errado/desatualizado. \n" + e.getMessage());
+													+ "Possivelmente o layou do arquivo esta errado/desatualizado. \n" + e.getMessage());
 						dadosMensagem.put("dados", e.toString());
 						dadosMensagem.put("usuario", funcoes.getValorXml("Usuario"));
 						dadosMensagem.put("empresa", funcoes.getValorXml("Empresa"));
@@ -137,7 +137,7 @@ public class ReceberDadosFtpAsyncRotinas extends AsyncTask<String, String, Integ
 					  }
 				});
 			}
-			mensagem += "Erro gravíssimo. Não foi possível pegar os dados do arquivo. \n" + e.getMessage() + "\n";
+			//mensagem += "Erro gravíssimo. Não foi possível pegar os dados do arquivo. \n" + e.getMessage() + "\n";
 			
 		}
 		return 0;
@@ -148,14 +148,29 @@ public class ReceberDadosFtpAsyncRotinas extends AsyncTask<String, String, Integ
 		super.onPostExecute(result);
 		
 		// Checa se que esta chamando esta classe eh o alarme
-		if( (mensagem != null) && (mensagem.length() > 1) && (telaChamou == TELA_RECEPTOR_ALARME)){
+		if( (mensagem != null) && (mensagem.length() > 1) && (telaChamou != TELA_RECEPTOR_ALARME)){
+
+			FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
+
+			ContentValues dadosMensagem = new ContentValues();
+
+			dadosMensagem.put("comando", 0);
+			dadosMensagem.put("tela", "ReceberDadosFtpAsyncRotinas");
+			dadosMensagem.put("mensagem", mensagem);
+			dadosMensagem.put("dados", context + "\n" + mensagem);
+			dadosMensagem.put("usuario", funcoes.getValorXml("Usuario"));
+			dadosMensagem.put("empresa", funcoes.getValorXml("Empresa"));
+			dadosMensagem.put("email", funcoes.getValorXml("Email"));
+
+			funcoes.menssagem(dadosMensagem);
+
 			// Cria a intent com identificacao do alarme
-			Intent intent = new Intent("NOTIFICACAO_SAVARE");
+			/*Intent intent = new Intent("NOTIFICACAO_SAVARE");
 			intent.putExtra("TICKER", "Nova Mensagem quando fomos Receber dados");
 			intent.putExtra("TITULO", "SAVARE");
 			intent.putExtra("MENSAGEM", mensagem);
 			
-			context.sendBroadcast(intent);
+			context.sendBroadcast(intent);*/
 		}
 	}
 

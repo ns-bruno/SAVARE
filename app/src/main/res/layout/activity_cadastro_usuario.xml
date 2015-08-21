@@ -90,6 +90,14 @@
             android:inputType="textPassword"
             android:hint="@string/senha_servidor" />
 
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/cadastro_usuario_edit_pasta_servidor"
+            android:layout_gravity="center_horizontal"
+            android:hint="@string/pasta_ftp"
+            android:text="/" />
+
     </LinearLayout>
     
 

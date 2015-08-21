@@ -31,6 +31,7 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.savare.R;
 import com.savare.banco.funcoesSql.UsuarioSQL;
 import com.savare.funcoes.FuncoesPersonalizadas;
 
@@ -123,281 +124,286 @@ public class ReceberArquivoTxtServidorFtpRotinas {
         UsuarioSQL usuarioSQL = new UsuarioSQL(context);
 		// Pega os dados do usuario e conexoes
 		Cursor dadosUsuario = usuarioSQL.query("ID_USUA = " + funcoes.getValorXml("CodigoUsuario"));
-		// Move para o primeiro registro
-		dadosUsuario.moveToFirst();
-		
-        // Pega o host(endereco) e outros dados do servidor FTP
-		String hostFtp = dadosUsuario.getString(dadosUsuario.getColumnIndex("IP_SERVIDOR_USUA"));
-		String usuarioFtp = dadosUsuario.getString(dadosUsuario.getColumnIndex("USUARIO_SERVIDOR_USUA"));
-		String senhaFtp = dadosUsuario.getString(dadosUsuario.getColumnIndex("SENHA_SERVIDOR_USUA"));
-		final String nomeLogin = dadosUsuario.getString(dadosUsuario.getColumnIndex("LOGIN_USUA"));
-		String nomeDiretorioFtp = dadosUsuario.getString(dadosUsuario.getColumnIndex("PASTA_SERVIDOR_USUA"));
-		
-		File pastaTemp = new File(Environment.getExternalStorageDirectory() + "/SAVARE/TEMP");
-        
-		// Checa se tem internet
-		if(funcoes.existeConexaoInternet()){
-			try {
-				// Cria a pasta temp se nao existir
-				if(!pastaTemp.exists()){
-					pastaTemp.mkdirs();
-				}
-				
-				conexaoFtp.setConnectTimeout(10 * 1000);
-				conexaoFtp.setDefaultTimeout(30 * 1000);
-				
-				if(telaChamou != TELA_RECEPTOR_ALARME){
-					((Activity) context).runOnUiThread(new Runnable() {
-						  public void run() {
-								  // Atualiza a mensagem de retorno
-								  textMensagemRetorno.setText("Estamos Conectando no Servidor em Nuvem...");
-						  }
-					});
-				}
-				// Conecta com o servidor FTP usando a porta 21
-				conexaoFtp.connect(hostFtp);
-				
-				boolean status = false;
-				
-				//Checa o codigo de resposta, se for positivo, a conexao foi feita
-	            if (FTPReply.isPositiveCompletion(conexaoFtp.getReplyCode())) {
-	            	
-	            	if(telaChamou != TELA_RECEPTOR_ALARME){
-		            	((Activity) context).runOnUiThread(new Runnable() {
-							  public void run() {
-								  // Atualiza a mensagem na tela de sincronizacao
-								  textMensagemRetorno.setText("Conseguimos Conectar no Servidor, agora vamor logar...");
-							  }
-		            	});
-	            	}
-	            	// Autenticacao com usuario e senha
-	            	status = conexaoFtp.login(usuarioFtp, funcoes.descriptografaSenha(senhaFtp));
-	            } else {
-	            	if(telaChamou != TELA_RECEPTOR_ALARME){
-		            	((Activity) context).runOnUiThread(new Runnable() {
-							  public void run() {
-								  // Atualiza a mensagem na tela de sincronizacao
-								  textMensagemRetorno.setText("Erro ao conectar no Servidor em Nuvem...");
-							  }
-		            	});
-	            	}
-	            	// Atualiza a mensagem do progresso
-	            	mensagemErro = "Não foi possível conectar no servidor em nuvem. \n";
-	            }
-	            
-	            if (status){
-	            	if(telaChamou != TELA_RECEPTOR_ALARME){
-		            	((Activity) context).runOnUiThread(new Runnable() {
-							  public void run() {
-								  // Atualiza a mensagem na tela de sincronizacao
-								  textMensagemRetorno.setText("Logado com sucesso.");
-							  }
-		            	});
-	            	}
-	            	
-	            	//Setando para o modo de transfer�ncia de Arquivos
-	            	conexaoFtp.setFileType(FTPClient.BINARY_FILE_TYPE);
-	            	conexaoFtp.setFileTransferMode(FTPClient.BINARY_FILE_TYPE);
-	            	conexaoFtp.enterLocalPassiveMode();
-	            	conexaoFtp.setAutodetectUTF8(true);
-                    
-                    // Vai para uma pasta especifica no servidor FTP
-                    if(!conexaoFtp.changeWorkingDirectory(nomeDiretorioFtp)){
-                    	criarDiretorio(nomeDiretorioFtp);
-                    }
+
+		if (dadosUsuario != null && dadosUsuario.getCount() > 0){
+			// Move para o primeiro registro
+			dadosUsuario.moveToFirst();
+
+			// Pega o host(endereco) e outros dados do servidor FTP
+			String hostFtp = dadosUsuario.getString(dadosUsuario.getColumnIndex("IP_SERVIDOR_USUA"));
+			String usuarioFtp = dadosUsuario.getString(dadosUsuario.getColumnIndex("USUARIO_SERVIDOR_USUA"));
+			String senhaFtp = dadosUsuario.getString(dadosUsuario.getColumnIndex("SENHA_SERVIDOR_USUA"));
+			final String nomeLogin = dadosUsuario.getString(dadosUsuario.getColumnIndex("LOGIN_USUA"));
+			String nomeDiretorioFtp = dadosUsuario.getString(dadosUsuario.getColumnIndex("PASTA_SERVIDOR_USUA"));
+
+			File pastaTemp = new File(Environment.getExternalStorageDirectory() + "/SAVARE/TEMP");
+
+			// Checa se tem internet
+			if(funcoes.existeConexaoInternet()){
+				try {
+					// Cria a pasta temp se nao existir
+					if(!pastaTemp.exists()){
+						pastaTemp.mkdirs();
+					}
+
+					conexaoFtp.setConnectTimeout(10 * 1000);
+					conexaoFtp.setDefaultTimeout(30 * 1000);
 
 					if(telaChamou != TELA_RECEPTOR_ALARME){
 						((Activity) context).runOnUiThread(new Runnable() {
-							public void run() {
-								// Atualiza a mensagem na tela de sincronizacao
-								textMensagemRetorno.setText("Aquarde... Estamos solicitando os dados.");
-							}
+							  public void run() {
+									  // Atualiza a mensagem de retorno
+									  textMensagemRetorno.setText("Estamos Conectando no Servidor em Nuvem...");
+							  }
 						});
+					}
+					// Conecta com o servidor FTP usando a porta 21
+					conexaoFtp.connect(hostFtp);
 
-						File arquivoSolicitacao = new File(geraArquivoSolicitacaoDados(blocoReceber));
-                        // Instancia a variavel para salvar os arquivos a serem baixados
-                        listaDadosArquivoFtp = new ArrayList<FTPFile>();
+					boolean status = false;
 
-                        if (arquivoSolicitacao.exists()) {
+					//Checa o codigo de resposta, se for positivo, a conexao foi feita
+					if (FTPReply.isPositiveCompletion(conexaoFtp.getReplyCode())) {
 
-                            // Pega o Arquivo a ser enviado e transforma em um formato proprio para transferir
-                            FileInputStream arqEnviar = new FileInputStream(arquivoSolicitacao);
-                            // Incrementa o tamanho da transferencia do arquivo
-                            conexaoFtp.setBufferSize(1024000);
+						if(telaChamou != TELA_RECEPTOR_ALARME){
+							((Activity) context).runOnUiThread(new Runnable() {
+								  public void run() {
+									  // Atualiza a mensagem na tela de sincronizacao
+									  textMensagemRetorno.setText("Conseguimos Conectar no Servidor, agora vamor logar...");
+								  }
+							});
+						}
+						// Autenticacao com usuario e senha
+						status = conexaoFtp.login(usuarioFtp, funcoes.descriptografaSenha(senhaFtp));
+					} else {
+						if(telaChamou != TELA_RECEPTOR_ALARME){
+							((Activity) context).runOnUiThread(new Runnable() {
+								  public void run() {
+									  // Atualiza a mensagem na tela de sincronizacao
+									  textMensagemRetorno.setText("Erro ao conectar no Servidor em Nuvem...");
+								  }
+							});
+						}
+						// Atualiza a mensagem do progresso
+						mensagemErro = "Não foi possível conectar no servidor em nuvem. \n";
+					}
 
-                            String nomeTemp = funcoes.getValorXml("ChaveEmpresa") + "_solicitacao.txt";
+					if (status){
+						if(telaChamou != TELA_RECEPTOR_ALARME){
+							((Activity) context).runOnUiThread(new Runnable() {
+								  public void run() {
+									  // Atualiza a mensagem na tela de sincronizacao
+									  textMensagemRetorno.setText("Logado com sucesso.");
+								  }
+							});
+						}
 
-                            // Envia o arquivo de solicitacao
-                            if (conexaoFtp.storeFile(nomeTemp, arqEnviar)){
+						//Setando para o modo de transfer�ncia de Arquivos
+						conexaoFtp.setFileType(FTPClient.BINARY_FILE_TYPE);
+						conexaoFtp.setFileTransferMode(FTPClient.BINARY_FILE_TYPE);
+						conexaoFtp.enterLocalPassiveMode();
+						conexaoFtp.setAutodetectUTF8(true);
 
-                                // Renomeia o arquivo enviado para checar se chegou no servidor FTP com  sucesso
-                                if (renomeaArquivoFtp(nomeTemp, arquivoSolicitacao.getName())) {
+						// Vai para uma pasta especifica no servidor FTP
+						if(!conexaoFtp.changeWorkingDirectory(nomeDiretorioFtp)){
+							criarDiretorio(nomeDiretorioFtp);
+						}
 
+						if(telaChamou != TELA_RECEPTOR_ALARME){
+							((Activity) context).runOnUiThread(new Runnable() {
+								public void run() {
+									// Atualiza a mensagem na tela de sincronizacao
+									textMensagemRetorno.setText("Aquarde... Estamos solicitando os dados.");
+								}
+							});
+
+							File arquivoSolicitacao = new File(geraArquivoSolicitacaoDados(blocoReceber));
+							// Instancia a variavel para salvar os arquivos a serem baixados
+							listaDadosArquivoFtp = new ArrayList<FTPFile>();
+
+							if (arquivoSolicitacao.exists()) {
+
+								// Pega o Arquivo a ser enviado e transforma em um formato proprio para transferir
+								FileInputStream arqEnviar = new FileInputStream(arquivoSolicitacao);
+								// Incrementa o tamanho da transferencia do arquivo
+								conexaoFtp.setBufferSize(1024000);
+
+								String nomeTemp = funcoes.getValorXml("ChaveEmpresa") + "_solicitacao.txt";
+
+								// Envia o arquivo de solicitacao
+								if (conexaoFtp.storeFile(nomeTemp, arqEnviar)){
+
+									// Renomeia o arquivo enviado para checar se chegou no servidor FTP com  sucesso
+									if (renomeaArquivoFtp(nomeTemp, arquivoSolicitacao.getName())) {
+
+										((Activity) context).runOnUiThread(new Runnable() {
+											public void run() {
+												// Atualiza a mensagem na tela de sincronizacao
+												textMensagemRetorno.setText("Solicitação Enviada. 1ª Tentativa para receber os dados. Aguarde...");
+											}
+										});
+									}
+								}
+							}
+							// Controle de repeticao
+							int controle = 0;
+
+							// Faz ess processo no máximo 3 vezes
+							while ((listaDadosArquivoFtp.size() <= 0) && (controle < 3)) {
+
+								controle++;
+
+								if (controle == 3){
 									((Activity) context).runOnUiThread(new Runnable() {
 										public void run() {
-											// Atualiza a mensagem na tela de sincronizacao
-											textMensagemRetorno.setText("Solicitação Enviada. 1ª Tentativa para receber os dados. Aguarde...");
+											// Exibe o tempo restante
+											textMensagemRetorno.setText("Solicitação Enviada. Última tentativa para receber os dados. Aguarde... ");
 										}
 									});
-                                }
-                            }
-                        }
-                        // Controle de repeticao
-                        int controle = 0;
+								} else {
+									final int finalControle = controle;
+									((Activity) context).runOnUiThread(new Runnable() {
+										public void run() {
+											// Exibe o tempo restante
+											textMensagemRetorno.setText("Solicitação Enviada. " + finalControle + "ª Tentativa para receber os dados. Aguarde... ");
+										}
+									});
+								}
+								// Pega uma lista com todos os arquivos a ser baixados
+								listaDadosArquivoFtp = listaDadosArquivoReceber(blocoReceber);
 
-                        // Faz ess processo no máximo 3 vezes
-                        while ((listaDadosArquivoFtp.size() <= 0) && (controle < 3)) {
+								/*// Inicia um cronometo regressivo de 20 segundos
+								final int finalControle = controle;
+								((Activity) context).runOnUiThread(new Runnable() {
+									public void run() {
+										new CountDownTimer(20000, 1000) {
+											@Override
+											public void onTick(final long millisUntilFinished) {
 
-                            controle++;
+												if (finalControle == 3){
+													// Exibe o tempo restante
+													textMensagemRetorno.setText("Solicitação Enviada. Última tentativa para receber os dados. Aguarde... " + (millisUntilFinished / 1000));
+												} else {
+													// Exibe o tempo restante
+													textMensagemRetorno.setText("Solicitação Enviada. " + finalControle + "ª Tentativa para receber os dados. Aguarde... " + (millisUntilFinished / 1000));
+												}
+											}
+											@Override
+											public void onFinish() {
 
-                            if (controle == 3){
-                                ((Activity) context).runOnUiThread(new Runnable() {
-                                    public void run() {
-                                        // Exibe o tempo restante
-                                        textMensagemRetorno.setText("Solicitação Enviada. Última tentativa para receber os dados. Aguarde... ");
-                                    }
-                                });
-                            } else {
-                                final int finalControle = controle;
-                                ((Activity) context).runOnUiThread(new Runnable() {
-                                    public void run() {
-                                        // Exibe o tempo restante
-                                        textMensagemRetorno.setText("Solicitação Enviada. " + finalControle + "ª Tentativa para receber os dados. Aguarde... ");
-                                    }
-                                });
-                            }
-                            // Pega uma lista com todos os arquivos a ser baixados
-                            listaDadosArquivoFtp = listaDadosArquivoReceber(blocoReceber);
+											}
+										}.start();
+									}
+								});
+								// Pausa o clodigo por 23 segundos
+								Thread.sleep(30000);*/
+							} // Fim while
+						} else {
+							// Pega uma lista com todos os arquivos a ser baixados
+							listaDadosArquivoFtp = listaDadosArquivoReceber(blocoReceber);
+						}
 
-                            /*// Inicia um cronometo regressivo de 20 segundos
-                            final int finalControle = controle;
-                            ((Activity) context).runOnUiThread(new Runnable() {
-                                public void run() {
-                                    new CountDownTimer(20000, 1000) {
-                                        @Override
-                                        public void onTick(final long millisUntilFinished) {
+						// Pega uma lista com todos os arquivos a ser baixados
+						//List<FTPFile> listaDadosArquivoFtp = listaDadosArquivoReceber(blocoReceber);
 
-                                            if (finalControle == 3){
-                                                // Exibe o tempo restante
-                                                textMensagemRetorno.setText("Solicitação Enviada. Última tentativa para receber os dados. Aguarde... " + (millisUntilFinished / 1000));
-                                            } else {
-                                                // Exibe o tempo restante
-                                                textMensagemRetorno.setText("Solicitação Enviada. " + finalControle + "ª Tentativa para receber os dados. Aguarde... " + (millisUntilFinished / 1000));
-                                            }
-                                        }
-                                        @Override
-                                        public void onFinish() {
+						// Checa se a lista nao esta vazia
+						if ((listaDadosArquivoFtp != null) && (listaDadosArquivoFtp.size() > 0)) {
 
-                                        }
-                                    }.start();
-                                }
-                            });
-                            // Pausa o clodigo por 23 segundos
-                            Thread.sleep(30000);*/
-                        } // Fim while
-                    } else {
-                        // Pega uma lista com todos os arquivos a ser baixados
-                        listaDadosArquivoFtp = listaDadosArquivoReceber(blocoReceber);
-                    }
+							// Passa por todos os arquivos da lista
+							for (final FTPFile dadosArquivoFtp : listaDadosArquivoFtp) {
 
-                    // Pega uma lista com todos os arquivos a ser baixados
-                    //List<FTPFile> listaDadosArquivoFtp = listaDadosArquivoReceber(blocoReceber);
+								// Checa se nao esta vazio
+								if (dadosArquivoFtp != null) {
 
-                    // Checa se a lista nao esta vazia
-                    if ((listaDadosArquivoFtp != null) && (listaDadosArquivoFtp.size() > 0)) {
+									// Checa qual classe chamou esta
+									if (telaChamou != TELA_RECEPTOR_ALARME) {
 
-                        // Passa por todos os arquivos da lista
-                        for (final FTPFile dadosArquivoFtp : listaDadosArquivoFtp) {
+										progressDownloads.setIndeterminate(false);
+										progressDownloads.setProgress(0);
 
-                            // Checa se nao esta vazio
-                            if (dadosArquivoFtp != null) {
+										((Activity) context).runOnUiThread(new Runnable() {
+											public void run() {
+												// Atualiza a mensagem na tela de sincronizacao
+												textMensagemRetorno.setText("Achamos o arquivo " + dadosArquivoFtp.getName());
+											}
+										});
 
-                                // Checa qual classe chamou esta
-                                if (telaChamou != TELA_RECEPTOR_ALARME) {
+										// Seta um tamanho maximo da barra de progresso
+										progressDownloads.setMax((int) dadosArquivoFtp.getSize());
+									}
 
-                                    progressDownloads.setIndeterminate(false);
-                                    progressDownloads.setProgress(0);
+									tamanhoArquivo = (double) dadosArquivoFtp.getSize();
 
-                                    ((Activity) context).runOnUiThread(new Runnable() {
-                                        public void run() {
-                                            // Atualiza a mensagem na tela de sincronizacao
-                                            textMensagemRetorno.setText("Achamos o arquivo " + dadosArquivoFtp.getName());
-                                        }
-                                    });
+									// Cria o nome do arquivo a ser baixado
+									String nomeAquivo = dadosArquivoFtp.getName();
 
-                                    // Seta um tamanho maximo da barra de progresso
-                                    progressDownloads.setMax((int) dadosArquivoFtp.getSize());
-                                }
+									// Faz o download do bloco no servidor ftp e pega o caminho
+									localArquivoRecebido.add(downloadFtp(nomeAquivo, pastaTemp, nomeDiretorioFtp));
 
-                                tamanhoArquivo = (double) dadosArquivoFtp.getSize();
+								} else {
+									if (telaChamou != TELA_RECEPTOR_ALARME) {
+									/*((Activity) context).runOnUiThread(new Runnable() {
+										  public void run() {
+											  // Atualiza a mensagem na tela de sincronizacao
+											  textMensagemRetorno.setText("Não achamos o " + nomeDiretorioFtp + "_" + ImportarDadosTxtRotinas.BLOCOS[posicao] + ".txt");
+										  }
+									});*/
+										progressDownloads.setIndeterminate(true);
+									}
+									mensagemErro = mensagemErro + "O arquivo " + dadosArquivoFtp.getName() + " esta vazio.";
 
-                                // Cria o nome do arquivo a ser baixado
-                                String nomeAquivo = dadosArquivoFtp.getName();
+								}
+							}
+						} else {
+							if(telaChamou != TELA_RECEPTOR_ALARME){
+								((Activity) context).runOnUiThread(new Runnable() {
+									public void run() {
+										// Atualiza a mensagem na tela de sincronizacao
+										textMensagemRetorno.setText("Não achamos nenhum arquivo para fazer downloads.");
+									}
+								});
+								progressDownloads.setIndeterminate(true);
 
-                                // Faz o download do bloco no servidor ftp e pega o caminho
-                                localArquivoRecebido.add(downloadFtp(nomeAquivo, pastaTemp, nomeDiretorioFtp));
+							} /*else {
+								mensagemErro = mensagemErro + "Não achamos nenhum arquivo para fazer downloads.";
+							}*/
+						}
 
-                            } else {
-                                if (telaChamou != TELA_RECEPTOR_ALARME) {
-                                /*((Activity) context).runOnUiThread(new Runnable() {
-                                      public void run() {
-                                          // Atualiza a mensagem na tela de sincronizacao
-                                          textMensagemRetorno.setText("Não achamos o " + nomeDiretorioFtp + "_" + ImportarDadosTxtRotinas.BLOCOS[posicao] + ".txt");
-                                      }
-                                });*/
-                                    progressDownloads.setIndeterminate(true);
-                                }
-                                mensagemErro = mensagemErro + "O arquivo " + dadosArquivoFtp.getName() + " esta vazio.";
 
-                            }
-                        }
-                    } else {
-                        if(telaChamou != TELA_RECEPTOR_ALARME){
-                            ((Activity) context).runOnUiThread(new Runnable() {
-                                public void run() {
-                                    // Atualiza a mensagem na tela de sincronizacao
-                                    textMensagemRetorno.setText("Não achamos nenhum arquivo para fazer downloads.");
-                                }
-                            });
-                            progressDownloads.setIndeterminate(true);
+					} else { // Fim if status
+						mensagemErro += "Usuário ou Senha incorretos";
+					}
+					if(telaChamou != TELA_RECEPTOR_ALARME){
+						((Activity) context).runOnUiThread(new Runnable() {
+							  public void run() {
+								  progressDownloads.setVisibility(View.INVISIBLE);
+							  }
+						});
+					}
+					// Fecha conexao
+					conexaoFtp.disconnect();
+					conexaoFtp = null;
 
-                        } /*else {
-                            mensagemErro = mensagemErro + "Não achamos nenhum arquivo para fazer downloads.";
-                        }*/
-                    }
+				} catch (IOException e) {
+					if(telaChamou != TELA_RECEPTOR_ALARME){
+						((Activity) context).runOnUiThread(new Runnable() {
+							  public void run() {
+								  progressDownloads.setVisibility(View.INVISIBLE);
+							  }
+						});
+					}
+					//arquivoRecebido.delete();
+					mensagemErro += "Não foi possível baixar nenhum arquivo do servidor em Nuvem. \n" + e.getMessage() + "\n";
 
-                    
-	            } else { // Fim if status
-	            	mensagemErro += "Usuário ou Senha incorretos";
-	            }
-	            if(telaChamou != TELA_RECEPTOR_ALARME){
-		            ((Activity) context).runOnUiThread(new Runnable() {
-						  public void run() {
-							  progressDownloads.setVisibility(View.INVISIBLE);
-						  }
-		            });
-	            }
-	            // Fecha conexao
-	            conexaoFtp.disconnect();
-	            conexaoFtp = null;
-               
-			} catch (IOException e) {
-				if(telaChamou != TELA_RECEPTOR_ALARME){
-		            ((Activity) context).runOnUiThread(new Runnable() {
-						  public void run() {
-							  progressDownloads.setVisibility(View.INVISIBLE);
-						  }
-		            });
+				} catch (Exception e) {
+
+					mensagemErro += "Erro ao baixar arquivo. \n" + e.getMessage();
 				}
-				//arquivoRecebido.delete();
-				mensagemErro += "Não foi possível baixar nenhum arquivo do servidor em Nuvem. \n" + e.getMessage() + "\n";
-				
-			} catch (Exception e) {
-				
-				mensagemErro += "Erro ao baixar arquivo. \n" + e.getMessage();
+			} else {
+				mensagemErro += context.getResources().getString(R.string.nao_existe_conexao_internet) + "\n";
 			}
 		} else {
-			mensagemErro += "Não existe conexão com a internet. \n";
+			mensagemErro += context.getResources().getString(R.string.nao_existe_dados_do_servidor_ftp) + "\n";
 		}
 		
 		// Exibe mensagem se existir

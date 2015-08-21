@@ -7,6 +7,7 @@
     <string name="nao_existe_conexao_internet">Não existe conexão com a internet.</string>
     <string name="nao_existe_produto_lista_orcamento">Não existe Produtos na lista do Orçamento/Pedido</string>
     <string name="nao_existe_tabela_banco_dados">Não existe está tabela no banco de dados.</string>
+    <string name="nao_existe_dados_do_servidor_ftp">Não existe dados do servidor FTP.</string>
     <string name="vamos_executar_processo_criar_tabelas">Vamos executar o processo para tentar criar as tabelas que falta.</string>
     <string name="nao_orcamento">Não é um orçamento.</string>
     <string name="nao_pode_ser_inserido_novos_produtos">Não pode ser inserido novos produtos.</string>

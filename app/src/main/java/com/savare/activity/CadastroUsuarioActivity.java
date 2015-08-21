@@ -23,7 +23,8 @@ public class CadastroUsuarioActivity extends Activity {
 					 editIpServidor,
 					 editSenhaServidor,
 					 editUsuarioServidor,
-					 editCodigoVendedor;
+					 editCodigoVendedor,
+					 editPastaServidor;
 	private FuncoesPersonalizadas funcoes;
 	private ContentValues mensagem;
 	private boolean recadastrar = false;
@@ -46,6 +47,7 @@ public class CadastroUsuarioActivity extends Activity {
 	@Override
 	protected void onResume() {
 		super.onResume();
+
 		if(recadastrar){
 			UsuarioSQL usuarioSQL = new UsuarioSQL(CadastroUsuarioActivity.this);
 			// Pega os dados do usuário no banco de dados
@@ -139,13 +141,13 @@ public class CadastroUsuarioActivity extends Activity {
 		editSenhaServidor = (EditText) findViewById(R.id.cadastro_usuario_edit_senha_servidor);
 		editUsuarioServidor = (EditText) findViewById(R.id.cadastro_usuario_edit_usuario_servidor);
 		editCodigoVendedor = (EditText) findViewById(R.id.cadastro_usuario_edit_codigo_vendedor);
+		editPastaServidor = (EditText) findViewById(R.id.cadastro_usuario_edit_pasta_servidor);
 	}
 	
 	private ContentValues salvarDadosCampo(){
 		ContentValues valores = new ContentValues();
 		
 		try{
-			
 			this.funcoes = new FuncoesPersonalizadas(CadastroUsuarioActivity.this);
 			
 			valores.put("chave_usua", editChaveEmpresa.getText().toString());
@@ -158,10 +160,9 @@ public class CadastroUsuarioActivity extends Activity {
 			valores.put("usuario_servidor_usua", editUsuarioServidor.getText().toString());
 			valores.put("id_usua", editCodigoVendedor.getText().toString());
 			valores.put("id_smaempre", editCodigoEmpresa.getText().toString());
-			
-		
+			valores.put("pasta_servidor_usua", editPastaServidor.getText().toString());
+
 		} catch (Exception e){
-			
 			// Preencho com os dados da mensagem que Ã© para ser usada
 			this.mensagem.put("comando", 0);
 			this.mensagem.put("tela", "CadastroUsuarioActivity");

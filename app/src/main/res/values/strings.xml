@@ -141,6 +141,7 @@
     <string name="valor_acumulado_varejo">Valor Acumulado Varejo</string>
     <string name="prazo_acumulo_varejo">Prazo para Acumulo Varejo</string>
     <string name="tipo_documento">Tipo de Documento</string>
+    <string name="pasta_ftp">Pasta do Servidor FTP</string>
 
 
 </resources>
