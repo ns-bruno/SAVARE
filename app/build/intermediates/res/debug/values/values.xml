@@ -308,6 +308,7 @@
     <eat-comment/>
     <string name="ordem_crescente">Ordem Crescente</string>
     <string name="ordem_decrescente">Ordem Decrescente</string>
+    <string name="pasta_ftp">Pasta do Servidor FTP</string>
     <string name="percentual_mark_up_atacado">% Mark Up Atacado</string>
     <string name="percentual_mark_up_varejo">% Mark Up Varejo</string>
     <string name="periodo_vencimento">Período de Vencimento</string>

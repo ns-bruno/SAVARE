@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.InetAddress;
 import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
@@ -13,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.net.ftp.FTPReply;
@@ -133,8 +135,9 @@ public class ReceberArquivoTxtServidorFtpRotinas {
 			String hostFtp = dadosUsuario.getString(dadosUsuario.getColumnIndex("IP_SERVIDOR_USUA"));
 			String usuarioFtp = dadosUsuario.getString(dadosUsuario.getColumnIndex("USUARIO_SERVIDOR_USUA"));
 			String senhaFtp = dadosUsuario.getString(dadosUsuario.getColumnIndex("SENHA_SERVIDOR_USUA"));
-			final String nomeLogin = dadosUsuario.getString(dadosUsuario.getColumnIndex("LOGIN_USUA"));
+			//final String nomeLogin = dadosUsuario.getString(dadosUsuario.getColumnIndex("LOGIN_USUA"));
 			String nomeDiretorioFtp = dadosUsuario.getString(dadosUsuario.getColumnIndex("PASTA_SERVIDOR_USUA"));
+			String modoConexao = dadosUsuario.getString(dadosUsuario.getColumnIndex("MODO_CONEXAO"));
 
 			File pastaTemp = new File(Environment.getExternalStorageDirectory() + "/SAVARE/TEMP");
 
@@ -159,6 +162,17 @@ public class ReceberArquivoTxtServidorFtpRotinas {
 					}
 					// Conecta com o servidor FTP usando a porta 21
 					conexaoFtp.connect(hostFtp);
+
+					// Muda o modo de conexao para ativa
+					if (modoConexao.equalsIgnoreCase("A")){
+						conexaoFtp.enterLocalActiveMode();
+						conexaoFtp.enterRemoteActiveMode(InetAddress.getByName(hostFtp), FTP.DEFAULT_PORT);
+
+					// Muda o modo de conexao para passiva
+					} else if (modoConexao.equalsIgnoreCase("P")){
+						conexaoFtp.enterLocalPassiveMode();
+						conexaoFtp.enterRemotePassiveMode();
+					}
 
 					boolean status = false;
 

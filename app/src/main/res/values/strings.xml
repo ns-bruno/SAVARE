@@ -142,6 +142,8 @@
     <string name="prazo_acumulo_varejo">Prazo para Acumulo Varejo</string>
     <string name="tipo_documento">Tipo de Documento</string>
     <string name="pasta_ftp">Pasta do Servidor FTP</string>
+    <string name="modo_ativo">Modo Ativo</string>
+    <string name="modo_passivo">Modo Passivo</string>
 
 
 </resources>

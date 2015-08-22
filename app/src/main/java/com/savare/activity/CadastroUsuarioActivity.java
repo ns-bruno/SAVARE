@@ -7,6 +7,9 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
+import android.widget.Spinner;
 
 import com.savare.R;
 import com.savare.banco.funcoesSql.UsuarioSQL;
@@ -25,6 +28,9 @@ public class CadastroUsuarioActivity extends Activity {
 					 editUsuarioServidor,
 					 editCodigoVendedor,
 					 editPastaServidor;
+	private RadioGroup radioGroupModoConexao;
+	private RadioButton radioButtonAtivo,
+						radioButtonPassivo;
 	private FuncoesPersonalizadas funcoes;
 	private ContentValues mensagem;
 	private boolean recadastrar = false;
@@ -69,6 +75,13 @@ public class CadastroUsuarioActivity extends Activity {
 				editSenhaServidor.setText(funcoes.descriptografaSenha(dadosUsuario.getString(dadosUsuario.getColumnIndex("SENHA_SERVIDOR_USUA"))));
 				editUsuarioServidor.setText(dadosUsuario.getString(dadosUsuario.getColumnIndex("USUARIO_SERVIDOR_USUA")));
 				editCodigoVendedor.setText(dadosUsuario.getString(dadosUsuario.getColumnIndex("ID_USUA")));
+
+				if (dadosUsuario.getString(dadosUsuario.getColumnIndex("MODO_CONEXAO")).equalsIgnoreCase("A")){
+					radioGroupModoConexao.check(R.id.activity_cadastro_radioButton_modo_ativo);
+
+				} else if (dadosUsuario.getString(dadosUsuario.getColumnIndex("MODO_CONEXAO")).equalsIgnoreCase("P")){
+					radioGroupModoConexao.check(R.id.activity_cadastro_radioButton_modo_passivo);
+				}
 			}
 			
 		} else {
@@ -142,6 +155,7 @@ public class CadastroUsuarioActivity extends Activity {
 		editUsuarioServidor = (EditText) findViewById(R.id.cadastro_usuario_edit_usuario_servidor);
 		editCodigoVendedor = (EditText) findViewById(R.id.cadastro_usuario_edit_codigo_vendedor);
 		editPastaServidor = (EditText) findViewById(R.id.cadastro_usuario_edit_pasta_servidor);
+		radioGroupModoConexao = (RadioGroup) findViewById(R.id.activity_cadastro_usuario_radio_group_modo_conexao);
 	}
 	
 	private ContentValues salvarDadosCampo(){
@@ -161,6 +175,11 @@ public class CadastroUsuarioActivity extends Activity {
 			valores.put("id_usua", editCodigoVendedor.getText().toString());
 			valores.put("id_smaempre", editCodigoEmpresa.getText().toString());
 			valores.put("pasta_servidor_usua", editPastaServidor.getText().toString());
+			if (radioGroupModoConexao.getCheckedRadioButtonId() == R.id.activity_cadastro_radioButton_modo_ativo) {
+				valores.put("modo_conexao", "A");
+			} else if (radioGroupModoConexao.getCheckedRadioButtonId() == R.id.activity_cadastro_radioButton_modo_passivo) {
+				valores.put("modo_conexao", "P");
+			}
 
 		} catch (Exception e){
 			// Preencho com os dados da mensagem que Ã© para ser usada
