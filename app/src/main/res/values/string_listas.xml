@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-
-    <string-array name="lista_modo_conexao">
-        <item>Ativo</item>
-        <item>Passivo</item>
-    </string-array>
-
-</resources>

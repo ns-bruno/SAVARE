@@ -16,7 +16,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
 /**
- * Created by Faturamento on 02/07/2015.
+ * Created by Bruno Nogueira Silva on 02/07/2015.
  */
 public class UsuarioRotinas extends Rotinas {
 

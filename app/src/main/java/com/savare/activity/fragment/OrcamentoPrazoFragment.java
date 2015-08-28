@@ -20,7 +20,7 @@ import com.savare.funcoes.rotinas.PlanoPagamentoRotinas;
 import com.savare.funcoes.rotinas.TipoDocumentoRotinas;
 
 /**
- * Created by Faturamento on 08/08/2015.
+ * Created by Bruno Nogueira Silva on 08/08/2015.
  */
 public class OrcamentoPrazoFragment extends Fragment {
 

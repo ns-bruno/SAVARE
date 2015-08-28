@@ -211,6 +211,7 @@
     <string name="data_ultimo_recebimento">Data Ultimo Recebimento</string>
     <string name="ddd">DDD</string>
     <string name="deletar">Deletar</string>
+    <string name="desconhecido">Desconhecido</string>
     <string name="desconto">Desconto</string>
     <string name="desconto_atacado_prazo">Desc. Atacado Prazo</string>
     <string name="desconto_atacado_vista">Desc. Atacado Vista</string>
@@ -266,6 +267,8 @@
     <string name="limite_compras">Limite de Compras</string>
     <string name="lista_creditos">Lista de Creditos</string>
     <string name="login_progress_signing_in">Signing in…</string>
+    <string name="modo_ativo">Modo Ativo</string>
+    <string name="modo_passivo">Modo Passivo</string>
     <!-- From: file:/D:/Dropbox/Forca%20de%20Venda%20Movel/Codigo%20Fonte/SAVARE_Studio/app/src/main/res/values/strings_erro.xml -->
     <eat-comment/>
     <string name="nao_conseguimos_deletar_itens">Não conseguimos deletar o(s) item(ns) selecionados.</string>
@@ -318,6 +321,7 @@
     <string name="pontos_acumulados">Pontos Acumulados</string>
     <string name="prazo_acumulo_atacado">Prazo para Acumulo Atacado</string>
     <string name="prazo_acumulo_varejo">Prazo para Acumulo Varejo</string>
+    <string name="prazo_desconhecido">Prazo Desconhecido</string>
     <string name="quantidade">Quantidade</string>
     <string name="quantidade_casas_decimais">Quantidade de Casas Decimais</string>
     <string name="ramo_atividade">Ramo de Atividade</string>

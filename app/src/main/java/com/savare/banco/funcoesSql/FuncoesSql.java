@@ -9,8 +9,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
 import android.util.Log;
 
-import com.savare.banco.ConexaoBancoDeDados;
-import com.savare.banco.VersionUtils;
+import com.savare.banco.local.ConexaoBancoDeDados;
+import com.savare.funcoes.VersionUtils;
 import com.savare.funcoes.FuncoesPersonalizadas;
 
 public class FuncoesSql {

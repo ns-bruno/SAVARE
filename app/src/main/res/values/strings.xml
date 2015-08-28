@@ -144,6 +144,8 @@
     <string name="pasta_ftp">Pasta do Servidor FTP</string>
     <string name="modo_ativo">Modo Ativo</string>
     <string name="modo_passivo">Modo Passivo</string>
+    <string name="prazo_desconhecido">Prazo Desconhecido</string>
+    <string name="desconhecido">Desconhecido</string>
 
 
 </resources>

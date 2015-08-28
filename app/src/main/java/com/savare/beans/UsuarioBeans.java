@@ -1,7 +1,7 @@
 package com.savare.beans;
 
 /**
- * Created by Faturamento on 04/08/2015.
+ * Created by Bruno Nogueira Silva on 04/08/2015.
  */
 public class UsuarioBeans {
 

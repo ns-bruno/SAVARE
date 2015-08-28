@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by Faturamento on 29/07/2015.
+ * Created by Bruno Nogueira Silva on 29/07/2015.
  */
 public class ReceptorAlarmeEnviarCadastroPessoaBroadcastRotinas extends BroadcastReceiver {
 

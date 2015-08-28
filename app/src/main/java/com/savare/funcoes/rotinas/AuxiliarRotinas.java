@@ -8,7 +8,7 @@ import com.savare.beans.AuxiliarBeans;
 import com.savare.funcoes.Rotinas;
 
 /**
- * Created by Faturamento on 18/07/2015.
+ * Created by Bruno Nogueira Silva on 18/07/2015.
  */
 public class AuxiliarRotinas extends Rotinas {
 

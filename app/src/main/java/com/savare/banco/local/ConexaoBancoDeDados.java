@@ -1,23 +1,17 @@
-package com.savare.banco;
+package com.savare.banco.local;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.pm.PackageManager;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Environment;
 import android.util.Log;
 
-import com.itextpdf.text.log.Logger;
-import com.itextpdf.text.log.LoggerFactory;
+import com.savare.banco.AssetUtils;
 import com.savare.funcoes.FuncoesPersonalizadas;
 
 public class ConexaoBancoDeDados extends SQLiteOpenHelper {
@@ -173,7 +167,7 @@ public class ConexaoBancoDeDados extends SQLiteOpenHelper {
 
 	protected void execSqlFile(String sqlFile, SQLiteDatabase db ) throws SQLException, IOException {
 		//log.info("  exec sql file: {}" + sqlFile);
-		for(String sqlInstruction : SqlParser.parseSqlFile( SQL_DIR + "/" + sqlFile, this.context.getAssets())) {
+		for(String sqlInstruction : SqlParser.parseSqlFile(SQL_DIR + "/" + sqlFile, this.context.getAssets())) {
 			// Executa a instrucao sql
 			db.execSQL(sqlInstruction);
 		}

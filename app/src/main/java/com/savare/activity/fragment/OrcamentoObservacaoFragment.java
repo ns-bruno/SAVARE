@@ -17,7 +17,7 @@ import com.savare.funcoes.FuncoesPersonalizadas;
 import com.savare.funcoes.rotinas.OrcamentoRotinas;
 
 /**
- * Created by Faturamento on 10/08/2015.
+ * Created by Bruno Nogueira Silva on 10/08/2015.
  */
 public class OrcamentoObservacaoFragment extends Fragment {
 

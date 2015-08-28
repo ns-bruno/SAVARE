@@ -41,9 +41,8 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.savare.R;
-import com.savare.banco.ConexaoBancoDeDados;
+import com.savare.banco.local.ConexaoBancoDeDados;
 import com.savare.banco.ConexaoTask;
-import com.savare.banco.VersionUtils;
 import com.savare.configuracao.ServicosWeb;
 
 public class FuncoesPersonalizadas {

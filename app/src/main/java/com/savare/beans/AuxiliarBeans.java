@@ -1,7 +1,7 @@
 package com.savare.beans;
 
 /**
- * Created by Faturamento on 18/07/2015.
+ * Created by Bruno Nogueira Silva on 18/07/2015.
  */
 public class AuxiliarBeans {
 

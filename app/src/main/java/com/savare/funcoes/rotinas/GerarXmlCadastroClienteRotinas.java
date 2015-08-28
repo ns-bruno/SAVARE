@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by Faturamento on 22/07/2015.
+ * Created by Bruno Nogueira Silva on 22/07/2015.
  */
 public class GerarXmlCadastroClienteRotinas {
 

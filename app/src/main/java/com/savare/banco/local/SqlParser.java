@@ -1,4 +1,4 @@
-package com.savare.banco;
+package com.savare.banco.local;
 
 import java.io.BufferedReader;
 import java.io.IOException;

@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 
 import org.apache.commons.net.ftp.FTPClient;
@@ -26,8 +25,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Environment;
 
-import com.savare.banco.ConexaoBancoDeDados;
-import com.savare.banco.VersionUtils;
+import com.savare.banco.local.ConexaoBancoDeDados;
+import com.savare.funcoes.VersionUtils;
 import com.savare.banco.funcoesSql.OrcamentoSql;
 import com.savare.banco.funcoesSql.UsuarioSQL;
 import com.savare.funcoes.FuncoesPersonalizadas;

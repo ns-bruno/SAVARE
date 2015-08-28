@@ -202,6 +202,14 @@ public class InicioActivity extends Activity {
             } else if (dadosEmpresa.getPeriodocrceditoVarejo().equalsIgnoreCase("A")) {
                 textPrazoAcumuloVarejo.setText("Anual");
             }
+        } else {
+            textTipoAcumuloAtacado.setText(getResources().getString(R.string.desconhecido));
+            textValorAcumuladoAtacado.setText("R$ 0,00");
+            textPrazoAcumuloAtacado.setText(getResources().getString(R.string.prazo_desconhecido));
+
+            textTipoAcumuloVarejo.setText(getResources().getString(R.string.desconhecido));
+            textValorAcumuladoVarejo.setText("R$ 0,00");
+            textPrazoAcumuloVarejo.setText(getResources().getString(R.string.prazo_desconhecido));
         }
     }
 

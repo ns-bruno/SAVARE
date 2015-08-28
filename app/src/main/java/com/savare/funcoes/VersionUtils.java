@@ -1,4 +1,4 @@
-package com.savare.banco;
+package com.savare.funcoes;
 
 import android.content.Context;
 import android.content.pm.PackageInfo;
