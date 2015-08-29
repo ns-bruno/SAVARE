@@ -1,1 +1,1 @@
-include ':app', ':bibliotecaparasistemamovel'
+include ':app'
