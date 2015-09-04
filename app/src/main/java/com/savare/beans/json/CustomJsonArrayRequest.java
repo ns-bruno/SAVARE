@@ -54,8 +54,7 @@ public class CustomJsonArrayRequest extends Request<JSONArray> {
         return cabecalho != null ? cabecalho : super.getHeaders();
     }
 
-    protected Map<String, String> getParams()
-            throws com.android.volley.AuthFailureError {
+    protected Map<String, String> getParams() throws com.android.volley.AuthFailureError {
         return params;
     }
 
@@ -71,6 +70,10 @@ public class CustomJsonArrayRequest extends Request<JSONArray> {
         } catch (JSONException je) {
             return Response.error(new ParseError(je));
         }
+    }
+
+    public Priority getPriority(){
+        return(Priority.NORMAL);
     }
 
     @Override

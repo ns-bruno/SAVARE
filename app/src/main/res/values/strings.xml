@@ -1,6 +1,7 @@
 <resources>
 
     <string name="app_name">SAVARE</string>
+    <string name="ACCOUNT_TYPE">com.savare.sincronizacao.autenticadorusuario</string>
     <string name="entrar">Entrar</string>
     <string name="usuario">Usuário</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>

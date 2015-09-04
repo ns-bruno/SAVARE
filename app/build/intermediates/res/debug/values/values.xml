@@ -158,6 +158,9 @@
     <eat-comment/>
     <item format="integer" name="ga_dispatchPeriod" type="integer">120</item>
     <integer name="ga_sessionTimeout">-1</integer>
+    <!-- From: file:/D:/Dropbox/Forca%20de%20Venda%20Movel/Codigo%20Fonte/SAVARE_Studio/app/src/main/res/values/strings.xml -->
+    <eat-comment/>
+    <string name="ACCOUNT_TYPE">com.savare.sincronizacao.autenticadorusuario</string>
     <!-- From: file:/D:/Dropbox/Forca%20de%20Venda%20Movel/Codigo%20Fonte/SAVARE_Studio/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/19.1.0/res/values/values.xml -->
     <eat-comment/>
     <string name="abc_action_bar_home_description">Navigate home</string>
@@ -271,6 +274,8 @@
     <string name="modo_passivo">Modo Passivo</string>
     <!-- From: file:/D:/Dropbox/Forca%20de%20Venda%20Movel/Codigo%20Fonte/SAVARE_Studio/app/src/main/res/values/strings_erro.xml -->
     <eat-comment/>
+    <string name="nao_achamos_endereco_email">Não achamos o endereço de e-mail</string>
+    <string name="nao_achamos_usuario">Não achamos o nome do usuário.</string>
     <string name="nao_conseguimos_deletar_itens">Não conseguimos deletar o(s) item(ns) selecionados.</string>
     <!-- From: file:/D:/Dropbox/Forca%20de%20Venda%20Movel/Codigo%20Fonte/SAVARE_Studio/app/src/main/res/values/strings.xml -->
     <eat-comment/>

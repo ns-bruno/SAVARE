@@ -19,6 +19,8 @@
     <uses-permission android:name="android.permission.AUTHENTICATE_ACCOUNTS" />
     <uses-permission android:name="android.permission.MANAGE_ACCOUNTS" />
     <uses-permission android:name="android.permission.USE_CREDENTIALS" />
+    <uses-permission android:name="android.permission.READ_SYNC_SETTINGS" />
+    <uses-permission android:name="android.permission.WRITE_SYNC_SETTINGS" />
 
     <application
         android:allowBackup="true"
@@ -133,15 +135,13 @@
 
 
         <!-- Servico de autenticacao -->
-        <service
-            android:name="com.savare.sincronizacao.AutenticacaoServico"
-            android:exported="false" >
+        <service android:name="com.savare.sincronizacao.AutenticacaoServico" >
             <intent-filter>
-                <action android:name=".configuracao.AutenticadorConta" />
+                <action android:name="android.accounts.AccountAuthenticator" />
             </intent-filter>
 
             <meta-data
-                android:name=".configuracao.AutenticadorConta"
+                android:name="android.accounts.AccountAuthenticator"
                 android:resource="@xml/autenticador" />
         </service>
     </application>
