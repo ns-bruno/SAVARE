@@ -201,7 +201,7 @@ public class GerarXmlOrcamentoRotinas {
 			tagIdentificacaoOrcamento.addContent(nomeCliente);
 			
 			Element ieRg = new Element("ieRg");
-			ieRg.setText(dadosOrcamento.getString(dadosOrcamento.getColumnIndex("CPF_CGC_CLIENTE")));
+			ieRg.setText(dadosOrcamento.getString(dadosOrcamento.getColumnIndex("IE_RG_CLIENTE")));
 			tagIdentificacaoOrcamento.addContent(ieRg);
 			
 			Element cpfCGC = new Element("cpfCGC");

@@ -45,13 +45,14 @@ public class CustomJsonArrayRequest extends Request<JSONArray> {
         HashMap<String, String> cabecalho = new HashMap<String, String>();
 
         FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
+
         // Adiciona os dados do cabecalho
         cabecalho.put("CHAVE_USUA", funcoes.getValorXml("ChaveEmpresa"));
         cabecalho.put("USUARIO_USUA", funcoes.getValorXml("Usuario"));
         cabecalho.put("ID_USUA", funcoes.getValorXml("CodigoUsuario"));
         cabecalho.put("ID_SMAEMPRE", funcoes.getValorXml("CodigoEmpresa"));
 
-        return cabecalho != null ? cabecalho : super.getHeaders();
+        return cabecalho; //!= null ? cabecalho : super.getHeaders();
     }
 
     protected Map<String, String> getParams() throws com.android.volley.AuthFailureError {
@@ -73,7 +74,7 @@ public class CustomJsonArrayRequest extends Request<JSONArray> {
     }
 
     public Priority getPriority(){
-        return(Priority.NORMAL);
+        return(Priority.IMMEDIATE);
     }
 
     @Override

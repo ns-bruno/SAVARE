@@ -137,7 +137,10 @@ public class SincronizacaoActivity extends Activity {
 				HashMap<String, String> params = new HashMap<String, String>();
 				params.put("email", "ns.bruno@gmail.com");
 				params.put("pasword", "123");
-				params.put("method", "web-data-jar");
+				params.put("method", "object");
+				params.put("dados", "Nenhum dados transmetidos");
+				params.put("usuario", "Bruno Nogueira Silva");
+				params.put("empresa", "Parceirão Distribuidora");
 
 				EnviarDadosJsonRotinas enviarDadosJson = new EnviarDadosJsonRotinas(SincronizacaoActivity.this, EnviarDadosJsonRotinas.TIPO_ARRAY, params);
 
