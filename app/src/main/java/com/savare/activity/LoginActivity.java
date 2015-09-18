@@ -30,10 +30,7 @@ public class LoginActivity extends Activity {
 		setContentView(R.layout.activity_login);
 		
 		recuperarDadosTela();
-		
-		
-		
-		
+
 		buttonEntrar.setOnClickListener(new View.OnClickListener() {
 			
 			@Override
@@ -101,37 +98,63 @@ public class LoginActivity extends Activity {
 	@Override
 	protected void onResume() {
 		super.onResume();
-		
-		// Instancia a classe de funcoes personalizadas
-		FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(LoginActivity.this);
-		// Funca o codigo do usuario no xml
-		String codigoUsuario = funcoes.getValorXml("CodigoUsuario");
-		
-		// Instancia a classe de rotinas
-		Rotinas rotinas = new Rotinas(LoginActivity.this);
-		
-		// Verfifica se existe algum usuario cadastrado, ou 
-		if((rotinas.existeUsuario() == false) || (codigoUsuario.equalsIgnoreCase(funcoes.NAO_ENCONTRADO))){
-			// Abre a tela inicial do sistema
-			Intent intent = new Intent(LoginActivity.this, CadastroUsuarioActivity.class);
-			startActivity(intent);
-			
-		} else {
-			textCodigoUsuario.setText(codigoUsuario);
-			UsuarioSQL usuarioSQL = new UsuarioSQL(LoginActivity.this);
-			// Pega os dados do usuario(vendedor)
-			Cursor dadosUsuario = usuarioSQL.query("id_usua = " + codigoUsuario);
-			
-			if( (dadosUsuario != null) && (dadosUsuario.getCount() > 0) ){
-				// Move para o primeiro registro
-				dadosUsuario.moveToFirst();
-				// Preenche os campos com os dados do usuario(vendedor)
-				textUsuario.setText(dadosUsuario.getString(dadosUsuario.getColumnIndex("LOGIN_USUA")));
+		try {
+			if (!camposObrigatorioPreenchido()) {
+				// Abre a tela inicial do sistema
+				Intent intent = new Intent(LoginActivity.this, CadastroUsuarioActivity.class);
+				startActivity(intent);
+				return;
 			}
+
+			// Instancia a classe de funcoes personalizadas
+			FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(LoginActivity.this);
+			// Funca o codigo do usuario no xml
+			String codigoUsuario = funcoes.getValorXml("CodigoUsuario");
+
+			funcoes.CreateSyncAccount(LoginActivity.this);
+
+			// Instancia a classe de rotinas
+			Rotinas rotinas = new Rotinas(LoginActivity.this);
+
+			// Verfifica se existe algum usuario cadastrado, ou
+			if ((rotinas.existeUsuario() == false) || (codigoUsuario.equalsIgnoreCase(funcoes.NAO_ENCONTRADO))) {
+				// Abre a tela inicial do sistema
+				Intent intent = new Intent(LoginActivity.this, CadastroUsuarioActivity.class);
+				startActivity(intent);
+
+			} else {
+				textCodigoUsuario.setText(codigoUsuario);
+				UsuarioSQL usuarioSQL = new UsuarioSQL(LoginActivity.this);
+				// Pega os dados do usuario(vendedor)
+				Cursor dadosUsuario = usuarioSQL.query("id_usua = " + codigoUsuario);
+
+				if ((dadosUsuario != null) && (dadosUsuario.getCount() > 0)) {
+					// Move para o primeiro registro
+					dadosUsuario.moveToFirst();
+					// Preenche os campos com os dados do usuario(vendedor)
+					textUsuario.setText(dadosUsuario.getString(dadosUsuario.getColumnIndex("LOGIN_USUA")));
+				}
+			}
+			// Cria o alarme se nao existir para enviar e receber dados
+			funcoes.criarAlarmeEnviarReceberDadosAutomatico();
+
+		}catch (Exception e){
+			FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(LoginActivity.this);
+
+			// Armazena as informacoes para para serem exibidas e enviadas
+			ContentValues contentValues = new ContentValues();
+			contentValues.put("comando", 0);
+			contentValues.put("tela", "LoginActivity");
+			contentValues.put("mensagem", funcoes.tratamentoErroBancoDados(e.getMessage()));
+			contentValues.put("dados", LoginActivity.this.toString());
+			// Pega os dados do usuario
+
+			contentValues.put("usuario", funcoes.getValorXml("Usuario"));
+			contentValues.put("empresa", funcoes.getValorXml("ChaveEmpresa"));
+			contentValues.put("email", funcoes.getValorXml("Email"));
+
+			funcoes.menssagem(contentValues);
 		}
-		// Cria o alarme se nao existir para enviar e receber dados
-		funcoes.criarAlarmeEnviarReceberDadosAutomatico();
-		
 	}
 	
 	
@@ -177,6 +200,21 @@ public class LoginActivity extends Activity {
 		buttonEntrar = (Button) findViewById(R.id.activity_login_button_entrar);
 	}
 	
+	private boolean camposObrigatorioPreenchido(){
+		boolean retorno = false;
 
+		FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(LoginActivity.this);
+		// Checa se tem algum campo obrigatorio vazio
+		if ((funcoes.getValorXml("Usuario").equalsIgnoreCase(funcoes.NAO_ENCONTRADO)) ||
+				(funcoes.getValorXml("CodigoUsuario").equalsIgnoreCase(funcoes.NAO_ENCONTRADO)) ||
+				(funcoes.getValorXml("CodigoEmpresa").equalsIgnoreCase(funcoes.NAO_ENCONTRADO)) ||
+				(funcoes.getValorXml("ChaveEmpresa").equalsIgnoreCase(funcoes.NAO_ENCONTRADO))){
+			retorno = false;
+
+		} else {
+			retorno = true;
+		}
+		return retorno;
+	}
 	
 }

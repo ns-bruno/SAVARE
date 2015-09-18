@@ -18,10 +18,14 @@ import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 import org.jasypt.util.text.BasicTextEncryptor;
 
+import android.accounts.Account;
+import android.accounts.AccountManager;
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.PendingIntent;
+import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -34,6 +38,9 @@ import android.content.res.Configuration;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Build;
+import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -44,6 +51,7 @@ import com.savare.R;
 import com.savare.banco.local.ConexaoBancoDeDados;
 import com.savare.banco.ConexaoTask;
 import com.savare.configuracao.ServicosWeb;
+import com.savare.sincronizacao.ContaService;
 
 public class FuncoesPersonalizadas {
 
@@ -944,6 +952,79 @@ public class FuncoesPersonalizadas {
 		} catch (InputMismatchException erro) {
 			return (false);
 		}
+	} // Fim validaCPF
+
+	/**
+	 * Create an entry for this application in the system account list, if it isn't already there.
+	 *
+	 * @param context Context
+	 */
+	@TargetApi(Build.VERSION_CODES.FROYO)
+	public void CreateSyncAccount(Context context) {
+		boolean newAccount = false;
+		boolean setupComplete = PreferenceManager.getDefaultSharedPreferences(context).getBoolean(context.getResources().getString(R.string.pref_setup_complete), false);
+
+		FuncoesPersonalizadas f = new FuncoesPersonalizadas(context);
+
+		Bundle dadosUsuario = new Bundle();
+		dadosUsuario.putString("Usuario", f.getValorXml("Usuario"));
+		dadosUsuario.putString("Email", f.getValorXml("Email"));
+
+		// Create account, if it's missing. (Either first run, or user has deleted account.)
+		Account account = new Account(f.getValorXml("Usuario"), context.getResources().getString(R.string.sync_account_type));
+
+		AccountManager accountManager = (AccountManager) context.getSystemService(Context.ACCOUNT_SERVICE);
+
+		if (accountManager.addAccountExplicitly(account, null, dadosUsuario)) {
+			// Inform the system that this account supports sync
+			ContentResolver.setIsSyncable(account, context.getResources().getString(R.string.content_authority), 1);
+			// Inform the system that this account is eligible for auto sync when the network is up
+			ContentResolver.setSyncAutomatically(account, context.getResources().getString(R.string.content_authority), true);
+			// Recommend a schedule for automatic synchronization. The system may modify this based
+			// on other scheduled syncs and network utilization.
+			ContentResolver.addPeriodicSync(account, context.getResources().getString(R.string.content_authority), new Bundle(), 20);
+			newAccount = true;
+		}
+
+		// Schedule an initial sync if we detect problems with either our account or our local
+		// data has been deleted. (Note that it's possible to clear app data WITHOUT affecting
+		// the account list, so wee need to check both.)
+		if (newAccount || !setupComplete) {
+			TriggerRefresh(context);
+			PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean(context.getResources().getString(R.string.pref_setup_complete), true).commit();
+		}
+
+		if (ContentResolver.isSyncPending(account, context.getResources().getString(R.string.content_authority))  ||
+			ContentResolver.isSyncActive(account, context.getResources().getString(R.string.content_authority))) {
+			Log.i("SAVARE", "SyncPending, canceling");
+			ContentResolver.cancelSync(account, context.getResources().getString(R.string.content_authority));
+		}
+		// To just enable the sync (not kick it off) call setSyncAutomatically on ContentResolver. An account is needed but it can be a dummy account.
+		ContentResolver.setSyncAutomatically(account, context.getResources().getString(R.string.content_authority), true);
+	}
+
+	/**
+	 * Helper method to trigger an immediate sync ("refresh").
+	 *
+	 * <p>This should only be used when we need to preempt the normal sync schedule. Typically, this
+	 * means the user has pressed the "refresh" button.
+	 *
+	 * Note that SYNC_EXTRAS_MANUAL will cause an immediate sync, without any optimization to
+	 * preserve battery life. If you know new data is available (perhaps via a GCM notification),
+	 * but the user is not actively waiting for that data, you should omit this flag; this will give
+	 * the OS additional freedom in scheduling your sync request.
+	 */
+	public void TriggerRefresh(Context context) {
+
+		Bundle b = new Bundle();
+		// Disable sync backoff and ignore sync preferences. In other words...perform sync NOW!
+		b.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
+		b.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
+
+		ContaService contaService = new ContaService();
+		Account c = ContaService.GetAccount(context);
+
+		ContentResolver.requestSync(c, context.getResources().getString(R.string.content_authority), b);
 	}
 
 } // Fecha classe

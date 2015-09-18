@@ -8,6 +8,7 @@
         android:minSdkVersion="11"
         android:targetSdkVersion="21" />
 
+    <uses-permission android:name="android.permission.READ_SYNC_STATS" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.INTERNET" />
@@ -85,6 +86,43 @@
         <activity android:name="com.savare.activity.LogActivity" />
         <activity android:name="com.savare.activity.fragment.ClienteCadastroFragment" />
 
+        <provider
+            android:name="com.savare.sincronizacao.EnviarProvider"
+            android:authorities="@string/content_authority"
+            android:exported="false" />
+
+        <!-- Servico de sincronizacao -->
+        <service
+            android:name="com.savare.sincronizacao.SyncService"
+            android:exported="true"
+            android:process=":sync" >
+
+            <!--
+            This intent filter is required. It allows the system to launch our sync service
+            as needed.
+            -->
+            <intent-filter>
+                <action android:name="android.content.SyncAdapter" />
+            </intent-filter>
+            <!-- This points to a required XML file which describes our SyncAdapter. -->
+            <meta-data
+                android:name="android.content.SyncAdapter"
+                android:resource="@xml/syncadapter" />
+        </service>
+
+        <!-- Servico de autenticacao -->
+        <service android:name="com.savare.sincronizacao.ContaService" >
+
+            <!-- Required filter used by the system to launch our account service. -->
+            <intent-filter>
+                <action android:name="android.accounts.AccountAuthenticator" />
+            </intent-filter>
+            <!-- This points to an XMLf ile which describes our account service. -->
+            <meta-data
+                android:name="android.accounts.AccountAuthenticator"
+                android:resource="@xml/authenticator" />
+        </service>
+
         <receiver
             android:name="com.savare.funcoes.rotinas.receptor.ReceptorAlarmeEnviarOrcamentoBroadcastRotinas"
             android:label="ReceptorAlarmeEnviarOrcamentoBroadcastRotinas" >
@@ -135,15 +173,10 @@
 
 
         <!-- Servico de autenticacao -->
-        <service android:name="com.savare.sincronizacao.AutenticacaoServico" >
-            <intent-filter>
-                <action android:name="android.accounts.AccountAuthenticator" />
-            </intent-filter>
 
-            <meta-data
-                android:name="android.accounts.AccountAuthenticator"
-                android:resource="@xml/autenticador" />
-        </service>
+
+        <!-- Servico de sincronizacao -->
+
     </application>
 
 </manifest>

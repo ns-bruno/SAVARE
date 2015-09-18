@@ -1,14 +1,22 @@
 package com.savare.activity;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.accounts.Account;
+import android.accounts.AccountManager;
+import android.accounts.AccountManagerCallback;
+import android.accounts.AccountManagerFuture;
+import android.accounts.AuthenticatorException;
+import android.accounts.OperationCanceledException;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.SearchManager;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -17,6 +25,7 @@ import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -41,6 +50,7 @@ import com.savare.funcoes.FuncoesPersonalizadas;
 import com.savare.funcoes.rotinas.EmpresaRotinas;
 import com.savare.funcoes.rotinas.OrcamentoRotinas;
 import com.savare.funcoes.rotinas.UsuarioRotinas;
+import com.savare.sincronizacao.ConfiguracoesSincronizacao;
 
 public class InicioActivity extends Activity {
 
@@ -57,6 +67,7 @@ public class InicioActivity extends Activity {
                      textTipoAcumuloVarejo,
                      textValorAcumuladoVarejo,
                      textPrazoAcumuloVarejo;
+    private Account conta;
 
 	@SuppressLint("NewApi")
 	@Override
@@ -129,6 +140,8 @@ public class InicioActivity extends Activity {
         }
 
         recuperarCampos();
+
+        //CreateSyncAccount(InicioActivity.this);
 	} // Fim do onCreate
 
     @Override
@@ -400,5 +413,22 @@ public class InicioActivity extends Activity {
         textTipoAcumuloVarejo = (TextView) findViewById(R.id.activity_inicio_text_tipo_acumulo_varejo);
         textValorAcumuladoVarejo = (TextView) findViewById(R.id.activity_inicio_text_valor_acumulado_varejo);
         textPrazoAcumuloVarejo = (TextView) findViewById(R.id.activity_inicio_text_prazo_acumulado_varejo);
+    }
+
+    public void CreateSyncAccount(Context context) {
+
+        FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(InicioActivity.this);
+        // Create the account type and default account
+
+        Account newAccount = new Account(funcoes.getValorXml("Usuario"), getResources().getString(R.string.sync_account_type));
+
+        // Get an instance of the Android account manager
+        AccountManager accountManager = (AccountManager) this.getSystemService(ACCOUNT_SERVICE);
+
+        Bundle dadosUsuario = new Bundle();
+        dadosUsuario.putString("Usuario", funcoes.getValorXml("Usuario"));
+        dadosUsuario.putString("Email", funcoes.getValorXml("Email"));
+
+        accountManager.addAccountExplicitly(newAccount, null, dadosUsuario);
     }
 }

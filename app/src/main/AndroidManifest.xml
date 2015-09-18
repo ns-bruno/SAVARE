@@ -7,6 +7,7 @@
         android:minSdkVersion="11"
         android:targetSdkVersion="22" />
 
+    <uses-permission android:name="android.permission.READ_SYNC_STATS" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.INTERNET" />
@@ -26,8 +27,9 @@
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@android:style/Theme.Holo.Light">
-        
-	    <!-- Google Analytics Version v4 needs this value for easy tracking -->
+
+
+        <!-- Google Analytics Version v4 needs this value for easy tracking -->
 	<meta-data android:name="com.google.android.gms.analytics.globalConfigResource" android:resource="@xml/global_tracker" />
         
         <activity android:name=".activity.LoginActivity"
@@ -95,6 +97,36 @@
 
         <activity android:name=".activity.fragment.ClienteCadastroFragment"></activity>
 
+        <provider
+            android:name=".sincronizacao.EnviarProvider"
+            android:authorities="@string/content_authority"
+            android:exported="false" />
+
+        <!-- Servico de sincronizacao -->
+        <service android:name=".sincronizacao.SyncService"
+            android:exported="true"
+            android:process=":sync">
+            <!-- This intent filter is required. It allows the system to launch our sync service
+            as needed. -->
+            <intent-filter>
+                <action android:name="android.content.SyncAdapter" />
+            </intent-filter>
+            <!-- This points to a required XML file which describes our SyncAdapter. -->
+            <meta-data android:name="android.content.SyncAdapter"
+                android:resource="@xml/syncadapter" />
+        </service>
+
+        <!-- Servico de autenticacao -->
+        <service android:name=".sincronizacao.ContaService">
+            <!-- Required filter used by the system to launch our account service. -->
+            <intent-filter>
+                <action android:name="android.accounts.AccountAuthenticator" />
+            </intent-filter>
+            <!-- This points to an XMLf ile which describes our account service. -->
+            <meta-data android:name="android.accounts.AccountAuthenticator"
+                android:resource="@xml/authenticator" />
+        </service>
+
         <receiver android:name="com.savare.funcoes.rotinas.receptor.ReceptorAlarmeEnviarOrcamentoBroadcastRotinas" android:label="ReceptorAlarmeEnviarOrcamentoBroadcastRotinas">
         <intent-filter>
             <action android:name="ENVIAR_ORCAMENTO_SAVARE" />
@@ -132,14 +164,9 @@
         </receiver>-->
 
         <!-- Servico de autenticacao -->
-        <service android:name=".sincronizacao.AutenticacaoServico">
-            <intent-filter>
-                <action android:name="android.accounts.AccountAuthenticator" />
-            </intent-filter>
-            <meta-data android:name="android.accounts.AccountAuthenticator"
-                android:resource="@xml/autenticador" />
-        </service>
-        
+
+        <!-- Servico de sincronizacao -->
+
     </application>
     
 

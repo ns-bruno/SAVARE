@@ -1,7 +1,7 @@
 package com.savare.sincronizacao;
 
 /**
- * Created by Faturamento on 03/09/2015.
+ * Created by Bruno Nogueira Silva on 03/09/2015.
  */
 public class ConfiguracoesSincronizacao {
 

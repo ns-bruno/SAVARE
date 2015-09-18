@@ -5,6 +5,7 @@ import java.util.List;
 import com.savare.R;
 import com.savare.adapter.ItemUniversalAdapter;
 import com.savare.beans.LogBeans;
+import com.savare.funcoes.FuncoesPersonalizadas;
 import com.savare.funcoes.rotinas.LogRotinas;
 
 import android.app.ActionBar;
@@ -74,8 +75,7 @@ public class LogActivity extends Activity implements OnNavigationListener{
  		actionBar.setSelectedNavigationItem(0);
  		
 	} // Fim onCreate
-	
-	
+
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		

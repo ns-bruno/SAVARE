@@ -6,10 +6,13 @@ import com.savare.funcoes.rotinas.EnviarDadosJsonRotinas;
 import com.savare.funcoes.rotinas.ImportarDadosTxtRotinas;
 import com.savare.funcoes.rotinas.UsuarioRotinas;
 import com.savare.funcoes.rotinas.async.ReceberDadosFtpAsyncRotinas;
+import com.savare.sincronizacao.ContaService;
 
 import android.app.ActionBar;
 import android.app.Activity;
+import android.content.ContentResolver;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -134,7 +137,7 @@ public class SincronizacaoActivity extends Activity {
 				break;
 
 			case  R.id.menu_sincronizacao_atualizar:
-				HashMap<String, String> params = new HashMap<String, String>();
+				/*HashMap<String, String> params = new HashMap<String, String>();
 				params.put("email", "ns.bruno@gmail.com");
 				params.put("pasword", "123");
 				params.put("method", "object");
@@ -144,7 +147,9 @@ public class SincronizacaoActivity extends Activity {
 
 				EnviarDadosJsonRotinas enviarDadosJson = new EnviarDadosJsonRotinas(SincronizacaoActivity.this, EnviarDadosJsonRotinas.TIPO_ARRAY, params);
 
-				enviarDadosJson.enviarDados();
+				enviarDadosJson.enviarDados(null);*/
+				FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(SincronizacaoActivity.this);
+				funcoes.TriggerRefresh(SincronizacaoActivity.this);
 				break;
 			
 		default:

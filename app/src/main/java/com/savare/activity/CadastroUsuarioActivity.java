@@ -66,7 +66,8 @@ public class CadastroUsuarioActivity extends Activity {
 				FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(CadastroUsuarioActivity.this);
 				
 				editChaveEmpresa.setText(dadosUsuario.getString(dadosUsuario.getColumnIndex("CHAVE_USUA")));
-				editCodigoEmpresa.setText(funcoes.getValorXml("CodigoEmpresa"));
+				//editCodigoEmpresa.setText(funcoes.getValorXml("CodigoEmpresa"));
+				editCodigoEmpresa.setText(dadosUsuario.getString(dadosUsuario.getColumnIndex("ID_SMAEMPRE")));
 				editNomeCompleto.setText(dadosUsuario.getString(dadosUsuario.getColumnIndex("NOME_USUA")));
 				editNomeLogin.setText(dadosUsuario.getString(dadosUsuario.getColumnIndex("LOGIN_USUA")));
 				editSenha.setText(funcoes.descriptografaSenha(dadosUsuario.getString(dadosUsuario.getColumnIndex("SENHA_USUA"))));
@@ -75,6 +76,7 @@ public class CadastroUsuarioActivity extends Activity {
 				editSenhaServidor.setText(funcoes.descriptografaSenha(dadosUsuario.getString(dadosUsuario.getColumnIndex("SENHA_SERVIDOR_USUA"))));
 				editUsuarioServidor.setText(dadosUsuario.getString(dadosUsuario.getColumnIndex("USUARIO_SERVIDOR_USUA")));
 				editCodigoVendedor.setText(dadosUsuario.getString(dadosUsuario.getColumnIndex("ID_USUA")));
+				editPastaServidor.setText(dadosUsuario.getString(dadosUsuario.getColumnIndex("PASTA_SERVIDOR_USUA")));
 
 				if (dadosUsuario.getString(dadosUsuario.getColumnIndex("MODO_CONEXAO")).equalsIgnoreCase("A")){
 					radioGroupModoConexao.check(R.id.activity_cadastro_radioButton_modo_ativo);
@@ -83,7 +85,6 @@ public class CadastroUsuarioActivity extends Activity {
 					radioGroupModoConexao.check(R.id.activity_cadastro_radioButton_modo_passivo);
 				}
 			}
-			
 		} else {
 			UsuarioSQL usuarioSQL = new UsuarioSQL(CadastroUsuarioActivity.this);
 			usuarioSQL.delete(null);

@@ -1,7 +1,9 @@
 <resources>
 
     <string name="app_name">SAVARE</string>
-    <string name="ACCOUNT_TYPE">com.savare.sincronizacao.autenticadorusuario</string>
+    <string name="sync_account_type">sync.savare.com</string>
+    <string name="content_authority">com.savare.sync.contaautenticador</string>
+    <string name="pref_setup_complete">setup_complete</string>
     <string name="entrar">Entrar</string>
     <string name="usuario">Usuário</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>

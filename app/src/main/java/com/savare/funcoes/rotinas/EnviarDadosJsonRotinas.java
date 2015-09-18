@@ -9,9 +9,12 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.Volley;
+import com.savare.beans.json.CustomJsonArrayRequest;
 import com.savare.beans.json.CustomJsonObjectRequest;
+import com.savare.beans.json.CustomJsonStringResquest;
 import com.savare.configuracao.ServicosWeb;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.HashMap;
@@ -29,6 +32,7 @@ public class EnviarDadosJsonRotinas {
     private HashMap<String, String> dados;
     private int tipoJson = -1;
     private RequestQueue filaPedido;
+    private boolean sucesso = false;
 
     public EnviarDadosJsonRotinas(Context context, int tipoJson, HashMap<String, String> dados) {
         this.context = context;
@@ -37,60 +41,28 @@ public class EnviarDadosJsonRotinas {
         this.filaPedido = Volley.newRequestQueue(context);
     }
 
-    public void enviarDados(){
+    public EnviarDadosJsonRotinas(Context context, int tipoJson) {
+        this.context = context;
+        this.tipoJson = tipoJson;
+        this.filaPedido = Volley.newRequestQueue(context);
+    }
+
+    public boolean enviarDados(HashMap<String, String> dados){
+
         // Checa se foi passado algum dados por parametro
         if (dados != null && dados.size() > 0) {
 
             // Checa o tipo de JSon a ser enviado
             if (tipoJson == TIPO_ARRAY) {
-                /*RequestQueue requestQueue = ConexaoVolleyRemoto.getInstance(context).getRequestQueue();
 
-                StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
-                        new Response.Listener<String>() {
-                            @Override
-                            public void onResponse(String response) {
-                                Log.i("SAVARE", "Sucesso: " + response);
-                            }
-                        },
-                        new Response.ErrorListener() {
-                            @Override
-                            public void onErrorResponse(VolleyError error) {
-                                Log.i("SAVARE", "Erro: " + error.toString());
-                            }
-                        });
-
-                requestQueue.add(stringRequest);*/
-
-                /*CustomJsonArrayRequest pedidoArray = new CustomJsonArrayRequest(
+                CustomJsonArrayRequest pedidoArray = new CustomJsonArrayRequest(
                         Request.Method.POST,
-                        ServicosWeb.URL_ENVIAR_TESTE,
+                        ServicosWeb.URL_ENVIAR_PEDIDO,
                         dados,
                         new Response.Listener<JSONArray>() {
                             @Override
                             public void onResponse(JSONArray response) {
-                                Log.i("SAVARE", "Sucesso: " + response);
-                            }
-                        },
-                        new Response.ErrorListener() {
-                            @Override
-                            public void onErrorResponse(VolleyError error) {
-                                Log.i("SAVARE", "Erro: " + error.toString());
-                            }
-                        },
-                        context
-                );
-
-                pedidoArray.setTag(TAG);
-                pedidoArray.setRetryPolicy(new DefaultRetryPolicy(5000, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-                filaPedido.add(pedidoArray);*/
-
-                CustomJsonObjectRequest pedidoArray = new CustomJsonObjectRequest(
-                        Request.Method.POST,
-                        ServicosWeb.URL_ENVIAR_TESTE,
-                        dados,
-                        new Response.Listener<JSONObject>() {
-                            @Override
-                            public void onResponse(JSONObject response) {
+                                sucesso = true;
                                 Log.i("SAVARE", "Sucesso: " + response);
                             }
                         },
@@ -107,8 +79,61 @@ public class EnviarDadosJsonRotinas {
                 pedidoArray.setRetryPolicy(new DefaultRetryPolicy(5000, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
                 filaPedido.add(pedidoArray);
 
+            } else if (tipoJson == TIPO_OBJECT){
+
+                CustomJsonObjectRequest pedidoObject = new CustomJsonObjectRequest(
+                        Request.Method.POST,
+                        ServicosWeb.URL_ENVIAR_PEDIDO,
+                        dados,
+                        new Response.Listener<JSONObject>() {
+                            @Override
+                            public void onResponse(JSONObject response) {
+                                sucesso = true;
+                                Log.i("SAVARE", "Sucesso: " + response);
+                            }
+                        },
+                        new Response.ErrorListener() {
+                            @Override
+                            public void onErrorResponse(VolleyError error) {
+                                Log.i("SAVARE", "Erro: " + error.toString());
+                            }
+                        },
+                        context
+                );
+
+                pedidoObject.setTag(TAG);
+                pedidoObject.setRetryPolicy(new DefaultRetryPolicy(5000, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+                filaPedido.add(pedidoObject);
+
+            } else if (tipoJson == TIPO_STRING){
+
+                CustomJsonStringResquest pedidoArray = new CustomJsonStringResquest(
+                        Request.Method.POST,
+                        ServicosWeb.URL_ENVIAR_PEDIDO,
+                        dados,
+                        new Response.Listener<String>() {
+                            @Override
+                            public void onResponse(String response) {
+                                sucesso = true;
+                                Log.i("SAVARE", "Sucesso: " + response);
+                            }
+                        },
+                        new Response.ErrorListener() {
+                            @Override
+                            public void onErrorResponse(VolleyError error) {
+                                Log.i("SAVARE", "Erro: " + error.toString());
+                            }
+                        },
+                        context
+                );
+
+                pedidoArray.setTag(TAG);
+                pedidoArray.setRetryPolicy(new DefaultRetryPolicy(5000, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+                filaPedido.add(pedidoArray);
             }
+            sucesso = false;
         }
+        return sucesso;
     }
 
     public void pararEnvioDados(){
