@@ -55,6 +55,7 @@ public class RetornoEnvioDadosJsonRotinas {
                     if (responseArray != null) {
 
                     }
+
                     // Checa se o tipo de envio foi por object
                 } else if (tipoJson == EnviarDadosJsonRotinas.TIPO_OBJECT) {
                     // Checa se a resposta nao esta vazia
@@ -105,6 +106,16 @@ public class RetornoEnvioDadosJsonRotinas {
                 dadosUp.put("STATUS", "N");
 
                 itemOrcamentoSql.update(dadosUp, "AEAITORC.GUID = " + guid);
+
+                break;
+
+            case "AEAORCAM.GUID" :
+                OrcamentoSql orcamentoSql = new OrcamentoSql(context);
+
+                ContentValues dadosRetorno = new ContentValues();
+                dadosRetorno.put("STATUS", "N");
+
+                orcamentoSql.update(dadosRetorno, "AEAORCAM.GUID = " + guid);
 
                 break;
             default:

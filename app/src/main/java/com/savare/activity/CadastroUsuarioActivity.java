@@ -213,6 +213,14 @@ public class CadastroUsuarioActivity extends Activity {
 		funcoes.setValorXml("Email", editEmail.getText().toString());
 		funcoes.setValorXml("EnviarAutomatico", "S");
 		funcoes.setValorXml("ReceberAutomatico", "S");
+		if (radioGroupModoConexao.getCheckedRadioButtonId() == R.id.activity_cadastro_radioButton_modo_ativo) {
+			funcoes.setValorXml("ModoConexao", "A");
+		} else if (radioGroupModoConexao.getCheckedRadioButtonId() == R.id.activity_cadastro_radioButton_modo_passivo) {
+			funcoes.setValorXml("ModoConexao", "P");
+		} else if (radioGroupModoConexao.getCheckedRadioButtonId() == R.id.activity_cadastro_radioButton_segundo_plano){
+			funcoes.setValorXml("ModoConexao", "S");
+		}
+
 
 		finish();
 	}

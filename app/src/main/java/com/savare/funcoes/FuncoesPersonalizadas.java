@@ -59,6 +59,7 @@ public class FuncoesPersonalizadas {
 	private static final int INFORMACAO = 1;
 	private static final int RAPIDO = 2;
 	private static final String CHAVE_UNICA = "117ff1e4cfcafb0370b3517042bf90c9";
+	private static final String TAG = "SAVARE";
 	public static final String ENVIAR_ORCAMENTO_SAVARE = "ENVIAR_ORCAMENTO_SAVARE";
 	public static final String RECEBER_DADOS_SAVARE = "RECEBER_DADOS_SAVARE";
 	public static final int MILISEGUNDOS = 0,
@@ -484,11 +485,12 @@ public class FuncoesPersonalizadas {
 		boolean alarmeReceberDesativado = (PendingIntent.getBroadcast(context, 0, new Intent(RECEBER_DADOS_SAVARE), PendingIntent.FLAG_NO_CREATE) == null);
 		
 		// Checa se esta configurado para enviar os orcamentos automaticos
-		if( (getValorXml("EnviarAutomatico").equalsIgnoreCase("S")) || (getValorXml("EnviarAutomatico") == null) ){
+		if( ((getValorXml("EnviarAutomatico").equalsIgnoreCase("S")) || (getValorXml("EnviarAutomatico") == null)) &&
+				(!getValorXml("ModoConexao").equalsIgnoreCase("S"))){
 		
 			// Checa se o alarme de envio de orcamento esta desativado
 			if(alarmeEnviarDesativado){
-				Log.i("Script", "Novo alarme Enviar");
+				Log.i(TAG, "Novo alarme Enviar");
 				
 				// Cria a intent com identificacao do alarme
 				Intent intent = new Intent(ENVIAR_ORCAMENTO_SAVARE);
@@ -513,16 +515,17 @@ public class FuncoesPersonalizadas {
 				
 				AlarmManager alarme = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 				alarme.cancel(alarmeIntent);
-				Log.i("Script", "Desativado alarme Enviar");
+				Log.i(TAG, "Desativado alarme Enviar");
 			}
 		}
 		
 		// Checa se esta configurado para receber dados automaticos
-		if( (getValorXml("ReceberAutomatico").equalsIgnoreCase("S")) || (getValorXml("ReceberAutomatico") == null) ){
+		if( ((getValorXml("ReceberAutomatico").equalsIgnoreCase("S")) || (getValorXml("ReceberAutomatico") == null)) &&
+				(!getValorXml("ModoConexao").equalsIgnoreCase("S"))){
 			
 			// Checa se o alarme de recebimento de dados esta desativado
 			if(alarmeReceberDesativado){
-				Log.i("Script", "Novo alarme Receber");
+				Log.i(TAG, "Novo alarme Receber");
 				
 				Intent intent = new Intent(RECEBER_DADOS_SAVARE);
 				PendingIntent alarmIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
@@ -541,7 +544,7 @@ public class FuncoesPersonalizadas {
 		} else {
 			// Checa se o alarme foi criado para podermos desativalo
 			if(!alarmeReceberDesativado){
-				Log.i("Script", "Desativado alarme Receber");
+				Log.i(TAG, "Desativado alarme Receber");
 				Intent intentCancelar = new Intent(RECEBER_DADOS_SAVARE);
 				PendingIntent alarmeIntent = PendingIntent.getBroadcast(context, 0, intentCancelar, 0);
 				

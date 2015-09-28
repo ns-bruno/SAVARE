@@ -206,7 +206,8 @@ public class LoginActivity extends Activity {
 		if ((funcoes.getValorXml("Usuario").equalsIgnoreCase(funcoes.NAO_ENCONTRADO)) ||
 				(funcoes.getValorXml("CodigoUsuario").equalsIgnoreCase(funcoes.NAO_ENCONTRADO)) ||
 				(funcoes.getValorXml("CodigoEmpresa").equalsIgnoreCase(funcoes.NAO_ENCONTRADO)) ||
-				(funcoes.getValorXml("ChaveEmpresa").equalsIgnoreCase(funcoes.NAO_ENCONTRADO))){
+				(funcoes.getValorXml("ChaveEmpresa").equalsIgnoreCase(funcoes.NAO_ENCONTRADO)) ||
+				(funcoes.getValorXml("ModoConexao").equalsIgnoreCase(funcoes.NAO_ENCONTRADO))){
 			retorno = false;
 
 		} else {

@@ -34,28 +34,16 @@ public class EnviarOrcamentoSyncAdapterRotinas {
     private static String TAG = "SAVARE";
 
     private Context context;
-    private ProgressDialog progress;
-    private int telaChamada;
 
-    public EnviarOrcamentoSyncAdapterRotinas(Context context, int telaChamada) {
+    public EnviarOrcamentoSyncAdapterRotinas(Context context) {
         Log.i(TAG, "construtor - EnviarOrcamentoSyncAdapterRotinas");
 
         this.context = context;
-        this.telaChamada = telaChamada;
     }
 
     protected void preExecute(){
         Log.i(TAG, "preExecute - EnviarOrcamentoSyncAdapterRotinas");
 
-        // Checa se esta classe esta sendo chamada por alguma tela ou em plano de fundo
-        if ((telaChamada == TELA_VISIVEL)){
-
-            // Cria novo um ProgressDialogo e exibe
-            progress = new ProgressDialog(context);
-            progress.setMessage(context.getResources().getString(R.string.aguarde_estamos_checando_se_existe_internet));
-            progress.setCancelable(false);
-            progress.show();
-        }
     }
 
     public String execute(){
@@ -72,12 +60,6 @@ public class EnviarOrcamentoSyncAdapterRotinas {
             // Checa se tem internet
             if (funcoes.existeConexaoInternet()) {
 
-                // Checa se esta classe esta sendo chamada por alguma tela ou em plano de fundo
-                if ((telaChamada == TELA_VISIVEL)){
-
-                    progress.setMessage(context.getResources().getString(R.string.parece_que_tem_internet_vamos_pegar_dados_agora));
-                }
-
                 OrcamentoSql orcamentoSql = new OrcamentoSql(context);
 
                 Cursor dadosOrcamento = orcamentoSql.query("AEAORCAM.STATUS = 'P'");
@@ -86,11 +68,6 @@ public class EnviarOrcamentoSyncAdapterRotinas {
 
                     // Passa por todos os registros recuperados
                     while (dadosOrcamento.moveToNext()){
-                        // Checa se esta classe esta sendo chamada por alguma tela ou em plano de fundo
-                        if ((telaChamada == TELA_VISIVEL)){
-
-                            progress.setMessage(context.getResources().getString(R.string.achamos_orcamento_numero) + dadosOrcamento.getInt(dadosOrcamento.getColumnIndex("ID_AEAORCAM")));
-                        }
                         // Pega os dados do orcamento
                         OrcamentoBeans orcamento = new OrcamentoBeans();
                         orcamento.setIdOrcamento(dadosOrcamento.getInt(dadosOrcamento.getColumnIndex("ID_AEAORCAM")));
@@ -151,11 +128,6 @@ public class EnviarOrcamentoSyncAdapterRotinas {
 
                             // Passa por todos os registros
                             while (dadosItens.moveToNext()){
-                                // Checa se esta classe esta sendo chamada por alguma tela ou em plano de fundo
-                                if ((telaChamada == TELA_VISIVEL)){
-
-                                    progress.setMessage(context.getResources().getString(R.string.agora_estamos_pegando_produtos_orcamento_numero) + listaOrcamentoComProdutos.get(i).getOrcamento().getIdOrcamento());
-                                }
 
                                 // Pega os dados do produtos
                                 ItemOrcamentoBeans itemOrcamento = new ItemOrcamentoBeans();
@@ -203,89 +175,24 @@ public class EnviarOrcamentoSyncAdapterRotinas {
 
                 mensagem += context.getResources().getString(R.string.nao_existe_conexao_internet) + "\n";
             }
-            // Checa se tem algum orcamento salvo na lista
+            // Checa se tem algum orcamento salvo na lista, para enviar via web
             if (listaOrcamentoComProdutos != null && listaOrcamentoComProdutos.size() > 0){
+
+                // Instancia a classe encarregada por enviar os dados pela net
+                final EnviarDadosJsonRotinas enviarDadosJson = new EnviarDadosJsonRotinas(context, EnviarDadosJsonRotinas.TIPO_OBJECT);
 
                 // Passa por todos os orcamentos
                 for (int i = 0; i < listaOrcamentoComProdutos.size(); i++) {
-                    // Checa se esta classe esta sendo chamada por alguma tela ou em plano de fundo
-                    if ((telaChamada == TELA_VISIVEL)){
 
-                        progress.setMessage(context.getResources().getString(R.string.vamos_prepara_dados_para_enviar));
-                    }
-                    final HashMap<String, String> paramOrcamento = new HashMap<String, String>();
-                    paramOrcamento.put("METODO", "OBJECT");
-                    paramOrcamento.put("tipoDados", EnviarDadosJsonRotinas.TIPO_DADOS_PEDIDO);
-                    paramOrcamento.put("idOrcam", ""+listaOrcamentoComProdutos.get(i).getOrcamento().getIdOrcamento());
-                    paramOrcamento.put("idEmpre", ""+listaOrcamentoComProdutos.get(i).getOrcamento().getIdEmpresa());
-                    paramOrcamento.put("idClifoVendedor", ""+listaOrcamentoComProdutos.get(i).getOrcamento().getIdPessoaVendedor());
-                    paramOrcamento.put("idClifo", ""+listaOrcamentoComProdutos.get(i).getOrcamento().getIdPessoa());
-                    paramOrcamento.put("idEstad", ""+listaOrcamentoComProdutos.get(i).getOrcamento().getIdEstado());
-                    paramOrcamento.put("idCidad", ""+listaOrcamentoComProdutos.get(i).getOrcamento().getIdCidade());
-                    paramOrcamento.put("idTpDoc", ""+listaOrcamentoComProdutos.get(i).getOrcamento().getIdTipoDocumento());
-                    paramOrcamento.put("guid", ""+listaOrcamentoComProdutos.get(i).getOrcamento().getGuid());
-                    paramOrcamento.put("dtCad", ""+listaOrcamentoComProdutos.get(i).getOrcamento().getDataCadastro());
-                    paramOrcamento.put("dtAlt", ""+listaOrcamentoComProdutos.get(i).getOrcamento().getDataAlteracao());
-                    paramOrcamento.put("vlMercBruto", ""+listaOrcamentoComProdutos.get(i).getOrcamento().getTotalOrcamentoBruto());
-                    paramOrcamento.put("vlMercDesconto", ""+listaOrcamentoComProdutos.get(i).getOrcamento().getTotalDesconto());
-                    paramOrcamento.put("vlFrete", ""+listaOrcamentoComProdutos.get(i).getOrcamento().getTotalFrete());
-                    paramOrcamento.put("vlSeguro", ""+listaOrcamentoComProdutos.get(i).getOrcamento().getTotalSeguro());
-                    paramOrcamento.put("vlOutros", ""+listaOrcamentoComProdutos.get(i).getOrcamento().getTotalOutros());
-                    paramOrcamento.put("vlEncargosFinanceiros", ""+listaOrcamentoComProdutos.get(i).getOrcamento().getTotalEncargosFinanceiros());
-                    paramOrcamento.put("vlTotal", ""+listaOrcamentoComProdutos.get(i).getOrcamento().getTotalOrcamento());
-                    paramOrcamento.put("atacVarejo", ""+listaOrcamentoComProdutos.get(i).getOrcamento().getTipoVenda());
-                    paramOrcamento.put("pessoaCliente", ""+listaOrcamentoComProdutos.get(i).getOrcamento().getPessoaCliente());
-                    paramOrcamento.put("nomeCliente", ""+listaOrcamentoComProdutos.get(i).getOrcamento().getNomeRazao());
-                    paramOrcamento.put("ieRg", ""+listaOrcamentoComProdutos.get(i).getOrcamento().getRgIe());
-                    paramOrcamento.put("cpfCGC", ""+listaOrcamentoComProdutos.get(i).getOrcamento().getCpfCnpj());
-                    paramOrcamento.put("enderecoCliente", ""+listaOrcamentoComProdutos.get(i).getOrcamento().getEnderecoCliente());
-                    paramOrcamento.put("bairroCliente", ""+listaOrcamentoComProdutos.get(i).getOrcamento().getBairroCliente());
-                    paramOrcamento.put("cepCliente", ""+listaOrcamentoComProdutos.get(i).getOrcamento().getCepCliente());
-                    paramOrcamento.put("obs", ""+listaOrcamentoComProdutos.get(i).getOrcamento().getObservacao());
-                    paramOrcamento.put("status", ""+listaOrcamentoComProdutos.get(i).getOrcamento().getStatus());
-                    paramOrcamento.put("tipoEntrega", ""+listaOrcamentoComProdutos.get(i).getOrcamento().getTipoEntrega());
-                    paramOrcamento.put("latitude", ""+listaOrcamentoComProdutos.get(i).getOrcamento().getLatitude());
-                    paramOrcamento.put("longitude", ""+listaOrcamentoComProdutos.get(i).getOrcamento().getLongitude());
-                    paramOrcamento.put("altitude", ""+listaOrcamentoComProdutos.get(i).getOrcamento().getAltitude());
-                    paramOrcamento.put("horarioLocalizacao", ""+listaOrcamentoComProdutos.get(i).getOrcamento().getHorarioLocalizacao());
-                    paramOrcamento.put("tipoLocalizacao", ""+listaOrcamentoComProdutos.get(i).getOrcamento().getTipoLocalizacao());
-                    paramOrcamento.put("precisao", ""+listaOrcamentoComProdutos.get(i).getOrcamento().getPrecisaoLocalizacao());
+                    // Checa se este pedido tem itens(produtos)
+                    if ((listaOrcamentoComProdutos.get(i).getListaProdutosOrcamento() != null) && (listaOrcamentoComProdutos.get(i).getListaProdutosOrcamento().size() > 0)) {
 
-                    final EnviarDadosJsonRotinas enviarDadosJson = new EnviarDadosJsonRotinas(context, EnviarDadosJsonRotinas.TIPO_OBJECT);
+                        // Passa por todos os produtos do orcamento
+                        for (int j = 0; j < listaOrcamentoComProdutos.get(i).getListaProdutosOrcamento().size(); j++) {
+                            // Checa se ja foi enviado
+                            if (!listaOrcamentoComProdutos.get(i).getListaProdutosOrcamento().get(j).isTagEnviado()) {
 
-                    // Executa o processo de enviar dados em segundo plano
-                    Runnable runnable = new Runnable() {
-                        @Override
-                        public void run() {
-                            enviarDadosJson.enviarDados(paramOrcamento);
-                        }
-                    };
-                    new Thread(runnable).start();
-
-                    // Checa se enviou os dados
-                    //if ( enviarDadosJson.enviarDados(paramOrcamento) ){
-                        // Checa se esta classe esta sendo chamada por alguma tela ou em plano de fundo
-                        if ((telaChamada == TELA_VISIVEL)){
-
-                            progress.setMessage(context.getResources().getString(R.string.conseguimos_enviar_pedido) + listaOrcamentoComProdutos.get(i).getOrcamento().getIdOrcamento());
-                        }
-                        // Marca o pedido como enviado
-                        listaOrcamentoComProdutos.get(i).getOrcamento().setTagEnviado(true);
-
-                        // Limba os parametro do orcamento
-                        paramOrcamento.clear();
-
-                        // Checa se este pedido tem itens
-                        if ((listaOrcamentoComProdutos.get(i).getListaProdutosOrcamento() != null) && (listaOrcamentoComProdutos.get(i).getListaProdutosOrcamento().size() > 0)) {
-
-                            // Passa por todos os produtos do orcamento
-                            for (int j = 0; j < listaOrcamentoComProdutos.get(i).getListaProdutosOrcamento().size(); j++) {
-                                // Checa se esta classe esta sendo chamada por alguma tela ou em plano de fundo
-                                if ((telaChamada == TELA_VISIVEL)){
-
-                                    progress.setMessage(context.getResources().getString(R.string.preparando_produtos));
-                                }
-                                HashMap<String, String> paramItemOrcamento = new HashMap<String, String>();
+                                final HashMap<String, String> paramItemOrcamento = new HashMap<String, String>();
                                 paramItemOrcamento.put("tipoDados", EnviarDadosJsonRotinas.TIPO_DADOS_ITENS_PEDIDO);
                                 paramItemOrcamento.put("sequencia", "" + listaOrcamentoComProdutos.get(i).getListaProdutosOrcamento().get(j).getSeguencia());
                                 paramItemOrcamento.put("idOrcamItem", "" + listaOrcamentoComProdutos.get(i).getListaProdutosOrcamento().get(j).getIdItemOrcamento());
@@ -305,18 +212,76 @@ public class EnviarOrcamentoSyncAdapterRotinas {
                                 paramItemOrcamento.put("complemento", "" + listaOrcamentoComProdutos.get(i).getListaProdutosOrcamento().get(j).getComplemento());
                                 paramItemOrcamento.put("seqDesconto", "" + listaOrcamentoComProdutos.get(i).getListaProdutosOrcamento().get(j).getSequencialDesconto());
 
-                                if (enviarDadosJson.enviarDados(paramItemOrcamento) ){
-                                    listaOrcamentoComProdutos.get(i).getListaProdutosOrcamento().get(j).setTagEnviado(true);
-
-                                    // Checa se esta classe esta sendo chamada por alguma tela ou em plano de fundo
-                                    if ((telaChamada == TELA_VISIVEL)){
-
-                                        progress.setMessage(context.getResources().getString(R.string.conseguimos_enviar_item));
+                                // Executa o processo de enviar dados em segundo plano
+                                Runnable runnableItem = new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        enviarDadosJson.enviarDados(paramItemOrcamento);
                                     }
-                                }
+                                };
+                                new Thread(runnableItem).start();
+
+                                listaOrcamentoComProdutos.get(i).getListaProdutosOrcamento().get(j).setTagEnviado(true);
                             }
+                            //paramItemOrcamento.clear();
                         }
-                    //}
+                    }
+                    // Checa se o orcamento ja foi enviado
+                    if (!listaOrcamentoComProdutos.get(i).getOrcamento().isTagEnviado()) {
+
+                        final HashMap<String, String> paramOrcamento = new HashMap<String, String>();
+                        paramOrcamento.put("METODO", "OBJECT");
+                        paramOrcamento.put("tipoDados", EnviarDadosJsonRotinas.TIPO_DADOS_PEDIDO);
+                        paramOrcamento.put("idOrcam", "" + listaOrcamentoComProdutos.get(i).getOrcamento().getIdOrcamento());
+                        paramOrcamento.put("idEmpre", "" + listaOrcamentoComProdutos.get(i).getOrcamento().getIdEmpresa());
+                        paramOrcamento.put("idClifoVendedor", "" + listaOrcamentoComProdutos.get(i).getOrcamento().getIdPessoaVendedor());
+                        paramOrcamento.put("idClifo", "" + listaOrcamentoComProdutos.get(i).getOrcamento().getIdPessoa());
+                        paramOrcamento.put("idEstad", "" + listaOrcamentoComProdutos.get(i).getOrcamento().getIdEstado());
+                        paramOrcamento.put("idCidad", "" + listaOrcamentoComProdutos.get(i).getOrcamento().getIdCidade());
+                        paramOrcamento.put("idTpDoc", "" + listaOrcamentoComProdutos.get(i).getOrcamento().getIdTipoDocumento());
+                        paramOrcamento.put("guid", "" + listaOrcamentoComProdutos.get(i).getOrcamento().getGuid());
+                        paramOrcamento.put("dtCad", "" + listaOrcamentoComProdutos.get(i).getOrcamento().getDataCadastro());
+                        paramOrcamento.put("dtAlt", "" + listaOrcamentoComProdutos.get(i).getOrcamento().getDataAlteracao());
+                        paramOrcamento.put("vlMercBruto", "" + listaOrcamentoComProdutos.get(i).getOrcamento().getTotalOrcamentoBruto());
+                        paramOrcamento.put("vlMercDesconto", "" + listaOrcamentoComProdutos.get(i).getOrcamento().getTotalDesconto());
+                        paramOrcamento.put("vlFrete", "" + listaOrcamentoComProdutos.get(i).getOrcamento().getTotalFrete());
+                        paramOrcamento.put("vlSeguro", "" + listaOrcamentoComProdutos.get(i).getOrcamento().getTotalSeguro());
+                        paramOrcamento.put("vlOutros", "" + listaOrcamentoComProdutos.get(i).getOrcamento().getTotalOutros());
+                        paramOrcamento.put("vlEncargosFinanceiros", "" + listaOrcamentoComProdutos.get(i).getOrcamento().getTotalEncargosFinanceiros());
+                        paramOrcamento.put("vlTotal", "" + listaOrcamentoComProdutos.get(i).getOrcamento().getTotalOrcamento());
+                        paramOrcamento.put("atacVarejo", "" + listaOrcamentoComProdutos.get(i).getOrcamento().getTipoVenda());
+                        paramOrcamento.put("pessoaCliente", "" + listaOrcamentoComProdutos.get(i).getOrcamento().getPessoaCliente());
+                        paramOrcamento.put("nomeCliente", "" + listaOrcamentoComProdutos.get(i).getOrcamento().getNomeRazao());
+                        paramOrcamento.put("ieRg", "" + listaOrcamentoComProdutos.get(i).getOrcamento().getRgIe());
+                        paramOrcamento.put("cpfCGC", "" + listaOrcamentoComProdutos.get(i).getOrcamento().getCpfCnpj());
+                        paramOrcamento.put("enderecoCliente", "" + listaOrcamentoComProdutos.get(i).getOrcamento().getEnderecoCliente());
+                        paramOrcamento.put("bairroCliente", "" + listaOrcamentoComProdutos.get(i).getOrcamento().getBairroCliente());
+                        paramOrcamento.put("cepCliente", "" + listaOrcamentoComProdutos.get(i).getOrcamento().getCepCliente());
+                        paramOrcamento.put("obs", "" + listaOrcamentoComProdutos.get(i).getOrcamento().getObservacao());
+                        paramOrcamento.put("status", "" + listaOrcamentoComProdutos.get(i).getOrcamento().getStatus());
+                        paramOrcamento.put("tipoEntrega", "" + listaOrcamentoComProdutos.get(i).getOrcamento().getTipoEntrega());
+                        paramOrcamento.put("latitude", "" + listaOrcamentoComProdutos.get(i).getOrcamento().getLatitude());
+                        paramOrcamento.put("longitude", "" + listaOrcamentoComProdutos.get(i).getOrcamento().getLongitude());
+                        paramOrcamento.put("altitude", "" + listaOrcamentoComProdutos.get(i).getOrcamento().getAltitude());
+                        paramOrcamento.put("horarioLocalizacao", "" + listaOrcamentoComProdutos.get(i).getOrcamento().getHorarioLocalizacao());
+                        paramOrcamento.put("tipoLocalizacao", "" + listaOrcamentoComProdutos.get(i).getOrcamento().getTipoLocalizacao());
+                        paramOrcamento.put("precisao", "" + listaOrcamentoComProdutos.get(i).getOrcamento().getPrecisaoLocalizacao());
+
+                        // Executa o processo de enviar dados em segundo plano
+                        Runnable runnable = new Runnable() {
+                            @Override
+                            public void run() {
+                                enviarDadosJson.enviarDados(paramOrcamento);
+                            }
+                        };
+                        new Thread(runnable).start();
+
+                        // Marca o pedido como enviado
+                        listaOrcamentoComProdutos.get(i).getOrcamento().setTagEnviado(true);
+
+                        // Limba os parametro do orcamento
+                        //paramOrcamento.clear();
+                    }
                 }
             }
         }catch (Exception e){
@@ -341,11 +306,5 @@ public class EnviarOrcamentoSyncAdapterRotinas {
     protected void postExecute(){
         Log.i(TAG, "postExecute - EnviarOrcamentoSyncAdapterRotinas");
 
-        if (telaChamada == TELA_VISIVEL) {
-            // Checa se a brassa de prograsso esta visivel
-            if (progress.isShowing()) {
-                progress.dismiss();
-            }
-        }
     }
 }

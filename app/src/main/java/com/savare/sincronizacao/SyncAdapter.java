@@ -43,7 +43,7 @@ class SyncAdapter extends AbstractThreadedSyncAdapter {
         Log.i(TAG, "### onPerformSync - SyncAdapter");
 
         try {
-            EnviarOrcamentoSyncAdapterRotinas enviarOrcamento = new EnviarOrcamentoSyncAdapterRotinas(getContext(), EnviarOrcamentoSyncAdapterRotinas.TELA_SEGUNDO_PLANO);
+            EnviarOrcamentoSyncAdapterRotinas enviarOrcamento = new EnviarOrcamentoSyncAdapterRotinas(getContext());
             enviarOrcamento.execute();
 
         }catch (Exception e){
