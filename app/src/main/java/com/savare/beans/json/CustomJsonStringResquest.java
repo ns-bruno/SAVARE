@@ -41,6 +41,7 @@ public class CustomJsonStringResquest extends StringRequest {
         FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
 
         // Adiciona os dados do cabecalho
+        cabecalho.put("METODO", "STRING");
         cabecalho.put("CHAVE_USUA", funcoes.getValorXml("ChaveEmpresa"));
         cabecalho.put("USUARIO_USUA", funcoes.getValorXml("Usuario"));
         cabecalho.put("ID_USUA", funcoes.getValorXml("CodigoUsuario"));

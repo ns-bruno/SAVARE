@@ -111,8 +111,6 @@ public class LoginActivity extends Activity {
 			// Funca o codigo do usuario no xml
 			String codigoUsuario = funcoes.getValorXml("CodigoUsuario");
 
-			funcoes.CreateSyncAccount(LoginActivity.this);
-
 			// Instancia a classe de rotinas
 			Rotinas rotinas = new Rotinas(LoginActivity.this);
 

@@ -1,6 +1,7 @@
 package com.savare.beans.json;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.NetworkResponse;
@@ -19,13 +20,15 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Created by Faturamento on 10/09/2015.
+ * Created by Bruno Nogueira Silva on 10/09/2015.
  */
 public class CustomJsonObjectRequest extends Request<JSONObject> {
 
+    public static String TAG = "SAVARE";
     private Response.Listener<JSONObject> listener;
     private Map<String, String> params;
     private Context context;
+
 
     public CustomJsonObjectRequest(int method,
                                   String url,
@@ -48,12 +51,12 @@ public class CustomJsonObjectRequest extends Request<JSONObject> {
         FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
 
         // Adiciona os dados do cabecalho
+        cabecalho.put("METODO", "OBJECT");
         cabecalho.put("CHAVE_USUA", funcoes.getValorXml("ChaveEmpresa"));
         cabecalho.put("USUARIO_USUA", funcoes.getValorXml("Usuario"));
         cabecalho.put("ID_USUA", funcoes.getValorXml("CodigoUsuario"));
         cabecalho.put("ID_SMAEMPRE", funcoes.getValorXml("CodigoEmpresa"));
-
-        return cabecalho; //!= null ? cabecalho : super.getHeaders();
+        return cabecalho != null ? cabecalho : super.getHeaders();
     }
 
     protected Map<String, String> getParams() throws com.android.volley.AuthFailureError {
@@ -63,13 +66,17 @@ public class CustomJsonObjectRequest extends Request<JSONObject> {
     @Override
     protected Response<JSONObject> parseNetworkResponse(NetworkResponse response) {
         try {
+            Log.i(TAG, "CustomJsonObjectResquest - Resposta: \n" + response.toString());
+
             String jsonString = new String(response.data, HttpHeaderParser.parseCharset(response.headers));
             return Response.success(new JSONObject(jsonString), HttpHeaderParser.parseCacheHeaders(response));
 
         } catch (UnsupportedEncodingException e) {
+            Log.e(TAG, "Erro. CustomJsonObjectRequest: \n");
             return Response.error(new ParseError(e));
 
         } catch (JSONException je) {
+            Log.e(TAG, "Erro. CustomJsonObjectRequest: \n");
             return Response.error(new ParseError(je));
         }
     }

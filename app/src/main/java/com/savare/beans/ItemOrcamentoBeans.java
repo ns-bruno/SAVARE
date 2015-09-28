@@ -10,6 +10,7 @@ public class ItemOrcamentoBeans implements Parcelable {
 	private UnidadeVendaBeans unidadeVenda;
 	private EstoqueBeans estoqueVenda;
 	private OrcamentoBeans orcamento;
+	private PlanoPagamentoBeans planoPagamento;
 	
 	private int idOrcamento,
 				idItemOrcamento,
@@ -32,7 +33,8 @@ public class ItemOrcamentoBeans implements Parcelable {
 	private char promocao,
 				 tipoProduto;
 	
-	private boolean tagSelectContext;
+	private boolean tagSelectContext,
+					tagEnviado;
 	
 	public ItemOrcamentoBeans(Parcel dados) {
 		this.produto = (ProdutoBeans) dados.readValue(ProdutoBeans.class.getClassLoader());
@@ -75,6 +77,14 @@ public class ItemOrcamentoBeans implements Parcelable {
 	 */
 	public void setTagSelectContext(boolean tagSelectContext) {
 		this.tagSelectContext = tagSelectContext;
+	}
+
+	public boolean isTagEnviado() {
+		return tagEnviado;
+	}
+
+	public void setTagEnviado(boolean tagEnviado) {
+		this.tagEnviado = tagEnviado;
 	}
 
 	/**
@@ -420,7 +430,14 @@ public class ItemOrcamentoBeans implements Parcelable {
 	public void setIdItemOrcamento(int idItemOrcamento) {
 		this.idItemOrcamento = idItemOrcamento;
 	}
-	
+
+	public PlanoPagamentoBeans getPlanoPagamento() {
+		return planoPagamento;
+	}
+
+	public void setPlanoPagamento(PlanoPagamentoBeans planoPagamento) {
+		this.planoPagamento = planoPagamento;
+	}
 
 	@Override
 	public int describeContents() {

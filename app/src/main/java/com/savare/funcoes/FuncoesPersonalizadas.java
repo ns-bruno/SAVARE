@@ -994,11 +994,11 @@ public class FuncoesPersonalizadas {
 			PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean(context.getResources().getString(R.string.pref_setup_complete), true).commit();
 		}
 
-		if (ContentResolver.isSyncPending(account, context.getResources().getString(R.string.content_authority))  ||
+		/*if (ContentResolver.isSyncPending(account, context.getResources().getString(R.string.content_authority))  ||
 			ContentResolver.isSyncActive(account, context.getResources().getString(R.string.content_authority))) {
-			Log.i("SAVARE", "SyncPending, canceling");
+			Log.i("SAVARE", "SyncPending, canceling - Tela FuncoesPersonalizadas");
 			ContentResolver.cancelSync(account, context.getResources().getString(R.string.content_authority));
-		}
+		}*/
 		// To just enable the sync (not kick it off) call setSyncAutomatically on ContentResolver. An account is needed but it can be a dummy account.
 		ContentResolver.setSyncAutomatically(account, context.getResources().getString(R.string.content_authority), true);
 	}
@@ -1025,6 +1025,24 @@ public class FuncoesPersonalizadas {
 		Account c = ContaService.GetAccount(context);
 
 		ContentResolver.requestSync(c, context.getResources().getString(R.string.content_authority), b);
+	}
+
+	public boolean statusSincronizacaoPlano(){
+		ContaService contaService = new ContaService();
+		Account c = ContaService.GetAccount(context);
+
+		if (ContentResolver.getIsSyncable(c, context.getResources().getString(R.string.content_authority)) > 0){
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	public void cancelarSincronizacaoSegundoPlano(){
+		ContaService contaService = new ContaService();
+		Account c = ContaService.GetAccount(context);
+
+		ContentResolver.cancelSync(c, context.getResources().getString(R.string.content_authority));
 	}
 
 } // Fecha classe

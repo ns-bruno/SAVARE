@@ -15,35 +15,38 @@ public class EnviarProvider extends ContentProvider {
 
     @Override
     public boolean onCreate() {
-        Log.e(TAG, "onCreate do EnviarProvider");
+        Log.i(TAG, "onCreate do EnviarProvider");
         return false;
     }
 
     @Override
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
-        Log.e(TAG, "query do EnviarProvider");
+        Log.i(TAG, "query do EnviarProvider");
 
         return null;
     }
 
     @Override
     public String getType(Uri uri) {
-        Log.e(TAG, "getType do EnviarProvider");
+        Log.i(TAG, "getType do EnviarProvider");
         return null;
     }
 
     @Override
     public Uri insert(Uri uri, ContentValues values) {
+        Log.i(TAG, "insert do EnviarProvider");
         return null;
     }
 
     @Override
     public int delete(Uri uri, String selection, String[] selectionArgs) {
+        Log.i(TAG, "delete do EnviarProvider");
         return 0;
     }
 
     @Override
     public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
+        Log.i(TAG, "update do EnviarProvider");
         return 0;
     }
 }

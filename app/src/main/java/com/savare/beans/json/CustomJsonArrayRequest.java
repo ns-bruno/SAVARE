@@ -47,6 +47,7 @@ public class CustomJsonArrayRequest extends Request<JSONArray> {
         FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
 
         // Adiciona os dados do cabecalho
+        cabecalho.put("METODO", "ARRAY");
         cabecalho.put("CHAVE_USUA", funcoes.getValorXml("ChaveEmpresa"));
         cabecalho.put("USUARIO_USUA", funcoes.getValorXml("Usuario"));
         cabecalho.put("ID_USUA", funcoes.getValorXml("CodigoUsuario"));

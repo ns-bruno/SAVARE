@@ -122,8 +122,10 @@ public class OrcamentoProdutoDetalhesActivity extends Activity {
 					produto = produtoRotinas.listaProduto("AEAPRODU.ID_AEAPRODU = " + idProduto, null, null).get(0);
 				}
 			}
-			// Pega se a venda eh no atacado ou varejo
-			produto.setAtacadoVarejo(getIntent().getExtras().getString("ATAC_VARE").charAt(0));
+			if (getIntent().getExtras().getString("ATAC_VARE") != null && getIntent().getExtras().getString("ATAC_VARE").length() >0) {
+				// Pega se a venda eh no atacado ou varejo
+				produto.setAtacadoVarejo(getIntent().getExtras().getString("ATAC_VARE").charAt(0));
+			}
 
 			// Checa se as variaveis nao estao vazias
 			if ((produto != null) && (produto.getProduto() != null) && (orcamento != null)) {
@@ -153,7 +155,7 @@ public class OrcamentoProdutoDetalhesActivity extends Activity {
 				ContentValues mensagem = new ContentValues();
 				mensagem.put("comando", 1);
 				mensagem.put("tela", "OrcamentoProdutoDetalhesActivity");
-				mensagem.put("mensagem", "Não foi possível carregar os detalhes do produto\n"
+				mensagem.put("mensagem", "Não foi possível carregar os detalhes do produto.\n"
 						   + "Favor, voltar e selecione novamente um produto");
 				
 				funcoes = new FuncoesPersonalizadas(OrcamentoProdutoDetalhesActivity.this);

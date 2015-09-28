@@ -28,11 +28,13 @@ public class EnviarDadosJsonRotinas {
     public static final int TIPO_ARRAY = 0;
     public static final int TIPO_OBJECT = 1;
     public static final int TIPO_STRING = 2;
+    public static final String TIPO_DADOS_PEDIDO = "SAVARE_PEDIDO_" + ServicosWeb.CHAVE_ENVIO_DADOS;
+    public static final String TIPO_DADOS_ITENS_PEDIDO = "SAVARE_ITENS_PEDIDO_" + ServicosWeb.CHAVE_ENVIO_DADOS;
     private Context context;
     private HashMap<String, String> dados;
     private int tipoJson = -1;
     private RequestQueue filaPedido;
-    private boolean sucesso = false;
+    private boolean sucesso = true;
 
     public EnviarDadosJsonRotinas(Context context, int tipoJson, HashMap<String, String> dados) {
         this.context = context;
@@ -57,19 +59,21 @@ public class EnviarDadosJsonRotinas {
 
                 CustomJsonArrayRequest pedidoArray = new CustomJsonArrayRequest(
                         Request.Method.POST,
-                        ServicosWeb.URL_ENVIAR_PEDIDO,
+                        ServicosWeb.URL_ENVIAR_DADOS,
                         dados,
                         new Response.Listener<JSONArray>() {
                             @Override
                             public void onResponse(JSONArray response) {
                                 sucesso = true;
                                 Log.i("SAVARE", "Sucesso: " + response);
+                                RetornoEnvioDadosJsonRotinas retornoEnvio = new RetornoEnvioDadosJsonRotinas(context, TIPO_ARRAY, response, null, null, null);
                             }
                         },
                         new Response.ErrorListener() {
                             @Override
                             public void onErrorResponse(VolleyError error) {
                                 Log.i("SAVARE", "Erro: " + error.toString());
+                                RetornoEnvioDadosJsonRotinas retornoEnvio = new RetornoEnvioDadosJsonRotinas(context, TIPO_ARRAY, null, null, null, error);
                             }
                         },
                         context
@@ -83,19 +87,21 @@ public class EnviarDadosJsonRotinas {
 
                 CustomJsonObjectRequest pedidoObject = new CustomJsonObjectRequest(
                         Request.Method.POST,
-                        ServicosWeb.URL_ENVIAR_PEDIDO,
+                        ServicosWeb.URL_ENVIAR_DADOS,
                         dados,
                         new Response.Listener<JSONObject>() {
                             @Override
                             public void onResponse(JSONObject response) {
                                 sucesso = true;
                                 Log.i("SAVARE", "Sucesso: " + response);
+                                RetornoEnvioDadosJsonRotinas retornoEnvio = new RetornoEnvioDadosJsonRotinas(context, TIPO_OBJECT, null, response, null, null);
                             }
                         },
                         new Response.ErrorListener() {
                             @Override
                             public void onErrorResponse(VolleyError error) {
                                 Log.i("SAVARE", "Erro: " + error.toString());
+                                RetornoEnvioDadosJsonRotinas retornoEnvio = new RetornoEnvioDadosJsonRotinas(context, TIPO_OBJECT, null, null, null, error);
                             }
                         },
                         context
@@ -109,19 +115,21 @@ public class EnviarDadosJsonRotinas {
 
                 CustomJsonStringResquest pedidoArray = new CustomJsonStringResquest(
                         Request.Method.POST,
-                        ServicosWeb.URL_ENVIAR_PEDIDO,
+                        ServicosWeb.URL_ENVIAR_DADOS,
                         dados,
                         new Response.Listener<String>() {
                             @Override
                             public void onResponse(String response) {
                                 sucesso = true;
                                 Log.i("SAVARE", "Sucesso: " + response);
+                                RetornoEnvioDadosJsonRotinas retornoEnvio = new RetornoEnvioDadosJsonRotinas(context, TIPO_STRING, null, null, response, null);
                             }
                         },
                         new Response.ErrorListener() {
                             @Override
                             public void onErrorResponse(VolleyError error) {
                                 Log.i("SAVARE", "Erro: " + error.toString());
+                                RetornoEnvioDadosJsonRotinas retornoEnvio = new RetornoEnvioDadosJsonRotinas(context, TIPO_STRING, null, null, null, error);
                             }
                         },
                         context
@@ -130,8 +138,9 @@ public class EnviarDadosJsonRotinas {
                 pedidoArray.setTag(TAG);
                 pedidoArray.setRetryPolicy(new DefaultRetryPolicy(5000, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
                 filaPedido.add(pedidoArray);
+            } else {
+                sucesso = false;
             }
-            sucesso = false;
         }
         return sucesso;
     }

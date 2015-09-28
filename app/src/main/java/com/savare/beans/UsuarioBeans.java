@@ -18,7 +18,8 @@ public class UsuarioBeans {
                    senhaServidor,
                    pastaServidor,
                    dataUltimoRecebimento,
-                   dataUltimoEnvio;
+                   dataUltimoEnvio,
+                   modoConexao;
     private char vendeAtacadoUsuario,
                  vendeVarejoUsuario,
                  ativoUsuario;
@@ -193,5 +194,13 @@ public class UsuarioBeans {
 
     public void setPercentualCreditoVarejo(double percentualCreditoVarejo) {
         this.percentualCreditoVarejo = percentualCreditoVarejo;
+    }
+
+    public String getModoConexao() {
+        return modoConexao;
+    }
+
+    public void setModoConexao(String modoConexao) {
+        this.modoConexao = modoConexao;
     }
 }

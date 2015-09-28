@@ -145,10 +145,20 @@
     <string name="prazo_acumulo_varejo">Prazo para Acumulo Varejo</string>
     <string name="tipo_documento">Tipo de Documento</string>
     <string name="pasta_ftp">Pasta do Servidor FTP</string>
-    <string name="modo_ativo">Modo Ativo</string>
-    <string name="modo_passivo">Modo Passivo</string>
+    <string name="ftp_modo_ativo">FTP Modo Ativo</string>
+    <string name="ftp_modo_passivo">FTP Modo Passivo</string>
+    <string name="segundo_plano">Segundo Plano</string>
     <string name="prazo_desconhecido">Prazo Desconhecido</string>
     <string name="desconhecido">Desconhecido</string>
+    <string name="parece_que_tem_internet_vamos_pegar_dados_agora">Parece que tem internet, agora vamos pegar os dados à serem enviados.</string>
+    <string name="aguarde_estamos_checando_se_existe_internet">Aguarde, estamos checando se existe internet...</string>
+    <string name="achamos_orcamento_numero">Achamos o orçamento de Nº </string>
+    <string name="agora_estamos_pegando_produtos_orcamento_numero">Agora estamos pegando os produtos do orçamento de Nº </string>
+    <string name="vamos_prepara_dados_para_enviar">Vamos preparar os dados coletados para enviar.</string>
+    <string name="conseguimos_enviar_pedido">Conseguimos enviar o pedido de Nº </string>
+    <string name="conseguimos_enviar_item">Conseguimos enviar o item </string>
+    <string name="pedido_numero">Pedido Nº </string>
+    <string name="preparando_produtos">Preparando o(s) Produto(s)</string>
 
 
 </resources>

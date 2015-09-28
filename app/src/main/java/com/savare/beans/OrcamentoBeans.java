@@ -9,14 +9,28 @@ public class OrcamentoBeans implements Parcelable {
 	private int idOrcamento,
 				idEmpresa,
 				idPessoa,
-				idPessoaVendedor;
+				idPessoaVendedor,
+				idEstado,
+				idCidade,
+				idTipoDocumento;
 	private String nomeRazao,
 				   siglaEstado,
 				   cidade,
 				   dataCadastro,
+				   dataAlteracao,
 				   observacao,
 				   status,
-				   statusRetorno;
+				   statusRetorno,
+				   guid,
+				   pessoaCliente,
+				   cpfCnpj,
+				   rgIe,
+				   enderecoCliente,
+				   bairroCliente,
+				   cepCliente,
+				   tipoEntrega,
+				   horarioLocalizacao,
+				   tipoLocalizacao;
 	
 	private char tipoVenda;
 	
@@ -24,9 +38,19 @@ public class OrcamentoBeans implements Parcelable {
 				   totalOrcamentoFaturado,
 				   totalOrcamentoBruto,
 				   totalTabela,
-				   totalTabelaFaturado;
+				   totalTabelaFaturado,
+				   totalDesconto,
+				   totalFrete,
+				   totalSeguro,
+				   totalOutros,
+				   totalEncargosFinanceiros,
+				   latitude,
+				   longitude,
+				   altitude,
+				   precisaoLocalizacao;
 	
-	private boolean tagSelectContext;
+	private boolean tagSelectContext,
+					tagEnviado;
 
 	public OrcamentoBeans(Parcel dados) {
 		this.idOrcamento = dados.readInt();
@@ -48,6 +72,14 @@ public class OrcamentoBeans implements Parcelable {
 
 	public void setTagSelectContext(boolean tagSelectContext) {
 		this.tagSelectContext = tagSelectContext;
+	}
+
+	public boolean isTagEnviado() {
+		return tagEnviado;
+	}
+
+	public void setTagEnviado(boolean tagEnviado) {
+		this.tagEnviado = tagEnviado;
 	}
 
 	/**
@@ -78,6 +110,10 @@ public class OrcamentoBeans implements Parcelable {
 		this.observacao = observacao;
 	}
 
+	/**
+	 * Pega se o orçamento/pedido eh para o atacado ou varejo
+	 * @return
+	 */
 	public char getTipoVenda() {
 		return tipoVenda;
 	}
@@ -213,6 +249,14 @@ public class OrcamentoBeans implements Parcelable {
 		this.dataCadastro = dataCadastro;
 	}
 
+	public String getDataAlteracao() {
+		return dataAlteracao;
+	}
+
+	public void setDataAlteracao(String dataAlteracao) {
+		this.dataAlteracao = dataAlteracao;
+	}
+
 	/**
 	 * @return the totalOrcamentoBruto
 	 */
@@ -251,11 +295,187 @@ public class OrcamentoBeans implements Parcelable {
 		this.totalTabelaFaturado = totalTabelaFaturado;
 	}
 
+	public double getTotalDesconto() {
+		return totalDesconto;
+	}
+
+	public void setTotalDesconto(double totalDesconto) {
+		this.totalDesconto = totalDesconto;
+	}
+
+	public double getTotalFrete() {
+		return totalFrete;
+	}
+
+	public void setTotalFrete(double totalFrete) {
+		this.totalFrete = totalFrete;
+	}
+
+	public double getTotalSeguro() {
+		return totalSeguro;
+	}
+
+	public void setTotalSeguro(double totalSeguro) {
+		this.totalSeguro = totalSeguro;
+	}
+
+	public double getTotalOutros() {
+		return totalOutros;
+	}
+
+	public void setTotalOutros(double totalOutros) {
+		this.totalOutros = totalOutros;
+	}
+
+	public double getTotalEncargosFinanceiros() {
+		return totalEncargosFinanceiros;
+	}
+
+	public void setTotalEncargosFinanceiros(double totalEncargosFinanceiros) {
+		this.totalEncargosFinanceiros = totalEncargosFinanceiros;
+	}
+
 	/**
 	 * @return the statusRetorno
 	 */
 	public String getStatusRetorno() {
 		return statusRetorno;
+	}
+
+	public int getIdEstado() {
+		return idEstado;
+	}
+
+	public void setIdEstado(int idEstado) {
+		this.idEstado = idEstado;
+	}
+
+	public int getIdCidade() {
+		return idCidade;
+	}
+
+	public void setIdCidade(int idCidade) {
+		this.idCidade = idCidade;
+	}
+
+	public int getIdTipoDocumento() {
+		return idTipoDocumento;
+	}
+
+	public void setIdTipoDocumento(int idTipoDocumento) {
+		this.idTipoDocumento = idTipoDocumento;
+	}
+
+	public String getGuid() {
+		return guid;
+	}
+
+	public void setGuid(String guid) {
+		this.guid = guid;
+	}
+
+	public String getPessoaCliente() {
+		return pessoaCliente;
+	}
+
+	public void setPessoaCliente(String pessoaCliente) {
+		this.pessoaCliente = pessoaCliente;
+	}
+
+	public String getCpfCnpj() {
+		return cpfCnpj;
+	}
+
+	public void setCpfCnpj(String cpfCnpj) {
+		this.cpfCnpj = cpfCnpj;
+	}
+
+	public String getRgIe() {
+		return rgIe;
+	}
+
+	public void setRgIe(String rgIe) {
+		this.rgIe = rgIe;
+	}
+
+	public String getEnderecoCliente() {
+		return enderecoCliente;
+	}
+
+	public void setEnderecoCliente(String enderecoCliente) {
+		this.enderecoCliente = enderecoCliente;
+	}
+
+	public String getBairroCliente() {
+		return bairroCliente;
+	}
+
+	public void setBairroCliente(String bairroCliente) {
+		this.bairroCliente = bairroCliente;
+	}
+
+	public String getCepCliente() {
+		return cepCliente;
+	}
+
+	public void setCepCliente(String cepCliente) {
+		this.cepCliente = cepCliente;
+	}
+
+	public String getTipoEntrega() {
+		return tipoEntrega;
+	}
+
+	public void setTipoEntrega(String tipoEntrega) {
+		this.tipoEntrega = tipoEntrega;
+	}
+
+	public String getHorarioLocalizacao() {
+		return horarioLocalizacao;
+	}
+
+	public void setHorarioLocalizacao(String horarioLocalizacao) {
+		this.horarioLocalizacao = horarioLocalizacao;
+	}
+
+	public String getTipoLocalizacao() {
+		return tipoLocalizacao;
+	}
+
+	public void setTipoLocalizacao(String tipoLocalizacao) {
+		this.tipoLocalizacao = tipoLocalizacao;
+	}
+
+	public double getLatitude() {
+		return latitude;
+	}
+
+	public void setLatitude(double latitude) {
+		this.latitude = latitude;
+	}
+
+	public double getLongitude() {
+		return longitude;
+	}
+
+	public void setLongitude(double longitude) {
+		this.longitude = longitude;
+	}
+
+	public double getAltitude() {
+		return altitude;
+	}
+
+	public void setAltitude(double altitude) {
+		this.altitude = altitude;
+	}
+
+	public double getPrecisaoLocalizacao() {
+		return precisaoLocalizacao;
+	}
+
+	public void setPrecisaoLocalizacao(double precisaoLocalizacao) {
+		this.precisaoLocalizacao = precisaoLocalizacao;
 	}
 
 	/**

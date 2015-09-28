@@ -99,7 +99,7 @@ public class ProdutoListaActivity extends Activity implements OnNavigationListen
 			textNomeRazao.setText(intentParametro.getString("NOME_RAZAO"));
 			textCodigoPessoa.setText(intentParametro.getString("ID_CFACLIFO"));
 			textAtacadoVarejo.setText(intentParametro.getString("ATAC_VAREJO"));
-			
+
 		} else {
 			// Dados da mensagem
 			ContentValues mensagem = new ContentValues();
@@ -129,11 +129,13 @@ public class ProdutoListaActivity extends Activity implements OnNavigationListen
 					
 					Bundle bundle = new Bundle();
 					bundle.putParcelable("AEAORCAM", preencheDadosOrcamento());
-					bundle.putString("ID_AEAPRODU", ""+produtoVenda.getProduto().getIdProduto());
-					bundle.putChar("ATAC_VARE", textAtacadoVarejo.getText().charAt(0));
+					bundle.putString("ID_AEAPRODU", "" + produtoVenda.getProduto().getIdProduto());
+					bundle.putString("ATAC_VARE", textAtacadoVarejo.getText().toString());
 					//bundle.putString("TELA_CHAMADA", "ProdutoListaActivity");
 					bundle.putInt("POSICAO", position);
 					bundle.putLong("ID_AEAITORC", idItemOrcamento);
+					bundle.putString("ID_AEAORCAM", textCodigoOrcamento.getText().toString());
+					bundle.putString("ID_CFACLIFO", textCodigoPessoa.getText().toString());
 
 					// Abre a tela de detalhes do produto
 					Intent intent = new Intent(ProdutoListaActivity.this, OrcamentoProdutoDetalhesActivity.class);

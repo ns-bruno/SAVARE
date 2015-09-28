@@ -74,7 +74,7 @@ public class EnviarOrcamentoFtpAsyncRotinas extends AsyncTask<String, String, In
 
 			// Cria novo um ProgressDialogo e exibe
 			progress = new ProgressDialog(context);
-			progress.setMessage("Aguarde, gerando os arquivos necessários à ser enviados...");
+			progress.setMessage("Aguarde, gerando os arquivos necessários à serem enviados...");
 			progress.setCancelable(false);
 			progress.show();
 		} 

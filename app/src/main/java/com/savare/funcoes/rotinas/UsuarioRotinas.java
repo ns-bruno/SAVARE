@@ -154,6 +154,7 @@ public class UsuarioRotinas extends Rotinas {
             usuario.setValorCreditoVarejo(dadosUsuario.getDouble(dadosUsuario.getColumnIndex("VALOR_CREDITO_VAREJO")));
             usuario.setPercentualCreditoAtacado(dadosUsuario.getDouble(dadosUsuario.getColumnIndex("PERCENTUAL_CREDITO_ATACADO")));
             usuario.setPercentualCreditoVarejo(dadosUsuario.getDouble(dadosUsuario.getColumnIndex("PERCENTUAL_CREDITO_VAREJO")));
+            usuario.setModoConexao(dadosUsuario.getString(dadosUsuario.getColumnIndex("MODO_CONEXAO")));
         }
 
         return usuario;

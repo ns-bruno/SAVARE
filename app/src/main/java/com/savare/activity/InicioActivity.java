@@ -141,7 +141,6 @@ public class InicioActivity extends Activity {
 
         recuperarCampos();
 
-        //CreateSyncAccount(InicioActivity.this);
 	} // Fim do onCreate
 
     @Override
@@ -224,6 +223,13 @@ public class InicioActivity extends Activity {
             textValorAcumuladoVarejo.setText("R$ 0,00");
             textPrazoAcumuloVarejo.setText(getResources().getString(R.string.prazo_desconhecido));
         }
+        if (dadosUsuario.getModoConexao().equalsIgnoreCase("S")) {
+            // Cria a conta para o envio automatico do syncAdapter
+            funcoes.CreateSyncAccount(InicioActivity.this);
+        } else {
+            funcoes.cancelarSincronizacaoSegundoPlano();
+        }
+
     }
 
     @Override
@@ -249,7 +255,6 @@ public class InicioActivity extends Activity {
         if (mDrawerToggle.onOptionsItemSelected(item)) {
             return true;
         }
-        
 		return true;
         
     }
@@ -413,22 +418,5 @@ public class InicioActivity extends Activity {
         textTipoAcumuloVarejo = (TextView) findViewById(R.id.activity_inicio_text_tipo_acumulo_varejo);
         textValorAcumuladoVarejo = (TextView) findViewById(R.id.activity_inicio_text_valor_acumulado_varejo);
         textPrazoAcumuloVarejo = (TextView) findViewById(R.id.activity_inicio_text_prazo_acumulado_varejo);
-    }
-
-    public void CreateSyncAccount(Context context) {
-
-        FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(InicioActivity.this);
-        // Create the account type and default account
-
-        Account newAccount = new Account(funcoes.getValorXml("Usuario"), getResources().getString(R.string.sync_account_type));
-
-        // Get an instance of the Android account manager
-        AccountManager accountManager = (AccountManager) this.getSystemService(ACCOUNT_SERVICE);
-
-        Bundle dadosUsuario = new Bundle();
-        dadosUsuario.putString("Usuario", funcoes.getValorXml("Usuario"));
-        dadosUsuario.putString("Email", funcoes.getValorXml("Email"));
-
-        accountManager.addAccountExplicitly(newAccount, null, dadosUsuario);
     }
 }

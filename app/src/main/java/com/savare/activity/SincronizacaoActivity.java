@@ -2,17 +2,13 @@ package com.savare.activity;
 
 import com.savare.R;
 import com.savare.funcoes.FuncoesPersonalizadas;
-import com.savare.funcoes.rotinas.EnviarDadosJsonRotinas;
 import com.savare.funcoes.rotinas.ImportarDadosTxtRotinas;
 import com.savare.funcoes.rotinas.UsuarioRotinas;
 import com.savare.funcoes.rotinas.async.ReceberDadosFtpAsyncRotinas;
-import com.savare.sincronizacao.ContaService;
 
 import android.app.ActionBar;
 import android.app.Activity;
-import android.content.ContentResolver;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -20,8 +16,6 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-
-import java.util.HashMap;
 
 public class SincronizacaoActivity extends Activity {
 
@@ -140,16 +134,42 @@ public class SincronizacaoActivity extends Activity {
 				/*HashMap<String, String> params = new HashMap<String, String>();
 				params.put("email", "ns.bruno@gmail.com");
 				params.put("pasword", "123");
-				params.put("method", "object");
+				params.put("METODO", "OBJECT");
 				params.put("dados", "Nenhum dados transmetidos");
 				params.put("usuario", "Bruno Nogueira Silva");
 				params.put("empresa", "Parceirão Distribuidora");
 
-				EnviarDadosJsonRotinas enviarDadosJson = new EnviarDadosJsonRotinas(SincronizacaoActivity.this, EnviarDadosJsonRotinas.TIPO_ARRAY, params);
+				EnviarDadosJsonRotinas enviarDadosJson = new EnviarDadosJsonRotinas(SincronizacaoActivity.this, EnviarDadosJsonRotinas.TIPO_OBJECT);
+				enviarDadosJson.enviarDados(params);
 
 				enviarDadosJson.enviarDados(null);*/
+
 				FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(SincronizacaoActivity.this);
 				funcoes.TriggerRefresh(SincronizacaoActivity.this);
+
+				/*EnviarOrcamentoSyncAdapterRotinas enviarOrcamento = new EnviarOrcamentoSyncAdapterRotinas(SincronizacaoActivity.this, EnviarOrcamentoSyncAdapterRotinas.TELA_SEGUNDO_PLANO);
+				enviarOrcamento.execute(); */
+				/*try {
+					EnviarOrcamentoSyncAdapterRotinas enviarOrcamento = new EnviarOrcamentoSyncAdapterRotinas(SincronizacaoActivity.this,
+																											  EnviarOrcamentoSyncAdapterRotinas.TELA_SEGUNDO_PLANO);
+					enviarOrcamento.execute();
+
+				}catch (Exception e){
+					FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(SincronizacaoActivity.this);
+
+					// Armazena as informacoes para para serem exibidas e enviadas
+					ContentValues contentValues = new ContentValues();
+					contentValues.put("comando", 0);
+					contentValues.put("tela", "SincronizacaoActivity");
+					contentValues.put("mensagem", e.getMessage());
+					contentValues.put("dados", this.toString());
+					// Pega os dados do usuario
+					contentValues.put("usuario", funcoes.getValorXml("Usuario"));
+					contentValues.put("empresa", funcoes.getValorXml("ChaveEmpresa"));
+					contentValues.put("email", funcoes.getValorXml("Email"));
+
+					funcoes.menssagem(contentValues);
+				}*/
 				break;
 			
 		default:

@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
@@ -17,6 +18,7 @@ import com.savare.funcoes.FuncoesPersonalizadas;
 
 public class CadastroUsuarioActivity extends Activity {
 	
+	private static String TAG = "SAVARE";
 	private EditText editChaveEmpresa,
 					 editCodigoEmpresa,
 					 editNomeCompleto,
@@ -44,10 +46,7 @@ public class CadastroUsuarioActivity extends Activity {
 		if (intentParametro != null) {
 			recadastrar = intentParametro.getBoolean("RECADASTRAR");
 		}
-		
 		recuperarCampoTela();
-		
-		
 	}
 	
 	@Override
@@ -83,9 +82,13 @@ public class CadastroUsuarioActivity extends Activity {
 
 				} else if (dadosUsuario.getString(dadosUsuario.getColumnIndex("MODO_CONEXAO")).equalsIgnoreCase("P")){
 					radioGroupModoConexao.check(R.id.activity_cadastro_radioButton_modo_passivo);
+
+				} else if (dadosUsuario.getString(dadosUsuario.getColumnIndex("MODO_CONEXAO")).equalsIgnoreCase("S")){
+					radioGroupModoConexao.check(R.id.activity_cadastro_radioButton_segundo_plano);
 				}
 			}
 		} else {
+			Log.i(TAG, "delete - CadastrousuarioActivity");
 			UsuarioSQL usuarioSQL = new UsuarioSQL(CadastroUsuarioActivity.this);
 			usuarioSQL.delete(null);
 		}
@@ -117,25 +120,24 @@ public class CadastroUsuarioActivity extends Activity {
 			
 			UsuarioSQL usuarioSQL = new UsuarioSQL(CadastroUsuarioActivity.this);
 
-			if (usuarioSQL.insert(salvarDadosCampo()) > 0) {
+			if (recadastrar){
+				if (usuarioSQL.update(salvarDadosCampo(), "ID_USUA = " + editCodigoVendedor.getText().toString()) > 0){
+					Log.i(TAG, "#update - salvarDadosCampo - CadastroUsuarioActivity");
 
-				funcoes = new FuncoesPersonalizadas(CadastroUsuarioActivity.this);
-				funcoes.setValorXml("CodigoUsuario", editCodigoVendedor.getText().toString());
-				funcoes.setValorXml("Usuario", editNomeLogin.getText().toString());
-				funcoes.setValorXml("ChaveEmpresa", editChaveEmpresa.getText().toString());
-				funcoes.setValorXml("CodigoEmpresa", editCodigoEmpresa.getText().toString());
-				funcoes.setValorXml("Email", editEmail.getText().toString());
-				funcoes.setValorXml("EnviarAutomatico", "S");
-				funcoes.setValorXml("ReceberAutomatico", "S");
+					salvarDadosXml();
+				}
+			} else {
+				if (usuarioSQL.insert(salvarDadosCampo()) > 0) {
+					Log.i(TAG, "#insert - salvarDadosCampo - CadastroUsuarioActivity");
 
-				finish();
+					salvarDadosXml();
+				}
 			}
 			
 		} else if (id == R.id.menu_cadastro_usuario_cancelar) {
 			// Fecha a view(tela)
 			finish();
 		}
-
 		return true;
 	}
 	
@@ -180,6 +182,8 @@ public class CadastroUsuarioActivity extends Activity {
 				valores.put("modo_conexao", "A");
 			} else if (radioGroupModoConexao.getCheckedRadioButtonId() == R.id.activity_cadastro_radioButton_modo_passivo) {
 				valores.put("modo_conexao", "P");
+			} else if (radioGroupModoConexao.getCheckedRadioButtonId() == R.id.activity_cadastro_radioButton_segundo_plano){
+				valores.put("modo_conexao", "S");
 			}
 
 		} catch (Exception e){
@@ -200,4 +204,16 @@ public class CadastroUsuarioActivity extends Activity {
 		return valores;
 	}
 
+	private void salvarDadosXml(){
+		funcoes = new FuncoesPersonalizadas(CadastroUsuarioActivity.this);
+		funcoes.setValorXml("CodigoUsuario", editCodigoVendedor.getText().toString());
+		funcoes.setValorXml("Usuario", editNomeLogin.getText().toString());
+		funcoes.setValorXml("ChaveEmpresa", editChaveEmpresa.getText().toString());
+		funcoes.setValorXml("CodigoEmpresa", editCodigoEmpresa.getText().toString());
+		funcoes.setValorXml("Email", editEmail.getText().toString());
+		funcoes.setValorXml("EnviarAutomatico", "S");
+		funcoes.setValorXml("ReceberAutomatico", "S");
+
+		finish();
+	}
 }

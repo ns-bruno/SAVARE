@@ -132,8 +132,8 @@ public class ConexaoBancoDeDados extends SQLiteOpenHelper {
 																		SQLiteDatabase.NO_LOCALIZED_COLLATORS|
 																		SQLiteDatabase.CREATE_IF_NECESSARY);*/
 			
-			bancoSavare = getWritableDatabase();
-			//bancoSavare = SQLiteDatabase.openDatabase(bancoDados, null, 0);
+			//bancoSavare = getWritableDatabase();
+			bancoSavare = SQLiteDatabase.openDatabase(bancoDados, null, 0);
 			// bancoSavare = getWritableDatabase();
 		}
 

@@ -30,8 +30,6 @@ public class GerarJsonOrcamentoRotinas {
 
             Cursor dadosOrcamento = orcamentoSql.query("AEAORCAM.ID_AEAORCAM = " + idOrcamento);
 
-
-
             // Cria o arquivo para gerar o json
             JSONStringer orcamentoJson = new JSONStringer();
 
@@ -67,7 +65,6 @@ public class GerarJsonOrcamentoRotinas {
                                     .object().key("enderecoCliente").value(dadosOrcamento.getString(dadosOrcamento.getColumnIndex("ENDERECO_CLIENTE")))
                                     .object().key("bairroCliente").value(dadosOrcamento.getString(dadosOrcamento.getColumnIndex("BAIRRO_CLIENTE")))
                                     .object().key("cepCliente").value(dadosOrcamento.getString(dadosOrcamento.getColumnIndex("CEP_CLIENTE")))
-                                    .object().key("obs").value(dadosOrcamento.getString(dadosOrcamento.getColumnIndex("OBS")))
                                     .object().key("obs").value(dadosOrcamento.getString(dadosOrcamento.getColumnIndex("OBS")))
                                     .object().key("status").value(dadosOrcamento.getString(dadosOrcamento.getColumnIndex("STATUS")))
                                     .object().key("tipoEntrega").value(dadosOrcamento.getString(dadosOrcamento.getColumnIndex("TIPO_ENTREGA")))

@@ -103,29 +103,37 @@
             android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center_horizontal">
+            android:gravity="center_horizontal"
+            android:weightSum="1">
 
             <RadioGroup
                 android:id="@+id/activity_cadastro_usuario_radio_group_modo_conexao"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:checkedButton="@+id/activity_cadastro_radioButton_modo_ativo"
-                android:orientation="horizontal"
-                android:layout_gravity="center_horizontal" >
+                android:gravity="left"
+                android:orientation="vertical">
 
-            <RadioButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/modo_ativo"
-                android:id="@+id/activity_cadastro_radioButton_modo_ativo"
-                android:checked="false" />
+                <RadioButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/segundo_plano"
+                    android:id="@+id/activity_cadastro_radioButton_segundo_plano"
+                    android:checked="false" />
 
-            <RadioButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/modo_passivo"
-                android:id="@+id/activity_cadastro_radioButton_modo_passivo"
-                android:checked="false" />
+                <RadioButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/ftp_modo_ativo"
+                    android:id="@+id/activity_cadastro_radioButton_modo_ativo"
+                    android:checked="true" />
+
+                <RadioButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/ftp_modo_passivo"
+                    android:id="@+id/activity_cadastro_radioButton_modo_passivo"
+                    android:checked="false" />
 
             </RadioGroup>
 
