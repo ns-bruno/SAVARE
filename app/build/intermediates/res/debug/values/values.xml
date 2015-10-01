@@ -324,6 +324,7 @@
     <string name="pedido_numero">Pedido Nº </string>
     <string name="percentual_mark_up_atacado">% Mark Up Atacado</string>
     <string name="percentual_mark_up_varejo">% Mark Up Varejo</string>
+    <string name="periodo">Peíodo</string>
     <string name="periodo_vencimento">Período de Vencimento</string>
     <string name="pesquisar">Pesquisar</string>
     <string name="pesquisar_cliente">Pesquisar Cliente</string>

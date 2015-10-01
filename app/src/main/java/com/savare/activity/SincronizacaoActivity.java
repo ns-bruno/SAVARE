@@ -37,6 +37,7 @@ public class SincronizacaoActivity extends Activity {
 				   buttonReceberDadosProdutos,
 				   buttonReceberDadosTitulos;
 	private ActionBar actionBar;
+	private String modoConexao = "";
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -104,8 +105,39 @@ public class SincronizacaoActivity extends Activity {
 				receberDadosFtpAsync.execute(ImportarDadosTxtRotinas.BLOCO_R);
 			}
 		});
+	} // Fim onCreate
+
+	@Override
+	protected void onResume() {
+		super.onResume();
+
+		UsuarioRotinas usuarioRotinas = new UsuarioRotinas(SincronizacaoActivity.this);
+		// Pega o modo de sincronizacao dos dados. FTP ou SyncAdapter
+		modoConexao = usuarioRotinas.modoConexao();
+
+		if (modoConexao.equalsIgnoreCase("S")){
+			textDataUltimoEnvio.setVisibility(View.INVISIBLE);
+			textDataUltimoRecebimento.setVisibility(View.INVISIBLE);
+			textReceberDados.setVisibility(View.INVISIBLE);
+			textReceberDadosEmpresa.setVisibility(View.INVISIBLE);
+			textReceberDadosClientes.setVisibility(View.INVISIBLE);
+			textReceberDadosProdutos.setVisibility(View.INVISIBLE);
+			textReceberDadosTitulos.setVisibility(View.INVISIBLE);
+			buttonReceberDados.setVisibility(View.INVISIBLE);
+			buttonReceberDadosEmpresa.setVisibility(View.INVISIBLE);
+			buttonReceberDadosClientes.setVisibility(View.INVISIBLE);
+			buttonReceberDadosProdutos.setVisibility(View.INVISIBLE);
+			buttonReceberDadosTitulos.setVisibility(View.INVISIBLE);
+			progressReceberDados.setVisibility(View.INVISIBLE);
+			progressReceberDadosEmpresa.setVisibility(View.INVISIBLE);
+			progressReceberDadosClientes.setVisibility(View.INVISIBLE);
+			progressReceberDadosProdutos.setVisibility(View.INVISIBLE);
+			progressReceberDadosTitulos.setVisibility(View.INVISIBLE);
+		} else {
+
+		}
 	}
-	
+
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
@@ -119,6 +151,16 @@ public class SincronizacaoActivity extends Activity {
 		getMenuInflater().inflate(R.menu.sincronizacao, menu);
 
 		return super.onCreateOptionsMenu(menu);
+	}
+
+	@Override
+	public boolean onPrepareOptionsMenu(Menu menu) {
+
+		// Checo se o modo de conexao eh diferente de SyncAdapter
+		if (!modoConexao.equalsIgnoreCase("S")){
+			menu.getItem(0).setVisible(false);
+		}
+		return true;
 	}
 
 	@Override

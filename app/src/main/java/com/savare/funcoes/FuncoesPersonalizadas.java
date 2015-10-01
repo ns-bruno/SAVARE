@@ -756,9 +756,9 @@ public class FuncoesPersonalizadas {
 	 * @return
 	 */
 	public String diferencaEntreDataHora(int TIPO, String dataHoraInicial, String dataHoraFinal){
-		SimpleDateFormat sdf = new SimpleDateFormat("dd/mm/yyyy HH:mm:ss");
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MMM-dd HH:mm:ss", Locale.ENGLISH);
 
-		String retorno = "";
+		String retorno = "0";
 		try {
 			Date date1 = sdf.parse(dataHoraInicial);
 			Date date2 = sdf.parse(dataHoraFinal);

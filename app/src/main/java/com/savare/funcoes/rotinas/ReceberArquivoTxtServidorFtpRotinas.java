@@ -29,6 +29,7 @@ import android.database.Cursor;
 import android.os.CountDownTimer;
 import android.os.Environment;
 import android.os.Handler;
+import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -135,7 +136,7 @@ public class ReceberArquivoTxtServidorFtpRotinas {
 			String hostFtp = dadosUsuario.getString(dadosUsuario.getColumnIndex("IP_SERVIDOR_USUA"));
 			String usuarioFtp = dadosUsuario.getString(dadosUsuario.getColumnIndex("USUARIO_SERVIDOR_USUA"));
 			String senhaFtp = dadosUsuario.getString(dadosUsuario.getColumnIndex("SENHA_SERVIDOR_USUA"));
-			//final String nomeLogin = dadosUsuario.getString(dadosUsuario.getColumnIndex("LOGIN_USUA"));
+			String nomeLogin = dadosUsuario.getString(dadosUsuario.getColumnIndex("LOGIN_USUA"));
 			String nomeDiretorioFtp = dadosUsuario.getString(dadosUsuario.getColumnIndex("PASTA_SERVIDOR_USUA"));
 			String modoConexao = dadosUsuario.getString(dadosUsuario.getColumnIndex("MODO_CONEXAO"));
 
@@ -163,16 +164,7 @@ public class ReceberArquivoTxtServidorFtpRotinas {
 					// Conecta com o servidor FTP usando a porta 21
 					conexaoFtp.connect(hostFtp);
 
-					// Muda o modo de conexao para ativa
-					if (modoConexao.equalsIgnoreCase("A")){
-						conexaoFtp.enterLocalActiveMode();
-						conexaoFtp.enterRemoteActiveMode(InetAddress.getByName(hostFtp), FTP.DEFAULT_PORT);
 
-					// Muda o modo de conexao para passiva
-					} else if (modoConexao.equalsIgnoreCase("P")){
-						conexaoFtp.enterLocalPassiveMode();
-						conexaoFtp.enterRemotePassiveMode();
-					}
 
 					boolean status = false;
 
@@ -183,7 +175,7 @@ public class ReceberArquivoTxtServidorFtpRotinas {
 							((Activity) context).runOnUiThread(new Runnable() {
 								  public void run() {
 									  // Atualiza a mensagem na tela de sincronizacao
-									  textMensagemRetorno.setText("Conseguimos Conectar no Servidor, agora vamor logar...");
+									  textMensagemRetorno.setText("Conseguimos Conectar no Servidor, agora vamos logar...");
 								  }
 							});
 						}
@@ -194,12 +186,12 @@ public class ReceberArquivoTxtServidorFtpRotinas {
 							((Activity) context).runOnUiThread(new Runnable() {
 								  public void run() {
 									  // Atualiza a mensagem na tela de sincronizacao
-									  textMensagemRetorno.setText("Erro ao conectar no Servidor em Nuvem...");
+									  textMensagemRetorno.setText("Erro ao conectar no Servidor em Nuvem, nem conseguimos logar.");
 								  }
 							});
 						}
 						// Atualiza a mensagem do progresso
-						mensagemErro = "Não foi possível conectar no servidor em nuvem. \n";
+						mensagemErro = "Não foi possível conectar no servidor em nuvem, nem conseguimos logar. \n";
 					}
 
 					if (status){
@@ -210,6 +202,16 @@ public class ReceberArquivoTxtServidorFtpRotinas {
 									  textMensagemRetorno.setText("Logado com sucesso.");
 								  }
 							});
+						}
+						// Muda o modo de conexao para ativa
+						/*if (modoConexao.equalsIgnoreCase("A")){
+							conexaoFtp.enterLocalActiveMode();
+							conexaoFtp.enterRemoteActiveMode(InetAddress.getByName(hostFtp), FTP.DEFAULT_PORT);
+
+						// Muda o modo de conexao para passiva
+						} else */if (modoConexao.equalsIgnoreCase("P")){
+								conexaoFtp.enterLocalPassiveMode();
+								conexaoFtp.enterRemotePassiveMode();
 						}
 
 						//Setando para o modo de transfer�ncia de Arquivos
@@ -283,8 +285,11 @@ public class ReceberArquivoTxtServidorFtpRotinas {
 										}
 									});
 								}
+								// Pausa o clodigo por 10 segundos
+								Thread.sleep(10000);
+
 								// Pega uma lista com todos os arquivos a ser baixados
-								listaDadosArquivoFtp = listaDadosArquivoReceber(blocoReceber);
+								listaDadosArquivoFtp = listaDadosArquivoReceber(blocoReceber, nomeLogin);
 
 								/*// Inicia um cronometo regressivo de 20 segundos
 								final int finalControle = controle;
@@ -314,7 +319,7 @@ public class ReceberArquivoTxtServidorFtpRotinas {
 							} // Fim while
 						} else {
 							// Pega uma lista com todos os arquivos a ser baixados
-							listaDadosArquivoFtp = listaDadosArquivoReceber(blocoReceber);
+							listaDadosArquivoFtp = listaDadosArquivoReceber(blocoReceber, nomeLogin);
 						}
 
 						// Pega uma lista com todos os arquivos a ser baixados
@@ -385,7 +390,7 @@ public class ReceberArquivoTxtServidorFtpRotinas {
 
 
 					} else { // Fim if status
-						mensagemErro += "Usuário ou Senha incorretos";
+						mensagemErro += "Talvez seja Usuário ou Senha incorretos";
 					}
 					if(telaChamou != TELA_RECEPTOR_ALARME){
 						((Activity) context).runOnUiThread(new Runnable() {
@@ -495,6 +500,7 @@ public class ReceberArquivoTxtServidorFtpRotinas {
 					int i = s.length();
 				}
 	        };
+			//conexaoFtp.connect(hor);
 	        // Associa um ouvite de transferencia de byte
 	        conexaoFtp.setCopyStreamListener(streamListener);
 	        // Incrementa o tamanho da transferencia do arquivo
@@ -619,7 +625,7 @@ public class ReceberArquivoTxtServidorFtpRotinas {
 		     return null;
 		}
 
-		public List<FTPFile> listaDadosArquivoReceber(String blocoReceber){
+		public List<FTPFile> listaDadosArquivoReceber(String blocoReceber, String nomeLogin){
 			List<FTPFile> arquivoParaReceber = new ArrayList<FTPFile>();
 			//FTPFile[] arquivoParaReceber = null;
 			try {
@@ -627,7 +633,7 @@ public class ReceberArquivoTxtServidorFtpRotinas {
 				// Passa por todos os registros
 				for (int i = 0; i < ftpFiles.length; i++) {
 					// Checa se eh um arquivo
-					if(ftpFiles[i].isFile()){
+					if((ftpFiles[i].isFile()) && (ftpFiles[i].getName().contains(nomeLogin))){
 
                         if (blocoReceber == null) {
                             // Checa se o arquivo tem a extencao .SAVARE
@@ -684,7 +690,7 @@ public class ReceberArquivoTxtServidorFtpRotinas {
         String chave = funcoes.getValorXml("ChaveEmpresa");
 
         // Local e nome do arquivo a ser salvo
-        String localArquivo = Environment.getExternalStorageDirectory() + "/SAVARE/TEMP/SO_" + dataFormatada.format(data) + "_" + chave + ".SAVARE";
+        String localArquivo = Environment.getExternalStorageDirectory() + "/SAVARE/TEMP/SO_" + chave + ".SAVARE";
 
 		try {
 			// Cria o arquivo txt
@@ -695,27 +701,31 @@ public class ReceberArquivoTxtServidorFtpRotinas {
 
 			// Checa se a opcao de bloco esta nula (pega todos os blocos)
 			if (blocos == null){
-				// Grava texto
-				gravarArquivo.print("|S|S|" + chave + "|\n");
-				gravarArquivo.print("|C|S|" + chave + "|\n");
-				gravarArquivo.print("|A|S|" + chave + "|\n");
-				gravarArquivo.print("|R|S|" + chave + "|");
+				// Grava texto |BLOCO|FINALIDADE|DISPOSITIVO(CHAVE)|DATA_ULTIMO_RECEBIMENTO|
+				gravarArquivo.print("|S|S|" + chave + "|" + funcoes.getValorXml("DataUltimoRecebimento") + "|\n");
+				gravarArquivo.print("|C|S|" + chave + "|" + funcoes.getValorXml("DataUltimoRecebimento") + "|\n");
+				gravarArquivo.print("|A|S|" + chave + "|" + funcoes.getValorXml("DataUltimoRecebimento") + "|\n");
+				gravarArquivo.print("|R|S|" + chave + "|" + funcoes.getValorXml("DataUltimoRecebimento") + "|");
+
 			// Pega o bloco de dados da empresa
 			} else if (blocoReceber.equalsIgnoreCase(ImportarDadosTxtRotinas.BLOCO_S)){
-				// Grava texto
-				gravarArquivo.print("|S|S|" + chave + "|\n");
+				// Grava texto |BLOCO|FINALIDADE|DISPOSITIVO(CHAVE)|DATA_ULTIMO_RECEBIMENTO|
+				gravarArquivo.print("|S|S|" + chave + "|" + funcoes.getValorXml("DataUltimoRecebimento") + "|\n");
+
 			// Pega o bloco de dados de clientes e associados
 			} else if (blocoReceber.equalsIgnoreCase(ImportarDadosTxtRotinas.BLOCO_C)){
 				// Grava texto
-				gravarArquivo.print("|C|S|" + chave + "|\n");
+				gravarArquivo.print("|C|S|" + chave + "|" + funcoes.getValorXml("DataUltimoRecebimento") + "|\n");
+
 			// Pega o bloco de dados de produtos
 			} else if (blocoReceber.equalsIgnoreCase(ImportarDadosTxtRotinas.BLOCO_A)){
 				// Grava texto
-				gravarArquivo.print("|A|S|" + chave + "|\n");
+				gravarArquivo.print("|A|S|" + chave + "|" + funcoes.getValorXml("DataUltimoRecebimento") + "|\n");
+
 			// Pega o bloco de dados de titulos
 			} else if (blocoReceber.equalsIgnoreCase(ImportarDadosTxtRotinas.BLOCO_R)){
 				// Grava texto
-				gravarArquivo.print("|R|S|" + chave + "|\n");
+				gravarArquivo.print("|R|S|" + chave + "|" + funcoes.getValorXml("DataUltimoRecebimento") + "|\n");
 			}
 			// Fecha o arquivo
 			arquivoTxt.close();
@@ -725,7 +735,7 @@ public class ReceberArquivoTxtServidorFtpRotinas {
                 localArquivo = "";
             }
 		} catch (IOException e) {
-			e.printStackTrace();
+			Log.e("SAVARE", "*ReceberArquivoTxtServidorFtpRotinas" + e.toString());
 		}
         return localArquivo;
 	} // Fim geraArquivoSolicitacaoDados

@@ -84,7 +84,15 @@ public class ReceberDadosFtpAsyncRotinas extends AsyncTask<String, String, Integ
 			if( (localDados != null) & (localDados.size() > 0)){
 				// Passa por todos os registros
 				for (int i = 0; i < localDados.size(); i++) {
-					
+
+					((Activity) context).runOnUiThread(new Runnable() {
+						public void run() {
+							UsuarioRotinas usuarioRotinas = new UsuarioRotinas(context);
+							// Atualiza a data de recebimento dos dados
+							usuarioRotinas.atualizaDataHoraRecebimento(null);
+						}
+					});
+
 					// Checa se que esta chamando esta classe eh o alarme
 					if(telaChamou == TELA_RECEPTOR_ALARME){
 						ImportarDadosTxtRotinas importarDados = new ImportarDadosTxtRotinas(context, localDados.get(i), TELA_RECEPTOR_ALARME);
@@ -95,10 +103,6 @@ public class ReceberDadosFtpAsyncRotinas extends AsyncTask<String, String, Integ
 						// Executa o processo de importacao
 						importarDados.importarDados();
 					}
-
-                    UsuarioRotinas usuarioRotinas = new UsuarioRotinas(context);
-                    // Atualiza a data de recebimento dos dados
-                    usuarioRotinas.atualizaDataHoraRecebimento(null);
 				}
 			
 			} else {

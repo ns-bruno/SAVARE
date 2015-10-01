@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Locale;
 import java.util.Scanner;
 
 import android.app.Activity;
@@ -191,7 +192,7 @@ public class ImportarDadosTxtRotinas {
 				// Pega o primeiro token da linha
 				String registro = scannerLinha.next();
 				
-				// Checa se o pertence ao bloco 0000
+				// Checa se o registro pertence ao bloco 0000
 				if(registro.equalsIgnoreCase("0000")){
 					// Pega a linha completa
 					String linha = scannerLinha.nextLine();
@@ -645,9 +646,11 @@ public class ImportarDadosTxtRotinas {
 			// Pega o tempo atual em milesegundos
 			long tempoFinal = System.currentTimeMillis();
 
-			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MMM-dd HH:mm:ss", Locale.ENGLISH);
 
-			final String tempoCorrido = funcoes.diferencaEntreDataHora(FuncoesPersonalizadas.MINUTOS, sdf.format(tempoInicial), sdf.format(tempoFinal));
+			final int tempoCorridoMin = Integer.parseInt(funcoes.diferencaEntreDataHora(FuncoesPersonalizadas.MINUTOS, sdf.format(tempoInicial), sdf.format(tempoFinal)));
+
+			final int tempoCorridoSeg = (Integer.parseInt(funcoes.diferencaEntreDataHora(FuncoesPersonalizadas.SEGUNDOS, sdf.format(tempoInicial), sdf.format(tempoFinal)))) - (60 * tempoCorridoMin);
 
 
 			// Fecha os dados do arquivo
@@ -668,7 +671,7 @@ public class ImportarDadosTxtRotinas {
 					((Activity) context).runOnUiThread(new Runnable() {
 						  public void run() {
 							  // Atualiza o texto da tela de sincronizacao
-							  textMensagemProcesso.setText("Recebemos todos os registros em " + tempoCorrido + " Minutos");
+							  textMensagemProcesso.setText("Recebemos todos os registros em " + tempoCorridoMin + " Min. e " + tempoCorridoSeg + " Seg.");
 						  }
 					});
 				}
@@ -682,11 +685,11 @@ public class ImportarDadosTxtRotinas {
 						  public void run() {
 							  // Atualiza o texto da tela de sincronizacao
 							  textMensagemProcesso.setText("Não foi recebido todos os registros. Diferença de " + (totalLinha2 - incremento2) +
-									  					   "\n Recebemos em " + tempoCorrido + " Minutos");
+									  					   "\n Recebemos em " + tempoCorridoMin + " Min. e " + tempoCorridoSeg + " Seg.");
 						  }
 					});
 				}
-				mensagem += "Não foi recebido todos os registros. \n Diferença de " + (totalLinha2 - incremento2) + "\n Recebemos em " + tempoCorrido + " Minutos";
+				mensagem += "Não foi recebido todos os registros. \n Diferença de " + (totalLinha2 - incremento2) + "\n Recebemos em " + tempoCorridoMin + " Min. e " + tempoCorridoSeg + " Seg.";
 			}
 			
 		} catch (final FileNotFoundException e) {

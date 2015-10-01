@@ -37,11 +37,10 @@ public class UsuarioRotinas extends Rotinas {
         ContentValues dados = new ContentValues();
 
         if(dataHora == null) {
-            DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-            Calendar cal = Calendar.getInstance();
+            DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            //Calendar cal = Calendar.getInstance().getTime();
 
-
-            dados.put("DT_ULTIMO_RECEBIMENTO", cal.getTime().toString());
+            dados.put("DT_ULTIMO_RECEBIMENTO", dateFormat.format(Calendar.getInstance().getTime()));
         } else {
             dados.put("DT_ULTIMO_RECEBIMENTO", dataHora);
         }
@@ -52,6 +51,7 @@ public class UsuarioRotinas extends Rotinas {
 
         if(usuarioSQL.update(dados, "ID_USUA = " + funcoes.getValorXml("CodigoUsuario")) > 0){
             retorno = true;
+            funcoes.setValorXml("DataUltimoRecebimento", dados.get("DT_ULTIMO_RECEBIMENTO").toString());
         }
         return retorno;
     } // Fim atualizaDataHoraRecebimento
@@ -158,5 +158,27 @@ public class UsuarioRotinas extends Rotinas {
         }
 
         return usuario;
+    }
+
+    public String modoConexao(){
+        FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
+
+        try {
+            if (!funcoes.getValorXml("CodigoUsuario").equalsIgnoreCase(funcoes.NAO_ENCONTRADO)) {
+                UsuarioSQL usuarioSQL = new UsuarioSQL(context);
+                // Executa o sql para pegar os dados do usuario
+                Cursor dadosUsuario = usuarioSQL.query("ID_USUA = " + funcoes.getValorXml("CodigoUsuario"));
+
+                if (dadosUsuario != null && dadosUsuario.getCount() > 0){
+                    // Move para o primeiro
+                    dadosUsuario.moveToFirst();
+
+                    return dadosUsuario.getString(dadosUsuario.getColumnIndex("MODO_CONEXAO"));
+                }
+            }
+        } catch (Exception e){
+
+        }
+        return "";
     }
 }

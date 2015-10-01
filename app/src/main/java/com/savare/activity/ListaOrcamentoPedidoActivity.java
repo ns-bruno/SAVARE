@@ -587,7 +587,7 @@ public class ListaOrcamentoPedidoActivity extends Activity implements OnNavigati
 			// Seta o layout customizado para o dialog
 			dialogPeriodo.setContentView(R.layout.layout_dialog_periodo_data);
 			// Seta o titulo do dialog
-			dialogPeriodo.setTitle("Per�odo");
+			dialogPeriodo.setTitle(getResources().getString(R.string.periodo));
 			dialogPeriodo.setCancelable(true);
 
 			// Associa o campo do dialog customizado

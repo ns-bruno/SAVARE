@@ -227,7 +227,7 @@ public class OrcamentoRotinas extends Rotinas {
 	 * Retorno um lista de ids de orcamentos de acordo com o tipo
 	 * de orcamento passado por paramentro.
 	 * 
-	 * @param tipo
+	 * @param tipo - O = Orcamento, P = Pedido, E = Excluido, N = Pedidos Enviados
 	 * @param where
 	 * @return
 	 */
@@ -923,7 +923,7 @@ public class OrcamentoRotinas extends Rotinas {
 	/**
 	 * Funcao para retornar a quantidade de orcamento presente em uma lista.
 	 * 
-	 * @param tipo - O = Orcamento, P = Pedido, E = Excluido
+	 * @param tipo - O = Orcamento, P = Pedido, E = Excluido, N = Pedidos Enviados
 	 * @return
 	 */
 	public String quantidadeListaOrcamento(String tipo, String cidade, String where){

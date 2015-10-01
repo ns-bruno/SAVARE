@@ -109,6 +109,7 @@ public class EnviarOrcamentoFtpAsyncRotinas extends AsyncTask<String, String, In
 				String hostFtp = dadosUsuario.getString(dadosUsuario.getColumnIndex("IP_SERVIDOR_USUA"));
 				String usuarioFtp = dadosUsuario.getString(dadosUsuario.getColumnIndex("USUARIO_SERVIDOR_USUA"));
 				String senhaFtp = dadosUsuario.getString(dadosUsuario.getColumnIndex("SENHA_SERVIDOR_USUA"));
+				String pastaFtp = dadosUsuario.getString(dadosUsuario.getColumnIndex("PASTA_SERVIDOR_USUA"));
 
 				for (int i = 0; i < params.length; i++) {
 					// Passa por paramento o id do orcamento a ser gerado XML
@@ -129,8 +130,8 @@ public class EnviarOrcamentoFtpAsyncRotinas extends AsyncTask<String, String, In
 						}
 
 						try {
-							conexaoFtp.setConnectTimeout(10 * 1000);
-							conexaoFtp.setDefaultTimeout(30 * 1000);
+							conexaoFtp.setConnectTimeout(20 * 1000);
+							conexaoFtp.setDefaultTimeout(40 * 1000);
 
 							// Conecta com o servidor FTP usando a porta 21
 							conexaoFtp.connect(hostFtp);
@@ -163,11 +164,11 @@ public class EnviarOrcamentoFtpAsyncRotinas extends AsyncTask<String, String, In
 									conexaoFtp.setFileTransferMode(FTPClient.ASCII_FILE_TYPE);
 									conexaoFtp.setFileType(FTPClient.ASCII_FILE_TYPE);
 
-									String nomeDiretorioFtp = dadosUsuario.getString(dadosUsuario.getColumnIndex("LOGIN_USUA"));
+									//String nomeDiretorioFtp = dadosUsuario.getString(dadosUsuario.getColumnIndex("LOGIN_USUA"));
 
 									// Vai para uma pasta especifica no servidor FTP
-									if (!conexaoFtp.changeWorkingDirectory(nomeDiretorioFtp)) {
-										criarDiretorio(nomeDiretorioFtp);
+									if (!conexaoFtp.changeWorkingDirectory(pastaFtp.replace("/", ""))) {
+										criarDiretorio(pastaFtp.replace("/", ""));
 									}
                                     // Pega o Arquivo a ser enviado e transforma em um formato proprio para transferir
 									FileInputStream arqEnviar = new FileInputStream(localXml);
@@ -214,15 +215,15 @@ public class EnviarOrcamentoFtpAsyncRotinas extends AsyncTask<String, String, In
 							        conexaoFtp.setBufferSize(1024000);
 									
 									// Envia o arquivo
-									if (conexaoFtp.storeFile("arquivoDeEnvio.txt", arqEnviar)) {
+									if (conexaoFtp.storeFile("arquivoDeEnvio_" + funcoes.getValorXml("ChaveEmpresa") + ".txt", arqEnviar)) {
 										
 										if(telaChamada != TELA_RECEPTOR_ALARME){
 											publishProgress("Confirmando o envio do arquivo " + (i + 1) + " de " + params.length + ", aguarde...");
 										}
 
 										// Renomeia o arquivo enviado para checar se chegou no servidor FTP com  sucesso
-										if (renomeaArquivoFtp("arquivoDeEnvio.txt", nome)) {
-											
+										if (renomeaArquivoFtp("arquivoDeEnvio_" + funcoes.getValorXml("ChaveEmpresa") + ".txt", nome)) {
+
 											if(telaChamada != TELA_RECEPTOR_ALARME){
 												publishProgress("Arquvio " + (i + 1) + " de " + params.length + " enviado com sucesso, eliminando os arquivos temporarios, aguarde...");
 											}
@@ -286,7 +287,10 @@ public class EnviarOrcamentoFtpAsyncRotinas extends AsyncTask<String, String, In
 												}
 												// Incrementa o total de arquivos enviados com sucesso
 												totalEnviado++;
-												
+
+												// Marca nas propriedades interna da aplicacao que nao esta mais enviando dados
+												funcoes.setValorXml("ChaveEmpresa", "N");
+
 												if(qtdUpdate <= 0){
 													mensagemErro = mensagemErro + "Não foi possível marcar o pedido " + idOrcamento + " como enviado. \n";
 												} else {
