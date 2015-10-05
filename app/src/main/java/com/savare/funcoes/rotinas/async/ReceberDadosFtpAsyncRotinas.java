@@ -82,16 +82,20 @@ public class ReceberDadosFtpAsyncRotinas extends AsyncTask<String, String, Integ
 			
 			// Checa se retornou algum valor
 			if( (localDados != null) & (localDados.size() > 0)){
+
+				// Marca que a aplicacao nao esta mais recebendo dados
+				funcoes.setValorXml("RecebendoDados", "S");
+
+				((Activity) context).runOnUiThread(new Runnable() {
+					public void run() {
+						UsuarioRotinas usuarioRotinas = new UsuarioRotinas(context);
+						// Atualiza a data de recebimento dos dados
+						usuarioRotinas.atualizaDataHoraRecebimento(null);
+					}
+				});
+
 				// Passa por todos os registros
 				for (int i = 0; i < localDados.size(); i++) {
-
-					((Activity) context).runOnUiThread(new Runnable() {
-						public void run() {
-							UsuarioRotinas usuarioRotinas = new UsuarioRotinas(context);
-							// Atualiza a data de recebimento dos dados
-							usuarioRotinas.atualizaDataHoraRecebimento(null);
-						}
-					});
 
 					// Checa se que esta chamando esta classe eh o alarme
 					if(telaChamou == TELA_RECEPTOR_ALARME){
@@ -106,6 +110,9 @@ public class ReceberDadosFtpAsyncRotinas extends AsyncTask<String, String, Integ
 				}
 			
 			} else {
+				// Marca que a aplicacao nao esta mais recebendo dados
+				funcoes.setValorXml("RecebendoDados", "N");
+
 				// Checa se que esta chamando esta classe eh o alarme
 				if(telaChamou != TELA_RECEPTOR_ALARME){
 					((Activity) context).runOnUiThread(new Runnable() {
@@ -119,6 +126,10 @@ public class ReceberDadosFtpAsyncRotinas extends AsyncTask<String, String, Integ
 			}
 		
 		} catch (final Exception e) {
+
+			// Marca que a aplicacao nao esta mais recebendo dados
+			funcoes.setValorXml("RecebendoDados", "N");
+
 			// Checa se que esta chamando esta classe eh o alarme
 			if(telaChamou != TELA_RECEPTOR_ALARME){
 				((Activity) context).runOnUiThread(new Runnable() {

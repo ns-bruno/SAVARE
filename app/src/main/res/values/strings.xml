@@ -160,6 +160,9 @@
     <string name="pedido_numero">Pedido Nº </string>
     <string name="preparando_produtos">Preparando o(s) Produto(s)</string>
     <string name="periodo">Peíodo</string>
+    <string name="nao_foi_possivel_cadastrar">Não foi possível cadastrar.</string>
+    <string name="nao_foi_possivel_atualizar">Não foi possível atualizar.</string>
+    <string name="desmarcar_transmissao_dados">Desmarcar as transmissões de dados</string>
 
 
 </resources>

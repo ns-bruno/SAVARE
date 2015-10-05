@@ -110,12 +110,12 @@ public class ImportarDadosTxtRotinas {
 		this.localDados = localDados;
 		this.progressRecebimentoDados = progressBar;
 		
-		((Activity) context).runOnUiThread(new Runnable() {
+		/*((Activity) context).runOnUiThread(new Runnable() {
 			  public void run() {
 				progressRecebimentoDados.setVisibility(View.VISIBLE);
 				progressRecebimentoDados.setIndeterminate(true);
 			  }
-		});
+		});*/
 	}
 	
 	public ImportarDadosTxtRotinas(Context context, String localDados, ProgressBar progressBar, TextView textMensagem) {
@@ -134,6 +134,14 @@ public class ImportarDadosTxtRotinas {
 	}
 	
 	public void importarDados(){
+
+		((Activity) context).runOnUiThread(new Runnable() {
+			public void run() {
+				progressRecebimentoDados.setVisibility(View.VISIBLE);
+				progressRecebimentoDados.setIndeterminate(true);
+			}
+		});
+
 		final Calendar calendario = Calendar.getInstance();
 		
 		long tempoInicial = calendario.getTimeInMillis();
@@ -676,7 +684,7 @@ public class ImportarDadosTxtRotinas {
 					});
 				}
 				mensagem += "Recebemos todos os registros.(" + totalLinha + ") \n";
-			}else {
+			} else {
 				final int totalLinha2 = totalLinha;
 				final int incremento2 = incremento;
 				
@@ -691,24 +699,21 @@ public class ImportarDadosTxtRotinas {
 				}
 				mensagem += "Não foi recebido todos os registros. \n Diferença de " + (totalLinha2 - incremento2) + "\n Recebemos em " + tempoCorridoMin + " Min. e " + tempoCorridoSeg + " Seg.";
 			}
+			// Marca a aplicacao que nao esta mais recebendo dados
+			funcoes.setValorXml("RecebendoDados", "N");
 			
-		} catch (final FileNotFoundException e) {
+		} catch (final Exception e) {
 			
 			mensagem += "Não foi possível escanear os dados do arquivo. \n" + e.getMessage();
 			
 			if(telaChamou != TELA_RECEPTOR_ALARME){
-				
-				progressRecebimentoDados.setVisibility(View.INVISIBLE);
-				textMensagemProcesso.setText(mensagem);
-				
 				((Activity) context).runOnUiThread(new Runnable() {
-					  public void run() {
-						  // Atualiza o texto da tela de sincronizacao
-						  textMensagemProcesso.setText(mensagem + "\n" + e.getMessage());
-						  progressRecebimentoDados.setVisibility(View.GONE);
-					  }
+					public void run() {
+						progressRecebimentoDados.setVisibility(View.INVISIBLE);
+						textMensagemProcesso.setText(mensagem + "\n" + e.getMessage());
+					}
 				});
-				
+
 				ContentValues dadosMensagem = new ContentValues();
 				
 		    	dadosMensagem.put("comando", 0);
@@ -721,41 +726,38 @@ public class ImportarDadosTxtRotinas {
 				 
 				funcoes.menssagem(dadosMensagem);
 			}
-			
-		
-		} catch (final Exception e) {
+
+		} /*catch (final FileNotFoundException e) {
 			
 			mensagem += "Não foi possível escanear os dados do arquivo. \n" + e.getMessage() + "\n";
 			
 			if(telaChamou != TELA_RECEPTOR_ALARME){
-				
-				progressRecebimentoDados.setVisibility(View.INVISIBLE);
-				textMensagemProcesso.setText(mensagem);
-				
+
 				((Activity) context).runOnUiThread(new Runnable() {
-					  public void run() {
-						  // Atualiza o texto da tela de sincronizacao
-						  textMensagemProcesso.setText(e.getMessage());
-						  
-						  ContentValues dadosMensagem = new ContentValues();
-							
-						  FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
-						  
-					    	dadosMensagem.put("comando", 0);
-							dadosMensagem.put("tela", "ReceberDadosFtpAsyncRotinas");
-							dadosMensagem.put("mensagem", mensagem);
-							dadosMensagem.put("dados", e.toString());
-							dadosMensagem.put("usuario", funcoes.getValorXml("Usuario"));
-							dadosMensagem.put("empresa", funcoes.getValorXml("Empresa"));
-							dadosMensagem.put("email", funcoes.getValorXml("Email"));
-							 
-							funcoes.menssagem(dadosMensagem);
-					  }
+					public void run() {
+
+						progressRecebimentoDados.setVisibility(View.INVISIBLE);
+						textMensagemProcesso.setText(mensagem + "\n" + e.getMessage());
+
+						ContentValues dadosMensagem = new ContentValues();
+
+						FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
+
+						dadosMensagem.put("comando", 0);
+						dadosMensagem.put("tela", "ReceberDadosFtpAsyncRotinas");
+						dadosMensagem.put("mensagem", mensagem);
+						dadosMensagem.put("dados", e.toString());
+						dadosMensagem.put("usuario", funcoes.getValorXml("Usuario"));
+						dadosMensagem.put("empresa", funcoes.getValorXml("Empresa"));
+						dadosMensagem.put("email", funcoes.getValorXml("Email"));
+
+						funcoes.menssagem(dadosMensagem);
+					}
 				});
 			}
-		}
+		}*/
 		// Checa se que esta chamando esta classe eh o alarme
-		if( (mensagem != null) && (mensagem.length() > 1) && (telaChamou == TELA_RECEPTOR_ALARME)){
+		if( (mensagem != null) && (mensagem.length() > 0) && (telaChamou == TELA_RECEPTOR_ALARME)){
 			// Cria a intent com identificacao do alarme
 			Intent intent = new Intent("NOTIFICACAO_SAVARE");
 			intent.putExtra("TICKER", "Importa��o dos Dados");
@@ -849,15 +851,13 @@ public class ImportarDadosTxtRotinas {
 		
 		// Checa se a finalidade eh inserir
 		if(FINALIDADE.equalsIgnoreCase("I")){
-			Runnable runnable = new Runnable() {
-				@Override
+			((Activity) context).runOnUiThread(new Runnable() {
 				public void run() {
 					//empresaSql.insertOrReplace(dadosEmpresa);
 					empresaSql.insertOrReplaceFast(sql, argumentoSql);
 				}
-			};
-			new Thread(runnable).start();
-	
+			});
+
 			// Checa se a finalidade eh atualizar
 		} else if(FINALIDADE.equalsIgnoreCase("U")){
 			((Activity) context).runOnUiThread(new Runnable() {
@@ -1080,34 +1080,28 @@ public class ImportarDadosTxtRotinas {
 		
 		// Checa se a finalidade eh inserir
 		if(FINALIDADE.equalsIgnoreCase("I")){
-			Runnable runnable = new Runnable() {
-				@Override
+			((Activity) context).runOnUiThread(new Runnable() {
 				public void run() {
 					//areasSql.insertOrReplace(dadosAreas);
 					areasSql.insertOrReplaceFast(sql, argumentoSql);
 				}
-			};
-			new Thread(runnable).start();
-			
+			});
+
 		// Checa se a finalidade eh atualizar
 		} else if(FINALIDADE.equalsIgnoreCase("U")){
-			Runnable runnable = new Runnable() {
-				@Override
+			((Activity) context).runOnUiThread(new Runnable() {
 				public void run() {
 					areasSql.update(dadosAreas, "ID_CFAAREAS = " + idAreas);
 				}
-			};
-			new Thread(runnable).start();
-			
+			});
+
 		// Checa se a finalidade eh deletar
 		} else if(FINALIDADE.equalsIgnoreCase("D")){
-			Runnable runnable = new Runnable() {
-				@Override
+			((Activity) context).runOnUiThread(new Runnable() {
 				public void run() {
 					areasSql.delete("ID_CFAAREAS = " + idAreas);
 				}
-			};
-			new Thread(runnable).start();
+			});
 		}
 			  
 		//dadosAreas.clear();
@@ -1151,34 +1145,28 @@ public class ImportarDadosTxtRotinas {
 		
 		// Checa se a finalidade eh inserir
 		if(FINALIDADE.equalsIgnoreCase("I")){
-			Runnable runnable = new Runnable() {
-				@Override
+			((Activity) context).runOnUiThread(new Runnable() {
 				public void run() {
 					//atividadeSql.insertOrReplace(dadosAtividade);
 					atividadeSql.insertOrReplaceFast(sql, argumentoSql);
 				}
-			};
-			new Thread(runnable).start();
-			
+			});
+
 		// Checa se a finalidade eh atualizar
 		} else if(FINALIDADE.equalsIgnoreCase("U")){
-			Runnable runnable = new Runnable() {
-				@Override
+			((Activity) context).runOnUiThread(new Runnable() {
 				public void run() {
 					atividadeSql.update(dadosAtividade, "ID_CFAATIVI = " + idAtivi);
 				}
-			};
-			new Thread(runnable).start();
-			
+			});
+
 		// Checa se a finalidade eh deletar
 		} else if(FINALIDADE.equalsIgnoreCase("D")){
-			Runnable runnable = new Runnable() {
-				@Override
+			((Activity) context).runOnUiThread(new Runnable() {
 				public void run() {
 					atividadeSql.delete("ID_CFAATIVI = " + idAtivi);
 				}
-			};
-			new Thread(runnable).start();
+			});
 		}
 		//dadosAtividade.clear();
 	} // Fim atividade
@@ -1228,34 +1216,28 @@ public class ImportarDadosTxtRotinas {
 		
 		// Checa se a finalidade eh inserir
 		if(FINALIDADE.equalsIgnoreCase("I")){
-			Runnable runnable = new Runnable() {
-				@Override
+			((Activity) context).runOnUiThread(new Runnable() {
 				public void run() {
 					//statusSql.insertOrReplace(dadosStatus);
 					statusSql.insertOrReplaceFast(sql, argumentoSql);
 				}
-			};
-			new Thread(runnable).start();
-			
+			});
+
 		// Checa se a finalidade eh atualizar
 		} else if(FINALIDADE.equalsIgnoreCase("U")){
-			Runnable runnable = new Runnable() {
-				@Override
+			((Activity) context).runOnUiThread(new Runnable() {
 				public void run() {
 					statusSql.update(dadosStatus, "ID_CFASTATU = " + idStatu);
 				}
-			};
-			new Thread(runnable).start();
-			
+			});
+
 		// Checa se a finalidade eh deletar
 		} else if(FINALIDADE.equalsIgnoreCase("D")){
-			Runnable runnable = new Runnable() {
-				@Override
+			((Activity) context).runOnUiThread(new Runnable() {
 				public void run() {
 					statusSql.delete("ID_CFASTATU = " + idStatu);
 				}
-			};
-			new Thread(runnable).start();
+			});
 		}
 		//dadosStatus.clear();
 	} // Fim Status
@@ -1295,34 +1277,28 @@ public class ImportarDadosTxtRotinas {
 		
 		// Checa se a finalidade eh inserir
 		if(FINALIDADE.equalsIgnoreCase("I")){
-			Runnable runnable = new Runnable() {
-				@Override
+			((Activity) context).runOnUiThread(new Runnable() {
 				public void run() {
 					//tipoDocumentoSql.insertOrReplace(dadosTipoDoc);
 					tipoDocumentoSql.insertOrReplaceFast(sql, argumentoSql);
 				}
-			};
-			new Thread(runnable).start();
-			
+			});
+
 		// Checa se a finalidade eh atualizar
 		} else if(FINALIDADE.equalsIgnoreCase("U")){
-			Runnable runnable = new Runnable() {
-				@Override
+			((Activity) context).runOnUiThread(new Runnable() {
 				public void run() {
 					tipoDocumentoSql.update(dadosTipoDoc, "ID_CFATPDOC = " + idTpdoc);
 				}
-			};
-			new Thread(runnable).start();
-			
+			});
+
 		// Checa se a finalidade eh deletar
 		} else if(FINALIDADE.equalsIgnoreCase("D")){
-			Runnable runnable = new Runnable() {
-				@Override
+			((Activity) context).runOnUiThread(new Runnable() {
 				public void run() {
 					tipoDocumentoSql.delete("ID_CFATPDOC = " + idTpdoc);
 				}
-			};
-			new Thread(runnable).start();
+			});
 		}
 	} // FIm TipoDocumento
 	
@@ -1354,34 +1330,28 @@ public class ImportarDadosTxtRotinas {
 		
 		// Checa se a finalidade eh inserir
 		if(FINALIDADE.equalsIgnoreCase("I")){
-			Runnable runnable = new Runnable() {
-				@Override
+			((Activity) context).runOnUiThread(new Runnable() {
 				public void run() {
 					//cartaoSql.insertOrReplace(dadosCartao);
 					cartaoSql.insertOrReplaceFast(sql, argumentoSql);
 				}
-			};
-			new Thread(runnable).start();
-			
+			});
+
 		// Checa se a finalidade eh atualizar
 		} else if(FINALIDADE.equalsIgnoreCase("U")){
-			Runnable runnable = new Runnable() {
-				@Override
+			((Activity) context).runOnUiThread(new Runnable() {
 				public void run() {
 					cartaoSql.update(dadosCartao, "ID_CFACCRED = " + idCred);
 				}
-			};
-			new Thread(runnable).start();
-			
+			});
+
 		// Checa se a finalidade eh deletar
 		} else if(FINALIDADE.equalsIgnoreCase("D")){
-			Runnable runnable = new Runnable() {
-				@Override
+			((Activity) context).runOnUiThread(new Runnable() {
 				public void run() {
 					cartaoSql.delete("ID_CFACCRED = " + idCred);
 				}
-			};
-			new Thread(runnable).start();
+			});
 		}
 	}
 	
@@ -1419,34 +1389,28 @@ public class ImportarDadosTxtRotinas {
 		
 		// Checa se a finalidade eh inserir
 		if(FINALIDADE.equalsIgnoreCase("I")){
-			Runnable runnable = new Runnable() {
-				@Override
+			((Activity) context).runOnUiThread(new Runnable() {
 				public void run() {
 					//portadorSql.insertOrReplace(dadosPortador);
 					portadorSql.insertOrReplaceFast(sql, argumentoSql);
 				}
-			};
-			new Thread(runnable).start();
-			
+			});
+
 		// Checa se a finalidade eh atualizar
 		} else if(FINALIDADE.equalsIgnoreCase("U")){
-			Runnable runnable = new Runnable() {
-				@Override
+			((Activity) context).runOnUiThread(new Runnable() {
 				public void run() {
 					portadorSql.update(dadosPortador, "ID_CFAPORTA = " + idPorta);
 				}
-			};
-			new Thread(runnable).start();
-			
+			});
+
 		// Checa se a finalidade eh deletar
 		} else if(FINALIDADE.equalsIgnoreCase("D")){
-			Runnable runnable = new Runnable() {
-				@Override
+			((Activity) context).runOnUiThread(new Runnable() {
 				public void run() {
 					portadorSql.delete("ID_CFAPORTA = " + idPorta);
 				}
-			};
-			new Thread(runnable).start();
+			});
 		}
 	} // Fim Portador
 	
@@ -1489,34 +1453,28 @@ public class ImportarDadosTxtRotinas {
 				
 		// Checa se a finalidade eh inserir
 		if(FINALIDADE.equalsIgnoreCase("I")){
-			Runnable runnable = new Runnable() {
-				@Override
+			((Activity) context).runOnUiThread(new Runnable() {
 				public void run() {
 					//profissaoSql.insertOrReplace(dadosProfissao);
 					profissaoSql.insertOrReplaceFast(sql, argumentoSql);
 				}
-			};
-			new Thread(runnable).start();
-			
+			});
+
 		// Checa se a finalidade eh atualizar
 		} else if(FINALIDADE.equalsIgnoreCase("U")){
-			Runnable runnable = new Runnable() {
-				@Override
+			((Activity) context).runOnUiThread(new Runnable() {
 				public void run() {
 					profissaoSql.update(dadosProfissao, "ID_CFAPROFI = " + idProfi);
 				}
-			};
-			new Thread(runnable).start();
-			
+			});
+
 		// Checa se a finalidade eh deletar
 		} else if(FINALIDADE.equalsIgnoreCase("D")){
-			Runnable runnable = new Runnable() {
-				@Override
+			((Activity) context).runOnUiThread(new Runnable() {
 				public void run() {
 					profissaoSql.delete("ID_CFAPROFI = " + idProfi);
 				}
-			};
-			new Thread(runnable).start();
+			});
 		}
 	}
 
@@ -1559,34 +1517,28 @@ public class ImportarDadosTxtRotinas {
 		
 		// Checa se a finalidade eh inserir
 		if(FINALIDADE.equalsIgnoreCase("I")){
-			Runnable runnable = new Runnable() {
-				@Override
+			((Activity) context).runOnUiThread(new Runnable() {
 				public void run() {
 					//tipoClienteSql.insertOrReplace(dadosTipoCliente);
 					tipoClienteSql.insertOrReplaceFast(sql, argumentoSql);
 				}
-			};
-			new Thread(runnable).start();
-			
+			});
+
 		// Checa se a finalidade eh atualizar
 		} else if(FINALIDADE.equalsIgnoreCase("U")){
-			Runnable runnable = new Runnable() {
-				@Override
+			((Activity) context).runOnUiThread(new Runnable() {
 				public void run() {
 					tipoClienteSql.update(dadosTipoCliente, "ID_CFATPCLI = " + idTpCli);
 				}
-			};
-			new Thread(runnable).start();
-			
+			});
+
 		// Checa se a finalidade eh deletar
 		} else if(FINALIDADE.equalsIgnoreCase("D")){
-			Runnable runnable = new Runnable() {
-				@Override
+			((Activity) context).runOnUiThread(new Runnable() {
 				public void run() {
 					tipoClienteSql.delete("ID_CFATPCLI = " + idTpCli);
 				}
-			};
-			new Thread(runnable).start();
+			});
 		}
 	} // Fim TipoCliente
 	
@@ -1626,33 +1578,27 @@ public class ImportarDadosTxtRotinas {
 		
 		// Checa se a finalidade eh inserir
 		if(FINALIDADE.equalsIgnoreCase("I")){
-			Runnable runnable = new Runnable() {
-				@Override
+			((Activity) context).runOnUiThread(new Runnable() {
 				public void run() {
 					estadoSql.insertOrReplace(dadosEstado);
 				}
-			};
-			new Thread(runnable).start();
-			
+			});
+
 		// Checa se a finalidade eh atualizar
 		} else if(FINALIDADE.equalsIgnoreCase("U")){
-			Runnable runnable = new Runnable() {
-				@Override
+			((Activity) context).runOnUiThread(new Runnable() {
 				public void run() {
 					estadoSql.update(dadosEstado, "ID_CFAESTAD = " + idEstad);
 				}
-			};
-			new Thread(runnable).start();
-			
+			});
+
 		// Checa se a finalidade eh deletar
 		} else if(FINALIDADE.equalsIgnoreCase("D")){
-			Runnable runnable = new Runnable() {
-				@Override
+			((Activity) context).runOnUiThread(new Runnable() {
 				public void run() {
 					estadoSql.delete("ID_CFAESTAD = " + idEstad);
 				}
-			};
-			new Thread(runnable).start();
+			});
 		}
 	} // Fim estado
 	
@@ -1689,34 +1635,28 @@ public class ImportarDadosTxtRotinas {
 		
 		// Checa se a finalidade eh inserir
 		if(FINALIDADE.equalsIgnoreCase("I")){
-			Runnable runnable = new Runnable() {
-				@Override
+			((Activity) context).runOnUiThread(new Runnable() {
 				public void run() {
 					//cidadeSql.insertOrReplace(dadosCidade);
 					cidadeSql.insertOrReplaceFast(sql, argumentoSql);
 				}
-			};
-			new Thread(runnable).start();
-			
+			});
+
 		// Checa se a finalidade eh atualizar
 		} else if(FINALIDADE.equalsIgnoreCase("U")){
-			Runnable runnable = new Runnable() {
-				@Override
+			((Activity) context).runOnUiThread(new Runnable() {
 				public void run() {
 					cidadeSql.update(dadosCidade, "ID_CFACIDAD = " + idCidade);
 				}
-			};
-			new Thread(runnable).start();
-			
+			});
+
 		// Checa se a finalidade eh deletar
 		} else if(FINALIDADE.equalsIgnoreCase("D")){
-			Runnable runnable = new Runnable() {
-				@Override
+			((Activity) context).runOnUiThread(new Runnable() {
 				public void run() {
 					cidadeSql.delete("ID_CFACIDAD = " + idCidade);
 				}
-			};
-			new Thread(runnable).start();
+			});
 		}
 	} // Fim Cidade
 	
@@ -1770,34 +1710,28 @@ public class ImportarDadosTxtRotinas {
 		
 		// Checa se a finalidade eh inserir
 		if(FINALIDADE.equalsIgnoreCase("I")){
-			Runnable runnable = new Runnable() {
-				@Override
+			((Activity) context).runOnUiThread(new Runnable() {
 				public void run() {
 					//enderecoSql.insertOrReplace(dadosEndereco);
 					enderecoSql.insertOrReplaceFast(sql, argumentoSql);
 				}
-			};
-			new Thread(runnable).start();
-			
+			});
+
 		// Checa se a finalidade eh atualizar
 		} else if(FINALIDADE.equalsIgnoreCase("U")){
-			Runnable runnable = new Runnable() {
-				@Override
+			((Activity) context).runOnUiThread(new Runnable() {
 				public void run() {
 					enderecoSql.update(dadosEndereco, "ID_CFAENDER = " + idEnder);
 				}
-			};
-			new Thread(runnable).start();
-			
+			});
+
 		// Checa se a finalidade eh deletar
 		} else if(FINALIDADE.equalsIgnoreCase("D")){
-			Runnable runnable = new Runnable() {
-				@Override
+			((Activity) context).runOnUiThread(new Runnable() {
 				public void run() {
 					enderecoSql.delete("ID_CFAENDER = " + idEnder);
 				}
-			};
-			new Thread(runnable).start();
+			});
 		}
 	} // FIm Endereco
 	
@@ -1878,34 +1812,28 @@ public class ImportarDadosTxtRotinas {
 		
 		// Checa se a finalidade eh inserir
 		if(FINALIDADE.equalsIgnoreCase("I")){
-			Runnable runnable = new Runnable() {
-				@Override
+			((Activity) context).runOnUiThread(new Runnable() {
 				public void run() {
 					//parametrosSql.insertOrReplace(dadosParametro);
 					parametrosSql.insertOrReplaceFast(sql, argumentoSql);
 				}
-			};
-			new Thread(runnable).start();
-			
+			});
+
 		// Checa se a finalidade eh atualizar
 		} else if(FINALIDADE.equalsIgnoreCase("U")){
-			Runnable runnable = new Runnable() {
-				@Override
+			((Activity) context).runOnUiThread(new Runnable() {
 				public void run() {
 					parametrosSql.update(dadosParametro, "ID_CFAPARAM = " + idParam);
 				}
-			};
-			new Thread(runnable).start();
-			
+			});
+
 		// Checa se a finalidade eh deletar
 		} else if(FINALIDADE.equalsIgnoreCase("D")){
-			Runnable runnable = new Runnable() {
-				@Override
+			((Activity) context).runOnUiThread(new Runnable() {
 				public void run() {
 					parametrosSql.delete("ID_CFAPARAM = " + idParam);
 				}
-			};
-			new Thread(runnable).start();
+			});
 		}
 	} // Fim Parametros
 
@@ -1935,34 +1863,28 @@ public class ImportarDadosTxtRotinas {
 		
 		// Checa se a finalidade eh inserir
 		if(FINALIDADE.equalsIgnoreCase("I")){
-			Runnable runnable = new Runnable() {
-				@Override
+			((Activity) context).runOnUiThread(new Runnable() {
 				public void run() {
 					//classeSql.insertOrReplace(dadosClasse);
 					classeSql.insertOrReplaceFast(sql, argumentoSql);
 				}
-			};
-			new Thread(runnable).start();
-			
+			});
+
 		// Checa se a finalidade eh atualizar
 		} else if(FINALIDADE.equalsIgnoreCase("U")){
-			Runnable runnable = new Runnable() {
-				@Override
+			((Activity) context).runOnUiThread(new Runnable() {
 				public void run() {
 					classeSql.update(dadosClasse, "ID_AEACLASE = " + idClase);
 				}
-			};
-			new Thread(runnable).start();
-			
+			});
+
 		// Checa se a finalidade eh deletar
 		} else if(FINALIDADE.equalsIgnoreCase("D")){
-			Runnable runnable = new Runnable() {
-				@Override
+			((Activity) context).runOnUiThread(new Runnable() {
 				public void run() {
 					classeSql.delete("ID_AEACLASE = " + idClase);
 				}
-			};
-			new Thread(runnable).start();
+			});
 		}
 	} // FIm classe
 	
@@ -1997,34 +1919,28 @@ public class ImportarDadosTxtRotinas {
 		
 		// Checa se a finalidade eh inserir
 		if(FINALIDADE.equalsIgnoreCase("I")){
-			Runnable runnable = new Runnable() {
-				@Override
+			((Activity) context).runOnUiThread(new Runnable() {
 				public void run() {
 					//unVendaSql.insertOrReplace(dadosUnVenda);
 					unVendaSql.insertOrReplaceFast(sql, argumentoSql);
 				}
-			};
-			new Thread(runnable).start();
-			
+			});
+
 		// Checa se a finalidade eh atualizar
 		} else if(FINALIDADE.equalsIgnoreCase("U")){
-			Runnable runnable = new Runnable() {
-				@Override
+			((Activity) context).runOnUiThread(new Runnable() {
 				public void run() {
 					unVendaSql.update(dadosUnVenda, "ID_AEAUNVEN = " + idUnVen);
 				}
-			};
-			new Thread(runnable).start();
-			
+			});
+
 		// Checa se a finalidade eh deletar
 		} else if(FINALIDADE.equalsIgnoreCase("D")){
-			Runnable runnable = new Runnable() {
-				@Override
+			((Activity) context).runOnUiThread(new Runnable() {
 				public void run() {
 					unVendaSql.delete("ID_AEAUNVEN = " + idUnVen);
 				}
-			};
-			new Thread(runnable).start();
+			});
 		}
 	} // Fim UnidadeVenda
 	
@@ -2062,34 +1978,28 @@ public class ImportarDadosTxtRotinas {
 		
 		// Checa se a finalidade eh inserir
 		if(FINALIDADE.equalsIgnoreCase("I")){
-			Runnable runnable = new Runnable() {
-				@Override
+			((Activity) context).runOnUiThread(new Runnable() {
 				public void run() {
 					//estoqueSql.insertOrReplace(dadosEstoque);
 					estoqueSql.insertOrReplaceFast(sql, argumentoSql);
 				}
-			};
-			new Thread(runnable).start();
-			
+			});
+
 		// Checa se a finalidade eh atualizar
 		} else if(FINALIDADE.equalsIgnoreCase("U")){
-			Runnable runnable = new Runnable() {
-				@Override
+			((Activity) context).runOnUiThread(new Runnable() {
 				public void run() {
 					estoqueSql.update(dadosEstoque, "ID_AEAESTOQ = " + idEstoq);
 				}
-			};
-			new Thread(runnable).start();
-			
+			});
+
 		// Checa se a finalidade eh deletar
 		} else if(FINALIDADE.equalsIgnoreCase("D")){
-			Runnable runnable = new Runnable() {
-				@Override
+			((Activity) context).runOnUiThread(new Runnable() {
 				public void run() {
 					estoqueSql.delete("ID_AEAESTOQ = " + idEstoq);
 				}
-			};
-			new Thread(runnable).start();
+			});
 		}
 	} // Fim Estoque
 	
@@ -2148,34 +2058,28 @@ public class ImportarDadosTxtRotinas {
 		
 		// Checa se a finalidade eh inserir
 		if(FINALIDADE.equalsIgnoreCase("I")){
-			Runnable runnable = new Runnable() {
-				@Override
+			((Activity) context).runOnUiThread(new Runnable() {
 				public void run() {
 					//gradeSql.insertOrReplace(dadosGrade);
 					orcamentoSql.insertOrReplaceFast(sql, argumentoSql);
 				}
-			};
-			new Thread(runnable).start();
-			
+			});
+
 		// Checa se a finalidade eh atualizar
 		} else if(FINALIDADE.equalsIgnoreCase("U")){
-			Runnable runnable = new Runnable() {
-				@Override
+			((Activity) context).runOnUiThread(new Runnable() {
 				public void run() {
 					orcamentoSql.update(dadosOrcamento, "GUID = " + guid);
 				}
-			};
-			new Thread(runnable).start();
-			
+			});
+
 		// Checa se a finalidade eh deletar
 		} else if(FINALIDADE.equalsIgnoreCase("D")){
-			Runnable runnable = new Runnable() {
-				@Override
+			((Activity) context).runOnUiThread(new Runnable() {
 				public void run() {
 					orcamentoSql.delete("GUID = " + guid);
 				}
-			};
-			new Thread(runnable).start();
+			});
 		}
 	} // Fim importarRegistroOrcamento
 	
@@ -2206,34 +2110,28 @@ public class ImportarDadosTxtRotinas {
 		final String[] argumentoSql = gradeSql.argumentoStatement(dadosGrade);
 		// Checa se a finalidade eh inserir
 		if(FINALIDADE.equalsIgnoreCase("I")){
-			Runnable runnable = new Runnable() {
-				@Override
+			((Activity) context).runOnUiThread(new Runnable() {
 				public void run() {
 					//gradeSql.insertOrReplace(dadosGrade);
 					gradeSql.insertOrReplaceFast(sql, argumentoSql);
 				}
-			};
-			new Thread(runnable).start();
-			
+			});
+
 		// Checa se a finalidade eh atualizar
 		} else if(FINALIDADE.equalsIgnoreCase("U")){
-			Runnable runnable = new Runnable() {
-				@Override
+			((Activity) context).runOnUiThread(new Runnable() {
 				public void run() {
 					gradeSql.update(dadosGrade, "ID_AEAGRADE = " + idGrade);
 				}
-			};
-			new Thread(runnable).start();
-			
+			});
+
 		// Checa se a finalidade eh deletar
 		} else if(FINALIDADE.equalsIgnoreCase("D")){
-			Runnable runnable = new Runnable() {
-				@Override
+			((Activity) context).runOnUiThread(new Runnable() {
 				public void run() {
 					gradeSql.delete("ID_AEAGRADE = " + idGrade);
 				}
-			};
-			new Thread(runnable).start();
+			});
 		}
 	} // FIm grade
 	
@@ -2261,34 +2159,28 @@ public class ImportarDadosTxtRotinas {
 		final String[] argumentoSql = marcaSql.argumentoStatement(dadosMarca);
 		// Checa se a finalidade eh inserir
 		if(FINALIDADE.equalsIgnoreCase("I")){
-			Runnable runnable = new Runnable() {
-				@Override
+			((Activity) context).runOnUiThread(new Runnable() {
 				public void run() {
 					//marcaSql.insertOrReplace(dadosMarca);
 					marcaSql.insertOrReplaceFast(sql, argumentoSql);
 				}
-			};
-			new Thread(runnable).start();
-			
+			});
+
 		// Checa se a finalidade eh atualizar
 		} else if(FINALIDADE.equalsIgnoreCase("U")){
-			Runnable runnable = new Runnable() {
-				@Override
+			((Activity) context).runOnUiThread(new Runnable() {
 				public void run() {
 					marcaSql.update(dadosMarca, "ID_AEAMARCA = " + idMarca);
 				}
-			};
-			new Thread(runnable).start();
-			
+			});
+
 		// Checa se a finalidade eh deletar
 		} else if(FINALIDADE.equalsIgnoreCase("D")){
-			Runnable runnable = new Runnable() {
-				@Override
+			((Activity) context).runOnUiThread(new Runnable() {
 				public void run() {
 					marcaSql.delete("ID_AEAMARCA = " + idMarca);
 				}
-			};
-			new Thread(runnable).start();
+			});
 		}
 	} // FIm Marca
 	
@@ -2342,34 +2234,28 @@ public class ImportarDadosTxtRotinas {
 		
 		// Checa se a finalidade eh inserir
 		if(FINALIDADE.equalsIgnoreCase("I")){
-			Runnable runnable = new Runnable() {
-				@Override
+			((Activity) context).runOnUiThread(new Runnable() {
 				public void run() {
 					//produtoSql.insertOrReplace(dadosProduto);
 					produtoSql.insertOrReplaceFast(sql, argumentoSql);
 				}
-			};
-			new Thread(runnable).start();
-			
+			});
+
 		// Checa se a finalidade eh atualizar
 		} else if(FINALIDADE.equalsIgnoreCase("U")){
-			Runnable runnable = new Runnable() {
-				@Override
+			((Activity) context).runOnUiThread(new Runnable() {
 				public void run() {
 					produtoSql.update(dadosProduto, "ID_AEAPRODU = " + idProdu);
 				}
-			};
-			new Thread(runnable).start();
-			
+			});
+
 		// Checa se a finalidade eh deletar
 		} else if(FINALIDADE.equalsIgnoreCase("D")){
-			Runnable runnable = new Runnable() {
-				@Override
+			((Activity) context).runOnUiThread(new Runnable() {
 				public void run() {
 					produtoSql.delete("ID_AEAPRODU = " + idProdu);
 				}
-			};
-			new Thread(runnable).start();
+			});
 		}
 	} // Fim Produto
 	
@@ -2415,34 +2301,28 @@ public class ImportarDadosTxtRotinas {
 		
 		// Checa se a finalidade eh inserir
 		if(FINALIDADE.equalsIgnoreCase("I")){
-			Runnable runnable = new Runnable() {
-				@Override
+			((Activity) context).runOnUiThread(new Runnable() {
 				public void run() {
 					//embalagemSql.insertOrReplace(dadosEmbal);
 					embalagemSql.insertOrReplaceFast(sql, argumentoSql);
 				}
-			};
-			new Thread(runnable).start();
-			
+			});
+
 		// Checa se a finalidade eh atualizar
 		} else if(FINALIDADE.equalsIgnoreCase("U")){
-			Runnable runnable = new Runnable() {
-				@Override
+			((Activity) context).runOnUiThread(new Runnable() {
 				public void run() {
 					embalagemSql.update(dadosEmbal, "ID_AEAEMBAL = " + idEmbal);
 				}
-			};
-			new Thread(runnable).start();
-			
+			});
+
 		// Checa se a finalidade eh deletar
 		} else if(FINALIDADE.equalsIgnoreCase("D")){
-			Runnable runnable = new Runnable() {
-				@Override
+			((Activity) context).runOnUiThread(new Runnable() {
 				public void run() {
 					embalagemSql.delete("ID_AEAEMBAL = " + idEmbal);
 				}
-			};
-			new Thread(runnable).start();
+			});
 		}
 	} // FIm embalagem
 	
@@ -2509,34 +2389,28 @@ public class ImportarDadosTxtRotinas {
 		
 		// Checa se a finalidade eh inserir
 		if(FINALIDADE.equalsIgnoreCase("I")){
-			Runnable runnable = new Runnable() {
-				@Override
+			((Activity) context).runOnUiThread(new Runnable() {
 				public void run() {
 					//produtoLojaSql.insertOrReplace(dadosPLoja);
 					produtoLojaSql.insertOrReplaceFast(sql, argumentoSql);
 				}
-			};
-			new Thread(runnable).start();
-			
+			});
+
 		// Checa se a finalidade eh atualizar
 		} else if(FINALIDADE.equalsIgnoreCase("U")){
-			Runnable runnable = new Runnable() {
-				@Override
+			((Activity) context).runOnUiThread(new Runnable() {
 				public void run() {
 					produtoLojaSql.update(dadosPLoja, "ID_AEAPLOJA = " + idPLoja);
 				}
-			};
-			new Thread(runnable).start();
-			
+			});
+
 		// Checa se a finalidade eh deletar
 		} else if(FINALIDADE.equalsIgnoreCase("D")){
-			Runnable runnable = new Runnable() {
-				@Override
+			((Activity) context).runOnUiThread(new Runnable() {
 				public void run() {
 					produtoLojaSql.delete("ID_AEAPLOJA = " + idPLoja);
 				}
-			};
-			new Thread(runnable).start();
+			});
 		}
 	} // Fim PLoja
 	
@@ -2588,34 +2462,28 @@ public class ImportarDadosTxtRotinas {
 		
 		// Checa se a finalidade eh inserir
 		if(FINALIDADE.equalsIgnoreCase("I")){
-			Runnable runnable = new Runnable() {
-				@Override
+			((Activity) context).runOnUiThread(new Runnable() {
 				public void run() {
 					//pagamentoSql.insertOrReplace(dadosPlanoPgto);
 					pagamentoSql.insertOrReplaceFast(sql, argumentoSql);
 				}
-			};
-			new Thread(runnable).start();
-			
+			});
+
 		// Checa se a finalidade eh atualizar
 		} else if(FINALIDADE.equalsIgnoreCase("U")){
-			Runnable runnable = new Runnable() {
-				@Override
+			((Activity) context).runOnUiThread(new Runnable() {
 				public void run() {
 					pagamentoSql.update(dadosPlanoPgto, "ID_AEAPLPGT = " + idPlPgt);
 				}
-			};
-			new Thread(runnable).start();
-			
+			});
+
 		// Checa se a finalidade eh deletar
 		} else if(FINALIDADE.equalsIgnoreCase("D")){
-			Runnable runnable = new Runnable() {
-				@Override
+			((Activity) context).runOnUiThread(new Runnable() {
 				public void run() {
 					pagamentoSql.delete("ID_AEAPLPGT = " + idPlPgt);
 				}
-			};
-			new Thread(runnable).start();
+			});
 		}
 	} // Fim PlanoPgto
 	
@@ -2681,34 +2549,28 @@ public class ImportarDadosTxtRotinas {
 		
 		// Checa se a finalidade eh inserir
 		if(FINALIDADE.equalsIgnoreCase("I")){
-			Runnable runnable = new Runnable() {
-				@Override
+			((Activity) context).runOnUiThread(new Runnable() {
 				public void run() {
 					//parcelaSql.insertOrReplace(dadosParcela);
 					parcelaSql.insertOrReplaceFast(sql, argumentoSql);
 				}
-			};
-			new Thread(runnable).start();
-			
+			});
+
 		// Checa se a finalidade eh atualizar
 		} else if(FINALIDADE.equalsIgnoreCase("U")){
-			Runnable runnable = new Runnable() {
-				@Override
+			((Activity) context).runOnUiThread(new Runnable() {
 				public void run() {
 					parcelaSql.update(dadosParcela, "ID_RPAPARCE = " + idParce);
 				}
-			};
-			new Thread(runnable).start();
-			
+			});
+
 		// Checa se a finalidade eh deletar
 		} else if(FINALIDADE.equalsIgnoreCase("D")){
-			Runnable runnable = new Runnable() {
-				@Override
+			((Activity) context).runOnUiThread(new Runnable() {
 				public void run() {
 					parcelaSql.delete("ID_RPAPARCE = " + idParce);
 				}
-			};
-			new Thread(runnable).start();
+			});
 		}
 	} // FIm Parcela
 	
@@ -2765,33 +2627,27 @@ public class ImportarDadosTxtRotinas {
 		
 		// Checa se a finalidade eh inserir
 		if(FINALIDADE.equalsIgnoreCase("I")){
-			Runnable runnable = new Runnable() {
-				@Override
+			((Activity) context).runOnUiThread(new Runnable() {
 				public void run() {
 					cobrancaSql.insertOrReplace(dadosTpCob);
 				}
-			};
-			new Thread(runnable).start();
-			
+			});
+
 		// Checa se a finalidade eh atualizar
 		} else if(FINALIDADE.equalsIgnoreCase("U")){
-			Runnable runnable = new Runnable() {
-				@Override
+			((Activity) context).runOnUiThread(new Runnable() {
 				public void run() {
 					cobrancaSql.update(dadosTpCob, "ID_CFATPCOB = " + idTpCob);
 				}
-			};
-			new Thread(runnable).start();
-			
+			});
+
 		// Checa se a finalidade eh deletar
 		} else if(FINALIDADE.equalsIgnoreCase("D")){
-			Runnable runnable = new Runnable() {
-				@Override
+			((Activity) context).runOnUiThread(new Runnable() {
 				public void run() {
 					cobrancaSql.delete("ID_CFATPCOB = " + idTpCob);
 				}
-			};
-			new Thread(runnable).start();
+			});
 		}
 	} // Fim TipoCobranca
 	
@@ -2823,33 +2679,27 @@ public class ImportarDadosTxtRotinas {
 		
 		// Checa se a finalidade eh inserir
 		if(FINALIDADE.equalsIgnoreCase("I")){
-			Runnable runnable = new Runnable() {
-				@Override
+			((Activity) context).runOnUiThread(new Runnable() {
 				public void run() {
 					tributariaSql.insertOrReplace(dadosSituacaoTrib);
 				}
-			};
-			new Thread(runnable).start();
-			
+			});
+
 		// Checa se a finalidade eh atualizar
 		} else if(FINALIDADE.equalsIgnoreCase("U")){
-			Runnable runnable = new Runnable() {
-				@Override
+			((Activity) context).runOnUiThread(new Runnable() {
 				public void run() {
 					tributariaSql.update(dadosSituacaoTrib, "ID_AEACODST = " + idCodSt);
 				}
-			};
-			new Thread(runnable).start();
-			
+			});
+
 		// Checa se a finalidade eh deletar
 		} else if(FINALIDADE.equalsIgnoreCase("D")){
-			Runnable runnable = new Runnable() {
-				@Override
+			((Activity) context).runOnUiThread(new Runnable() {
 				public void run() {
 					tributariaSql.delete("ID_AEACODST = " + idCodSt);
 				}
-			};
-			new Thread(runnable).start();
+			});
 		}
 	}
 
@@ -2883,33 +2733,27 @@ public class ImportarDadosTxtRotinas {
 		
 		// Checa se a finalidade eh inserir
 		if(FINALIDADE.equalsIgnoreCase("I")){
-			Runnable runnable = new Runnable() {
-				@Override
+			((Activity) context).runOnUiThread(new Runnable() {
 				public void run() {
 					locacaoSql.insertOrReplace(dadosLocacao);
 				}
-			};
-			new Thread(runnable).start();
-			
+			});
+
 		// Checa se a finalidade eh atualizar
 		} else if(FINALIDADE.equalsIgnoreCase("U")){
-			Runnable runnable = new Runnable() {
-				@Override
+			((Activity) context).runOnUiThread(new Runnable() {
 				public void run() {
 					locacaoSql.update(dadosLocacao, "ID_AEALOCES = " + idLoces);
 				}
-			};
-			new Thread(runnable).start();
-			
+			});
+
 		// Checa se a finalidade eh deletar
 		} else if(FINALIDADE.equalsIgnoreCase("D")){
-			Runnable runnable = new Runnable() {
-				@Override
+			((Activity) context).runOnUiThread(new Runnable() {
 				public void run() {
 					locacaoSql.delete("ID_AEALOCES = " + idLoces);
 				}
-			};
-			new Thread(runnable).start();
+			});
 		}
 	}
 }

@@ -462,7 +462,7 @@ public class ReceberArquivoTxtServidorFtpRotinas {
 	} // Fim downloadArquivoTxtServidorFtp
 	
 	
-	private String downloadFtp(String nomeAquivo, File pastaDestino, String diretorioFtp){
+	private String downloadFtp(final String nomeAquivo, File pastaDestino, String diretorioFtp){
 		// Salvar o local que foi feito o downlods junto com o nome do arquivo
 		String localArquivoRecebido = "";
 		try{
@@ -481,12 +481,11 @@ public class ReceberArquivoTxtServidorFtpRotinas {
 	        		double totalTransferido = (double) totalBytesTransferred;
 	        		// Calcula em percentual do total transferido do arquivo XML
 	        		final double percentual = ((totalTransferido / tamanhoArquivo) * 100); 
-	        		
 	        		if(telaChamou != TELA_RECEPTOR_ALARME){
 		        		((Activity) context).runOnUiThread(new Runnable() {
 	    					  public void run() {
 	    						  // Atualiza a mensagem na tela de sincronizacao
-	    						  textMensagemRetorno.setText("Fazendo o Download... " + format.format(percentual) + "% ");
+	    						  textMensagemRetorno.setText("Fazendo o Download do arquivo " + nomeAquivo + " ... " + format.format(percentual) + "% ");
 	    					  }
 		        		});
 		        	// Atualiza a barra de progresso
@@ -530,7 +529,7 @@ public class ReceberArquivoTxtServidorFtpRotinas {
 		        	((Activity) context).runOnUiThread(new Runnable() {
 						  public void run() {
 							  // Atualiza a mensagem na tela de sincronizacao
-							  textMensagemRetorno.setText("Download efetuado com sucesso... ");
+							  textMensagemRetorno.setText("Download do arquivo " + nomeAquivo + " efetuado com sucesso... ");
 						  }
 		        	});
 	        	}

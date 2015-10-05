@@ -11,4 +11,13 @@
         tools:ignore="AppCompatResource">
     </item>
 
+    <item
+        android:id="@+id/menu_sincronizacao_desmarcar_transmissao_dados"
+        android:orderInCategory="1"
+        android:title="@string/desmarcar_transmissao_dados"
+        android:icon="@drawable/ic_action_cancel"
+        android:showAsAction="always"
+        tools:ignore="AppCompatResource">
+    </item>
+
 </menu>

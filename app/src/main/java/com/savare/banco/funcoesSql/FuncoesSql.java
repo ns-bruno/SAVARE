@@ -9,6 +9,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
 import android.util.Log;
 
+import com.savare.R;
 import com.savare.banco.local.ConexaoBancoDeDados;
 import com.savare.funcoes.VersionUtils;
 import com.savare.funcoes.FuncoesPersonalizadas;
@@ -47,7 +48,7 @@ public class FuncoesSql {
 		
 		try {
 			// Inseri os valores no banco de dados
-			id = bancoDados.insertWithOnConflict(tabela, null, values, 0);
+			id = bancoDados.insertWithOnConflict(tabela, null, values, SQLiteDatabase.CONFLICT_NONE);
 			//id = bancoDados.insert(tabela, null, values);
 			
 			if (id > 0){
@@ -62,7 +63,7 @@ public class FuncoesSql {
 			} else {
 				ContentValues mensagem = new ContentValues();
 				mensagem.put("comando", 1);
-				mensagem.put("mensagem", "N�o foi poss�vel cadastrar! \n");
+				mensagem.put("mensagem", context.getResources().getString(R.string.nao_foi_possivel_cadastrar) +"\n");
 				mensagem.put("tela", tabela);
 				
 				this.funcoes = new FuncoesPersonalizadas(context);
@@ -87,15 +88,15 @@ public class FuncoesSql {
 			this.funcoes.menssagem(contentValues);
 			
 		} catch (Exception e) {
-			
+			this.funcoes = new FuncoesPersonalizadas(context);
+
 			// Armazena as informacoes para para serem exibidas e enviadas
 			ContentValues contentValues = new ContentValues();
 			contentValues.put("comando", 0);
 			contentValues.put("tela", tabela);
-			contentValues.put("mensagem", e.getMessage());
+			contentValues.put("mensagem", funcoes.tratamentoErroBancoDados(e.getMessage()));
 			contentValues.put("dados", e.toString());
 			// Pega os dados do usuario
-			this.funcoes = new FuncoesPersonalizadas(context);
 			contentValues.put("usuario", funcoes.getValorXml("Usuario"));
 			contentValues.put("empresa", funcoes.getValorXml("ChaveEmpresa"));
 			contentValues.put("email", funcoes.getValorXml("Email"));
@@ -151,7 +152,7 @@ public class FuncoesSql {
 			ContentValues contentValues = new ContentValues();
 			contentValues.put("comando", 0);
 			contentValues.put("tela", tabela);
-			contentValues.put("mensagem", e.getMessage());
+			contentValues.put("mensagem", funcoes.tratamentoErroBancoDados(e.getMessage()));
 			contentValues.put("dados", values.toString());
 			// Pega os dados do usuario
 			this.funcoes = new FuncoesPersonalizadas(context);
@@ -167,7 +168,7 @@ public class FuncoesSql {
 			ContentValues contentValues = new ContentValues();
 			contentValues.put("comando", 0);
 			contentValues.put("tela", tabela);
-			contentValues.put("mensagem", e.getMessage());
+			contentValues.put("mensagem", funcoes.tratamentoErroBancoDados(e.getMessage()));
 			contentValues.put("dados", e.toString());
 			// Pega os dados do usuario
 			this.funcoes = new FuncoesPersonalizadas(context);
@@ -258,7 +259,7 @@ public class FuncoesSql {
 			} else {
 				ContentValues mensagem = new ContentValues();
 				mensagem.put("comando", 1);
-				mensagem.put("mensagem", "N�o foi poss�vel cadastrar! \n");
+				mensagem.put("mensagem", "Não foi possível cadastrar! \n");
 				mensagem.put("tela", tabela);
 				
 				this.funcoes = new FuncoesPersonalizadas(context);
@@ -266,15 +267,16 @@ public class FuncoesSql {
 			}
 			
 		} catch (SQLException e) {
-			
+			this.funcoes = new FuncoesPersonalizadas(context);
+
 			// Armazena as informacoes para para serem exibidas e enviadas
 			ContentValues contentValues = new ContentValues();
 			contentValues.put("comando", 0);
 			contentValues.put("tela", tabela);
-			contentValues.put("mensagem", e.getMessage());
+			contentValues.put("mensagem", funcoes.tratamentoErroBancoDados(e.getMessage()));
 			contentValues.put("dados", values.toString());
 			// Pega os dados do usuario
-			this.funcoes = new FuncoesPersonalizadas(context);
+
 			contentValues.put("usuario", funcoes.getValorXml("Usuario"));
 			contentValues.put("empresa", funcoes.getValorXml("ChaveEmpresa"));
 			contentValues.put("email", funcoes.getValorXml("Email"));
@@ -282,15 +284,15 @@ public class FuncoesSql {
 			this.funcoes.menssagem(contentValues);
 			
 		} catch (Exception e) {
-			
+			this.funcoes = new FuncoesPersonalizadas(context);
+
 			// Armazena as informacoes para para serem exibidas e enviadas
 			ContentValues contentValues = new ContentValues();
 			contentValues.put("comando", 0);
 			contentValues.put("tela", tabela);
-			contentValues.put("mensagem", e.getMessage());
+			contentValues.put("mensagem", funcoes.tratamentoErroBancoDados(e.getMessage()));
 			contentValues.put("dados", e.toString());
 			// Pega os dados do usuario
-			this.funcoes = new FuncoesPersonalizadas(context);
 			contentValues.put("usuario", funcoes.getValorXml("Usuario"));
 			contentValues.put("empresa", funcoes.getValorXml("ChaveEmpresa"));
 			contentValues.put("email", funcoes.getValorXml("Email"));
@@ -326,7 +328,7 @@ public class FuncoesSql {
 			} else {
 				ContentValues mensagem = new ContentValues();
 				mensagem.put("comando", 2);
-				mensagem.put("mensagem", "Não foi possível atualizar! \n");
+				mensagem.put("mensagem", context.getResources().getString(R.string.nao_foi_possivel_atualizar) + " \n");
 				mensagem.put("tela", tabela);
 				
 				this.funcoes = new FuncoesPersonalizadas(context);
@@ -334,15 +336,15 @@ public class FuncoesSql {
 			}
 			
 		} catch (SQLException e) {
-			
+			this.funcoes = new FuncoesPersonalizadas(context);
+
 			// Armazena as informacoes para para serem exibidas e enviadas
 			ContentValues contentValues = new ContentValues();
 			contentValues.put("comando", 0);
 			contentValues.put("tela", tabela);
-			contentValues.put("mensagem", e.getMessage());
+			contentValues.put("mensagem", funcoes.tratamentoErroBancoDados(e.getMessage()));
 			contentValues.put("dados", dados.toString());
 			// Pega os dados do usuario
-			this.funcoes = new FuncoesPersonalizadas(context);
 			contentValues.put("usuario", funcoes.getValorXml("Usuario"));
 			contentValues.put("empresa", funcoes.getValorXml("ChaveEmpresa"));
 			contentValues.put("email", funcoes.getValorXml("Email"));
@@ -354,7 +356,7 @@ public class FuncoesSql {
 			ContentValues contentValues = new ContentValues();
 			contentValues.put("comando", 0);
 			contentValues.put("tela", tabela);
-			contentValues.put("mensagem", e.getMessage());
+			contentValues.put("mensagem", funcoes.tratamentoErroBancoDados(e.getMessage()));
 			contentValues.put("dados", dados.toString());
 			// Pega os dados do usuario
 			this.funcoes = new FuncoesPersonalizadas(context);
@@ -392,7 +394,7 @@ public class FuncoesSql {
 			ContentValues contentValues = new ContentValues();
 			contentValues.put("comando", 0);
 			contentValues.put("tela", tabela);
-			contentValues.put("mensagem", e.getMessage());
+			contentValues.put("mensagem", funcoes.tratamentoErroBancoDados(e.getMessage()));
 			contentValues.put("dados", e.toString());
 			// Pega os dados do usuario
 			this.funcoes = new FuncoesPersonalizadas(context);
@@ -407,7 +409,7 @@ public class FuncoesSql {
 			ContentValues contentValues = new ContentValues();
 			contentValues.put("comando", 0);
 			contentValues.put("tela", tabela + " - FuncoesSql");
-			contentValues.put("mensagem", e.getMessage());
+			contentValues.put("mensagem", funcoes.tratamentoErroBancoDados(e.getMessage()));
 			contentValues.put("dados", e.toString());
 			// Pega os dados do usuario
 			this.funcoes = new FuncoesPersonalizadas(context);
@@ -449,7 +451,7 @@ public class FuncoesSql {
 			ContentValues contentValues = new ContentValues();
 			contentValues.put("comando", 0);
 			contentValues.put("tela", tabela);
-			contentValues.put("mensagem", e.getMessage());
+			contentValues.put("mensagem", funcoes.tratamentoErroBancoDados(e.getMessage()));
 			contentValues.put("dados", e.toString());
 			// Pega os dados do usuario
 			this.funcoes = new FuncoesPersonalizadas(context);
@@ -464,7 +466,7 @@ public class FuncoesSql {
 			ContentValues contentValues = new ContentValues();
 			contentValues.put("comando", 0);
 			contentValues.put("tela", tabela);
-			contentValues.put("mensagem", e.getMessage());
+			contentValues.put("mensagem", funcoes.tratamentoErroBancoDados(e.getMessage()));
 			contentValues.put("dados", e.toString());
 			// Pega os dados do usuario
 			this.funcoes = new FuncoesPersonalizadas(context);
@@ -499,7 +501,7 @@ public class FuncoesSql {
 			ContentValues contentValues = new ContentValues();
 			contentValues.put("comando", 0);
 			contentValues.put("tela", tabela);
-			contentValues.put("mensagem", e.getMessage());
+			contentValues.put("mensagem", funcoes.tratamentoErroBancoDados(e.getMessage()));
 			contentValues.put("dados", e.toString());
 			// Pega os dados do usuario
 			this.funcoes = new FuncoesPersonalizadas(context);
@@ -514,7 +516,7 @@ public class FuncoesSql {
 			ContentValues contentValues = new ContentValues();
 			contentValues.put("comando", 0);
 			contentValues.put("tela", tabela);
-			contentValues.put("mensagem", e.getMessage());
+			contentValues.put("mensagem", funcoes.tratamentoErroBancoDados(e.getMessage()));
 			contentValues.put("dados", e.toString());
 			// Pega os dados do usuario
 			this.funcoes = new FuncoesPersonalizadas(context);
@@ -553,14 +555,15 @@ public class FuncoesSql {
 			if(e.getMessage().toLowerCase().indexOf("no such table") != -1){
 				conexaoBanco.onCreate(bancoDados);
 			}else {
+				this.funcoes = new FuncoesPersonalizadas(context);
+
 				// Armazena as informacoes para para serem exibidas e enviadas
 				ContentValues contentValues = new ContentValues();
 				contentValues.put("comando", 0);
 				contentValues.put("tela", tabela + " - FuncoesSql");
-				contentValues.put("mensagem", e.getMessage());
+				contentValues.put("mensagem", funcoes.tratamentoErroBancoDados(e.getMessage()));
 				contentValues.put("dados", e.toString());
 				// Pega os dados do usuario
-				this.funcoes = new FuncoesPersonalizadas(context);
 				contentValues.put("usuario", funcoes.getValorXml("Usuario"));
 				contentValues.put("empresa", funcoes.getValorXml("ChaveEmpresa"));
 				contentValues.put("email", funcoes.getValorXml("Email"));
@@ -573,7 +576,7 @@ public class FuncoesSql {
 			ContentValues contentValues = new ContentValues();
 			contentValues.put("comando", 0);
 			contentValues.put("tela", tabela + " - FuncoesSql");
-			contentValues.put("mensagem", e.getMessage());
+			contentValues.put("mensagem", funcoes.tratamentoErroBancoDados(e.getMessage()));
 			contentValues.put("dados", e.toString());
 			// Pega os dados do usuario
 			this.funcoes = new FuncoesPersonalizadas(context);
@@ -604,14 +607,15 @@ public class FuncoesSql {
 			quantidadeExcluido = bancoDados.delete(tabela, where, null);
 			
 		} catch (SQLException e) {
+			this.funcoes = new FuncoesPersonalizadas(context);
+
 			// Armazena as informacoes para para serem exibidas e enviadas
 			ContentValues contentValues = new ContentValues();
 			contentValues.put("comando", 0);
 			contentValues.put("tela", tabela);
-			contentValues.put("mensagem", e.getMessage());
+			contentValues.put("mensagem", funcoes.tratamentoErroBancoDados(e.getMessage()));
 			contentValues.put("dados", e.toString());
 			// Pega os dados do usuario
-			this.funcoes = new FuncoesPersonalizadas(context);
 			contentValues.put("usuario", funcoes.getValorXml("Usuario"));
 			contentValues.put("empresa", funcoes.getValorXml("ChaveEmpresa"));
 			contentValues.put("email", funcoes.getValorXml("Email"));
@@ -623,7 +627,7 @@ public class FuncoesSql {
 			ContentValues contentValues = new ContentValues();
 			contentValues.put("comando", 0);
 			contentValues.put("tela", tabela);
-			contentValues.put("mensagem", e.getMessage());
+			contentValues.put("mensagem", funcoes.tratamentoErroBancoDados(e.getMessage()));
 			contentValues.put("dados", e.toString());
 			// Pega os dados do usuario
 			this.funcoes = new FuncoesPersonalizadas(context);
@@ -661,7 +665,7 @@ public class FuncoesSql {
 			ContentValues contentValues = new ContentValues();
 			contentValues.put("comando", 0);
 			contentValues.put("tela", "FuncoesSQL - queryUsuario");
-			contentValues.put("mensagem", e.getMessage());
+			contentValues.put("mensagem", funcoes.tratamentoErroBancoDados(e.getMessage()));
 			contentValues.put("dados", e.toString());
 			// Pega os dados do usuario
 			this.funcoes = new FuncoesPersonalizadas(context);
@@ -751,5 +755,5 @@ public class FuncoesSql {
 		}
 		return bindArgs;
 	}
-	
+
 }

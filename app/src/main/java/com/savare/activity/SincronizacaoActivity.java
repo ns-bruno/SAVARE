@@ -213,6 +213,13 @@ public class SincronizacaoActivity extends Activity {
 					funcoes.menssagem(contentValues);
 				}*/
 				break;
+			case R.id.menu_sincronizacao_desmarcar_transmissao_dados:
+				FuncoesPersonalizadas funcoesExtra = new FuncoesPersonalizadas(SincronizacaoActivity.this);
+
+				// Marca a aplicacao que nao esta mais recebendo dados
+				funcoesExtra.setValorXml("RecebendoDados", "N");
+				funcoesExtra.setValorXml("EnviandoDados", "N");
+				break;
 			
 		default:
 			break;

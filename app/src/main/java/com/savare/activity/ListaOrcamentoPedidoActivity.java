@@ -844,7 +844,7 @@ public class ListaOrcamentoPedidoActivity extends Activity implements OnNavigati
 						dadosCliente.put("HORARIO_LOCALIZACAO", localizacao.getHorarioLocalizacao());
 						dadosCliente.put("TIPO_LOCALIZACAO", localizacao.getTipoLocalizacao());
 						dadosCliente.put("PRECISAO", localizacao.getPrecisao());*/
-						
+
 						OrcamentoRotinas orcamentoRotinas = new OrcamentoRotinas(ListaOrcamentoPedidoActivity.this);
 						// Cria um novo orcamento no banco de dados
 						long numeroOracmento = orcamentoRotinas.insertOrcamento(dadosCliente);
