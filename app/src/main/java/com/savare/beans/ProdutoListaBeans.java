@@ -27,6 +27,7 @@ public class ProdutoListaBeans implements Parcelable {
 				   estoqueContabil;
 	private char atacadoVarejo,
 				 estaNoOrcamento;
+	private boolean produtoNovo = false;
 	
 	public ProdutoListaBeans(Parcel dados) {
 		this.estaNoOrcamento = dados.readString().charAt(0);
@@ -268,6 +269,13 @@ public class ProdutoListaBeans implements Parcelable {
 		this.valorTabelaVarejo = valorTabelaVarejo;
 	}
 
+	public boolean isProdutoNovo() {
+		return produtoNovo;
+	}
+
+	public void setProdutoNovo(boolean produtoNovo) {
+		this.produtoNovo = produtoNovo;
+	}
 
 	/**
 	 * Pega todos os dados que deseja ser transportado para

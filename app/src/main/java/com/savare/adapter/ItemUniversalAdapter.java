@@ -795,10 +795,10 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 			
 			FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
 			
-			diasProdutoNovo = produtoRotinas.diasProdutoNovo(funcoes.getValorXml("CodigoEmpresa"));
+			//diasProdutoNovo = produtoRotinas.diasProdutoNovo(funcoes.getValorXml("CodigoEmpresa"));
 			
 			// Checa se eh um produto novo
-			if((diasProdutoNovo > 0) && (diasProdutoNovo >= produto.getProduto().getDiasCadastro()) && (produto.getEstaNoOrcamento() != '1')){
+			if(produto.isProdutoNovo()){
 				// Muda o fundo do view
 				view.setBackgroundColor(context.getResources().getColor(R.color.azul_medio_200));
 				

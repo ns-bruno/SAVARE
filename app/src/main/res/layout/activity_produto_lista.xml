@@ -7,10 +7,38 @@
 
     <LinearLayout
         android:layout_width="match_parent"
+        android:orientation="vertical"
+        android:layout_height="wrap_content"
+        android:layout_weight="0">
+
+        <ProgressBar
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/activity_produto_lista_progressBar_processo_pesquisa"
+            android:layout_gravity="center_horizontal"
+            android:indeterminate="true"
+            android:visibility="gone"
+            style="@style/Widget.AppCompat.Base.ProgressBar.Horizontal" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="@string/pesquisar"
+            android:id="@+id/activity_produto_lista_textView_processo_pesquisa"
+            android:layout_gravity="center_horizontal"
+            android:visibility="gone"
+            android:gravity="center_horizontal" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="0dp"
         android:orientation="vertical"
         android:layout_weight="1" >
-        
+
+
+
         <ListView
             android:id="@+id/activity_produto_lista_listView_produto"
             android:layout_width="match_parent"
@@ -24,7 +52,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-         >
+        android:layout_weight="0">
 
         <TextView
             android:id="@+id/activity_produto_lista_text_codigo_orcamento"

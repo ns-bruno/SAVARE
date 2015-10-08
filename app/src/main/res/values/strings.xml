@@ -163,6 +163,8 @@
     <string name="nao_foi_possivel_cadastrar">Não foi possível cadastrar.</string>
     <string name="nao_foi_possivel_atualizar">Não foi possível atualizar.</string>
     <string name="desmarcar_transmissao_dados">Desmarcar as transmissões de dados</string>
+    <string name="achamos_alguma_coisa">Achamos alguma coisa</string>
+    <string name="pegamos_produto">Pegamos o produto</string>
 
 
 </resources>

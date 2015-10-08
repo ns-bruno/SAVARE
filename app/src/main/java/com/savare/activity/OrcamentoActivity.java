@@ -115,7 +115,7 @@ public class OrcamentoActivity extends Activity {
 					// Instancia a classe de rotinas de produtos
 					ProdutoRotinas produtoRotinas = new ProdutoRotinas(OrcamentoActivity.this);
 					// Pega os dados do produto
-					produtoVenda = produtoRotinas.listaProduto("AEAPRODU.ID_AEAPRODU = " + itemOrcamento.getProduto().getIdProduto(), null, textCodigoOrcamento.getText().toString()).get(0);
+					produtoVenda = produtoRotinas.listaProduto("AEAPRODU.ID_AEAPRODU = " + itemOrcamento.getProduto().getIdProduto(), null, textCodigoOrcamento.getText().toString(), null, null).get(0);
 					produtoVenda.setAtacadoVarejo(textAtacadoVarejo.getText().charAt(0));
 					
 					// Checa se nao esta vazio

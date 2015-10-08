@@ -175,6 +175,7 @@
     <string name="abc_shareactionprovider_share_with_application">Share with %s</string>
     <!-- From: file:/D:/Dropbox/Forca%20de%20Venda%20Movel/Codigo%20Fonte/SAVARE_Studio/app/src/main/res/values/strings.xml -->
     <eat-comment/>
+    <string name="achamos_alguma_coisa">Achamos alguma coisa</string>
     <string name="achamos_orcamento_numero">Achamos o orçamento de Nº </string>
     <string name="action_example">Example action</string>
     <string name="action_settings">Settings</string>
@@ -329,6 +330,7 @@
     <string name="parece_que_tem_internet_vamos_pegar_dados_agora">Parece que tem internet, agora vamos pegar os dados à serem enviados.</string>
     <string name="pasta_ftp">Pasta do Servidor FTP</string>
     <string name="pedido_numero">Pedido Nº </string>
+    <string name="pegamos_produto">Pegamos o produto</string>
     <string name="percentual_mark_up_atacado">% Mark Up Atacado</string>
     <string name="percentual_mark_up_varejo">% Mark Up Varejo</string>
     <string name="periodo">Peíodo</string>

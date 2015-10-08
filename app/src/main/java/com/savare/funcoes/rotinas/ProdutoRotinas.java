@@ -3,10 +3,16 @@ package com.savare.funcoes.rotinas;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.os.AsyncTask;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
+import com.savare.R;
 import com.savare.banco.funcoesSql.ClasseSql;
 import com.savare.banco.funcoesSql.EmbalagemSql;
 import com.savare.banco.funcoesSql.EmpresaSql;
@@ -69,7 +75,7 @@ public class ProdutoRotinas extends Rotinas {
 	} // Fim listaClasse
 	
 	
-	public List<ProdutoListaBeans> listaProduto(String where, String group, String idOrcamento){
+	public List<ProdutoListaBeans> listaProduto(String where, String group, String idOrcamento, ProgressBar progresso, final TextView textProgresso){
 		
 		FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
 		
@@ -128,8 +134,23 @@ public class ProdutoRotinas extends Rotinas {
 		if(cursor.getCount() > 0){
 			// Move o foco para o primeiro registro que esta dentro do cursor
 			//cursor.moveToFirst();
+
+			// Checa se tem alguma barra de progresso
+			if (progresso != null){
+
+				progresso.setIndeterminate(false);
+				progresso.setMax(cursor.getCount());
+			}
+
+			int incremento = 0;
 			try{
 				while(cursor.moveToNext()){
+
+					if (progresso != null) {
+						incremento++;
+						progresso.setProgress(incremento);
+					}
+
 					// Preenche os dados do produto
 					ProdutoListaBeans produtoLista = new ProdutoListaBeans();
 					ProdutoBeans produto = new ProdutoBeans();
@@ -146,7 +167,16 @@ public class ProdutoRotinas extends Rotinas {
 						produto.setTipoProduto('P');
 					}
 					produto.setDiasCadastro(cursor.getInt(cursor.getColumnIndex("DIAS_CADASTRO")));
-					
+
+					final String descProduto = produto.getDescricaoProduto();
+
+					/*if (textProgresso != null){
+						((Activity) context).runOnUiThread(new Runnable() {
+							public void run() {
+								textProgresso.setText(descProduto);
+							}
+						});
+					}*/
 					// Pega a unidade de venda do produto
 					UnidadeVendaBeans unidadeVenda = new UnidadeVendaBeans();
 					unidadeVenda.setIdUnidadeVenda(cursor.getInt(cursor.getColumnIndex("ID_AEAUNVEN")));
@@ -228,6 +258,12 @@ public class ProdutoRotinas extends Rotinas {
 							// Adiciona a embalagem a uma lista
 							listaEmbalagem.add(embalagem);
 						} // FIm do while
+
+						int diasProdutoNovo = diasProdutoNovo(idEmpresa);
+
+						if((diasProdutoNovo > 0) && (diasProdutoNovo >= produto.getDiasCadastro()) && (produtoLista.getEstaNoOrcamento() != '1')){
+							produtoLista.setProdutoNovo(true);
+						}
 						
 						// Adiciona uma lista de embalagens no produto
 						produto.setListaEmbalagem(listaEmbalagem);
@@ -479,5 +515,5 @@ public class ProdutoRotinas extends Rotinas {
 		
 		return listaDetalhes;
 	}
-	
+
 } // FIm da classe

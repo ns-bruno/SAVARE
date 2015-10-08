@@ -39,18 +39,19 @@ import com.savare.beans.OrcamentoBeans;
 import com.savare.beans.ProdutoListaBeans;
 import com.savare.funcoes.FuncoesPersonalizadas;
 import com.savare.funcoes.rotinas.ProdutoRotinas;
+import com.savare.funcoes.rotinas.async.PesquisaListaProdutoAsyncRotinas;
 
 public class ProdutoListaActivity extends Activity implements OnNavigationListener {
 	
-	private TextView textCodigoOrcamento, textCodigoPessoa, textNomeRazao, textAtacadoVarejo;
+	private TextView textCodigoOrcamento, textCodigoPessoa, textNomeRazao, textAtacadoVarejo, textProcessoPesquisa;
 	private ListView listViewProduto;
+	private ProgressBar progressoPesquisa;
 	private ActionBar actionBar;
 	private DescricaoSimplesAdapter adapterClasse;
 	private List<ProdutoListaBeans> listaProdutos;
 	private ItemUniversalAdapter adapterProduto;
 	private long idItemOrcamento = 0;
 	private ProdutoListaBeans produtoVendaClicado;
-	private ProgressDialog progressoTela;
 	public static final String KEY_TELA_PRODUTO_LISTA_ACTIVITY = "ProdutoListaActivity";
 	
 	
@@ -58,18 +59,6 @@ public class ProdutoListaActivity extends Activity implements OnNavigationListen
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_produto_lista);
-		
-		runOnUiThread(new Runnable() {
-			  public void run() {
-				  
-				  progressoTela = new ProgressDialog(ProdutoListaActivity.this);
-				  progressoTela.setIndeterminate(true);
-				  progressoTela.setCancelable(false);
-				  progressoTela.show();
-			  }
-		});
-		
-		
 		
 		// Ativa a action bar com o simbolo de voltar
 		actionBar = getActionBar();
@@ -169,19 +158,8 @@ public class ProdutoListaActivity extends Activity implements OnNavigationListen
 		//produtoAsyncRotinas.execute(new String[]{textCodigoOrcamento.getText().toString()});
 		
 	}
-	
-	@Override
-	protected void onPostCreate(Bundle savedInstanceState) {
-		super.onPostCreate(savedInstanceState);
-		
-		runOnUiThread(new Runnable() {
-			  public void run() {
-				  
-				  progressoTela.dismiss();
-			  }
-		});
-	}
-	
+
+
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		//super.onCreateOptionsMenu(menu);
@@ -205,23 +183,29 @@ public class ProdutoListaActivity extends Activity implements OnNavigationListen
 			@Override
 			public boolean onQueryTextSubmit(String query) {
 								
-				//Cria novo um ProgressDialogo e exibe
-				ProgressDialog progress = new ProgressDialog(ProdutoListaActivity.this);
-		        progress.setMessage("Aguarde, Buscando o(s) Produto(s)...");
-		        progress.show();
-				
 				String where = "( (AEAPRODU.DESCRICAO LIKE '%"+query+"%') OR "
 							     + "(AEAPRODU.CODIGO_ESTRUTURAL LIKE '%"+query+"%') OR "
 							     + "(AEAPRODU.DESCRICAO_AUXILIAR LIKE '%"+query+"%') OR "
 							     + "(AEAPRODU.REFERENCIA LIKE '%"+query+"%') OR "
 							     + "(AEAMARCA.DESCRICAO LIKE '%"+query+"%') )";
-					
-				criaListaDeProdutos(where, null, 1);
+
+				PesquisaListaProdutoAsyncRotinas pesquisaProduto =
+						new PesquisaListaProdutoAsyncRotinas(ProdutoListaActivity.this,
+															 where,
+															 null,
+															 textCodigoOrcamento.getText().toString(),
+															 textAtacadoVarejo.getText().toString(),
+															 1,
+															 listViewProduto,
+															 progressoPesquisa,
+															 textProcessoPesquisa);
+				pesquisaProduto.execute();
+
+				//criaListaDeProdutos(where, null, 1);
 				InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
 				// Fecha o teclado
 				imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
 				// Fecha a barra de progresso
-				progress.dismiss();
 				return false;
 			} // Fim do onQueryTextSubmit
 
@@ -296,7 +280,18 @@ public class ProdutoListaActivity extends Activity implements OnNavigationListen
 					where = where + "AND (AEAPLOJA.ID_SMAEMPRE = " + funcoes.getValorXml("CodigoEmpresa") + ") ";
 				}
 				// Cria a lista com os produtos de acordo com a classe selecionada
-				criaListaDeProdutos(where, null, 0);
+				PesquisaListaProdutoAsyncRotinas pesquisaProduto =
+						new PesquisaListaProdutoAsyncRotinas(ProdutoListaActivity.this,
+								where,
+								null,
+								textCodigoOrcamento.getText().toString(),
+								textAtacadoVarejo.getText().toString(),
+								0,
+								listViewProduto,
+								progressoPesquisa,
+								textProcessoPesquisa);
+				pesquisaProduto.execute();
+				//criaListaDeProdutos(where, null, 0);
 				
 			} else if(adapterClasse.getLista().get(itemPosition).getTextoPrincipal().equalsIgnoreCase("Todos os produtos")) {
 				// Verifica se a listagem de produto pertence a um orcamento
@@ -308,7 +303,18 @@ public class ProdutoListaActivity extends Activity implements OnNavigationListen
 					where = "AEAPLOJA.ID_SMAEMPRE = " + funcoes.getValorXml("CodigoEmpresa");
 				}
 				// Preenche a lista de PRODUTOS
-				criaListaDeProdutos(where, " GROUP BY AEAPLOJA.ID_AEAPLOJA ", 0);
+				PesquisaListaProdutoAsyncRotinas pesquisaProduto =
+						new PesquisaListaProdutoAsyncRotinas(ProdutoListaActivity.this,
+								where,
+								" GROUP BY AEAPLOJA.ID_AEAPLOJA ",
+								textCodigoOrcamento.getText().toString(),
+								textAtacadoVarejo.getText().toString(),
+								0,
+								listViewProduto,
+								progressoPesquisa,
+								textProcessoPesquisa);
+				pesquisaProduto.execute();
+				//criaListaDeProdutos(where, " GROUP BY AEAPLOJA.ID_AEAPLOJA ", 0);
 			}
 		}
 
@@ -381,7 +387,9 @@ public class ProdutoListaActivity extends Activity implements OnNavigationListen
 		textNomeRazao = (TextView) findViewById(R.id.activity_produto_lista_text_nome_razao);
 		textCodigoPessoa = (TextView) findViewById(R.id.activity_produto_lista_text_codigo_pessoa);
 		textAtacadoVarejo = (TextView) findViewById(R.id.activity_produto_lista_text_atacado_varejo);
+		textProcessoPesquisa = (TextView) findViewById(R.id.activity_produto_lista_textView_processo_pesquisa);
 		listViewProduto = (ListView) findViewById(R.id.activity_produto_lista_listView_produto);
+		progressoPesquisa = (ProgressBar) findViewById(R.id.activity_produto_lista_progressBar_processo_pesquisa);
 	}
 	
 	/**
@@ -391,15 +399,8 @@ public class ProdutoListaActivity extends Activity implements OnNavigationListen
 	 * @param group
 	 * @param tipo - 0 = Normal | 1 = Campo de Pesquisa(actionBar)
 	 */
-	private void criaListaDeProdutos(String where, String group, int tipo){
-		runOnUiThread(new Runnable() {
-			  public void run() {
-				  progressoTela.setIndeterminate(true);
-				  progressoTela.setCancelable(false);
-				  progressoTela.show();
-			  }
-		});
-		
+	/*private void criaListaDeProdutos(String where, String group, int tipo){
+
 		// Cria variavel para armazenar where auxiliar
 		String whereAux = "";
 		
@@ -410,10 +411,10 @@ public class ProdutoListaActivity extends Activity implements OnNavigationListen
 
 			if( (textCodigoOrcamento != null) && (textCodigoOrcamento.getText().length() > 0) ){
 				// Cria a lista de produto e verifica se os produto existe no orcamento
-				listaProdutos = produtoRotinas.listaProduto(where, group, textCodigoOrcamento.getText().toString());
+				listaProdutos = produtoRotinas.listaProduto(where, group, textCodigoOrcamento.getText().toString(), null, null);
 			}else {
 				// Cria a lista de produto sem verificar se o produto existe no orcamento
-				listaProdutos = produtoRotinas.listaProduto(where, group, null);
+				listaProdutos = produtoRotinas.listaProduto(where, group, null, null, null);
 			}
 			
 		// Lista todos os produtos, para o Campo de Pesquisa(actionBar)
@@ -449,12 +450,7 @@ public class ProdutoListaActivity extends Activity implements OnNavigationListen
 		// Seta o listView com o novo adapter que ja esta com a nova lista
 		listViewProduto.setAdapter(adapterProduto);
 		
-		runOnUiThread(new Runnable() {
-			  public void run() {
-				  progressoTela.dismiss();
-			  }
-		});
-	} //Fim criaListaDeProdutos
+	} //Fim criaListaDeProdutos*/
 
 	
 	/**
