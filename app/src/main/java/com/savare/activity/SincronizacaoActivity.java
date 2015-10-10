@@ -219,13 +219,14 @@ public class SincronizacaoActivity extends Activity {
 				// Marca a aplicacao que nao esta mais recebendo dados
 				funcoesExtra.setValorXml("RecebendoDados", "N");
 				funcoesExtra.setValorXml("EnviandoDados", "N");
+				funcoesExtra.cancelarSincronizacaoSegundoPlano();
 				break;
 			
 		default:
 			break;
 		}
 			return true;
-	} // Fim do onOptionsItemSelected
+	} // Fim do onOptionsItemSelectedK
 	
 	private void recuperaCampos(){
 		textDataUltimoEnvio = (TextView) findViewById(R.id.activity_sincronizacao_text_data_ultimo_envio);
