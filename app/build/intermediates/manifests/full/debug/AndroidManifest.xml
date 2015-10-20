@@ -161,22 +161,15 @@
                 <action android:name="RECEBER_DADOS_SAVARE" />
             </intent-filter>
         </receiver>
-
-        <!--
-        <receiver android:name="com.savare.funcoes.rotinas.receptor.ReceptorAlarmeEnviarCadastroPessoaBroadcastRotinas" android:label="ReceptorAlarmeEnviarCadastroPessoaBroadcastRotinas">
+        <receiver
+            android:name="com.savare.funcoes.rotinas.receptor.ReceptorAlarmeEnviarCadastroPessoaBroadcastRotinas"
+            android:label="ReceptorAlarmeEnviarCadastroPessoaBroadcastRotinas" >
             <intent-filter>
-                <action android:name="ENVIAR_ORCAMENTO_SAVARE" />
+                <action android:name="ENVIAR_OUTROS_DADOS_SAVARE" />
+
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </receiver>
-        -->
-
-
-        <!-- Servico de autenticacao -->
-
-
-        <!-- Servico de sincronizacao -->
-
     </application>
 
 </manifest>

@@ -13,5 +13,11 @@
         android:orderInCategory="101"
         android:title="@string/titulos_cliente"
         app:showAsAction="never" />
+
+    <item
+        android:id="@+id/menu_cliente_detalhes_enviar_cadastro"
+        android:orderInCategory="102"
+        android:title="@string/enviar_dados_cliente"
+        app:showAsAction="never" />
     
 </menu>

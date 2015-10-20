@@ -44,6 +44,7 @@ import com.savare.funcoes.FuncoesPersonalizadas;
 import com.savare.funcoes.LocalizacaoFuncoes;
 import com.savare.funcoes.rotinas.OrcamentoRotinas;
 import com.savare.funcoes.rotinas.PessoaRotinas;
+import com.savare.funcoes.rotinas.async.EnviarCadastroClienteFtpAsyncRotinas;
 
 public class ClienteDetalhesActivity extends Activity implements OnChartGestureListener, OnChartValueSelectedListener {
 	
@@ -262,12 +263,41 @@ public class ClienteDetalhesActivity extends Activity implements OnChartGestureL
 			startActivity(intentTitulos);
 			break;
 
+			case R.id.menu_cliente_detalhes_enviar_cadastro:
+
+				String where = " (CFACLIFO.ID_CFACLIFO == " + idCliente + ")";
+
+				List<PessoaBeans> listaPessoasCadastro = new ArrayList<PessoaBeans>();
+
+				PessoaRotinas pessoaRotinasCad = new PessoaRotinas(ClienteDetalhesActivity.this);
+
+				// Pega a lista de pessoas a serem enviadas os dados
+				listaPessoasCadastro = pessoaRotinasCad.listaPessoaCompleta(PessoaRotinas.KEY_TIPO_CLIENTE, where);
+				// Checa se retornou alguma lista
+				if (listaPessoasCadastro != null && listaPessoasCadastro.size() > 0) {
+					EnviarCadastroClienteFtpAsyncRotinas enviarCadastro = new EnviarCadastroClienteFtpAsyncRotinas(ClienteDetalhesActivity.this, EnviarCadastroClienteFtpAsyncRotinas.TELA_CLIENTE_DETALHES);
+					// Executa o envio do cadastro em segundo plano
+					enviarCadastro.execute(listaPessoasCadastro);
+				}
+				break;
+
 		default:
 			break;
 		}
 			return true;
 	} // Fim do onOptionsItemSelected
-	
+
+
+	@Override
+	public boolean onPrepareOptionsMenu(Menu menu) {
+
+		if (Integer.parseInt(idCliente) > 0) {
+			// Desabilita o menu de enviar dados do cliente
+			menu.getItem(2).setVisible(false);
+		}
+		return true;
+	}
+
 	private void recuperarCamposTela(){
 		textCodigoPessoa = (TextView) findViewById(R.id.activity_cliente_detalhes_text_codigo_pessoa);
 		textStatus = (TextView) findViewById(R.id.activity_cliente_detalhes_text_status);

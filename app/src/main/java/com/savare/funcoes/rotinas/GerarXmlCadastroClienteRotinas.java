@@ -62,7 +62,7 @@ public class GerarXmlCadastroClienteRotinas {
 
                     FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
 
-                    arquivoXml = new File(pasta, "/CD_" + listaPessoasCadastro.get(i).getCpfCnpj().replace(".", "").replace("-", "").replace("/", "") + "_" + funcoes.getValorXml("ChaveEmpresa") + ".xml");
+                    arquivoXml = new File(pasta, "/CD_" + funcoes.getValorXml("ChaveEmpresa") + "_" + listaPessoasCadastro.get(i).getCpfCnpj().replace(".", "").replace("-", "").replace("/", "") + ".xml");
 
                     Writer saida = new OutputStreamWriter(new FileOutputStream(arquivoXml));
 

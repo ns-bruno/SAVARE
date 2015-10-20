@@ -237,6 +237,7 @@
     <string name="entrar">Entrar</string>
     <string name="enviar">Enviar</string>
     <string name="enviar_automatico">Enviar Automático</string>
+    <string name="enviar_dados_cliente">Enviar Dados Cliente</string>
     <string name="enviar_email">Enviar e-Mail</string>
     <string name="enviar_pedido_nuvem">Enviar Pedido para Nuvem</string>
     <!-- From: file:/D:/Dropbox/Forca%20de%20Venda%20Movel/Codigo%20Fonte/SAVARE_Studio/app/src/main/res/values/strings_erro.xml -->

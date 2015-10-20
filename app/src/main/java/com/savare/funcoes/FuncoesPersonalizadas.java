@@ -62,6 +62,7 @@ public class FuncoesPersonalizadas {
 	private static final String TAG = "SAVARE";
 	public static final String ENVIAR_ORCAMENTO_SAVARE = "ENVIAR_ORCAMENTO_SAVARE";
 	public static final String RECEBER_DADOS_SAVARE = "RECEBER_DADOS_SAVARE";
+	public static final String ENVIAR_OUTROS_DADOS_SAVARE = "ENVIAR_OUTROS_DADOS_SAVARE";
 	public static final int MILISEGUNDOS = 0,
 							SEGUNDOS = 1,
 							MINUTOS = 2,
@@ -483,7 +484,8 @@ public class FuncoesPersonalizadas {
 		// Checa se o alarme nao foi criado
 		boolean alarmeEnviarDesativado =  (PendingIntent.getBroadcast(context, 0, new Intent(ENVIAR_ORCAMENTO_SAVARE), PendingIntent.FLAG_NO_CREATE) == null);
 		boolean alarmeReceberDesativado = (PendingIntent.getBroadcast(context, 0, new Intent(RECEBER_DADOS_SAVARE), PendingIntent.FLAG_NO_CREATE) == null);
-		
+		boolean alarmeEnviarOutrosDesativado = (PendingIntent.getBroadcast(context, 0, new Intent(ENVIAR_OUTROS_DADOS_SAVARE), PendingIntent.FLAG_NO_CREATE) == null);
+
 		// Checa se esta configurado para enviar os orcamentos automaticos
 		if( ((getValorXml("EnviarAutomatico").equalsIgnoreCase("S")) || (getValorXml("EnviarAutomatico") == null)) &&
 				(!getValorXml("ModoConexao").equalsIgnoreCase("S"))){
@@ -502,10 +504,30 @@ public class FuncoesPersonalizadas {
 				// Adiciona mais alguns segundo para executar o alarme depois de alguns segundo que esta Activity for abaerta
 				tempoInicio.add(Calendar.SECOND, 10);
 				// Cria um intervalo de quanto em quanto tempo o alarme vai repetir
-				long intervalo = 1 * 1000; // 1 Minutos
+				long intervalo = 60 * 1000; // 1 Minutos
 				
 				AlarmManager alarmeEnviarOrcamento = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 				alarmeEnviarOrcamento.setRepeating(AlarmManager.RTC_WAKEUP, tempoInicio.getTimeInMillis(), intervalo, alarmIntent);
+			}
+
+			// Checa se o alarme de envio de outros dados qualquers esta desativado
+			if (alarmeEnviarOutrosDesativado){
+				Log.i(TAG, "Novo alarme Enviar Outros Dados");
+
+				// Cria a intent com identificacao do alarme
+				Intent intent = new Intent(ENVIAR_OUTROS_DADOS_SAVARE);
+				PendingIntent alarmIntentOutros = PendingIntent.getBroadcast(context, 0, intent, 0);
+
+				Calendar tempoInicio = Calendar.getInstance();
+				// Pega a hora atual do sistema em milesegundo
+				tempoInicio.setTimeInMillis(System.currentTimeMillis());
+				// Adiciona mais alguns segundo para executar o alarme depois de alguns segundo que esta Activity for abaerta
+				tempoInicio.add(Calendar.SECOND, 20);
+				// Cria um intervalo de quanto em quanto tempo o alarme vai repetir
+				long intervalo = 150 * 1000; // 2 Minutos e 30 Segundos
+
+				AlarmManager alarmeEnviarOrcamento = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+				alarmeEnviarOrcamento.setRepeating(AlarmManager.RTC_WAKEUP, tempoInicio.getTimeInMillis(), intervalo, alarmIntentOutros);
 			}
 		} else {
 			// Checa se o alarme foi cria para enviar a desativacao

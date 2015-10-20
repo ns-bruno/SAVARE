@@ -41,7 +41,8 @@ import java.util.List;
 public class EnviarCadastroClienteFtpAsyncRotinas extends AsyncTask<List<PessoaBeans>, String, Integer> {
 
     public static final int TELA_RECEPTOR_ALARME = 0,
-                            TELA_CLIENTE_CADASTRO_DADOS_FRAGMENT = 1;
+                            TELA_CLIENTE_CADASTRO_DADOS_FRAGMENT = 1,
+                            TELA_CLIENTE_DETALHES = 2;
     private Context context;
     private ProgressDialog progress;
     private FTPClient conexaoFtp = new FTPClient();
@@ -63,7 +64,7 @@ public class EnviarCadastroClienteFtpAsyncRotinas extends AsyncTask<List<PessoaB
         // Inicializa a variavel de mensagem
         mensagemErro = " ";
 
-        if (telaChamada == TELA_CLIENTE_CADASTRO_DADOS_FRAGMENT){
+        if (telaChamada == TELA_CLIENTE_CADASTRO_DADOS_FRAGMENT || telaChamada == TELA_CLIENTE_DETALHES){
             // Instancia a classe para montar uma tela de progresso
             progress = new ProgressDialog(context);
             progress.setMessage("Aguarde, estamos gerando os arquivos necessários à ser enviados...");
@@ -79,7 +80,7 @@ public class EnviarCadastroClienteFtpAsyncRotinas extends AsyncTask<List<PessoaB
         // Checa se nao foi cancelada o progresso
         if(!isCancelled()){
             // Checa se quem chamou esta operacao foi alguma tela
-            if (telaChamada == TELA_CLIENTE_CADASTRO_DADOS_FRAGMENT){
+            if (telaChamada == TELA_CLIENTE_CADASTRO_DADOS_FRAGMENT || telaChamada == TELA_CLIENTE_DETALHES){
                 publishProgress("Estamos verificando se existe alguma conexão com a internet, aguarde...");
             }
             // Checa se tem internet
@@ -111,7 +112,7 @@ public class EnviarCadastroClienteFtpAsyncRotinas extends AsyncTask<List<PessoaB
     protected void onProgressUpdate(String... values) {
         super.onProgressUpdate(values);
         // Atualiza mensagem
-        if(telaChamada == TELA_CLIENTE_CADASTRO_DADOS_FRAGMENT){
+        if(telaChamada == TELA_CLIENTE_CADASTRO_DADOS_FRAGMENT || telaChamada == TELA_CLIENTE_DETALHES){
             progress.setMessage(values[0]);
         }
     }
@@ -123,26 +124,33 @@ public class EnviarCadastroClienteFtpAsyncRotinas extends AsyncTask<List<PessoaB
 
         FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
 
+        funcoes.setValorXml("EnviandoDados", "N");
+
         // Atualiza mensagem
-        if(telaChamada == TELA_CLIENTE_CADASTRO_DADOS_FRAGMENT) {
+        if(telaChamada == TELA_CLIENTE_CADASTRO_DADOS_FRAGMENT || telaChamada == TELA_CLIENTE_DETALHES) {
             // Fecha progressDialogo
             if (progress.isShowing()) {
                 progress.dismiss();
             }
 
             ContentValues dadosMensagem = new ContentValues();
-            dadosMensagem.put("comando", 0);
+
             dadosMensagem.put("tela", "EnviarOrcamentoFtpAsyncRotinas");
             dadosMensagem.put("dados", mensagemErro);
             dadosMensagem.put("usuario", funcoes.getValorXml("Usuario"));
             dadosMensagem.put("empresa", funcoes.getValorXml("Empresa"));
             dadosMensagem.put("email", funcoes.getValorXml("Email"));
 
-            if (result > 0) {
+            if (result != null && result > 0) {
                 dadosMensagem.put("comando", 1);
                 dadosMensagem.put("mensagem", "Foram enviados " + result + " arquivos.");
-            } else {
+                dadosMensagem.put("comando", 0);
+            } else if (mensagemErro.length() > 5){
                 dadosMensagem.put("mensagem", mensagemErro);
+                dadosMensagem.put("comando", 0);
+            } else {
+                dadosMensagem.put("mensagem", "Pronto.");
+                dadosMensagem.put("comando", 1);
             }
 
             funcoes.menssagem(dadosMensagem);
@@ -169,7 +177,7 @@ public class EnviarCadastroClienteFtpAsyncRotinas extends AsyncTask<List<PessoaB
         GerarXmlCadastroClienteRotinas gerarXml = new GerarXmlCadastroClienteRotinas(context);
 
         // Checa se quem chamou esta operacao foi alguma tela
-        if (telaChamada == TELA_CLIENTE_CADASTRO_DADOS_FRAGMENT){
+        if (telaChamada == TELA_CLIENTE_CADASTRO_DADOS_FRAGMENT || telaChamada == TELA_CLIENTE_DETALHES){
             publishProgress("Vamor gerar os arquivos para ser enviado, aguarde...");
         }
 
@@ -184,7 +192,7 @@ public class EnviarCadastroClienteFtpAsyncRotinas extends AsyncTask<List<PessoaB
                 idPessoaTemporario = "" + listaPessoasCadastro.get(j).getIdPessoa();
 
                 // Checa se quem chamou esta operacao foi alguma tela
-                if (telaChamada == TELA_CLIENTE_CADASTRO_DADOS_FRAGMENT){
+                if (telaChamada == TELA_CLIENTE_CADASTRO_DADOS_FRAGMENT || telaChamada == TELA_CLIENTE_DETALHES){
                     publishProgress("Foi gerado " + listaLocalXml.size() + " arquivo(s). Estamos conectando com o servidor em nuvem, aguarde mais um pouco...");
                 }
                 try{
@@ -203,13 +211,13 @@ public class EnviarCadastroClienteFtpAsyncRotinas extends AsyncTask<List<PessoaB
                         status = conexaoFtp.login(usuarioFtp, funcoes.descriptografaSenha(senhaFtp));
                     } else {
                         // Atualiza a mensagem do progresso
-                        if(telaChamada == TELA_CLIENTE_CADASTRO_DADOS_FRAGMENT){
+                        if(telaChamada == TELA_CLIENTE_CADASTRO_DADOS_FRAGMENT || telaChamada == TELA_CLIENTE_DETALHES){
                             publishProgress("Não foi possível conectar no servidor em nuvem. Vamos para próxima etapa, aguarde... \n");
                         }
                     }
                     if (status) {
                         // Atualiza a mensagem do progresso
-                        if(telaChamada == TELA_CLIENTE_CADASTRO_DADOS_FRAGMENT){
+                        if(telaChamada == TELA_CLIENTE_CADASTRO_DADOS_FRAGMENT || telaChamada == TELA_CLIENTE_DETALHES){
                             publishProgress("Conectou com sucesso no servidor em nuvem. Estamos enviado o arquivo " + (j + 1) + " de " + listaLocalXml.size() + "\n");
                         }
                         // Checa se o arquivo xml existe
@@ -270,14 +278,14 @@ public class EnviarCadastroClienteFtpAsyncRotinas extends AsyncTask<List<PessoaB
                             // Envia o arquivo
                             if (conexaoFtp.storeFile(funcoes.getValorXml("ChaveEmpresa") + "_arquivoDeEnvio.txt", arqEnviar)) {
                                 // Atualiza a mensagem do progresso
-                                if(telaChamada == TELA_CLIENTE_CADASTRO_DADOS_FRAGMENT){
+                                if(telaChamada == TELA_CLIENTE_CADASTRO_DADOS_FRAGMENT || telaChamada == TELA_CLIENTE_DETALHES){
                                     publishProgress("Confirmando o envio do arquivo " + (j + 1) + " de " + listaLocalXml.size() + ", aguarde...\n");
                                 }
                                 // Renomeia o arquivo enviado para checar se chegou no servidor FTP com  sucesso
                                 if (renomeaArquivoFtp(funcoes.getValorXml("ChaveEmpresa") + "_arquivoDeEnvio.txt", nome)) {
 
                                     // Atualiza a mensagem do progresso
-                                    if(telaChamada == TELA_CLIENTE_CADASTRO_DADOS_FRAGMENT){
+                                    if(telaChamada == TELA_CLIENTE_CADASTRO_DADOS_FRAGMENT || telaChamada == TELA_CLIENTE_DETALHES){
                                         publishProgress("Arquvio " + (j + 1) + " de " + listaLocalXml.size() + " enviado com sucesso, eliminando os arquivos temporarios, aguarde...");
                                     }
                                     // Desconecta do servidor FTP
@@ -293,7 +301,7 @@ public class EnviarCadastroClienteFtpAsyncRotinas extends AsyncTask<List<PessoaB
                                     // Move o arquivo XML para a pasta  de arquivos enviados
                                     if (listaLocalXml.get(j).renameTo(new File(localNovoDiretorio, listaLocalXml.get(j).getName()))) {
                                         // Atualiza a mensagem do progresso
-                                        if(telaChamada == TELA_CLIENTE_CADASTRO_DADOS_FRAGMENT){
+                                        if(telaChamada == TELA_CLIENTE_CADASTRO_DADOS_FRAGMENT || telaChamada == TELA_CLIENTE_DETALHES){
                                             publishProgress("Arquvio temporario eliminado com sucesso, vamos passar para a próxima etapa.");
                                         }
                                         /*//Criamos uma classe SAXBuilder que vai processar o XML4
@@ -322,12 +330,12 @@ public class EnviarCadastroClienteFtpAsyncRotinas extends AsyncTask<List<PessoaB
                                                 // Atualiza os dados da pessoa
                                                 if ((pessoaSql.update(atualizaPessoa, "CFACLIFO.ID_CFACLIFO = " + idPessoaTemporario)) > 0){
                                                     // Atualiza a mensagem do progresso
-                                                    if(telaChamada == TELA_CLIENTE_CADASTRO_DADOS_FRAGMENT){
+                                                    if(telaChamada == TELA_CLIENTE_CADASTRO_DADOS_FRAGMENT || telaChamada == TELA_CLIENTE_DETALHES){
                                                         publishProgress("Pronto! Enviamos e marcamos o cadastro como enviado. Só aguardar o retorno da empresa. Vamos para próxima faze.");
                                                     }
                                                 } else {
                                                     // Atualiza a mensagem do progresso
-                                                    if(telaChamada == TELA_CLIENTE_CADASTRO_DADOS_FRAGMENT){
+                                                    if(telaChamada == TELA_CLIENTE_CADASTRO_DADOS_FRAGMENT || telaChamada == TELA_CLIENTE_DETALHES){
                                                         publishProgress("Não conseguimos marca o cadastro como enviado.");
                                                     }
                                                     mensagemErro += "Não conseguimos marca o cadastro como enviado.";

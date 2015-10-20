@@ -410,8 +410,16 @@ public class ClienteCadastroDadosFragment extends Fragment {
 				enderecoSql.insert(dadosEndereco);
 				// Instancia a classe para pegar os dados do usuario
 				PessoaRotinas pessoaRotinas = new PessoaRotinas(getActivity());
+
 				// Pega os dados do usuario
-				PessoaBeans dadosUsuario = pessoaRotinas.listaPessoaResumido("CFACLIFO.CODIGO_USU = " + funcoes.getValorXml("CodigoUsuario"), PessoaRotinas.KEY_TIPO_USUARIO).get(0);
+				List<PessoaBeans> listaPessoas = new ArrayList<PessoaBeans>();
+				listaPessoas = pessoaRotinas.listaPessoaResumido("CFACLIFO.CODIGO_USU = " + funcoes.getValorXml("CodigoUsuario"), PessoaRotinas.KEY_TIPO_USUARIO);
+
+				PessoaBeans dadosUsuario = null;
+
+				if (listaPessoas.size() > 0) {
+					dadosUsuario = listaPessoas.get(0);
+				}
 
 				ContentValues dadosParametro = new ContentValues();
 				dadosParametro.put("ID_CFAPARAM", idPessoaTemporario);
@@ -420,7 +428,7 @@ public class ClienteCadastroDadosFragment extends Fragment {
 				dadosParametro.put("ID_CFAPORTA", portador.getIdPortadorBanco());
 				dadosParametro.put("ID_CFATPDOC", documento.getIdTipoDocumento());
 				dadosParametro.put("ID_AEAPLPGT", planoPagamento.getIdPlanoPagamento());
-				dadosParametro.put("ID_CFACLIFO_VENDE", dadosUsuario.getIdPessoa());
+				dadosParametro.put("ID_CFACLIFO_VENDE", (dadosUsuario != null) ? dadosUsuario.getIdPessoa() : -1);
 				dadosParametro.put("LIMITE", editLimiteCompra.getText().toString());
 				dadosParametro.put("DESC_ATAC_VISTA", editDescontoAtacadoVista.getText().toString());
 				dadosParametro.put("DESC_ATAC_PRAZO", editDescontoAtacadoPrazo.getText().toString());

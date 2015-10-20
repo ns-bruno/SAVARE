@@ -127,7 +127,8 @@
                 android:resource="@xml/authenticator" />
         </service>
 
-        <receiver android:name="com.savare.funcoes.rotinas.receptor.ReceptorAlarmeEnviarOrcamentoBroadcastRotinas" android:label="ReceptorAlarmeEnviarOrcamentoBroadcastRotinas">
+        <receiver android:name="com.savare.funcoes.rotinas.receptor.ReceptorAlarmeEnviarOrcamentoBroadcastRotinas"
+                  android:label="ReceptorAlarmeEnviarOrcamentoBroadcastRotinas">
         <intent-filter>
             <action android:name="ENVIAR_ORCAMENTO_SAVARE" />
             <category android:name="android.intent.category.DEFAULT" />
@@ -156,16 +157,13 @@
             </intent-filter>
         </receiver>
 
-        <!--<receiver android:name="com.savare.funcoes.rotinas.receptor.ReceptorAlarmeEnviarCadastroPessoaBroadcastRotinas" android:label="ReceptorAlarmeEnviarCadastroPessoaBroadcastRotinas">
+        <receiver android:name="com.savare.funcoes.rotinas.receptor.ReceptorAlarmeEnviarCadastroPessoaBroadcastRotinas"
+                      android:label="ReceptorAlarmeEnviarCadastroPessoaBroadcastRotinas">
             <intent-filter>
-                <action android:name="ENVIAR_ORCAMENTO_SAVARE" />
+                <action android:name="ENVIAR_OUTROS_DADOS_SAVARE" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
-        </receiver>-->
-
-        <!-- Servico de autenticacao -->
-
-        <!-- Servico de sincronizacao -->
+        </receiver>
 
     </application>
     
