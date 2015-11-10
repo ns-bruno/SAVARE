@@ -1004,6 +1004,7 @@ public class ImportarDadosTxtRotinas {
 		dadosPessoa.put("CONJ_PODE_COMPRAR", conjugePodeComprar);
 		dadosPessoa.put("DT_ULT_COMPRA", dtUltimaCompra);
 		dadosPessoa.put("DT_RENOVACAO", dtRenovacao);
+		dadosPessoa.putNull("STATUS_CADASTRO_NOVO");
 		
 		final PessoaSql pessoaSql = new PessoaSql(context);
 

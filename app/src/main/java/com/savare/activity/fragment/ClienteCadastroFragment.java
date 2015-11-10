@@ -4,6 +4,7 @@ import com.savare.R;
 import com.savare.activity.InicioActivity;
 import com.savare.adapter.ClienteCadastroFragmentAdapter;
 import com.savare.banco.funcoesSql.PessoaSql;
+import com.savare.funcoes.FuncoesPersonalizadas;
 import com.savare.funcoes.rotinas.AuxiliarRotinas;
 
 import android.app.ActionBar;
@@ -38,9 +39,13 @@ public class ClienteCadastroFragment extends FragmentActivity {
 		AuxiliarRotinas auxiliarRotinas = new AuxiliarRotinas(ClienteCadastroFragment.this);
 		// Pega um id negativo temporario para fazer o cadastro do cliente
 		int idClifo = auxiliarRotinas.getIdClienteTemporario(null).getIdClienteTemporario();
+
+		FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(getApplicationContext());
+
 		// Cria a variavel para salvar o id temporario
 		Bundle clienteBundle = new Bundle();
-		clienteBundle.putString(ClienteCadastroTelefoneFragment.KEY_ID_PESSOA, "" + idClifo);
+		clienteBundle.putString(ClienteCadastroTelefoneFragment.KEY_ID_PESSOA, ""+idClifo);
+		clienteBundle.putString("CADASTRO_NOVO", "S");
 		// Passa por parametro o id temporario
 		adapterClienteCadastro.setParamentros(clienteBundle);
 		

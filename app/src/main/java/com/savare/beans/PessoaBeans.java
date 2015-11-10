@@ -85,6 +85,7 @@ public class PessoaBeans implements Parcelable {
 					totalAPagar,
 					totalVencido,
 					totalPago;
+	private boolean cadastroNovo;
 	
 	public PessoaBeans(Parcel dados) {
 		this.idPessoa = dados.readInt();
@@ -1111,6 +1112,14 @@ public class PessoaBeans implements Parcelable {
 
 	public void setListaTelefone(List<TelefoneBeans> listaTelefone) {
 		this.listaTelefone = listaTelefone;
+	}
+
+	public boolean isCadastroNovo() {
+		return cadastroNovo;
+	}
+
+	public void setCadastroNovo(boolean cadastroNovo) {
+		this.cadastroNovo = cadastroNovo;
 	}
 
 	@Override

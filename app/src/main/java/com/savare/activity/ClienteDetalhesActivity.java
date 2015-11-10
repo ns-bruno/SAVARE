@@ -83,6 +83,7 @@ public class ClienteDetalhesActivity extends Activity implements OnChartGestureL
 				   codigoUsu,
 				   codigoTra,
 				   idCliente;
+	private boolean clienteNovo = false;
 	
 	private ItemUniversalAdapter adapterRamoAtividade,
 								 adapterTipoCliente,
@@ -116,8 +117,12 @@ public class ClienteDetalhesActivity extends Activity implements OnChartGestureL
 			// Pega o id do cliente
 			idCliente = intentParametro.getString("ID_CFACLIFO");
 
+			if (intentParametro.getString("CADASTRO_NOVO").equalsIgnoreCase("S")){
+				clienteNovo = true;
+			}
+
 			// Checa se eh um cadastro novo feito na aplicacao
-			if (Integer.parseInt(intentParametro.getString("ID_CFACLIFO")) < 0){
+			if ((Integer.parseInt(intentParametro.getString("ID_CFACLIFO")) < 0) || (clienteNovo)){
 				// Seta o campo codigo da pessoa com o que foi passado por parametro
 				textCodigoPessoa.setText("*" + intentParametro.getString("CODIGO_CLI"));
 				textCodigoPessoa.setTextColor(getResources().getColor(R.color.vermelho_escuro));

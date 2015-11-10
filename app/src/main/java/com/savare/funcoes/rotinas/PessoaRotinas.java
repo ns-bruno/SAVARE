@@ -91,7 +91,7 @@ public class PessoaRotinas extends Rotinas {
 	public List<PessoaBeans> listaPessoaResumido(String where, String tipoPessoa) {
 		String sql = "SELECT CFACLIFO.ID_CFACLIFO, CFACLIFO.CODIGO_CLI, CFACLIFO.CODIGO_FUN, CFACLIFO.CODIGO_USU, "
 					+"CFACLIFO.CODIGO_TRA, CFACLIFO.CLIENTE, "
-					+"CFACLIFO.NOME_RAZAO, CFACLIFO.NOME_FANTASIA, CFACLIFO.PESSOA, CFACLIFO.DT_ULT_COMPRA, "
+					+"CFACLIFO.NOME_RAZAO, CFACLIFO.NOME_FANTASIA, CFACLIFO.PESSOA, CFACLIFO.DT_ULT_COMPRA, CFACLIFO.STATUS_CADASTRO_NOVO, "
 					+"CFASTATU.ID_CFASTATU, CFASTATU.DESCRICAO AS DESCRICAO_STATU, CFASTATU.BLOQUEIA, CFASTATU.PARCELA_EM_ABERTO, CFASTATU.VISTA_PRAZO, CPF_CNPJ, CFACLIFO.IE_RG, "
 					+"CFACIDAD.ID_CFACIDAD, CFACIDAD.DESCRICAO AS DESCRICAO_CIDAD, CFAESTAD.UF, CFAESTAD.ID_CFAESTAD, "
 					+"CFAENDER.TIPO, CFAENDER.CEP, CFAENDER.BAIRRO, CFAENDER.LOGRADOURO, CFAENDER.NUMERO, CFAENDER.COMPLEMENTO, CFAENDER.EMAIL "
@@ -153,6 +153,12 @@ public class PessoaRotinas extends Rotinas {
 				pessoa.setDataUltimaCompra(funcoes.formataData(dadosPessoa.getString(dadosPessoa.getColumnIndex("DT_ULT_COMPRA"))));
 				pessoa.setCpfCnpj(dadosPessoa.getString(dadosPessoa.getColumnIndex("CPF_CNPJ")));
 				pessoa.setIeRg(dadosPessoa.getString(dadosPessoa.getColumnIndex("IE_RG")));
+				// Checa se a pessoa eh um cadastro novo
+				if (dadosPessoa.getString(dadosPessoa.getColumnIndex("STATUS_CADASTRO_NOVO")).equalsIgnoreCase("N")){
+					pessoa.setCadastroNovo(true);
+				} else {
+					pessoa.setCadastroNovo(false);
+				}
 				if ((dadosPessoa.getString(dadosPessoa.getColumnIndex("CLIENTE")) != null) && (dadosPessoa.getString(dadosPessoa.getColumnIndex("CLIENTE")).length() > 0)) {
 					pessoa.setCliente(dadosPessoa.getString(dadosPessoa.getColumnIndex("CLIENTE")).charAt(0));
 				}

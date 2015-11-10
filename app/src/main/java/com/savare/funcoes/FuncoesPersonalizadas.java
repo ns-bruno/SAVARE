@@ -13,6 +13,7 @@ import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Locale;
 import java.util.Scanner;
+import java.util.UUID;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
@@ -1068,6 +1069,14 @@ public class FuncoesPersonalizadas {
 		Account c = ContaService.GetAccount(context);
 
 		ContentResolver.cancelSync(c, context.getResources().getString(R.string.content_authority));
+	}
+
+	public String geraGuid(int tamanho){
+		if (tamanho > 0){
+			return UUID.randomUUID().toString().replace("-", "").toUpperCase().substring(0, tamanho);
+		}else {
+			return  UUID.randomUUID().toString();
+		}
 	}
 
 } // Fecha classe

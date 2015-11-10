@@ -113,7 +113,9 @@ public class ClienteListaActivity extends Activity implements OnNavigationListen
 					returnIntent.putExtra("ENDERECO_CLIENTE", pessoa.getEnderecoPessoa().getLogradouro() + ", " + pessoa.getEnderecoPessoa().getNumero());
 					returnIntent.putExtra("BAIRRO_CLIENTE", pessoa.getEnderecoPessoa().getBairro());
 					returnIntent.putExtra("CEP_CLIENTE", pessoa.getEnderecoPessoa().getCep());
-
+					if (pessoa.isCadastroNovo()){
+						returnIntent.putExtra("CADASTRO_NOVO", "S");
+					}
 					setResult(ListaOrcamentoPedidoActivity.RETORNA_CLIENTE, returnIntent);
 					// Fecha a tela de detalhes de produto
 					finish();
@@ -137,7 +139,9 @@ public class ClienteListaActivity extends Activity implements OnNavigationListen
 					dadosCliente.put("ENDERECO_CLIENTE", pessoa.getEnderecoPessoa().getLogradouro() + ", " + pessoa.getEnderecoPessoa().getNumero());
 					dadosCliente.put("BAIRRO_CLIENTE", pessoa.getEnderecoPessoa().getBairro());
 					dadosCliente.put("CEP_CLIENTE", pessoa.getEnderecoPessoa().getCep());
-					
+					if (pessoa.isCadastroNovo()){
+						dadosCliente.put("CADASTRO_NOVO", "S");
+					}
 					OrcamentoRotinas orcamentoRotinas = new OrcamentoRotinas(ClienteListaActivity.this);
 					// Atualiza o cliente do orcamento
 					int qtdAlterado = orcamentoRotinas.updateOrcamento(dadosCliente, idOrcamento);
@@ -174,6 +178,9 @@ public class ClienteListaActivity extends Activity implements OnNavigationListen
 					intent.putExtra("CODIGO_USU", String.valueOf(pessoa.getCodigoUsuario()));
 					intent.putExtra("CODIGO_TRA", String.valueOf(pessoa.getCodigoTransportadora()));
 					intent.putExtra("CODIGO_FUN", String.valueOf(pessoa.getCodigoFuncionario()));
+					if (pessoa.isCadastroNovo()){
+						intent.putExtra("CADASTRO_NOVO", "S");
+					}
 					startActivity(intent);
 				}
 			}
