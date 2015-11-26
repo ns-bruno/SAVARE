@@ -38,14 +38,14 @@ public class ConexaoBancoDeDados extends SQLiteOpenHelper {
 		super(context, PATH_BANCO + NOME_BANCO, null, versao);
 		new File(Environment.getExternalStorageDirectory().toString() + "/SAVARE/BancoDeDados").mkdirs();
 		this.context = context;
-		abrirBanco();
+		//abrirBanco();
 	}
 
 	@Override
 	public void onCreate(SQLiteDatabase bd) {
+		Log.i("SAVARE", "create database");
 		try {
 			//bd.execSQL(SQL_TABELAS[i]);
-			Log.i("DB_SAVARE", "create database");
 			execSqlFile(CREATEFILE, bd);
 
 		} catch (SQLException e) {
@@ -85,7 +85,7 @@ public class ConexaoBancoDeDados extends SQLiteOpenHelper {
 	@Override
 	public void onUpgrade(SQLiteDatabase bd, int versaoAntiga, int versaoNova) {
 		try {
-			Log.i("DB_SAVARE", "upgrade database from " + versaoAntiga + " to " + versaoNova);
+			Log.i("SAVARE", "upgrade database from " + versaoAntiga + " to " + versaoNova);
 
 			for( String sqlFile : AssetUtils.list(SQL_DIR, this.context.getAssets())) {
 				if ( sqlFile.startsWith(UPGRADEFILE_PREFIX)) {
@@ -123,15 +123,15 @@ public class ConexaoBancoDeDados extends SQLiteOpenHelper {
 	public SQLiteDatabase abrirBanco() {
 
 		String bancoDados = PATH_BANCO + NOME_BANCO;
-		
+		Log.i("SAVARE", "abrirBanco");
 		//File s = context.getExternalFilesDir(null);
 
 		if (bancoSavare == null || !bancoSavare.isOpen()) {
-			bancoSavare = SQLiteDatabase.openDatabase(bancoDados, null, SQLiteDatabase.ENABLE_WRITE_AHEAD_LOGGING|
+			/*bancoSavare = SQLiteDatabase.openDatabase(bancoDados, null, SQLiteDatabase.ENABLE_WRITE_AHEAD_LOGGING|
 																		SQLiteDatabase.NO_LOCALIZED_COLLATORS|
-																		SQLiteDatabase.CREATE_IF_NECESSARY);
+																		SQLiteDatabase.CREATE_IF_NECESSARY);*/
 			
-			//bancoSavare = getWritableDatabase();
+			bancoSavare = getWritableDatabase();
 			//bancoSavare = SQLiteDatabase.openDatabase(bancoDados, null, 0);
 			// bancoSavare = getWritableDatabase();
 		}
@@ -166,6 +166,7 @@ public class ConexaoBancoDeDados extends SQLiteOpenHelper {
 
 	protected void execSqlFile(String sqlFile, SQLiteDatabase db ) throws SQLException, IOException {
 		//log.info("  exec sql file: {}" + sqlFile);
+		Log.i("SAVARE", "Executar o SqlFile.");
 		for(String sqlInstruction : SqlParser.parseSqlFile(SQL_DIR + "/" + sqlFile, this.context.getAssets())) {
 			// Executa a instrucao sql
 			db.execSQL(sqlInstruction);

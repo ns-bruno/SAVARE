@@ -28,7 +28,7 @@ public class FuncoesSql {
 		this.context = context;
 		this.tabela = tabela;
 		try {
-			int vAtual =  VersionUtils.getVersionCode(context);
+			//int vAtual =  VersionUtils.getVersionCode(context);
 			conexaoBanco = new ConexaoBancoDeDados(context, VersionUtils.getVersionCode(context));
 		} catch (PackageManager.NameNotFoundException e) {
 			e.printStackTrace();
