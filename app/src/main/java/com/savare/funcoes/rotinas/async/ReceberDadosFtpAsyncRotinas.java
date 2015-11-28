@@ -7,6 +7,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
+import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -83,7 +84,7 @@ public class ReceberDadosFtpAsyncRotinas extends AsyncTask<String, String, Integ
 			// Checa se retornou algum valor
 			if( (localDados != null) & (localDados.size() > 0)){
 
-				// Marca que a aplicacao nao esta mais recebendo dados
+				// Marca que a aplicacao esta recebendo dados
 				funcoes.setValorXml("RecebendoDados", "S");
 
 				((Activity) context).runOnUiThread(new Runnable() {
@@ -96,7 +97,7 @@ public class ReceberDadosFtpAsyncRotinas extends AsyncTask<String, String, Integ
 
 				// Passa por todos os registros
 				for (int i = 0; i < localDados.size(); i++) {
-
+					Log.i("SAVARE", "importar os dados do arquivo "+ localDados.get(i) + " - ReceberDadosFtpAsyncRotinas");
 					// Checa se que esta chamando esta classe eh o alarme
 					if(telaChamou == TELA_RECEPTOR_ALARME){
 						ImportarDadosTxtRotinas importarDados = new ImportarDadosTxtRotinas(context, localDados.get(i), TELA_RECEPTOR_ALARME);

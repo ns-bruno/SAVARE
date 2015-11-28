@@ -12,6 +12,7 @@ import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -27,6 +28,7 @@ import com.savare.banco.funcoesSql.EnderecoSql;
 import com.savare.banco.funcoesSql.EstadoSql;
 import com.savare.banco.funcoesSql.EstoqueSql;
 import com.savare.banco.funcoesSql.GradeSql;
+import com.savare.banco.funcoesSql.ItemOrcamentoSql;
 import com.savare.banco.funcoesSql.LocacaoSql;
 import com.savare.banco.funcoesSql.MarcaSql;
 import com.savare.banco.funcoesSql.OrcamentoSql;
@@ -134,8 +136,9 @@ public class ImportarDadosTxtRotinas {
 	}
 	
 	public void importarDados(){
+		Log.i("SAVARE", "Executando a rotina importarDados - ImportarDadosTxtRotinas");
 
-		((Activity) context).runOnUiThread(new Runnable() {
+				((Activity) context).runOnUiThread(new Runnable() {
 			public void run() {
 				progressRecebimentoDados.setVisibility(View.VISIBLE);
 				progressRecebimentoDados.setIndeterminate(true);
@@ -183,6 +186,8 @@ public class ImportarDadosTxtRotinas {
 			
 			// Passa por todas as linha do arquivo txt
 			while(scannerDados.hasNextLine()){
+				Log.i("SAVARE", "Escaneando as linhas(sccanerDados) - " + incremento + " - ImportarDadosTxtRotinas");
+
 				if(progressRecebimentoDados != null){
 					// Incrementa o progresso
 					progressRecebimentoDados.setProgress(incremento);
@@ -633,7 +638,21 @@ public class ImportarDadosTxtRotinas {
 						});
 					}
 
+					importarRegistroOrcamento(linha);
 
+				} else if(registro.equalsIgnoreCase(BLOCO_A312_AEAITORC) && layoutValido){
+					// Pega a linha completa
+					final String linha = scannerLinha.nextLine();
+
+					if(telaChamou != TELA_RECEPTOR_ALARME){
+						((Activity) context).runOnUiThread(new Runnable() {
+							public void run() {
+								// Atualiza o texto da tela de sincronizacao
+								textMensagemProcesso.setText(posicaoLinhaAtual + " de " + totalLinhaRegistro +" Importando o bloco " + BLOCO_R400_RPAPARCE + linha);
+							}
+						});
+					}
+					importarRegistroItemOrcamento(linha);
 
 				} else if(registro.equalsIgnoreCase(BLOCO_R400_RPAPARCE) && layoutValido){
 					// Pega a linha completa
@@ -703,7 +722,10 @@ public class ImportarDadosTxtRotinas {
 			funcoes.setValorXml("RecebendoDados", "N");
 			
 		} catch (final Exception e) {
-			
+			Log.e("SAVARE", "erro, Não foi possível escanear os dados do arquivo. - ImportarDadosTxtRotinas");
+
+			funcoes.setValorXml("RecebendoDados", "N");
+
 			mensagem += "Não foi possível escanear os dados do arquivo. \n" + e.getMessage();
 			
 			if(telaChamou != TELA_RECEPTOR_ALARME){
@@ -760,7 +782,7 @@ public class ImportarDadosTxtRotinas {
 		if( (mensagem != null) && (mensagem.length() > 0) && (telaChamou == TELA_RECEPTOR_ALARME)){
 			// Cria a intent com identificacao do alarme
 			Intent intent = new Intent("NOTIFICACAO_SAVARE");
-			intent.putExtra("TICKER", "Importa��o dos Dados");
+			intent.putExtra("TICKER", "Importação dos Dados");
 			intent.putExtra("TITULO", "SAVARE");
 			intent.putExtra("MENSAGEM", mensagem);
 			
@@ -960,7 +982,7 @@ public class ImportarDadosTxtRotinas {
 		dadosPessoa.put("IE_RG", ieRg);
 		dadosPessoa.put("NOME_RAZAO", nomeRazao.replace("'", " "));
 		dadosPessoa.put("NOME_FANTASIA", nomeFantasia.replace(",", " "));
-		dadosPessoa.put("DT_NASCIMENTO", dtNascimento);
+		dadosPessoa.put("DT_NASCIMENTO", dtNascimento.replace("0000-00-00", null));
 		dadosPessoa.put("CODIGO_CLI", codigoCli);
 		dadosPessoa.put("CODIGO_FUN", codigoFun);
 		dadosPessoa.put("CODIGO_USU", codigoUsu);
@@ -986,7 +1008,7 @@ public class ImportarDadosTxtRotinas {
 		dadosPessoa.put("CIVIL", civil);
 		dadosPessoa.put("CONJUGE", conjuge);
 		dadosPessoa.put("CPF_CONJUGE", cpfConjuge);
-		dadosPessoa.put("DT_NASC_CONJ", dtNascimentoConjuge);
+		dadosPessoa.put("DT_NASC_CONJ", dtNascimentoConjuge.replace("0000-00-00", null));
 		dadosPessoa.put("QTDE_FUNCIONARIOS", qtdeFuncionarios);
 		dadosPessoa.put("OUTRAS_RENDAS", outrasRendas);
 		dadosPessoa.put("NUM_DEP_MAIOR", numeroDependenteMaior);
@@ -1002,8 +1024,8 @@ public class ImportarDadosTxtRotinas {
 		dadosPessoa.put("ENVIAR_EXTRATO", enviarExtrato);
 		dadosPessoa.put("TIPO_EXTRATO", tipoExtrato);
 		dadosPessoa.put("CONJ_PODE_COMPRAR", conjugePodeComprar);
-		dadosPessoa.put("DT_ULT_COMPRA", dtUltimaCompra);
-		dadosPessoa.put("DT_RENOVACAO", dtRenovacao);
+		dadosPessoa.put("DT_ULT_COMPRA", dtUltimaCompra.replace("0000-00-00", null));
+		dadosPessoa.put("DT_RENOVACAO", dtRenovacao.replace("0000-00-00", null));
 		dadosPessoa.putNull("STATUS_CADASTRO_NOVO");
 		
 		final PessoaSql pessoaSql = new PessoaSql(context);
@@ -1792,10 +1814,10 @@ public class ImportarDadosTxtRotinas {
 		dadosParametro.put("DESC_PROMOCAO", descPromocao);
 		dadosParametro.put("ROTEIRO", roteiro);
 		dadosParametro.put("FREQUENCIA", frequencia);
-		dadosParametro.put("DT_ULT_VISITA", dtUltimaVisita);
-		dadosParametro.put("DT_ULT_ENVIO", dtUltimoEnvio);
-		dadosParametro.put("DT_ULT_RECEBTO", dtUltimoRecebto);
-		dadosParametro.put("DT_PROXIMO_CONTATO", dtProximoContato);
+		dadosParametro.put("DT_ULT_VISITA", dtUltimaVisita.replace("0000-00-00", null));
+		dadosParametro.put("DT_ULT_ENVIO", dtUltimoEnvio.replace("0000-00-00", null));
+		dadosParametro.put("DT_ULT_RECEBTO", dtUltimoRecebto.replace("0000-00-00", null));
+		dadosParametro.put("DT_PROXIMO_CONTATO", dtProximoContato.replace("0000-00-00", null));
 		dadosParametro.put("DIAS_ATRAZO", diasAtrazo);
 		dadosParametro.put("DIAS_CARENCIA", diasCarencia);
 		dadosParametro.put("JUROS_DIARIO", jurosDiario);
@@ -2015,6 +2037,7 @@ public class ImportarDadosTxtRotinas {
 		String idCidade = scannerOrcamento.next();
 		String idRomaneio = scannerOrcamento.next();
 		String idTipoDocumento = scannerOrcamento.next();
+		String dataAlt = scannerOrcamento.next();
 		String numero = scannerOrcamento.next();
 		String valorFaturado = scannerOrcamento.next();
 		String pessoaCliente = scannerOrcamento.next();
@@ -2037,6 +2060,7 @@ public class ImportarDadosTxtRotinas {
 		dadosOrcamento.put("ID_CFACIDAD", idCidade);
 		dadosOrcamento.put("ID_AEAROMAN", idRomaneio);
 		dadosOrcamento.put("ID_CFATPDOC", idTipoDocumento);
+		dadosOrcamento.put("DT_ALT", dataAlt);
 		dadosOrcamento.put("NUMERO", numero);
 		dadosOrcamento.put("VL_FATURADO", valorFaturado);
 		dadosOrcamento.put("PESSOA_CLIENTE", pessoaCliente);
@@ -2083,7 +2107,71 @@ public class ImportarDadosTxtRotinas {
 			});
 		}
 	} // Fim importarRegistroOrcamento
-	
+
+	private void importarRegistroItemOrcamento(String linha){
+		Scanner scannerOrcamento = new Scanner(linha).useDelimiter("\\|");
+
+		String FINALIDADE = scannerOrcamento.next();
+		final String guid = scannerOrcamento.next();
+		String idOrcamento = scannerOrcamento.next();
+		String idEstoque = scannerOrcamento.next();
+		String idPlanoPagamento = scannerOrcamento.next();
+		String idUnidadeVenda = scannerOrcamento.next();
+		String dtAlt = scannerOrcamento.next();
+		String quantidade = scannerOrcamento.next();
+		String vlTabalaFaturado = scannerOrcamento.next();
+		String vlLiquidoFaturado = scannerOrcamento.next();
+		String complemento = scannerOrcamento.next();
+		String seqDesconto = scannerOrcamento.next();
+		String statusRetorno = scannerOrcamento.next();
+
+		final ContentValues dadosItemOrcamento = new ContentValues();
+		dadosItemOrcamento.put("GUID", guid);
+		dadosItemOrcamento.put("ID_AEAORCAM", idOrcamento);
+		dadosItemOrcamento.put("ID_AEAESTOQ", idEstoque);
+		dadosItemOrcamento.put("ID_AEAPLPGT", idPlanoPagamento);
+		dadosItemOrcamento.put("ID_AEAUNVEN", idUnidadeVenda);
+		dadosItemOrcamento.put("DT_ALT", dtAlt);
+		dadosItemOrcamento.put("QUANTIDADE_FATURADA", quantidade);
+		dadosItemOrcamento.put("VL_TABELA_FATURADO", vlTabalaFaturado);
+		dadosItemOrcamento.put("FC_LIQUIDO_FATURADO", vlLiquidoFaturado);
+		dadosItemOrcamento.put("COMPLEMENTO", complemento);
+		dadosItemOrcamento.put("SEQ_DESCONTO", seqDesconto);
+		dadosItemOrcamento.put("STATUS_RETORNO", statusRetorno);
+
+		final ItemOrcamentoSql itemOrcamentoSql = new ItemOrcamentoSql(context);
+
+		// Pega o sql para passar para o statement
+		final String sql = itemOrcamentoSql.construirSqlStatement(dadosItemOrcamento);
+		// Pega o argumento para o statement
+		final String[] argumentoSql = itemOrcamentoSql.argumentoStatement(dadosItemOrcamento);
+
+		// Checa se a finalidade eh inserir
+		if(FINALIDADE.equalsIgnoreCase("I")){
+			((Activity) context).runOnUiThread(new Runnable() {
+				public void run() {
+					//gradeSql.insertOrReplace(dadosGrade);
+					itemOrcamentoSql.insertOrReplaceFast(sql, argumentoSql);
+				}
+			});
+
+			// Checa se a finalidade eh atualizar
+		} else if(FINALIDADE.equalsIgnoreCase("U")){
+			((Activity) context).runOnUiThread(new Runnable() {
+				public void run() {
+					itemOrcamentoSql.update(dadosItemOrcamento, "GUID = " + guid);
+				}
+			});
+
+			// Checa se a finalidade eh deletar
+		} else if(FINALIDADE.equalsIgnoreCase("D")){
+			((Activity) context).runOnUiThread(new Runnable() {
+				public void run() {
+					itemOrcamentoSql.delete("GUID = " + guid);
+				}
+			});
+		}
+	}
 	
 	private void importarRegistroGrade(String linha){
 		
@@ -2368,8 +2456,8 @@ public class ImportarDadosTxtRotinas {
 		dadosPLoja.put("RETIDO", retido);
 		dadosPLoja.put("PEDIDO", pedido);
 		dadosPLoja.put("ATIVO", ativo);
-		dadosPLoja.put("DT_ENTRADA_D", dtEntradaD);
-		dadosPLoja.put("DT_ENTRADA_N", dtEntradaN);
+		dadosPLoja.put("DT_ENTRADA_D", dtEntradaD.replace("0000-00-00", null));
+		dadosPLoja.put("DT_ENTRADA_N", dtEntradaN.replace("0000-00-00", null));
 		dadosPLoja.put("CT_REPOSICAO_N", ctReposicaoN);
 		dadosPLoja.put("CT_COMPLETO_N", ctCompletoN);
 		dadosPLoja.put("VENDA_ATAC", vendaAtac);
@@ -2528,9 +2616,9 @@ public class ImportarDadosTxtRotinas {
 		dadosParcela.put("ID_CFAPORTA", idPorta);
 		dadosParcela.put("DT_ALT", dtAlta);
 		dadosParcela.put("TIPO", tipo);
-		dadosParcela.put("DT_EMISSAO", dtEmissao);
-		dadosParcela.put("DT_VENCIMENTO", dtVencimento);
-		dadosParcela.put("DT_BAIXA", dtBaixa);
+		dadosParcela.put("DT_EMISSAO", dtEmissao.replace("0000-00-00", null));
+		dadosParcela.put("DT_VENCIMENTO", dtVencimento.replace("0000-00-00", null));
+		dadosParcela.put("DT_BAIXA", dtBaixa.replace("0000-00-00", null));
 		dadosParcela.put("PARCELA", parcela);
 		dadosParcela.put("VL_PARCELA", vlParcela);
 		dadosParcela.put("FC_VL_TOTAL_PAGO", vlTotalPago);

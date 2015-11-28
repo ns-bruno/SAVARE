@@ -121,17 +121,17 @@ public class ConexaoBancoDeDados extends SQLiteOpenHelper {
 	 * @return
 	 */
 	public SQLiteDatabase abrirBanco() {
+		Log.i("SAVARE", "abrirBanco");
 
 		String bancoDados = PATH_BANCO + NOME_BANCO;
-		Log.i("SAVARE", "abrirBanco");
 		//File s = context.getExternalFilesDir(null);
 
 		if (bancoSavare == null || !bancoSavare.isOpen()) {
-			/*bancoSavare = SQLiteDatabase.openDatabase(bancoDados, null, SQLiteDatabase.ENABLE_WRITE_AHEAD_LOGGING|
+			bancoSavare = SQLiteDatabase.openDatabase(bancoDados, null, SQLiteDatabase.ENABLE_WRITE_AHEAD_LOGGING|
 																		SQLiteDatabase.NO_LOCALIZED_COLLATORS|
-																		SQLiteDatabase.CREATE_IF_NECESSARY);*/
+																		SQLiteDatabase.CREATE_IF_NECESSARY);
 			
-			bancoSavare = getWritableDatabase();
+			//bancoSavare = getWritableDatabase();
 			//bancoSavare = SQLiteDatabase.openDatabase(bancoDados, null, 0);
 			// bancoSavare = getWritableDatabase();
 		}

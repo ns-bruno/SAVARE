@@ -710,7 +710,10 @@ public class FuncoesSql {
             for (String colName : values.keySet()) {
                 sql.append(((i > 0) && (values.get(colName).toString().length() > 0)) ? "," : "");
                 sql.append((values.get(colName).toString().length() > 0) ? colName : "");
-                i++;
+                // Incrementa o controle
+				if ((values.get(colName).toString().length() > 0)) {
+					i++;
+				}
             }
             sql.append(')');
             sql.append(" VALUES (");
@@ -718,7 +721,10 @@ public class FuncoesSql {
             for (String colName : values.keySet()) {
             	sql.append(((i > 0) && (values.get(colName).toString().length() > 0)) ? "," : "");
             	sql.append((values.get(colName).toString().length() > 0) ? "?" : "");
-            	i++;
+				// Incrementa o controle
+				if (values.get(colName).toString().length() > 0) {
+					i++;
+				}
             }
         } else {
             sql.append(null + ") VALUES (NULL");
