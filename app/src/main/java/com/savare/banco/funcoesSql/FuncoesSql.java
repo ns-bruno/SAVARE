@@ -390,11 +390,15 @@ public class FuncoesSql {
 			}
 			
 		} catch (SQLException e) {
+			// Verifica se as funcoes estao instanciadas
+			if (funcoes == null){
+				funcoes = new FuncoesPersonalizadas(context);
+			}
 			// Armazena as informacoes para para serem exibidas e enviadas
 			ContentValues contentValues = new ContentValues();
 			contentValues.put("comando", 0);
 			contentValues.put("tela", tabela);
-			contentValues.put("mensagem", funcoes.tratamentoErroBancoDados(e.getMessage()));
+			contentValues.put("mensagem", funcoes.tratamentoErroBancoDados(e.getMessage().toString()));
 			contentValues.put("dados", e.toString());
 			// Pega os dados do usuario
 			this.funcoes = new FuncoesPersonalizadas(context);

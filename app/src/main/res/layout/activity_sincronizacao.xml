@@ -61,7 +61,7 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:layout_marginTop="20dp" >
-                
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" >
@@ -91,19 +91,19 @@
                     android:visibility="gone"
                     android:layout_marginTop="5dp" />
             </LinearLayout>
-            
+
             <View
                 android:id="@+id/view2"
                 android:layout_width="wrap_content"
                 android:layout_height="2dp"
                 android:background="@color/azul_escuro" />
-            
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:layout_marginTop="20dp" >
-                
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" >
@@ -133,20 +133,20 @@
                     android:visibility="gone"
                     android:layout_marginTop="5dp" />
             </LinearLayout>
-            
+
             <View
                 android:id="@+id/view3"
                 android:layout_width="wrap_content"
                 android:layout_height="2dp"
                 android:background="@color/azul_escuro" />
-            
-            
+
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:layout_marginTop="20dp" >
-                
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" >
@@ -176,20 +176,20 @@
                     android:visibility="gone"
                     android:layout_marginTop="5dp" />
             </LinearLayout>
-            
+
             <View
                 android:id="@+id/view4"
                 android:layout_width="wrap_content"
                 android:layout_height="2dp"
                 android:background="@color/azul_escuro" />
-            
-            
+
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:layout_marginTop="20dp" >
-                
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" >
@@ -219,7 +219,7 @@
                     android:visibility="gone"
                     android:layout_marginTop="5dp" />
             </LinearLayout>
-            
+
             <View
                 android:id="@+id/view5"
                 android:layout_width="wrap_content"

@@ -152,7 +152,7 @@ public class ConfiguracoesActivity extends Activity {
 					funcoesP.setValorXml("EnviarAutomatico", "N");
 				}
 				
-				funcoesP.criarAlarmeEnviarReceberDadosAutomatico();
+				funcoesP.criarAlarmeEnviarReceberDadosAutomatico(true, true);
 			}
 		});
 		
@@ -171,7 +171,7 @@ public class ConfiguracoesActivity extends Activity {
 					funcoesP.setValorXml("ReceberAutomatico", "N");
 				}
 				
-				funcoesP.criarAlarmeEnviarReceberDadosAutomatico();
+				funcoesP.criarAlarmeEnviarReceberDadosAutomatico(true, true);
 			}
 		});
 	

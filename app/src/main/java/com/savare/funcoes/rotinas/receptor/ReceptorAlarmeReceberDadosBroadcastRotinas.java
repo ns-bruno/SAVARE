@@ -19,14 +19,16 @@ public class ReceptorAlarmeReceberDadosBroadcastRotinas extends BroadcastReceive
 
 		if (!funcoes.getValorXml("RecebendoDados").equalsIgnoreCase("S")) {
 			// Marca nos parametro internos que a aplicacao que esta recebendo os dados
-			funcoes.setValorXml("RecebendoDados", "S");
+			//funcoes.setValorXml("RecebendoDados", "S");
+
+			// Desavia o recebimento automatico
+			funcoes.criarAlarmeEnviarReceberDadosAutomatico(true, false);
 
 			ReceberDadosFtpAsyncRotinas receberDadosFtpAsync = new ReceberDadosFtpAsyncRotinas(context, ReceberDadosFtpAsyncRotinas.TELA_RECEPTOR_ALARME);
 			receberDadosFtpAsync.execute();
 
 			Log.i("SAVARE", "Executou a rotina para receber os dados. - ReceptorAlarmeReceberDadosBroadcastRotinas");
 		}
-
 
 	}
 

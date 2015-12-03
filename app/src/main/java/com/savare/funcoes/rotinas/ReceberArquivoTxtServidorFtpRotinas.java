@@ -460,8 +460,16 @@ public class ReceberArquivoTxtServidorFtpRotinas {
 		
 		return localArquivoRecebido;
 	} // Fim downloadArquivoTxtServidorFtp
-	
-	
+
+
+	/**
+	 * Faz o download do arquivo no servidor FTP.
+	 *
+	 * @param nomeAquivo
+	 * @param pastaDestino - Pasta localizada no dispositivo
+	 * @param diretorioFtp
+	 * @return
+	 */
 	private String downloadFtp(final String nomeAquivo, File pastaDestino, String diretorioFtp){
 		// Salvar o local que foi feito o downlods junto com o nome do arquivo
 		String localArquivoRecebido = "";

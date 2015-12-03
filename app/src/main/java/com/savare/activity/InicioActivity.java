@@ -50,6 +50,7 @@ import com.savare.funcoes.FuncoesPersonalizadas;
 import com.savare.funcoes.rotinas.EmpresaRotinas;
 import com.savare.funcoes.rotinas.OrcamentoRotinas;
 import com.savare.funcoes.rotinas.UsuarioRotinas;
+import com.savare.funcoes.rotinas.async.ReceberDadosFtpAsyncRotinas;
 import com.savare.sincronizacao.ConfiguracoesSincronizacao;
 
 public class InicioActivity extends Activity {
@@ -228,6 +229,19 @@ public class InicioActivity extends Activity {
             funcoes.CreateSyncAccount(InicioActivity.this);
         } else {
             funcoes.cancelarSincronizacaoSegundoPlano();
+        }
+
+        if (!funcoes.getValorXml("RecebendoDados").equalsIgnoreCase("S")) {
+            // Marca nos parametro internos que a aplicacao que esta recebendo os dados
+            //funcoes.setValorXml("RecebendoDados", "S");
+
+            // Desavia o recebimento automatico
+            funcoes.criarAlarmeEnviarReceberDadosAutomatico(true, false);
+
+            ReceberDadosFtpAsyncRotinas receberDadosFtpAsync = new ReceberDadosFtpAsyncRotinas(InicioActivity.this, ReceberDadosFtpAsyncRotinas.TELA_LOGIN);
+            receberDadosFtpAsync.execute();
+
+            Log.i("SAVARE", "Executou a rotina para receber os dados. - InicioActivity");
         }
 
     }

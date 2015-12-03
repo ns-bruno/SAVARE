@@ -134,7 +134,7 @@ public class LoginActivity extends Activity {
 				}
 			}
 			// Cria o alarme se nao existir para enviar e receber dados
-			funcoes.criarAlarmeEnviarReceberDadosAutomatico();
+			funcoes.criarAlarmeEnviarReceberDadosAutomatico(true, true);
 
 		}catch (Exception e){
 			FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(LoginActivity.this);

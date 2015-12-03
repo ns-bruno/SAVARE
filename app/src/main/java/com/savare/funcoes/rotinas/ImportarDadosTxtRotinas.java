@@ -107,19 +107,7 @@ public class ImportarDadosTxtRotinas {
 		this.telaChamou = telaChamou;
 	}
 	
-	public ImportarDadosTxtRotinas(Context context, String localDados, ProgressBar progressBar) {
-		this.context = context;
-		this.localDados = localDados;
-		this.progressRecebimentoDados = progressBar;
-		
-		/*((Activity) context).runOnUiThread(new Runnable() {
-			  public void run() {
-				progressRecebimentoDados.setVisibility(View.VISIBLE);
-				progressRecebimentoDados.setIndeterminate(true);
-			  }
-		});*/
-	}
-	
+
 	public ImportarDadosTxtRotinas(Context context, String localDados, ProgressBar progressBar, TextView textMensagem) {
 		this.context = context;
 		this.localDados = localDados;
@@ -138,16 +126,16 @@ public class ImportarDadosTxtRotinas {
 	public void importarDados(){
 		Log.i("SAVARE", "Executando a rotina importarDados - ImportarDadosTxtRotinas");
 
-				((Activity) context).runOnUiThread(new Runnable() {
+		/*((Activity) context).runOnUiThread(new Runnable() {
 			public void run() {
-				progressRecebimentoDados.setVisibility(View.VISIBLE);
+				//progressRecebimentoDados.setVisibility(View.VISIBLE);
 				progressRecebimentoDados.setIndeterminate(true);
 			}
-		});
+		});*/
 
-		final Calendar calendario = Calendar.getInstance();
+		//final Calendar calendario = Calendar.getInstance();
 		
-		long tempoInicial = calendario.getTimeInMillis();
+		//long tempoInicial = calendario.getTimeInMillis();
 		
 		FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
 		
@@ -173,24 +161,40 @@ public class ImportarDadosTxtRotinas {
 	        //liberamos o fluxo dos objetos ou fechamos o arquivo
 	        fileReader.close();
 	        bufferedReader.close();
-			
-			if(progressRecebimentoDados != null){
-				// Torna a barra de progresso finita
-				progressRecebimentoDados.setIndeterminate(false);
-				// Zera a contagem do progresso
-				progressRecebimentoDados.setProgress(0);
-				// Inseri o total que a barra de progresso pode ir
-				progressRecebimentoDados.setMax(totalLinha);
+
+			final int finalTotalLinha = totalLinha;
+
+			if (progressRecebimentoDados != null) {
+
+				((Activity) context).runOnUiThread(new Runnable() {
+					public void run() {
+
+						// Torna a barra de progresso finita
+						progressRecebimentoDados.setIndeterminate(false);
+						// Zera a contagem do progresso
+						progressRecebimentoDados.setProgress(0);
+						// Inseri o total que a barra de progresso pode ir
+						progressRecebimentoDados.setMax(finalTotalLinha);
+					}
+				});
 			}
 			int incremento = 0;
 			
 			// Passa por todas as linha do arquivo txt
 			while(scannerDados.hasNextLine()){
+
 				Log.i("SAVARE", "Escaneando as linhas(sccanerDados) - " + incremento + " - ImportarDadosTxtRotinas");
 
-				if(progressRecebimentoDados != null){
-					// Incrementa o progresso
-					progressRecebimentoDados.setProgress(incremento);
+				final int finalIncremento = incremento;
+
+				if (progressRecebimentoDados != null) {
+
+					//((Activity) context).runOnUiThread(new Runnable() {
+					//	public void run() {
+							// Incrementa o progresso
+							progressRecebimentoDados.setProgress(finalIncremento);
+					///	}
+					//});
 				}
 				// Incrementa o numero de linha scaneadas
 				incremento ++;
@@ -238,7 +242,8 @@ public class ImportarDadosTxtRotinas {
 				} else if(registro.equalsIgnoreCase(BLOCO_S100_SMAEMPRE) && layoutValido){
 					// Pega a linha completa
 					final String linha = scannerLinha.nextLine();
-					
+
+					Log.i("SAVARE", linha + " - ImportarDadosTxtRotinas");
 					if(telaChamou != TELA_RECEPTOR_ALARME){
 						((Activity) context).runOnUiThread(new Runnable() {
 	  					  public void run() {
@@ -253,7 +258,8 @@ public class ImportarDadosTxtRotinas {
 				} else if(registro.equalsIgnoreCase(BLOCO_C200_CFAAREAS) && layoutValido){
 					// Pega a linha completa
 					final String linha = scannerLinha.nextLine();
-					
+
+					Log.i("SAVARE", linha + " - ImportarDadosTxtRotinas");
 					if(telaChamou != TELA_RECEPTOR_ALARME){
 						((Activity) context).runOnUiThread(new Runnable() {
 		  					  public void run() {
@@ -268,7 +274,8 @@ public class ImportarDadosTxtRotinas {
 				} else if(registro.equalsIgnoreCase(BLOCO_C201_CFAATIVI) && layoutValido){
 					// Pega a linha completa
 					final String linha = scannerLinha.nextLine();
-					
+
+					Log.i("SAVARE", linha + " - ImportarDadosTxtRotinas");
 					if(telaChamou != TELA_RECEPTOR_ALARME){
 						((Activity) context).runOnUiThread(new Runnable() {
 		  					  public void run() {
@@ -283,7 +290,8 @@ public class ImportarDadosTxtRotinas {
 				} else if(registro.equalsIgnoreCase(BLOCO_C202_CFASTATU) && layoutValido){
 					// Pega a linha completa
 					final String linha = scannerLinha.nextLine();
-					
+
+					Log.i("SAVARE", linha + " - ImportarDadosTxtRotinas");
 					if(telaChamou != TELA_RECEPTOR_ALARME){
 						((Activity) context).runOnUiThread(new Runnable() {
 		  					  public void run() {
@@ -298,7 +306,8 @@ public class ImportarDadosTxtRotinas {
 				} else if(registro.equalsIgnoreCase(BLOCO_C203_CFATPDOC) && layoutValido){
 					// Pega a linha completa
 					final String linha = scannerLinha.nextLine();
-					
+
+					Log.i("SAVARE", linha + " - ImportarDadosTxtRotinas");
 					if(telaChamou != TELA_RECEPTOR_ALARME){
 						((Activity) context).runOnUiThread(new Runnable() {
 		  					  public void run() {
@@ -313,7 +322,8 @@ public class ImportarDadosTxtRotinas {
 				} else if(registro.equalsIgnoreCase(BLOCO_C204_CFACCRED) && layoutValido){
 					// Pega a linha completa
 					final String linha = scannerLinha.nextLine();
-					
+
+					Log.i("SAVARE", linha + " - ImportarDadosTxtRotinas");
 					if(telaChamou != TELA_RECEPTOR_ALARME){
 						((Activity) context).runOnUiThread(new Runnable() {
 		  					  public void run() {
@@ -328,7 +338,8 @@ public class ImportarDadosTxtRotinas {
 				} else if(registro.equalsIgnoreCase(BLOCO_C205_CFAPORTA) && layoutValido){
 					// Pega a linha completa
 					final String linha = scannerLinha.nextLine();
-					
+
+					Log.i("SAVARE", linha + " - ImportarDadosTxtRotinas");
 					if(telaChamou != TELA_RECEPTOR_ALARME){
 						((Activity) context).runOnUiThread(new Runnable() {
 		  					  public void run() {
@@ -343,7 +354,8 @@ public class ImportarDadosTxtRotinas {
 				} else if(registro.equalsIgnoreCase(BLOCO_C206_CFAPROFI) && layoutValido){
 					// Pega a linha completa
 					final String linha = scannerLinha.nextLine();
-					
+
+					Log.i("SAVARE", linha + " - ImportarDadosTxtRotinas");
 					if(telaChamou != TELA_RECEPTOR_ALARME){
 						((Activity) context).runOnUiThread(new Runnable() {
 		  					  public void run() {
@@ -358,7 +370,8 @@ public class ImportarDadosTxtRotinas {
 				} else if(registro.equalsIgnoreCase(BLOCO_C207_CFATPCLI) && layoutValido){
 					// Pega a linha completa
 					final String linha = scannerLinha.nextLine();
-					
+
+					Log.i("SAVARE", linha + " - ImportarDadosTxtRotinas");
 					if(telaChamou != TELA_RECEPTOR_ALARME){
 						((Activity) context).runOnUiThread(new Runnable() {
 		  					  public void run() {
@@ -373,7 +386,8 @@ public class ImportarDadosTxtRotinas {
 				} else if(registro.equalsIgnoreCase(BLOCO_C208_CFATPCOB) && layoutValido){
 					// Pega a linha completa
 					final String linha = scannerLinha.nextLine();
-					
+
+					Log.i("SAVARE", linha + " - ImportarDadosTxtRotinas");
 					if(telaChamou != TELA_RECEPTOR_ALARME){
 						((Activity) context).runOnUiThread(new Runnable() {
 		  					  public void run() {
@@ -388,7 +402,8 @@ public class ImportarDadosTxtRotinas {
 				} else if(registro.equalsIgnoreCase(BLOCO_C209_CFAESTAD) && layoutValido){
 					// Pega a linha completa
 					final String linha = scannerLinha.nextLine();
-					
+
+					Log.i("SAVARE", linha + " - ImportarDadosTxtRotinas");
 					if(telaChamou != TELA_RECEPTOR_ALARME){
 						((Activity) context).runOnUiThread(new Runnable() {
 		  					  public void run() {
@@ -403,7 +418,8 @@ public class ImportarDadosTxtRotinas {
 				} else if(registro.equalsIgnoreCase(BLOCO_C210_CFACIDAD) && layoutValido){
 					// Pega a linha completa
 					final String linha = scannerLinha.nextLine();
-					
+
+					Log.i("SAVARE", linha + " - ImportarDadosTxtRotinas");
 					if(telaChamou != TELA_RECEPTOR_ALARME){
 						((Activity) context).runOnUiThread(new Runnable() {
 		  					  public void run() {
@@ -418,7 +434,8 @@ public class ImportarDadosTxtRotinas {
 				} else if(registro.equalsIgnoreCase(BLOCO_C211_CFACLIFO) && layoutValido){
 					// Pega a linha completa
 					final String linha = scannerLinha.nextLine();
-					
+
+					Log.i("SAVARE", linha + " - ImportarDadosTxtRotinas");
 					if(telaChamou != TELA_RECEPTOR_ALARME){
 						((Activity) context).runOnUiThread(new Runnable() {
 		  					  public void run() {
@@ -433,7 +450,8 @@ public class ImportarDadosTxtRotinas {
 				} else if(registro.equalsIgnoreCase(BLOCO_C212_CFAENDER) && layoutValido){
 					// Pega a linha completa
 					final String linha = scannerLinha.nextLine();
-					
+
+					Log.i("SAVARE", linha + " - ImportarDadosTxtRotinas");
 					if(telaChamou != TELA_RECEPTOR_ALARME){
 						((Activity) context).runOnUiThread(new Runnable() {
 		  					  public void run() {
@@ -448,7 +466,8 @@ public class ImportarDadosTxtRotinas {
 				} else if(registro.equalsIgnoreCase(BLOCO_C213_CFAPARAM) && layoutValido){
 					// Pega a linha completa
 					final String linha = scannerLinha.nextLine();
-					
+
+					Log.i("SAVARE", linha + " - ImportarDadosTxtRotinas");
 					if(telaChamou != TELA_RECEPTOR_ALARME){
 						((Activity) context).runOnUiThread(new Runnable() {
 		  					  public void run() {
@@ -463,7 +482,8 @@ public class ImportarDadosTxtRotinas {
 				} else if(registro.equalsIgnoreCase(BLOCO_A300_AEAPLPGT) && layoutValido){
 					// Pega a linha completa
 					final String linha = scannerLinha.nextLine();
-					
+
+					Log.i("SAVARE", linha + " - ImportarDadosTxtRotinas");
 					if(telaChamou != TELA_RECEPTOR_ALARME){
 						((Activity) context).runOnUiThread(new Runnable() {
 		  					  public void run() {
@@ -478,7 +498,8 @@ public class ImportarDadosTxtRotinas {
 				} else if(registro.equalsIgnoreCase(BLOCO_A301_AEACLASE) && layoutValido){
 					// Pega a linha completa
 					final String linha = scannerLinha.nextLine();
-					
+
+					Log.i("SAVARE", linha + " - ImportarDadosTxtRotinas");
 					if(telaChamou != TELA_RECEPTOR_ALARME){
 						((Activity) context).runOnUiThread(new Runnable() {
 		  					  public void run() {
@@ -493,7 +514,8 @@ public class ImportarDadosTxtRotinas {
 				} else if(registro.equalsIgnoreCase(BLOCO_A302_AEAUNVEN) && layoutValido){
 					// Pega a linha completa
 					final String linha = scannerLinha.nextLine();
-					
+
+					Log.i("SAVARE", linha + " - ImportarDadosTxtRotinas");
 					if(telaChamou != TELA_RECEPTOR_ALARME){
 						((Activity) context).runOnUiThread(new Runnable() {
 		  					  public void run() {
@@ -508,7 +530,8 @@ public class ImportarDadosTxtRotinas {
 				} else if(registro.equalsIgnoreCase(BLOCO_A303_AEAGRADE) && layoutValido){
 					// Pega a linha completa
 					final String linha = scannerLinha.nextLine();
-					
+
+					Log.i("SAVARE", linha + " - ImportarDadosTxtRotinas");
 					if(telaChamou != TELA_RECEPTOR_ALARME){
 						((Activity) context).runOnUiThread(new Runnable() {
 		  					  public void run() {
@@ -523,7 +546,8 @@ public class ImportarDadosTxtRotinas {
 				} else if(registro.equalsIgnoreCase(BLOCO_A304_AEAMARCA) && layoutValido){
 					// Pega a linha completa
 					final String linha = scannerLinha.nextLine();
-					
+
+					Log.i("SAVARE", linha + " - ImportarDadosTxtRotinas");
 					if(telaChamou != TELA_RECEPTOR_ALARME){
 						((Activity) context).runOnUiThread(new Runnable() {
 		  					  public void run() {
@@ -538,7 +562,8 @@ public class ImportarDadosTxtRotinas {
 				} else if(registro.equalsIgnoreCase(BLOCO_A305_AEACODST) && layoutValido){
 					// Pega a linha completa
 					final String linha = scannerLinha.nextLine();
-					
+
+					Log.i("SAVARE", linha + " - ImportarDadosTxtRotinas");
 					if(telaChamou != TELA_RECEPTOR_ALARME){
 						((Activity) context).runOnUiThread(new Runnable() {
 		  					  public void run() {
@@ -553,7 +578,8 @@ public class ImportarDadosTxtRotinas {
 				} else if(registro.equalsIgnoreCase(BLOCO_A306_AEAPRODU) && layoutValido){
 					// Pega a linha completa
 					final String linha = scannerLinha.nextLine();
-					
+
+					Log.i("SAVARE", linha + " - ImportarDadosTxtRotinas");
 					if(telaChamou != TELA_RECEPTOR_ALARME){
 						((Activity) context).runOnUiThread(new Runnable() {
 		  					  public void run() {
@@ -568,7 +594,8 @@ public class ImportarDadosTxtRotinas {
 				} else if(registro.equalsIgnoreCase(BLOCO_A307_AEAEMBAL) && layoutValido){
 					// Pega a linha completa
 					final String linha = scannerLinha.nextLine();
-					
+
+					Log.i("SAVARE", linha + " - ImportarDadosTxtRotinas");
 					if(telaChamou != TELA_RECEPTOR_ALARME){
 						((Activity) context).runOnUiThread(new Runnable() {
 		  					  public void run() {
@@ -583,7 +610,8 @@ public class ImportarDadosTxtRotinas {
 				} else if(registro.equalsIgnoreCase(BLOCO_A308_AEAPLOJA) && layoutValido){
 					// Pega a linha completa
 					final String linha = scannerLinha.nextLine();
-					
+
+					Log.i("SAVARE", linha + " - ImportarDadosTxtRotinas");
 					if(telaChamou != TELA_RECEPTOR_ALARME){
 						((Activity) context).runOnUiThread(new Runnable() {
 		  					  public void run() {
@@ -598,7 +626,8 @@ public class ImportarDadosTxtRotinas {
 				} else if(registro.equalsIgnoreCase(BLOCO_A309_AEALOCES) && layoutValido){
 					// Pega a linha completa
 					final String linha = scannerLinha.nextLine();
-					
+
+					Log.i("SAVARE", linha + " - ImportarDadosTxtRotinas");
 					if(telaChamou != TELA_RECEPTOR_ALARME){
 						((Activity) context).runOnUiThread(new Runnable() {
 		  					  public void run() {
@@ -613,7 +642,8 @@ public class ImportarDadosTxtRotinas {
 				} else if(registro.equalsIgnoreCase(BLOCO_A310_AEAESTOQ) && layoutValido){
 					// Pega a linha completa
 					final String linha = scannerLinha.nextLine();
-					
+
+					Log.i("SAVARE", linha + " - ImportarDadosTxtRotinas");
 					if(telaChamou != TELA_RECEPTOR_ALARME){
 						((Activity) context).runOnUiThread(new Runnable() {
 		  					  public void run() {
@@ -628,7 +658,8 @@ public class ImportarDadosTxtRotinas {
 				} else if(registro.equalsIgnoreCase(BLOCO_A311_AEAORCAM) && layoutValido){
 					// Pega a linha completa
 					final String linha = scannerLinha.nextLine();
-					
+
+					Log.i("SAVARE", linha + " - ImportarDadosTxtRotinas");
 					if(telaChamou != TELA_RECEPTOR_ALARME){
 						((Activity) context).runOnUiThread(new Runnable() {
 		  					  public void run() {
@@ -644,6 +675,7 @@ public class ImportarDadosTxtRotinas {
 					// Pega a linha completa
 					final String linha = scannerLinha.nextLine();
 
+					Log.i("SAVARE", linha + " - ImportarDadosTxtRotinas");
 					if(telaChamou != TELA_RECEPTOR_ALARME){
 						((Activity) context).runOnUiThread(new Runnable() {
 							public void run() {
@@ -657,7 +689,8 @@ public class ImportarDadosTxtRotinas {
 				} else if(registro.equalsIgnoreCase(BLOCO_R400_RPAPARCE) && layoutValido){
 					// Pega a linha completa
 					final String linha = scannerLinha.nextLine();
-					
+
+					Log.i("SAVARE", linha + " - ImportarDadosTxtRotinas");
 					if(telaChamou != TELA_RECEPTOR_ALARME){
 					((Activity) context).runOnUiThread(new Runnable() {
 	  					  public void run() {
@@ -671,13 +704,13 @@ public class ImportarDadosTxtRotinas {
 
 			} // Fim while
 			// Pega o tempo atual em milesegundos
-			long tempoFinal = System.currentTimeMillis();
+			//long tempoFinal = System.currentTimeMillis();
 
-			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MMM-dd HH:mm:ss", Locale.ENGLISH);
+			//SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MMM-dd HH:mm:ss", Locale.ENGLISH);
 
-			final int tempoCorridoMin = Integer.parseInt(funcoes.diferencaEntreDataHora(FuncoesPersonalizadas.MINUTOS, sdf.format(tempoInicial), sdf.format(tempoFinal)));
+			//final int tempoCorridoMin = Integer.parseInt(funcoes.diferencaEntreDataHora(FuncoesPersonalizadas.MINUTOS, sdf.format(tempoInicial), sdf.format(tempoFinal)));
 
-			final int tempoCorridoSeg = (Integer.parseInt(funcoes.diferencaEntreDataHora(FuncoesPersonalizadas.SEGUNDOS, sdf.format(tempoInicial), sdf.format(tempoFinal)))) - (60 * tempoCorridoMin);
+			//final int tempoCorridoSeg = (Integer.parseInt(funcoes.diferencaEntreDataHora(FuncoesPersonalizadas.SEGUNDOS, sdf.format(tempoInicial), sdf.format(tempoFinal)))) - (60 * tempoCorridoMin);
 
 
 			// Fecha os dados do arquivo
@@ -698,7 +731,8 @@ public class ImportarDadosTxtRotinas {
 					((Activity) context).runOnUiThread(new Runnable() {
 						  public void run() {
 							  // Atualiza o texto da tela de sincronizacao
-							  textMensagemProcesso.setText("Recebemos todos os registros em " + tempoCorridoMin + " Min. e " + tempoCorridoSeg + " Seg.");
+							  textMensagemProcesso.setText("Recebemos todos os registros");
+							  //textMensagemProcesso.setText("Recebemos todos os registros em " + tempoCorridoMin + " Min. e " + tempoCorridoSeg + " Seg.");
 						  }
 					});
 				}
@@ -711,18 +745,18 @@ public class ImportarDadosTxtRotinas {
 					((Activity) context).runOnUiThread(new Runnable() {
 						  public void run() {
 							  // Atualiza o texto da tela de sincronizacao
-							  textMensagemProcesso.setText("Não foi recebido todos os registros. Diferença de " + (totalLinha2 - incremento2) +
-									  					   "\n Recebemos em " + tempoCorridoMin + " Min. e " + tempoCorridoSeg + " Seg.");
+							  textMensagemProcesso.setText("Não foi recebido todos os registros. Diferença de " + (totalLinha2 - incremento2));
+									  					   //"\n Recebemos em " + tempoCorridoMin + " Min. e " + tempoCorridoSeg + " Seg.");
 						  }
 					});
 				}
-				mensagem += "Não foi recebido todos os registros. \n Diferença de " + (totalLinha2 - incremento2) + "\n Recebemos em " + tempoCorridoMin + " Min. e " + tempoCorridoSeg + " Seg.";
+				mensagem += "Não foi recebido todos os registros. \n Diferença de " + (totalLinha2 - incremento2); // + "\n Recebemos em " + tempoCorridoMin + " Min. e " + tempoCorridoSeg + " Seg.";
 			}
 			// Marca a aplicacao que nao esta mais recebendo dados
 			funcoes.setValorXml("RecebendoDados", "N");
 			
 		} catch (final Exception e) {
-			Log.e("SAVARE", "erro, Não foi possível escanear os dados do arquivo. - ImportarDadosTxtRotinas");
+			Log.e("SAVARE", "erro, Não foi possível escanear os dados do arquivo. " + e.getMessage() + " - ImportarDadosTxtRotinas");
 
 			funcoes.setValorXml("RecebendoDados", "N");
 
@@ -873,28 +907,40 @@ public class ImportarDadosTxtRotinas {
 		
 		// Checa se a finalidade eh inserir
 		if(FINALIDADE.equalsIgnoreCase("I")){
-			((Activity) context).runOnUiThread(new Runnable() {
-				public void run() {
-					//empresaSql.insertOrReplace(dadosEmpresa);
-					empresaSql.insertOrReplaceFast(sql, argumentoSql);
-				}
-			});
+			if (telaChamou != TELA_RECEPTOR_ALARME) {
+				((Activity) context).runOnUiThread(new Runnable() {
+					public void run() {
+						//empresaSql.insertOrReplace(dadosEmpresa);
+						empresaSql.insertOrReplaceFast(sql, argumentoSql);
+					}
+				});
+			}else {
+				empresaSql.insertOrReplaceFast(sql, argumentoSql);
+			}
 
 			// Checa se a finalidade eh atualizar
 		} else if(FINALIDADE.equalsIgnoreCase("U")){
-			((Activity) context).runOnUiThread(new Runnable() {
-				  public void run() {
-					  empresaSql.update(dadosEmpresa, "ID_SMAEMPRE = " + idEmpre);
-				  }
-			});
+			if (telaChamou != TELA_RECEPTOR_ALARME) {
+				((Activity) context).runOnUiThread(new Runnable() {
+					public void run() {
+						empresaSql.update(dadosEmpresa, "ID_SMAEMPRE = " + idEmpre);
+					}
+				});
+			}else {
+				empresaSql.update(dadosEmpresa, "ID_SMAEMPRE = " + idEmpre);
+			}
 
 			// Checa se a finalidade eh deletar
 		} else if(FINALIDADE.equalsIgnoreCase("D")){
-			((Activity) context).runOnUiThread(new Runnable() {
-				  public void run() {
-					  empresaSql.delete("ID_SMAEMPRE = " + idEmpre);
-				  }
-			});
+			if (telaChamou != TELA_RECEPTOR_ALARME) {
+				((Activity) context).runOnUiThread(new Runnable() {
+					public void run() {
+						empresaSql.delete("ID_SMAEMPRE = " + idEmpre);
+					}
+				});
+			}else {
+				empresaSql.delete("ID_SMAEMPRE = " + idEmpre);
+			}
 		}
 		
 		//dadosEmpresa.clear();
@@ -982,7 +1028,7 @@ public class ImportarDadosTxtRotinas {
 		dadosPessoa.put("IE_RG", ieRg);
 		dadosPessoa.put("NOME_RAZAO", nomeRazao.replace("'", " "));
 		dadosPessoa.put("NOME_FANTASIA", nomeFantasia.replace(",", " "));
-		dadosPessoa.put("DT_NASCIMENTO", dtNascimento.replace("0000-00-00", null));
+		dadosPessoa.put("DT_NASCIMENTO", dtNascimento.replace("0000-00-00", ""));
 		dadosPessoa.put("CODIGO_CLI", codigoCli);
 		dadosPessoa.put("CODIGO_FUN", codigoFun);
 		dadosPessoa.put("CODIGO_USU", codigoUsu);
@@ -1008,7 +1054,7 @@ public class ImportarDadosTxtRotinas {
 		dadosPessoa.put("CIVIL", civil);
 		dadosPessoa.put("CONJUGE", conjuge);
 		dadosPessoa.put("CPF_CONJUGE", cpfConjuge);
-		dadosPessoa.put("DT_NASC_CONJ", dtNascimentoConjuge.replace("0000-00-00", null));
+		dadosPessoa.put("DT_NASC_CONJ", dtNascimentoConjuge.replace("0000-00-00", ""));
 		dadosPessoa.put("QTDE_FUNCIONARIOS", qtdeFuncionarios);
 		dadosPessoa.put("OUTRAS_RENDAS", outrasRendas);
 		dadosPessoa.put("NUM_DEP_MAIOR", numeroDependenteMaior);
@@ -1024,9 +1070,9 @@ public class ImportarDadosTxtRotinas {
 		dadosPessoa.put("ENVIAR_EXTRATO", enviarExtrato);
 		dadosPessoa.put("TIPO_EXTRATO", tipoExtrato);
 		dadosPessoa.put("CONJ_PODE_COMPRAR", conjugePodeComprar);
-		dadosPessoa.put("DT_ULT_COMPRA", dtUltimaCompra.replace("0000-00-00", null));
-		dadosPessoa.put("DT_RENOVACAO", dtRenovacao.replace("0000-00-00", null));
-		dadosPessoa.putNull("STATUS_CADASTRO_NOVO");
+		dadosPessoa.put("DT_ULT_COMPRA", dtUltimaCompra.replace("0000-00-00", ""));
+		dadosPessoa.put("DT_RENOVACAO", dtRenovacao.replace("0000-00-00", ""));
+		dadosPessoa.put("STATUS_CADASTRO_NOVO", "null");
 		
 		final PessoaSql pessoaSql = new PessoaSql(context);
 
@@ -1037,28 +1083,40 @@ public class ImportarDadosTxtRotinas {
 		
 		// Checa se a finalidade eh inserir
 		if(FINALIDADE.equalsIgnoreCase("I")){
-			((Activity) context).runOnUiThread(new Runnable() {
-				  public void run() {
-					  //pessoaSql.insertOrReplace(dadosPessoa);
-					  pessoaSql.insertOrReplaceFast(sql, argumentoSql);
-				  }
-			});
+			if (telaChamou != TELA_RECEPTOR_ALARME) {
+				((Activity) context).runOnUiThread(new Runnable() {
+					public void run() {
+						//pessoaSql.insertOrReplace(dadosPessoa);
+						pessoaSql.insertOrReplaceFast(sql, argumentoSql);
+					}
+				});
+			} else {
+				pessoaSql.insertOrReplaceFast(sql, argumentoSql);
+			}
 			
 		// Checa se a finalidade eh atualizar
 		} else if(FINALIDADE.equalsIgnoreCase("U")){
-			((Activity) context).runOnUiThread(new Runnable() {
-				  public void run() {
-					  pessoaSql.update(dadosPessoa, "ID_CFACLIFO = " + idClifo);
-				  }
-			});
+			if (telaChamou != TELA_RECEPTOR_ALARME) {
+				((Activity) context).runOnUiThread(new Runnable() {
+					public void run() {
+						pessoaSql.update(dadosPessoa, "ID_CFACLIFO = " + idClifo);
+					}
+				});
+			} else {
+				pessoaSql.update(dadosPessoa, "ID_CFACLIFO = " + idClifo);
+			}
 			
 		// Checa se a finalidade eh deletar
 		} else if(FINALIDADE.equalsIgnoreCase("D")){
-			((Activity) context).runOnUiThread(new Runnable() {
-				  public void run() {
-					  pessoaSql.delete("ID_CFACLIFO = " + idClifo);
-				  }
-			});
+			if (telaChamou != TELA_RECEPTOR_ALARME) {
+				((Activity) context).runOnUiThread(new Runnable() {
+					public void run() {
+						pessoaSql.delete("ID_CFACLIFO = " + idClifo);
+					}
+				});
+			} else {
+				pessoaSql.delete("ID_CFACLIFO = " + idClifo);
+			}
 		}
 		
 		//dadosPessoa.clear();
@@ -1103,28 +1161,40 @@ public class ImportarDadosTxtRotinas {
 		
 		// Checa se a finalidade eh inserir
 		if(FINALIDADE.equalsIgnoreCase("I")){
-			((Activity) context).runOnUiThread(new Runnable() {
-				public void run() {
-					//areasSql.insertOrReplace(dadosAreas);
-					areasSql.insertOrReplaceFast(sql, argumentoSql);
-				}
-			});
+			if (telaChamou != TELA_RECEPTOR_ALARME) {
+				((Activity) context).runOnUiThread(new Runnable() {
+					public void run() {
+						//areasSql.insertOrReplace(dadosAreas);
+						areasSql.insertOrReplaceFast(sql, argumentoSql);
+					}
+				});
+			} else {
+				areasSql.insertOrReplaceFast(sql, argumentoSql);
+			}
 
 		// Checa se a finalidade eh atualizar
 		} else if(FINALIDADE.equalsIgnoreCase("U")){
-			((Activity) context).runOnUiThread(new Runnable() {
-				public void run() {
-					areasSql.update(dadosAreas, "ID_CFAAREAS = " + idAreas);
-				}
-			});
+			if (telaChamou != TELA_RECEPTOR_ALARME) {
+				((Activity) context).runOnUiThread(new Runnable() {
+					public void run() {
+						areasSql.update(dadosAreas, "ID_CFAAREAS = " + idAreas);
+					}
+				});
+			} else {
+				areasSql.update(dadosAreas, "ID_CFAAREAS = " + idAreas);
+			}
 
 		// Checa se a finalidade eh deletar
 		} else if(FINALIDADE.equalsIgnoreCase("D")){
-			((Activity) context).runOnUiThread(new Runnable() {
-				public void run() {
-					areasSql.delete("ID_CFAAREAS = " + idAreas);
-				}
-			});
+			if (telaChamou != TELA_RECEPTOR_ALARME) {
+				((Activity) context).runOnUiThread(new Runnable() {
+					public void run() {
+						areasSql.delete("ID_CFAAREAS = " + idAreas);
+					}
+				});
+			} else {
+				areasSql.delete("ID_CFAAREAS = " + idAreas);
+			}
 		}
 			  
 		//dadosAreas.clear();
@@ -1168,28 +1238,40 @@ public class ImportarDadosTxtRotinas {
 		
 		// Checa se a finalidade eh inserir
 		if(FINALIDADE.equalsIgnoreCase("I")){
-			((Activity) context).runOnUiThread(new Runnable() {
-				public void run() {
-					//atividadeSql.insertOrReplace(dadosAtividade);
-					atividadeSql.insertOrReplaceFast(sql, argumentoSql);
-				}
-			});
+			if (telaChamou != TELA_RECEPTOR_ALARME) {
+				((Activity) context).runOnUiThread(new Runnable() {
+					public void run() {
+						//atividadeSql.insertOrReplace(dadosAtividade);
+						atividadeSql.insertOrReplaceFast(sql, argumentoSql);
+					}
+				});
+			} else {
+				atividadeSql.insertOrReplaceFast(sql, argumentoSql);
+			}
 
 		// Checa se a finalidade eh atualizar
 		} else if(FINALIDADE.equalsIgnoreCase("U")){
-			((Activity) context).runOnUiThread(new Runnable() {
-				public void run() {
-					atividadeSql.update(dadosAtividade, "ID_CFAATIVI = " + idAtivi);
-				}
-			});
+			if (telaChamou != TELA_RECEPTOR_ALARME) {
+				((Activity) context).runOnUiThread(new Runnable() {
+					public void run() {
+						atividadeSql.update(dadosAtividade, "ID_CFAATIVI = " + idAtivi);
+					}
+				});
+			} else {
+				atividadeSql.update(dadosAtividade, "ID_CFAATIVI = " + idAtivi);
+			}
 
 		// Checa se a finalidade eh deletar
 		} else if(FINALIDADE.equalsIgnoreCase("D")){
-			((Activity) context).runOnUiThread(new Runnable() {
-				public void run() {
-					atividadeSql.delete("ID_CFAATIVI = " + idAtivi);
-				}
-			});
+			if (telaChamou != TELA_RECEPTOR_ALARME) {
+				((Activity) context).runOnUiThread(new Runnable() {
+					public void run() {
+						atividadeSql.delete("ID_CFAATIVI = " + idAtivi);
+					}
+				});
+			} else {
+				atividadeSql.delete("ID_CFAATIVI = " + idAtivi);
+			}
 		}
 		//dadosAtividade.clear();
 	} // Fim atividade
@@ -1239,28 +1321,40 @@ public class ImportarDadosTxtRotinas {
 		
 		// Checa se a finalidade eh inserir
 		if(FINALIDADE.equalsIgnoreCase("I")){
-			((Activity) context).runOnUiThread(new Runnable() {
-				public void run() {
-					//statusSql.insertOrReplace(dadosStatus);
-					statusSql.insertOrReplaceFast(sql, argumentoSql);
-				}
-			});
+			if (telaChamou != TELA_RECEPTOR_ALARME) {
+				((Activity) context).runOnUiThread(new Runnable() {
+					public void run() {
+						//statusSql.insertOrReplace(dadosStatus);
+						statusSql.insertOrReplaceFast(sql, argumentoSql);
+					}
+				});
+			} else {
+				statusSql.insertOrReplaceFast(sql, argumentoSql);
+			}
 
 		// Checa se a finalidade eh atualizar
 		} else if(FINALIDADE.equalsIgnoreCase("U")){
-			((Activity) context).runOnUiThread(new Runnable() {
-				public void run() {
-					statusSql.update(dadosStatus, "ID_CFASTATU = " + idStatu);
-				}
-			});
+			if (telaChamou != TELA_RECEPTOR_ALARME) {
+				((Activity) context).runOnUiThread(new Runnable() {
+					public void run() {
+						statusSql.update(dadosStatus, "ID_CFASTATU = " + idStatu);
+					}
+				});
+			} else {
+				statusSql.update(dadosStatus, "ID_CFASTATU = " + idStatu);
+			}
 
 		// Checa se a finalidade eh deletar
 		} else if(FINALIDADE.equalsIgnoreCase("D")){
-			((Activity) context).runOnUiThread(new Runnable() {
-				public void run() {
-					statusSql.delete("ID_CFASTATU = " + idStatu);
-				}
-			});
+			if (telaChamou != TELA_RECEPTOR_ALARME) {
+				((Activity) context).runOnUiThread(new Runnable() {
+					public void run() {
+						statusSql.delete("ID_CFASTATU = " + idStatu);
+					}
+				});
+			} else {
+				statusSql.delete("ID_CFASTATU = " + idStatu);
+			}
 		}
 		//dadosStatus.clear();
 	} // Fim Status
@@ -1300,28 +1394,40 @@ public class ImportarDadosTxtRotinas {
 		
 		// Checa se a finalidade eh inserir
 		if(FINALIDADE.equalsIgnoreCase("I")){
-			((Activity) context).runOnUiThread(new Runnable() {
-				public void run() {
-					//tipoDocumentoSql.insertOrReplace(dadosTipoDoc);
-					tipoDocumentoSql.insertOrReplaceFast(sql, argumentoSql);
-				}
-			});
+			if (telaChamou != TELA_RECEPTOR_ALARME) {
+				((Activity) context).runOnUiThread(new Runnable() {
+					public void run() {
+						//tipoDocumentoSql.insertOrReplace(dadosTipoDoc);
+						tipoDocumentoSql.insertOrReplaceFast(sql, argumentoSql);
+					}
+				});
+			} else {
+				tipoDocumentoSql.insertOrReplaceFast(sql, argumentoSql);
+			}
 
 		// Checa se a finalidade eh atualizar
 		} else if(FINALIDADE.equalsIgnoreCase("U")){
-			((Activity) context).runOnUiThread(new Runnable() {
-				public void run() {
-					tipoDocumentoSql.update(dadosTipoDoc, "ID_CFATPDOC = " + idTpdoc);
-				}
-			});
+			if (telaChamou != TELA_RECEPTOR_ALARME) {
+				((Activity) context).runOnUiThread(new Runnable() {
+					public void run() {
+						tipoDocumentoSql.update(dadosTipoDoc, "ID_CFATPDOC = " + idTpdoc);
+					}
+				});
+			} else {
+				tipoDocumentoSql.update(dadosTipoDoc, "ID_CFATPDOC = " + idTpdoc);
+			}
 
 		// Checa se a finalidade eh deletar
 		} else if(FINALIDADE.equalsIgnoreCase("D")){
-			((Activity) context).runOnUiThread(new Runnable() {
-				public void run() {
-					tipoDocumentoSql.delete("ID_CFATPDOC = " + idTpdoc);
-				}
-			});
+			if (telaChamou != TELA_RECEPTOR_ALARME) {
+				((Activity) context).runOnUiThread(new Runnable() {
+					public void run() {
+						tipoDocumentoSql.delete("ID_CFATPDOC = " + idTpdoc);
+					}
+				});
+			} else {
+				tipoDocumentoSql.delete("ID_CFATPDOC = " + idTpdoc);
+			}
 		}
 	} // FIm TipoDocumento
 	
@@ -1353,28 +1459,40 @@ public class ImportarDadosTxtRotinas {
 		
 		// Checa se a finalidade eh inserir
 		if(FINALIDADE.equalsIgnoreCase("I")){
-			((Activity) context).runOnUiThread(new Runnable() {
-				public void run() {
-					//cartaoSql.insertOrReplace(dadosCartao);
-					cartaoSql.insertOrReplaceFast(sql, argumentoSql);
-				}
-			});
+			if (telaChamou != TELA_RECEPTOR_ALARME) {
+				((Activity) context).runOnUiThread(new Runnable() {
+					public void run() {
+						//cartaoSql.insertOrReplace(dadosCartao);
+						cartaoSql.insertOrReplaceFast(sql, argumentoSql);
+					}
+				});
+			} else {
+				cartaoSql.insertOrReplaceFast(sql, argumentoSql);
+			}
 
 		// Checa se a finalidade eh atualizar
 		} else if(FINALIDADE.equalsIgnoreCase("U")){
-			((Activity) context).runOnUiThread(new Runnable() {
-				public void run() {
-					cartaoSql.update(dadosCartao, "ID_CFACCRED = " + idCred);
-				}
-			});
+			if (telaChamou != TELA_RECEPTOR_ALARME) {
+				((Activity) context).runOnUiThread(new Runnable() {
+					public void run() {
+						cartaoSql.update(dadosCartao, "ID_CFACCRED = " + idCred);
+					}
+				});
+			} else {
+				cartaoSql.update(dadosCartao, "ID_CFACCRED = " + idCred);
+			}
 
 		// Checa se a finalidade eh deletar
 		} else if(FINALIDADE.equalsIgnoreCase("D")){
-			((Activity) context).runOnUiThread(new Runnable() {
-				public void run() {
-					cartaoSql.delete("ID_CFACCRED = " + idCred);
-				}
-			});
+			if (telaChamou != TELA_RECEPTOR_ALARME) {
+				((Activity) context).runOnUiThread(new Runnable() {
+					public void run() {
+						cartaoSql.delete("ID_CFACCRED = " + idCred);
+					}
+				});
+			} else {
+				cartaoSql.delete("ID_CFACCRED = " + idCred);
+			}
 		}
 	}
 	
@@ -1412,28 +1530,40 @@ public class ImportarDadosTxtRotinas {
 		
 		// Checa se a finalidade eh inserir
 		if(FINALIDADE.equalsIgnoreCase("I")){
-			((Activity) context).runOnUiThread(new Runnable() {
-				public void run() {
-					//portadorSql.insertOrReplace(dadosPortador);
-					portadorSql.insertOrReplaceFast(sql, argumentoSql);
-				}
-			});
+			if (telaChamou != TELA_RECEPTOR_ALARME) {
+				((Activity) context).runOnUiThread(new Runnable() {
+					public void run() {
+						//portadorSql.insertOrReplace(dadosPortador);
+						portadorSql.insertOrReplaceFast(sql, argumentoSql);
+					}
+				});
+			} else {
+				portadorSql.insertOrReplaceFast(sql, argumentoSql);
+			}
 
 		// Checa se a finalidade eh atualizar
 		} else if(FINALIDADE.equalsIgnoreCase("U")){
-			((Activity) context).runOnUiThread(new Runnable() {
-				public void run() {
-					portadorSql.update(dadosPortador, "ID_CFAPORTA = " + idPorta);
-				}
-			});
+			if (telaChamou != TELA_RECEPTOR_ALARME) {
+				((Activity) context).runOnUiThread(new Runnable() {
+					public void run() {
+						portadorSql.update(dadosPortador, "ID_CFAPORTA = " + idPorta);
+					}
+				});
+			} else {
+				portadorSql.update(dadosPortador, "ID_CFAPORTA = " + idPorta);
+			}
 
 		// Checa se a finalidade eh deletar
 		} else if(FINALIDADE.equalsIgnoreCase("D")){
-			((Activity) context).runOnUiThread(new Runnable() {
-				public void run() {
-					portadorSql.delete("ID_CFAPORTA = " + idPorta);
-				}
-			});
+			if (telaChamou != TELA_RECEPTOR_ALARME) {
+				((Activity) context).runOnUiThread(new Runnable() {
+					public void run() {
+						portadorSql.delete("ID_CFAPORTA = " + idPorta);
+					}
+				});
+			} else {
+				portadorSql.delete("ID_CFAPORTA = " + idPorta);
+			}
 		}
 	} // Fim Portador
 	
@@ -1476,28 +1606,40 @@ public class ImportarDadosTxtRotinas {
 				
 		// Checa se a finalidade eh inserir
 		if(FINALIDADE.equalsIgnoreCase("I")){
-			((Activity) context).runOnUiThread(new Runnable() {
-				public void run() {
-					//profissaoSql.insertOrReplace(dadosProfissao);
-					profissaoSql.insertOrReplaceFast(sql, argumentoSql);
-				}
-			});
+			if (telaChamou != TELA_RECEPTOR_ALARME) {
+				((Activity) context).runOnUiThread(new Runnable() {
+					public void run() {
+						//profissaoSql.insertOrReplace(dadosProfissao);
+						profissaoSql.insertOrReplaceFast(sql, argumentoSql);
+					}
+				});
+			} else {
+				profissaoSql.insertOrReplaceFast(sql, argumentoSql);
+			}
 
 		// Checa se a finalidade eh atualizar
 		} else if(FINALIDADE.equalsIgnoreCase("U")){
-			((Activity) context).runOnUiThread(new Runnable() {
-				public void run() {
-					profissaoSql.update(dadosProfissao, "ID_CFAPROFI = " + idProfi);
-				}
-			});
+			if (telaChamou != TELA_RECEPTOR_ALARME) {
+				((Activity) context).runOnUiThread(new Runnable() {
+					public void run() {
+						profissaoSql.update(dadosProfissao, "ID_CFAPROFI = " + idProfi);
+					}
+				});
+			} else {
+				profissaoSql.update(dadosProfissao, "ID_CFAPROFI = " + idProfi);
+			}
 
 		// Checa se a finalidade eh deletar
 		} else if(FINALIDADE.equalsIgnoreCase("D")){
-			((Activity) context).runOnUiThread(new Runnable() {
-				public void run() {
-					profissaoSql.delete("ID_CFAPROFI = " + idProfi);
-				}
-			});
+			if (telaChamou != TELA_RECEPTOR_ALARME) {
+				((Activity) context).runOnUiThread(new Runnable() {
+					public void run() {
+						profissaoSql.delete("ID_CFAPROFI = " + idProfi);
+					}
+				});
+			} else {
+				profissaoSql.delete("ID_CFAPROFI = " + idProfi);
+			}
 		}
 	}
 
@@ -1540,28 +1682,40 @@ public class ImportarDadosTxtRotinas {
 		
 		// Checa se a finalidade eh inserir
 		if(FINALIDADE.equalsIgnoreCase("I")){
-			((Activity) context).runOnUiThread(new Runnable() {
-				public void run() {
-					//tipoClienteSql.insertOrReplace(dadosTipoCliente);
-					tipoClienteSql.insertOrReplaceFast(sql, argumentoSql);
-				}
-			});
+			if (telaChamou != TELA_RECEPTOR_ALARME) {
+				((Activity) context).runOnUiThread(new Runnable() {
+					public void run() {
+						//tipoClienteSql.insertOrReplace(dadosTipoCliente);
+						tipoClienteSql.insertOrReplaceFast(sql, argumentoSql);
+					}
+				});
+			} else {
+				tipoClienteSql.insertOrReplaceFast(sql, argumentoSql);
+			}
 
 		// Checa se a finalidade eh atualizar
 		} else if(FINALIDADE.equalsIgnoreCase("U")){
-			((Activity) context).runOnUiThread(new Runnable() {
-				public void run() {
-					tipoClienteSql.update(dadosTipoCliente, "ID_CFATPCLI = " + idTpCli);
-				}
-			});
+			if (telaChamou != TELA_RECEPTOR_ALARME) {
+				((Activity) context).runOnUiThread(new Runnable() {
+					public void run() {
+						tipoClienteSql.update(dadosTipoCliente, "ID_CFATPCLI = " + idTpCli);
+					}
+				});
+			} else {
+				tipoClienteSql.update(dadosTipoCliente, "ID_CFATPCLI = " + idTpCli);
+			}
 
 		// Checa se a finalidade eh deletar
 		} else if(FINALIDADE.equalsIgnoreCase("D")){
-			((Activity) context).runOnUiThread(new Runnable() {
-				public void run() {
-					tipoClienteSql.delete("ID_CFATPCLI = " + idTpCli);
-				}
-			});
+			if (telaChamou != TELA_RECEPTOR_ALARME) {
+				((Activity) context).runOnUiThread(new Runnable() {
+					public void run() {
+						tipoClienteSql.delete("ID_CFATPCLI = " + idTpCli);
+					}
+				});
+			} else {
+				tipoClienteSql.delete("ID_CFATPCLI = " + idTpCli);
+			}
 		}
 	} // Fim TipoCliente
 	
@@ -1601,27 +1755,39 @@ public class ImportarDadosTxtRotinas {
 		
 		// Checa se a finalidade eh inserir
 		if(FINALIDADE.equalsIgnoreCase("I")){
-			((Activity) context).runOnUiThread(new Runnable() {
-				public void run() {
-					estadoSql.insertOrReplace(dadosEstado);
-				}
-			});
+			if (telaChamou != TELA_RECEPTOR_ALARME) {
+				((Activity) context).runOnUiThread(new Runnable() {
+					public void run() {
+						estadoSql.insertOrReplace(dadosEstado);
+					}
+				});
+			} else {
+				estadoSql.insertOrReplace(dadosEstado);
+			}
 
 		// Checa se a finalidade eh atualizar
 		} else if(FINALIDADE.equalsIgnoreCase("U")){
-			((Activity) context).runOnUiThread(new Runnable() {
-				public void run() {
-					estadoSql.update(dadosEstado, "ID_CFAESTAD = " + idEstad);
-				}
-			});
+			if (telaChamou != TELA_RECEPTOR_ALARME) {
+				((Activity) context).runOnUiThread(new Runnable() {
+					public void run() {
+						estadoSql.update(dadosEstado, "ID_CFAESTAD = " + idEstad);
+					}
+				});
+			} else {
+				estadoSql.update(dadosEstado, "ID_CFAESTAD = " + idEstad);
+			}
 
 		// Checa se a finalidade eh deletar
 		} else if(FINALIDADE.equalsIgnoreCase("D")){
-			((Activity) context).runOnUiThread(new Runnable() {
-				public void run() {
-					estadoSql.delete("ID_CFAESTAD = " + idEstad);
-				}
-			});
+			if (telaChamou != TELA_RECEPTOR_ALARME) {
+				((Activity) context).runOnUiThread(new Runnable() {
+					public void run() {
+						estadoSql.delete("ID_CFAESTAD = " + idEstad);
+					}
+				});
+			} else {
+				estadoSql.delete("ID_CFAESTAD = " + idEstad);
+			}
 		}
 	} // Fim estado
 	
@@ -1658,28 +1824,40 @@ public class ImportarDadosTxtRotinas {
 		
 		// Checa se a finalidade eh inserir
 		if(FINALIDADE.equalsIgnoreCase("I")){
-			((Activity) context).runOnUiThread(new Runnable() {
-				public void run() {
-					//cidadeSql.insertOrReplace(dadosCidade);
-					cidadeSql.insertOrReplaceFast(sql, argumentoSql);
-				}
-			});
+			if (telaChamou != TELA_RECEPTOR_ALARME) {
+				((Activity) context).runOnUiThread(new Runnable() {
+					public void run() {
+						//cidadeSql.insertOrReplace(dadosCidade);
+						cidadeSql.insertOrReplaceFast(sql, argumentoSql);
+					}
+				});
+			} else {
+				cidadeSql.insertOrReplaceFast(sql, argumentoSql);
+			}
 
 		// Checa se a finalidade eh atualizar
 		} else if(FINALIDADE.equalsIgnoreCase("U")){
-			((Activity) context).runOnUiThread(new Runnable() {
-				public void run() {
-					cidadeSql.update(dadosCidade, "ID_CFACIDAD = " + idCidade);
-				}
-			});
+			if (telaChamou != TELA_RECEPTOR_ALARME) {
+				((Activity) context).runOnUiThread(new Runnable() {
+					public void run() {
+						cidadeSql.update(dadosCidade, "ID_CFACIDAD = " + idCidade);
+					}
+				});
+			} else {
+				cidadeSql.update(dadosCidade, "ID_CFACIDAD = " + idCidade);
+			}
 
 		// Checa se a finalidade eh deletar
 		} else if(FINALIDADE.equalsIgnoreCase("D")){
-			((Activity) context).runOnUiThread(new Runnable() {
-				public void run() {
-					cidadeSql.delete("ID_CFACIDAD = " + idCidade);
-				}
-			});
+			if (telaChamou != TELA_RECEPTOR_ALARME) {
+				((Activity) context).runOnUiThread(new Runnable() {
+					public void run() {
+						cidadeSql.delete("ID_CFACIDAD = " + idCidade);
+					}
+				});
+			} else {
+				cidadeSql.delete("ID_CFACIDAD = " + idCidade);
+			}
 		}
 	} // Fim Cidade
 	
@@ -1733,28 +1911,40 @@ public class ImportarDadosTxtRotinas {
 		
 		// Checa se a finalidade eh inserir
 		if(FINALIDADE.equalsIgnoreCase("I")){
-			((Activity) context).runOnUiThread(new Runnable() {
-				public void run() {
-					//enderecoSql.insertOrReplace(dadosEndereco);
-					enderecoSql.insertOrReplaceFast(sql, argumentoSql);
-				}
-			});
+			if (telaChamou != TELA_RECEPTOR_ALARME) {
+				((Activity) context).runOnUiThread(new Runnable() {
+					public void run() {
+						//enderecoSql.insertOrReplace(dadosEndereco);
+						enderecoSql.insertOrReplaceFast(sql, argumentoSql);
+					}
+				});
+			} else {
+				enderecoSql.insertOrReplaceFast(sql, argumentoSql);
+			}
 
 		// Checa se a finalidade eh atualizar
 		} else if(FINALIDADE.equalsIgnoreCase("U")){
-			((Activity) context).runOnUiThread(new Runnable() {
-				public void run() {
-					enderecoSql.update(dadosEndereco, "ID_CFAENDER = " + idEnder);
-				}
-			});
+			if (telaChamou != TELA_RECEPTOR_ALARME) {
+				((Activity) context).runOnUiThread(new Runnable() {
+					public void run() {
+						enderecoSql.update(dadosEndereco, "ID_CFAENDER = " + idEnder);
+					}
+				});
+			} else {
+				enderecoSql.update(dadosEndereco, "ID_CFAENDER = " + idEnder);
+			}
 
 		// Checa se a finalidade eh deletar
 		} else if(FINALIDADE.equalsIgnoreCase("D")){
-			((Activity) context).runOnUiThread(new Runnable() {
-				public void run() {
-					enderecoSql.delete("ID_CFAENDER = " + idEnder);
-				}
-			});
+			if (telaChamou != TELA_RECEPTOR_ALARME) {
+				((Activity) context).runOnUiThread(new Runnable() {
+					public void run() {
+						enderecoSql.delete("ID_CFAENDER = " + idEnder);
+					}
+				});
+			} else {
+				enderecoSql.delete("ID_CFAENDER = " + idEnder);
+			}
 		}
 	} // FIm Endereco
 	
@@ -1814,10 +2004,10 @@ public class ImportarDadosTxtRotinas {
 		dadosParametro.put("DESC_PROMOCAO", descPromocao);
 		dadosParametro.put("ROTEIRO", roteiro);
 		dadosParametro.put("FREQUENCIA", frequencia);
-		dadosParametro.put("DT_ULT_VISITA", dtUltimaVisita.replace("0000-00-00", null));
-		dadosParametro.put("DT_ULT_ENVIO", dtUltimoEnvio.replace("0000-00-00", null));
-		dadosParametro.put("DT_ULT_RECEBTO", dtUltimoRecebto.replace("0000-00-00", null));
-		dadosParametro.put("DT_PROXIMO_CONTATO", dtProximoContato.replace("0000-00-00", null));
+		dadosParametro.put("DT_ULT_VISITA", dtUltimaVisita.replace("0000-00-00", ""));
+		dadosParametro.put("DT_ULT_ENVIO", dtUltimoEnvio.replace("0000-00-00", ""));
+		dadosParametro.put("DT_ULT_RECEBTO", dtUltimoRecebto.replace("0000-00-00", ""));
+		dadosParametro.put("DT_PROXIMO_CONTATO", dtProximoContato.replace("0000-00-00", ""));
 		dadosParametro.put("DIAS_ATRAZO", diasAtrazo);
 		dadosParametro.put("DIAS_CARENCIA", diasCarencia);
 		dadosParametro.put("JUROS_DIARIO", jurosDiario);
@@ -1835,28 +2025,40 @@ public class ImportarDadosTxtRotinas {
 		
 		// Checa se a finalidade eh inserir
 		if(FINALIDADE.equalsIgnoreCase("I")){
-			((Activity) context).runOnUiThread(new Runnable() {
-				public void run() {
-					//parametrosSql.insertOrReplace(dadosParametro);
-					parametrosSql.insertOrReplaceFast(sql, argumentoSql);
-				}
-			});
+			if (telaChamou != TELA_RECEPTOR_ALARME) {
+				((Activity) context).runOnUiThread(new Runnable() {
+					public void run() {
+						//parametrosSql.insertOrReplace(dadosParametro);
+						parametrosSql.insertOrReplaceFast(sql, argumentoSql);
+					}
+				});
+			} else {
+				parametrosSql.insertOrReplaceFast(sql, argumentoSql);
+			}
 
 		// Checa se a finalidade eh atualizar
 		} else if(FINALIDADE.equalsIgnoreCase("U")){
-			((Activity) context).runOnUiThread(new Runnable() {
-				public void run() {
-					parametrosSql.update(dadosParametro, "ID_CFAPARAM = " + idParam);
-				}
-			});
+			if (telaChamou != TELA_RECEPTOR_ALARME) {
+				((Activity) context).runOnUiThread(new Runnable() {
+					public void run() {
+						parametrosSql.update(dadosParametro, "ID_CFAPARAM = " + idParam);
+					}
+				});
+			} else {
+				parametrosSql.update(dadosParametro, "ID_CFAPARAM = " + idParam);
+			}
 
 		// Checa se a finalidade eh deletar
 		} else if(FINALIDADE.equalsIgnoreCase("D")){
-			((Activity) context).runOnUiThread(new Runnable() {
-				public void run() {
-					parametrosSql.delete("ID_CFAPARAM = " + idParam);
-				}
-			});
+			if (telaChamou != TELA_RECEPTOR_ALARME) {
+				((Activity) context).runOnUiThread(new Runnable() {
+					public void run() {
+						parametrosSql.delete("ID_CFAPARAM = " + idParam);
+					}
+				});
+			} else {
+				parametrosSql.delete("ID_CFAPARAM = " + idParam);
+			}
 		}
 	} // Fim Parametros
 
@@ -1886,28 +2088,40 @@ public class ImportarDadosTxtRotinas {
 		
 		// Checa se a finalidade eh inserir
 		if(FINALIDADE.equalsIgnoreCase("I")){
-			((Activity) context).runOnUiThread(new Runnable() {
-				public void run() {
-					//classeSql.insertOrReplace(dadosClasse);
-					classeSql.insertOrReplaceFast(sql, argumentoSql);
-				}
-			});
+			if (telaChamou != TELA_RECEPTOR_ALARME) {
+				((Activity) context).runOnUiThread(new Runnable() {
+					public void run() {
+						//classeSql.insertOrReplace(dadosClasse);
+						classeSql.insertOrReplaceFast(sql, argumentoSql);
+					}
+				});
+			} else {
+				classeSql.insertOrReplaceFast(sql, argumentoSql);
+			}
 
 		// Checa se a finalidade eh atualizar
 		} else if(FINALIDADE.equalsIgnoreCase("U")){
-			((Activity) context).runOnUiThread(new Runnable() {
-				public void run() {
-					classeSql.update(dadosClasse, "ID_AEACLASE = " + idClase);
-				}
-			});
+			if (telaChamou != TELA_RECEPTOR_ALARME) {
+				((Activity) context).runOnUiThread(new Runnable() {
+					public void run() {
+						classeSql.update(dadosClasse, "ID_AEACLASE = " + idClase);
+					}
+				});
+			} else {
+				classeSql.update(dadosClasse, "ID_AEACLASE = " + idClase);
+			}
 
 		// Checa se a finalidade eh deletar
 		} else if(FINALIDADE.equalsIgnoreCase("D")){
-			((Activity) context).runOnUiThread(new Runnable() {
-				public void run() {
-					classeSql.delete("ID_AEACLASE = " + idClase);
-				}
-			});
+			if (telaChamou != TELA_RECEPTOR_ALARME) {
+				((Activity) context).runOnUiThread(new Runnable() {
+					public void run() {
+						classeSql.delete("ID_AEACLASE = " + idClase);
+					}
+				});
+			} else {
+				classeSql.delete("ID_AEACLASE = " + idClase);
+			}
 		}
 	} // FIm classe
 	
@@ -1942,28 +2156,40 @@ public class ImportarDadosTxtRotinas {
 		
 		// Checa se a finalidade eh inserir
 		if(FINALIDADE.equalsIgnoreCase("I")){
-			((Activity) context).runOnUiThread(new Runnable() {
-				public void run() {
-					//unVendaSql.insertOrReplace(dadosUnVenda);
-					unVendaSql.insertOrReplaceFast(sql, argumentoSql);
-				}
-			});
+			if (telaChamou != TELA_RECEPTOR_ALARME) {
+				((Activity) context).runOnUiThread(new Runnable() {
+					public void run() {
+						//unVendaSql.insertOrReplace(dadosUnVenda);
+						unVendaSql.insertOrReplaceFast(sql, argumentoSql);
+					}
+				});
+			} else {
+				unVendaSql.insertOrReplaceFast(sql, argumentoSql);
+			}
 
 		// Checa se a finalidade eh atualizar
 		} else if(FINALIDADE.equalsIgnoreCase("U")){
-			((Activity) context).runOnUiThread(new Runnable() {
-				public void run() {
-					unVendaSql.update(dadosUnVenda, "ID_AEAUNVEN = " + idUnVen);
-				}
-			});
+			if (telaChamou != TELA_RECEPTOR_ALARME) {
+				((Activity) context).runOnUiThread(new Runnable() {
+					public void run() {
+						unVendaSql.update(dadosUnVenda, "ID_AEAUNVEN = " + idUnVen);
+					}
+				});
+			} else {
+				unVendaSql.update(dadosUnVenda, "ID_AEAUNVEN = " + idUnVen);
+			}
 
 		// Checa se a finalidade eh deletar
 		} else if(FINALIDADE.equalsIgnoreCase("D")){
-			((Activity) context).runOnUiThread(new Runnable() {
-				public void run() {
-					unVendaSql.delete("ID_AEAUNVEN = " + idUnVen);
-				}
-			});
+			if (telaChamou != TELA_RECEPTOR_ALARME) {
+				((Activity) context).runOnUiThread(new Runnable() {
+					public void run() {
+						unVendaSql.delete("ID_AEAUNVEN = " + idUnVen);
+					}
+				});
+			} else {
+				unVendaSql.delete("ID_AEAUNVEN = " + idUnVen);
+			}
 		}
 	} // Fim UnidadeVenda
 	
@@ -2001,28 +2227,40 @@ public class ImportarDadosTxtRotinas {
 		
 		// Checa se a finalidade eh inserir
 		if(FINALIDADE.equalsIgnoreCase("I")){
-			((Activity) context).runOnUiThread(new Runnable() {
-				public void run() {
-					//estoqueSql.insertOrReplace(dadosEstoque);
-					estoqueSql.insertOrReplaceFast(sql, argumentoSql);
-				}
-			});
+			if (telaChamou != TELA_RECEPTOR_ALARME) {
+				((Activity) context).runOnUiThread(new Runnable() {
+					public void run() {
+						//estoqueSql.insertOrReplace(dadosEstoque);
+						estoqueSql.insertOrReplaceFast(sql, argumentoSql);
+					}
+				});
+			} else {
+				estoqueSql.insertOrReplaceFast(sql, argumentoSql);
+			}
 
 		// Checa se a finalidade eh atualizar
 		} else if(FINALIDADE.equalsIgnoreCase("U")){
-			((Activity) context).runOnUiThread(new Runnable() {
-				public void run() {
-					estoqueSql.update(dadosEstoque, "ID_AEAESTOQ = " + idEstoq);
-				}
-			});
+			if (telaChamou != TELA_RECEPTOR_ALARME) {
+				((Activity) context).runOnUiThread(new Runnable() {
+					public void run() {
+						estoqueSql.update(dadosEstoque, "ID_AEAESTOQ = " + idEstoq);
+					}
+				});
+			} else {
+				estoqueSql.update(dadosEstoque, "ID_AEAESTOQ = " + idEstoq);
+			}
 
 		// Checa se a finalidade eh deletar
 		} else if(FINALIDADE.equalsIgnoreCase("D")){
-			((Activity) context).runOnUiThread(new Runnable() {
-				public void run() {
-					estoqueSql.delete("ID_AEAESTOQ = " + idEstoq);
-				}
-			});
+			if (telaChamou != TELA_RECEPTOR_ALARME) {
+				((Activity) context).runOnUiThread(new Runnable() {
+					public void run() {
+						estoqueSql.delete("ID_AEAESTOQ = " + idEstoq);
+					}
+				});
+			} else {
+				estoqueSql.delete("ID_AEAESTOQ = " + idEstoq);
+			}
 		}
 	} // Fim Estoque
 	
@@ -2083,28 +2321,40 @@ public class ImportarDadosTxtRotinas {
 		
 		// Checa se a finalidade eh inserir
 		if(FINALIDADE.equalsIgnoreCase("I")){
-			((Activity) context).runOnUiThread(new Runnable() {
-				public void run() {
-					//gradeSql.insertOrReplace(dadosGrade);
-					orcamentoSql.insertOrReplaceFast(sql, argumentoSql);
-				}
-			});
+			if (telaChamou != TELA_RECEPTOR_ALARME) {
+				((Activity) context).runOnUiThread(new Runnable() {
+					public void run() {
+						//gradeSql.insertOrReplace(dadosGrade);
+						orcamentoSql.insertOrReplaceFast(sql, argumentoSql);
+					}
+				});
+			} else {
+				orcamentoSql.insertOrReplaceFast(sql, argumentoSql);
+			}
 
 		// Checa se a finalidade eh atualizar
 		} else if(FINALIDADE.equalsIgnoreCase("U")){
-			((Activity) context).runOnUiThread(new Runnable() {
-				public void run() {
-					orcamentoSql.update(dadosOrcamento, "GUID = " + guid);
-				}
-			});
+			if (telaChamou != TELA_RECEPTOR_ALARME) {
+				((Activity) context).runOnUiThread(new Runnable() {
+					public void run() {
+						orcamentoSql.update(dadosOrcamento, "GUID = " + guid);
+					}
+				});
+			} else {
+				orcamentoSql.update(dadosOrcamento, "GUID = " + guid);
+			}
 
 		// Checa se a finalidade eh deletar
 		} else if(FINALIDADE.equalsIgnoreCase("D")){
-			((Activity) context).runOnUiThread(new Runnable() {
-				public void run() {
-					orcamentoSql.delete("GUID = " + guid);
-				}
-			});
+			if (telaChamou != TELA_RECEPTOR_ALARME) {
+				((Activity) context).runOnUiThread(new Runnable() {
+					public void run() {
+						orcamentoSql.delete("GUID = " + guid);
+					}
+				});
+			} else {
+				orcamentoSql.delete("GUID = " + guid);
+			}
 		}
 	} // Fim importarRegistroOrcamento
 
@@ -2148,28 +2398,40 @@ public class ImportarDadosTxtRotinas {
 
 		// Checa se a finalidade eh inserir
 		if(FINALIDADE.equalsIgnoreCase("I")){
-			((Activity) context).runOnUiThread(new Runnable() {
-				public void run() {
-					//gradeSql.insertOrReplace(dadosGrade);
-					itemOrcamentoSql.insertOrReplaceFast(sql, argumentoSql);
-				}
-			});
+			if (telaChamou != TELA_RECEPTOR_ALARME) {
+				((Activity) context).runOnUiThread(new Runnable() {
+					public void run() {
+						//gradeSql.insertOrReplace(dadosGrade);
+						itemOrcamentoSql.insertOrReplaceFast(sql, argumentoSql);
+					}
+				});
+			} else {
+				itemOrcamentoSql.insertOrReplaceFast(sql, argumentoSql);
+			}
 
 			// Checa se a finalidade eh atualizar
 		} else if(FINALIDADE.equalsIgnoreCase("U")){
-			((Activity) context).runOnUiThread(new Runnable() {
-				public void run() {
-					itemOrcamentoSql.update(dadosItemOrcamento, "GUID = " + guid);
-				}
-			});
+			if (telaChamou != TELA_RECEPTOR_ALARME) {
+				((Activity) context).runOnUiThread(new Runnable() {
+					public void run() {
+						itemOrcamentoSql.update(dadosItemOrcamento, "GUID = " + guid);
+					}
+				});
+			} else {
+				itemOrcamentoSql.update(dadosItemOrcamento, "GUID = " + guid);
+			}
 
 			// Checa se a finalidade eh deletar
 		} else if(FINALIDADE.equalsIgnoreCase("D")){
-			((Activity) context).runOnUiThread(new Runnable() {
-				public void run() {
-					itemOrcamentoSql.delete("GUID = " + guid);
-				}
-			});
+			if (telaChamou != TELA_RECEPTOR_ALARME) {
+				((Activity) context).runOnUiThread(new Runnable() {
+					public void run() {
+						itemOrcamentoSql.delete("GUID = " + guid);
+					}
+				});
+			} else {
+				itemOrcamentoSql.delete("GUID = " + guid);
+			}
 		}
 	}
 	
@@ -2199,28 +2461,40 @@ public class ImportarDadosTxtRotinas {
 		final String[] argumentoSql = gradeSql.argumentoStatement(dadosGrade);
 		// Checa se a finalidade eh inserir
 		if(FINALIDADE.equalsIgnoreCase("I")){
-			((Activity) context).runOnUiThread(new Runnable() {
-				public void run() {
-					//gradeSql.insertOrReplace(dadosGrade);
-					gradeSql.insertOrReplaceFast(sql, argumentoSql);
-				}
-			});
+			if (telaChamou != TELA_RECEPTOR_ALARME) {
+				((Activity) context).runOnUiThread(new Runnable() {
+					public void run() {
+						//gradeSql.insertOrReplace(dadosGrade);
+						gradeSql.insertOrReplaceFast(sql, argumentoSql);
+					}
+				});
+			} else {
+				gradeSql.insertOrReplaceFast(sql, argumentoSql);
+			}
 
 		// Checa se a finalidade eh atualizar
 		} else if(FINALIDADE.equalsIgnoreCase("U")){
-			((Activity) context).runOnUiThread(new Runnable() {
-				public void run() {
-					gradeSql.update(dadosGrade, "ID_AEAGRADE = " + idGrade);
-				}
-			});
+			if (telaChamou != TELA_RECEPTOR_ALARME) {
+				((Activity) context).runOnUiThread(new Runnable() {
+					public void run() {
+						gradeSql.update(dadosGrade, "ID_AEAGRADE = " + idGrade);
+					}
+				});
+			} else {
+				gradeSql.update(dadosGrade, "ID_AEAGRADE = " + idGrade);
+			}
 
 		// Checa se a finalidade eh deletar
 		} else if(FINALIDADE.equalsIgnoreCase("D")){
-			((Activity) context).runOnUiThread(new Runnable() {
-				public void run() {
-					gradeSql.delete("ID_AEAGRADE = " + idGrade);
-				}
-			});
+			if (telaChamou != TELA_RECEPTOR_ALARME) {
+				((Activity) context).runOnUiThread(new Runnable() {
+					public void run() {
+						gradeSql.delete("ID_AEAGRADE = " + idGrade);
+					}
+				});
+			} else {
+				gradeSql.delete("ID_AEAGRADE = " + idGrade);
+			}
 		}
 	} // FIm grade
 	
@@ -2248,28 +2522,40 @@ public class ImportarDadosTxtRotinas {
 		final String[] argumentoSql = marcaSql.argumentoStatement(dadosMarca);
 		// Checa se a finalidade eh inserir
 		if(FINALIDADE.equalsIgnoreCase("I")){
-			((Activity) context).runOnUiThread(new Runnable() {
-				public void run() {
-					//marcaSql.insertOrReplace(dadosMarca);
-					marcaSql.insertOrReplaceFast(sql, argumentoSql);
-				}
-			});
+			if (telaChamou != TELA_RECEPTOR_ALARME) {
+				((Activity) context).runOnUiThread(new Runnable() {
+					public void run() {
+						//marcaSql.insertOrReplace(dadosMarca);
+						marcaSql.insertOrReplaceFast(sql, argumentoSql);
+					}
+				});
+			} else {
+				marcaSql.insertOrReplaceFast(sql, argumentoSql);
+			}
 
 		// Checa se a finalidade eh atualizar
 		} else if(FINALIDADE.equalsIgnoreCase("U")){
-			((Activity) context).runOnUiThread(new Runnable() {
-				public void run() {
-					marcaSql.update(dadosMarca, "ID_AEAMARCA = " + idMarca);
-				}
-			});
+			if (telaChamou != TELA_RECEPTOR_ALARME) {
+				((Activity) context).runOnUiThread(new Runnable() {
+					public void run() {
+						marcaSql.update(dadosMarca, "ID_AEAMARCA = " + idMarca);
+					}
+				});
+			} else {
+				marcaSql.update(dadosMarca, "ID_AEAMARCA = " + idMarca);
+			}
 
 		// Checa se a finalidade eh deletar
 		} else if(FINALIDADE.equalsIgnoreCase("D")){
-			((Activity) context).runOnUiThread(new Runnable() {
-				public void run() {
-					marcaSql.delete("ID_AEAMARCA = " + idMarca);
-				}
-			});
+			if (telaChamou != TELA_RECEPTOR_ALARME) {
+				((Activity) context).runOnUiThread(new Runnable() {
+					public void run() {
+						marcaSql.delete("ID_AEAMARCA = " + idMarca);
+					}
+				});
+			} else {
+				marcaSql.delete("ID_AEAMARCA = " + idMarca);
+			}
 		}
 	} // FIm Marca
 	
@@ -2323,28 +2609,40 @@ public class ImportarDadosTxtRotinas {
 		
 		// Checa se a finalidade eh inserir
 		if(FINALIDADE.equalsIgnoreCase("I")){
-			((Activity) context).runOnUiThread(new Runnable() {
-				public void run() {
-					//produtoSql.insertOrReplace(dadosProduto);
-					produtoSql.insertOrReplaceFast(sql, argumentoSql);
-				}
-			});
+			if (telaChamou != TELA_RECEPTOR_ALARME) {
+				((Activity) context).runOnUiThread(new Runnable() {
+					public void run() {
+						//produtoSql.insertOrReplace(dadosProduto);
+						produtoSql.insertOrReplaceFast(sql, argumentoSql);
+					}
+				});
+			} else {
+				produtoSql.insertOrReplaceFast(sql, argumentoSql);
+			}
 
 		// Checa se a finalidade eh atualizar
 		} else if(FINALIDADE.equalsIgnoreCase("U")){
-			((Activity) context).runOnUiThread(new Runnable() {
-				public void run() {
-					produtoSql.update(dadosProduto, "ID_AEAPRODU = " + idProdu);
-				}
-			});
+			if (telaChamou != TELA_RECEPTOR_ALARME) {
+				((Activity) context).runOnUiThread(new Runnable() {
+					public void run() {
+						produtoSql.update(dadosProduto, "ID_AEAPRODU = " + idProdu);
+					}
+				});
+			} else {
+				produtoSql.update(dadosProduto, "ID_AEAPRODU = " + idProdu);
+			}
 
 		// Checa se a finalidade eh deletar
 		} else if(FINALIDADE.equalsIgnoreCase("D")){
-			((Activity) context).runOnUiThread(new Runnable() {
-				public void run() {
-					produtoSql.delete("ID_AEAPRODU = " + idProdu);
-				}
-			});
+			if (telaChamou != TELA_RECEPTOR_ALARME) {
+				((Activity) context).runOnUiThread(new Runnable() {
+					public void run() {
+						produtoSql.delete("ID_AEAPRODU = " + idProdu);
+					}
+				});
+			} else {
+				produtoSql.delete("ID_AEAPRODU = " + idProdu);
+			}
 		}
 	} // Fim Produto
 	
@@ -2390,28 +2688,40 @@ public class ImportarDadosTxtRotinas {
 		
 		// Checa se a finalidade eh inserir
 		if(FINALIDADE.equalsIgnoreCase("I")){
-			((Activity) context).runOnUiThread(new Runnable() {
-				public void run() {
-					//embalagemSql.insertOrReplace(dadosEmbal);
-					embalagemSql.insertOrReplaceFast(sql, argumentoSql);
-				}
-			});
+			if (telaChamou != TELA_RECEPTOR_ALARME) {
+				((Activity) context).runOnUiThread(new Runnable() {
+					public void run() {
+						//embalagemSql.insertOrReplace(dadosEmbal);
+						embalagemSql.insertOrReplaceFast(sql, argumentoSql);
+					}
+				});
+			} else {
+				embalagemSql.insertOrReplaceFast(sql, argumentoSql);
+			}
 
 		// Checa se a finalidade eh atualizar
 		} else if(FINALIDADE.equalsIgnoreCase("U")){
-			((Activity) context).runOnUiThread(new Runnable() {
-				public void run() {
-					embalagemSql.update(dadosEmbal, "ID_AEAEMBAL = " + idEmbal);
-				}
-			});
+			if (telaChamou != TELA_RECEPTOR_ALARME) {
+				((Activity) context).runOnUiThread(new Runnable() {
+					public void run() {
+						embalagemSql.update(dadosEmbal, "ID_AEAEMBAL = " + idEmbal);
+					}
+				});
+			} else {
+				embalagemSql.update(dadosEmbal, "ID_AEAEMBAL = " + idEmbal);
+			}
 
 		// Checa se a finalidade eh deletar
 		} else if(FINALIDADE.equalsIgnoreCase("D")){
-			((Activity) context).runOnUiThread(new Runnable() {
-				public void run() {
-					embalagemSql.delete("ID_AEAEMBAL = " + idEmbal);
-				}
-			});
+			if (telaChamou != TELA_RECEPTOR_ALARME) {
+				((Activity) context).runOnUiThread(new Runnable() {
+					public void run() {
+						embalagemSql.delete("ID_AEAEMBAL = " + idEmbal);
+					}
+				});
+			} else {
+				embalagemSql.delete("ID_AEAEMBAL = " + idEmbal);
+			}
 		}
 	} // FIm embalagem
 	
@@ -2456,8 +2766,8 @@ public class ImportarDadosTxtRotinas {
 		dadosPLoja.put("RETIDO", retido);
 		dadosPLoja.put("PEDIDO", pedido);
 		dadosPLoja.put("ATIVO", ativo);
-		dadosPLoja.put("DT_ENTRADA_D", dtEntradaD.replace("0000-00-00", null));
-		dadosPLoja.put("DT_ENTRADA_N", dtEntradaN.replace("0000-00-00", null));
+		dadosPLoja.put("DT_ENTRADA_D", dtEntradaD.replace("0000-00-00", ""));
+		dadosPLoja.put("DT_ENTRADA_N", dtEntradaN.replace("0000-00-00", ""));
 		dadosPLoja.put("CT_REPOSICAO_N", ctReposicaoN);
 		dadosPLoja.put("CT_COMPLETO_N", ctCompletoN);
 		dadosPLoja.put("VENDA_ATAC", vendaAtac);
@@ -2478,28 +2788,40 @@ public class ImportarDadosTxtRotinas {
 		
 		// Checa se a finalidade eh inserir
 		if(FINALIDADE.equalsIgnoreCase("I")){
-			((Activity) context).runOnUiThread(new Runnable() {
-				public void run() {
-					//produtoLojaSql.insertOrReplace(dadosPLoja);
-					produtoLojaSql.insertOrReplaceFast(sql, argumentoSql);
-				}
-			});
+			if (telaChamou != TELA_RECEPTOR_ALARME) {
+				((Activity) context).runOnUiThread(new Runnable() {
+					public void run() {
+						//produtoLojaSql.insertOrReplace(dadosPLoja);
+						produtoLojaSql.insertOrReplaceFast(sql, argumentoSql);
+					}
+				});
+			} else {
+				produtoLojaSql.insertOrReplaceFast(sql, argumentoSql);
+			}
 
 		// Checa se a finalidade eh atualizar
 		} else if(FINALIDADE.equalsIgnoreCase("U")){
-			((Activity) context).runOnUiThread(new Runnable() {
-				public void run() {
-					produtoLojaSql.update(dadosPLoja, "ID_AEAPLOJA = " + idPLoja);
-				}
-			});
+			if (telaChamou != TELA_RECEPTOR_ALARME) {
+				((Activity) context).runOnUiThread(new Runnable() {
+					public void run() {
+						produtoLojaSql.update(dadosPLoja, "ID_AEAPLOJA = " + idPLoja);
+					}
+				});
+			} else {
+				produtoLojaSql.update(dadosPLoja, "ID_AEAPLOJA = " + idPLoja);
+			}
 
 		// Checa se a finalidade eh deletar
 		} else if(FINALIDADE.equalsIgnoreCase("D")){
-			((Activity) context).runOnUiThread(new Runnable() {
-				public void run() {
-					produtoLojaSql.delete("ID_AEAPLOJA = " + idPLoja);
-				}
-			});
+			if (telaChamou != TELA_RECEPTOR_ALARME) {
+				((Activity) context).runOnUiThread(new Runnable() {
+					public void run() {
+						produtoLojaSql.delete("ID_AEAPLOJA = " + idPLoja);
+					}
+				});
+			} else {
+				produtoLojaSql.delete("ID_AEAPLOJA = " + idPLoja);
+			}
 		}
 	} // Fim PLoja
 	
@@ -2551,28 +2873,40 @@ public class ImportarDadosTxtRotinas {
 		
 		// Checa se a finalidade eh inserir
 		if(FINALIDADE.equalsIgnoreCase("I")){
-			((Activity) context).runOnUiThread(new Runnable() {
-				public void run() {
-					//pagamentoSql.insertOrReplace(dadosPlanoPgto);
-					pagamentoSql.insertOrReplaceFast(sql, argumentoSql);
-				}
-			});
+			if (telaChamou != TELA_RECEPTOR_ALARME) {
+				((Activity) context).runOnUiThread(new Runnable() {
+					public void run() {
+						//pagamentoSql.insertOrReplace(dadosPlanoPgto);
+						pagamentoSql.insertOrReplaceFast(sql, argumentoSql);
+					}
+				});
+			} else {
+				pagamentoSql.insertOrReplaceFast(sql, argumentoSql);
+			}
 
 		// Checa se a finalidade eh atualizar
 		} else if(FINALIDADE.equalsIgnoreCase("U")){
-			((Activity) context).runOnUiThread(new Runnable() {
-				public void run() {
-					pagamentoSql.update(dadosPlanoPgto, "ID_AEAPLPGT = " + idPlPgt);
-				}
-			});
+			if (telaChamou != TELA_RECEPTOR_ALARME) {
+				((Activity) context).runOnUiThread(new Runnable() {
+					public void run() {
+						pagamentoSql.update(dadosPlanoPgto, "ID_AEAPLPGT = " + idPlPgt);
+					}
+				});
+			} else {
+				pagamentoSql.update(dadosPlanoPgto, "ID_AEAPLPGT = " + idPlPgt);
+			}
 
 		// Checa se a finalidade eh deletar
 		} else if(FINALIDADE.equalsIgnoreCase("D")){
-			((Activity) context).runOnUiThread(new Runnable() {
-				public void run() {
-					pagamentoSql.delete("ID_AEAPLPGT = " + idPlPgt);
-				}
-			});
+			if (telaChamou != TELA_RECEPTOR_ALARME) {
+				((Activity) context).runOnUiThread(new Runnable() {
+					public void run() {
+						pagamentoSql.delete("ID_AEAPLPGT = " + idPlPgt);
+					}
+				});
+			} else {
+				pagamentoSql.delete("ID_AEAPLPGT = " + idPlPgt);
+			}
 		}
 	} // Fim PlanoPgto
 	
@@ -2616,9 +2950,9 @@ public class ImportarDadosTxtRotinas {
 		dadosParcela.put("ID_CFAPORTA", idPorta);
 		dadosParcela.put("DT_ALT", dtAlta);
 		dadosParcela.put("TIPO", tipo);
-		dadosParcela.put("DT_EMISSAO", dtEmissao.replace("0000-00-00", null));
-		dadosParcela.put("DT_VENCIMENTO", dtVencimento.replace("0000-00-00", null));
-		dadosParcela.put("DT_BAIXA", dtBaixa.replace("0000-00-00", null));
+		dadosParcela.put("DT_EMISSAO", dtEmissao.replace("0000-00-00", ""));
+		dadosParcela.put("DT_VENCIMENTO", dtVencimento.replace("0000-00-00", ""));
+		dadosParcela.put("DT_BAIXA", dtBaixa.replace("0000-00-00", ""));
 		dadosParcela.put("PARCELA", parcela);
 		dadosParcela.put("VL_PARCELA", vlParcela);
 		dadosParcela.put("FC_VL_TOTAL_PAGO", vlTotalPago);
@@ -2638,28 +2972,40 @@ public class ImportarDadosTxtRotinas {
 		
 		// Checa se a finalidade eh inserir
 		if(FINALIDADE.equalsIgnoreCase("I")){
-			((Activity) context).runOnUiThread(new Runnable() {
-				public void run() {
-					//parcelaSql.insertOrReplace(dadosParcela);
-					parcelaSql.insertOrReplaceFast(sql, argumentoSql);
-				}
-			});
+			if (telaChamou != TELA_RECEPTOR_ALARME) {
+				((Activity) context).runOnUiThread(new Runnable() {
+					public void run() {
+						//parcelaSql.insertOrReplace(dadosParcela);
+						parcelaSql.insertOrReplaceFast(sql, argumentoSql);
+					}
+				});
+			} else {
+				parcelaSql.insertOrReplaceFast(sql, argumentoSql);
+			}
 
 		// Checa se a finalidade eh atualizar
 		} else if(FINALIDADE.equalsIgnoreCase("U")){
-			((Activity) context).runOnUiThread(new Runnable() {
-				public void run() {
-					parcelaSql.update(dadosParcela, "ID_RPAPARCE = " + idParce);
-				}
-			});
+			if (telaChamou != TELA_RECEPTOR_ALARME) {
+				((Activity) context).runOnUiThread(new Runnable() {
+					public void run() {
+						parcelaSql.update(dadosParcela, "ID_RPAPARCE = " + idParce);
+					}
+				});
+			} else {
+				parcelaSql.update(dadosParcela, "ID_RPAPARCE = " + idParce);
+			}
 
 		// Checa se a finalidade eh deletar
 		} else if(FINALIDADE.equalsIgnoreCase("D")){
-			((Activity) context).runOnUiThread(new Runnable() {
-				public void run() {
-					parcelaSql.delete("ID_RPAPARCE = " + idParce);
-				}
-			});
+			if (telaChamou != TELA_RECEPTOR_ALARME) {
+				((Activity) context).runOnUiThread(new Runnable() {
+					public void run() {
+						parcelaSql.delete("ID_RPAPARCE = " + idParce);
+					}
+				});
+			} else {
+				parcelaSql.delete("ID_RPAPARCE = " + idParce);
+			}
 		}
 	} // FIm Parcela
 	
@@ -2716,27 +3062,39 @@ public class ImportarDadosTxtRotinas {
 		
 		// Checa se a finalidade eh inserir
 		if(FINALIDADE.equalsIgnoreCase("I")){
-			((Activity) context).runOnUiThread(new Runnable() {
-				public void run() {
-					cobrancaSql.insertOrReplace(dadosTpCob);
-				}
-			});
+			if (telaChamou != TELA_RECEPTOR_ALARME) {
+				((Activity) context).runOnUiThread(new Runnable() {
+					public void run() {
+						cobrancaSql.insertOrReplace(dadosTpCob);
+					}
+				});
+			} else {
+				cobrancaSql.insertOrReplace(dadosTpCob);
+			}
 
 		// Checa se a finalidade eh atualizar
 		} else if(FINALIDADE.equalsIgnoreCase("U")){
-			((Activity) context).runOnUiThread(new Runnable() {
-				public void run() {
-					cobrancaSql.update(dadosTpCob, "ID_CFATPCOB = " + idTpCob);
-				}
-			});
+			if (telaChamou != TELA_RECEPTOR_ALARME) {
+				((Activity) context).runOnUiThread(new Runnable() {
+					public void run() {
+						cobrancaSql.update(dadosTpCob, "ID_CFATPCOB = " + idTpCob);
+					}
+				});
+			} else {
+				cobrancaSql.update(dadosTpCob, "ID_CFATPCOB = " + idTpCob);
+			}
 
 		// Checa se a finalidade eh deletar
 		} else if(FINALIDADE.equalsIgnoreCase("D")){
-			((Activity) context).runOnUiThread(new Runnable() {
-				public void run() {
-					cobrancaSql.delete("ID_CFATPCOB = " + idTpCob);
-				}
-			});
+			if (telaChamou != TELA_RECEPTOR_ALARME) {
+				((Activity) context).runOnUiThread(new Runnable() {
+					public void run() {
+						cobrancaSql.delete("ID_CFATPCOB = " + idTpCob);
+					}
+				});
+			} else {
+				cobrancaSql.delete("ID_CFATPCOB = " + idTpCob);
+			}
 		}
 	} // Fim TipoCobranca
 	
@@ -2768,27 +3126,39 @@ public class ImportarDadosTxtRotinas {
 		
 		// Checa se a finalidade eh inserir
 		if(FINALIDADE.equalsIgnoreCase("I")){
-			((Activity) context).runOnUiThread(new Runnable() {
-				public void run() {
-					tributariaSql.insertOrReplace(dadosSituacaoTrib);
-				}
-			});
+			if (telaChamou != TELA_RECEPTOR_ALARME) {
+				((Activity) context).runOnUiThread(new Runnable() {
+					public void run() {
+						tributariaSql.insertOrReplace(dadosSituacaoTrib);
+					}
+				});
+			} else {
+				tributariaSql.insertOrReplace(dadosSituacaoTrib);
+			}
 
 		// Checa se a finalidade eh atualizar
 		} else if(FINALIDADE.equalsIgnoreCase("U")){
-			((Activity) context).runOnUiThread(new Runnable() {
-				public void run() {
-					tributariaSql.update(dadosSituacaoTrib, "ID_AEACODST = " + idCodSt);
-				}
-			});
+			if (telaChamou != TELA_RECEPTOR_ALARME) {
+				((Activity) context).runOnUiThread(new Runnable() {
+					public void run() {
+						tributariaSql.update(dadosSituacaoTrib, "ID_AEACODST = " + idCodSt);
+					}
+				});
+			} else {
+				tributariaSql.update(dadosSituacaoTrib, "ID_AEACODST = " + idCodSt);
+			}
 
 		// Checa se a finalidade eh deletar
 		} else if(FINALIDADE.equalsIgnoreCase("D")){
-			((Activity) context).runOnUiThread(new Runnable() {
-				public void run() {
-					tributariaSql.delete("ID_AEACODST = " + idCodSt);
-				}
-			});
+			if (telaChamou != TELA_RECEPTOR_ALARME) {
+				((Activity) context).runOnUiThread(new Runnable() {
+					public void run() {
+						tributariaSql.delete("ID_AEACODST = " + idCodSt);
+					}
+				});
+			} else {
+				tributariaSql.delete("ID_AEACODST = " + idCodSt);
+			}
 		}
 	}
 
@@ -2822,27 +3192,39 @@ public class ImportarDadosTxtRotinas {
 		
 		// Checa se a finalidade eh inserir
 		if(FINALIDADE.equalsIgnoreCase("I")){
-			((Activity) context).runOnUiThread(new Runnable() {
-				public void run() {
-					locacaoSql.insertOrReplace(dadosLocacao);
-				}
-			});
+			if (telaChamou != TELA_RECEPTOR_ALARME) {
+				((Activity) context).runOnUiThread(new Runnable() {
+					public void run() {
+						locacaoSql.insertOrReplace(dadosLocacao);
+					}
+				});
+			} else {
+				locacaoSql.insertOrReplace(dadosLocacao);
+			}
 
 		// Checa se a finalidade eh atualizar
 		} else if(FINALIDADE.equalsIgnoreCase("U")){
-			((Activity) context).runOnUiThread(new Runnable() {
-				public void run() {
-					locacaoSql.update(dadosLocacao, "ID_AEALOCES = " + idLoces);
-				}
-			});
+			if (telaChamou != TELA_RECEPTOR_ALARME) {
+				((Activity) context).runOnUiThread(new Runnable() {
+					public void run() {
+						locacaoSql.update(dadosLocacao, "ID_AEALOCES = " + idLoces);
+					}
+				});
+			} else {
+				locacaoSql.update(dadosLocacao, "ID_AEALOCES = " + idLoces);
+			}
 
 		// Checa se a finalidade eh deletar
 		} else if(FINALIDADE.equalsIgnoreCase("D")){
-			((Activity) context).runOnUiThread(new Runnable() {
-				public void run() {
-					locacaoSql.delete("ID_AEALOCES = " + idLoces);
-				}
-			});
+			if (telaChamou != TELA_RECEPTOR_ALARME) {
+				((Activity) context).runOnUiThread(new Runnable() {
+					public void run() {
+						locacaoSql.delete("ID_AEALOCES = " + idLoces);
+					}
+				});
+			} else {
+				locacaoSql.delete("ID_AEALOCES = " + idLoces);
+			}
 		}
 	}
 }

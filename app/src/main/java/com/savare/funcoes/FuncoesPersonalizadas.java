@@ -480,7 +480,7 @@ public class FuncoesPersonalizadas {
 	}
 	
 	
-	public void criarAlarmeEnviarReceberDadosAutomatico(){
+	public void criarAlarmeEnviarReceberDadosAutomatico(Boolean ativarEnvio, Boolean ativarRecebimento){
 		
 		// Checa se o alarme nao foi criado
 		boolean alarmeEnviarDesativado =  (PendingIntent.getBroadcast(context, 0, new Intent(ENVIAR_ORCAMENTO_SAVARE), PendingIntent.FLAG_NO_CREATE) == null);
@@ -488,7 +488,7 @@ public class FuncoesPersonalizadas {
 		boolean alarmeEnviarOutrosDesativado = (PendingIntent.getBroadcast(context, 0, new Intent(ENVIAR_OUTROS_DADOS_SAVARE), PendingIntent.FLAG_NO_CREATE) == null);
 
 		// Checa se esta configurado para enviar os orcamentos automaticos
-		if( ((getValorXml("EnviarAutomatico").equalsIgnoreCase("S")) || (getValorXml("EnviarAutomatico") == null)) &&
+		if( ((getValorXml("EnviarAutomatico").equalsIgnoreCase("S")) || (getValorXml("EnviarAutomatico") == null) || (ativarEnvio == true)) &&
 				(!getValorXml("ModoConexao").equalsIgnoreCase("S"))){
 		
 			// Checa se o alarme de envio de orcamento esta desativado
@@ -505,7 +505,7 @@ public class FuncoesPersonalizadas {
 				// Adiciona mais alguns segundo para executar o alarme depois de alguns segundo que esta Activity for abaerta
 				tempoInicio.add(Calendar.SECOND, 10);
 				// Cria um intervalo de quanto em quanto tempo o alarme vai repetir
-				long intervalo = 60 * 1000; // 1 Minutos
+				long intervalo = 120 * 1000; // 2 Minutos
 				
 				AlarmManager alarmeEnviarOrcamento = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 				alarmeEnviarOrcamento.setRepeating(AlarmManager.RTC_WAKEUP, tempoInicio.getTimeInMillis(), intervalo, alarmIntent);
@@ -525,14 +525,22 @@ public class FuncoesPersonalizadas {
 				// Adiciona mais alguns segundo para executar o alarme depois de alguns segundo que esta Activity for abaerta
 				tempoInicio.add(Calendar.SECOND, 20);
 				// Cria um intervalo de quanto em quanto tempo o alarme vai repetir
-				long intervalo = 150 * 1000; // 2 Minutos e 30 Segundos
+				long intervalo = 180 * 1000; // 3 Minutos
 
 				AlarmManager alarmeEnviarOrcamento = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 				alarmeEnviarOrcamento.setRepeating(AlarmManager.RTC_WAKEUP, tempoInicio.getTimeInMillis(), intervalo, alarmIntentOutros);
+
+			} else if (ativarEnvio == false){
+					Intent intentCancelar = new Intent(ENVIAR_ORCAMENTO_SAVARE);
+					PendingIntent alarmeIntent = PendingIntent.getBroadcast(context, 0, intentCancelar, 0);
+
+					AlarmManager alarme = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+					alarme.cancel(alarmeIntent);
+					Log.i(TAG, "Desativado alarme Enviar");
 			}
 		} else {
 			// Checa se o alarme foi cria para enviar a desativacao
-			if(!alarmeEnviarDesativado){
+			if((!alarmeEnviarDesativado) || (ativarEnvio == false)){
 				Intent intentCancelar = new Intent(ENVIAR_ORCAMENTO_SAVARE);
 				PendingIntent alarmeIntent = PendingIntent.getBroadcast(context, 0, intentCancelar, 0);
 				
@@ -543,7 +551,7 @@ public class FuncoesPersonalizadas {
 		}
 		
 		// Checa se esta configurado para receber dados automaticos
-		if( ((getValorXml("ReceberAutomatico").equalsIgnoreCase("S")) || (getValorXml("ReceberAutomatico") == null)) &&
+		if( ((getValorXml("ReceberAutomatico").equalsIgnoreCase("S")) || (getValorXml("ReceberAutomatico") == null) || (ativarRecebimento == true)) &&
 				(!getValorXml("ModoConexao").equalsIgnoreCase("S"))){
 			
 			// Checa se o alarme de recebimento de dados esta desativado
@@ -559,14 +567,23 @@ public class FuncoesPersonalizadas {
 				// Adiciona mais alguns segundo para executar o alarme depois de alguns segundo que esta Activity for abaerta
 				tempoInicio.add(Calendar.SECOND, 10);
 				
-				long intervalo = 2 * 1000;
+				long intervalo = 600 * 1000; // 10 Minutos
 				
 				AlarmManager alarmeReceberOrcamento = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 				alarmeReceberOrcamento.setRepeating(AlarmManager.RTC_WAKEUP, tempoInicio.getTimeInMillis(), intervalo, alarmIntent);
+
+			} else if (ativarRecebimento == false){
+					Log.i(TAG, "Desativado alarme Receber");
+
+				Intent intentCancelar = new Intent(RECEBER_DADOS_SAVARE);
+					PendingIntent alarmeIntent = PendingIntent.getBroadcast(context, 0, intentCancelar, 0);
+
+					AlarmManager alarme = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+					alarme.cancel(alarmeIntent);
 			}
 		} else {
 			// Checa se o alarme foi criado para podermos desativalo
-			if(!alarmeReceberDesativado){
+			if((!alarmeReceberDesativado) || (ativarRecebimento == false)){
 				Log.i(TAG, "Desativado alarme Receber");
 				Intent intentCancelar = new Intent(RECEBER_DADOS_SAVARE);
 				PendingIntent alarmeIntent = PendingIntent.getBroadcast(context, 0, intentCancelar, 0);
