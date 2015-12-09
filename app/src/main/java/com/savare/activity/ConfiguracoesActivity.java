@@ -104,7 +104,7 @@ public class ConfiguracoesActivity extends Activity {
 				// Cria um dialog para selecionar atacado ou varejo
 				AlertDialog.Builder mensagemAtacadoVarejo = new AlertDialog.Builder(ConfiguracoesActivity.this);
 				// Atributo(variavel) para escolher o tipo da venda
-				final String[] opcao = {"Normal", "M�dio", "Grande"};
+				final String[] opcao = {"Normal", "Médio", "Grande"};
 				// Preenche o dialogo com o titulo e as opcoes
 				mensagemAtacadoVarejo.setTitle("Tamanho dos Textos").setItems(opcao, new DialogInterface.OnClickListener() {
 				

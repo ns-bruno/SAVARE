@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="materiallist-3.1.2">
+    <CLASSES>
+      <root url="file://$PROJECT_DIR$/app/build/intermediates/exploded-aar/com.github.dexafree/materiallist/3.1.2/res" />
+      <root url="jar://$PROJECT_DIR$/app/build/intermediates/exploded-aar/com.github.dexafree/materiallist/3.1.2/jars/classes.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.github.dexafree/materiallist/3.1.2/a97fc274fafcbcf893af4c4896862c990cf0302b/materiallist-3.1.2-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

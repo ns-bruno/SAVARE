@@ -152,7 +152,7 @@ public class ReceberDadosFtpAsyncRotinas extends AsyncTask<String, String, Integ
 				funcoes.setValorXml("RecebendoDados", "N");
 
 				// Checa se que esta chamando esta classe eh o alarme
-				if(telaChamou != TELA_RECEPTOR_ALARME){
+				if((telaChamou != TELA_RECEPTOR_ALARME) && (telaChamou != TELA_LOGIN)){
 					((Activity) context).runOnUiThread(new Runnable() {
 						  public void run() {
 							  progressReceberDados.setVisibility(View.GONE);

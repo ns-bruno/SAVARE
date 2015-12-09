@@ -68,7 +68,7 @@ public class LogRotinas extends Rotinas {
 		
 		Cursor dadosLog = logSql.sqlSelect(sql);
 		
-		if(dadosLog != null){
+		if(dadosLog != null && dadosLog.getCount()> 0){
 			// Move para o primeiro
 			//dadosLog.moveToFirst();
 			

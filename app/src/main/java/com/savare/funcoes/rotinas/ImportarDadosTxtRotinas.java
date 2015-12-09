@@ -254,7 +254,7 @@ public class ImportarDadosTxtRotinas {
 					}
 					
 					importarRegistroEmpresa(linha);
-				
+
 				} else if(registro.equalsIgnoreCase(BLOCO_C200_CFAAREAS) && layoutValido){
 					// Pega a linha completa
 					final String linha = scannerLinha.nextLine();

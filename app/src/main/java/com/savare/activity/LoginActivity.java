@@ -12,6 +12,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import com.savare.R;
+import com.savare.activity.material.designer.InicioMDActivity;
 import com.savare.banco.funcoesSql.UsuarioSQL;
 import com.savare.funcoes.FuncoesPersonalizadas;
 import com.savare.funcoes.Rotinas;
@@ -45,7 +46,8 @@ public class LoginActivity extends Activity {
 					try {
 						if(rotinas.checaUsuarioESenha(textCodigoUsuario.getText().toString(), textUsuario.getText().toString(), editSenha.getText().toString()) == true){
 							// Abre a tela inicial do sistema
-							Intent intent = new Intent(LoginActivity.this, InicioActivity.class);
+							//Intent intent = new Intent(LoginActivity.this, InicioActivity.class);
+							Intent intent = new Intent(LoginActivity.this, InicioMDActivity.class);
 							// Tira a acitivity da pilha e inicia uma nova
 							intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 							startActivity(intent);

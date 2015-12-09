@@ -6,7 +6,7 @@
 
     <uses-sdk
         android:minSdkVersion="11"
-        android:targetSdkVersion="21" />
+        android:targetSdkVersion="22" />
 
     <uses-permission android:name="android.permission.READ_SYNC_STATS" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -54,8 +54,7 @@
                 android:name="android.app.searchable"
                 android:resource="@layout/searchable" />
         </activity>
-        <activity android:name="com.savare.activity.ClienteDetalhesActivity" >
-        </activity>
+        <activity android:name="com.savare.activity.ClienteDetalhesActivity" />
         <activity
             android:name="com.savare.activity.OrcamentoActivity"
             android:uiOptions="splitActionBarWhenNarrow" >
@@ -70,8 +69,7 @@
                 android:name="android.support.UI_OPTIONS"
                 android:value="splitActionBarWhenNarrow" />
         </activity>
-        <activity android:name="com.savare.activity.ProdutoListaActivity" >
-        </activity>
+        <activity android:name="com.savare.activity.ProdutoListaActivity" />
         <activity android:name="com.savare.activity.OrcamentoProdutoDetalhesActivity" />
         <activity android:name="com.savare.activity.OrcamentoPlanoPagamentoActivity" />
         <activity android:name="com.savare.activity.ListaOrcamentoPedidoActivity" />
@@ -80,11 +78,13 @@
         <activity android:name="com.savare.activity.ConfiguracoesActivity" />
         <activity
             android:name="com.savare.activity.fragment.OrcamentoTabulacaoFragment"
-            android:uiOptions="splitActionBarWhenNarrow" >
-        </activity>
+            android:uiOptions="splitActionBarWhenNarrow" />
         <activity android:name="com.savare.activity.ProdutoDetalhesActivity" />
         <activity android:name="com.savare.activity.LogActivity" />
         <activity android:name="com.savare.activity.fragment.ClienteCadastroFragment" />
+        <activity
+            android:name="com.savare.activity.material.designer.InicioMDActivity"
+            android:theme="@style/AppBaseTheme" />
 
         <provider
             android:name="com.savare.sincronizacao.EnviarProvider"

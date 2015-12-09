@@ -18,7 +18,7 @@
             android:layout_gravity="center_horizontal"
             android:indeterminate="true"
             android:visibility="gone"
-            style="@style/Widget.AppCompat.Base.ProgressBar.Horizontal" />
+            style="?android:attr/progressBarStyleHorizontal" />
 
         <TextView
             android:layout_width="match_parent"

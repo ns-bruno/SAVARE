@@ -102,9 +102,8 @@ public class InicioActivity extends Activity {
         dataList.add(new DrawerItem("Logs", R.drawable.ic_sim_alert));
         
         // set a custom shadow that overlays the main content when the drawer opens
-        mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
-        
-        adapter = new CustomDrawerAdapter(this, R.layout.drawer_listview_item, dataList);
+        mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow9, GravityCompat.START);
+                adapter = new CustomDrawerAdapter(this, R.layout.drawer_listview_item, dataList);
         
         // set up the drawer's list view with items and click listener
         mDrawerList.setAdapter(adapter);
@@ -160,7 +159,7 @@ public class InicioActivity extends Activity {
         //
         if (dadosEmpresa != null && dadosUsuario != null) {
 
-            // Checa se o tipo eh por valor para vendas no atacado
+            // Checa se o tipo de acumulo eh por valor para vendas no atacado
             if (dadosEmpresa.getTitpoAcumuloCreditoAtacado().equalsIgnoreCase("V")) {
                 textTipoAcumuloAtacado.setText("Por Valor");
                 textValorAcumuladoAtacado.setText("R$ " + funcoes.arredondarValor(dadosUsuario.getValorCreditoAtacado()));
@@ -224,6 +223,7 @@ public class InicioActivity extends Activity {
             textValorAcumuladoVarejo.setText("R$ 0,00");
             textPrazoAcumuloVarejo.setText(getResources().getString(R.string.prazo_desconhecido));
         }
+
         if (dadosUsuario.getModoConexao().equalsIgnoreCase("S")) {
             // Cria a conta para o envio automatico do syncAdapter
             funcoes.CreateSyncAccount(InicioActivity.this);
@@ -295,7 +295,7 @@ public class InicioActivity extends Activity {
 			break;
 
 		case 2:
-        	// Abre a tela inicial do sistema
+        	// Abre a tela de clientes
 			Intent intent = new Intent(InicioActivity.this, ClienteListaActivity.class);
 			startActivity(intent);
             break;

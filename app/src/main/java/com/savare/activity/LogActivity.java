@@ -70,9 +70,11 @@ public class LogActivity extends Activity implements OnNavigationListener{
         
         // Preenche o spinner da action bar com as cidades
  		actionBar.setListNavigationCallbacks(adapterTabela, this);
-     		
- 		// Posiciona o spinner na primeira posicao da lista
- 		actionBar.setSelectedNavigationItem(0);
+
+		if (actionBar.getNavigationItemCount() > 0) {
+			// Posiciona o spinner na primeira posicao da lista
+			actionBar.setSelectedNavigationItem(0);
+		}
  		
 	} // Fim onCreate
 

@@ -1,7 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.savare"
     android:versionCode="1002"
-    android:versionName="1.0.0.2" >
+    android:versionName="1.0.0.2">
 
     <uses-sdk
         android:minSdkVersion="11"
@@ -17,33 +18,33 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.AUTHENTICATE_ACCOUNTS" />
-    <uses-permission android:name="android.permission.MANAGE_ACCOUNTS"/>
-    <uses-permission android:name="android.permission.USE_CREDENTIALS"/>
-    <uses-permission android:name="android.permission.READ_SYNC_SETTINGS"/>
-    <uses-permission android:name="android.permission.WRITE_SYNC_SETTINGS"/>
+    <uses-permission android:name="android.permission.MANAGE_ACCOUNTS" />
+    <uses-permission android:name="android.permission.USE_CREDENTIALS" />
+    <uses-permission android:name="android.permission.READ_SYNC_SETTINGS" />
+    <uses-permission android:name="android.permission.WRITE_SYNC_SETTINGS" />
 
-	<application
+    <application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@android:style/Theme.Holo.Light">
 
-
         <!-- Google Analytics Version v4 needs this value for easy tracking -->
-	<meta-data android:name="com.google.android.gms.analytics.globalConfigResource" android:resource="@xml/global_tracker" />
-        
-        <activity android:name=".activity.LoginActivity"
-            android:label="@string/app_name" >
+        <meta-data
+            android:name="com.google.android.gms.analytics.globalConfigResource"
+            android:resource="@xml/global_tracker" />
+
+        <activity
+            android:name=".activity.LoginActivity"
+            android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        
-        <activity android:name=".activity.CadastroUsuarioActivity"></activity>
-        
-        <activity android:name=".activity.InicioActivity"></activity>
-        
+        <activity android:name=".activity.CadastroUsuarioActivity" />
+        <activity android:name=".activity.InicioActivity" />
         <activity android:name=".activity.ClienteListaActivity">
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
@@ -53,13 +54,10 @@
                 android:name="android.app.searchable"
                 android:resource="@layout/searchable" />
         </activity>
-
-        <activity android:name=".activity.ClienteDetalhesActivity">
-            
-        </activity>
-        
-        <activity android:name=".activity.OrcamentoActivity"
-            	  android:uiOptions="splitActionBarWhenNarrow">
+        <activity android:name=".activity.ClienteDetalhesActivity"></activity>
+        <activity
+            android:name=".activity.OrcamentoActivity"
+            android:uiOptions="splitActionBarWhenNarrow">
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
             </intent-filter>
@@ -67,35 +65,25 @@
             <meta-data
                 android:name="android.app.searchable"
                 android:resource="@layout/searchable" />
-        	<meta-data 
-        	    android:name="android.support.UI_OPTIONS"
+            <meta-data
+                android:name="android.support.UI_OPTIONS"
                 android:value="splitActionBarWhenNarrow" />
         </activity>
-        
-        <activity android:name=".activity.ProdutoListaActivity">
-        </activity>
-
-        <activity android:name=".activity.OrcamentoProdutoDetalhesActivity"></activity>
-
-        <activity android:name=".activity.OrcamentoPlanoPagamentoActivity"></activity>
-
-        <activity android:name=".activity.ListaOrcamentoPedidoActivity"></activity>
-
-        <activity android:name=".activity.ListaTitulosActivity"></activity>
-
-        <activity android:name=".activity.SincronizacaoActivity"></activity>
-
-        <activity android:name=".activity.ConfiguracoesActivity"></activity>
-
-        <activity android:name=".activity.fragment.OrcamentoTabulacaoFragment"
-            android:uiOptions="splitActionBarWhenNarrow">
-        </activity>
-
-        <activity android:name=".activity.ProdutoDetalhesActivity"></activity>
-
-        <activity android:name=".activity.LogActivity"></activity>
-
-        <activity android:name=".activity.fragment.ClienteCadastroFragment"></activity>
+        <activity android:name=".activity.ProdutoListaActivity"></activity>
+        <activity android:name=".activity.OrcamentoProdutoDetalhesActivity" />
+        <activity android:name=".activity.OrcamentoPlanoPagamentoActivity" />
+        <activity android:name=".activity.ListaOrcamentoPedidoActivity" />
+        <activity android:name=".activity.ListaTitulosActivity" />
+        <activity android:name=".activity.SincronizacaoActivity" />
+        <activity android:name=".activity.ConfiguracoesActivity" />
+        <activity
+            android:name=".activity.fragment.OrcamentoTabulacaoFragment"
+            android:uiOptions="splitActionBarWhenNarrow"></activity>
+        <activity android:name=".activity.ProdutoDetalhesActivity" />
+        <activity android:name=".activity.LogActivity" />
+        <activity android:name=".activity.fragment.ClienteCadastroFragment" />
+        <activity android:name=".activity.material.designer.InicioMDActivity"
+            android:theme="@style/AppBaseTheme"/>
 
         <provider
             android:name=".sincronizacao.EnviarProvider"
@@ -103,69 +91,85 @@
             android:exported="false" />
 
         <!-- Servico de sincronizacao -->
-        <service android:name=".sincronizacao.SyncService"
+        <service
+            android:name=".sincronizacao.SyncService"
             android:exported="true"
             android:process=":sync">
-            <!-- This intent filter is required. It allows the system to launch our sync service
-            as needed. -->
+
+            <!--
+            This intent filter is required. It allows the system to launch our sync service
+            as needed.
+            -->
             <intent-filter>
                 <action android:name="android.content.SyncAdapter" />
             </intent-filter>
             <!-- This points to a required XML file which describes our SyncAdapter. -->
-            <meta-data android:name="android.content.SyncAdapter"
+            <meta-data
+                android:name="android.content.SyncAdapter"
                 android:resource="@xml/syncadapter" />
         </service>
 
         <!-- Servico de autenticacao -->
         <service android:name=".sincronizacao.ContaService">
+
             <!-- Required filter used by the system to launch our account service. -->
             <intent-filter>
                 <action android:name="android.accounts.AccountAuthenticator" />
             </intent-filter>
             <!-- This points to an XMLf ile which describes our account service. -->
-            <meta-data android:name="android.accounts.AccountAuthenticator"
+            <meta-data
+                android:name="android.accounts.AccountAuthenticator"
                 android:resource="@xml/authenticator" />
         </service>
 
-        <receiver android:name="com.savare.funcoes.rotinas.receptor.ReceptorAlarmeEnviarOrcamentoBroadcastRotinas"
-                  android:label="ReceptorAlarmeEnviarOrcamentoBroadcastRotinas">
-        <intent-filter>
-            <action android:name="ENVIAR_ORCAMENTO_SAVARE" />
-            <category android:name="android.intent.category.DEFAULT" />
-        </intent-filter>
-        </receiver>
-
-        <receiver android:label="ReceptorNotificarAparelhoRotinas" android:name="com.savare.funcoes.rotinas.receptor.ReceptorNotificarAparelhoRotinas">
+        <receiver
+            android:name=".funcoes.rotinas.receptor.ReceptorAlarmeEnviarOrcamentoBroadcastRotinas"
+            android:label="ReceptorAlarmeEnviarOrcamentoBroadcastRotinas">
             <intent-filter>
-                <category android:name="android.intent.category.DEFAULT"/>
-                <action android:name="NOTIFICACAO_SAVARE"/>
+                <action android:name="ENVIAR_ORCAMENTO_SAVARE" />
+
+                <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </receiver>
-
-        <receiver android:label="ReceptorCriarAlarmeRebootRotinas" android:name="com.savare.funcoes.rotinas.receptor.ReceptorCriarAlarmeRebootRotinas">
+        <receiver
+            android:name=".funcoes.rotinas.receptor.ReceptorNotificarAparelhoRotinas"
+            android:label="ReceptorNotificarAparelhoRotinas">
             <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED"/>
-                <category android:name="android.intent.category.DEFAULT"/>
-                <action android:name="android.intent.action.REBOOT"/>
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <action android:name="NOTIFICACAO_SAVARE" />
             </intent-filter>
         </receiver>
-
-        <receiver android:label="ReceptorAlarmeReceberDadosBroadcastRotinas" android:name=".funcoes.rotinas.receptor.ReceptorAlarmeReceberDadosBroadcastRotinas">
+        <receiver
+            android:name=".funcoes.rotinas.receptor.ReceptorCriarAlarmeRebootRotinas"
+            android:label="ReceptorCriarAlarmeRebootRotinas">
             <intent-filter>
-                <category android:name="android.intent.category.DEFAULT"/>
-                <action android:name="RECEBER_DADOS_SAVARE"/>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <action android:name="android.intent.action.REBOOT" />
             </intent-filter>
         </receiver>
+        <receiver
+            android:name=".funcoes.rotinas.receptor.ReceptorAlarmeReceberDadosBroadcastRotinas"
+            android:label="ReceptorAlarmeReceberDadosBroadcastRotinas">
+            <intent-filter>
+                <category android:name="android.intent.category.DEFAULT" />
 
-        <receiver android:name="com.savare.funcoes.rotinas.receptor.ReceptorAlarmeEnviarCadastroPessoaBroadcastRotinas"
-                      android:label="ReceptorAlarmeEnviarCadastroPessoaBroadcastRotinas">
+                <action android:name="RECEBER_DADOS_SAVARE" />
+            </intent-filter>
+        </receiver>
+        <receiver
+            android:name=".funcoes.rotinas.receptor.ReceptorAlarmeEnviarCadastroPessoaBroadcastRotinas"
+            android:label="ReceptorAlarmeEnviarCadastroPessoaBroadcastRotinas">
             <intent-filter>
                 <action android:name="ENVIAR_OUTROS_DADOS_SAVARE" />
+
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </receiver>
 
     </application>
-    
 
 </manifest>

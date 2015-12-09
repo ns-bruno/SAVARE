@@ -57,6 +57,7 @@
     <string name="receber_dados_produto">Receber Dados dos Produtos</string>
     <string name="receber_dados_titulos">Receber Dados dos Títulos</string>
     <string name="credito_acumulado">Credito Acumulado</string>
+    <string name="credito_acumulado_atacado">Credito Acumulado Atacado</string>
     <string name="pontos_acumulados">Pontos Acumulados</string>
     <string name="capital_social">Capital Social</string>
     <string name="limite_compras">Limite de Compras</string>
@@ -73,6 +74,7 @@
     <string name="pesquisar_cliente">Pesquisar Cliente</string>
     <string name="esqueceu_senha">Esqueceu a senha</string>
     <string name="configuracao">Configuração</string>
+    <string name="configuracoes">Configurações</string>
     <string name="cadastro_usuario">Cadastro Usuário</string>
     <string name="login_progress_signing_in">Signing in&#8230;</string>
     <string name="pesquisar">Pesquisar</string>
@@ -166,6 +168,18 @@
     <string name="desmarcar_transmissao_dados">Desmarcar as transmissões de dados</string>
     <string name="achamos_alguma_coisa">Achamos alguma coisa</string>
     <string name="pegamos_produto">Pegamos o produto</string>
+    <string name="clientes">Clientes</string>
+    <string name="orcamentos">Orçamentos</string>
+    <string name="produtos">Produtos</string>
+    <string name="titulos">Títulos</string>
+    <string name="pedidos_a_enviar">Pedidos à Enviar</string>
+    <string name="pedidos_enviados">Pedidos Enviados</string>
+    <string name="lixeira">Lixeira</string>
+    <string name="sincronizacao">Sincronização</string>
+    <string name="logs">Logs</string>
+    <string name="monitoramento">Monitoramento</string>
+    <string name="sigla_real">R$</string>
+
 
 
 </resources>

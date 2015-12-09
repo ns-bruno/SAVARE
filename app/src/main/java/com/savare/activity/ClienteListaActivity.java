@@ -255,10 +255,11 @@ public class ClienteListaActivity extends Activity implements OnNavigationListen
 		switch (item.getItemId()) {
 		// Respond to the action bar's Up/Home button
 		case android.R.id.home:
-			Intent intent = new Intent(ClienteListaActivity.this, InicioActivity.class);
+			//Intent intent = new Intent(ClienteListaActivity.this, InicioActivity.class);
 			// Tira a acitivity da pilha e inicia uma nova
 			//intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-			startActivity(intent);
+			//startActivity(intent);
+			finish();
 			break;
 			
 		case R.id.menu_cliente_novo_cliente:

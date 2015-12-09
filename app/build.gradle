@@ -1,14 +1,15 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 16
-    buildToolsVersion '23.0.0'
+    compileSdkVersion 23
+    buildToolsVersion '22.0.0'
     compileOptions.encoding = 'UTF-8'
+    useLibrary 'org.apache.http.legacy'
 
     defaultConfig {
         applicationId "com.savare"
-        minSdkVersion 11
-        targetSdkVersion 21
+        //minSdkVersion 11
+        //targetSdkVersion 21
     }
 
     buildTypes {
@@ -28,10 +29,17 @@ android {
     }
 }
 
+repositories {
+    maven {
+        url "https://jitpack.io"
+    }
+}
+
 dependencies {
-    compile 'com.android.support:support-v4:18.0.0'
-    compile 'com.android.support:appcompat-v7:19.1.0'
-    //compile 'com.android.support:appcompat-v7:22.0.0'
+    compile fileTree(include: ['*.jar'], dir: 'libs')
+    //compile 'com.android.support:support-v4:+'
+    //compile 'com.android.support:support-v4:18.0.0'
+    //compile 'com.android.support:appcompat-v7:23.1.1'
     compile files('libs/commons-net-3.3.jar')
     compile files('libs/itextpdf-5.5.4.jar')
     compile files('libs/jasypt-1.9.2.jar')
@@ -40,4 +48,10 @@ dependencies {
     compile files('libs/mpandroidchartlibrary-2-0-9.jar')
     compile 'com.mcxiaoke.volley:library:1.0.18'
     compile 'com.google.code.gson:gson:2.3.1'
+    compile 'com.android.support:appcompat-v7:23.1.1'
+    compile('com.mikepenz:materialdrawer:4.5.5@aar') {
+        transitive = true
+    }
+    compile group: 'org.apache.httpcomponents' , name: 'httpclient-android' , version: '4.3.5.1'
+    compile 'com.github.dexafree:materiallist:3+'
 }
