@@ -1,22 +1,13 @@
 package com.savare.activity;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import android.accounts.Account;
-import android.accounts.AccountManager;
-import android.accounts.AccountManagerCallback;
-import android.accounts.AccountManagerFuture;
-import android.accounts.AuthenticatorException;
-import android.accounts.OperationCanceledException;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Fragment;
-import android.app.FragmentManager;
-import android.app.SearchManager;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -31,27 +22,21 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.savare.R;
-import com.savare.activity.fragment.ClienteListaFragment;
-import com.savare.activity.fragment.OrcamentoTabulacaoFragment;
 import com.savare.activity.fragment.ResumoFragment;
 import com.savare.adapter.CustomDrawerAdapter;
 import com.savare.banco.funcoesSql.UsuarioSQL;
 import com.savare.beans.DrawerItem;
 import com.savare.beans.EmpresaBeans;
-import com.savare.beans.TitulosListaBeans;
 import com.savare.beans.UsuarioBeans;
 import com.savare.funcoes.FuncoesPersonalizadas;
 import com.savare.funcoes.rotinas.EmpresaRotinas;
 import com.savare.funcoes.rotinas.OrcamentoRotinas;
 import com.savare.funcoes.rotinas.UsuarioRotinas;
 import com.savare.funcoes.rotinas.async.ReceberDadosFtpAsyncRotinas;
-import com.savare.sincronizacao.ConfiguracoesSincronizacao;
 
 public class InicioActivity extends Activity {
 
@@ -238,7 +223,7 @@ public class InicioActivity extends Activity {
             // Desavia o recebimento automatico
             funcoes.criarAlarmeEnviarReceberDadosAutomatico(true, false);
 
-            ReceberDadosFtpAsyncRotinas receberDadosFtpAsync = new ReceberDadosFtpAsyncRotinas(InicioActivity.this, ReceberDadosFtpAsyncRotinas.TELA_LOGIN);
+            ReceberDadosFtpAsyncRotinas receberDadosFtpAsync = new ReceberDadosFtpAsyncRotinas(InicioActivity.this, ReceberDadosFtpAsyncRotinas.TELA_INICIO);
             receberDadosFtpAsync.execute();
 
             Log.i("SAVARE", "Executou a rotina para receber os dados. - InicioActivity");

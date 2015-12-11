@@ -772,7 +772,7 @@ public class ListaOrcamentoPedidoActivity extends Activity implements OnNavigati
 					ContentValues mensagem = new ContentValues();
 					mensagem.put("comando", 1);
 					mensagem.put("tela", "ListaOrcamentoPedidoActivity");
-					mensagem.put("mensagem", "Voc� j� esta na lista de pedidos N�O enviados.\n");
+					mensagem.put("mensagem", "Você já esta na lista de pedidos NÃO enviados.\n");
 					
 					FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(ListaOrcamentoPedidoActivity.this);
 					funcoes.menssagem(mensagem);

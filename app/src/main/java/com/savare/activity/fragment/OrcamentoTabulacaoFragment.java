@@ -28,6 +28,7 @@ import android.widget.SearchView.OnQueryTextListener;
 import com.savare.R;
 import com.savare.activity.InicioActivity;
 import com.savare.activity.ProdutoListaActivity;
+import com.savare.activity.material.designer.InicioMDActivity;
 import com.savare.adapter.ItemUniversalAdapter;
 import com.savare.adapter.OrcamentoTabulacaoFragmentAdapter;
 import com.savare.banco.funcoesSql.OrcamentoSql;
@@ -193,11 +194,13 @@ public class OrcamentoTabulacaoFragment extends FragmentActivity {
 		switch (item.getItemId()) {
 			// Respond to the action bar's Up/Home button
 			case android.R.id.home:
-				// Abre a tela inicial do sistema
-				Intent intentInicio = new Intent(OrcamentoTabulacaoFragment.this, InicioActivity.class);
+				/*// Abre a tela inicial do sistema
+				Intent intentInicio = new Intent(OrcamentoTabulacaoFragment.this, InicioMDActivity.class);
 				// Tira a acitivity da pilha e inicia uma nova
 				intentInicio.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-				startActivity(intentInicio);
+				startActivity(intentInicio);*/
+
+				finish();
 				break;
 		}
 		return super.onOptionsItemSelected(item);

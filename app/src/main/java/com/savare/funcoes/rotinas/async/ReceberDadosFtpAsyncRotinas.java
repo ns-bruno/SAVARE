@@ -6,16 +6,13 @@ import java.util.ArrayList;
 import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Environment;
 import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.savare.banco.funcoesSql.UsuarioSQL;
 import com.savare.funcoes.FuncoesPersonalizadas;
 import com.savare.funcoes.rotinas.ImportarDadosTxtRotinas;
 import com.savare.funcoes.rotinas.ReceberArquivoTxtServidorFtpRotinas;
@@ -27,7 +24,7 @@ public class ReceberDadosFtpAsyncRotinas extends AsyncTask<String, String, Integ
 	private ProgressBar progressReceberDados;
 	private TextView textMensagem;
 	public static final int TELA_RECEPTOR_ALARME = 0,
-							TELA_LOGIN = 1;
+							TELA_INICIO = 1;
 	private int telaChamou = -1;
 	private String mensagem = " ";
 	
@@ -83,7 +80,7 @@ public class ReceberDadosFtpAsyncRotinas extends AsyncTask<String, String, Integ
 				localDados = receberArquivoTxt.downloadArquivoTxtServidorFtp();
 			}
 
-			if (telaChamou == TELA_LOGIN){
+			if (telaChamou == TELA_INICIO){
 				File pastaTemporaria = new File(Environment.getExternalStorageDirectory() + "/SAVARE/TEMP");
 				// Checa se existe a pasta temporaria
 				if (pastaTemporaria.exists()){
@@ -120,7 +117,7 @@ public class ReceberDadosFtpAsyncRotinas extends AsyncTask<String, String, Integ
 					Log.i("SAVARE", "importar os dados do arquivo "+ localDados.get(i) + " - ReceberDadosFtpAsyncRotinas");
 
 					// Checa se que esta chamando esta classe eh o alarme
-					if((telaChamou == TELA_RECEPTOR_ALARME) || (telaChamou == TELA_LOGIN)){
+					if((telaChamou == TELA_RECEPTOR_ALARME) || (telaChamou == TELA_INICIO)){
 						ImportarDadosTxtRotinas importarDados = new ImportarDadosTxtRotinas(context, localDados.get(i), TELA_RECEPTOR_ALARME);
 						importarDados.importarDados();
 
@@ -152,14 +149,15 @@ public class ReceberDadosFtpAsyncRotinas extends AsyncTask<String, String, Integ
 				funcoes.setValorXml("RecebendoDados", "N");
 
 				// Checa se que esta chamando esta classe eh o alarme
-				if((telaChamou != TELA_RECEPTOR_ALARME) && (telaChamou != TELA_LOGIN)){
+				if((telaChamou != TELA_RECEPTOR_ALARME) && (telaChamou != TELA_INICIO)){
 					((Activity) context).runOnUiThread(new Runnable() {
 						  public void run() {
 							  progressReceberDados.setVisibility(View.GONE);
 						  }
 					});
-				} else {
+				} else if (telaChamou != TELA_INICIO){
 					mensagem += "Não localizamos o arquivo para receber os dados de atualização.";
+
 				}
 			}
 		
@@ -212,7 +210,7 @@ public class ReceberDadosFtpAsyncRotinas extends AsyncTask<String, String, Integ
 		funcoes.criarAlarmeEnviarReceberDadosAutomatico(true, true);
 
 		// Checa se que esta chamando esta classe eh o alarme
-		if( (mensagem != null) && (mensagem.length() > 1) && (telaChamou != TELA_RECEPTOR_ALARME)){
+		if( (mensagem != null) && (mensagem.length() > 1) && (telaChamou != TELA_RECEPTOR_ALARME) && (telaChamou != TELA_INICIO)){
 
 			ContentValues dadosMensagem = new ContentValues();
 

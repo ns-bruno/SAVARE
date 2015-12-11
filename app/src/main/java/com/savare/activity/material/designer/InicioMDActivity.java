@@ -1,21 +1,21 @@
 package com.savare.activity.material.designer;
 
 import android.annotation.TargetApi;
-import android.app.ActionBar;
-import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.CompoundButton;
+import android.widget.Toast;
 
 import com.dexafree.materialList.card.Card;
 import com.dexafree.materialList.card.CardProvider;
@@ -23,15 +23,15 @@ import com.dexafree.materialList.card.OnActionClickListener;
 import com.dexafree.materialList.card.action.TextViewAction;
 import com.dexafree.materialList.listeners.RecyclerItemClickListener;
 import com.dexafree.materialList.view.MaterialListView;
+import com.github.clans.fab.FloatingActionButton;
+import com.github.clans.fab.FloatingActionMenu;
 import com.mikepenz.materialdrawer.AccountHeader;
 import com.mikepenz.materialdrawer.AccountHeaderBuilder;
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.DrawerBuilder;
 import com.mikepenz.materialdrawer.interfaces.OnCheckedChangeListener;
-import com.mikepenz.materialdrawer.model.DividerDrawerItem;
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
-import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
 import com.mikepenz.materialdrawer.model.SectionDrawerItem;
 import com.mikepenz.materialdrawer.model.SwitchDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
@@ -44,6 +44,8 @@ import com.savare.activity.ListaTitulosActivity;
 import com.savare.activity.LogActivity;
 import com.savare.activity.ProdutoListaActivity;
 import com.savare.activity.SincronizacaoActivity;
+import com.savare.activity.fragment.ClienteCadastroFragment;
+import com.savare.activity.fragment.OrcamentoTabulacaoFragment;
 import com.savare.banco.funcoesSql.UsuarioSQL;
 import com.savare.beans.EmpresaBeans;
 import com.savare.beans.UsuarioBeans;
@@ -52,6 +54,8 @@ import com.savare.funcoes.rotinas.EmpresaRotinas;
 import com.savare.funcoes.rotinas.OrcamentoRotinas;
 import com.savare.funcoes.rotinas.UsuarioRotinas;
 import com.savare.funcoes.rotinas.async.ReceberDadosFtpAsyncRotinas;
+
+import java.util.UUID;
 
 /**
  * Created by Bruno Nogueira Silva on 04/12/2015.
@@ -62,6 +66,7 @@ public class InicioMDActivity extends AppCompatActivity {
     private Drawer navegacaoDrawerEsquerdo;
     private AccountHeader cabecalhoDrawer;
     private MaterialListView mListView;
+    private int cliqueVoltar = 0;
 
 
     @TargetApi(Build.VERSION_CODES.M)
@@ -258,9 +263,343 @@ public class InicioMDActivity extends AppCompatActivity {
                 }
             })
             .build();
+        // Recupera o campo de lista de card da activity(view)
+        mListView = (MaterialListView) findViewById(R.id.activity_inicio_md_material_listview);
+        // Pega os cliques dos cards
+        mListView.addOnItemTouchListener(new RecyclerItemClickListener.OnItemClickListener() {
 
-        mListView = (MaterialListView) findViewById(R.id.material_listview);
+            @Override
+            public void onItemClick(Card card, int position) {
+                String s = card.toString();
+            }
 
+            @Override
+            public void onItemLongClick(Card card, int position) {
+                String s = card.toString();
+            }
+        });
+
+        FloatingActionMenu menuFloat = (FloatingActionMenu) findViewById(R.id.activity_inicio_md_menu_float);
+        menuFloat.setMenuButtonColorNormal(getResources().getColor(R.color.colorAccent));
+        menuFloat.setMenuButtonColorPressed(getResources().getColor(R.color.colorPrimary));
+        menuFloat.setMenuButtonColorRipple(getResources().getColor(R.color.colorAccent));
+
+
+        FloatingActionButton itemMenuNovoOrcamento = (FloatingActionButton) findViewById(R.id.activity_inicio_md_menu_item_novo_orcamento);
+        itemMenuNovoOrcamento.setButtonSize(FloatingActionButton.SIZE_MINI);
+        itemMenuNovoOrcamento.setColorNormal(getResources().getColor(R.color.branco));
+        itemMenuNovoOrcamento.setColorPressed(getResources().getColor(R.color.colorPrimary));
+        itemMenuNovoOrcamento.setColorRipple(getResources().getColor(R.color.branco));
+        itemMenuNovoOrcamento.setLabelText(getResources().getString(R.string.novo_orcamento));
+        itemMenuNovoOrcamento.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Abre a tela de detalhes do produto
+                Intent intent = new Intent(InicioMDActivity.this, ClienteListaActivity.class);
+                intent.putExtra(ListaOrcamentoPedidoActivity.KEY_TELA_CHAMADA, ListaOrcamentoPedidoActivity.KEY_TELA_LISTA_ORCAMENTO_PEDIDO);
+                // Abre a activity aquardando uma resposta
+                startActivityForResult(intent, ListaOrcamentoPedidoActivity.SOLICITA_CLIENTE);
+            }
+        });
+
+        FloatingActionButton itemMenuNovoCliente = (FloatingActionButton) findViewById(R.id.activity_inicio_md_menu_item_novo_cliente);
+        itemMenuNovoCliente.setButtonSize(FloatingActionButton.SIZE_MINI);
+        itemMenuNovoCliente.setColorNormal(getResources().getColor(R.color.branco));
+        itemMenuNovoCliente.setColorPressed(getResources().getColor(R.color.colorPrimary));
+        itemMenuNovoCliente.setColorRipple(getResources().getColor(R.color.branco));
+        itemMenuNovoCliente.setLabelText(getResources().getString(R.string.novo_cliente));
+        itemMenuNovoCliente.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Abre a tela inicial do sistema
+                Intent intentNovo = new Intent(InicioMDActivity.this, ClienteCadastroFragment.class);
+                startActivity(intentNovo);
+            }
+        });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        navegacaoDrawerEsquerdo.setSelectionAtPosition(-1);
+
+        FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(InicioMDActivity.this);
+
+        if (!funcoes.getValorXml("RecebendoDados").equalsIgnoreCase("S")) {
+            // Marca nos parametro internos que a aplicacao que esta recebendo os dados
+            //funcoes.setValorXml("RecebendoDados", "S");
+
+            // Desavia o recebimento automatico
+            funcoes.criarAlarmeEnviarReceberDadosAutomatico(true, false);
+
+            ReceberDadosFtpAsyncRotinas receberDadosFtpAsync = new ReceberDadosFtpAsyncRotinas(InicioMDActivity.this, ReceberDadosFtpAsyncRotinas.TELA_INICIO);
+            receberDadosFtpAsync.execute();
+
+            Log.i("SAVARE", "Executou a rotina para receber os dados. - InicioActivity");
+        }
+        // Checa se existe algum card view
+        if (mListView.getAdapter().getItemCount() > 0) {
+            // Remove todos a lista de cards
+            mListView.getAdapter().clearAll();
+        }
+
+        geraCardView();
+
+        EmpresaRotinas empresaRotinas = new EmpresaRotinas(InicioMDActivity.this);
+        // Pega os dados da empresa
+        EmpresaBeans dadosEmpresa = empresaRotinas.empresa(funcoes.getValorXml("CodigoEmpresa"));
+
+        UsuarioRotinas usuarioRotinas = new UsuarioRotinas(InicioMDActivity.this);
+        // Pega os dados do usuario(vendedor)
+        UsuarioBeans dadosUsuario = usuarioRotinas.usuarioCompleto("ID_USUA = " + funcoes.getValorXml("CodigoUsuario"));
+
+        if (dadosEmpresa != null && dadosUsuario != null) {
+
+            // Checa se esta liberado para vender no atacado
+            if (dadosUsuario.getVendeAtacadoUsuario() == '1'){
+                // Vareavel para salvar a descricao do card
+                String descricaoCard = "";
+
+                // Checa se o tipo de acumulo eh por valor para vendas no atacado
+                if (dadosEmpresa.getTitpoAcumuloCreditoAtacado().equalsIgnoreCase("V")) {
+
+                    descricaoCard += "Tpo de Acumulo de Crédito:  Por Valor. \n" +
+                            "Valor Acumulado: " + getResources().getString(R.string.sigla_real) + " " + funcoes.arredondarValor(dadosUsuario.getValorCreditoAtacado() + "\n");
+
+                    // Checa se o tipo eh por percentual para vendas no atacado
+                } else if (dadosEmpresa.getTitpoAcumuloCreditoAtacado().equalsIgnoreCase("P")) {
+
+                    descricaoCard += "Tpo de Acumulo de Crédito:  Por Percentual. \n" +
+                            "Percentual Acumulado: " + funcoes.arredondarValor(dadosUsuario.getPercentualCreditoAtacado())+"% \n";
+
+                }
+                // Checa os periodo que vai ser acumulado os creditos para vendas no atacado
+                if (dadosEmpresa.getPeriodocrceditoAtacado().equalsIgnoreCase("M")) {
+                    descricaoCard += "Período do Crédito está Mensal. \n";
+
+                } else if (dadosEmpresa.getPeriodocrceditoAtacado().equalsIgnoreCase("Q")) {
+                    descricaoCard += "Período do Crédito está Quinzenal. \n";
+
+                } else if (dadosEmpresa.getPeriodocrceditoAtacado().equalsIgnoreCase("S")) {
+                    descricaoCard += "Período do Crédito está Semanal. \n";
+
+                } else if (dadosEmpresa.getPeriodocrceditoAtacado().equalsIgnoreCase("T")) {
+                    descricaoCard += "Período do Crédito está Semestral. \n";
+
+                } else if (dadosEmpresa.getPeriodocrceditoAtacado().equalsIgnoreCase("A")) {
+                    descricaoCard += "Período do Crédito está Anual. \n";
+                }
+
+                Card cardCreditoAtacado = new Card.Builder(getApplicationContext())
+                        .withProvider(new CardProvider())
+                        .setLayout(R.layout.material_basic_buttons_card)
+                        .setTitle("Resumo de Credito no Atacado")
+                        .setDescription(descricaoCard)
+                        .addAction(R.id.right_text_button, new TextViewAction(getApplicationContext())
+                                .setText("Action")
+                                .setListener(new OnActionClickListener() {
+                                    @Override
+                                    public void onActionClicked(View view, Card card) {
+                                        String s = card.toString();
+                                    }
+
+                                }))
+                        .endConfig()
+                        .build();
+                // Adiciona o card view em uma lista
+                mListView.getAdapter().add(cardCreditoAtacado);
+
+                // Checa se esta liberado para vender no varejo
+            }
+
+            if (dadosUsuario.getVendeVarejoUsuario() == '1'){
+                String descricaoCard = "";
+                // Checa se o tipo eh por valor para vendas no varejo
+                if (dadosEmpresa.getTitpoAcumuloCreditoVarejo().equalsIgnoreCase("V")) {
+                    descricaoCard += "Tpo de Acumulo de Crédito:  Por Valor. \n" +
+                            "Valor Acumulado: " + getResources().getString(R.string.sigla_real) + " " + funcoes.arredondarValor(dadosUsuario.getValorCreditoVarejo() + "\n");
+
+                    // Checa se o tipo eh por percentual para vendas no atacado
+                } else if (dadosEmpresa.getTitpoAcumuloCreditoVarejo().equalsIgnoreCase("P")) {
+                    descricaoCard += "Tpo de Acumulo de Crédito:  Por Percentual. \n" +
+                            "Percentual Acumulado: " + funcoes.arredondarValor(dadosUsuario.getPercentualCreditoVarejo())+"% \n";
+                }
+
+                // Checa os periodo que vai ser acumulado os creditos para vendas no atacado
+                if (dadosEmpresa.getPeriodocrceditoVarejo().equalsIgnoreCase("M")) {
+                    descricaoCard += "Período do Crédito está Mensal. \n";
+
+                } else if (dadosEmpresa.getPeriodocrceditoVarejo().equalsIgnoreCase("Q")) {
+                    descricaoCard += "Período do Crédito está Quinzenal. \n";
+
+                } else if (dadosEmpresa.getPeriodocrceditoVarejo().equalsIgnoreCase("S")) {
+                    descricaoCard += "Período do Crédito está Semanal. \n";
+
+                } else if (dadosEmpresa.getPeriodocrceditoVarejo().equalsIgnoreCase("T")) {
+                    descricaoCard += "Período do Crédito está Semestral. \n";
+
+                } else if (dadosEmpresa.getPeriodocrceditoVarejo().equalsIgnoreCase("A")) {
+                    descricaoCard += "Período do Crédito está Anual. \n";
+                }
+
+                Card cardCreditoVarejo = new Card.Builder(getApplicationContext())
+                        .withProvider(new CardProvider())
+                        .setLayout(R.layout.material_basic_buttons_card)
+                        .setTitle("Resumo de Credito no Varejo")
+                        .setDescription(descricaoCard)
+                        .addAction(R.id.right_text_button, new TextViewAction(getApplicationContext())
+                                .setText("Action")
+                                .setListener(new OnActionClickListener() {
+                                    @Override
+                                    public void onActionClicked(View view, Card card) {
+                                        String s = card.toString();
+                                    }
+
+                                }))
+                        .endConfig()
+                        .build();
+
+                mListView.getAdapter().add(cardCreditoVarejo);
+            }
+            // Checa se o modo de sincronizacao esta SyncAccount
+            if (dadosUsuario.getModoConexao().equalsIgnoreCase("S")) {
+                // Cria a conta para o envio automatico do syncAdapter
+                funcoes.CreateSyncAccount(InicioMDActivity.this);
+            } else {
+                funcoes.cancelarSincronizacaoSegundoPlano();
+            }
+        }
+    } // Fim onResume
+
+
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        // Checa se eh um retorno
+        if(requestCode == ListaOrcamentoPedidoActivity.SOLICITA_CLIENTE){
+            // Checa se eh um retorno da tela de clientes
+            if(resultCode == ListaOrcamentoPedidoActivity.RETORNA_CLIENTE){
+
+                final Intent dadosRetornado = data;
+
+                // Cria um dialog para selecionar atacado ou varejo
+                AlertDialog.Builder mensagemAtacadoVarejo = new AlertDialog.Builder(InicioMDActivity.this);
+                // Atributo(variavel) para escolher o tipo da venda
+                final String[] opcao = {"Atacado", "Varejo"};
+                // Preenche o dialogo com o titulo e as opcoes
+                mensagemAtacadoVarejo.setTitle("Atacado ou Varejo").setItems(opcao, new DialogInterface.OnClickListener() {
+
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                        // Preenche o ContentValues com os dados da pessoa
+                        ContentValues dadosCliente = new ContentValues();
+                        dadosCliente.put("ID_CFACLIFO", dadosRetornado.getStringExtra("ID_CFACLIFO"));
+                        dadosCliente.put("ID_CFAESTAD", dadosRetornado.getStringExtra("ID_CFAESTAD"));
+                        dadosCliente.put("ID_CFACIDAD", dadosRetornado.getStringExtra("ID_CFACIDAD"));
+                        dadosCliente.put("ID_SMAEMPRE", dadosRetornado.getStringExtra("ID_SMAEMPRE"));
+                        dadosCliente.put("GUID", UUID.randomUUID().toString().replace("-", "").toUpperCase().substring(0, 16));
+                        dadosCliente.put("ATAC_VAREJO", which);
+                        dadosCliente.put("PESSOA_CLIENTE", dadosRetornado.getStringExtra("PESSOA_CLIENTE"));
+                        dadosCliente.put("NOME_CLIENTE", dadosRetornado.getStringExtra("NOME_CLIENTE"));
+                        dadosCliente.put("IE_RG_CLIENTE", dadosRetornado.getStringExtra("IE_RG_CLIENTE"));
+                        dadosCliente.put("CPF_CGC_CLIENTE", dadosRetornado.getStringExtra("CPF_CGC_CLIENTE"));
+                        dadosCliente.put("ENDERECO_CLIENTE", dadosRetornado.getStringExtra("ENDERECO_CLIENTE"));
+                        dadosCliente.put("BAIRRO_CLIENTE", dadosRetornado.getStringExtra("BAIRRO_CLIENTE"));
+                        dadosCliente.put("CEP_CLIENTE", dadosRetornado.getStringExtra("CEP_CLIENTE"));
+						/*dadosCliente.put("LATITUDE", localizacao.getLatitude());
+						dadosCliente.put("LONGITUDE", localizacao.getLongitude());
+						dadosCliente.put("ALTITUDE", localizacao.getAltitude());
+						dadosCliente.put("HORARIO_LOCALIZACAO", localizacao.getHorarioLocalizacao());
+						dadosCliente.put("TIPO_LOCALIZACAO", localizacao.getTipoLocalizacao());
+						dadosCliente.put("PRECISAO", localizacao.getPrecisao());*/
+
+                        OrcamentoRotinas orcamentoRotinas = new OrcamentoRotinas(InicioMDActivity.this);
+                        // Cria um novo orcamento no banco de dados
+                        long numeroOracmento = orcamentoRotinas.insertOrcamento(dadosCliente);
+
+                        // Verifica se retornou algum numero
+                        if(numeroOracmento > 0){
+
+                            Bundle bundle = new Bundle();
+                            bundle.putString(OrcamentoTabulacaoFragment.KEY_ID_ORCAMENTO, String.valueOf(numeroOracmento));
+                            bundle.putString(OrcamentoTabulacaoFragment.KEY_NOME_RAZAO, dadosRetornado.getStringExtra("NOME_CLIENTE"));
+                            bundle.putString(OrcamentoTabulacaoFragment.KEY_ID_PESSOA, dadosRetornado.getStringExtra("ID_CFACLIFO"));
+                            bundle.putString(OrcamentoTabulacaoFragment.KEY_ATACADO_VAREJO, String.valueOf(which));
+                            bundle.putString("AV", "0");
+
+                            Intent i = new Intent(InicioMDActivity.this, OrcamentoTabulacaoFragment.class);
+                            i.putExtras(bundle);
+
+                            // Abre outra tela
+                            startActivity(i);
+                        }
+                    }});
+
+                // Faz a mensagem (dialog) aparecer
+                mensagemAtacadoVarejo.show();
+            }
+        }
+
+    } // FIm onActivityResult
+
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if(keyCode == KeyEvent.KEYCODE_BACK) {
+
+            if (cliqueVoltar < 1){
+                // Mostra uma mensagem para clicar novamente em voltar
+                Toast.makeText(InicioMDActivity.this, getResources().getString(R.string.clique_sair_novamente_para_sair), Toast.LENGTH_LONG).show();
+                cliqueVoltar ++;
+
+            } else if (cliqueVoltar >= 1){
+                // Executa o comando sair
+                //InicioMDActivity.super.onBackPressed();
+                InicioMDActivity.this.finish();
+            }
+            return true;
+        } else {
+            return super.onKeyDown(keyCode, event);
+        }
+    }
+
+    /**
+     * Pega os cliques feito no sweep do menu drawer.
+     */
+    private OnCheckedChangeListener mOnCheckedChangeListener = new OnCheckedChangeListener(){
+        @Override
+        public void onCheckedChanged(IDrawerItem iDrawerItem, CompoundButton compoundButton, boolean b) {
+
+            FuncoesPersonalizadas funcoesP = new FuncoesPersonalizadas(InicioMDActivity.this);
+
+            // Checa se a opcao selecionada eh para enviar
+            if (iDrawerItem.getTag().toString().contains("enviar")){
+                // Checa se foi escolhido verdadeiro ou false
+                if (b){
+                    funcoesP.setValorXml("EnviarAutomatico", "S");
+                } else {
+                    funcoesP.setValorXml("EnviarAutomatico", "N");
+                }
+            }
+            // Checa se a opcao selecionada eh para receber
+            if (iDrawerItem.getTag().toString().contains("receber")){
+                // Checa se foi escolhido verdadeiro ou false
+                if (b){
+                    funcoesP.setValorXml("ReceberAutomatico", "S");
+                } else {
+                    funcoesP.setValorXml("ReceberAutomatico", "N");
+                }
+            }
+            // Executa a funcao para criar os alarmes em background
+            funcoesP.criarAlarmeEnviarReceberDadosAutomatico(true, true);
+        }
+    };
+
+    private void geraCardView() {
         /*Card card = new Card.Builder(getApplicationContext())
                 .withProvider(new CardProvider())
                 .setLayout(R.layout.material_basic_buttons_card)
@@ -339,199 +678,5 @@ public class InicioMDActivity extends AppCompatActivity {
         mListView.getAdapter().add(card);
         mListView.getAdapter().add(card2);
         mListView.getAdapter().add(card3);*/
-
-        mListView.addOnItemTouchListener(new RecyclerItemClickListener.OnItemClickListener(){
-
-            @Override
-            public void onItemClick(Card card, int position) {
-                String s = card.toString();
-            }
-
-            @Override
-            public void onItemLongClick(Card card, int position) {
-                String s = card.toString();
-            }
-        });
     }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-        navegacaoDrawerEsquerdo.setSelectionAtPosition(-1);
-
-        FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(InicioMDActivity.this);
-
-        if (!funcoes.getValorXml("RecebendoDados").equalsIgnoreCase("S")) {
-            // Marca nos parametro internos que a aplicacao que esta recebendo os dados
-            //funcoes.setValorXml("RecebendoDados", "S");
-
-            // Desavia o recebimento automatico
-            funcoes.criarAlarmeEnviarReceberDadosAutomatico(true, false);
-
-            ReceberDadosFtpAsyncRotinas receberDadosFtpAsync = new ReceberDadosFtpAsyncRotinas(InicioMDActivity.this, ReceberDadosFtpAsyncRotinas.TELA_LOGIN);
-            receberDadosFtpAsync.execute();
-
-            Log.i("SAVARE", "Executou a rotina para receber os dados. - InicioActivity");
-        }
-
-
-        EmpresaRotinas empresaRotinas = new EmpresaRotinas(InicioMDActivity.this);
-        // Pega os dados da empresa
-        EmpresaBeans dadosEmpresa = empresaRotinas.empresa(funcoes.getValorXml("CodigoEmpresa"));
-
-        UsuarioRotinas usuarioRotinas = new UsuarioRotinas(InicioMDActivity.this);
-        // Pega os dados do usuario(vendedor)
-        UsuarioBeans dadosUsuario = usuarioRotinas.usuarioCompleto("ID_USUA = " + funcoes.getValorXml("CodigoUsuario"));
-
-        if (dadosEmpresa != null && dadosUsuario != null) {
-
-            // Checa se esta liberado para vender no atacado
-            if (dadosUsuario.getVendeAtacadoUsuario() == '1'){
-                // Vareavel para salvar a descricao do card
-                String descricaoCard = "";
-
-                // Checa se o tipo de acumulo eh por valor para vendas no atacado
-                if (dadosEmpresa.getTitpoAcumuloCreditoAtacado().equalsIgnoreCase("V")) {
-
-                    descricaoCard += "Tpo de Acumulo de Crédito:  Por Valor. \n" +
-                            "Valor Acumulado: " + getResources().getString(R.string.sigla_real) + " " + funcoes.arredondarValor(dadosUsuario.getValorCreditoAtacado() + "\n");
-
-                    // Checa se o tipo eh por percentual para vendas no atacado
-                } else if (dadosEmpresa.getTitpoAcumuloCreditoAtacado().equalsIgnoreCase("P")) {
-
-                    descricaoCard += "Tpo de Acumulo de Crédito:  Por Percentual. \n" +
-                            "Percentual Acumulado: " + funcoes.arredondarValor(dadosUsuario.getPercentualCreditoAtacado())+"% \n";
-
-                }
-                // Checa os periodo que vai ser acumulado os creditos para vendas no atacado
-                if (dadosEmpresa.getPeriodocrceditoAtacado().equalsIgnoreCase("M")) {
-                    descricaoCard += "Período do Crédito está Mensal. \n";
-
-                } else if (dadosEmpresa.getPeriodocrceditoAtacado().equalsIgnoreCase("Q")) {
-                    descricaoCard += "Período do Crédito está Quinzenal. \n";
-
-                } else if (dadosEmpresa.getPeriodocrceditoAtacado().equalsIgnoreCase("S")) {
-                    descricaoCard += "Período do Crédito está Semanal. \n";
-
-                } else if (dadosEmpresa.getPeriodocrceditoAtacado().equalsIgnoreCase("T")) {
-                    descricaoCard += "Período do Crédito está Semestral. \n";
-
-                } else if (dadosEmpresa.getPeriodocrceditoAtacado().equalsIgnoreCase("A")) {
-                    descricaoCard += "Período do Crédito está Anual. \n";
-                }
-
-                Card cardCreditoAtacado = new Card.Builder(getApplicationContext())
-                        .withProvider(new CardProvider())
-                        .setLayout(R.layout.material_basic_buttons_card)
-                        .setTitle("Resumo de Credito no Atacado")
-                        .setDescription(descricaoCard)
-                        .addAction(R.id.right_text_button, new TextViewAction(getApplicationContext())
-                                .setText("Action")
-                                .setListener(new OnActionClickListener() {
-                                    @Override
-                                    public void onActionClicked(View view, Card card) {
-                                        String s = card.toString();
-                                    }
-
-                                }))
-                        .endConfig()
-                        .build();
-
-                mListView.getAdapter().add(cardCreditoAtacado);
-
-                // Checa se esta liberado para vender no varejo
-            }
-
-            if (dadosUsuario.getVendeVarejoUsuario() == '1'){
-                String descricaoCard = "";
-                // Checa se o tipo eh por valor para vendas no varejo
-                if (dadosEmpresa.getTitpoAcumuloCreditoVarejo().equalsIgnoreCase("V")) {
-                    descricaoCard += "Tpo de Acumulo de Crédito:  Por Valor. \n" +
-                            "Valor Acumulado: " + getResources().getString(R.string.sigla_real) + " " + funcoes.arredondarValor(dadosUsuario.getValorCreditoVarejo() + "\n");
-
-                    // Checa se o tipo eh por percentual para vendas no atacado
-                } else if (dadosEmpresa.getTitpoAcumuloCreditoVarejo().equalsIgnoreCase("P")) {
-                    descricaoCard += "Tpo de Acumulo de Crédito:  Por Percentual. \n" +
-                            "Percentual Acumulado: " + funcoes.arredondarValor(dadosUsuario.getPercentualCreditoVarejo())+"% \n";
-                }
-
-                // Checa os periodo que vai ser acumulado os creditos para vendas no atacado
-                if (dadosEmpresa.getPeriodocrceditoVarejo().equalsIgnoreCase("M")) {
-                    descricaoCard += "Período do Crédito está Mensal. \n";
-
-                } else if (dadosEmpresa.getPeriodocrceditoVarejo().equalsIgnoreCase("Q")) {
-                    descricaoCard += "Período do Crédito está Quinzenal. \n";
-
-                } else if (dadosEmpresa.getPeriodocrceditoVarejo().equalsIgnoreCase("S")) {
-                    descricaoCard += "Período do Crédito está Semanal. \n";
-
-                } else if (dadosEmpresa.getPeriodocrceditoVarejo().equalsIgnoreCase("T")) {
-                    descricaoCard += "Período do Crédito está Semestral. \n";
-
-                } else if (dadosEmpresa.getPeriodocrceditoVarejo().equalsIgnoreCase("A")) {
-                    descricaoCard += "Período do Crédito está Anual. \n";
-                }
-
-                Card cardCreditoVarejo = new Card.Builder(getApplicationContext())
-                        .withProvider(new CardProvider())
-                        .setLayout(R.layout.material_basic_buttons_card)
-                        .setTitle("Resumo de Credito no Varejo")
-                        .setDescription(descricaoCard)
-                        .addAction(R.id.right_text_button, new TextViewAction(getApplicationContext())
-                                .setText("Action")
-                                .setListener(new OnActionClickListener() {
-                                    @Override
-                                    public void onActionClicked(View view, Card card) {
-                                        String s = card.toString();
-                                    }
-
-                                }))
-                        .endConfig()
-                        .build();
-
-                mListView.getAdapter().add(cardCreditoVarejo);
-            }
-
-            // Checa se o modo de sincronizacao esta SyncAccount
-            if (dadosUsuario.getModoConexao().equalsIgnoreCase("S")) {
-                // Cria a conta para o envio automatico do syncAdapter
-                funcoes.CreateSyncAccount(InicioMDActivity.this);
-            } else {
-                funcoes.cancelarSincronizacaoSegundoPlano();
-            }
-        }
-    } // Fim onResume
-
-    /**
-     * Pega os cliques feito no sweep do menu drawer.
-     */
-    private OnCheckedChangeListener mOnCheckedChangeListener = new OnCheckedChangeListener(){
-        @Override
-        public void onCheckedChanged(IDrawerItem iDrawerItem, CompoundButton compoundButton, boolean b) {
-
-            FuncoesPersonalizadas funcoesP = new FuncoesPersonalizadas(InicioMDActivity.this);
-
-            // Checa se a opcao selecionada eh para enviar
-            if (iDrawerItem.getTag().toString().contains("enviar")){
-                // Checa se foi escolhido verdadeiro ou false
-                if (b){
-                    funcoesP.setValorXml("EnviarAutomatico", "S");
-                } else {
-                    funcoesP.setValorXml("EnviarAutomatico", "N");
-                }
-            }
-            // Checa se a opcao selecionada eh para receber
-            if (iDrawerItem.getTag().toString().contains("receber")){
-                // Checa se foi escolhido verdadeiro ou false
-                if (b){
-                    funcoesP.setValorXml("ReceberAutomatico", "S");
-                } else {
-                    funcoesP.setValorXml("ReceberAutomatico", "N");
-                }
-            }
-            // Executa a funcao para criar os alarmes em background
-            funcoesP.criarAlarmeEnviarReceberDadosAutomatico(true, true);
-        }
-    };
 }
