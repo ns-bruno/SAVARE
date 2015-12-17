@@ -365,30 +365,30 @@ public class InicioMDActivity extends AppCompatActivity {
                 if (dadosEmpresa.getTitpoAcumuloCreditoAtacado().equalsIgnoreCase("V")) {
 
                     descricaoCard += "Tpo de Acumulo de Crédito:  Por Valor. \n" +
-                            "Valor Acumulado: " + getResources().getString(R.string.sigla_real) + " " + funcoes.arredondarValor(dadosUsuario.getValorCreditoAtacado() + "\n");
+                            "Valor Acumulado: " + getResources().getString(R.string.sigla_real) + " " + funcoes.arredondarValor(dadosUsuario.getValorCreditoAtacado() + " \n");
 
                     // Checa se o tipo eh por percentual para vendas no atacado
                 } else if (dadosEmpresa.getTitpoAcumuloCreditoAtacado().equalsIgnoreCase("P")) {
 
                     descricaoCard += "Tpo de Acumulo de Crédito:  Por Percentual. \n" +
-                            "Percentual Acumulado: " + funcoes.arredondarValor(dadosUsuario.getPercentualCreditoAtacado())+"% \n";
+                            "Percentual Acumulado: " + funcoes.arredondarValor(dadosUsuario.getPercentualCreditoAtacado())+"%" + " \n";
 
                 }
                 // Checa os periodo que vai ser acumulado os creditos para vendas no atacado
                 if (dadosEmpresa.getPeriodocrceditoAtacado().equalsIgnoreCase("M")) {
-                    descricaoCard += "Período do Crédito está Mensal. \n";
+                    descricaoCard += "\nPeríodo do Crédito está Mensal. \n";
 
                 } else if (dadosEmpresa.getPeriodocrceditoAtacado().equalsIgnoreCase("Q")) {
-                    descricaoCard += "Período do Crédito está Quinzenal. \n";
+                    descricaoCard += "\n Período do Crédito está Quinzenal. \n";
 
                 } else if (dadosEmpresa.getPeriodocrceditoAtacado().equalsIgnoreCase("S")) {
-                    descricaoCard += "Período do Crédito está Semanal. \n";
+                    descricaoCard += "\n Período do Crédito está Semanal. \n";
 
                 } else if (dadosEmpresa.getPeriodocrceditoAtacado().equalsIgnoreCase("T")) {
-                    descricaoCard += "Período do Crédito está Semestral. \n";
+                    descricaoCard += "\n Período do Crédito está Semestral. \n";
 
                 } else if (dadosEmpresa.getPeriodocrceditoAtacado().equalsIgnoreCase("A")) {
-                    descricaoCard += "Período do Crédito está Anual. \n";
+                    descricaoCard += "\n Período do Crédito está Anual. \n";
                 }
 
                 Card cardCreditoAtacado = new Card.Builder(getApplicationContext())
@@ -428,19 +428,19 @@ public class InicioMDActivity extends AppCompatActivity {
 
                 // Checa os periodo que vai ser acumulado os creditos para vendas no atacado
                 if (dadosEmpresa.getPeriodocrceditoVarejo().equalsIgnoreCase("M")) {
-                    descricaoCard += "Período do Crédito está Mensal. \n";
+                    descricaoCard += "\n Período do Crédito está Mensal. \n";
 
                 } else if (dadosEmpresa.getPeriodocrceditoVarejo().equalsIgnoreCase("Q")) {
-                    descricaoCard += "Período do Crédito está Quinzenal. \n";
+                    descricaoCard += "\n Período do Crédito está Quinzenal. \n";
 
                 } else if (dadosEmpresa.getPeriodocrceditoVarejo().equalsIgnoreCase("S")) {
-                    descricaoCard += "Período do Crédito está Semanal. \n";
+                    descricaoCard += "\n Período do Crédito está Semanal. \n";
 
                 } else if (dadosEmpresa.getPeriodocrceditoVarejo().equalsIgnoreCase("T")) {
-                    descricaoCard += "Período do Crédito está Semestral. \n";
+                    descricaoCard += "\n Período do Crédito está Semestral. \n";
 
                 } else if (dadosEmpresa.getPeriodocrceditoVarejo().equalsIgnoreCase("A")) {
-                    descricaoCard += "Período do Crédito está Anual. \n";
+                    descricaoCard += "\n Período do Crédito está Anual. \n";
                 }
 
                 Card cardCreditoVarejo = new Card.Builder(getApplicationContext())

@@ -29,6 +29,8 @@ public class ConfiguracoesActivity extends Activity {
 	private EditText editQuantidadeCasasDecimais,
 					 editMarkUpAtacado,
 					 editMarkUpVarejo;
+	double markUpAtacado;
+	double markUpVarejo;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -79,11 +81,11 @@ public class ConfiguracoesActivity extends Activity {
 		
 		PercentualRotinas percentualRotinas = new PercentualRotinas(ConfiguracoesActivity.this);
 		
-		double markUpAtacado = percentualRotinas.percentualMarkUpAtacado(funcoes.getValorXml("CodigoUsuario"));
-		double markUpVarejo = percentualRotinas.percentualMarkUpVarejo(funcoes.getValorXml("CodigoUsuario"));
+		markUpAtacado = percentualRotinas.percentualMarkUpAtacado(funcoes.getValorXml("CodigoUsuario"));
+		markUpVarejo = percentualRotinas.percentualMarkUpVarejo(funcoes.getValorXml("CodigoUsuario"));
 		
 		if(markUpAtacado > 0){
-			String s = ""+funcoes.arredondarValor(markUpAtacado);
+			//String s = ""+funcoes.arredondarValor(markUpAtacado);
 			editMarkUpAtacado.setText(""+funcoes.arredondarValor(markUpAtacado));
 		
 		}else {
@@ -121,7 +123,7 @@ public class ConfiguracoesActivity extends Activity {
 						} else if(which == 1){
 							// Salva M para fontes Medias
 							funcoes.setValorXml("TamanhoFonte", "M");
-							buttonTamanhoFonte.setText("Tamanho do Texto: M�dio");
+							buttonTamanhoFonte.setText("Tamanho do Texto: Médio");
 							buttonTamanhoFonte.setTextSize(16);
 							
 						} else if(which == 2){
@@ -214,37 +216,65 @@ public class ConfiguracoesActivity extends Activity {
 		case R.id.menu_configuracoes_salvar:
 			// Checa s efoi preenchido alguma coisa
 			if(editMarkUpVarejo.getText().length() > 0){
-				PercentualSql percentualSql = new PercentualSql(ConfiguracoesActivity.this); 
-				
-				FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(ConfiguracoesActivity.this);
-				// Pega o codigo de usuario
-				int codigoUsuario = Integer.parseInt(funcoes.getValorXml("CodigoUsuario"));
-				
-				String sql = "UPDATE AEAPERCE SET MARKUP_VARE = " + funcoes.desformatarValor(editMarkUpVarejo.getText().toString())
-						+ " WHERE ID_AEAPERCE = (SELECT AEAPERCE.ID_AEAPERCE FROM AEAPERCE "
-						+ "LEFT OUTER JOIN CFAPARAM ON (AEAPERCE.ID_CFAPARAM_VENDEDOR = CFAPARAM.ID_CFAPARAM) "
-						+ "LEFT OUTER JOIN CFACLIFO ON (CFAPARAM.ID_CFACLIFO = CFACLIFO.ID_CFACLIFO) "
-						+ "WHERE CFACLIFO.CODIGO_USU = " + codigoUsuario + " AND CFACLIFO.USUARIO = '1') AND "
-				        + "(AEAPERCE.ID_SMAEMPRE = " + funcoes.getValorXml("CodigoEmpresa") + ")";
-				percentualSql.execSQL(sql);
+
+				if (markUpVarejo > 0) {
+					PercentualSql percentualSql = new PercentualSql(ConfiguracoesActivity.this);
+
+					FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(ConfiguracoesActivity.this);
+					// Pega o codigo de usuario
+					int codigoUsuario = Integer.parseInt(funcoes.getValorXml("CodigoUsuario"));
+
+					String sql = "UPDATE AEAPERCE SET MARKUP_VARE = " + funcoes.desformatarValor(editMarkUpVarejo.getText().toString())
+							+ " WHERE ID_AEAPERCE = (SELECT AEAPERCE.ID_AEAPERCE FROM AEAPERCE "
+							+ "LEFT OUTER JOIN CFAPARAM ON (AEAPERCE.ID_CFAPARAM_VENDEDOR = CFAPARAM.ID_CFAPARAM) "
+							+ "LEFT OUTER JOIN CFACLIFO ON (CFAPARAM.ID_CFACLIFO = CFACLIFO.ID_CFACLIFO) "
+							+ "WHERE CFACLIFO.CODIGO_USU = " + codigoUsuario + " AND CFACLIFO.USUARIO = '1') AND "
+							+ "(AEAPERCE.ID_SMAEMPRE = " + funcoes.getValorXml("CodigoEmpresa") + ")";
+					percentualSql.execSQL(sql);
+
+				} else {
+					ContentValues dadosMensagem = new ContentValues();
+
+					FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(ConfiguracoesActivity.this);
+
+					dadosMensagem.put("comando", 1);
+					dadosMensagem.put("tela", "ConfiguracaoesActivity");
+					dadosMensagem.put("mensagem", getResources().getString(R.string.nao_existe_parametros_tabela_percentuais_usuario));
+
+					funcoes.menssagem(dadosMensagem);
+				}
 			}
 			
 			// Checa s efoi preenchido alguma coisa
 			if(editMarkUpAtacado.getText().length() > 0){
-				PercentualSql percentualSql = new PercentualSql(ConfiguracoesActivity.this); 
-				
-				FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(ConfiguracoesActivity.this);
-				// Pega o codigo de usuario
-				int codigoUsuario = Integer.parseInt(funcoes.getValorXml("CodigoUsuario"));
-				
-				String sql = "UPDATE AEAPERCE SET MARKUP_ATAC = " + funcoes.desformatarValor(editMarkUpAtacado.getText().toString())
-						+ " WHERE ID_AEAPERCE = (SELECT AEAPERCE.ID_AEAPERCE FROM AEAPERCE "
-						+ "LEFT OUTER JOIN CFAPARAM ON (AEAPERCE.ID_CFAPARAM_VENDEDOR = CFAPARAM.ID_CFAPARAM) "
-						+ "LEFT OUTER JOIN CFACLIFO ON (CFAPARAM.ID_CFACLIFO = CFACLIFO.ID_CFACLIFO) "
-						+ "WHERE CFACLIFO.CODIGO_USU = " + codigoUsuario + " AND CFACLIFO.USUARIO = '1') AND "
-						+ "(AEAPERCE.ID_SMAEMPRE = " + funcoes.getValorXml("CodigoEmpresa") + ")";
-				
-				percentualSql.execSQL(sql);
+
+				if (markUpAtacado > 0) {
+					PercentualSql percentualSql = new PercentualSql(ConfiguracoesActivity.this);
+
+					FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(ConfiguracoesActivity.this);
+					// Pega o codigo de usuario
+					int codigoUsuario = Integer.parseInt(funcoes.getValorXml("CodigoUsuario"));
+
+					String sql = "UPDATE AEAPERCE SET MARKUP_ATAC = " + funcoes.desformatarValor(editMarkUpAtacado.getText().toString())
+							+ " WHERE ID_AEAPERCE = (SELECT AEAPERCE.ID_AEAPERCE FROM AEAPERCE "
+							+ "LEFT OUTER JOIN CFAPARAM ON (AEAPERCE.ID_CFAPARAM_VENDEDOR = CFAPARAM.ID_CFAPARAM) "
+							+ "LEFT OUTER JOIN CFACLIFO ON (CFAPARAM.ID_CFACLIFO = CFACLIFO.ID_CFACLIFO) "
+							+ "WHERE CFACLIFO.CODIGO_FUN = " + codigoUsuario + " AND CFACLIFO.FUNCIONARIO = '1') AND "
+							+ "(AEAPERCE.ID_SMAEMPRE = " + funcoes.getValorXml("CodigoEmpresa") + ")";
+
+					percentualSql.execSQL(sql);
+
+				} else {
+					ContentValues dadosMensagem = new ContentValues();
+
+					FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(ConfiguracoesActivity.this);
+
+					dadosMensagem.put("comando", 1);
+					dadosMensagem.put("tela", "ConfiguracaoesActivity");
+					dadosMensagem.put("mensagem", getResources().getString(R.string.nao_existe_parametros_tabela_percentuais_usuario));
+
+					funcoes.menssagem(dadosMensagem);
+				}
 			}
 			
 			if(editQuantidadeCasasDecimais.getText().length() > 0){

@@ -34,6 +34,7 @@ import com.savare.banco.funcoesSql.MarcaSql;
 import com.savare.banco.funcoesSql.OrcamentoSql;
 import com.savare.banco.funcoesSql.ParametrosSql;
 import com.savare.banco.funcoesSql.ParcelaSql;
+import com.savare.banco.funcoesSql.PercentualSql;
 import com.savare.banco.funcoesSql.PessoaSql;
 import com.savare.banco.funcoesSql.PlanoPagamentoSql;
 import com.savare.banco.funcoesSql.PortadorBancoSql;
@@ -89,6 +90,7 @@ public class ImportarDadosTxtRotinas {
 							   BLOCO_A310_AEAESTOQ = "A310",
 							   BLOCO_A311_AEAORCAM = "A311",
 							   BLOCO_A312_AEAITORC = "A312",
+							   BLOCO_A313_AEAPERCE = "A313",
 							   BLOCO_R400_RPAPARCE = "R400";
 	public static final String LAYOUT = "001";
 	private boolean layoutValido = false;
@@ -680,13 +682,28 @@ public class ImportarDadosTxtRotinas {
 						((Activity) context).runOnUiThread(new Runnable() {
 							public void run() {
 								// Atualiza o texto da tela de sincronizacao
-								textMensagemProcesso.setText(posicaoLinhaAtual + " de " + totalLinhaRegistro +" Importando o bloco " + BLOCO_R400_RPAPARCE + linha);
+								textMensagemProcesso.setText(posicaoLinhaAtual + " de " + totalLinhaRegistro +" Importando o bloco " + BLOCO_A312_AEAITORC + linha);
 							}
 						});
 					}
 					importarRegistroItemOrcamento(linha);
 
-				} else if(registro.equalsIgnoreCase(BLOCO_R400_RPAPARCE) && layoutValido){
+				} else if(registro.equalsIgnoreCase(BLOCO_A313_AEAPERCE) && layoutValido){
+					// Pega a linha completa
+					final String linha = scannerLinha.nextLine();
+
+					Log.i("SAVARE", linha + " - ImportarDadosTxtRotinas");
+					if(telaChamou != TELA_RECEPTOR_ALARME){
+						((Activity) context).runOnUiThread(new Runnable() {
+							public void run() {
+								// Atualiza o texto da tela de sincronizacao
+								textMensagemProcesso.setText(posicaoLinhaAtual + " de " + totalLinhaRegistro +" Importando o bloco " + BLOCO_A313_AEAPERCE + linha);
+							}
+						});
+					}
+					importarRegistroPercentual(linha);
+
+				}else if(registro.equalsIgnoreCase(BLOCO_R400_RPAPARCE) && layoutValido){
 					// Pega a linha completa
 					final String linha = scannerLinha.nextLine();
 
@@ -2431,6 +2448,95 @@ public class ImportarDadosTxtRotinas {
 				});
 			} else {
 				itemOrcamentoSql.delete("GUID = " + guid);
+			}
+		}
+	}
+
+	private void importarRegistroPercentual(String linha){
+		Scanner scannerPercen = new Scanner(linha).useDelimiter("\\|");
+
+		String FINALIDADE = scannerPercen.next();
+		final String idPercentual = scannerPercen.next();
+		String idEmpresa = scannerPercen.next();
+		String idClasse = scannerPercen.next();
+		String idMarca = scannerPercen.next();
+		String idProduto = scannerPercen.next();
+		String idLoja = scannerPercen.next();
+		String idParamVendedor = scannerPercen.next();
+		String dtAlt = scannerPercen.next();
+		String custoFixo = scannerPercen.next();
+		String impostosFederais = scannerPercen.next();
+		String markupVarejo = scannerPercen.next();
+		String markupAtacado = scannerPercen.next();
+		String lucroVarejo = scannerPercen.next();
+		String lucroAtacado = scannerPercen.next();
+		String descontoVistaVarejo = scannerPercen.next();
+		String descontoVistaAtacado = scannerPercen.next();
+		String descontoPrazoVarejo = scannerPercen.next();
+		String descontoPrazoAtacado = scannerPercen.next();
+
+		final ContentValues dadosItemOrcamento = new ContentValues();
+		dadosItemOrcamento.put("ID_AEAPERCE", idPercentual);
+		dadosItemOrcamento.put("ID_SMAEMPRE", idEmpresa);
+		dadosItemOrcamento.put("ID_AEACLASE", idClasse);
+		dadosItemOrcamento.put("ID_AEAMARCA", idClasse);
+		dadosItemOrcamento.put("ID_AEAPRODU", idProduto);
+		dadosItemOrcamento.put("ID_AEAPLOJA", idLoja);
+		dadosItemOrcamento.put("ID_CFAPARAM_VENDEDOR", idParamVendedor);
+		dadosItemOrcamento.put("DT_ALT", dtAlt);
+		dadosItemOrcamento.put("CUSTO_FIXO", custoFixo);
+		dadosItemOrcamento.put("IMPOSTOS_FEDERAIS", impostosFederais);
+		dadosItemOrcamento.put("MARKUP_VARE", markupVarejo);
+		dadosItemOrcamento.put("MARKUP_ATAC", markupAtacado);
+		dadosItemOrcamento.put("LUCRO_VARE", lucroVarejo);
+		dadosItemOrcamento.put("LUCRO_ATAC", lucroAtacado);
+		dadosItemOrcamento.put("DESC_MERC_VISTA_VARE", descontoVistaVarejo);
+		dadosItemOrcamento.put("DESC_MERC_VISTA_ATAC", descontoVistaAtacado);
+		dadosItemOrcamento.put("DESC_MERC_PRAZO_VARE", descontoPrazoVarejo);
+		dadosItemOrcamento.put("DESC_MERC_PRAZO_ATAC", descontoPrazoAtacado);
+
+		final PercentualSql percentualSql = new PercentualSql(context);
+
+		// Pega o sql para passar para o statement
+		final String sql = percentualSql.construirSqlStatement(dadosItemOrcamento);
+		// Pega o argumento para o statement
+		final String[] argumentoSql = percentualSql.argumentoStatement(dadosItemOrcamento);
+
+		// Checa se a finalidade eh inserir
+		if(FINALIDADE.equalsIgnoreCase("I")){
+			if (telaChamou != TELA_RECEPTOR_ALARME) {
+				((Activity) context).runOnUiThread(new Runnable() {
+					public void run() {
+						//gradeSql.insertOrReplace(dadosGrade);
+						percentualSql.insertOrReplaceFast(sql, argumentoSql);
+					}
+				});
+			} else {
+				percentualSql.insertOrReplaceFast(sql, argumentoSql);
+			}
+
+			// Checa se a finalidade eh atualizar
+		} else if(FINALIDADE.equalsIgnoreCase("U")){
+			if (telaChamou != TELA_RECEPTOR_ALARME) {
+				((Activity) context).runOnUiThread(new Runnable() {
+					public void run() {
+						percentualSql.update(dadosItemOrcamento, "ID_AEAPERCE = " + idPercentual);
+					}
+				});
+			} else {
+				percentualSql.update(dadosItemOrcamento, "ID_AEAPERCE = " + idPercentual);
+			}
+
+			// Checa se a finalidade eh deletar
+		} else if(FINALIDADE.equalsIgnoreCase("D")){
+			if (telaChamou != TELA_RECEPTOR_ALARME) {
+				((Activity) context).runOnUiThread(new Runnable() {
+					public void run() {
+						percentualSql.delete("ID_AEAPERCE = " + idPercentual);
+					}
+				});
+			} else {
+				percentualSql.delete("ID_AEAPERCE = " + idPercentual);
 			}
 		}
 	}
