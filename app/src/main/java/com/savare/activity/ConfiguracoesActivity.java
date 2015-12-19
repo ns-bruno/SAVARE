@@ -217,7 +217,7 @@ public class ConfiguracoesActivity extends Activity {
 			// Checa s efoi preenchido alguma coisa
 			if(editMarkUpVarejo.getText().length() > 0){
 
-				if (markUpVarejo > 0) {
+				if (markUpVarejo >= 0) {
 					PercentualSql percentualSql = new PercentualSql(ConfiguracoesActivity.this);
 
 					FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(ConfiguracoesActivity.this);
@@ -238,7 +238,7 @@ public class ConfiguracoesActivity extends Activity {
 					FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(ConfiguracoesActivity.this);
 
 					dadosMensagem.put("comando", 1);
-					dadosMensagem.put("tela", "ConfiguracaoesActivity");
+					dadosMensagem.put("tela", "ConfiguracaoesActivity - Varejo");
 					dadosMensagem.put("mensagem", getResources().getString(R.string.nao_existe_parametros_tabela_percentuais_usuario));
 
 					funcoes.menssagem(dadosMensagem);
@@ -248,7 +248,7 @@ public class ConfiguracoesActivity extends Activity {
 			// Checa s efoi preenchido alguma coisa
 			if(editMarkUpAtacado.getText().length() > 0){
 
-				if (markUpAtacado > 0) {
+				if (markUpAtacado >= 0) {
 					PercentualSql percentualSql = new PercentualSql(ConfiguracoesActivity.this);
 
 					FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(ConfiguracoesActivity.this);
@@ -270,7 +270,7 @@ public class ConfiguracoesActivity extends Activity {
 					FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(ConfiguracoesActivity.this);
 
 					dadosMensagem.put("comando", 1);
-					dadosMensagem.put("tela", "ConfiguracaoesActivity");
+					dadosMensagem.put("tela", "ConfiguracaoesActivity - Atacado");
 					dadosMensagem.put("mensagem", getResources().getString(R.string.nao_existe_parametros_tabela_percentuais_usuario));
 
 					funcoes.menssagem(dadosMensagem);
@@ -289,8 +289,10 @@ public class ConfiguracoesActivity extends Activity {
 				
 				empresaSql.update(dados, "ID_SMAEMPRE = " + funcoes.getValorXml("CodigoEmpresa"));
 			}
-			
-			finish();
+
+			if ((markUpVarejo >= 0) && (markUpAtacado >= 0)) {
+				finish();
+			}
 			break;
 
 		default:

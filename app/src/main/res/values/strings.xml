@@ -180,6 +180,12 @@
     <string name="monitoramento">Monitoramento</string>
     <string name="sigla_real">R$</string>
     <string name="clique_sair_novamente_para_sair">Clieque em voltar novamente para sair.</string>
+    <string name="estamos_providenciado_recebimento_dados">Estamos providenciando o recebimento dos dados.</string>
+    <string name="estamos_conectanto_servidor_nuvem">Estamos Conectando no Servidor em Nuvem...</string>
+    <string name="erro_conectar_servidor_nuvem">Erro ao conectar no Servidor em Nuvem, nem conseguimos logar.</string>
+    <string name="logado_sucesso">Logado com sucesso.</string>
+    <string name="nao_achamos_nenhum_arquivo_downloads">Não achamos nenhum arquivo para fazer downloads.</string>
+    <string name="importar_dados_recebidos">Importar os dados recebidos</string>
 
 
 

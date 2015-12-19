@@ -490,7 +490,7 @@ public class FuncoesSql {
 	
 	/**
 	 *  Executa os comando em SQL de INSERT, UPDATE e DELETE;
-	 *  N�O executa SELECT.
+	 *  NAO executa SELECT.
 	 *  
 	 * @param sql
 	 */

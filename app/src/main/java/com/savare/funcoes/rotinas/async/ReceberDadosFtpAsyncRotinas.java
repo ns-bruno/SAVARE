@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.ArrayList;
 
 import android.app.Activity;
+import android.app.Notification;
 import android.content.ContentValues;
 import android.content.Context;
 import android.os.AsyncTask;
@@ -13,10 +14,13 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.savare.R;
 import com.savare.funcoes.FuncoesPersonalizadas;
 import com.savare.funcoes.rotinas.ImportarDadosTxtRotinas;
 import com.savare.funcoes.rotinas.ReceberArquivoTxtServidorFtpRotinas;
 import com.savare.funcoes.rotinas.UsuarioRotinas;
+
+import br.com.goncalves.pugnotification.notification.PugNotification;
 
 public class ReceberDadosFtpAsyncRotinas extends AsyncTask<String, String, Integer> {
 	
@@ -27,7 +31,7 @@ public class ReceberDadosFtpAsyncRotinas extends AsyncTask<String, String, Integ
 							TELA_INICIO = 1;
 	private int telaChamou = -1;
 	private String mensagem = " ";
-	
+
 	
 	public ReceberDadosFtpAsyncRotinas(Context context, ProgressBar progressBar, TextView textMensagem) {
 		this.context = context;
@@ -57,7 +61,7 @@ public class ReceberDadosFtpAsyncRotinas extends AsyncTask<String, String, Integ
 
 		try {
 			ReceberArquivoTxtServidorFtpRotinas receberArquivoTxt = null;
-			
+
 			// Checa se que esta chamando esta classe eh o alarme
 			if(telaChamou == TELA_RECEPTOR_ALARME){
 				receberArquivoTxt = new ReceberArquivoTxtServidorFtpRotinas(context, TELA_RECEPTOR_ALARME);
@@ -126,7 +130,7 @@ public class ReceberDadosFtpAsyncRotinas extends AsyncTask<String, String, Integ
 						// Executa o processo de importacao
 						importarDados.importarDados();
 					}
-					File pastaTem = new File(Environment.getExternalStorageDirectory() + "/SAVARE/TEMP");
+					//File pastaTem = new File(Environment.getExternalStorageDirectory() + "/SAVARE/TEMP");
 					// Instancia o arquivo recebido
 					File arquivoRecebido = new File(localDados.get(i));
 					// checa se existe o arquivo
@@ -158,6 +162,17 @@ public class ReceberDadosFtpAsyncRotinas extends AsyncTask<String, String, Integ
 				} else if (telaChamou != TELA_INICIO){
 					mensagem += "Não localizamos o arquivo para receber os dados de atualização.";
 
+					PugNotification.with(context)
+							.load()
+							.title(R.string.receber_todos_dados)
+							.message(mensagem)
+							.bigTextStyle("bigtext")
+							.smallIcon(R.drawable.ic_launcher)
+							.largeIcon(R.drawable.ic_launcher)
+							.flags(Notification.DEFAULT_ALL)
+							.vibrate(new long[]{150, 300, 150, 600})
+							.simple()
+							.build();
 				}
 			}
 		
@@ -231,6 +246,18 @@ public class ReceberDadosFtpAsyncRotinas extends AsyncTask<String, String, Integ
 			intent.putExtra("MENSAGEM", mensagem);
 			
 			context.sendBroadcast(intent);*/
+		} else if ((mensagem != null) && (mensagem.length() > 1)){
+			PugNotification.with(context)
+					.load()
+					.title(R.string.receber_todos_dados)
+					.message(mensagem)
+					.bigTextStyle("bigtext")
+					.smallIcon(R.drawable.ic_launcher)
+					.largeIcon(R.drawable.ic_launcher)
+					.flags(Notification.DEFAULT_ALL)
+					.vibrate(new long[]{150, 300, 150, 600})
+					.simple()
+					.build();
 		}
 	}
 

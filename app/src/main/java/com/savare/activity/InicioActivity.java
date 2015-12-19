@@ -38,6 +38,7 @@ import com.savare.funcoes.rotinas.OrcamentoRotinas;
 import com.savare.funcoes.rotinas.UsuarioRotinas;
 import com.savare.funcoes.rotinas.async.ReceberDadosFtpAsyncRotinas;
 
+@Deprecated
 public class InicioActivity extends Activity {
 
 	private DrawerLayout mDrawerLayout;

@@ -125,6 +125,7 @@ public class ProdutoListaActivity extends Activity implements OnNavigationListen
 					bundle.putLong("ID_AEAITORC", idItemOrcamento);
 					bundle.putString("ID_AEAORCAM", textCodigoOrcamento.getText().toString());
 					bundle.putString("ID_CFACLIFO", textCodigoPessoa.getText().toString());
+					bundle.putString("RAZAO_SOCIAL", textNomeRazao.getText().toString());
 
 					// Abre a tela de detalhes do produto
 					Intent intent = new Intent(ProdutoListaActivity.this, OrcamentoProdutoDetalhesActivity.class);

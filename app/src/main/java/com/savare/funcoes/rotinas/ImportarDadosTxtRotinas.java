@@ -9,6 +9,7 @@ import java.util.Locale;
 import java.util.Scanner;
 
 import android.app.Activity;
+import android.app.Notification;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
@@ -17,6 +18,7 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.savare.R;
 import com.savare.banco.funcoesSql.AreasSql;
 import com.savare.banco.funcoesSql.CartaoSql;
 import com.savare.banco.funcoesSql.CidadeSql;

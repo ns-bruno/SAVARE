@@ -472,7 +472,7 @@ public class OrcamentoFragment extends Fragment {
 			try {
 				//Cria novo um ProgressDialogo e exibe
 				ProgressDialog progress = new ProgressDialog(getActivity());
-		        progress.setMessage("Aguarde, o PDF est� sendo Gerado...");
+		        progress.setMessage("Aguarde, o PDF está sendo Gerado...");
 		        progress.setCancelable(false);
 		        progress.show();
 		        
@@ -706,6 +706,7 @@ public class OrcamentoFragment extends Fragment {
 	    	
 	    	if(resultCode == RETORNA_CLIENTE){
 	    		getActivity().getActionBar().setTitle(data.getStringExtra("ID_CFACLIFO") + " - " + data.getStringExtra("NOME_CLIENTE"));
+				razaoSocial = data.getStringExtra("NOME_CLIENTE");
 	    	
 	    	} else if(requestCode == ERRO_RETORNA_CLIENTE){
 	    		// Dados da mensagem

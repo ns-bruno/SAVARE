@@ -280,17 +280,8 @@ public class InicioMDActivity extends AppCompatActivity {
         });
 
         FloatingActionMenu menuFloat = (FloatingActionMenu) findViewById(R.id.activity_inicio_md_menu_float);
-        menuFloat.setMenuButtonColorNormal(getResources().getColor(R.color.colorAccent));
-        menuFloat.setMenuButtonColorPressed(getResources().getColor(R.color.colorPrimary));
-        menuFloat.setMenuButtonColorRipple(getResources().getColor(R.color.colorAccent));
-
 
         FloatingActionButton itemMenuNovoOrcamento = (FloatingActionButton) findViewById(R.id.activity_inicio_md_menu_item_novo_orcamento);
-        itemMenuNovoOrcamento.setButtonSize(FloatingActionButton.SIZE_MINI);
-        itemMenuNovoOrcamento.setColorNormal(getResources().getColor(R.color.branco));
-        itemMenuNovoOrcamento.setColorPressed(getResources().getColor(R.color.colorPrimary));
-        itemMenuNovoOrcamento.setColorRipple(getResources().getColor(R.color.branco));
-        itemMenuNovoOrcamento.setLabelText(getResources().getString(R.string.novo_orcamento));
         itemMenuNovoOrcamento.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -303,11 +294,6 @@ public class InicioMDActivity extends AppCompatActivity {
         });
 
         FloatingActionButton itemMenuNovoCliente = (FloatingActionButton) findViewById(R.id.activity_inicio_md_menu_item_novo_cliente);
-        itemMenuNovoCliente.setButtonSize(FloatingActionButton.SIZE_MINI);
-        itemMenuNovoCliente.setColorNormal(getResources().getColor(R.color.branco));
-        itemMenuNovoCliente.setColorPressed(getResources().getColor(R.color.colorPrimary));
-        itemMenuNovoCliente.setColorRipple(getResources().getColor(R.color.branco));
-        itemMenuNovoCliente.setLabelText(getResources().getString(R.string.novo_cliente));
         itemMenuNovoCliente.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
