@@ -4,15 +4,28 @@
     android:layout_height="match_parent"
     android:padding="5dp">
 
+    <de.hdodenhof.circleimageview.CircleImageView
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/layout_item_universal_profile_image"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:src="@mipmap/ic_image"
+        app:civ_border_width="2dp"
+        app:civ_border_color="#FF000000"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:visibility="gone" />
+
     <TextView
         android:id="@+id/layout_item_universal_text_descricao"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignTop="@+id/layout_item_universal_view_topo"
-        android:layout_toRightOf="@+id/layout_item_universal_view_topo"
-        android:layout_marginLeft="2dp"
         android:text="@string/descricao"
-        android:layout_toLeftOf="@+id/layout_item_universal_imageView_opcao" />
+        android:layout_toLeftOf="@+id/layout_item_universal_imageView_opcao"
+        android:layout_toEndOf="@+id/layout_item_universal_view_topo"
+        android:layout_toRightOf="@+id/layout_item_universal_view_topo"
+        android:layout_marginLeft="2dp" />
 
     <TextView
         android:id="@+id/layout_item_universal_text_abaixo_descricao_esquerda"
@@ -48,18 +61,19 @@
         android:id="@+id/layout_item_universal_view_rodape"
         android:layout_width="5dp"
         android:layout_height="25dp"
+        android:background="@color/azul_escuro"
         android:layout_alignBottom="@+id/layout_item_universal_text_botton_esquerdo"
-        android:layout_toLeftOf="@+id/layout_item_universal_text_botton_esquerdo"
-        android:layout_marginRight="2dp"
-        android:background="@color/azul_escuro" />
+        android:layout_toRightOf="@+id/layout_item_universal_profile_image"
+        android:layout_toEndOf="@+id/layout_item_universal_profile_image" />
 
     <View
         android:id="@+id/layout_item_universal_view_topo"
         android:layout_width="5dp"
         android:layout_height="25dp"
-        android:layout_alignParentLeft="true"
+        android:background="@color/azul_escuro"
         android:layout_alignParentTop="true"
-        android:background="@color/azul_escuro" />
+        android:layout_toRightOf="@+id/layout_item_universal_profile_image"
+        android:layout_toEndOf="@+id/layout_item_universal_profile_image" />
 
     <TextView
         android:id="@+id/layout_item_universal_text_abaixo_descricao_direita"

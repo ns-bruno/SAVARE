@@ -24,7 +24,6 @@ import com.dexafree.materialList.card.action.TextViewAction;
 import com.dexafree.materialList.listeners.RecyclerItemClickListener;
 import com.dexafree.materialList.view.MaterialListView;
 import com.github.clans.fab.FloatingActionButton;
-import com.github.clans.fab.FloatingActionMenu;
 import com.mikepenz.materialdrawer.AccountHeader;
 import com.mikepenz.materialdrawer.AccountHeaderBuilder;
 import com.mikepenz.materialdrawer.Drawer;
@@ -42,10 +41,10 @@ import com.savare.activity.ConfiguracoesActivity;
 import com.savare.activity.ListaOrcamentoPedidoActivity;
 import com.savare.activity.ListaTitulosActivity;
 import com.savare.activity.LogActivity;
-import com.savare.activity.ProdutoListaActivity;
 import com.savare.activity.SincronizacaoActivity;
 import com.savare.activity.fragment.ClienteCadastroFragment;
 import com.savare.activity.fragment.OrcamentoTabulacaoFragment;
+import com.savare.activity.material.designer.fragment.ProdutoListaTabMD;
 import com.savare.banco.funcoesSql.UsuarioSQL;
 import com.savare.beans.EmpresaBeans;
 import com.savare.beans.UsuarioBeans;
@@ -84,7 +83,7 @@ public class InicioMDActivity extends AppCompatActivity {
         // Seta uma toolBar para esta activiy(tela)
         setSupportActionBar(toolbarInicio);
 
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        //getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
 
         FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(InicioMDActivity.this);
@@ -155,7 +154,6 @@ public class InicioMDActivity extends AppCompatActivity {
             .withSelectedItem(-1)
             .withActionBarDrawerToggle(true)
             .withAccountHeader(cabecalhoDrawer)
-
             .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                 @Override
                 public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
@@ -191,8 +189,10 @@ public class InicioMDActivity extends AppCompatActivity {
                                 public void onClick(DialogInterface dialog, int which) {
 
                                     // Cria uma intent para abrir uma nova activity
-                                    Intent intentOrcamento = new Intent(InicioMDActivity.this, ProdutoListaActivity.class);
-                                    intentOrcamento.putExtra("ATAC_VAREJO", String.valueOf(which).toString());
+                                    //Intent intentOrcamento = new Intent(InicioMDActivity.this, ProdutoListaActivity.class);
+                                    Intent intentOrcamento = new Intent(InicioMDActivity.this, ProdutoListaTabMD.class);
+                                    intentOrcamento.putExtra(ProdutoListaTabMD.KEY_ATACADO_VAREJO, String.valueOf(which).toString());
+                                    // Abre outra tela
                                     startActivity(intentOrcamento);
 
                                 }
@@ -279,7 +279,7 @@ public class InicioMDActivity extends AppCompatActivity {
             }
         });
 
-        FloatingActionMenu menuFloat = (FloatingActionMenu) findViewById(R.id.activity_inicio_md_menu_float);
+        //FloatingActionMenu menuFloat = (FloatingActionMenu) findViewById(R.id.activity_inicio_md_menu_float);
 
         FloatingActionButton itemMenuNovoOrcamento = (FloatingActionButton) findViewById(R.id.activity_inicio_md_menu_item_novo_orcamento);
         itemMenuNovoOrcamento.setOnClickListener(new View.OnClickListener() {

@@ -186,7 +186,14 @@
     <string name="logado_sucesso">Logado com sucesso.</string>
     <string name="nao_achamos_nenhum_arquivo_downloads">Não achamos nenhum arquivo para fazer downloads.</string>
     <string name="importar_dados_recebidos">Importar os dados recebidos</string>
-
+    <string-array name="tab_produto_md">
+        <item>Produtos</item>
+        <item>+ Vendidos Cidade</item>
+        <item>+ Vendidos Área</item>
+        <item>+ Vendidos Vendedor</item>
+        <item>+ Vendidos Empresa</item>
+        <item>Cortes Chegaram</item>
+    </string-array>
 
 
 </resources>

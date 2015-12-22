@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto" >
+
+    <item
+        android:id="@+id/menu_produto_lista_tab_md_fragment_search_pesquisar"
+        android:orderInCategory="100"
+        android:icon="@drawable/ic_action_search"
+        android:title="@string/pesquisar"
+        app:showAsAction="ifRoom|collapseActionView"
+        app:actionViewClass="android.support.v7.widget.SearchView"
+        app:theme="@style/MaterialDrawerTheme.Light.DarkToolbar"/>
+
+</menu>

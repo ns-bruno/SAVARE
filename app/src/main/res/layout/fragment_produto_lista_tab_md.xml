@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:layout_weight="1" >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/fragment_produto_lista_tab_md_toolbar_inicio"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:layout_alignParentLeft="true"
+                android:background="?attr/colorPrimary"
+                android:elevation="4dp"
+                android:minHeight="?attr/actionBarSize"
+                app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
+
+
+        </LinearLayout>
+
+
+
+
+        <com.ogaclejapan.smarttablayout.SmartTabLayout
+            android:id="@+id/fragment_produto_lista_tab_md_tab_layout"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:background="?attr/colorPrimary"
+            app:stl_indicatorAlwaysInCenter="false"
+            app:stl_indicatorWithoutPadding="false"
+            app:stl_indicatorInFront="false"
+            app:stl_indicatorInterpolation="smart"
+            app:stl_indicatorGravity="bottom"
+            app:stl_indicatorColor="#40C4FF"
+            app:stl_indicatorThickness="4dp"
+            app:stl_indicatorWidth="auto"
+            app:stl_indicatorCornerRadius="2dp"
+            app:stl_overlineColor="#4D000000"
+            app:stl_overlineThickness="0dp"
+            app:stl_underlineColor="#4D000000"
+            app:stl_underlineThickness="1dp"
+            app:stl_dividerColor="@color/branco"
+            app:stl_dividerThickness="1dp"
+            app:stl_defaultTabBackground="?attr/selectableItemBackground"
+            app:stl_defaultTabTextAllCaps="false"
+            app:stl_defaultTabTextColor="@color/branco"
+            app:stl_defaultTabTextSize="12sp"
+            app:stl_defaultTabTextHorizontalPadding="16dp"
+            app:stl_defaultTabTextMinWidth="0dp"
+            app:stl_distributeEvenly="false"
+            app:stl_clickable="true"
+            app:stl_titleOffset="24dp"
+            app:stl_drawDecorationAfterTab="false"
+            />
+
+        <android.support.v4.view.ViewPager
+            android:id="@+id/fragment_produto_lista_tab_md_pager"
+            android:layout_width="match_parent"
+            android:layout_height="fill_parent"
+            android:layout_below="@id/fragment_produto_lista_tab_md_tab_layout"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/fragment_produto_lista_tab_md_linearlayout_rodape"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="0"
+        android:background="@color/colorPrimary"
+        android:foregroundGravity="center_vertical|center_horizontal"
+        android:gravity="center_vertical|center|center_horizontal">
+
+        <TextView
+            android:id="@+id/fragment_produto_lista_tab_md_text_codigo_orcamento"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:maxLines="1"
+            android:text="@string/codigo"
+            android:textColor="@color/branco"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/fragment_produto_lista_tab_md_text_nome_razao"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:maxLines="1"
+            android:text="@string/razao_social"
+            android:textColor="@color/branco"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/fragment_produto_lista_tab_md_text_codigo_pessoa"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:maxLines="1"
+            android:layout_weight="1"
+            android:gravity="right"
+            android:text="@string/codigo"
+            android:textColor="@color/branco"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/fragment_produto_lista_tab_md_text_atacado_varejo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:maxLines="1"
+            android:gravity="right"
+            android:textColor="@color/branco"
+            android:textStyle="bold" />
+
+    </LinearLayout>
+
+</LinearLayout>
