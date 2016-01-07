@@ -835,7 +835,7 @@ public class FuncoesPersonalizadas {
 			erro = context.getResources().getString(R.string.erro_sqlite_code_1299) + "\n" + erro + "\n";
 		}
 
-		if (erro.toLowerCase().contains("no such table")){
+		if ((erro.toLowerCase().contains("no such table")) || (erro.toLowerCase().contains("no such column"))){
 			erro = context.getResources().getString(R.string.nao_existe_tabela_banco_dados)  + "\n" + erro + "\n" + context.getResources().getString(R.string.vamos_executar_processo_criar_tabelas);
 			try {
 				ConexaoBancoDeDados conexaoBancoDeDados = new ConexaoBancoDeDados(context, VersionUtils.getVersionCode(context));

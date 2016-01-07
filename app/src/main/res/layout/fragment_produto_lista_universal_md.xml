@@ -15,22 +15,57 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <android.support.v7.widget.Toolbar
-                android:id="@+id/fragment_produto_lista_universal_md_toolbar_inicio"
+                <android.support.v7.widget.Toolbar
+                android:id="@+id/fragment_produto_lista_universal_md_toolbar_cabecalho"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
                 android:layout_alignParentLeft="true"
                 android:background="?attr/colorPrimary"
                 android:elevation="4dp"
                 android:minHeight="?attr/actionBarSize"
-                app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
+                app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
+
+                <Spinner
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/fragment_produto_lista_universal_md_spinner_filtro_toolbar"
+                    style="@style/MaterialBaseTheme.Light"
+                    android:visibility="gone" />
+
+                </android.support.v7.widget.Toolbar>
 
         </LinearLayout>-->
+
+
+        <ProgressBar
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/fragment_produto_lista_universal_md_progressBar_lista_produto"
+            android:layout_gravity="center_horizontal"
+            android:indeterminate="true"
+            android:visibility="gone"/>
+
+        <Spinner
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/fragment_produto_lista_universal_md_spinner_filtro"
+            android:layout_gravity="center_horizontal"
+            android:visibility="gone"/>
 
         <ListView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:id="@+id/fragment_produto_lista_universal_md_listView_lista_produto" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="@string/nenhum_valor_encontrado"
+            android:id="@+id/fragment_produto_lista_universal_md_text_mensagem_geral"
+            android:gravity="center"
+            android:visibility="gone"/>
 
 
     </LinearLayout>

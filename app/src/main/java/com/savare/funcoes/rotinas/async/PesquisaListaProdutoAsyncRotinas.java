@@ -37,16 +37,6 @@ public class PesquisaListaProdutoAsyncRotinas extends AsyncTask<String, String, 
     private ProgressBar progressBar;
     private TextView textProcessoPesquisa;
 
-    public PesquisaListaProdutoAsyncRotinas(Context context, String where, String group, String codigoOrcamento, String atacadoVarejo, int tipo, ListView listViewProduto) {
-        this.context = context;
-        this.where = where;
-        this.group = group;
-        this.codigoOrcamento = codigoOrcamento;
-        this.atacadoVarejo = atacadoVarejo;
-        this.tipo = tipo;
-        this.listViewProduto = listViewProduto;
-    }
-
     public PesquisaListaProdutoAsyncRotinas(Context context, String where, String group, String codigoOrcamento, String atacadoVarejo, int tipo, ListView listViewProduto, ProgressBar progressBar, TextView textProcessoPesquisa) {
         this.context = context;
         this.where = where;

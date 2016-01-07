@@ -278,7 +278,7 @@ public class OrcamentoRotinas extends Rotinas {
 	
 	/**
 	 * Retorna uma lista de orcamento ou pedido, de acordo com o tipo passado por paramento.
-	 * @param tipoOrdem é um parametro para ordernar o resultado, por padr�o a ordem � ASC (Crescente),
+	 * @param tipoOrdem é um parametro para ordernar o resultado, por padrao a ordem eh ASC (Crescente),
 	 * para escolher a ordem decrescente para colocar como parametro a letra D outro usar a 
 	 * variavel public {@value}ORDEM_DECRESCENTE.
 	 * 

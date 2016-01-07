@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/cl_container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/cinza_platina"
+    android:fitsSystemWindows="true">
+
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/activity_searchable_listview_lista_produto" />
+
+    <android.support.design.widget.AppBarLayout
+        android:id="@+id/appbar"
+        android:fitsSystemWindows="true"
+        android:layout_height="wrap_content"
+        android:paddingTop="@dimen/tool_bar_top_padding"
+        android:layout_width="match_parent">
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/activity_searchable_tb_main"
+            android:elevation="0dp"
+            android:layout_height="?attr/actionBarSize"
+            android:layout_width="match_parent"
+            android:background="?attr/colorPrimary"
+            app:layout_scrollFlags="scroll|enterAlways"
+            app:theme="@style/ThemeOverlay.AppCompat.Light"
+            app:popupTheme="@style/ThemeOverlay.AppCompat.Dark"/>
+
+    </android.support.design.widget.AppBarLayout>
+
+</android.support.design.widget.CoordinatorLayout>

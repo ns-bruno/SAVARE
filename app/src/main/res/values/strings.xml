@@ -186,6 +186,12 @@
     <string name="logado_sucesso">Logado com sucesso.</string>
     <string name="nao_achamos_nenhum_arquivo_downloads">Não achamos nenhum arquivo para fazer downloads.</string>
     <string name="importar_dados_recebidos">Importar os dados recebidos</string>
+    <string name="limpar_historico">Limpar Histórico</string>
+    <string name="aguarde">Aguarde...</string>
+    <string name="nao_achamos_nenhum_produto_com_descricao_digitada">Não achamos nenhum produto com essa descrição digitada.</string>
+    <string name="nenhuma_opcao_encontrada">Nenhuma Opção Encontrada</string>
+    <string name="selecione_uma_opcao">Selecione Uma Opção</string>
+    <string name="todos">Todos</string>
     <string-array name="tab_produto_md">
         <item>Produtos</item>
         <item>+ Vendidos Cidade</item>

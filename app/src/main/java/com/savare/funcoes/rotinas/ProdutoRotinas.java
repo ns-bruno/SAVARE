@@ -7,17 +7,21 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.savare.R;
+import com.savare.activity.material.designer.fragment.ProdutoListaMDFragment;
 import com.savare.banco.funcoesSql.ClasseSql;
 import com.savare.banco.funcoesSql.EmbalagemSql;
 import com.savare.banco.funcoesSql.EmpresaSql;
+import com.savare.banco.funcoesSql.ProdutoRecomendadoSql;
 import com.savare.banco.funcoesSql.ProdutoSql;
 import com.savare.banco.funcoesSql.UnidadeVendaSql;
+import com.savare.beans.CidadeBeans;
 import com.savare.beans.ClasseBeans;
 import com.savare.beans.DescricaoDublaBeans;
 import com.savare.beans.DescricaoSimplesBeans;
@@ -73,9 +77,304 @@ public class ProdutoRotinas extends Rotinas {
 		
 		return lista;
 	} // Fim listaClasse
+
+	public List<CidadeBeans> listaCidadesMaisVendidos(){
+		// Cria uma lista para retornar as cidades
+		List<CidadeBeans> listaCidade = new ArrayList<CidadeBeans>();
+
+		String sql = "SELECT CFACIDAD.ID_CFACIDAD, CFACIDAD.ID_CFAESTAD, CFACIDAD.DESCRICAO AS DESCRICAO_CIDADE " +
+					 "FROM AEAPRREC \n" +
+					 "LEFT OUTER JOIN CFACIDAD CFACIDAD \n" +
+					 "ON(AEAPRREC.ID_CFACIDAD = CFACIDAD.ID_CFACIDAD) \n" +
+					 "WHERE (AEAPRREC.ID_CFACIDAD IS NOT NULL)";
+
+		// Instancia a classe para manipular o banco de dados
+		ProdutoRecomendadoSql produtoRecomendadoSql = new ProdutoRecomendadoSql(context);
+		// Executa a funcao para retornar os registro do banco de dados
+		Cursor cursor = produtoRecomendadoSql.sqlSelect(sql);
+
+		if((cursor != null) && (cursor.getCount() > 0)){
+
+			CidadeBeans cidade = new CidadeBeans();
+			cidade.setDescricao(context.getResources().getString(R.string.selecione_uma_opcao));
+			cidade.setIdCidade(0);
+
+			listaCidade.add(cidade);
+
+			while (cursor.moveToNext()) {
+				// Instancia a classe para salvar o nome da cidade
+				cidade = new CidadeBeans();
+				// Seta o texto principal com o nome da cidade
+				cidade.setIdCidade(cursor.getInt(cursor.getColumnIndex("ID_CFACIDAD")));
+				cidade.setIdEstado(cursor.getInt(cursor.getColumnIndex("ID_CFAESDAD")));
+				cidade.setDescricao(cursor.getString(cursor.getColumnIndex("DESCRICAO_CIDADE")));
+				// Adiciona a cidade em uma lista
+				listaCidade.add(cidade);
+			}
+			// Adiciona um valor padrao para selecionar todas as cidades
+			cidade = new CidadeBeans();
+			cidade.setDescricao(context.getResources().getString(R.string.todos));
+			cidade.setIdCidade(0);
+
+		} else {
+			CidadeBeans cidade = new CidadeBeans();
+			cidade.setDescricao(context.getResources().getString(R.string.nenhuma_opcao_encontrada));
+			cidade.setIdCidade(0);
+
+			listaCidade.add(cidade);
+		}
+
+		return listaCidade;
+	} // Fim listaClasse
+
+	/**
+	 * Lista os produtos mais vendidos. Existe algumas classificacoes de produtos mais vendidos,
+	 * as classificao pode ser por:
+	 * cidade(produtos mais vendidos de uma determinada cidade),
+	 * Area (produtos mais vendidos de uma determianda area,
+	 * Vendedor (Produtos mais venddidos de um determinado vendedor, que no caso o vendedor logado no app),
+	 * Empresa (produtos mais vendidos da empresa selecionada pelo app),
+	 * Corte (produtos cortados, as lista de produtos pode ser os produtos cortados de um determinado cliente,
+	 * ou uma lista de produtos cortados de varios clientes).
+	 *
+	 * @param tipoTela
+	 * @param filtro
+	 * @param where
+	 * @param group
+	 * @param idOrcamento
+	 * @return
+	 */
+	public List<ProdutoListaBeans> listaProdutoMaisVendido(int tipoTela, ContentValues filtro, String where, String group, String idOrcamento, ProgressBar progresso, TextView textProgresso){
+		FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
+
+		String idEmpresa = funcoes.getValorXml("CodigoEmpresa");
+		String codigoVendedor = funcoes.getValorXml("CodigoUsuario");
+
+		String sql =  "SELECT AEAPLOJA.ID_AEAPLOJA, AEAPRODU.ID_AEAPRODU, AEAPRODU.CODIGO_ESTRUTURAL, AEAPRODU.REFERENCIA, "
+					+ "AEAPRODU.DESCRICAO AS DESCRICAO_PRODU, AEAPRODU.TIPO, (JULIANDAY(DATE('NOW', 'LOCALTIME')) - JULIANDAY(AEAPRODU.DT_CAD)) AS DIAS_CADASTRO, "
+					+ "AEAMARCA.DESCRICAO AS DESCRICAO_MARCA, AEAPRODU.ID_AEAUNVEN, AEAUNVEN.SIGLA, "
+					+ "AEAPLOJA.VENDA_ATAC AS VENDA_ATAC_TABELA, AEAPLOJA.VENDA_VARE AS VENDA_VARE_TABELA, "
+
+					+ "ROUND((AEAPLOJA.VENDA_ATAC + (AEAPLOJA.VENDA_ATAC * (IFNULL((SELECT AEAPERCE.MARKUP_ATAC FROM AEAPERCE WHERE AEAPERCE.ID_SMAEMPRE = " + idEmpresa + "), 0)/100))) + "
+					+ "((AEAPLOJA.VENDA_ATAC + (AEAPLOJA.VENDA_ATAC * (IFNULL((SELECT AEAPERCE.MARKUP_ATAC FROM AEAPERCE WHERE AEAPERCE.ID_SMAEMPRE = " + idEmpresa + "), 0)/100))) * "
+					+ "(IFNULL((SELECT AEAPERCE.MARKUP_ATAC FROM AEAPERCE LEFT OUTER JOIN CFAPARAM ON(AEAPERCE.ID_CFAPARAM_VENDEDOR = CFAPARAM.ID_CFAPARAM) "
+					+ "LEFT OUTER JOIN CFACLIFO ON(CFAPARAM.ID_CFACLIFO = CFACLIFO.ID_CFACLIFO) WHERE CFACLIFO.CODIGO_FUN = " + codigoVendedor + "), 0)/100)), "
+					+ "(SELECT SMAEMPRE.QTD_CASAS_DECIMAIS FROM SMAEMPRE WHERE SMAEMPRE.ID_SMAEMPRE = " + idEmpresa + ")) AS VENDA_ATAC_FINAL, "
+
+					+ "ROUND((AEAPLOJA.VENDA_VARE + (AEAPLOJA.VENDA_VARE * (IFNULL((SELECT AEAPERCE.MARKUP_VARE FROM AEAPERCE WHERE AEAPERCE.ID_SMAEMPRE = " + idEmpresa + "), 0)/100))) + "
+					+ "((AEAPLOJA.VENDA_VARE + (AEAPLOJA.VENDA_VARE * (IFNULL((SELECT AEAPERCE.MARKUP_VARE FROM AEAPERCE WHERE AEAPERCE.ID_SMAEMPRE = " + idEmpresa + "), 0)/100))) * "
+					+ "(IFNULL((SELECT AEAPERCE.MARKUP_VARE FROM AEAPERCE LEFT OUTER JOIN CFAPARAM ON(AEAPERCE.ID_CFAPARAM_VENDEDOR = CFAPARAM.ID_CFAPARAM) "
+					+ "LEFT OUTER JOIN CFACLIFO ON(CFAPARAM.ID_CFACLIFO = CFACLIFO.ID_CFACLIFO) WHERE CFACLIFO.CODIGO_FUN = " + codigoVendedor + "), 0)/100)), "
+					+ "(SELECT SMAEMPRE.QTD_CASAS_DECIMAIS FROM SMAEMPRE WHERE SMAEMPRE.ID_SMAEMPRE = " + idEmpresa + ")) AS VENDA_VARE_FINAL, "
+
+					+ "AEAPLOJA.PROMOCAO_ATAC, AEAPLOJA.PROMOCAO_VARE,"
+					+ "AEAPLOJA.CT_REPOSICAO_N, AEAPLOJA.CT_COMPLETO_N, "
+					+ "AEAPLOJA.ESTOQUE_F ESTOQUE_FISICO, AEAPLOJA.ESTOQUE_C ESTOQUE_CONTABIL, "
+					+ "AEACLASE.CODIGO AS CODIGO_CLASE, AEACLASE.DESCRICAO AS DESCRICAO_CLASE, AEAPRODU.PESO_BRUTO, AEAPRODU.PESO_LIQUIDO "
+					+ "FROM AEAPRREC AEAPRREC "
+					+ "LEFT OUTER JOIN AEAPRODU AEAPRODU ON  (AEAPRODU.ID_AEAPRODU = AEAPRREC.ID_AEAPRODU) "
+					+ "LEFT OUTER JOIN AEAPLOJA AEAPLOJA ON  (AEAPLOJA.ID_AEAPRODU = AEAPRODU.ID_AEAPRODU) "
+					+ "LEFT OUTER JOIN AEACLASE AEACLASE ON  (AEACLASE.ID_AEACLASE = AEAPRODU.ID_AEACLASE) "
+					+ "LEFT OUTER JOIN AEAMARCA AEAMARCA ON  (AEAMARCA.ID_AEAMARCA = AEAPRODU.ID_AEAMARCA) "
+					+ "LEFT OUTER JOIN AEAUNVEN AEAUNVEN ON  (AEAUNVEN.ID_AEAUNVEN = AEAPRODU.ID_AEAUNVEN) "
+					+ "WHERE (AEAPRODU.ATIVO = '1') AND (AEAPRODU.DESCRICAO IS NOT NULL) ";
+
+		// Adiciona a clausula where passada por parametro no sql
+		if(where != null){
+			sql = sql + " AND ( " + where +" ) ";
+		}
+
+		if (tipoTela == ProdutoListaMDFragment.TELA_MAIS_VENDIDOS_CIDADE){
+
+			if ((filtro.getAsString(String.valueOf(ProdutoListaMDFragment.TELA_MAIS_VENDIDOS_CIDADE)) != null) &&
+					(filtro.getAsString(String.valueOf(ProdutoListaMDFragment.TELA_MAIS_VENDIDOS_CIDADE)).length() > 0)) {
+
+				sql += " AND ( AEAPRREC.ID_CFACIDAD = " + filtro.getAsString(String.valueOf(ProdutoListaMDFragment.TELA_MAIS_VENDIDOS_CIDADE)) + " ) ";
+			} else {
+				sql += " AND ( AEAPRREC.ID_CFACIDAD IS NOT NULL ) ";
+			}
+
+		} else if (tipoTela == ProdutoListaMDFragment.TELA_MAIS_VENDIDOS_AREA){
+			// Checa se foi enviado algum parametro
+			if ((filtro.getAsString(String.valueOf(ProdutoListaMDFragment.TELA_MAIS_VENDIDOS_AREA)) != null) &&
+					(filtro.getAsString(String.valueOf(ProdutoListaMDFragment.TELA_MAIS_VENDIDOS_AREA)).length() > 0)) {
+
+				sql += " AND ( AEAPRREC.ID_CFAAREAS = " + filtro.getAsString(String.valueOf(ProdutoListaMDFragment.TELA_MAIS_VENDIDOS_AREA)) + " ) ";
+			} else {
+				sql += " AND ( AEAPRREC.ID_CFAAREAS IS NOT NULL ) ";
+			}
+
+		} else if (tipoTela == ProdutoListaMDFragment.TELA_MAIS_VENDIDOS_VENDEDOR){
+			sql += " AND ( AEAPRREC.ID_CFACLIFO_VENDEDOR = " + filtro.getAsString(String.valueOf(ProdutoListaMDFragment.TELA_MAIS_VENDIDOS_VENDEDOR)) + " ) ";
+
+		} else if (tipoTela == ProdutoListaMDFragment.TELA_MAIS_VENDIDOS_EMPRESA){
+			sql += " AND ( AEAPRREC.ID_SMAEMPRE = " + idEmpresa + " ) ";
+
+		} else if (tipoTela == ProdutoListaMDFragment.TELA_MAIS_VENDIDOS_CORTES_CHEGARAM){
+			// Checa se foi passado por paramentro algum orcamento
+			if ((idOrcamento != null) && (idOrcamento.length() > 0)) {
+
+				sql += " AND ( AEAPRREC.ID_CFACLIFO = " + filtro.getAsString(String.valueOf(ProdutoListaMDFragment.TELA_MAIS_VENDIDOS_CORTES_CHEGARAM)) + " ) ";
+			} else {
+				sql += " AND ( AEAPRREC.ID_CFAAREAS IS NULL ) AND ( AEAPRREC.ID_CFACIDAD IS NULL ) AND ( AEAPRREC.ID_CFACLIFO_VENDEDOR IS NULL ) " +
+					   " AND ( AEAPRREC.ID_SMAEMPRE IS NULL ) (AEAPRREC.ID_CFACLIFO IS NOT NULL) ";
+			}
+		}
+		if (group != null){
+			sql = sql + " " + group + " ";
+		}
+		// Adiciona a ordem no sql
+		sql = sql + " ORDER BY AEAPRODU.DESCRICAO, AEAUNVEN.SIGLA, AEAMARCA.DESCRICAO ";
+
+		// Cria uma lista para armazenar todas os produtos retornados do banco
+		List<ProdutoListaBeans> listaProduto = new ArrayList<ProdutoListaBeans>();
+
+		// Instancia a classe para manipular o banco de dados
+		ProdutoSql produtoSql = new ProdutoSql(context);
+
+		Cursor cursor = produtoSql.sqlSelect(sql);
+
+		// Se o cursor tiver algum valor entra no laco
+		if(cursor.getCount() > 0){
+			try{
+				while(cursor.moveToNext()){
+
+					// Preenche os dados do produto
+					ProdutoListaBeans produtoLista = new ProdutoListaBeans();
+					ProdutoBeans produto = new ProdutoBeans();
+					produto.setIdProduto(cursor.getInt(cursor.getColumnIndex("ID_AEAPRODU")));
+					produto.setCodigoEstrutural(cursor.getString(cursor.getColumnIndex("CODIGO_ESTRUTURAL")));
+					produto.setReferencia(cursor.getString(cursor.getColumnIndex("REFERENCIA")));
+					produto.setDescricaoProduto(cursor.getString(cursor.getColumnIndex("DESCRICAO_PRODU")));
+					produto.setDescricaoMarca(cursor.getString(cursor.getColumnIndex("DESCRICAO_MARCA")));
+					produto.setPesoBruto(cursor.getDouble(cursor.getColumnIndex("PESO_BRUTO")));
+					produto.setPesoLiquido(cursor.getDouble(cursor.getColumnIndex("PESO_LIQUIDO")));
+					if(cursor.getString(cursor.getColumnIndex("TIPO")).length() > 0){
+						produto.setTipoProduto(cursor.getString(cursor.getColumnIndex("TIPO")).charAt(0));
+					}else{
+						produto.setTipoProduto('P');
+					}
+					produto.setDiasCadastro(cursor.getInt(cursor.getColumnIndex("DIAS_CADASTRO")));
+
+					final String descProduto = produto.getDescricaoProduto();
+
+					// Pega a unidade de venda do produto
+					UnidadeVendaBeans unidadeVenda = new UnidadeVendaBeans();
+					unidadeVenda.setIdUnidadeVenda(cursor.getInt(cursor.getColumnIndex("ID_AEAUNVEN")));
+					unidadeVenda.setSiglaUnidadeVenda(cursor.getString(cursor.getColumnIndex("SIGLA")));
+					// Adiciiona a unidade de venda no produto
+					produto.setUnidadeVendaProduto(unidadeVenda);
+
+					// Pega a classe do produto
+					ClasseBeans classe = new ClasseBeans();
+					classe.setCodigoClasse(cursor.getInt(cursor.getColumnIndex("CODIGO_CLASE")));
+					classe.setDescricaoClasse(cursor.getString(cursor.getColumnIndex("DESCRICAO_CLASE")));
+					// Adiciona a classe no produto
+					produto.setClasseProduto(classe);
+
+					// Adiciona o produto a lista
+					//produtoLista.setProduto(produto);
+
+					produtoLista.setValorTabelaAtacado(cursor.getDouble(cursor.getColumnIndex("VENDA_ATAC_TABELA")));
+					produtoLista.setValorTabelaVarejo(cursor.getDouble(cursor.getColumnIndex("VENDA_VARE_TABELA")));
+					produtoLista.setValorUnitarioAtacado(cursor.getDouble(cursor.getColumnIndex("VENDA_ATAC_FINAL")));
+					produtoLista.setValorUnitarioVarejo(cursor.getDouble(cursor.getColumnIndex("VENDA_VARE_FINAL")));
+					produtoLista.setValorPromocaoAtacado(cursor.getDouble(cursor.getColumnIndex("PROMOCAO_ATAC")));
+					produtoLista.setValorPromocaoVarejo(cursor.getDouble(cursor.getColumnIndex("PROMOCAO_VARE")));
+					produtoLista.setCustoReposicaoN(cursor.getDouble(cursor.getColumnIndex("CT_REPOSICAO_N")));
+					produtoLista.setCustoCompleto(cursor.getDouble(cursor.getColumnIndex("CT_COMPLETO_N")));
+					produtoLista.setEstoqueFisico(cursor.getDouble(cursor.getColumnIndex("ESTOQUE_FISICO")));
+					produtoLista.setEstoqueContabil(cursor.getDouble(cursor.getColumnIndex("ESTOQUE_CONTABIL")));
+
+					// Verifica se tem numero de orcamento para pesquisar
+					if(idOrcamento != null){
+						//Verifica se o produto esta dentro de um orcamento
+						if( marcaProdutoJaComprados(String.valueOf(produto.getIdProduto()), idOrcamento) ){
+							produtoLista.setEstaNoOrcamento('1');
+						}
+					}
+					// Instancia a clesse de embalagens
+					EmbalagemSql embalagemSql = new EmbalagemSql(context);
+					Cursor cursorEmbalagem = embalagemSql.query("ID_AEAPRODU = " + produto.getIdProduto());
+
+					// Verifica se retornou algum registro
+					if(cursorEmbalagem.getCount() > 0){
+						List<EmbalagemBeans> listaEmbalagem = new ArrayList<EmbalagemBeans>();
+						// Enquanto tiver registro vai para frente
+						while(cursorEmbalagem.moveToNext()){
+							// Instancia a classe de embalagem
+							EmbalagemBeans embalagem = new EmbalagemBeans();
+							// Preenche os dados da embalagem
+							embalagem.setIdEmbalagem(cursorEmbalagem.getInt(cursorEmbalagem.getColumnIndex("ID_AEAEMBAL")));
+							embalagem.setIdUnidadeVenda(cursorEmbalagem.getInt(cursorEmbalagem.getColumnIndex("ID_AEAUNVEN")));
+							if((cursorEmbalagem.getString(cursorEmbalagem.getColumnIndex("ATIVO")) != null) && (cursorEmbalagem.getString(cursorEmbalagem.getColumnIndex("ATIVO")).length() > 0)){
+								embalagem.setAtivo(cursorEmbalagem.getString(cursorEmbalagem.getColumnIndex("ATIVO")).charAt(0));
+							}
+							if((cursorEmbalagem.getString(cursorEmbalagem.getColumnIndex("PRINCIPAL")) != null) && (cursorEmbalagem.getString(cursorEmbalagem.getColumnIndex("PRINCIPAL")).length() > 0)){
+								embalagem.setPrincipal(cursorEmbalagem.getString(cursorEmbalagem.getColumnIndex("PRINCIPAL")).charAt(0));
+							}
+							embalagem.setDescricaoEmbalagem(cursorEmbalagem.getString(cursorEmbalagem.getColumnIndex("DESCRICAO")));
+							embalagem.setFatorConversao(cursorEmbalagem.getDouble(cursorEmbalagem.getColumnIndex("FATOR_CONVERSAO")));
+							embalagem.setFatorPreco(cursorEmbalagem.getDouble(cursorEmbalagem.getColumnIndex("FATOR_PRECO")));
+							embalagem.setModulo(cursorEmbalagem.getInt(cursorEmbalagem.getColumnIndex("MODULO")));
+							embalagem.setDecimais(cursorEmbalagem.getInt(cursorEmbalagem.getColumnIndex("DECIMAIS")));
+
+							// Instancia a classe de unidade de venda para manipular banco de dados
+							UnidadeVendaSql unidadeVendaSql = new UnidadeVendaSql(context);
+							Cursor cursorUnVenda = unidadeVendaSql.query("ID_AEAUNVEN = " + embalagem.getIdUnidadeVenda());
+							// Verifica se retornou registro
+							if(cursorUnVenda.getCount() > 0){
+								// Move para o primeiro registro
+								cursorUnVenda.moveToFirst();
+								// Preenche os dados da unidade de venda
+								unidadeVenda.setIdUnidadeVenda(cursorUnVenda.getInt(cursorUnVenda.getColumnIndex("ID_AEAUNVEN")));
+								unidadeVenda.setSiglaUnidadeVenda(cursorUnVenda.getString(cursorUnVenda.getColumnIndex("SIGLA")));
+								unidadeVenda.setDescricaoUnidadeVenda(cursorUnVenda.getString(cursorUnVenda.getColumnIndex("DESCRICAO_SINGULAR")));
+								unidadeVenda.setCasasDecimais(cursorUnVenda.getInt(cursorUnVenda.getColumnIndex("DECIMAIS")));
+
+								embalagem.setUnidadeVendaEmbalagem(unidadeVenda);
+							}
+							// Adiciona a embalagem a uma lista
+							listaEmbalagem.add(embalagem);
+						} // FIm do while
+
+						int diasProdutoNovo = diasProdutoNovo(idEmpresa);
+
+						if((diasProdutoNovo > 0) && (diasProdutoNovo >= produto.getDiasCadastro()) && (produtoLista.getEstaNoOrcamento() != '1')){
+							produtoLista.setProdutoNovo(true);
+						}
+
+						// Adiciona uma lista de embalagens no produto
+						produto.setListaEmbalagem(listaEmbalagem);
+
+						// Adiciona o produto a lista
+						produtoLista.setProduto(produto);
+					}
+
+					listaProduto.add(produtoLista);
+				} // Fim primeiro while
+
+			}catch(Exception e){
+				// Armazena as informacoes para para serem exibidas e enviadas
+				ContentValues contentValues = new ContentValues();
+				contentValues.put("comando", 0);
+				contentValues.put("tela", "ProdutoRotinas");
+				contentValues.put("mensagem", "Erro ao carregar os dados do produto. \n" + e.getMessage());
+				contentValues.put("dados", e.toString());
+				// Pega os dados do usuario
+				funcoes = new FuncoesPersonalizadas(context);
+				contentValues.put("usuario", funcoes.getValorXml("Usuario"));
+				contentValues.put("empresa", funcoes.getValorXml("ChaveEmpresa"));
+				contentValues.put("email", funcoes.getValorXml("Email"));
+				// Exibe a mensagem
+				funcoes.menssagem(contentValues);
+			}
+		}
+		return listaProduto;
+	}
 	
 	
-	public List<ProdutoListaBeans> listaProduto(String where, String group, String idOrcamento, ProgressBar progresso, final TextView textProgresso){
+	public List<ProdutoListaBeans> listaProduto(String where, String group, String idOrcamento, final ProgressBar progresso, final TextView textProgresso){
 		
 		FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
 		
@@ -109,6 +408,13 @@ public class ProdutoRotinas extends Rotinas {
 				   + "LEFT OUTER JOIN AEAMARCA AEAMARCA ON  (AEAMARCA.ID_AEAMARCA = AEAPRODU.ID_AEAMARCA) "
 				   + "LEFT OUTER JOIN AEAUNVEN AEAUNVEN ON  (AEAUNVEN.ID_AEAUNVEN = AEAPRODU.ID_AEAUNVEN) "
 				   + "WHERE (AEAPRODU.ATIVO = '1') AND (AEAPRODU.DESCRICAO IS NOT NULL) ";
+
+		// Checa se tem o id do orcamento
+		if (idOrcamento != null && idOrcamento.length() > 0){
+			sql += " AND (AEAPLOJA.ID_SMAEMPRE = (SELECT AEAORCAM.ID_SMAEMPRE FROM AEAORCAM WHERE AEAORCAM.ID_AEAORCAM = " + idOrcamento + ")) ";
+		} else {
+			sql += " AND (AEAPLOJA.ID_SMAEMPRE = " + idEmpresa + ")";
+		}
 		
 		// Adiciona a clausula where passada por parametro no sql
 		if(where != null){
@@ -128,7 +434,7 @@ public class ProdutoRotinas extends Rotinas {
 		// Instancia a classe para manipular o banco de dados
 		ProdutoSql produtoSql = new ProdutoSql(context);
 		
-		Cursor cursor = produtoSql.sqlSelect(sql);
+		final Cursor cursor = produtoSql.sqlSelect(sql);
 		
 		// Se o cursor tiver algum valor entra no laco
 		if(cursor.getCount() > 0){
@@ -137,9 +443,13 @@ public class ProdutoRotinas extends Rotinas {
 
 			// Checa se tem alguma barra de progresso
 			if (progresso != null){
-
-				progresso.setIndeterminate(false);
-				progresso.setMax(cursor.getCount());
+				((Activity) context).runOnUiThread(new Runnable() {
+					public void run() {
+						progresso.setIndeterminate(false);
+						progresso.setProgress(0);
+						progresso.setMax(cursor.getCount());
+					}
+				});
 			}
 
 			int incremento = 0;
@@ -147,8 +457,14 @@ public class ProdutoRotinas extends Rotinas {
 				while(cursor.moveToNext()){
 
 					if (progresso != null) {
+
 						incremento++;
-						progresso.setProgress(incremento);
+						final int finalIncremento = incremento;
+						((Activity) context).runOnUiThread(new Runnable() {
+							public void run() {
+								progresso.setProgress(finalIncremento);
+							}
+						});
 					}
 
 					// Preenche os dados do produto

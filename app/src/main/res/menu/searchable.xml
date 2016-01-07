@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".activity.material.designer.fragment.ProdutoListaTabMD">
+
+    <item
+        android:id="@+id/menu_searchable_search_pesquisar"
+        android:orderInCategory="100"
+        android:icon="@drawable/ic_action_search"
+        android:title="@string/pesquisar"
+        app:showAsAction="ifRoom|collapseActionView"
+        app:actionViewClass="android.support.v7.widget.SearchView"
+        app:theme="@style/MaterialDrawerTheme.Light.DarkToolbar"/>
+
+    <item
+        android:id="@+id/menu_searchable_search_action_delete"
+        android:orderInCategory="101"
+        android:icon="@mipmap/ic_delete"
+        android:title="@string/limpar_historico"
+        app:showAsAction="never" />
+
+</menu>

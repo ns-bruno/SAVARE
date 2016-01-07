@@ -1308,8 +1308,13 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 				CidadeBeans cidade = listaCidade.get(position);
 				
 				textDescricao.setText(cidade.getDescricao());
+
+				if (cidade.getIdCidade() >= 0){
+					textAbaixoDescricaoDireita.setText(cidade.getIdCidade());
+				} else {
+					textAbaixoDescricaoDireita.setVisibility(View.GONE);
+				}
 				
-				textAbaixoDescricaoDireita.setVisibility(View.GONE);
 				textAbaixoDescricaoEsqueda.setVisibility(View.GONE);
 				textBottonDireito.setVisibility(View.GONE);
 				textBottonEsquerdo.setVisibility(View.GONE);

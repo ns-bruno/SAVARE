@@ -86,18 +86,43 @@
         <activity android:name=".activity.material.designer.InicioMDActivity"
                   android:theme="@style/AppBaseTheme"/>
         <activity android:name=".activity.LoginActivity" />
+
         <activity
             android:name=".activity.material.designer.fragment.ProdutoListaTabMD"
             android:theme="@style/AppBaseTheme" >
-                <intent-filter>
-                    <action android:name="android.intent.action.SEARCH"/>
-                </intent-filter>
+            <!--<intent-filter>
+                <action android:name="android.intent.action.SEARCH"/>
+            </intent-filter>-->
+            <!--<meta-data android:name="android.app.default_searchable"
+                android:value="com.savare.activity.SearchableActivity"/>-->
+            <meta-data
+                android:name="android.app.searchable"
+                android:resource="@xml/searchable" />
+        </activity>
+
+        <activity
+            android:windowSoftInputMode="adjustPan|adjustNothing"
+            android:name="com.savare.activity.SearchableActivity"
+            android:label="@string/produtos"
+            android:launchMode="singleTop"
+            android:theme="@style/AppBaseTheme">
+            <intent-filter>
+                <action android:name="android.intent.action.SEARCH"/>
+            </intent-filter>
+            <meta-data
+                android:name="android.app.searchable"
+                android:resource="@xml/searchable">
+            </meta-data>
         </activity>
 
         <provider
             android:name=".sincronizacao.EnviarProvider"
             android:authorities="@string/content_authority"
             android:exported="false" />
+
+        <provider
+            android:authorities="com.savare.provider.SearchableProvider"
+            android:name="com.savare.provider.SearchableProvider" />
 
         <!-- Servico de sincronizacao -->
         <service
