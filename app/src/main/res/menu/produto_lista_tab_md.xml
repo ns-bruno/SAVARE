@@ -5,7 +5,7 @@
     <item
         android:id="@+id/menu_produto_lista_tab_md_search_pesquisar"
         android:orderInCategory="100"
-        android:icon="@drawable/ic_action_search"
+        android:icon="@mipmap/ic_magnify_dark"
         android:title="@string/pesquisar"
         app:showAsAction="ifRoom|collapseActionView"
         app:actionViewClass="android.support.v7.widget.SearchView" />
@@ -14,7 +14,7 @@
     <item
         android:id="@+id/menu_produto_lista_tab_md_search_action_delete"
         android:orderInCategory="102"
-        android:icon="@mipmap/ic_delete"
+        android:icon="@mipmap/ic_delete_dark"
         android:title="@string/limpar_historico"
         app:showAsAction="never" />
 

@@ -1,23 +1,12 @@
 package com.savare.activity.material.designer.fragment;
 
-import android.app.SearchManager;
 import android.content.ContentValues;
-import android.content.Context;
-import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.provider.SearchRecentSuggestions;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
-import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.Spinner;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.ogaclejapan.smarttablayout.SmartTabLayout;
@@ -32,12 +21,13 @@ import com.savare.provider.SearchableProvider;
 public class ProdutoListaTabMD extends AppCompatActivity {
 
     private Toolbar toolbarInicio;
-    private TextView textCodigoOrcamento, textCodigoPessoa, textNomeRazao, textAtacadoVarejo, textProcessoPesquisa;
+    //private TextView textCodigoOrcamento, textCodigoPessoa, textNomeRazao, textAtacadoVarejo, textProcessoPesquisa;
     private ContentValues dadosParametros;
     public static final String KEY_ATACADO_VAREJO = "ATACADO_VAREJO",
                                KEY_ID_ORCAMENTO = "ID_AEAORCAM",
                                KEY_NOME_RAZAO = "NOME_RAZAO",
-                               KEY_ID_CLIENTE = "ID_CFACLIFO";
+                               KEY_ID_CLIENTE = "ID_CFACLIFO",
+                               KEY_ID_PRODUTO = "ID_PRODUTO";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,11 +55,6 @@ public class ProdutoListaTabMD extends AppCompatActivity {
          */
         Bundle intentParametro = getIntent().getExtras();
         if (intentParametro != null) {
-            // Seta o campo codigo consumo total com o que foi passado por parametro
-            textCodigoOrcamento.setText(intentParametro.getString(KEY_ID_ORCAMENTO));
-            textNomeRazao.setText(intentParametro.getString(KEY_NOME_RAZAO));
-            textCodigoPessoa.setText(intentParametro.getString(KEY_ID_CLIENTE));
-            textAtacadoVarejo.setText(intentParametro.getString(KEY_ATACADO_VAREJO));
             // Instancia a vareavel
             dadosParametros = new ContentValues();
             // Adiciona os dados para ser passado por parametro
@@ -145,19 +130,7 @@ public class ProdutoListaTabMD extends AppCompatActivity {
     }
 
     private void recuperaCamposTela(){
-        textCodigoOrcamento = (TextView) findViewById(R.id.fragment_produto_lista_tab_md_text_codigo_orcamento);
-        textNomeRazao = (TextView) findViewById(R.id.fragment_produto_lista_tab_md_text_nome_razao);
-        textCodigoPessoa = (TextView) findViewById(R.id.fragment_produto_lista_tab_md_text_codigo_pessoa);
-        textAtacadoVarejo = (TextView) findViewById(R.id.fragment_produto_lista_tab_md_text_atacado_varejo);
+
     }
 
-    public void pesquisarBanco( String query){
-        if((query != null ) && (query.length() > 0)){
-
-            //toolbarInicio.setTitle(query);
-
-            SearchRecentSuggestions searchRecentSuggestions = new SearchRecentSuggestions(getApplicationContext(), SearchableProvider.AUTHORITY, SearchableProvider.MODE);
-            searchRecentSuggestions.saveRecentQuery(query, null);
-        }
-    }
 }

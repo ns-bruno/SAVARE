@@ -84,7 +84,10 @@ public class ListaOrcamentoPedidoActivity extends Activity implements OnNavigati
 							   TIPO_PEDIDO_RETORNADO_EXCLUIDO = "RE",
     						   TIPO_PEDIDO_FATURADO = "F";
     public static final String KEY_TELA_LISTA_ORCAMENTO_PEDIDO = "ListaOrcamentoPedidosActivity",
-    						   KEY_TELA_CHAMADA = "TELA_CHAMADA";
+    						   KEY_TELA_CHAMADA = "TELA_CHAMADA",
+							   KEY_RETORNA_VALOR = "RETORNA_VALOR",
+							   KEY_ORCAMENTO_PEDIDO = "ORCAMENTO_PEDIDO";
+	public static final String TELA_LISTA_PRODUTOS = "LISTA_PRODUTOS";
     public static final int RETORNA_CLIENTE = 100;
     public static final int SOLICITA_CLIENTE = 1;
 
@@ -114,8 +117,8 @@ public class ListaOrcamentoPedidoActivity extends Activity implements OnNavigati
 		Bundle intentParametro = getIntent().getExtras();
 		if (intentParametro != null) {
 			
-			this.tipoOrcamentoPedido = intentParametro.getString("ORCAMENTO_PEDIDO");
-			this.retornaValor = intentParametro.getString("RETORNA_VALOR");
+			this.tipoOrcamentoPedido = intentParametro.getString(KEY_ORCAMENTO_PEDIDO);
+			this.retornaValor = intentParametro.getString(KEY_RETORNA_VALOR);
 			
 			if(this.retornaValor == null){
 				this.retornaValor = "F";
@@ -152,14 +155,14 @@ public class ListaOrcamentoPedidoActivity extends Activity implements OnNavigati
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 				
 				// Checa se quem chamou essa tela eh para retornar 
-				if( (retornaValor != null) && (retornaValor.equals("T")) ){
+				if( (retornaValor != null) && (retornaValor.equals(TELA_LISTA_PRODUTOS)) ){
 					
 					//Pega os dados da pessoa que foi clicado
 					OrcamentoBeans orcamento = (OrcamentoBeans) parent.getItemAtPosition(position);
 					
 					Bundle bundle = new Bundle();
 					bundle.putParcelable("AEAORCAM", orcamento);
-					
+
 					// Cria uma intent para returnar um valor para activity ProdutoLista
 					Intent returnIntent = new Intent();
 					returnIntent.putExtras(bundle);

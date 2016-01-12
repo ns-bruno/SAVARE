@@ -568,7 +568,7 @@ public class OrcamentoRotinas extends Rotinas {
 		Cursor cursor = orcamentoSql.query("ID_AEAORCAM = " + idOrcamento);
 		
 		// Verifica se retornou algum registro
-		if(cursor.getCount() > 0){
+		if(cursor != null && cursor.getCount() > 0){
 			return cursor.getString(cursor.getColumnIndex("ID_CFACLIFO"));
 		}else {
 			return "0";

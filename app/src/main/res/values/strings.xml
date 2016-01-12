@@ -192,6 +192,7 @@
     <string name="nenhuma_opcao_encontrada">Nenhuma Opção Encontrada</string>
     <string name="selecione_uma_opcao">Selecione Uma Opção</string>
     <string name="todos">Todos</string>
+    <string name="imagem_produto">Imagem do Produto</string>
     <string-array name="tab_produto_md">
         <item>Produtos</item>
         <item>+ Vendidos Cidade</item>

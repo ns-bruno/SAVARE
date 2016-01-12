@@ -5,6 +5,7 @@ import android.app.Dialog;
 import android.app.SearchManager;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -19,6 +20,10 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.BaseAdapter;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
@@ -26,10 +31,17 @@ import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.savare.R;
+import com.savare.activity.ListaOrcamentoPedidoActivity;
+import com.savare.activity.OrcamentoProdutoDetalhesActivity;
+import com.savare.activity.fragment.OrcamentoFragment;
 import com.savare.adapter.ItemUniversalAdapter;
+import com.savare.banco.funcoesSql.ProdutoRecomendadoSql;
+import com.savare.beans.AreaBeans;
 import com.savare.beans.CidadeBeans;
+import com.savare.beans.OrcamentoBeans;
 import com.savare.beans.ProdutoListaBeans;
 import com.savare.funcoes.FuncoesPersonalizadas;
+import com.savare.funcoes.rotinas.OrcamentoRotinas;
 import com.savare.funcoes.rotinas.ProdutoRotinas;
 import com.savare.provider.SearchableProvider;
 
@@ -53,12 +65,18 @@ public class ProdutoListaMDFragment extends Fragment {
     private List<ProdutoListaBeans> listaProdutos;
     private ItemUniversalAdapter adapterListaProdutos;
     private ItemUniversalAdapter adapterFiltroCidade;
+    private ItemUniversalAdapter adapterFiltroArea;
     private Spinner spinnerFiltro;
     private View viewOrcamento;
     private TextView textMensagem;
-    private String idOrcamento, idCliente, atacadoVarejo = "0";
+    private String idOrcamento, idCliente, atacadoVarejo = "0", atacadoVarejoAuxiliar = "0", nomeRazao;
     private ProgressBar progressBarListaProdutos;
     private Boolean pesquisando = false;
+    private ProdutoListaBeans produtoVendaClicado;
+    private long idItemOrcamento = 0;
+    public static final String KEY_TELA_PRODUTO_LISTA_ACTIVITY = "ProdutoListaActivity";
+    private TextView textCodigoOrcamento, textCodigoPessoa, textNomeRazao, textAtacadoVarejo, textProcessoPesquisa;
+    LinearLayout layoutFragmentRodape;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -67,6 +85,10 @@ public class ProdutoListaMDFragment extends Fragment {
 
         // Ativa a opcao de menus para este fragment
         setHasOptionsMenu(true);
+
+        recuperarCampos();
+
+
 
         /**
          * Pega valores passados por parametro de outra Activity
@@ -78,11 +100,91 @@ public class ProdutoListaMDFragment extends Fragment {
             idOrcamento = parametro.getString(ProdutoListaTabMD.KEY_ID_ORCAMENTO);
             idCliente = parametro.getString(ProdutoListaTabMD.KEY_ID_CLIENTE);
             atacadoVarejo = parametro.getString(ProdutoListaTabMD.KEY_ATACADO_VAREJO);
+            atacadoVarejoAuxiliar = atacadoVarejo;
+            nomeRazao = parametro.getString(ProdutoListaTabMD.KEY_NOME_RAZAO);
+
+            if ((idOrcamento != null) && (idCliente.length() > 0)) {
+                textCodigoOrcamento.setText(idOrcamento);
+                textNomeRazao.setText(nomeRazao);
+                textCodigoPessoa.setText(idCliente);
+                textAtacadoVarejo.setText(atacadoVarejo);
+
+            } else {
+
+                layoutFragmentRodape.setVisibility(View.GONE);
+            }
         }
 
-        recuperarCampos();
-
         criaListaProdutos();
+
+        spinnerFiltro.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                // Checa qual eh o tipo da tela
+                if (tipoTela == TELA_MAIS_VENDIDOS_CIDADE){
+                    // Limpa o listView
+                    listViewProdutos.setAdapter(null);
+                    // Executa
+                    LoaderProdutos loaderProdutosAsync = new LoaderProdutos(null, spinnerFiltro);
+                    loaderProdutosAsync.execute();
+
+                } else if (tipoTela == TELA_MAIS_VENDIDOS_AREA) {
+
+                    // Limpa o listView
+                    listViewProdutos.setAdapter(null);
+                    // Executa
+                    LoaderProdutos loaderProdutosAsync = new LoaderProdutos(null, spinnerFiltro);
+                    loaderProdutosAsync.execute();
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+        listViewProdutos.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                // Checa se a lista de produtos pertence a um orcamento
+                if ((idOrcamento != null) && (idOrcamento.length() > 0)) {
+
+                    //Pega os dados da pessoa que foi clicado
+                    ProdutoListaBeans produtoVenda = (ProdutoListaBeans) parent.getItemAtPosition(position);
+                    produtoVenda.setAtacadoVarejo((atacadoVarejo != null) ? atacadoVarejo.charAt(0) : atacadoVarejoAuxiliar.charAt(0));
+
+                    Bundle bundle = new Bundle();
+                    bundle.putParcelable("AEAORCAM", preencheDadosOrcamento());
+                    bundle.putString("ID_AEAPRODU", "" + produtoVenda.getProduto().getIdProduto());
+                    bundle.putString("ATAC_VARE", (atacadoVarejo != null) ? atacadoVarejo : atacadoVarejoAuxiliar);
+                    bundle.putInt("POSICAO", position);
+                    bundle.putLong("ID_AEAITORC", idItemOrcamento);
+                    bundle.putString("ID_AEAORCAM", idOrcamento);
+                    bundle.putString("ID_CFACLIFO", idCliente);
+                    bundle.putString("RAZAO_SOCIAL", nomeRazao);
+
+                    // Abre a tela de detalhes do produto
+                    Intent intent = new Intent(getContext(), OrcamentoProdutoDetalhesActivity.class);
+                    intent.putExtras(bundle);
+
+                    startActivityForResult(intent, 1);
+
+                } else {
+                    // Pega os dados do produto clicado
+                    produtoVendaClicado = (ProdutoListaBeans) parent.getItemAtPosition(position);
+                    produtoVendaClicado.setAtacadoVarejo((atacadoVarejo != null) ? atacadoVarejo.charAt(0) : atacadoVarejoAuxiliar.charAt(0));
+
+                    // Abre a tela de detalhes do produto
+                    Intent intent = new Intent(getContext(), ListaOrcamentoPedidoActivity.class);
+                    intent.putExtra(ListaOrcamentoPedidoActivity.KEY_ORCAMENTO_PEDIDO, "O");
+                    intent.putExtra(ListaOrcamentoPedidoActivity.KEY_RETORNA_VALOR, ListaOrcamentoPedidoActivity.TELA_LISTA_PRODUTOS);
+                    // Abre a activity aquardando uma resposta
+                    startActivityForResult(intent, 1);
+                }
+            }
+        });
 
         return viewOrcamento;
     }
@@ -96,7 +198,7 @@ public class ProdutoListaMDFragment extends Fragment {
 
         //SearchView searchView = (SearchView) menu.findItem(R.id.menu_produto_lista_tab_md_fragment_search_pesquisar).getActionView();
         final SearchView searchView;
-        MenuItem itemMenuSearch = menu.findItem(R.id.menu_produto_lista_tab_md_search_pesquisar);
+        final MenuItem itemMenuSearch = menu.findItem(R.id.menu_produto_lista_tab_md_search_pesquisar);
 
         if( Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB ){
             searchView = (SearchView) itemMenuSearch.getActionView();
@@ -106,6 +208,11 @@ public class ProdutoListaMDFragment extends Fragment {
         }
 
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getActivity().getComponentName()));
+
+        //SearchView searchView = (SearchView) findViewById(R.id.search);
+        EditText searchEditText = (EditText) searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text);
+        searchEditText.setTextColor(getResources().getColor(R.color.branco));
+        searchEditText.setHintTextColor(getResources().getColor(R.color.branco));
 
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
@@ -130,19 +237,29 @@ public class ProdutoListaMDFragment extends Fragment {
                                 + "(AEAPRODU.DESCRICAO_AUXILIAR LIKE '%" + query + "%') OR "
                                 + "(AEAPRODU.REFERENCIA LIKE '%" + query + "%') OR "
                                 + "(AEAMARCA.DESCRICAO LIKE '%" + query + "%') )";
-                        // Limpa o listView
-                        listViewProdutos.setAdapter(null);
-                        // Executa
-                        LoaderProdutos loaderProdutosAsync = new LoaderProdutos(where);
-                        loaderProdutosAsync.execute();
 
-                        return true;
-                    } else {
-                        return false;
+                        if ((tipoTela == TELA_MAIS_VENDIDOS_AREA) || (tipoTela == TELA_MAIS_VENDIDOS_CIDADE)) {
+                            // Limpa o listView
+                            listViewProdutos.setAdapter(null);
+                            // Executa
+                            LoaderProdutos loaderProdutosAsync = new LoaderProdutos(where, spinnerFiltro);
+                            loaderProdutosAsync.execute();
+
+                        } else {
+                            // Limpa o listView
+                            listViewProdutos.setAdapter(null);
+                            // Executa
+                            LoaderProdutos loaderProdutosAsync = new LoaderProdutos(where, null);
+                            loaderProdutosAsync.execute();
+                            // Tira o foco da searchView e fecha o teclado virtual
+                            searchView.clearFocus();
+                            return true;
+                        }
+                        // Tira o foco da searchView e fecha o teclado virtual
+                        searchView.clearFocus();
                     }
-                } else {
-                    return false;
                 }
+                return false;
             }
 
             @Override
@@ -153,22 +270,88 @@ public class ProdutoListaMDFragment extends Fragment {
         searchView.setQueryHint(getResources().getString(R.string.pesquisar));
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        //super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 1) {
+            if(resultCode == Activity.RESULT_OK){
+                // Pega a posicao da lista de produtos
+                int posicao = data.getExtras().getInt("POSICAO");
+
+                // Informa que o produto esta em um orcamento
+                listaProdutos.get(posicao).setEstaNoOrcamento(data.getExtras().getChar("RESULTADO"));
+                this.idItemOrcamento = data.getExtras().getLong("ID_AEAITORC");
+
+                ((BaseAdapter) listViewProdutos.getAdapter()).notifyDataSetChanged();
+
+            } else if(resultCode == 100){
+
+                OrcamentoBeans orcamento = new OrcamentoBeans();
+                // Pega os dados do orcamento restornado a lista de orcamento
+                orcamento = data.getParcelableExtra("AEAORCAM");
+
+                if((orcamento != null) && (orcamento.getIdOrcamento() > 0)){
+                    // Mosta o rodape
+                    layoutFragmentRodape.setVisibility(View.VISIBLE);
+
+                    idOrcamento = ""+orcamento.getIdOrcamento();
+                    nomeRazao = orcamento.getNomeRazao();
+                    idCliente = ""+orcamento.getIdPessoa();
+                    atacadoVarejo = ""+orcamento.getTipoVenda();
+
+                    textCodigoOrcamento.setText(""+orcamento.getIdOrcamento());
+                    textNomeRazao.setText(orcamento.getNomeRazao());
+                    textCodigoPessoa.setText("" + orcamento.getIdPessoa());
+                    textAtacadoVarejo.setText("" + orcamento.getTipoVenda());
+
+                    Intent dadosParametro = new Intent(getContext(), OrcamentoProdutoDetalhesActivity.class);
+                    // Pega os dados para enviar para outra tela
+                    dadosParametro.putExtra("ID_AEAPRODU", "" + produtoVendaClicado.getProduto().getIdProduto());
+                    dadosParametro.putExtra("ID_AEAORCAM", idOrcamento);
+                    dadosParametro.putExtra("ID_CFACLIFO", "" + orcamento.getIdPessoa());
+                    dadosParametro.putExtra("RAZAO_SOCIAL", orcamento.getNomeRazao());
+                    //dadosParametro.putExtra("POSICAO", position);
+                    dadosParametro.putExtra("ID_AEAITORC", "" + produtoVendaClicado.getProduto().getIdProduto());
+                    dadosParametro.putExtra("ATAC_VARE", atacadoVarejo);
+                    dadosParametro.putExtra(OrcamentoFragment.KEY_TELA_CHAMADA, KEY_TELA_PRODUTO_LISTA_ACTIVITY);
+
+                    startActivityForResult(dadosParametro, 1);
+                }
+
+            } else if(resultCode == 101){
+                // Mosta o rodape
+                layoutFragmentRodape.setVisibility(View.GONE);
+
+                textCodigoOrcamento.setText("");
+                textNomeRazao.setText("");
+                textCodigoPessoa.setText("");
+
+                idOrcamento = null;
+                nomeRazao = null;
+                idCliente = null;
+            }
+        }
+    }
+
+
+
     private void recuperarCampos(){
         listViewProdutos = (ListView) viewOrcamento.findViewById(R.id.fragment_produto_lista_universal_md_listView_lista_produto);
         progressBarListaProdutos = (ProgressBar) viewOrcamento.findViewById(R.id.fragment_produto_lista_universal_md_progressBar_lista_produto);
         spinnerFiltro = (Spinner) viewOrcamento.findViewById(R.id.fragment_produto_lista_universal_md_spinner_filtro);
         textMensagem = (TextView) viewOrcamento.findViewById(R.id.fragment_produto_lista_universal_md_text_mensagem_geral);
+        textCodigoOrcamento = (TextView) viewOrcamento.findViewById(R.id.fragment_produto_lista_universal_md_text_codigo_orcamento);
+        textNomeRazao = (TextView) viewOrcamento.findViewById(R.id.fragment_produto_lista_universal_md_text_nome_razao);
+        textCodigoPessoa = (TextView) viewOrcamento.findViewById(R.id.fragment_produto_lista_universal_md_text_codigo_pessoa);
+        textAtacadoVarejo = (TextView) viewOrcamento.findViewById(R.id.fragment_produto_lista_universal_md_text_atacado_varejo);
+        layoutFragmentRodape = (LinearLayout) viewOrcamento.findViewById(R.id.fragment_produto_lista_universal_md_linearlayout_rodape);
     }
 
     private void criaListaProdutos(){
 
         ProdutoRotinas produtoRotinas = new ProdutoRotinas(getContext());
 
-        if (tipoTela == TELA_LISTA_PRODUTO){
-
-        } else if (tipoTela == TELA_MAIS_VENDIDOS_CIDADE){
-            // Mosta a opcao de filtro de cidades
-            spinnerFiltro.setVisibility(View.VISIBLE);
+        if (tipoTela == TELA_MAIS_VENDIDOS_CIDADE){
 
             adapterFiltroCidade = new ItemUniversalAdapter(getContext(), ItemUniversalAdapter.CIDADE);
             // Pega a lista de cidades
@@ -179,29 +362,113 @@ public class ProdutoListaMDFragment extends Fragment {
                 // Deixa invisivel o spinne e a lista
                 listViewProdutos.setVisibility(View.GONE);
                 spinnerFiltro.setVisibility(View.GONE);
+                layoutFragmentRodape.setVisibility(View.GONE);
+                // Mostra a mensagem
                 textMensagem.setVisibility(View.VISIBLE);
 
             }else {
+                // Mosta a opcao de filtro de cidades
+                spinnerFiltro.setVisibility(View.VISIBLE);
+
                 // Preenche o spinne com a lista de cidades
                 spinnerFiltro.setAdapter(adapterFiltroCidade);
             }
 
         } else if (tipoTela == TELA_MAIS_VENDIDOS_AREA){
 
+            adapterFiltroArea =new ItemUniversalAdapter(getContext(), ItemUniversalAdapter.AREA);
+            // Pega a lista de area
+            adapterFiltroArea.setListaArea(produtoRotinas.listaAreaMaisVendidos());
+
+            // Checa se retornou apenas um resultado(padrao de nenhum valor)
+            if (adapterFiltroArea.getCount() == 1){
+                // Deixa invisivel o spinne e a lista
+                listViewProdutos.setVisibility(View.GONE);
+                spinnerFiltro.setVisibility(View.GONE);
+                textMensagem.setVisibility(View.VISIBLE);
+
+            }else {
+                // Mosta a opcao de filtro de cidades
+                spinnerFiltro.setVisibility(View.VISIBLE);
+
+                // Preenche o spinne com a lista de cidades
+                spinnerFiltro.setAdapter(adapterFiltroCidade);
+            }
+
         } else if (tipoTela == TELA_MAIS_VENDIDOS_VENDEDOR){
+            ProdutoRecomendadoSql produtoRecomendadoSql = new ProdutoRecomendadoSql(getContext());
+
+            if (produtoRecomendadoSql.getCountRows("ID_CFACLIFO_VENDEDOR IS NOT NULL") <= 0){
+                // Deixa invisivel o spinne e a lista
+                listViewProdutos.setVisibility(View.GONE);
+                spinnerFiltro.setVisibility(View.GONE);
+                textMensagem.setVisibility(View.VISIBLE);
+            }
 
         } else if (tipoTela == TELA_MAIS_VENDIDOS_EMPRESA){
+            ProdutoRecomendadoSql produtoRecomendadoSql = new ProdutoRecomendadoSql(getContext());
 
+            if (produtoRecomendadoSql.getCountRows("ID_SMAEMPRE IS NOT NULL") <= 0){
+                // Deixa invisivel o spinne e a lista
+                listViewProdutos.setVisibility(View.GONE);
+                spinnerFiltro.setVisibility(View.GONE);
+                textMensagem.setVisibility(View.VISIBLE);
+            }
         } else if (tipoTela == TELA_MAIS_VENDIDOS_CORTES_CHEGARAM){
+            ProdutoRecomendadoSql produtoRecomendadoSql = new ProdutoRecomendadoSql(getContext());
 
+            if (produtoRecomendadoSql.getCountRows("ID_CFACLIFO IS NOT NULL") <= 0){
+                // Deixa invisivel o spinne e a lista
+                listViewProdutos.setVisibility(View.GONE);
+                spinnerFiltro.setVisibility(View.GONE);
+                textMensagem.setVisibility(View.VISIBLE);
+            }
         }
+    }
+
+    /**
+     * Funcao para retornar os dados do orcamento
+     * @return
+     */
+    private OrcamentoBeans preencheDadosOrcamento(){
+        OrcamentoBeans orcamento = new OrcamentoBeans();
+        FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(getContext());
+
+        orcamento.setIdOrcamento(Integer.valueOf(idOrcamento));
+        orcamento.setIdEmpresa(Integer.valueOf(funcoes.getValorXml("CodigoEmpresa")));
+        orcamento.setIdPessoa(Integer.valueOf(idCliente));
+        orcamento.setNomeRazao(nomeRazao);
+        orcamento.setTipoVenda((atacadoVarejo != null) ? atacadoVarejo.charAt(0) : atacadoVarejoAuxiliar.charAt(0));
+
+        return orcamento;
     }
 
     public class LoaderProdutos extends AsyncTask<Void, Void, Void> {
         String where = "";
+        AreaBeans area;
+        CidadeBeans cidade;
 
-        public LoaderProdutos(String where) {
+        public LoaderProdutos(String where, Spinner spinnerFiltro) {
             this.where = where;
+
+            if (spinnerFiltro != null && spinnerFiltro.getCount() > 0) {
+                // Checa qual eh a tela que esta chamando
+                if (tipoTela == TELA_MAIS_VENDIDOS_AREA) {
+                    // Pega a area selecionada
+                    area = (AreaBeans) spinnerFiltro.getSelectedItem();
+
+                    if (area.getDescricaoArea().contains(getString(R.string.nenhuma_opcao_encontrada))) {
+                        listViewProdutos.setAdapter(null);
+                    }
+                } else if (tipoTela == TELA_MAIS_VENDIDOS_CIDADE) {
+                    // Pega a cidade selecionada
+                    cidade = (CidadeBeans) spinnerFiltro.getSelectedItem();
+
+                    if (cidade.getDescricao().contains(getString(R.string.nenhuma_opcao_encontrada))) {
+                        listViewProdutos.setAdapter(null);
+                    }
+                }
+            }
         }
 
         // Aqui eh o que acontece antes da tarefa principal ser executado
@@ -229,12 +496,64 @@ public class ProdutoListaMDFragment extends Fragment {
                         // Cria a lista de produto sem verificar se o produto existe no orcamento
                         listaProdutos = produtoRotinas.listaProduto(where, null, null, progressBarListaProdutos, null);
                     }
-                } else if (tipoTela == TELA_MAIS_VENDIDOS_CIDADE) {
-                    // Checa se tem algum orcamento vinculado na visualizacao
-                    if ((idOrcamento != null) && (idOrcamento.length() > 0)) {
+                // Checa a tela que esta chamando esta funcao (Mais Vendidos por Cidade)
+                } else if (tipoTela == TELA_MAIS_VENDIDOS_AREA) {
+                    // Checa se nao pegou uma selecao vazia
+                    if (area != null){
+                        // Checa se eh a opcao de nenhum selecionado
+                        if (area.getDescricaoArea().contains(getString(R.string.todos))){
 
-                        //produtoRotinas.listaProdutoMaisVendido(tipoTela, contentvalue, where, null, idOrcamento, progressBarListaProdutos, null);
+                            // Pega a lista de produtos baseado na opcao selecionada
+                            listaProdutos = produtoRotinas.listaProdutoMaisVendido(TELA_MAIS_VENDIDOS_AREA, null, null, null, idOrcamento, progressBarListaProdutos, null);
+
+                        } else if ( (!area.getDescricaoArea().contains(getString(R.string.todos))) && (!area.getDescricaoArea().contains(getString(R.string.nenhuma_opcao_encontrada))) &&
+                                   (!area.getDescricaoArea().contains(getString(R.string.selecione_uma_opcao))) ){
+
+                            ContentValues filtro = new ContentValues();
+                            filtro.put(String.valueOf(TELA_MAIS_VENDIDOS_AREA), String.valueOf(area.getIdArea()));
+                            // Pega a lista de produtos baseado na opcao selecionada
+                            listaProdutos = produtoRotinas.listaProdutoMaisVendido(TELA_MAIS_VENDIDOS_AREA, filtro, null, null, idOrcamento, progressBarListaProdutos, null);
+                        }
                     }
+                } else if (tipoTela == TELA_MAIS_VENDIDOS_CIDADE){
+                    if (cidade != null) {
+
+                        if (cidade.getDescricao().contains(getString(R.string.todos))) {
+
+                            // Pega a lista de produtos baseado na opcao selecionada
+                            listaProdutos = produtoRotinas.listaProdutoMaisVendido(TELA_MAIS_VENDIDOS_CIDADE, null, null, null, idOrcamento, progressBarListaProdutos, null);
+
+                        } else if ( (!cidade.getDescricao().contains(getString(R.string.todos))) && (!cidade.getDescricao().contains(getString(R.string.nenhuma_opcao_encontrada))) &&
+                                (!cidade.getDescricao().contains(getString(R.string.selecione_uma_opcao))) ){
+
+                            ContentValues filtro = new ContentValues();
+                            filtro.put(String.valueOf(TELA_MAIS_VENDIDOS_CIDADE), String.valueOf(cidade.getIdCidade()));
+                            // Pega a lista de produtos baseado na opcao selecionada
+                            listaProdutos = produtoRotinas.listaProdutoMaisVendido(TELA_MAIS_VENDIDOS_CIDADE, filtro, null, null, idOrcamento, progressBarListaProdutos, null);
+                        }
+                    }
+                } else if ((tipoTela == TELA_MAIS_VENDIDOS_EMPRESA) || (tipoTela == TELA_MAIS_VENDIDOS_VENDEDOR) || (tipoTela == TELA_MAIS_VENDIDOS_CORTES_CHEGARAM)){
+                    // Cria uma vareavel para salvar os parametros para filtrar
+                    ContentValues filtro = new ContentValues();
+
+                    if ((idOrcamento != null) && (idOrcamento.length() > 0)){
+                        OrcamentoRotinas orcamentoRotinas = new OrcamentoRotinas(getContext());
+                        //
+                        String idCliente = orcamentoRotinas.codigoClienteOrcamento(idOrcamento);
+                        // Checa se retornou apenas um digito
+                        if ((idCliente != null) && (idCliente.length() == 1)){
+                            // Checa se retornou zero
+                            if (idCliente.contains("0")){
+                                // Deixa nulo a vareavel para caso tenha retornado zero
+                                idCliente = null;
+                            }
+                        }
+                        // Adiciona o codigo do cliente no filtro
+                        filtro.put(String.valueOf(TELA_MAIS_VENDIDOS_CORTES_CHEGARAM), idCliente);
+                    }
+                    // Pega a lista de produtos baseado
+                    listaProdutos = produtoRotinas.listaProdutoMaisVendido(tipoTela, filtro, null, null, idOrcamento, progressBarListaProdutos, null);
+
                 }
                 // Checa se a lista de produtos nao esta vazia e nem nula
                 if ((listaProdutos != null) && (listaProdutos.size() > 0)){
@@ -243,14 +562,16 @@ public class ProdutoListaMDFragment extends Fragment {
                     // Seta a lista de produtos no adapter
                     adapterListaProdutos.setListaProduto(listaProdutos);
                     // Informa o tipo da venda (atacado ou varejo)
-                    adapterListaProdutos.setAtacadoVarejo(atacadoVarejo);
+                    adapterListaProdutos.setAtacadoVarejo((atacadoVarejo != null) ? atacadoVarejo : atacadoVarejoAuxiliar);
 
                 } else {
                     ((Activity) getContext()).runOnUiThread(new Runnable() {
                         public void run() {
                             new MaterialDialog.Builder(getActivity())
                                     .title(R.string.produtos)
-                                    .content(R.string.nao_achamos_nenhum_produto_com_descricao_digitada)
+                                    .content(((tipoTela == TELA_LISTA_PRODUTO) || (tipoTela == TELA_MAIS_VENDIDOS_EMPRESA)
+                                            || (tipoTela == TELA_MAIS_VENDIDOS_VENDEDOR) || (tipoTela == TELA_MAIS_VENDIDOS_CORTES_CHEGARAM)) ?
+                                            R.string.nao_achamos_nenhum_produto_com_descricao_digitada : R.string.nenhum_valor_encontrado)
                                     .positiveText(android.R.string.ok)
                                     //.negativeText(R.string.disagree)
                                     .autoDismiss(true)

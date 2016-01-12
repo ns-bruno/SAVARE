@@ -647,7 +647,58 @@ public class FuncoesSql {
 		// Retorna a quantidade de registros excluidos
 		return quantidadeExcluido;
 	}
-	
+
+	public int getCountRows(String where){
+		Cursor cursor = null;
+		bancoDados = conexaoBanco.abrirBanco();
+		int qtdRows = 0;
+		try {
+			cursor = bancoDados.rawQuery("SELECT COUNT(*) AS QTDROWS FROM " + tabela + ((where != null && where.length() > 0) ?
+										 " WHERE ( " + where + " );" : ";") , null);
+
+			if((cursor != null) && (cursor.getCount() > 0)){
+				cursor.moveToFirst();
+				qtdRows = cursor.getInt(cursor.getColumnIndex("QTDROWS"));
+			}
+
+		} catch (SQLException e) {
+
+			this.funcoes = new FuncoesPersonalizadas(context);
+
+			// Armazena as informacoes para para serem exibidas e enviadas
+			ContentValues contentValues = new ContentValues();
+			contentValues.put("comando", 0);
+			contentValues.put("tela", tabela + " - FuncoesSql");
+			contentValues.put("mensagem", funcoes.tratamentoErroBancoDados(e.getMessage()));
+			contentValues.put("dados", e.toString());
+			// Pega os dados do usuario
+			contentValues.put("usuario", funcoes.getValorXml("Usuario"));
+			contentValues.put("empresa", funcoes.getValorXml("ChaveEmpresa"));
+			contentValues.put("email", funcoes.getValorXml("Email"));
+
+			this.funcoes.menssagem(contentValues);
+
+		} catch (Exception e) {
+			// Armazena as informacoes para para serem exibidas e enviadas
+			ContentValues contentValues = new ContentValues();
+			contentValues.put("comando", 0);
+			contentValues.put("tela", tabela + " - FuncoesSql");
+			contentValues.put("mensagem", funcoes.tratamentoErroBancoDados(e.getMessage()));
+			contentValues.put("dados", e.toString());
+			// Pega os dados do usuario
+			this.funcoes = new FuncoesPersonalizadas(context);
+			contentValues.put("usuario", funcoes.getValorXml("Usuario"));
+			contentValues.put("empresa", funcoes.getValorXml("ChaveEmpresa"));
+			contentValues.put("email", funcoes.getValorXml("Email"));
+
+			this.funcoes.menssagem(contentValues);
+
+		} finally {
+			bancoDados.close();
+			conexaoBanco.fechar();
+		}
+		return qtdRows;
+	}
 	
 	/**
 	 * Metodo especificao para busca usuarios.

@@ -91,11 +91,12 @@ public class ClienteCadastroFragment extends FragmentActivity {
 		switch (item.getItemId()) {
 			// Respond to the action bar's Up/Home button
 			case android.R.id.home:
-				// Abre a tela inicial do sistema
+				/*// Abre a tela inicial do sistema
 				Intent intentInicio = new Intent(ClienteCadastroFragment.this, InicioActivity.class);
 				// Tira a acitivity da pilha e inicia uma nova
 				intentInicio.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-				startActivity(intentInicio);
+				startActivity(intentInicio);*/
+				finish();
 				break;
 		}
 		return super.onOptionsItemSelected(item);

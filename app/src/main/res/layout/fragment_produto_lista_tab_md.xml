@@ -24,7 +24,8 @@
                 android:background="?attr/colorPrimary"
                 android:elevation="4dp"
                 android:minHeight="?attr/actionBarSize"
-                app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
+                app:popupTheme="@style/MaterialDrawerTheme.Light.DarkToolbar"
+                android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
 
                 </android.support.v7.widget.Toolbar>
 
@@ -73,14 +74,14 @@
 
     </LinearLayout>
 
-    <LinearLayout
+    <!--<LinearLayout
         android:id="@+id/fragment_produto_lista_tab_md_linearlayout_rodape"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="0"
         android:background="@color/colorPrimary"
         android:foregroundGravity="center_vertical|center_horizontal"
-        android:gravity="center_vertical|center|center_horizontal">
+        android:gravity="center_vertical|center|center_horizontal" >
 
         <TextView
             android:id="@+id/fragment_produto_lista_tab_md_text_codigo_orcamento"
@@ -119,8 +120,9 @@
             android:maxLines="1"
             android:gravity="right"
             android:textColor="@color/branco"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:visibility="invisible"/>
 
-    </LinearLayout>
+    </LinearLayout>-->
 
 </LinearLayout>

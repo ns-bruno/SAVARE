@@ -23,6 +23,8 @@ public class ProdutoBeans implements Parcelable {
 	private double pesoBruto,
 				   pesoLiquido;
 	private char tipoProduto;
+
+	private FotosBeans imagemProduto;
 	
 	public ProdutoBeans(Parcel dados) {
 		this.idProduto = dados.readInt();
@@ -188,6 +190,14 @@ public class ProdutoBeans implements Parcelable {
 	 */
 	public void setCodigoBarras(String codigoBarras) {
 		this.codigoBarras = codigoBarras;
+	}
+
+	public FotosBeans getImagemProduto() {
+		return imagemProduto;
+	}
+
+	public void setImagemProduto(FotosBeans imagemProduto) {
+		this.imagemProduto = imagemProduto;
 	}
 
 	/**

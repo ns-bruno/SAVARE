@@ -15,12 +15,15 @@ import android.widget.TextView;
 
 import com.savare.R;
 import com.savare.activity.material.designer.fragment.ProdutoListaMDFragment;
+import com.savare.banco.funcoesSql.AreasSql;
 import com.savare.banco.funcoesSql.ClasseSql;
 import com.savare.banco.funcoesSql.EmbalagemSql;
 import com.savare.banco.funcoesSql.EmpresaSql;
+import com.savare.banco.funcoesSql.FotosSql;
 import com.savare.banco.funcoesSql.ProdutoRecomendadoSql;
 import com.savare.banco.funcoesSql.ProdutoSql;
 import com.savare.banco.funcoesSql.UnidadeVendaSql;
+import com.savare.beans.AreaBeans;
 import com.savare.beans.CidadeBeans;
 import com.savare.beans.ClasseBeans;
 import com.savare.beans.DescricaoDublaBeans;
@@ -127,6 +130,54 @@ public class ProdutoRotinas extends Rotinas {
 		return listaCidade;
 	} // Fim listaClasse
 
+	public List<AreaBeans> listaAreaMaisVendidos(){
+		// Cria uma lista para retornar as cidades
+		List<AreaBeans> listaArea = new ArrayList<AreaBeans>();
+
+		String sql = "SELECT CFAAREAS.ID_CFAAREAS, CFAAREAS.CODIGO, CFAAREAS.DESCRICAO AS DESCRICAO_AREA, CFAAREAS.DESC_PROMOCAO FROM AEAPRREC \n" +
+					 "LEFT OUTER JOIN CFAAREAS CFAAREAS \n" +
+					 "ON(AEAPRREC.ID_CFAAREAS = CFAAREAS.ID_CFAAREAS) " +
+					 "WHERE (AEAPRREC.ID_CFAAREAS IS NOT NULL) ";
+
+		// Instancia a classe para manipular o banco de dados
+		AreasSql areasSql = new AreasSql(context);
+		// Executa a funcao para retornar os registro do banco de dados
+		Cursor cursor = areasSql.sqlSelect(sql);
+
+		if((cursor != null) && (cursor.getCount() > 0)){
+
+			AreaBeans area = new AreaBeans();
+			area.setDescricaoArea(context.getResources().getString(R.string.selecione_uma_opcao));
+			area.setIdArea(0);
+
+			listaArea.add(area);
+
+			while (cursor.moveToNext()) {
+				// Instancia a classe para salvar o nome da cidade
+				area = new AreaBeans();
+				// Seta o texto principal com o nome da cidade
+				area.setIdArea(cursor.getInt(cursor.getColumnIndex("ID_CFAAREAS")));
+				area.setDescricaoArea(cursor.getString(cursor.getColumnIndex("DESCRICAO_AREA")));
+				area.setPromocao(cursor.getString(cursor.getColumnIndex("DESC_PROMOCAO")).charAt(0));
+				// Adiciona a cidade em uma lista
+				listaArea.add(area);
+			}
+			// Adiciona um valor padrao para selecionar todas as cidades
+			area = new AreaBeans();
+			area.setDescricaoArea(context.getResources().getString(R.string.todos));
+			area.setIdArea(0);
+
+		} else {
+			AreaBeans area = new AreaBeans();
+			area.setDescricaoArea(context.getResources().getString(R.string.nenhuma_opcao_encontrada));
+			area.setIdArea(0);
+
+			listaArea.add(area);
+		}
+
+		return listaArea;
+	} // Fim listaClasse
+
 	/**
 	 * Lista os produtos mais vendidos. Existe algumas classificacoes de produtos mais vendidos,
 	 * as classificao pode ser por:
@@ -144,7 +195,7 @@ public class ProdutoRotinas extends Rotinas {
 	 * @param idOrcamento
 	 * @return
 	 */
-	public List<ProdutoListaBeans> listaProdutoMaisVendido(int tipoTela, ContentValues filtro, String where, String group, String idOrcamento, ProgressBar progresso, TextView textProgresso){
+	public List<ProdutoListaBeans> listaProdutoMaisVendido(int tipoTela, ContentValues filtro, String where, String group, String idOrcamento, final ProgressBar progresso, TextView textProgresso){
 		FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
 
 		String idEmpresa = funcoes.getValorXml("CodigoEmpresa");
@@ -186,7 +237,7 @@ public class ProdutoRotinas extends Rotinas {
 
 		if (tipoTela == ProdutoListaMDFragment.TELA_MAIS_VENDIDOS_CIDADE){
 
-			if ((filtro.getAsString(String.valueOf(ProdutoListaMDFragment.TELA_MAIS_VENDIDOS_CIDADE)) != null) &&
+			if ((filtro != null) && (filtro.getAsString(String.valueOf(ProdutoListaMDFragment.TELA_MAIS_VENDIDOS_CIDADE)) != null) &&
 					(filtro.getAsString(String.valueOf(ProdutoListaMDFragment.TELA_MAIS_VENDIDOS_CIDADE)).length() > 0)) {
 
 				sql += " AND ( AEAPRREC.ID_CFACIDAD = " + filtro.getAsString(String.valueOf(ProdutoListaMDFragment.TELA_MAIS_VENDIDOS_CIDADE)) + " ) ";
@@ -196,7 +247,7 @@ public class ProdutoRotinas extends Rotinas {
 
 		} else if (tipoTela == ProdutoListaMDFragment.TELA_MAIS_VENDIDOS_AREA){
 			// Checa se foi enviado algum parametro
-			if ((filtro.getAsString(String.valueOf(ProdutoListaMDFragment.TELA_MAIS_VENDIDOS_AREA)) != null) &&
+			if ((filtro != null) && (filtro.getAsString(String.valueOf(ProdutoListaMDFragment.TELA_MAIS_VENDIDOS_AREA)) != null) &&
 					(filtro.getAsString(String.valueOf(ProdutoListaMDFragment.TELA_MAIS_VENDIDOS_AREA)).length() > 0)) {
 
 				sql += " AND ( AEAPRREC.ID_CFAAREAS = " + filtro.getAsString(String.valueOf(ProdutoListaMDFragment.TELA_MAIS_VENDIDOS_AREA)) + " ) ";
@@ -205,19 +256,34 @@ public class ProdutoRotinas extends Rotinas {
 			}
 
 		} else if (tipoTela == ProdutoListaMDFragment.TELA_MAIS_VENDIDOS_VENDEDOR){
-			sql += " AND ( AEAPRREC.ID_CFACLIFO_VENDEDOR = " + filtro.getAsString(String.valueOf(ProdutoListaMDFragment.TELA_MAIS_VENDIDOS_VENDEDOR)) + " ) ";
+			/*if ((filtro != null) && (filtro.getAsString(String.valueOf(ProdutoListaMDFragment.TELA_MAIS_VENDIDOS_VENDEDOR)) != null) &&
+					(filtro.getAsString(String.valueOf(ProdutoListaMDFragment.TELA_MAIS_VENDIDOS_VENDEDOR)).length() > 0)) {*/
+			if ((codigoVendedor != null) && (codigoVendedor.length() > 0)){
+
+				sql += " AND ( AEAPRREC.ID_CFACLIFO_VENDEDOR = " + codigoVendedor + " ) ";
+			} else {
+				sql += " AND ( AEAPRREC.ID_CFACLIFO_VENDEDOR IS NOT NULL ) ";
+			}
 
 		} else if (tipoTela == ProdutoListaMDFragment.TELA_MAIS_VENDIDOS_EMPRESA){
-			sql += " AND ( AEAPRREC.ID_SMAEMPRE = " + idEmpresa + " ) ";
+			/*if ((filtro != null) && (filtro.getAsString(String.valueOf(ProdutoListaMDFragment.TELA_MAIS_VENDIDOS_EMPRESA)) != null) &&
+					(filtro.getAsString(String.valueOf(ProdutoListaMDFragment.TELA_MAIS_VENDIDOS_EMPRESA)).length() > 0)) {*/
+			if ((idEmpresa != null) && (idEmpresa.length() > 0)){
+
+				sql += " AND ( AEAPRREC.ID_SMAEMPRE = " + idEmpresa + " ) ";
+			} else {
+				sql += " AND ( AEAPRREC.ID_SMAEMPRE IS NOT NULL ) ";
+			}
 
 		} else if (tipoTela == ProdutoListaMDFragment.TELA_MAIS_VENDIDOS_CORTES_CHEGARAM){
-			// Checa se foi passado por paramentro algum orcamento
-			if ((idOrcamento != null) && (idOrcamento.length() > 0)) {
+			// Checa se foi passado por paramentro
+			if ((filtro != null) && (filtro.getAsString(String.valueOf(ProdutoListaMDFragment.TELA_MAIS_VENDIDOS_CORTES_CHEGARAM)) != null) &&
+					(filtro.getAsString(String.valueOf(ProdutoListaMDFragment.TELA_MAIS_VENDIDOS_CORTES_CHEGARAM)).length() > 0)) {
 
 				sql += " AND ( AEAPRREC.ID_CFACLIFO = " + filtro.getAsString(String.valueOf(ProdutoListaMDFragment.TELA_MAIS_VENDIDOS_CORTES_CHEGARAM)) + " ) ";
+
 			} else {
-				sql += " AND ( AEAPRREC.ID_CFAAREAS IS NULL ) AND ( AEAPRREC.ID_CFACIDAD IS NULL ) AND ( AEAPRREC.ID_CFACLIFO_VENDEDOR IS NULL ) " +
-					   " AND ( AEAPRREC.ID_SMAEMPRE IS NULL ) (AEAPRREC.ID_CFACLIFO IS NOT NULL) ";
+				sql += " AND (AEAPRREC.ID_CFACLIFO IS NOT NULL) ";
 			}
 		}
 		if (group != null){
@@ -232,13 +298,34 @@ public class ProdutoRotinas extends Rotinas {
 		// Instancia a classe para manipular o banco de dados
 		ProdutoSql produtoSql = new ProdutoSql(context);
 
-		Cursor cursor = produtoSql.sqlSelect(sql);
+		final Cursor cursor = produtoSql.sqlSelect(sql);
 
 		// Se o cursor tiver algum valor entra no laco
 		if(cursor.getCount() > 0){
+			// Checa se tem alguma barra de progresso
+			if (progresso != null){
+				((Activity) context).runOnUiThread(new Runnable() {
+					public void run() {
+						progresso.setIndeterminate(false);
+						progresso.setProgress(0);
+						progresso.setMax(cursor.getCount());
+					}
+				});
+			}
 			try{
+				int incremento = 0;
 				while(cursor.moveToNext()){
+					// Checa se tem alguma barra de progresso
+					if (progresso != null) {
 
+						incremento++;
+						final int finalIncremento = incremento;
+						((Activity) context).runOnUiThread(new Runnable() {
+							public void run() {
+								progresso.setProgress(finalIncremento);
+							}
+						});
+					}
 					// Preenche os dados do produto
 					ProdutoListaBeans produtoLista = new ProdutoListaBeans();
 					ProdutoBeans produto = new ProdutoBeans();

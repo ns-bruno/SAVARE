@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -8,34 +7,8 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical" >
-
-        <!--<LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-                <android.support.v7.widget.Toolbar
-                android:id="@+id/fragment_produto_lista_universal_md_toolbar_cabecalho"
-                android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                android:layout_alignParentLeft="true"
-                android:background="?attr/colorPrimary"
-                android:elevation="4dp"
-                android:minHeight="?attr/actionBarSize"
-                app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
-
-                <Spinner
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/fragment_produto_lista_universal_md_spinner_filtro_toolbar"
-                    style="@style/MaterialBaseTheme.Light"
-                    android:visibility="gone" />
-
-                </android.support.v7.widget.Toolbar>
-
-        </LinearLayout>-->
-
+        android:orientation="vertical"
+        android:layout_weight="1">
 
         <ProgressBar
             style="?android:attr/progressBarStyleHorizontal"
@@ -67,6 +40,57 @@
             android:gravity="center"
             android:visibility="gone"/>
 
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/fragment_produto_lista_universal_md_linearlayout_rodape"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="0"
+        android:background="@color/colorPrimary"
+        android:foregroundGravity="center_vertical|center_horizontal"
+        android:gravity="center_vertical|center|center_horizontal" >
+
+        <TextView
+            android:id="@+id/fragment_produto_lista_universal_md_text_codigo_orcamento"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:maxLines="1"
+            android:text="@string/codigo"
+            android:textColor="@color/branco"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/fragment_produto_lista_universal_md_text_nome_razao"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:maxLines="1"
+            android:text="@string/razao_social"
+            android:textColor="@color/branco"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/fragment_produto_lista_universal_md_text_codigo_pessoa"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:maxLines="1"
+            android:layout_weight="1"
+            android:gravity="right"
+            android:text="@string/codigo"
+            android:textColor="@color/branco"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/fragment_produto_lista_universal_md_text_atacado_varejo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:maxLines="1"
+            android:gravity="right"
+            android:textColor="@color/branco"
+            android:textStyle="bold"
+            android:visibility="invisible"/>
 
     </LinearLayout>
 

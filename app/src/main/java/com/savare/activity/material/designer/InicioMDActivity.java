@@ -1,6 +1,7 @@
 package com.savare.activity.material.designer;
 
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ContentValues;
 import android.content.DialogInterface;
@@ -8,6 +9,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -96,6 +98,7 @@ public class InicioMDActivity extends AppCompatActivity {
         String nomeCompletoUsua = funcoes.getValorXml("Usuario");
         boolean enviaAutomatico = false;
         boolean recebeAutomatico = false;
+        boolean imagemProduto = false;
 
         if (funcoes.getValorXml("EnviarAutomatico").equalsIgnoreCase("S")){
             enviaAutomatico = true;
@@ -103,6 +106,10 @@ public class InicioMDActivity extends AppCompatActivity {
 
         if (funcoes.getValorXml("ReceberAutomatico").equalsIgnoreCase("S")){
             recebeAutomatico = true;
+        }
+
+        if (funcoes.getValorXml("ImagemProduto").equalsIgnoreCase("S")){
+            imagemProduto = true;
         }
 
         // Checa se retornou algum dados do usuario
@@ -144,7 +151,8 @@ public class InicioMDActivity extends AppCompatActivity {
                         new SectionDrawerItem().withName(R.string.monitoramento),
                         new PrimaryDrawerItem().withName(R.string.logs).withIcon(R.drawable.ic_sim_alert),
                         new SwitchDrawerItem().withName(R.string.enviar_automatico).withIcon(R.mipmap.ic_upload).withChecked(enviaAutomatico).withOnCheckedChangeListener(mOnCheckedChangeListener).withTag("enviar"),
-                        new SwitchDrawerItem().withName(R.string.receber_automatico).withIcon(R.mipmap.ic_download).withChecked(recebeAutomatico).withOnCheckedChangeListener(mOnCheckedChangeListener).withTag("receber")
+                        new SwitchDrawerItem().withName(R.string.receber_automatico).withIcon(R.mipmap.ic_download).withChecked(recebeAutomatico).withOnCheckedChangeListener(mOnCheckedChangeListener).withTag("receber"),
+                        new SwitchDrawerItem().withName(R.string.imagem_produto).withIcon(R.mipmap.ic_image).withChecked(imagemProduto).withOnCheckedChangeListener(mOnCheckedChangeListener).withTag("imagem_produto")
 
                 )
             .withDisplayBelowStatusBar(true)
@@ -541,6 +549,14 @@ public class InicioMDActivity extends AppCompatActivity {
                 // Mostra uma mensagem para clicar novamente em voltar
                 Toast.makeText(InicioMDActivity.this, getResources().getString(R.string.clique_sair_novamente_para_sair), Toast.LENGTH_LONG).show();
                 cliqueVoltar ++;
+                // Cria um temporizador para voltar a zero o clique depois que fechar a menssagem
+                Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        cliqueVoltar = 0;
+                    }
+                }, 3700);
 
             } else if (cliqueVoltar >= 1){
                 // Executa o comando sair
@@ -578,6 +594,15 @@ public class InicioMDActivity extends AppCompatActivity {
                     funcoesP.setValorXml("ReceberAutomatico", "S");
                 } else {
                     funcoesP.setValorXml("ReceberAutomatico", "N");
+                }
+            }
+            // Checa se a opcao seleciona eh para mostrar imagem de produto
+            if (iDrawerItem.getTag().toString().contains("imagem_produto")){
+                // Checa se foi escolhido verdadeiro ou false
+                if (b){
+                    funcoesP.setValorXml("ImagemProduto", "S");
+                } else {
+                    funcoesP.setValorXml("ImagemProduto", "N");
                 }
             }
             // Executa a funcao para criar os alarmes em background

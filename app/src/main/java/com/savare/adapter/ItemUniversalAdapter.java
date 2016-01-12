@@ -27,6 +27,7 @@ import android.widget.TextView;
 import com.savare.R;
 import com.savare.activity.ListaOrcamentoPedidoActivity;
 import com.savare.activity.ProdutoDetalhesActivity;
+import com.savare.beans.AreaBeans;
 import com.savare.beans.CidadeBeans;
 import com.savare.beans.DescricaoDublaBeans;
 import com.savare.beans.EmbalagemBeans;
@@ -46,6 +47,8 @@ import com.savare.beans.TipoDocumentoBeans;
 import com.savare.funcoes.FuncoesPersonalizadas;
 import com.savare.funcoes.rotinas.OrcamentoRotinas;
 import com.savare.funcoes.rotinas.ProdutoRotinas;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 
 public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnItemClickListener {
 
@@ -68,7 +71,8 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 							ESTADO = 16,
 							CIDADE = 17,
 							TELEFONE = 18,
-							STATUS = 19;
+							STATUS = 19,
+							AREA = 20;
 	private Context context;
 	private int tipoItem, diasProdutoNovo;
 	private int campoAtualProduto = -1;
@@ -90,6 +94,7 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 	private List<CidadeBeans> listaCidade;
 	private List<TelefoneBeans> listaTelefone;
 	private List<StatusBeans> listaStatus;
+	private List<AreaBeans> listaArea;
 	private FuncoesPersonalizadas funcoes;
 	
 	/**
@@ -406,6 +411,14 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 		this.listaStatus = listaStatus;
 	}
 
+	public List<AreaBeans> getListaArea() {
+		return listaArea;
+	}
+
+	public void setListaArea(List<AreaBeans> listaArea) {
+		this.listaArea = listaArea;
+	}
+
 	@Override
 	public int getCount() {
 		// Verifica o tipo de item
@@ -476,7 +489,10 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 
 			return  this.listaStatus.size();
 
-		}else{
+		} else if (this.tipoItem == AREA){
+
+			return this.listaArea.size();
+		} else{
 			return 0;
 		}
 	}
@@ -552,6 +568,10 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 
 			return this.listaStatus.get(position);
 
+		} else if(this.tipoItem == AREA){
+
+			return this.listaArea.get(position);
+
 		} else {
 			return null;
 		}
@@ -620,6 +640,9 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 
 			return this.listaStatus.get(position).getIdStatus();
 
+		} else if (this.tipoItem == AREA){
+
+			return this.listaArea.get(position).getIdArea();
 		} else {
 			return position;
 		}
@@ -656,6 +679,7 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 		View viewTopo = (View) view.findViewById(R.id.layout_item_universal_view_topo);
 		View viewRodape = (View) view.findViewById(R.id.layout_item_universal_view_rodape);
 		ImageView imageOpcao = (ImageView) view.findViewById(R.id.layout_item_universal_imageView_opcao);
+		CircleImageView imageCirclePrincipal = (CircleImageView) view.findViewById(R.id.layout_item_universal_profile_image);
 		
 		funcoes = new FuncoesPersonalizadas(context);
 		
@@ -733,7 +757,12 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 			textAbaixoDescricaoDireita.setText("Ref. " + produto.getProduto().getReferencia());
 			textBottonEsquerdoDois.setText(produto.getProduto().getUnidadeVendaProduto().getSiglaUnidadeVenda());
 			textBottonDireito.setText("Est.: " + this.funcoes.arredondarValor(produto.getEstoqueFisico()));
-			
+			// Checa se tem alguma imagem salva no produto
+			if ( (funcoes.getValorXml("ImagemProduto").equalsIgnoreCase("S")) && (produto.getProduto().getImagemProduto() != null) && (produto.getProduto().getImagemProduto().getFotos() != null)){
+				// Torna o campo da imagem do produto visivel
+				imageCirclePrincipal.setVisibility(View.VISIBLE);
+				imageCirclePrincipal.setImageBitmap(produto.getProduto().getImagemProduto().getImagem());
+			}
 			// Verifica se o estoque eh menor que zero
 			if(produto.getEstoqueFisico() < 1){
 				textBottonDireito.setTextColor(context.getResources().getColor(R.color.vermelho));
@@ -1346,6 +1375,19 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 			textBottonDireito.setVisibility(View.INVISIBLE);
 			viewRodape.setVisibility(View.INVISIBLE);
 			viewTopo.setVisibility(View.INVISIBLE);
+
+		} else if (this.tipoItem == AREA) {
+			AreaBeans area = listaArea.get(position);
+
+			textDescricao.setText(area.getDescricaoArea());
+			textAbaixoDescricaoEsqueda.setText("Código: "+area.getCodigo());
+
+			textAbaixoDescricaoDireita.setVisibility(View.GONE);
+			textBottonEsquerdo.setVisibility(View.GONE);
+			textBottonEsquerdoDois.setVisibility(View.GONE);
+			textBottonDireito.setVisibility(View.GONE);
+			viewRodape.setVisibility(View.GONE);
+			viewTopo.setVisibility(View.GONE);
 		}
 		// Pega a posicao atual
 		final int posicao = position;
