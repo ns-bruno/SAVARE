@@ -49,7 +49,11 @@ public class ProdutoDetalhesMDFragment extends Fragment {
             idFoto = ((parametro.getString(KEY_ID_CFAFOTO) != null) && (parametro.getString(KEY_ID_CFAFOTO).length() > 0)) ? parametro.getString(KEY_ID_CFAFOTO) : null;
         }
 
-        if (idFoto != null){
+        FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(getContext());
+
+        // Checa se foi passado algum id por parametro e se esta configurado para visualizar as imagens dos produtos
+        if ((idFoto != null) && (funcoes.getValorXml("ImagemProduto").equalsIgnoreCase("S"))){
+
             // Inscancia a classe de rotinas das fotos/imagens
             FotoRotinas fotoRotinas = new FotoRotinas(getContext());
             // Pega a imagem especificada
@@ -67,7 +71,7 @@ public class ProdutoDetalhesMDFragment extends Fragment {
                     imageProduto.setImageBitmap(imagem);
 
                 } catch (Exception e){
-                    FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(getContext());
+                    funcoes = new FuncoesPersonalizadas(getContext());
 
                     // Armazena as informacoes para para serem exibidas e enviadas
                     ContentValues contentValues = new ContentValues();
