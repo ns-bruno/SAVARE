@@ -14,6 +14,7 @@ import com.savare.activity.OrcamentoActivity;
 import com.savare.activity.OrcamentoPlanoPagamentoActivity;
 import com.savare.activity.OrcamentoProdutoDetalhesActivity;
 import com.savare.activity.ProdutoListaActivity;
+import com.savare.activity.material.designer.fragment.ProdutoListaTabMD;
 import com.savare.adapter.ItemUniversalAdapter;
 import com.savare.banco.funcoesSql.ItemOrcamentoSql;
 import com.savare.banco.funcoesSql.OrcamentoSql;
@@ -446,13 +447,20 @@ public class OrcamentoFragment extends Fragment {
 			// Checa se eh um orcamento
 			if (this.tipoOrcamentoPedido.equals("O")){
 				// Abre a tela inicial do sistema
-				Intent intent = new Intent(getActivity(), ProdutoListaActivity.class);
+				/*Intent intent = new Intent(getActivity(), ProdutoListaActivity.class);
 				intent.putExtra("ID_AEAORCAM", textCodigoOrcamento.getText().toString());
 				intent.putExtra("ID_CFACLIFO", idPessoa);
 				intent.putExtra("NOME_RAZAO", razaoSocial.replaceFirst("- ", ""));
 				intent.putExtra("ATAC_VAREJO", textAtacadoVarejo.getText().toString());
-				startActivity(intent);
-			
+				startActivity(intent);*/
+
+				Intent intentOrcamento = new Intent(getContext(), ProdutoListaTabMD.class);
+				intentOrcamento.putExtra(ProdutoListaTabMD.KEY_ID_ORCAMENTO, textCodigoOrcamento.getText().toString());
+				intentOrcamento.putExtra(ProdutoListaTabMD.KEY_ID_CLIENTE, idPessoa);
+				intentOrcamento.putExtra(ProdutoListaTabMD.KEY_ATACADO_VAREJO, textAtacadoVarejo.getText().toString());
+				intentOrcamento.putExtra(ProdutoListaTabMD.KEY_NOME_RAZAO, razaoSocial.replaceFirst("- ", ""));
+				startActivity(intentOrcamento);
+
 			} else {
 				FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(getActivity());
 				// Cria uma variavem para inserir as propriedades da mensagem

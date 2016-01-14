@@ -61,6 +61,7 @@ public class ProdutoListaTabMD extends AppCompatActivity {
             dadosParametros.put(KEY_ID_ORCAMENTO, intentParametro.getString(KEY_ID_ORCAMENTO));
             dadosParametros.put(KEY_ID_CLIENTE, intentParametro.getString(KEY_ID_CLIENTE));
             dadosParametros.put(KEY_ATACADO_VAREJO, intentParametro.getString(KEY_ATACADO_VAREJO));
+            dadosParametros.put(KEY_NOME_RAZAO, intentParametro.getString(KEY_NOME_RAZAO));
 
         } else {
             // Dados da mensagem

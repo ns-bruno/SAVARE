@@ -85,6 +85,8 @@
         <activity android:name=".activity.fragment.ClienteCadastroFragment" />
         <activity android:name=".activity.material.designer.InicioMDActivity"
                   android:theme="@style/AppBaseTheme"/>
+        <activity android:name=".activity.material.designer.ProdutoDetalhesMDActivity"
+            android:theme="@style/AppBaseTheme"/>
         <activity android:name=".activity.LoginActivity" />
 
         <activity

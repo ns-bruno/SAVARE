@@ -15,6 +15,7 @@ import android.os.Bundle;
 import android.view.MenuItem;
 import android.widget.ListView;
 
+@Deprecated
 public class ProdutoDetalhesActivity extends Activity {
 	
 	private ListView listViewDetalhesProduto;

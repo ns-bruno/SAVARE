@@ -27,6 +27,7 @@ import android.widget.TextView;
 import com.savare.R;
 import com.savare.activity.ListaOrcamentoPedidoActivity;
 import com.savare.activity.ProdutoDetalhesActivity;
+import com.savare.activity.material.designer.ProdutoDetalhesMDActivity;
 import com.savare.beans.AreaBeans;
 import com.savare.beans.CidadeBeans;
 import com.savare.beans.DescricaoDublaBeans;
@@ -1429,9 +1430,10 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 					
 					long idProduto = getItemId(posicao);
 					
-					Intent intent = new Intent(context, ProdutoDetalhesActivity.class);
-					intent.putExtra(ProdutoDetalhesActivity.KEY_ID_PRODUTO, String.valueOf(idProduto));
-					
+					Intent intent = new Intent(context, ProdutoDetalhesMDActivity.class);
+					//intent.putExtra(ProdutoDetalhesActivity.KEY_ID_PRODUTO, String.valueOf(idProduto));
+					intent.putExtra(ProdutoDetalhesMDActivity.KEY_ID_PRODUTO, String.valueOf(idProduto));
+
 					context.startActivity(intent);
 					break;
 

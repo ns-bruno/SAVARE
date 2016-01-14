@@ -24,4 +24,11 @@
     <style name="textoMendio" parent="android:Theme.Light">
         <item name="android:textSize">16dp</item>
     </style>
+
+    <style name="ExpandedAppBar" parent="@android:style/TextAppearance.Medium">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">@color/branco</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
 </resources>

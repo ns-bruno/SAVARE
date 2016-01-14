@@ -1,7 +1,6 @@
 package com.savare.activity.material.designer.fragment;
 
 import android.app.Activity;
-import android.app.Dialog;
 import android.app.SearchManager;
 import android.content.ContentValues;
 import android.content.Context;
@@ -13,13 +12,13 @@ import android.provider.SearchRecentSuggestions;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.SearchView;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.EditText;
@@ -38,14 +37,15 @@ import com.savare.adapter.ItemUniversalAdapter;
 import com.savare.banco.funcoesSql.ProdutoRecomendadoSql;
 import com.savare.beans.AreaBeans;
 import com.savare.beans.CidadeBeans;
+import com.savare.beans.FotosBeans;
 import com.savare.beans.OrcamentoBeans;
 import com.savare.beans.ProdutoListaBeans;
 import com.savare.funcoes.FuncoesPersonalizadas;
+import com.savare.funcoes.rotinas.FotoRotinas;
 import com.savare.funcoes.rotinas.OrcamentoRotinas;
 import com.savare.funcoes.rotinas.ProdutoRotinas;
 import com.savare.provider.SearchableProvider;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -257,6 +257,12 @@ public class ProdutoListaMDFragment extends Fragment {
                         }
                         // Tira o foco da searchView e fecha o teclado virtual
                         searchView.clearFocus();
+
+                        // Forca o fechamento do teclado virtual
+                        if (viewOrcamento != null) {
+                            InputMethodManager imm = (InputMethodManager) viewOrcamento.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+                            imm.hideSoftInputFromWindow(viewOrcamento.getWindowToken(), 0);
+                        }
                     }
                 }
                 return false;
@@ -599,9 +605,13 @@ public class ProdutoListaMDFragment extends Fragment {
 
         @Override
         protected void onPostExecute(Void result) {
+
             if ((listaProdutos != null) && (listaProdutos.size() > 0)) {
                 // Preenche a listView com os produtos buscados
                 listViewProdutos.setAdapter(adapterListaProdutos);
+
+                LoaderImagemProdutos carregarImagemProduto = new LoaderImagemProdutos(getContext());
+                carregarImagemProduto.execute();
             }
             //tirando o ProgressBar da nossa tela
             progressBarListaProdutos.setVisibility(View.GONE);
@@ -609,5 +619,61 @@ public class ProdutoListaMDFragment extends Fragment {
             pesquisando = false;
         }
 
+    }
+
+    public class LoaderImagemProdutos extends AsyncTask<Void, Void, Void> {
+
+        private Context context;
+
+        public LoaderImagemProdutos(Context context) {
+            this.context = context;
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            try {
+                FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(this.context);
+
+                // Checa se pode mostrar a imagem do produto
+                if (funcoes.getValorXml("ImagemProduto").equalsIgnoreCase("S")){
+                    // Checa se tem alguma lista de produtos preenchida
+                    if (adapterListaProdutos.getListaProduto().size() > 0){
+
+                        for (int i = 0; i < adapterListaProdutos.getListaProduto().size(); i++){
+                            FotoRotinas fotoRotinas = new FotoRotinas(context);
+
+                            FotosBeans fotoProduto = fotoRotinas.fotoIdProtudo("" + adapterListaProdutos.getListaProduto().get(i).getProduto().getIdProduto());
+                            // Checa se tem alguma foto
+                            if ((fotoProduto != null) && (fotoProduto.getFotos().length > 0)){
+                                // Atualiza o adapte com a foto do produto
+                                adapterListaProdutos.getListaProduto().get(i).getProduto().setImagemProduto(fotoProduto);
+
+                            }
+                        }
+                        // Envia um sinal para o adapter atualizar
+                        ((Activity) getContext()).runOnUiThread(new Runnable() {
+                            public void run() {
+                                adapterListaProdutos.notifyDataSetChanged();
+                            }
+                        });
+                    }
+                }
+            } catch (Exception e){
+                // Armazena as informacoes para para serem exibidas e enviadas
+                ContentValues contentValues = new ContentValues();
+                contentValues.put("comando", 0);
+                contentValues.put("tela", "ProdutoListaMDFragment");
+                contentValues.put("mensagem", getResources().getString(R.string.nao_consegimos_carregar_imagem_produtos) + " \n" + e.getMessage());
+                contentValues.put("dados", e.toString());
+                // Pega os dados do usuario
+                FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(getContext());
+                contentValues.put("usuario", funcoes.getValorXml("Usuario"));
+                contentValues.put("empresa", funcoes.getValorXml("ChaveEmpresa"));
+                contentValues.put("email", funcoes.getValorXml("Email"));
+                // Exibe a mensagem
+                funcoes.menssagem(contentValues);
+            }
+            return null;
+        }
     }
 }

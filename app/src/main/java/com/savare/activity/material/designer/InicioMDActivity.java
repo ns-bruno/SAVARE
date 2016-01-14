@@ -278,12 +278,12 @@ public class InicioMDActivity extends AppCompatActivity {
 
             @Override
             public void onItemClick(Card card, int position) {
-                String s = card.toString();
+                //String s = card.toString();
             }
 
             @Override
             public void onItemLongClick(Card card, int position) {
-                String s = card.toString();
+                //String s = card.toString();
             }
         });
 
