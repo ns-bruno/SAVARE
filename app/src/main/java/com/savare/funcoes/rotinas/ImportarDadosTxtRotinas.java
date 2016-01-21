@@ -3,6 +3,7 @@ package com.savare.funcoes.rotinas;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.sql.Blob;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
@@ -29,6 +30,7 @@ import com.savare.banco.funcoesSql.EmpresaSql;
 import com.savare.banco.funcoesSql.EnderecoSql;
 import com.savare.banco.funcoesSql.EstadoSql;
 import com.savare.banco.funcoesSql.EstoqueSql;
+import com.savare.banco.funcoesSql.FotosSql;
 import com.savare.banco.funcoesSql.GradeSql;
 import com.savare.banco.funcoesSql.ItemOrcamentoSql;
 import com.savare.banco.funcoesSql.LocacaoSql;
@@ -41,6 +43,7 @@ import com.savare.banco.funcoesSql.PessoaSql;
 import com.savare.banco.funcoesSql.PlanoPagamentoSql;
 import com.savare.banco.funcoesSql.PortadorBancoSql;
 import com.savare.banco.funcoesSql.ProdutoLojaSql;
+import com.savare.banco.funcoesSql.ProdutoRecomendadoSql;
 import com.savare.banco.funcoesSql.ProdutoSql;
 import com.savare.banco.funcoesSql.ProfissaoSql;
 import com.savare.banco.funcoesSql.RamoAtividadeSql;
@@ -58,6 +61,7 @@ public class ImportarDadosTxtRotinas {
 	private String localDados = "",
 				   mensagem = " ";	
 	private int telaChamou = -1;
+	private String TAG = "SAVARE";
 	public static final String BLOCO_S = "BLOCO_S",
 							   BLOCO_C = "BLOCO_C",
 							   BLOCO_A = "BLOCO_A",
@@ -79,6 +83,7 @@ public class ImportarDadosTxtRotinas {
 							   BLOCO_C211_CFACLIFO = "C211",
 							   BLOCO_C212_CFAENDER = "C212",
 							   BLOCO_C213_CFAPARAM = "C213",
+							   BLOCO_C214_CFAFOTOS = "C214",
 							   BLOCO_A300_AEAPLPGT = "A300",
 							   BLOCO_A301_AEACLASE = "A301",
 							   BLOCO_A302_AEAUNVEN = "A302",
@@ -93,6 +98,7 @@ public class ImportarDadosTxtRotinas {
 							   BLOCO_A311_AEAORCAM = "A311",
 							   BLOCO_A312_AEAITORC = "A312",
 							   BLOCO_A313_AEAPERCE = "A313",
+							   BLOCO_A314_AEAPRREC = "A314",
 							   BLOCO_R400_RPAPARCE = "R400";
 	public static final String LAYOUT = "001";
 	private boolean layoutValido = false;
@@ -128,7 +134,7 @@ public class ImportarDadosTxtRotinas {
 	}
 	
 	public void importarDados(){
-		Log.i("SAVARE", "Executando a rotina importarDados - ImportarDadosTxtRotinas");
+		Log.i(TAG, "Executando a rotina importarDados - ImportarDadosTxtRotinas");
 
 		/*((Activity) context).runOnUiThread(new Runnable() {
 			public void run() {
@@ -187,7 +193,7 @@ public class ImportarDadosTxtRotinas {
 			// Passa por todas as linha do arquivo txt
 			while(scannerDados.hasNextLine()){
 
-				Log.i("SAVARE", "Escaneando as linhas(sccanerDados) - " + incremento + " - ImportarDadosTxtRotinas");
+				Log.i(TAG, "Escaneando as linhas(sccanerDados) - " + incremento + " - ImportarDadosTxtRotinas");
 
 				final int finalIncremento = incremento;
 
@@ -247,7 +253,7 @@ public class ImportarDadosTxtRotinas {
 					// Pega a linha completa
 					final String linha = scannerLinha.nextLine();
 
-					Log.i("SAVARE", linha + " - ImportarDadosTxtRotinas");
+					Log.i(TAG, linha + " - ImportarDadosTxtRotinas");
 					if(telaChamou != TELA_RECEPTOR_ALARME){
 						((Activity) context).runOnUiThread(new Runnable() {
 	  					  public void run() {
@@ -263,7 +269,7 @@ public class ImportarDadosTxtRotinas {
 					// Pega a linha completa
 					final String linha = scannerLinha.nextLine();
 
-					Log.i("SAVARE", linha + " - ImportarDadosTxtRotinas");
+					Log.i(TAG, linha + " - ImportarDadosTxtRotinas");
 					if(telaChamou != TELA_RECEPTOR_ALARME){
 						((Activity) context).runOnUiThread(new Runnable() {
 		  					  public void run() {
@@ -279,7 +285,7 @@ public class ImportarDadosTxtRotinas {
 					// Pega a linha completa
 					final String linha = scannerLinha.nextLine();
 
-					Log.i("SAVARE", linha + " - ImportarDadosTxtRotinas");
+					Log.i(TAG, linha + " - ImportarDadosTxtRotinas");
 					if(telaChamou != TELA_RECEPTOR_ALARME){
 						((Activity) context).runOnUiThread(new Runnable() {
 		  					  public void run() {
@@ -295,7 +301,7 @@ public class ImportarDadosTxtRotinas {
 					// Pega a linha completa
 					final String linha = scannerLinha.nextLine();
 
-					Log.i("SAVARE", linha + " - ImportarDadosTxtRotinas");
+					Log.i(TAG, linha + " - ImportarDadosTxtRotinas");
 					if(telaChamou != TELA_RECEPTOR_ALARME){
 						((Activity) context).runOnUiThread(new Runnable() {
 		  					  public void run() {
@@ -311,7 +317,7 @@ public class ImportarDadosTxtRotinas {
 					// Pega a linha completa
 					final String linha = scannerLinha.nextLine();
 
-					Log.i("SAVARE", linha + " - ImportarDadosTxtRotinas");
+					Log.i(TAG, linha + " - ImportarDadosTxtRotinas");
 					if(telaChamou != TELA_RECEPTOR_ALARME){
 						((Activity) context).runOnUiThread(new Runnable() {
 		  					  public void run() {
@@ -327,7 +333,7 @@ public class ImportarDadosTxtRotinas {
 					// Pega a linha completa
 					final String linha = scannerLinha.nextLine();
 
-					Log.i("SAVARE", linha + " - ImportarDadosTxtRotinas");
+					Log.i(TAG, linha + " - ImportarDadosTxtRotinas");
 					if(telaChamou != TELA_RECEPTOR_ALARME){
 						((Activity) context).runOnUiThread(new Runnable() {
 		  					  public void run() {
@@ -343,7 +349,7 @@ public class ImportarDadosTxtRotinas {
 					// Pega a linha completa
 					final String linha = scannerLinha.nextLine();
 
-					Log.i("SAVARE", linha + " - ImportarDadosTxtRotinas");
+					Log.i(TAG, linha + " - ImportarDadosTxtRotinas");
 					if(telaChamou != TELA_RECEPTOR_ALARME){
 						((Activity) context).runOnUiThread(new Runnable() {
 		  					  public void run() {
@@ -359,7 +365,7 @@ public class ImportarDadosTxtRotinas {
 					// Pega a linha completa
 					final String linha = scannerLinha.nextLine();
 
-					Log.i("SAVARE", linha + " - ImportarDadosTxtRotinas");
+					Log.i(TAG, linha + " - ImportarDadosTxtRotinas");
 					if(telaChamou != TELA_RECEPTOR_ALARME){
 						((Activity) context).runOnUiThread(new Runnable() {
 		  					  public void run() {
@@ -375,7 +381,7 @@ public class ImportarDadosTxtRotinas {
 					// Pega a linha completa
 					final String linha = scannerLinha.nextLine();
 
-					Log.i("SAVARE", linha + " - ImportarDadosTxtRotinas");
+					Log.i(TAG, linha + " - ImportarDadosTxtRotinas");
 					if(telaChamou != TELA_RECEPTOR_ALARME){
 						((Activity) context).runOnUiThread(new Runnable() {
 		  					  public void run() {
@@ -391,7 +397,7 @@ public class ImportarDadosTxtRotinas {
 					// Pega a linha completa
 					final String linha = scannerLinha.nextLine();
 
-					Log.i("SAVARE", linha + " - ImportarDadosTxtRotinas");
+					Log.i(TAG, linha + " - ImportarDadosTxtRotinas");
 					if(telaChamou != TELA_RECEPTOR_ALARME){
 						((Activity) context).runOnUiThread(new Runnable() {
 		  					  public void run() {
@@ -407,7 +413,7 @@ public class ImportarDadosTxtRotinas {
 					// Pega a linha completa
 					final String linha = scannerLinha.nextLine();
 
-					Log.i("SAVARE", linha + " - ImportarDadosTxtRotinas");
+					Log.i(TAG, linha + " - ImportarDadosTxtRotinas");
 					if(telaChamou != TELA_RECEPTOR_ALARME){
 						((Activity) context).runOnUiThread(new Runnable() {
 		  					  public void run() {
@@ -423,7 +429,7 @@ public class ImportarDadosTxtRotinas {
 					// Pega a linha completa
 					final String linha = scannerLinha.nextLine();
 
-					Log.i("SAVARE", linha + " - ImportarDadosTxtRotinas");
+					Log.i(TAG, linha + " - ImportarDadosTxtRotinas");
 					if(telaChamou != TELA_RECEPTOR_ALARME){
 						((Activity) context).runOnUiThread(new Runnable() {
 		  					  public void run() {
@@ -439,7 +445,7 @@ public class ImportarDadosTxtRotinas {
 					// Pega a linha completa
 					final String linha = scannerLinha.nextLine();
 
-					Log.i("SAVARE", linha + " - ImportarDadosTxtRotinas");
+					Log.i(TAG, linha + " - ImportarDadosTxtRotinas");
 					if(telaChamou != TELA_RECEPTOR_ALARME){
 						((Activity) context).runOnUiThread(new Runnable() {
 		  					  public void run() {
@@ -455,7 +461,7 @@ public class ImportarDadosTxtRotinas {
 					// Pega a linha completa
 					final String linha = scannerLinha.nextLine();
 
-					Log.i("SAVARE", linha + " - ImportarDadosTxtRotinas");
+					Log.i(TAG, linha + " - ImportarDadosTxtRotinas");
 					if(telaChamou != TELA_RECEPTOR_ALARME){
 						((Activity) context).runOnUiThread(new Runnable() {
 		  					  public void run() {
@@ -471,7 +477,7 @@ public class ImportarDadosTxtRotinas {
 					// Pega a linha completa
 					final String linha = scannerLinha.nextLine();
 
-					Log.i("SAVARE", linha + " - ImportarDadosTxtRotinas");
+					Log.i(TAG, linha + " - ImportarDadosTxtRotinas");
 					if(telaChamou != TELA_RECEPTOR_ALARME){
 						((Activity) context).runOnUiThread(new Runnable() {
 		  					  public void run() {
@@ -480,14 +486,30 @@ public class ImportarDadosTxtRotinas {
 		  					  }
 						});
 					}
-					
+
 					importarRegistroParametro(linha);
-					
+
+				} else if(registro.equalsIgnoreCase(BLOCO_C214_CFAFOTOS) && layoutValido){
+					// Pega a linha completa
+					final String linha = scannerLinha.nextLine();
+
+					Log.i(TAG, linha + " - ImportarDadosTxtRotinas");
+					if(telaChamou != TELA_RECEPTOR_ALARME){
+						((Activity) context).runOnUiThread(new Runnable() {
+							public void run() {
+								// Atualiza o texto da tela de sincronizacao
+								textMensagemProcesso.setText(posicaoLinhaAtual + " de " + totalLinhaRegistro +" Importando o bloco " + BLOCO_C214_CFAFOTOS + linha);
+							}
+						});
+					}
+
+					importarRegistroFotos(linha);
+
 				} else if(registro.equalsIgnoreCase(BLOCO_A300_AEAPLPGT) && layoutValido){
 					// Pega a linha completa
 					final String linha = scannerLinha.nextLine();
 
-					Log.i("SAVARE", linha + " - ImportarDadosTxtRotinas");
+					Log.i(TAG, linha + " - ImportarDadosTxtRotinas");
 					if(telaChamou != TELA_RECEPTOR_ALARME){
 						((Activity) context).runOnUiThread(new Runnable() {
 		  					  public void run() {
@@ -503,7 +525,7 @@ public class ImportarDadosTxtRotinas {
 					// Pega a linha completa
 					final String linha = scannerLinha.nextLine();
 
-					Log.i("SAVARE", linha + " - ImportarDadosTxtRotinas");
+					Log.i(TAG, linha + " - ImportarDadosTxtRotinas");
 					if(telaChamou != TELA_RECEPTOR_ALARME){
 						((Activity) context).runOnUiThread(new Runnable() {
 		  					  public void run() {
@@ -519,7 +541,7 @@ public class ImportarDadosTxtRotinas {
 					// Pega a linha completa
 					final String linha = scannerLinha.nextLine();
 
-					Log.i("SAVARE", linha + " - ImportarDadosTxtRotinas");
+					Log.i(TAG, linha + " - ImportarDadosTxtRotinas");
 					if(telaChamou != TELA_RECEPTOR_ALARME){
 						((Activity) context).runOnUiThread(new Runnable() {
 		  					  public void run() {
@@ -535,7 +557,7 @@ public class ImportarDadosTxtRotinas {
 					// Pega a linha completa
 					final String linha = scannerLinha.nextLine();
 
-					Log.i("SAVARE", linha + " - ImportarDadosTxtRotinas");
+					Log.i(TAG, linha + " - ImportarDadosTxtRotinas");
 					if(telaChamou != TELA_RECEPTOR_ALARME){
 						((Activity) context).runOnUiThread(new Runnable() {
 		  					  public void run() {
@@ -551,7 +573,7 @@ public class ImportarDadosTxtRotinas {
 					// Pega a linha completa
 					final String linha = scannerLinha.nextLine();
 
-					Log.i("SAVARE", linha + " - ImportarDadosTxtRotinas");
+					Log.i(TAG, linha + " - ImportarDadosTxtRotinas");
 					if(telaChamou != TELA_RECEPTOR_ALARME){
 						((Activity) context).runOnUiThread(new Runnable() {
 		  					  public void run() {
@@ -567,7 +589,7 @@ public class ImportarDadosTxtRotinas {
 					// Pega a linha completa
 					final String linha = scannerLinha.nextLine();
 
-					Log.i("SAVARE", linha + " - ImportarDadosTxtRotinas");
+					Log.i(TAG, linha + " - ImportarDadosTxtRotinas");
 					if(telaChamou != TELA_RECEPTOR_ALARME){
 						((Activity) context).runOnUiThread(new Runnable() {
 		  					  public void run() {
@@ -583,7 +605,7 @@ public class ImportarDadosTxtRotinas {
 					// Pega a linha completa
 					final String linha = scannerLinha.nextLine();
 
-					Log.i("SAVARE", linha + " - ImportarDadosTxtRotinas");
+					Log.i(TAG, linha + " - ImportarDadosTxtRotinas");
 					if(telaChamou != TELA_RECEPTOR_ALARME){
 						((Activity) context).runOnUiThread(new Runnable() {
 		  					  public void run() {
@@ -599,7 +621,7 @@ public class ImportarDadosTxtRotinas {
 					// Pega a linha completa
 					final String linha = scannerLinha.nextLine();
 
-					Log.i("SAVARE", linha + " - ImportarDadosTxtRotinas");
+					Log.i(TAG, linha + " - ImportarDadosTxtRotinas");
 					if(telaChamou != TELA_RECEPTOR_ALARME){
 						((Activity) context).runOnUiThread(new Runnable() {
 		  					  public void run() {
@@ -615,7 +637,7 @@ public class ImportarDadosTxtRotinas {
 					// Pega a linha completa
 					final String linha = scannerLinha.nextLine();
 
-					Log.i("SAVARE", linha + " - ImportarDadosTxtRotinas");
+					Log.i(TAG, linha + " - ImportarDadosTxtRotinas");
 					if(telaChamou != TELA_RECEPTOR_ALARME){
 						((Activity) context).runOnUiThread(new Runnable() {
 		  					  public void run() {
@@ -631,7 +653,7 @@ public class ImportarDadosTxtRotinas {
 					// Pega a linha completa
 					final String linha = scannerLinha.nextLine();
 
-					Log.i("SAVARE", linha + " - ImportarDadosTxtRotinas");
+					Log.i(TAG, linha + " - ImportarDadosTxtRotinas");
 					if(telaChamou != TELA_RECEPTOR_ALARME){
 						((Activity) context).runOnUiThread(new Runnable() {
 		  					  public void run() {
@@ -647,7 +669,7 @@ public class ImportarDadosTxtRotinas {
 					// Pega a linha completa
 					final String linha = scannerLinha.nextLine();
 
-					Log.i("SAVARE", linha + " - ImportarDadosTxtRotinas");
+					Log.i(TAG, linha + " - ImportarDadosTxtRotinas");
 					if(telaChamou != TELA_RECEPTOR_ALARME){
 						((Activity) context).runOnUiThread(new Runnable() {
 		  					  public void run() {
@@ -663,7 +685,7 @@ public class ImportarDadosTxtRotinas {
 					// Pega a linha completa
 					final String linha = scannerLinha.nextLine();
 
-					Log.i("SAVARE", linha + " - ImportarDadosTxtRotinas");
+					Log.i(TAG, linha + " - ImportarDadosTxtRotinas");
 					if(telaChamou != TELA_RECEPTOR_ALARME){
 						((Activity) context).runOnUiThread(new Runnable() {
 		  					  public void run() {
@@ -679,7 +701,7 @@ public class ImportarDadosTxtRotinas {
 					// Pega a linha completa
 					final String linha = scannerLinha.nextLine();
 
-					Log.i("SAVARE", linha + " - ImportarDadosTxtRotinas");
+					Log.i(TAG, linha + " - ImportarDadosTxtRotinas");
 					if(telaChamou != TELA_RECEPTOR_ALARME){
 						((Activity) context).runOnUiThread(new Runnable() {
 							public void run() {
@@ -694,7 +716,7 @@ public class ImportarDadosTxtRotinas {
 					// Pega a linha completa
 					final String linha = scannerLinha.nextLine();
 
-					Log.i("SAVARE", linha + " - ImportarDadosTxtRotinas");
+					Log.i(TAG, linha + " - ImportarDadosTxtRotinas");
 					if(telaChamou != TELA_RECEPTOR_ALARME){
 						((Activity) context).runOnUiThread(new Runnable() {
 							public void run() {
@@ -705,11 +727,26 @@ public class ImportarDadosTxtRotinas {
 					}
 					importarRegistroPercentual(linha);
 
-				}else if(registro.equalsIgnoreCase(BLOCO_R400_RPAPARCE) && layoutValido){
+				}  else if(registro.equalsIgnoreCase(BLOCO_A314_AEAPRREC) && layoutValido){
 					// Pega a linha completa
 					final String linha = scannerLinha.nextLine();
 
-					Log.i("SAVARE", linha + " - ImportarDadosTxtRotinas");
+					Log.i(TAG, linha + " - ImportarDadosTxtRotinas");
+					if(telaChamou != TELA_RECEPTOR_ALARME){
+						((Activity) context).runOnUiThread(new Runnable() {
+							public void run() {
+								// Atualiza o texto da tela de sincronizacao
+								textMensagemProcesso.setText(posicaoLinhaAtual + " de " + totalLinhaRegistro +" Importando o bloco " + BLOCO_A313_AEAPERCE + linha);
+							}
+						});
+					}
+					importarRegistroProdutoRecomendado(linha);
+
+				} else if(registro.equalsIgnoreCase(BLOCO_R400_RPAPARCE) && layoutValido){
+					// Pega a linha completa
+					final String linha = scannerLinha.nextLine();
+
+					Log.i(TAG, linha + " - ImportarDadosTxtRotinas");
 					if(telaChamou != TELA_RECEPTOR_ALARME){
 					((Activity) context).runOnUiThread(new Runnable() {
 	  					  public void run() {
@@ -775,7 +812,7 @@ public class ImportarDadosTxtRotinas {
 			funcoes.setValorXml("RecebendoDados", "N");
 			
 		} catch (final Exception e) {
-			Log.e("SAVARE", "erro, Não foi possível escanear os dados do arquivo. " + e.getMessage() + " - ImportarDadosTxtRotinas");
+			Log.e(TAG, "erro, Não foi possível escanear os dados do arquivo. " + e.getMessage() + " - ImportarDadosTxtRotinas");
 
 			funcoes.setValorXml("RecebendoDados", "N");
 
@@ -836,7 +873,7 @@ public class ImportarDadosTxtRotinas {
 			// Cria a intent com identificacao do alarme
 			Intent intent = new Intent("NOTIFICACAO_SAVARE");
 			intent.putExtra("TICKER", "Importação dos Dados");
-			intent.putExtra("TITULO", "SAVARE");
+			intent.putExtra("TITULO", TAG);
 			intent.putExtra("MENSAGEM", mensagem);
 			
 			context.sendBroadcast(intent);
@@ -2081,6 +2118,72 @@ public class ImportarDadosTxtRotinas {
 		}
 	} // Fim Parametros
 
+
+	private void importarRegistroFotos(String linha){
+
+		Scanner scannerFotos = new Scanner(linha).useDelimiter("\\|");
+
+		String FINALIDADE = scannerFotos.next();
+		final String idFoto = scannerFotos.next();
+		String idClifo = scannerFotos.next();
+		String idProduto = scannerFotos.next();
+		String dtAlt = scannerFotos.next();
+		String foto = scannerFotos.next();
+
+		final ContentValues dadosFoto = new ContentValues();
+		dadosFoto.put("ID_CFAFOTOS", idFoto);
+		dadosFoto.put("ID_CFACLIFO", idClifo);
+		dadosFoto.put("ID_AEAPRODU", idProduto);
+		dadosFoto.put("DT_ALT", dtAlt);
+		dadosFoto.put("FOTO", foto);
+
+		final FotosSql fotosSql = new FotosSql(context);
+
+		// Pega o sql para passar para o statement
+		final String sql = fotosSql.construirSqlStatement(dadosFoto);
+		// Pega o argumento para o statement
+		final String[] argumentoSql = fotosSql.argumentoStatement(dadosFoto);
+
+		// Checa se a finalidade eh inserir
+		if(FINALIDADE.equalsIgnoreCase("I")){
+
+			if (telaChamou != TELA_RECEPTOR_ALARME) {
+				((Activity) context).runOnUiThread(new Runnable() {
+					public void run() {
+						//fotosSql.insertOrReplace(dadosFoto);
+						fotosSql.insertOrReplaceFast(sql, argumentoSql);
+					}
+				});
+			} else {
+				fotosSql.insertOrReplaceFast(sql, argumentoSql);
+			}
+
+			// Checa se a finalidade eh atualizar
+		} else if(FINALIDADE.equalsIgnoreCase("U")){
+			if (telaChamou != TELA_RECEPTOR_ALARME) {
+				((Activity) context).runOnUiThread(new Runnable() {
+					public void run() {
+						fotosSql.update(dadosFoto, "ID_CFAFOTOS = " + idFoto);
+					}
+				});
+			} else {
+				fotosSql.update(dadosFoto, "ID_CFAFOTOS = " + idFoto);
+			}
+
+			// Checa se a finalidade eh deletar
+		} else if(FINALIDADE.equalsIgnoreCase("D")){
+			if (telaChamou != TELA_RECEPTOR_ALARME) {
+				((Activity) context).runOnUiThread(new Runnable() {
+					public void run() {
+						fotosSql.delete("ID_CFAFOTOS = " + idFoto);
+					}
+				});
+			} else {
+				fotosSql.delete("ID_CFAFOTOS = " + idFoto);
+			}
+		}
+	}
+
 	
 	private void importarRegistroClasse(String linha){
 		
@@ -2542,6 +2645,76 @@ public class ImportarDadosTxtRotinas {
 			}
 		}
 	}
+
+	private void importarRegistroProdutoRecomendado(String linha){
+
+		Scanner scannerGrade = new Scanner(linha).useDelimiter("\\|");
+
+		String FINALIDADE = scannerGrade.next();
+		final String idRecomenda = scannerGrade.next();
+		String idPRoduto = scannerGrade.next();
+		String idAreas = scannerGrade.next();
+		String idCidade = scannerGrade.next();
+		String idVendedor = scannerGrade.next();
+		String idCliente = scannerGrade.next();
+		String idEmpresa = scannerGrade.next();
+		String posicao = scannerGrade.next();
+
+		final ContentValues dadosProdutoRec = new ContentValues();
+		dadosProdutoRec.put("ID_AEAPRREC", idRecomenda);
+		dadosProdutoRec.put("ID_AEAPRODU", idPRoduto);
+		dadosProdutoRec.put("ID_CFAAREAS", idAreas);
+		dadosProdutoRec.put("ID_CFACIDAD", idCidade);
+		dadosProdutoRec.put("ID_CFACLIFO_VENDEDOR", idVendedor);
+		dadosProdutoRec.put("ID_CFACLIFO", idCliente);
+		dadosProdutoRec.put("ID_SMAEMPRE", idEmpresa);
+		dadosProdutoRec.put("POSICAO", posicao);
+
+		final ProdutoRecomendadoSql produtoRecomendadoSql = new ProdutoRecomendadoSql(context);
+
+		// Pega o sql para passar para o statement
+		final String sql = produtoRecomendadoSql.construirSqlStatement(dadosProdutoRec);
+		// Pega o argumento para o statement
+		final String[] argumentoSql = produtoRecomendadoSql.argumentoStatement(dadosProdutoRec);
+		// Checa se a finalidade eh inserir
+		if(FINALIDADE.equalsIgnoreCase("I")){
+			if (telaChamou != TELA_RECEPTOR_ALARME) {
+				((Activity) context).runOnUiThread(new Runnable() {
+					public void run() {
+						//gradeSql.insertOrReplace(dadosGrade);
+						produtoRecomendadoSql.insertOrReplaceFast(sql, argumentoSql);
+					}
+				});
+			} else {
+				produtoRecomendadoSql.insertOrReplaceFast(sql, argumentoSql);
+			}
+
+			// Checa se a finalidade eh atualizar
+		} else if(FINALIDADE.equalsIgnoreCase("U")){
+			if (telaChamou != TELA_RECEPTOR_ALARME) {
+				((Activity) context).runOnUiThread(new Runnable() {
+					public void run() {
+						produtoRecomendadoSql.update(dadosProdutoRec, "ID_AEAPRREC = " + idRecomenda);
+					}
+				});
+			} else {
+				produtoRecomendadoSql.update(dadosProdutoRec, "ID_AEAPRREC = " + idRecomenda);
+			}
+
+			// Checa se a finalidade eh deletar
+		} else if(FINALIDADE.equalsIgnoreCase("D")){
+			if (telaChamou != TELA_RECEPTOR_ALARME) {
+				((Activity) context).runOnUiThread(new Runnable() {
+					public void run() {
+						produtoRecomendadoSql.delete("ID_AEAPRREC = " + idRecomenda);
+					}
+				});
+			} else {
+				produtoRecomendadoSql.delete("ID_AEAPRREC = " + idRecomenda);
+			}
+		}
+	}
+
 	
 	private void importarRegistroGrade(String linha){
 		

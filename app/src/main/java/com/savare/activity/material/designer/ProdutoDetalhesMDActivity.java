@@ -22,6 +22,7 @@ import com.savare.activity.material.designer.fragment.ProdutoDetalhesMDFragment;
 import com.savare.beans.DescricaoDublaBeans;
 import com.savare.beans.FotosBeans;
 import com.savare.beans.ProdutoBeans;
+import com.savare.funcoes.FuncoesPersonalizadas;
 import com.savare.funcoes.rotinas.FotoRotinas;
 import com.savare.funcoes.rotinas.ProdutoRotinas;
 
@@ -72,8 +73,10 @@ public class ProdutoDetalhesMDActivity extends AppCompatActivity{
 
         ProdutoDetalheTabMDAdapter produtoDetalheTabMDAdapter = null;
 
-        // Checa se retonou algum alguma foto
-        if ((listaFotoProduto != null) && (listaFotoProduto.size() > 0)) {
+        FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(ProdutoDetalhesMDActivity.this);
+
+        // Checa se retonou algum alguma foto e se esta configurado para visualizar as imagens
+        if ((listaFotoProduto != null) && (listaFotoProduto.size() > 0) && (funcoes.getValorXml("ImagemProduto").equalsIgnoreCase("S"))) {
 
             produtoDetalheTabMDAdapter = new ProdutoDetalheTabMDAdapter(getSupportFragmentManager(), listaFotoProduto.size(), listaFotoProduto);
         }

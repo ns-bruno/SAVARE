@@ -21,7 +21,7 @@ public class FuncoesSql {
 	private String tabela;
 	private FuncoesPersonalizadas funcoes;
 	private Context context;
-	
+
 	
 	public FuncoesSql(Context context, String tabela) {
 		super();

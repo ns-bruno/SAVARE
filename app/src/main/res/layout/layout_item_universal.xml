@@ -11,7 +11,7 @@
         android:layout_height="64dp"
         android:src="@mipmap/ic_image"
         app:civ_border_width="2dp"
-        app:civ_border_color="#FF000000"
+        app:civ_border_color="@color/branco"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
         android:visibility="gone" />

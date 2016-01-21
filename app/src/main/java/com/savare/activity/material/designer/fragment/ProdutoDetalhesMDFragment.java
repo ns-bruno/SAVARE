@@ -59,8 +59,6 @@ public class ProdutoDetalhesMDFragment extends Fragment {
             // Pega a imagem especificada
             FotosBeans imagemBanco = fotoRotinas.fotoIdFoto(idFoto);
 
-            Bitmap imagemPadrao = BitmapFactory.decodeResource(getResources(), R.drawable.plano_fundo);
-
             // Checa se retonou alguma coisa
             if ((imagemBanco != null) && (imagemBanco.getFotos().length > 0)){
                 try {
@@ -87,9 +85,6 @@ public class ProdutoDetalhesMDFragment extends Fragment {
                     funcoes.menssagem(contentValues);
                 }
             }
-        } else {
-            //Drawable imagemPadrao = getResources().getDrawable(R.drawable.plano_fundo);
-            imageProduto.setImageResource(R.drawable.plano_fundo);
         }
 
         return viewProduto;

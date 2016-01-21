@@ -712,7 +712,7 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 			 */
 			ItemOrcamentoBeans item = listaItemOrcamento.get(position);
 			// Instancia a classe de funcoes para serem usadas
-			funcoes = new FuncoesPersonalizadas(context);
+			//funcoes = new FuncoesPersonalizadas(context);
 			
 			textDescricao.setText(item.getProduto().getDescricaoProduto() + " - " + item.getProduto().getDescricaoMarca());
 			textAbaixoDescricaoEsqueda.setText("Código: " + item.getProduto().getCodigoEstrutural());
