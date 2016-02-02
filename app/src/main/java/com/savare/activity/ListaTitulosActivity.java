@@ -112,7 +112,7 @@ public class ListaTitulosActivity extends Activity {
 		// Configuracao associando item de pesquisa com a SearchView
 		SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
 		
-		SearchView searchView = (SearchView) menu.findItem(R.id.menu_lista_titulos_pesquisa).getActionView();
+		SearchView searchView = (SearchView) menu.findItem(R.id.menu_lista_titulos_search_pesquisar).getActionView();
 		searchView.setQueryHint("Pesquisar");
 		
 		searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));

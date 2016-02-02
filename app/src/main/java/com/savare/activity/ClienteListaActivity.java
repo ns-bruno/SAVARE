@@ -1,12 +1,8 @@
 package com.savare.activity;
 
-import java.util.List;
-import java.util.UUID;
-
 import android.app.ActionBar;
 import android.app.ActionBar.OnNavigationListener;
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.app.SearchManager;
 import android.content.ContentValues;
 import android.content.Context;
@@ -17,20 +13,21 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.ProgressBar;
 import android.widget.SearchView;
 import android.widget.SearchView.OnQueryTextListener;
-import android.widget.Spinner;
 
 import com.savare.R;
 import com.savare.activity.fragment.ClienteCadastroFragment;
 import com.savare.activity.fragment.OrcamentoFragment;
+import com.savare.activity.material.designer.ClienteDetalhesMDActivity;
 import com.savare.adapter.DescricaoSimplesAdapter;
 import com.savare.adapter.PessoaAdapter;
 import com.savare.beans.PessoaBeans;
 import com.savare.funcoes.FuncoesPersonalizadas;
 import com.savare.funcoes.rotinas.OrcamentoRotinas;
 import com.savare.funcoes.rotinas.PessoaRotinas;
+
+import java.util.List;
 
 public class ClienteListaActivity extends Activity implements OnNavigationListener{
 	
@@ -172,7 +169,7 @@ public class ClienteListaActivity extends Activity implements OnNavigationListen
 					PessoaBeans pessoa = (PessoaBeans) parent.getItemAtPosition(position);
 					
 					// Abre a tela inicial do sistema
-					Intent intent = new Intent(ClienteListaActivity.this, ClienteDetalhesActivity.class);
+					Intent intent = new Intent(ClienteListaActivity.this, ClienteDetalhesMDActivity.class);
 					intent.putExtra("ID_CFACLIFO", String.valueOf(pessoa.getIdPessoa()));
 					intent.putExtra("CODIGO_CLI", String.valueOf(pessoa.getCodigoCliente()));
 					intent.putExtra("CODIGO_USU", String.valueOf(pessoa.getCodigoUsuario()));

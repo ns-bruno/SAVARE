@@ -1,4 +1,4 @@
-package com.savare.activity.material.designer.fragment;
+package com.savare.activity.material.designer;
 
 import android.content.ContentValues;
 import android.os.Bundle;
@@ -18,7 +18,7 @@ import com.savare.provider.SearchableProvider;
 /**
  * Created by Bruno Nogueira Silva on 21/12/2015.
  */
-public class ProdutoListaTabMD extends AppCompatActivity {
+public class ProdutoListaMDActivity extends AppCompatActivity {
 
     private Toolbar toolbarInicio;
     //private TextView textCodigoOrcamento, textCodigoPessoa, textNomeRazao, textAtacadoVarejo, textProcessoPesquisa;

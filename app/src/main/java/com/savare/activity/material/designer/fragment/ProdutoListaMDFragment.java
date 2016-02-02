@@ -33,6 +33,7 @@ import com.savare.R;
 import com.savare.activity.ListaOrcamentoPedidoActivity;
 import com.savare.activity.OrcamentoProdutoDetalhesActivity;
 import com.savare.activity.fragment.OrcamentoFragment;
+import com.savare.activity.material.designer.ProdutoListaMDActivity;
 import com.savare.adapter.ItemUniversalAdapter;
 import com.savare.banco.funcoesSql.ProdutoRecomendadoSql;
 import com.savare.beans.AreaBeans;
@@ -97,11 +98,11 @@ public class ProdutoListaMDFragment extends Fragment {
 
         if(parametro != null){
             tipoTela = parametro.getInt(KEY_TIPO_TELA);
-            idOrcamento = parametro.getString(ProdutoListaTabMD.KEY_ID_ORCAMENTO);
-            idCliente = parametro.getString(ProdutoListaTabMD.KEY_ID_CLIENTE);
-            atacadoVarejo = parametro.getString(ProdutoListaTabMD.KEY_ATACADO_VAREJO);
+            idOrcamento = parametro.getString(ProdutoListaMDActivity.KEY_ID_ORCAMENTO);
+            idCliente = parametro.getString(ProdutoListaMDActivity.KEY_ID_CLIENTE);
+            atacadoVarejo = parametro.getString(ProdutoListaMDActivity.KEY_ATACADO_VAREJO);
             atacadoVarejoAuxiliar = atacadoVarejo;
-            nomeRazao = parametro.getString(ProdutoListaTabMD.KEY_NOME_RAZAO);
+            nomeRazao = parametro.getString(ProdutoListaMDActivity.KEY_NOME_RAZAO);
 
             if ((idOrcamento != null) && (idCliente.length() > 0)) {
                 textCodigoOrcamento.setText(idOrcamento);

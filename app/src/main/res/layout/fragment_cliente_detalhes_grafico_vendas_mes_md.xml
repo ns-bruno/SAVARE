@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:weightSum="1">
+
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:background="@color/colorPrimary">
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/fragment_cliente_detalhes_grafico_vendas_mes_md_button_anterior"
+            android:drawableLeft="@mipmap/ic_arrow_left_bold"
+            android:layout_weight="1"
+            android:background="@android:color/transparent"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="@string/mes_vendas"
+            android:id="@+id/fragment_cliente_detalhes_grafico_vendas_mes_md_textView_mes_vendas"
+            android:layout_weight="1"
+            android:textColor="@color/branco"
+            android:textStyle="bold" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/fragment_cliente_detalhes_grafico_vendas_mes_md_button_proximo"
+            android:layout_weight="1"
+            android:drawableRight="@mipmap/ic_arrow_right_bold"
+            android:background="@android:color/transparent" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@android:color/white"
+        android:orientation="vertical">
+
+        <com.github.mikephil.charting.charts.BarChart
+            android:id="@+id/fragment_cliente_detalhes_grafico_vendas_mes_md_barChart_vendas_mes"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <com.github.mikephil.charting.charts.LineChart
+            android:id="@+id/fragment_cliente_detalhes_grafico_vendas_mes_md_lineChart_numero_vendas_mes"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+    </LinearLayout>
+
+
+</LinearLayout>

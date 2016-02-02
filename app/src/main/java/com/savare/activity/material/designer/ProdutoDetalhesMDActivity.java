@@ -91,7 +91,7 @@ public class ProdutoDetalhesMDActivity extends AppCompatActivity{
     } // Fim onCreate
 
     @Override
-    protected void onResume() {
+        protected void onResume() {
         super.onResume();
         ProdutoRotinas produtoRotinas = new ProdutoRotinas(ProdutoDetalhesMDActivity.this);
 

@@ -10,7 +10,7 @@ import android.util.SparseArray;
 
 import com.savare.R;
 import com.savare.activity.material.designer.fragment.ProdutoListaMDFragment;
-import com.savare.activity.material.designer.fragment.ProdutoListaTabMD;
+import com.savare.activity.material.designer.ProdutoListaMDActivity;
 
 /**
  * Created by Bruno Nogueira Silva on 21/12/2015.
@@ -42,10 +42,10 @@ public class ProdutoTabMDAdapter extends FragmentStatePagerAdapter {
                 argumentoFragmet.putInt(ProdutoListaMDFragment.KEY_TIPO_TELA, ProdutoListaMDFragment.TELA_LISTA_PRODUTO);
 
                 if (dadosArgumentos != null){
-                    argumentoFragmet.putString(ProdutoListaTabMD.KEY_ID_ORCAMENTO, dadosArgumentos.getAsString(ProdutoListaTabMD.KEY_ID_ORCAMENTO));
-                    argumentoFragmet.putString(ProdutoListaTabMD.KEY_ID_CLIENTE, dadosArgumentos.getAsString(ProdutoListaTabMD.KEY_ID_CLIENTE));
-                    argumentoFragmet.putString(ProdutoListaTabMD.KEY_ATACADO_VAREJO, dadosArgumentos.getAsString(ProdutoListaTabMD.KEY_ATACADO_VAREJO));
-                    argumentoFragmet.putString(ProdutoListaTabMD.KEY_NOME_RAZAO, dadosArgumentos.getAsString(ProdutoListaTabMD.KEY_NOME_RAZAO));
+                    argumentoFragmet.putString(ProdutoListaMDActivity.KEY_ID_ORCAMENTO, dadosArgumentos.getAsString(ProdutoListaMDActivity.KEY_ID_ORCAMENTO));
+                    argumentoFragmet.putString(ProdutoListaMDActivity.KEY_ID_CLIENTE, dadosArgumentos.getAsString(ProdutoListaMDActivity.KEY_ID_CLIENTE));
+                    argumentoFragmet.putString(ProdutoListaMDActivity.KEY_ATACADO_VAREJO, dadosArgumentos.getAsString(ProdutoListaMDActivity.KEY_ATACADO_VAREJO));
+                    argumentoFragmet.putString(ProdutoListaMDActivity.KEY_NOME_RAZAO, dadosArgumentos.getAsString(ProdutoListaMDActivity.KEY_NOME_RAZAO));
                 }
                 registeredFragments.put(position, produtoListaFragment);
                 // Adiciona o argumento no fragment
@@ -60,10 +60,10 @@ public class ProdutoTabMDAdapter extends FragmentStatePagerAdapter {
                 argumentoCidadeFragmet.putInt(ProdutoListaMDFragment.KEY_TIPO_TELA, ProdutoListaMDFragment.TELA_MAIS_VENDIDOS_CIDADE);
 
                 if (dadosArgumentos != null){
-                    argumentoCidadeFragmet.putString(ProdutoListaTabMD.KEY_ID_ORCAMENTO, dadosArgumentos.getAsString(ProdutoListaTabMD.KEY_ID_ORCAMENTO));
-                    argumentoCidadeFragmet.putString(ProdutoListaTabMD.KEY_ID_CLIENTE, dadosArgumentos.getAsString(ProdutoListaTabMD.KEY_ID_CLIENTE));
-                    argumentoCidadeFragmet.putString(ProdutoListaTabMD.KEY_ATACADO_VAREJO, dadosArgumentos.getAsString(ProdutoListaTabMD.KEY_ATACADO_VAREJO));
-                    argumentoCidadeFragmet.putString(ProdutoListaTabMD.KEY_NOME_RAZAO, dadosArgumentos.getAsString(ProdutoListaTabMD.KEY_NOME_RAZAO));
+                    argumentoCidadeFragmet.putString(ProdutoListaMDActivity.KEY_ID_ORCAMENTO, dadosArgumentos.getAsString(ProdutoListaMDActivity.KEY_ID_ORCAMENTO));
+                    argumentoCidadeFragmet.putString(ProdutoListaMDActivity.KEY_ID_CLIENTE, dadosArgumentos.getAsString(ProdutoListaMDActivity.KEY_ID_CLIENTE));
+                    argumentoCidadeFragmet.putString(ProdutoListaMDActivity.KEY_ATACADO_VAREJO, dadosArgumentos.getAsString(ProdutoListaMDActivity.KEY_ATACADO_VAREJO));
+                    argumentoCidadeFragmet.putString(ProdutoListaMDActivity.KEY_NOME_RAZAO, dadosArgumentos.getAsString(ProdutoListaMDActivity.KEY_NOME_RAZAO));
                 }
                 registeredFragments.put(position, maisVendidosCidadeFragment);
 
@@ -79,10 +79,10 @@ public class ProdutoTabMDAdapter extends FragmentStatePagerAdapter {
                 argumentoAreaFragmet.putInt(ProdutoListaMDFragment.KEY_TIPO_TELA, ProdutoListaMDFragment.TELA_MAIS_VENDIDOS_AREA);
 
                 if (dadosArgumentos != null){
-                    argumentoAreaFragmet.putString(ProdutoListaTabMD.KEY_ID_ORCAMENTO, dadosArgumentos.getAsString(ProdutoListaTabMD.KEY_ID_ORCAMENTO));
-                    argumentoAreaFragmet.putString(ProdutoListaTabMD.KEY_ID_CLIENTE, dadosArgumentos.getAsString(ProdutoListaTabMD.KEY_ID_CLIENTE));
-                    argumentoAreaFragmet.putString(ProdutoListaTabMD.KEY_ATACADO_VAREJO, dadosArgumentos.getAsString(ProdutoListaTabMD.KEY_ATACADO_VAREJO));
-                    argumentoAreaFragmet.putString(ProdutoListaTabMD.KEY_NOME_RAZAO, dadosArgumentos.getAsString(ProdutoListaTabMD.KEY_NOME_RAZAO));
+                    argumentoAreaFragmet.putString(ProdutoListaMDActivity.KEY_ID_ORCAMENTO, dadosArgumentos.getAsString(ProdutoListaMDActivity.KEY_ID_ORCAMENTO));
+                    argumentoAreaFragmet.putString(ProdutoListaMDActivity.KEY_ID_CLIENTE, dadosArgumentos.getAsString(ProdutoListaMDActivity.KEY_ID_CLIENTE));
+                    argumentoAreaFragmet.putString(ProdutoListaMDActivity.KEY_ATACADO_VAREJO, dadosArgumentos.getAsString(ProdutoListaMDActivity.KEY_ATACADO_VAREJO));
+                    argumentoAreaFragmet.putString(ProdutoListaMDActivity.KEY_NOME_RAZAO, dadosArgumentos.getAsString(ProdutoListaMDActivity.KEY_NOME_RAZAO));
                 }
                 registeredFragments.put(position, maisVendidosAreaFragment);
 
@@ -98,10 +98,10 @@ public class ProdutoTabMDAdapter extends FragmentStatePagerAdapter {
                 argumentoVendedorFragmet.putInt(ProdutoListaMDFragment.KEY_TIPO_TELA, ProdutoListaMDFragment.TELA_MAIS_VENDIDOS_VENDEDOR);
 
                 if (dadosArgumentos != null){
-                    argumentoVendedorFragmet.putString(ProdutoListaTabMD.KEY_ID_ORCAMENTO, dadosArgumentos.getAsString(ProdutoListaTabMD.KEY_ID_ORCAMENTO));
-                    argumentoVendedorFragmet.putString(ProdutoListaTabMD.KEY_ID_CLIENTE, dadosArgumentos.getAsString(ProdutoListaTabMD.KEY_ID_CLIENTE));
-                    argumentoVendedorFragmet.putString(ProdutoListaTabMD.KEY_ATACADO_VAREJO, dadosArgumentos.getAsString(ProdutoListaTabMD.KEY_ATACADO_VAREJO));
-                    argumentoVendedorFragmet.putString(ProdutoListaTabMD.KEY_NOME_RAZAO, dadosArgumentos.getAsString(ProdutoListaTabMD.KEY_NOME_RAZAO));
+                    argumentoVendedorFragmet.putString(ProdutoListaMDActivity.KEY_ID_ORCAMENTO, dadosArgumentos.getAsString(ProdutoListaMDActivity.KEY_ID_ORCAMENTO));
+                    argumentoVendedorFragmet.putString(ProdutoListaMDActivity.KEY_ID_CLIENTE, dadosArgumentos.getAsString(ProdutoListaMDActivity.KEY_ID_CLIENTE));
+                    argumentoVendedorFragmet.putString(ProdutoListaMDActivity.KEY_ATACADO_VAREJO, dadosArgumentos.getAsString(ProdutoListaMDActivity.KEY_ATACADO_VAREJO));
+                    argumentoVendedorFragmet.putString(ProdutoListaMDActivity.KEY_NOME_RAZAO, dadosArgumentos.getAsString(ProdutoListaMDActivity.KEY_NOME_RAZAO));
                 }
                 registeredFragments.put(position, maisVendidosVendedorFragment);
 
@@ -117,10 +117,10 @@ public class ProdutoTabMDAdapter extends FragmentStatePagerAdapter {
                 argumentoEmpresaFragmet.putInt(ProdutoListaMDFragment.KEY_TIPO_TELA, ProdutoListaMDFragment.TELA_MAIS_VENDIDOS_EMPRESA);
 
                 if (dadosArgumentos != null){
-                    argumentoEmpresaFragmet.putString(ProdutoListaTabMD.KEY_ID_ORCAMENTO, dadosArgumentos.getAsString(ProdutoListaTabMD.KEY_ID_ORCAMENTO));
-                    argumentoEmpresaFragmet.putString(ProdutoListaTabMD.KEY_ID_CLIENTE, dadosArgumentos.getAsString(ProdutoListaTabMD.KEY_ID_CLIENTE));
-                    argumentoEmpresaFragmet.putString(ProdutoListaTabMD.KEY_ATACADO_VAREJO, dadosArgumentos.getAsString(ProdutoListaTabMD.KEY_ATACADO_VAREJO));
-                    argumentoEmpresaFragmet.putString(ProdutoListaTabMD.KEY_NOME_RAZAO, dadosArgumentos.getAsString(ProdutoListaTabMD.KEY_NOME_RAZAO));
+                    argumentoEmpresaFragmet.putString(ProdutoListaMDActivity.KEY_ID_ORCAMENTO, dadosArgumentos.getAsString(ProdutoListaMDActivity.KEY_ID_ORCAMENTO));
+                    argumentoEmpresaFragmet.putString(ProdutoListaMDActivity.KEY_ID_CLIENTE, dadosArgumentos.getAsString(ProdutoListaMDActivity.KEY_ID_CLIENTE));
+                    argumentoEmpresaFragmet.putString(ProdutoListaMDActivity.KEY_ATACADO_VAREJO, dadosArgumentos.getAsString(ProdutoListaMDActivity.KEY_ATACADO_VAREJO));
+                    argumentoEmpresaFragmet.putString(ProdutoListaMDActivity.KEY_NOME_RAZAO, dadosArgumentos.getAsString(ProdutoListaMDActivity.KEY_NOME_RAZAO));
                 }
                 registeredFragments.put(position, maisVendidosEmpresaFragment);
 
@@ -136,10 +136,10 @@ public class ProdutoTabMDAdapter extends FragmentStatePagerAdapter {
                 argumentoCortesFragmet.putInt(ProdutoListaMDFragment.KEY_TIPO_TELA, ProdutoListaMDFragment.TELA_MAIS_VENDIDOS_CORTES_CHEGARAM);
 
                 if (dadosArgumentos != null){
-                    argumentoCortesFragmet.putString(ProdutoListaTabMD.KEY_ID_ORCAMENTO, dadosArgumentos.getAsString(ProdutoListaTabMD.KEY_ID_ORCAMENTO));
-                    argumentoCortesFragmet.putString(ProdutoListaTabMD.KEY_ID_CLIENTE, dadosArgumentos.getAsString(ProdutoListaTabMD.KEY_ID_CLIENTE));
-                    argumentoCortesFragmet.putString(ProdutoListaTabMD.KEY_ATACADO_VAREJO, dadosArgumentos.getAsString(ProdutoListaTabMD.KEY_ATACADO_VAREJO));
-                    argumentoCortesFragmet.putString(ProdutoListaTabMD.KEY_NOME_RAZAO, dadosArgumentos.getAsString(ProdutoListaTabMD.KEY_NOME_RAZAO));
+                    argumentoCortesFragmet.putString(ProdutoListaMDActivity.KEY_ID_ORCAMENTO, dadosArgumentos.getAsString(ProdutoListaMDActivity.KEY_ID_ORCAMENTO));
+                    argumentoCortesFragmet.putString(ProdutoListaMDActivity.KEY_ID_CLIENTE, dadosArgumentos.getAsString(ProdutoListaMDActivity.KEY_ID_CLIENTE));
+                    argumentoCortesFragmet.putString(ProdutoListaMDActivity.KEY_ATACADO_VAREJO, dadosArgumentos.getAsString(ProdutoListaMDActivity.KEY_ATACADO_VAREJO));
+                    argumentoCortesFragmet.putString(ProdutoListaMDActivity.KEY_NOME_RAZAO, dadosArgumentos.getAsString(ProdutoListaMDActivity.KEY_NOME_RAZAO));
                 }
                 registeredFragments.put(position, maisVendidosCortesFragment);
 

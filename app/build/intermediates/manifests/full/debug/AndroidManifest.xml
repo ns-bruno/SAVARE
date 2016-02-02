@@ -90,20 +90,17 @@
         <activity
             android:name="com.savare.activity.material.designer.ProdutoDetalhesMDActivity"
             android:theme="@style/AppBaseTheme" />
+        <activity
+            android:name="com.savare.activity.material.designer.ListaTitulosMDActivity"
+            android:theme="@style/AppBaseTheme" >
+            <meta-data
+                android:name="android.app.searchable"
+                android:resource="@xml/searchable" />
+        </activity>
         <activity android:name="com.savare.activity.LoginActivity" />
         <activity
-            android:name="com.savare.activity.material.designer.fragment.ProdutoListaTabMD"
+            android:name="com.savare.activity.material.designer.ProdutoListaMDActivity"
             android:theme="@style/AppBaseTheme" >
-
-            <!--
-            <intent-filter>
-                <action android:name="android.intent.action.SEARCH"/>
-            </intent-filter>
-            -->
-            <!--
-                <meta-data android:name="android.app.default_searchable"
-                android:value="com.savare.activity.SearchableActivity"/>
-            -->
             <meta-data
                 android:name="android.app.searchable"
                 android:resource="@xml/searchable" />
@@ -123,6 +120,9 @@
                 android:resource="@xml/searchable" >
             </meta-data>
         </activity>
+        <activity
+            android:name="com.savare.activity.material.designer.ClienteDetalhesMDActivity"
+            android:theme="@style/AppBaseTheme" />
 
         <provider
             android:name="com.savare.sincronizacao.EnviarProvider"

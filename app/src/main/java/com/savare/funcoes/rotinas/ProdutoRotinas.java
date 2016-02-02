@@ -864,15 +864,17 @@ public class ProdutoRotinas extends Rotinas {
 		descricaoDupla.setTextoSecundario("Código de Barras");
 		// Adiciona a lista
 		listaDetalhes.add(descricaoDupla);
-		
+
+		FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
+
 		descricaoDupla = new DescricaoDublaBeans();
-		descricaoDupla.setTextoPrincipal(""+produtoBeans.getPesoLiquido());
+		descricaoDupla.setTextoPrincipal(""+ funcoes.arredondarValor(produtoBeans.getPesoLiquido()));
 		descricaoDupla.setTextoSecundario("Peso Líquido");
 		// Adiciona a lista
 		listaDetalhes.add(descricaoDupla);
 		
 		descricaoDupla = new DescricaoDublaBeans();
-		descricaoDupla.setTextoPrincipal(""+produtoBeans.getPesoBruto());
+		descricaoDupla.setTextoPrincipal(""+ funcoes.arredondarValor(produtoBeans.getPesoBruto()));
 		descricaoDupla.setTextoSecundario("Peso Bruto");
 		// Adiciona a lista
 		listaDetalhes.add(descricaoDupla);

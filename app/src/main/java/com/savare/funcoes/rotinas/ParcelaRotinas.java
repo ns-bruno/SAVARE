@@ -19,8 +19,7 @@ public class ParcelaRotinas extends Rotinas {
 		super(context);
 		
 	}
-	
-	
+
 	/**
 	 * 
 	 * @param idPessoa

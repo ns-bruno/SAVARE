@@ -30,6 +30,7 @@ import com.github.mikephil.charting.utils.ColorTemplate;
 import com.github.mikephil.charting.utils.Highlight;
 import com.savare.R;
 import com.savare.activity.fragment.OrcamentoTabulacaoFragment;
+import com.savare.activity.material.designer.ListaTitulosMDActivity;
 import com.savare.adapter.ItemUniversalAdapter;
 import com.savare.beans.OrcamentoBeans;
 import com.savare.beans.PessoaBeans;
@@ -91,6 +92,7 @@ public class ClienteDetalhesActivity extends Activity implements OnChartGestureL
 								 adapterPortadorBanco,
 								 adapterPlanoPagamento;
 	private LineChart graficoVendasPedidoMes;
+	private boolean abertoTitulosPriveiraVez = false;
 	
 	
 	@Override
@@ -117,7 +119,7 @@ public class ClienteDetalhesActivity extends Activity implements OnChartGestureL
 			// Pega o id do cliente
 			idCliente = intentParametro.getString("ID_CFACLIFO");
 
-			if (intentParametro.getString("CADASTRO_NOVO").equalsIgnoreCase("S")){
+			if ((intentParametro.getString("CADASTRO_NOVO") != null) && (intentParametro.getString("CADASTRO_NOVO").equalsIgnoreCase("S"))){
 				clienteNovo = true;
 			}
 
@@ -148,6 +150,15 @@ public class ClienteDetalhesActivity extends Activity implements OnChartGestureL
 		if(textCodigoPessoa.getText().length() > 0){
 			// Carrega o grafico que mosta os totais vendidos para este cliente por mes
 			carregarGraficoVendasPedidoMes();
+
+			if (abertoTitulosPriveiraVez == false) {
+
+				abertoTitulosPriveiraVez = true;
+				// Cria uma intent para abrir uma nova activity
+				Intent intentTitulos = new Intent(ClienteDetalhesActivity.this, ListaTitulosMDActivity.class);
+				intentTitulos.putExtra("ID_CFACLIFO", textCodigoPessoa.getText().toString());
+				startActivity(intentTitulos);
+			}
 		}
 	}
 	
@@ -262,29 +273,29 @@ public class ClienteDetalhesActivity extends Activity implements OnChartGestureL
 			
 		case R.id.menu_cliente_detalhes_titulos_cliente:
 			// Cria uma intent para abrir uma nova activity
-			Intent intentTitulos = new Intent(ClienteDetalhesActivity.this, ListaTitulosActivity.class);
+			Intent intentTitulos = new Intent(ClienteDetalhesActivity.this, ListaTitulosMDActivity.class);
 			intentTitulos.putExtra("ID_CFACLIFO", textCodigoPessoa.getText().toString());
 			
 			startActivity(intentTitulos);
 			break;
 
-			case R.id.menu_cliente_detalhes_enviar_cadastro:
+		case R.id.menu_cliente_detalhes_enviar_cadastro:
 
-				String where = " (CFACLIFO.ID_CFACLIFO == " + idCliente + ")";
+			String where = " (CFACLIFO.ID_CFACLIFO == " + idCliente + ")";
 
-				List<PessoaBeans> listaPessoasCadastro = new ArrayList<PessoaBeans>();
+			List<PessoaBeans> listaPessoasCadastro = new ArrayList<PessoaBeans>();
 
-				PessoaRotinas pessoaRotinasCad = new PessoaRotinas(ClienteDetalhesActivity.this);
+			PessoaRotinas pessoaRotinasCad = new PessoaRotinas(ClienteDetalhesActivity.this);
 
-				// Pega a lista de pessoas a serem enviadas os dados
-				listaPessoasCadastro = pessoaRotinasCad.listaPessoaCompleta(PessoaRotinas.KEY_TIPO_CLIENTE, where);
-				// Checa se retornou alguma lista
-				if (listaPessoasCadastro != null && listaPessoasCadastro.size() > 0) {
-					EnviarCadastroClienteFtpAsyncRotinas enviarCadastro = new EnviarCadastroClienteFtpAsyncRotinas(ClienteDetalhesActivity.this, EnviarCadastroClienteFtpAsyncRotinas.TELA_CLIENTE_DETALHES);
-					// Executa o envio do cadastro em segundo plano
-					enviarCadastro.execute(listaPessoasCadastro);
-				}
-				break;
+			// Pega a lista de pessoas a serem enviadas os dados
+			listaPessoasCadastro = pessoaRotinasCad.listaPessoaCompleta(PessoaRotinas.KEY_TIPO_CLIENTE, where);
+			// Checa se retornou alguma lista
+			if (listaPessoasCadastro != null && listaPessoasCadastro.size() > 0) {
+				EnviarCadastroClienteFtpAsyncRotinas enviarCadastro = new EnviarCadastroClienteFtpAsyncRotinas(ClienteDetalhesActivity.this, EnviarCadastroClienteFtpAsyncRotinas.TELA_CLIENTE_DETALHES);
+				// Executa o envio do cadastro em segundo plano
+				enviarCadastro.execute(listaPessoasCadastro);
+			}
+			break;
 
 		default:
 			break;
@@ -540,7 +551,7 @@ public class ClienteDetalhesActivity extends Activity implements OnChartGestureL
 			// Muda a cor do fundo do grafico
 			graficoVendasPedidoMes.setBackgroundColor(getResources().getColor(R.color.branco));
 			// Definir um texto de descrição que aparece no canto inferior direito do gráfico.
-			graficoVendasPedidoMes.setDescription("Histórico de Valores do Pedidos Realizados Mensais");
+			graficoVendasPedidoMes.setDescription(getResources().getString(R.string.historico_valores_vendas_mensais));
 			// Define o texto que deve aparecer se o gráfico se encontra vazio.
 			graficoVendasPedidoMes.setNoDataTextDescription("Não foi realizado nenhum pedido.");
 			
@@ -549,7 +560,7 @@ public class ClienteDetalhesActivity extends Activity implements OnChartGestureL
 			//graficoVendasPedidoMes.setHighlightIndicatorEnabled(true);
 		}
 		
-	}
+	} // fim carregarGrafico
 
 	@Override
 	public void onValueSelected(Entry e, int dataSetIndex, Highlight h) {

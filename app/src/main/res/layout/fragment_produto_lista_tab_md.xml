@@ -63,8 +63,7 @@
             app:stl_distributeEvenly="false"
             app:stl_clickable="true"
             app:stl_titleOffset="24dp"
-            app:stl_drawDecorationAfterTab="false"
-            />
+            app:stl_drawDecorationAfterTab="false" />
 
         <android.support.v4.view.ViewPager
             android:id="@+id/fragment_produto_lista_tab_md_pager"

@@ -292,7 +292,7 @@ public class FuncoesPersonalizadas {
 			int qtdCasasDecimais;
 			
 			// Checa se tem algum parametro de casas decimais
-			if(getValorXml("CasasDecimais") != null && getValorXml("CasasDecimais").length() > 0){
+			if ((getValorXml("CasasDecimais") != null) && (getValorXml("CasasDecimais").length() > 0) && (!getValorXml("CasasDecimais").equalsIgnoreCase(NAO_ENCONTRADO))){
 				qtdCasasDecimais = Integer.valueOf(getValorXml("CasasDecimais"));
 			}else {
 				qtdCasasDecimais = 3;

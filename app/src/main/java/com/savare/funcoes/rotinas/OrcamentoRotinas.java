@@ -8,6 +8,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.util.Log;
 
+import com.savare.R;
 import com.savare.banco.funcoesSql.ItemOrcamentoSql;
 import com.savare.banco.funcoesSql.OrcamentoSql;
 import com.savare.beans.CidadeBeans;
@@ -384,6 +385,65 @@ public class OrcamentoRotinas extends Rotinas {
 		}
 		
 		return listaOrcamento;
+	}
+
+
+	public List<OrcamentoBeans> listaTotalVendaDiarioCliente(String idClifo, String where, String mes, String ano){
+		List<OrcamentoBeans> lista = new ArrayList<OrcamentoBeans>();
+
+		try {
+			String sql = "SELECT AEAORCAM.ID_CFACLIFO, STRFTIME('%d', AEAORCAM.DT_CAD) AS DIA, AEAORCAM.DT_CAD, AEAORCAM.FC_VL_TOTAL, AEAORCAM.FC_VL_TOTAL_FATURADO " +
+						 "FROM AEAORCAM " +
+						 "WHERE (AEAORCAM.STATUS = 'P' OR AEAORCAM.STATUS = 'N') " +
+						 " AND (AEAORCAM.ID_CFACLIFO = " + idClifo + ") ";
+
+			if (mes != null){
+				sql += " AND ((STRFTIME('%m', AEAORCAM.DT_CAD)) = '" + mes + "') ";
+			} else {
+				sql += " AND ((STRFTIME('%m', AEAORCAM.DT_CAD)) = strftime('%m','now'))";
+			}
+
+			if (ano != null){
+				sql += " AND ((STRFTIME('%Y', AEAORCAM.DT_CAD)) = '" + ano + "') ";
+			} else {
+				sql += " AND ((STRFTIME('%Y', AEAORCAM.DT_CAD)) = strftime('%Y','now'))";
+			}
+
+			if (where != null){
+				sql += " AND ( " + where + " ) ";
+			}
+
+			OrcamentoSql orcamentoSql = new OrcamentoSql(context);
+			// Executa o sql e armazena os registro em um Cursor
+			Cursor cursor = orcamentoSql.sqlSelect(sql);
+
+			// Verifica se retornou algum registro
+			if((cursor != null) && (cursor.getCount() > 0)){
+
+				// Passa por todos os registro
+				while (cursor.moveToNext()) {
+					OrcamentoBeans orcamento = new OrcamentoBeans();
+					orcamento.setIdPessoa(cursor.getInt(cursor.getColumnIndex("ID_CFACLIFO")));
+					orcamento.setDataCadastro(cursor.getString(cursor.getColumnIndex("DIA")));
+					orcamento.setTotalOrcamento(cursor.getDouble(cursor.getColumnIndex("FC_VL_TOTAL")));
+					orcamento.setTotalOrcamentoFaturado(cursor.getDouble(cursor.getColumnIndex("FC_VL_TOTAL_FATURADO")));
+
+					lista.add(orcamento);
+				}
+			}
+		} catch (Exception e){
+			FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
+			// Cria uma variavem para inserir as propriedades da mensagem
+			ContentValues mensagem = new ContentValues();
+			mensagem.put("comando", 1);
+			mensagem.put("tela", "OrcamentoRotinas");
+			mensagem.put("mensagem", context.getResources().getString(R.string.nao_conseguimo_carregar_dados_vendas) + e.getMessage());
+
+			// Executa a mensagem passando por parametro as propriedades
+			funcoes.menssagem(mensagem);
+		}
+
+		return lista;
 	}
 	
 	

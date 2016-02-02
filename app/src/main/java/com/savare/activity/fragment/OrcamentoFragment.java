@@ -1,34 +1,23 @@
 package com.savare.activity.fragment;
 
 import java.io.File;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
 import com.savare.R;
 import com.savare.activity.ClienteListaActivity;
-import com.savare.activity.InicioActivity;
-import com.savare.activity.ListaOrcamentoPedidoActivity;
 import com.savare.activity.LogActivity;
-import com.savare.activity.OrcamentoActivity;
-import com.savare.activity.OrcamentoPlanoPagamentoActivity;
 import com.savare.activity.OrcamentoProdutoDetalhesActivity;
-import com.savare.activity.ProdutoListaActivity;
-import com.savare.activity.material.designer.fragment.ProdutoListaTabMD;
+import com.savare.activity.material.designer.ProdutoListaMDActivity;
 import com.savare.adapter.ItemUniversalAdapter;
 import com.savare.banco.funcoesSql.ItemOrcamentoSql;
 import com.savare.banco.funcoesSql.OrcamentoSql;
 import com.savare.beans.ItemOrcamentoBeans;
 import com.savare.beans.OrcamentoBeans;
-import com.savare.beans.ProdutoListaBeans;
-import com.savare.custom.AlertDialogTextoCustom;
 import com.savare.funcoes.FuncoesPersonalizadas;
-import com.savare.funcoes.GPSTracker;
-import com.savare.funcoes.LocalizacaoFuncoes;
 import com.savare.funcoes.rotinas.GerarPdfRotinas;
 import com.savare.funcoes.rotinas.OrcamentoRotinas;
 import com.savare.funcoes.rotinas.PessoaRotinas;
-import com.savare.funcoes.rotinas.ProdutoRotinas;
 import com.savare.funcoes.rotinas.async.GerarPdfAsyncRotinas;
 
 import android.app.Activity;
@@ -39,7 +28,6 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -52,7 +40,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
-import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.TextView;
@@ -454,11 +441,11 @@ public class OrcamentoFragment extends Fragment {
 				intent.putExtra("ATAC_VAREJO", textAtacadoVarejo.getText().toString());
 				startActivity(intent);*/
 
-				Intent intentOrcamento = new Intent(getContext(), ProdutoListaTabMD.class);
-				intentOrcamento.putExtra(ProdutoListaTabMD.KEY_ID_ORCAMENTO, textCodigoOrcamento.getText().toString());
-				intentOrcamento.putExtra(ProdutoListaTabMD.KEY_ID_CLIENTE, idPessoa);
-				intentOrcamento.putExtra(ProdutoListaTabMD.KEY_ATACADO_VAREJO, textAtacadoVarejo.getText().toString());
-				intentOrcamento.putExtra(ProdutoListaTabMD.KEY_NOME_RAZAO, razaoSocial.replaceFirst("- ", ""));
+				Intent intentOrcamento = new Intent(getContext(), ProdutoListaMDActivity.class);
+				intentOrcamento.putExtra(ProdutoListaMDActivity.KEY_ID_ORCAMENTO, textCodigoOrcamento.getText().toString());
+				intentOrcamento.putExtra(ProdutoListaMDActivity.KEY_ID_CLIENTE, idPessoa);
+				intentOrcamento.putExtra(ProdutoListaMDActivity.KEY_ATACADO_VAREJO, textAtacadoVarejo.getText().toString());
+				intentOrcamento.putExtra(ProdutoListaMDActivity.KEY_NOME_RAZAO, razaoSocial.replaceFirst("- ", ""));
 				startActivity(intentOrcamento);
 
 			} else {

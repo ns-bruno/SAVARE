@@ -1,7 +1,6 @@
 package com.savare.activity.material.designer;
 
 import android.annotation.TargetApi;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ContentValues;
 import android.content.DialogInterface;
@@ -41,12 +40,10 @@ import com.savare.R;
 import com.savare.activity.ClienteListaActivity;
 import com.savare.activity.ConfiguracoesActivity;
 import com.savare.activity.ListaOrcamentoPedidoActivity;
-import com.savare.activity.ListaTitulosActivity;
 import com.savare.activity.LogActivity;
 import com.savare.activity.SincronizacaoActivity;
 import com.savare.activity.fragment.ClienteCadastroFragment;
 import com.savare.activity.fragment.OrcamentoTabulacaoFragment;
-import com.savare.activity.material.designer.fragment.ProdutoListaTabMD;
 import com.savare.banco.funcoesSql.UsuarioSQL;
 import com.savare.beans.EmpresaBeans;
 import com.savare.beans.UsuarioBeans;
@@ -198,8 +195,8 @@ public class InicioMDActivity extends AppCompatActivity {
 
                                     // Cria uma intent para abrir uma nova activity
                                     //Intent intentOrcamento = new Intent(InicioMDActivity.this, ProdutoListaActivity.class);
-                                    Intent intentOrcamento = new Intent(InicioMDActivity.this, ProdutoListaTabMD.class);
-                                    intentOrcamento.putExtra(ProdutoListaTabMD.KEY_ATACADO_VAREJO, String.valueOf(which).toString());
+                                    Intent intentOrcamento = new Intent(InicioMDActivity.this, ProdutoListaMDActivity.class);
+                                    intentOrcamento.putExtra(ProdutoListaMDActivity.KEY_ATACADO_VAREJO, String.valueOf(which).toString());
                                     // Abre outra tela
                                     startActivity(intentOrcamento);
 
@@ -212,7 +209,7 @@ public class InicioMDActivity extends AppCompatActivity {
 
                         case 4:
                             // Tela de Lista de Titulos
-                            Intent intentListaTitulos = new Intent(InicioMDActivity.this, ListaTitulosActivity.class);
+                            Intent intentListaTitulos = new Intent(InicioMDActivity.this, ListaTitulosMDActivity.class);
                             // Abre outra tela
                             startActivity(intentListaTitulos);
                             return true;

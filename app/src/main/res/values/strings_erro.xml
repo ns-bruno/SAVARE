@@ -23,6 +23,7 @@
     <string name="favor_entrar_contato_responsavel_ti">Favor, entrar em contato com o responsável de T.I.</string>
     <string name="nao_existe_parametros_tabela_percentuais_usuario">Não existe nenhum parametro na tabela de percentuais(AEAPERCE) do usuário/funcionário, entrar em contato com o responsável de T.I.</string>
     <string name="nao_consegimos_carregar_imagem_produtos">Não conseguimos carregar as imagens dos produtos.</string>
+    <string name="nao_conseguimo_carregar_dados_vendas">Não conseguimos carregar os dados/valores de vendas.</string>
 
     
 </resources>
