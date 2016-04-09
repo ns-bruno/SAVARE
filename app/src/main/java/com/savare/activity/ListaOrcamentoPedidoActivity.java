@@ -40,6 +40,7 @@ import android.widget.TextView;
 
 import com.savare.R;
 import com.savare.activity.fragment.OrcamentoTabulacaoFragment;
+import com.savare.activity.material.designer.ClienteListaMDActivity;
 import com.savare.adapter.DescricaoSimplesAdapter;
 import com.savare.adapter.ItemUniversalAdapter;
 import com.savare.banco.funcoesSql.OrcamentoSql;
@@ -532,12 +533,6 @@ public class ListaOrcamentoPedidoActivity extends Activity implements OnNavigati
 		case R.id.menu_lista_orcamento_atualizar:
 			
 			carregarListaCidade();
-			// Pega a posicao da lista
-			//int index = actionBar.getSelectedNavigationIndex();
-			
-			//onNavigationItemSelected(index, adapterCidade.getItemId(index));
-			
-			//onResume();
 			break;
 			
 		case R.id.menu_lista_orcamento_rateio_preco:
@@ -794,7 +789,7 @@ public class ListaOrcamentoPedidoActivity extends Activity implements OnNavigati
 			
 		case R.id.menu_lista_orcamento_novo_orcamento:
 			// Abre a tela de detalhes do produto
-			Intent intent = new Intent(ListaOrcamentoPedidoActivity.this, ClienteListaActivity.class);
+			Intent intent = new Intent(ListaOrcamentoPedidoActivity.this, ClienteListaMDActivity.class);
 			intent.putExtra(KEY_TELA_CHAMADA, KEY_TELA_LISTA_ORCAMENTO_PEDIDO);
 			// Abre a activity aquardando uma resposta
 			startActivityForResult(intent, SOLICITA_CLIENTE);
