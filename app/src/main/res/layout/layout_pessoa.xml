@@ -25,18 +25,20 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignTop="@+id/layout_pessoa_image_foto"
-        android:layout_toRightOf="@+id/layout_pessoa_image_foto"
-        android:text="@string/razao_social" />
+        android:text="@string/razao_social"
+        android:layout_alignLeft="@+id/layout_pessoa_text_ultima_venda"
+        android:layout_alignStart="@+id/layout_pessoa_text_ultima_venda" />
 
     <TextView
         android:id="@+id/layout_pessoa_text_fantasia"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/layout_pessoa_text_razao_social"
-        android:layout_toRightOf="@+id/layout_pessoa_image_foto"
         android:text="@string/fantasia"
         android:textColor="@color/azul_escuro"
-        android:layout_marginTop="5dp" />
+        android:layout_marginTop="5dp"
+        android:layout_alignLeft="@+id/layout_pessoa_text_razao_social"
+        android:layout_alignStart="@+id/layout_pessoa_text_razao_social" />
 
     <TextView
         android:id="@+id/layout_pessoa_text_cidade"
@@ -45,7 +47,8 @@
         android:layout_alignLeft="@+id/layout_pessoa_text_fantasia"
         android:layout_below="@+id/layout_pessoa_text_fantasia"
         android:text="@string/cidade"
-        android:textColor="@color/verde_escuro" />
+        android:textColor="@color/verde_escuro"
+        android:layout_marginTop="5dp" />
 
     <TextView
         android:id="@+id/layout_pessoa_text_status"
@@ -55,7 +58,8 @@
         android:layout_alignBottom="@+id/layout_pessoa_text_numero_qualquer"
         android:layout_toRightOf="@+id/layout_pessoa_text_ultima_venda"
         android:text="@string/status"
-        android:layout_marginLeft="5dp" />
+        android:layout_marginLeft="5dp"
+        android:layout_marginTop="5dp" />
 
     <TextView
         android:id="@+id/layout_pessoa_text_numero_qualquer"
@@ -65,7 +69,8 @@
         android:layout_marginLeft="15dp"
         android:layout_toRightOf="@+id/layout_pessoa_text_status"
         android:text="@string/numero"
-        android:gravity="right" />
+        android:gravity="right"
+        android:layout_marginTop="5dp" />
 
     <TextView
         android:id="@+id/layout_pessoa_text_ultima_venda"
@@ -74,6 +79,8 @@
         android:layout_alignBaseline="@+id/layout_pessoa_text_status"
         android:layout_alignBottom="@+id/layout_pessoa_text_status"
         android:layout_toRightOf="@+id/layout_pessoa_view_status"
-        android:text="@string/ultima_venda" />
+        android:text="@string/ultima_venda"
+        android:layout_marginLeft="5dp"
+        android:layout_marginTop="5dp" />
 
 </RelativeLayout>

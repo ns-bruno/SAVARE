@@ -14,6 +14,7 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
 import android.widget.Filter;
 import android.widget.Filterable;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -26,6 +27,7 @@ public class PessoaAdapter extends BaseAdapter implements Filterable, OnItemClic
 	private Context context;
 	private List<PessoaBeans> listaPessoas;
 	private int tipoPessoa;
+	public static final int KEY_CLIENTE = 0, KEY_FORNECEDOR = 1, KEY_USUARIO = 2, KEY_REPRESENTANTE = 3, KEY_CONCORRENTE = 4, KEY_TRANSPORTADORA = 5;
 	//private final List<Integer> pessoasSelecionadas = new ArrayList<Integer>(); // Para armazenar os itens selecionados
 
 	/**
@@ -58,7 +60,7 @@ public class PessoaAdapter extends BaseAdapter implements Filterable, OnItemClic
 	/**
 	 * Retorna a quantidade de pessoas contidos na lista.
 	 * Importante retornar o tamanho do registro a ser exibido, 
-	 * pois esse m�todo � chamado pelo {@link ListView} para que o mesmo saiba quantos registro tem dentro do adaptador
+	 * pois esse metodo eh chamado pelo {@link ListView} para que o mesmo saiba quantos registro tem dentro do adaptador
 	 */
 	@Override
 	public int getCount() {
@@ -103,6 +105,7 @@ public class PessoaAdapter extends BaseAdapter implements Filterable, OnItemClic
 		TextView textUltimaVenda = (TextView) view.findViewById(R.id.layout_pessoa_text_ultima_venda);
 		TextView textNumero = (TextView) view.findViewById(R.id.layout_pessoa_text_numero_qualquer);
 		View viewStatus = (View) view.findViewById(R.id.layout_pessoa_view_status);
+		ImageView imagePessoa = (ImageView) view.findViewById(R.id.layout_pessoa_image_foto);
 		
 		FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
 		
@@ -123,7 +126,10 @@ public class PessoaAdapter extends BaseAdapter implements Filterable, OnItemClic
 			textUltimaVenda.setTextAppearance(context, R.style.textoMendio);
 			textNumero.setTextAppearance(context, R.style.textoMendio);
 		}
-		
+
+		if (!funcoes.getValorXml("ImagemPessoa").equalsIgnoreCase("S")){
+			imagePessoa.setVisibility(View.GONE);
+		}
 		/**
 		 * Recupera dentro da lista de pessoas, uma pessoa(nome) especifica de acordo com a
 		 * posicao passada no parametro do getView

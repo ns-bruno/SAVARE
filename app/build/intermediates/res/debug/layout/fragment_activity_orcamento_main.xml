@@ -1,8 +1,0 @@
-<android.support.v4.view.ViewPager 
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/fragment_activity_orcamento_main_pagina"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent" >
-
-
-</android.support.v4.view.ViewPager><!-- From: file:/D:/Dropbox/Forca%20de%20Venda%20Movel/Codigo%20Fonte/SAVARE_Studio/app/src/main/res/layout/fragment_activity_orcamento_main.xml -->

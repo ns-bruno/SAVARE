@@ -1,7 +1,7 @@
 package com.savare.configuracao;
 
 /**
- * Created by Faturamento on 18/12/2015.
+ * Created by Bruno Nogueira Silva on 18/12/2015.
  */
 public class ConfiguracoesInternas {
 

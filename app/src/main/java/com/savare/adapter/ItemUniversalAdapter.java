@@ -37,6 +37,7 @@ import com.savare.beans.EstoqueBeans;
 import com.savare.beans.ItemOrcamentoBeans;
 import com.savare.beans.LogBeans;
 import com.savare.beans.OrcamentoBeans;
+import com.savare.beans.PessoaBeans;
 import com.savare.beans.PlanoPagamentoBeans;
 import com.savare.beans.PortadorBancoBeans;
 import com.savare.beans.ProdutoListaBeans;
@@ -73,7 +74,9 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 							CIDADE = 17,
 							TELEFONE = 18,
 							STATUS = 19,
-							AREA = 20;
+							AREA = 20,
+							CIDADE_DARK = 21,
+							CLIENTE = 22;
 	private Context context;
 	private int tipoItem, diasProdutoNovo;
 	private int campoAtualProduto = -1;
@@ -96,6 +99,7 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 	private List<TelefoneBeans> listaTelefone;
 	private List<StatusBeans> listaStatus;
 	private List<AreaBeans> listaArea;
+	private List<PessoaBeans> listaPessoa;
 	private FuncoesPersonalizadas funcoes;
 	
 	/**
@@ -420,6 +424,14 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 		this.listaArea = listaArea;
 	}
 
+	public List<PessoaBeans> getListaPessoa() {
+		return listaPessoa;
+	}
+
+	public void setListaPessoa(List<PessoaBeans> listaPessoa) {
+		this.listaPessoa = listaPessoa;
+	}
+
 	@Override
 	public int getCount() {
 		// Verifica o tipo de item
@@ -478,7 +490,7 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 			
 			return this.listaEstado.size();
 			
-		} else if(this.tipoItem == CIDADE){
+		} else if(this.tipoItem == CIDADE || this.tipoItem == CIDADE_DARK){
 			
 			return this.listaCidade.size();
 			
@@ -493,6 +505,9 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 		} else if (this.tipoItem == AREA){
 
 			return this.listaArea.size();
+		} else if (this.tipoItem == CLIENTE){
+
+			return this.listaPessoa.size();
 		} else{
 			return 0;
 		}
@@ -557,7 +572,7 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 			
 			return this.listaEstado.get(position);
 			
-		} else if(this.tipoItem == CIDADE){
+		} else if(this.tipoItem == CIDADE || this.tipoItem == CIDADE_DARK){
 			
 			return this.listaCidade.get(position);
 			
@@ -572,6 +587,10 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 		} else if(this.tipoItem == AREA){
 
 			return this.listaArea.get(position);
+
+		} else if(this.tipoItem == CLIENTE){
+
+			return this.listaPessoa.get(position);
 
 		} else {
 			return null;
@@ -629,7 +648,7 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 			
 			return this.listaEstado.get(position).getIdEstado();
 			
-		} else if(this.tipoItem == CIDADE){
+		} else if(this.tipoItem == CIDADE || this.tipoItem == CIDADE_DARK){
 			
 			return this.listaCidade.get(position).getIdCidade();
 			
@@ -644,6 +663,9 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 		} else if (this.tipoItem == AREA){
 
 			return this.listaArea.get(position).getIdArea();
+		} else if (this.tipoItem == CLIENTE){
+
+			return this.listaPessoa.get(position).getIdPessoa();
 		} else {
 			return position;
 		}
@@ -762,9 +784,10 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 			if ( (funcoes.getValorXml("ImagemProduto").equalsIgnoreCase("S")) && (produto.getProduto().getImagemProduto() != null) && (produto.getProduto().getImagemProduto().getFotos() != null)){
 				// Torna o campo da imagem do produto visivel
 				imageCirclePrincipal.setVisibility(View.VISIBLE);
+				// Pega a imagem que esta no banco de dados
 				imageCirclePrincipal.setImageBitmap(produto.getProduto().getImagemProduto().getImagem());
 			}
-			// Verifica se o estoque eh menor que zero
+			// Verifica se o estoque eh menor ou igual a que zero
 			if(produto.getEstoqueFisico() < 1){
 				textBottonDireito.setTextColor(context.getResources().getColor(R.color.vermelho));
 				textBottonDireito.setTag(produto.getEstoqueFisico());
@@ -1336,27 +1359,58 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 			
 		} else if(this.tipoItem == CIDADE){
 				CidadeBeans cidade = listaCidade.get(position);
-				
+
 				textDescricao.setText(cidade.getDescricao());
 
-				if (cidade.getIdCidade() >= 0){
-					textAbaixoDescricaoDireita.setText(cidade.getIdCidade());
+				if ((cidade.getEstado() != null) && (cidade.getEstado().getSiglaEstado() != null)){
+					textAbaixoDescricaoDireita.setText(cidade.getEstado().getSiglaEstado());
+
+				} else if (cidade.getIdCidade() >= 0){
+					textAbaixoDescricaoDireita.setText("Cod.: " + cidade.getIdCidade());
+
 				} else {
 					textAbaixoDescricaoDireita.setVisibility(View.GONE);
 				}
-				
+
 				textAbaixoDescricaoEsqueda.setVisibility(View.GONE);
 				textBottonDireito.setVisibility(View.GONE);
 				textBottonEsquerdo.setVisibility(View.GONE);
 				textBottonEsquerdoDois.setVisibility(View.GONE);
 				viewRodape.setVisibility(View.INVISIBLE);
 				viewTopo.setVisibility(View.INVISIBLE);
-				
+
+		} else if(this.tipoItem == CIDADE_DARK){
+			CidadeBeans cidade = listaCidade.get(position);
+
+			textDescricao.setText(cidade.getDescricao());
+			textDescricao.setTextColor(context.getResources().getColor(R.color.branco));
+
+			//view.setBackgroundColor(context.getResources().getColor(R.color.preto));
+
+			if ((cidade.getEstado() != null) && (cidade.getEstado().getSiglaEstado() != null)){
+				textAbaixoDescricaoEsqueda.setText(cidade.getEstado().getSiglaEstado());
+				textAbaixoDescricaoEsqueda.setTextColor(context.getResources().getColor(R.color.branco));
+
+			} else if (cidade.getIdCidade() >= 0){
+				textAbaixoDescricaoEsqueda.setText("Cod.: " + cidade.getIdCidade());
+				textAbaixoDescricaoEsqueda.setTextColor(context.getResources().getColor(R.color.branco));
+
+			} else {
+				textAbaixoDescricaoEsqueda.setVisibility(View.GONE);
+			}
+
+			textAbaixoDescricaoDireita.setVisibility(View.GONE);
+			textBottonDireito.setVisibility(View.GONE);
+			textBottonEsquerdo.setVisibility(View.GONE);
+			textBottonEsquerdoDois.setVisibility(View.GONE);
+			viewRodape.setVisibility(View.INVISIBLE);
+			viewTopo.setVisibility(View.INVISIBLE);
+
 		} else if(this.tipoItem == TELEFONE){
 			TelefoneBeans telefone = listaTelefone.get(position);
-			
+
 			textDescricao.setText("(" + telefone.getDdd() + ") " + telefone.getTelefone());
-			
+
 			textAbaixoDescricaoDireita.setVisibility(View.GONE);
 			textAbaixoDescricaoEsqueda.setVisibility(View.GONE);
 			textBottonDireito.setVisibility(View.GONE);
@@ -1384,6 +1438,43 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 			textAbaixoDescricaoEsqueda.setText("Código: "+area.getCodigo());
 
 			textAbaixoDescricaoDireita.setVisibility(View.GONE);
+			textBottonEsquerdo.setVisibility(View.GONE);
+			textBottonEsquerdoDois.setVisibility(View.GONE);
+			textBottonDireito.setVisibility(View.GONE);
+			viewRodape.setVisibility(View.GONE);
+			viewTopo.setVisibility(View.GONE);
+
+		} else if (this.tipoItem == CLIENTE) {
+			PessoaBeans pessoa = listaPessoa.get(position);
+
+			textDescricao.setText(pessoa.getCodigoCliente() + " - " + pessoa.getNomeRazao());
+			textDescricao.setTextColor(context.getResources().getColor(R.color.verde));
+			textAbaixoDescricaoEsqueda.setText(pessoa.getNomeFantasia());
+			textAbaixoDescricaoEsqueda.setTextColor(context.getResources().getColor(R.color.azul_medio_200));
+
+			textAbaixoDescricaoDireita.setVisibility(View.GONE);
+
+			textBottonEsquerdo.setText(pessoa.getCidadePessoa().getDescricao() + " - ");
+			textBottonEsquerdoDois.setText(pessoa.getEnderecoPessoa().getBairro());
+			textBottonDireito.setText(pessoa.getCpfCnpj());
+
+			// Verifica se o campo bloqueia eh NAO(0) e  o campo PARCELA EM ABERTO eh VENDE(1)
+			if((pessoa.getStatusPessoa().getBloqueia() == '0' ) && (pessoa.getStatusPessoa().getParcelaEmAberto() == '1')){
+				// Muda a cor da View
+				viewRodape.setBackgroundColor(context.getResources().getColor(R.color.verde_escuro));
+
+				// Verifica se o campo bloqueia eh SIM(1) e  o campo PARCELA EM ABERTO eh diferente de VENDE(1)
+			} else if((pessoa.getStatusPessoa().getBloqueia() == '1') && (pessoa.getStatusPessoa().getParcelaEmAberto() != '1')){
+				// Muda a cor da View para vermelho
+				viewRodape.setBackgroundColor(context.getResources().getColor(R.color.vermelho_escuro));
+				//textStatus.setTypeface(null, Typeface.BOLD_ITALIC);
+
+			} else {
+				// Muda a cor da View
+				viewRodape.setBackgroundColor(context.getResources().getColor(R.color.amarelo));
+				//textStatus.setTypeface(null, Typeface.BOLD);
+			}
+
 			textBottonEsquerdo.setVisibility(View.GONE);
 			textBottonEsquerdoDois.setVisibility(View.GONE);
 			textBottonDireito.setVisibility(View.GONE);

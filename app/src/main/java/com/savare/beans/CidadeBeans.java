@@ -10,6 +10,8 @@ public class CidadeBeans {
 	private String descricao,
 				   cep;
 
+	private EstadoBeans estado;
+
 	/**
 	 * @return the idCidade
 	 */
@@ -22,6 +24,14 @@ public class CidadeBeans {
 	 */
 	public void setIdCidade(int idCidade) {
 		this.idCidade = idCidade;
+	}
+
+	public EstadoBeans getEstado() {
+		return estado;
+	}
+
+	public void setEstado(EstadoBeans estado) {
+		this.estado = estado;
 	}
 
 	/**

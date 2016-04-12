@@ -217,7 +217,7 @@ public class ClienteListaActivity extends Activity implements OnNavigationListen
 						     + "CFASTATU.DESCRICAO LIKE '%" + query + "%' ";
 				
 				// Cria a lista com as pessoas de acordo com a cidade selecionada
-				listaPessoas = pessoaRotinas.listaPessoaResumido(where, "cliente");
+				listaPessoas = pessoaRotinas.listaPessoaResumido(where, "cliente", null);
 				// Seta o adapter com a nova lista
 				adapterPessoa = new PessoaAdapter(ClienteListaActivity.this, listaPessoas, 0);
 				// Seta o listView com o novo adapter que ja esta com a nova lista
@@ -283,11 +283,11 @@ public class ClienteListaActivity extends Activity implements OnNavigationListen
 			// Monta a clausula where do sql
 			where = "CFACIDAD.DESCRICAO = '" + adapterCidade.getLista().get(itemPosition).getTextoPrincipal().replace("'", "%") + "'";
 			// Cria a lista com as pessoas de acordo com a cidade selecionada
-			listaPessoas = pessoaRotinas.listaPessoaResumido(where, "cliente");
+			listaPessoas = pessoaRotinas.listaPessoaResumido(where, "cliente", null);
 			
 		} else if(adapterCidade.getLista().get(itemPosition).getTextoPrincipal().equalsIgnoreCase("Todas as Cidades")) {
 			// Preenche a lista de pessoas
-			listaPessoas = pessoaRotinas.listaPessoaResumido(null, "cliente");
+			listaPessoas = pessoaRotinas.listaPessoaResumido(null, "cliente", null);
 		}
 		if(listaPessoas != null){
 			// Seta o adapter com a nova lista

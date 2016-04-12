@@ -14,6 +14,7 @@ import org.apache.commons.net.io.CopyStreamAdapter;
 import org.apache.commons.net.io.CopyStreamEvent;
 
 import android.app.Activity;
+import android.app.Notification;
 import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Context;
@@ -25,12 +26,16 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Environment;
 
+import com.savare.R;
 import com.savare.banco.local.ConexaoBancoDeDados;
+import com.savare.configuracao.ConfiguracoesInternas;
 import com.savare.funcoes.VersionUtils;
 import com.savare.banco.funcoesSql.OrcamentoSql;
 import com.savare.banco.funcoesSql.UsuarioSQL;
 import com.savare.funcoes.FuncoesPersonalizadas;
 import com.savare.funcoes.rotinas.GerarXmlOrcamentoRotinas;
+
+import br.com.goncalves.pugnotification.notification.PugNotification;
 
 public class EnviarOrcamentoFtpAsyncRotinas extends AsyncTask<String, String, Integer> {
 
@@ -77,7 +82,16 @@ public class EnviarOrcamentoFtpAsyncRotinas extends AsyncTask<String, String, In
 			progress.setMessage("Aguarde, gerando os arquivos necessários à serem enviados...");
 			progress.setCancelable(false);
 			progress.show();
-		} 
+		}
+		PugNotification.with(context)
+					   .load()
+					   .title(R.string.enviando_pedidos)
+					   .bigTextStyle("Aguarde, gerando os arquivos necessários à serem enviados...")
+					   .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
+					   .smallIcon(R.drawable.ic_launcher)
+					   .progress()
+					   .value(0, 0, true)
+					   .build();
 	}
 
 	@Override
@@ -93,6 +107,17 @@ public class EnviarOrcamentoFtpAsyncRotinas extends AsyncTask<String, String, In
 			if(telaChamada != TELA_RECEPTOR_ALARME){
 				publishProgress("Estamos verificando se existe alguma conexão com a internet, aguarde...");
 			}
+			PugNotification.with(context)
+					.load()
+					.title(R.string.enviando_pedidos)
+					.bigTextStyle("Estamos verificando se existe alguma conexão com a internet, aguarde...")
+					.identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
+					.smallIcon(R.drawable.ic_launcher)
+					.progress()
+					.value(0, 0, true)
+					.build();
+
+
 
 			// Checa se tem internet
 			if (funcoes.existeConexaoInternet()) {
@@ -119,6 +144,15 @@ public class EnviarOrcamentoFtpAsyncRotinas extends AsyncTask<String, String, In
 					if(telaChamada != TELA_RECEPTOR_ALARME){
 						publishProgress("Estamos gerando o arquivo " + (i + 1) + " de " + params.length + ", aguarde...");
 					}
+					PugNotification.with(context)
+							.load()
+							.title(R.string.enviando_pedidos)
+							.bigTextStyle("Estamos gerando o arquivo " + (i + 1) + " de " + params.length + ", aguarde...")
+							.identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
+							.smallIcon(R.drawable.ic_launcher)
+							.progress()
+							.value(0, 0, true)
+							.build();
 
 					File localXml = new File(gerarXml.criarArquivoXml());
 
@@ -128,7 +162,15 @@ public class EnviarOrcamentoFtpAsyncRotinas extends AsyncTask<String, String, In
 						if(telaChamada != TELA_RECEPTOR_ALARME){
 							publishProgress("O arquivo " + (i + 1) + " de " + params.length + " foi gerado com sucesso, estamos conectando com o servidor em nuvem, aguarde...");
 						}
-
+						PugNotification.with(context)
+								.load()
+								.title(R.string.enviando_pedidos)
+								.bigTextStyle("O arquivo " + (i + 1) + " de " + params.length + " foi gerado com sucesso, estamos conectando com o servidor em nuvem, aguarde...")
+								.identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
+								.smallIcon(R.drawable.ic_launcher)
+								.progress()
+								.value(0, 0, true)
+								.build();
 						try {
 							conexaoFtp.setConnectTimeout(20 * 1000);
 							conexaoFtp.setDefaultTimeout(40 * 1000);
@@ -148,6 +190,15 @@ public class EnviarOrcamentoFtpAsyncRotinas extends AsyncTask<String, String, In
 								if(telaChamada != TELA_RECEPTOR_ALARME){
 									publishProgress( mensagemErro = mensagemErro + "Não foi possível conectar no servidor em nuvem. Vamos para próxima etapa, aguarde... \n");
 								}
+								PugNotification.with(context)
+										.load()
+										.title(R.string.enviando_pedidos)
+										.bigTextStyle("Não foi possível conectar no servidor em nuvem. Vamos para próxima etapa, aguarde...")
+										.identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
+										.smallIcon(R.drawable.ic_launcher)
+										.progress()
+										.value(0, 0, true)
+										.build();
 							}
 
 							if (status) {
@@ -155,7 +206,15 @@ public class EnviarOrcamentoFtpAsyncRotinas extends AsyncTask<String, String, In
 								if(telaChamada != TELA_RECEPTOR_ALARME){
 									publishProgress("Conectou com sucesso no servidor em nuvem. Estamos enviado o arquivo " + (i + 1) + " de " + params.length + ", aguarde...");
 								}
-
+								PugNotification.with(context)
+										.load()
+										.title(R.string.enviando_pedidos)
+										.bigTextStyle("Conectou com sucesso no servidor em nuvem. Estamos enviado o arquivo " + (i + 1) + " de " + params.length + ", aguarde...")
+										.identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
+										.smallIcon(R.drawable.ic_launcher)
+										.progress()
+										.value(0, 0, true)
+										.build();
 								// Checa se o arquivo xml existe
 								if (localXml.exists()) {
 									// Setando para o modo de transferencia de Arquivos
@@ -177,6 +236,16 @@ public class EnviarOrcamentoFtpAsyncRotinas extends AsyncTask<String, String, In
 									// Pega o tamanho total do arquivo XML em bytes
 									final double totalByteArquivo = (double) localXml.length();
 									final int arquivoAtual = i;
+
+									PugNotification.with(context)
+											.load()
+											.title(R.string.enviando_pedidos)
+											.bigTextStyle("Conectou com sucesso no servidor em nuvem. Estamos enviado o arquivo " + (i + 1) + " de " + params.length + ", aguarde...")
+											.identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
+											.smallIcon(R.drawable.ic_launcher)
+											.progress()
+											.value(0, (int) localXml.length(), false)
+											.build();
 
 									// Cria um formato para o formatar numeros
 									// reais (double)
@@ -200,8 +269,18 @@ public class EnviarOrcamentoFtpAsyncRotinas extends AsyncTask<String, String, In
 												double percentual = ((totalTransferido / totalArquivo) * 100);
 	
 												publishProgress("Foi transferido " + format.format(percentual) + "%, " + totalBytesTransferred + " de " + totalByteArquivo
-															  + " bytes do arquivo " + (arquivoAtual + 1) + " de " + params.length + ", aguarde...");
+														+ " bytes do arquivo " + (arquivoAtual + 1) + " de " + params.length + ", aguarde...");
+
 											}
+											PugNotification.with(context)
+													.load()
+													.title(R.string.enviando_pedidos)
+													.bigTextStyle("Transferindo o aquivo, aguarde...")
+													.identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
+													.smallIcon(R.drawable.ic_launcher)
+													.progress()
+													.value(bytesTransferred, (int) totalByteArquivo, false)
+													.build();
 										}
 
 										@Override
@@ -220,6 +299,15 @@ public class EnviarOrcamentoFtpAsyncRotinas extends AsyncTask<String, String, In
 										if(telaChamada != TELA_RECEPTOR_ALARME){
 											publishProgress("Confirmando o envio do arquivo " + (i + 1) + " de " + params.length + ", aguarde...");
 										}
+										PugNotification.with(context)
+												.load()
+												.title(R.string.enviando_pedidos)
+												.bigTextStyle("Confirmando o envio do arquivo " + (i + 1) + " de " + params.length + ", aguarde...")
+												.identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
+												.smallIcon(R.drawable.ic_launcher)
+												.progress()
+												.value(0, (int) localXml.length(), false)
+												.build();
 
 										// Renomeia o arquivo enviado para checar se chegou no servidor FTP com  sucesso
 										if (renomeaArquivoFtp("arquivoDeEnvio_" + funcoes.getValorXml("ChaveEmpresa") + ".txt", nome)) {
@@ -227,6 +315,15 @@ public class EnviarOrcamentoFtpAsyncRotinas extends AsyncTask<String, String, In
 											if(telaChamada != TELA_RECEPTOR_ALARME){
 												publishProgress("Arquvio " + (i + 1) + " de " + params.length + " enviado com sucesso, eliminando os arquivos temporarios, aguarde...");
 											}
+											PugNotification.with(context)
+													.load()
+													.title(R.string.enviando_pedidos)
+													.bigTextStyle("Confirmando o envio do arquivo " + (i + 1) + " de " + params.length + ", aguarde...")
+													.identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
+													.smallIcon(R.drawable.ic_launcher)
+													.progress()
+													.value(0, 0, true)
+													.build();
 											// Desconecta do servidor FTP
 											conexaoFtp.disconnect();
 
@@ -247,7 +344,15 @@ public class EnviarOrcamentoFtpAsyncRotinas extends AsyncTask<String, String, In
 												if(telaChamada != TELA_RECEPTOR_ALARME){
 													publishProgress("Arquvio temporario " + (i + 1) + " de " + params.length + " eliminado com sucesso, vamos passar para o próximo, aguarde...");
 												}
-												
+												PugNotification.with(context)
+														.load()
+														.title(R.string.enviando_pedidos)
+														.bigTextStyle("Arquvio temporario " + (i + 1) + " de " + params.length + " eliminado com sucesso, vamos passar para o próximo, aguarde...")
+														.identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
+														.smallIcon(R.drawable.ic_launcher)
+														.progress()
+														.value(0, 0, true)
+														.build();
 												// Pega o id do orcamento
 												final String idOrcamento = params[i];
 												
@@ -289,7 +394,7 @@ public class EnviarOrcamentoFtpAsyncRotinas extends AsyncTask<String, String, In
 												totalEnviado++;
 
 												// Marca nas propriedades interna da aplicacao que nao esta mais enviando dados
-												funcoes.setValorXml("ChaveEmpresa", "N");
+												funcoes.setValorXml("EnviandoDados", "N");
 
 												if(qtdUpdate <= 0){
 													mensagemErro = mensagemErro + "Não foi possível marcar o pedido " + idOrcamento + " como enviado. \n";
@@ -368,6 +473,8 @@ public class EnviarOrcamentoFtpAsyncRotinas extends AsyncTask<String, String, In
 
 		FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
 
+		funcoes.setValorXml("EnviandoDados", "N");
+
 		if(telaChamada != TELA_RECEPTOR_ALARME){
 			ContentValues dadosMensagem = new ContentValues();
 			dadosMensagem.put("comando", 0);
@@ -392,13 +499,17 @@ public class EnviarOrcamentoFtpAsyncRotinas extends AsyncTask<String, String, In
 	
 			desbloqueiaOrientacaoTela();
 		} else {
-			// Cria a intent com identificacao do alarme
-			Intent intent = new Intent("NOTIFICACAO_SAVARE");
-			intent.putExtra("TICKER", "Nova Mensagem do Envio de Orçamento");
-			intent.putExtra("TITULO", "SAVARE");
-			intent.putExtra("MENSAGEM", mensagemErro);
-			
-			context.sendBroadcast(intent);
+
+			PugNotification.with(context)
+					.load()
+					.identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
+					.title(R.string.enviando_pedidos)
+					.bigTextStyle(mensagemErro)
+					.smallIcon(R.drawable.ic_launcher)
+					.largeIcon(R.drawable.ic_launcher)
+					.flags(Notification.DEFAULT_ALL)
+					.simple()
+					.build();
 		}
 	}
 

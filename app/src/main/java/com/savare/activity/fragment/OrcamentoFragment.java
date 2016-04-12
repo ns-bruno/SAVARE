@@ -8,6 +8,7 @@ import com.savare.R;
 import com.savare.activity.ClienteListaActivity;
 import com.savare.activity.LogActivity;
 import com.savare.activity.OrcamentoProdutoDetalhesActivity;
+import com.savare.activity.material.designer.ClienteListaMDActivity;
 import com.savare.activity.material.designer.ProdutoListaMDActivity;
 import com.savare.adapter.ItemUniversalAdapter;
 import com.savare.banco.funcoesSql.ItemOrcamentoSql;
@@ -125,38 +126,6 @@ public class OrcamentoFragment extends Fragment {
 						funcoes.menssagem(mensagem);
 					}
 
-					/*ProdutoListaBeans produtoVenda = new ProdutoListaBeans();
-					// Instancia a classe de rotinas de produtos
-					ProdutoRotinas produtoRotinas = new ProdutoRotinas(getActivity());
-					// Pega os dados do produto
-					produtoVenda = produtoRotinas.listaProduto("AEAPRODU.ID_AEAPRODU = " + itemOrcamento.getProduto().getIdProduto(), null, textCodigoOrcamento.getText().toString()).get(0);
-					produtoVenda.setAtacadoVarejo(textAtacadoVarejo.getText().charAt(0));
-
-					// Checa se nao esta vazio
-					if ((produtoVenda != null) && (produtoVenda.getProduto() != null)) {
-
-						Bundle bundle = new Bundle();
-						bundle.putParcelable("AEAPLOJA", produtoVenda);
-						bundle.putParcelable("AEAORCAM", preencheDadosOrcamento());
-						bundle.putInt("POSICAO", position);
-						bundle.putLong("ID_AEAITORC", itemOrcamento.getIdItemOrcamento());
-						bundle.putString("TELA_CHAMADA", "OrcamentoActivity");
-						// Abre a tela de detalhes do produto
-						Intent intent = new Intent(getActivity(), OrcamentoProdutoDetalhesActivity.class);
-						intent.putExtras(bundle);
-
-						startActivityForResult(intent, 1);
-					} else {
-						// Dados da mensagem
-						ContentValues mensagem = new ContentValues();
-						mensagem.put("comando", 0);
-						mensagem.put("tela", "OrcamentoActivity");
-						mensagem.put("mensagem", "Não foi possível carregar os dados do produto. \n");
-						// Instancia a classe  de funcoes para mostra a mensagem
-						FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(getActivity());
-						funcoes.menssagem(mensagem);
-					}*/
-
 				} else {
 					FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(getActivity());
 					// Cria uma variavem para inserir as propriedades da mensagem
@@ -270,8 +239,8 @@ public class OrcamentoFragment extends Fragment {
 							ContentValues mensagem = new ContentValues();
 							mensagem.put("comando", 2);
 							mensagem.put("tela", "OrcamentoActivity");
-							mensagem.put("mensagem", "N�o � um or�amento. \n"
-									+ "N�o pode ser deletado.");
+							mensagem.put("mensagem", viewOrcamento.getResources().getString(R.string.nao_orcamento) + "\n"
+												   + viewOrcamento.getResources().getString(R.string.nao_pode_deletado));
 							// Executa a mensagem passando por parametro as propriedades
 							funcoes.menssagem(mensagem);
 						}
@@ -344,7 +313,7 @@ public class OrcamentoFragment extends Fragment {
 		
 		OrcamentoRotinas orcamentoRotinas = new OrcamentoRotinas(getActivity());
 		// Pega todos os produtos do orcamento
-		listaItemOrcamento = orcamentoRotinas.listaItemOrcamentoResumida(null, textCodigoOrcamento.getText().toString());
+		listaItemOrcamento = orcamentoRotinas.listaItemOrcamentoResumida(null, textCodigoOrcamento.getText().toString(), null);
 		
 		adapterItemOrcamento = new ItemUniversalAdapter(getActivity(), ItemUniversalAdapter.ITEM_ORCAMENTO, listaItemOrcamento);
 		
@@ -656,7 +625,7 @@ public class OrcamentoFragment extends Fragment {
 			// Checa se eh um orcamento
 			if (tipoOrcamentoPedido.equals("O")){
 				// Abre a tela de detalhes do produto
-				Intent intent = new Intent(getActivity(), ClienteListaActivity.class);
+				Intent intent = new Intent(getActivity(), ClienteListaMDActivity.class);
 				intent.putExtra(KEY_TELA_CHAMADA, KEY_TELA_ORCAMENTO_FRAGMENTO);
 				intent.putExtra(KEY_ID_ORCAMENTO, textCodigoOrcamento.getText().toString());
 				// Abre a activity aquardando uma resposta

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/menu_cliente_lista_md_search_pesquisar"
+        android:orderInCategory="100"
+        android:icon="@mipmap/ic_magnify_dark"
+        android:title="@string/pesquisar"
+        app:showAsAction="ifRoom|collapseActionView"
+        app:actionViewClass="android.support.v7.widget.SearchView" />
+
+
+    <item
+        android:id="@+id/menu_cliente_lista_md_search_action_delete"
+        android:orderInCategory="102"
+        android:icon="@mipmap/ic_delete_dark"
+        android:title="@string/limpar_historico"
+        app:showAsAction="never" />
+
+</menu>

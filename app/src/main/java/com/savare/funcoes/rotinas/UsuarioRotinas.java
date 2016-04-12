@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 
+import com.savare.banco.funcoesSql.OrcamentoSql;
 import com.savare.banco.funcoesSql.PessoaSql;
 import com.savare.banco.funcoesSql.UsuarioSQL;
 import com.savare.beans.StatusBeans;
@@ -180,5 +181,24 @@ public class UsuarioRotinas extends Rotinas {
 
         }
         return "";
+    }
+
+    public int quantidadeHorasUltimoEnvio(){
+        int qtdHoras = -1;
+        // Instancia a classe para manipular a tabela no banco de dados
+        UsuarioSQL usuarioSQL = new UsuarioSQL(context);
+
+        String sql = ("SELECT (((STRFTIME('%s','now') - STRFTIME('%s',USUARIO_USUA.DT_ULTIMO_ENVIO))/60)/60) AS HORAS FROM USUARIO_USUA");
+
+        Cursor cursor = usuarioSQL.sqlSelect(sql);
+
+        // Checa se retornou algum registro
+        if( (cursor != null) && (cursor.getCount() > 0) ){
+            // Move para o primeiro registro
+            cursor.moveToFirst();
+            // Pega o valor salvo no cursor
+            qtdHoras = cursor.getInt(cursor.getColumnIndex("HORAS"));
+        }
+        return qtdHoras;
     }
 }

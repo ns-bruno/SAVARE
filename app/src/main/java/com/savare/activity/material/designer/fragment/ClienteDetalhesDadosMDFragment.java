@@ -156,21 +156,6 @@ public class ClienteDetalhesDadosMDFragment extends Fragment {
         }
     }
 
-    @Override
-    public boolean onContextItemSelected(MenuItem item) {
-
-        switch (item.getItemId()){
-
-            case android.R.id.home:
-                getActivity().finish();
-                break;
-
-            default:
-                break;
-        }
-
-        return super.onContextItemSelected(item);
-    }
 
     private void recuperarCamposTela(){
         textCodigoPessoa = (TextView) viewDados.findViewById(R.id.fragment_cliente_detalhes_dados_md_text_codigo_pessoa);

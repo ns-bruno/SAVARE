@@ -3,11 +3,14 @@ package com.savare.funcoes.rotinas;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
+import android.widget.ProgressBar;
 
+import com.savare.R;
 import com.savare.banco.funcoesSql.PessoaSql;
 import com.savare.beans.CidadeBeans;
 import com.savare.beans.DescricaoSimplesBeans;
@@ -80,6 +83,58 @@ public class PessoaRotinas extends Rotinas {
 		
 		return lista;
 	} // Fim listaCidadePessoa
+
+	public List<CidadeBeans> listaCidadeCliente(String tipoPessoa){
+		// Cria uma lista para retornar as cidades
+		List<CidadeBeans> lista = new ArrayList<CidadeBeans>();
+
+		String sql = "SELECT CFACIDAD.ID_CFACIDAD, CFACIDAD.DESCRICAO AS DESCRICAO_CIDAD, CFAESTAD.UF FROM CFAENDER "
+				+ "LEFT OUTER JOIN CFACIDAD ON CFAENDER.ID_CFACIDAD = CFACIDAD.ID_CFACIDAD "
+				+ "LEFT OUTER JOIN CFAESTAD ON CFACIDAD.ID_CFAESTAD = CFAESTAD.ID_CFAESTAD "
+				+ "LEFT OUTER JOIN CFACLIFO ON CFAENDER.ID_CFACLIFO = CFACLIFO.ID_CFACLIFO "
+				+ "WHERE (CFACIDAD.DESCRICAO IS NOT NULL) ";
+
+		// Verifica qual opcao foi passado por parametro
+		if(tipoPessoa.equalsIgnoreCase(KEY_TIPO_CLIENTE)){
+			sql = sql + "AND (CFACLIFO.CLIENTE = 1) GROUP BY CFACIDAD.DESCRICAO ";
+
+		}else {
+			sql = sql + "GROUP BY CFACIDAD.DESCRICAO ";
+		}
+		// Instancia a classe para manipular o banco de dados
+		PessoaSql clienteSql = new PessoaSql(context);
+		// Executa a funcao para retornar os registro do banco de dados
+		Cursor cursor = clienteSql.sqlSelect(sql);
+
+		if((cursor != null) && (cursor.getCount() > 0)){
+
+			while (cursor.moveToNext()) {
+				// Instancia a classe para salvar o nome da cidade
+				CidadeBeans cidade = new CidadeBeans();
+				cidade.setIdCidade(cursor.getInt(cursor.getColumnIndex("ID_CFACIDAD")));
+				cidade.setDescricao(cursor.getString(cursor.getColumnIndex("DESCRICAO_CIDAD")));
+
+				EstadoBeans estado = new EstadoBeans();
+				estado.setSiglaEstado(cursor.getString(cursor.getColumnIndex("UF")));
+				cidade.setEstado(estado);
+				// Adiciona a cidade em uma lista
+				lista.add(cidade);
+			}
+
+		} else {
+			CidadeBeans cidade = new CidadeBeans();
+			cidade.setIdCidade(0);
+			cidade.setDescricao("Nenhum valor encontrado");
+		}
+
+		// Adiciona um valor padrao para selecionar todas as cidades
+		CidadeBeans cidade = new CidadeBeans();
+		cidade.setIdCidade(0);
+		cidade.setDescricao("Todas as Cidades");
+		lista.add(cidade);
+
+		return lista;
+	} // Fim listaCidadePessoa
 	
 	
 	/**
@@ -88,7 +143,8 @@ public class PessoaRotinas extends Rotinas {
 	 * @param tipoPessoa - KEY_TIPO_CLIENTE, KEY_TIPO_FONECEDOR, KEY_TIPO_USUARIO
 	 * @return
 	 */
-	public List<PessoaBeans> listaPessoaResumido(String where, String tipoPessoa) {
+	public List<PessoaBeans> listaPessoaResumido(String where, String tipoPessoa, final ProgressBar progresso) {
+
 		String sql = "SELECT CFACLIFO.ID_CFACLIFO, CFACLIFO.CODIGO_CLI, CFACLIFO.CODIGO_FUN, CFACLIFO.CODIGO_USU, "
 					+"CFACLIFO.CODIGO_TRA, CFACLIFO.CLIENTE, "
 					+"CFACLIFO.NOME_RAZAO, CFACLIFO.NOME_FANTASIA, CFACLIFO.PESSOA, CFACLIFO.DT_ULT_COMPRA, CFACLIFO.STATUS_CADASTRO_NOVO, "
@@ -126,9 +182,21 @@ public class PessoaRotinas extends Rotinas {
 		// Instancia a classe para manipular o banco de dados
 		PessoaSql pessoaSql = new PessoaSql(context);
 		
-		Cursor dadosPessoa = pessoaSql.sqlSelect(sql);
+		final Cursor dadosPessoa = pessoaSql.sqlSelect(sql);
 		// Se o cursor tiver algum valor entra no laco
 		if (dadosPessoa != null && dadosPessoa.getCount() > 0){
+
+			// Checa se tem alguma barra de progresso
+			if (progresso != null){
+				((Activity) context).runOnUiThread(new Runnable() {
+					public void run() {
+						progresso.setIndeterminate(false);
+						progresso.setProgress(0);
+						progresso.setMax(dadosPessoa.getCount());
+					}
+				});
+			}
+
 			// Cria a variavel para salvar os dados da pesso
 			PessoaBeans pessoa;
 			
@@ -139,7 +207,16 @@ public class PessoaRotinas extends Rotinas {
 			
 			// Enquanto o cursor for para o proximo registro e entra no laco
 			for(int controle = 0; controle < dadosPessoa.getCount(); controle++){
-				
+
+				if (progresso != null) {
+
+					final int finalControle = controle;
+					((Activity) context).runOnUiThread(new Runnable() {
+						public void run() {
+							progresso.setProgress(finalControle);
+						}
+					});
+				}
 				// Instancia a classe de pessoa para armazenar os valores do banco
 				pessoa = new PessoaBeans();
 				// Preenche os dados da pessoa
@@ -247,7 +324,7 @@ public class PessoaRotinas extends Rotinas {
 		try{
 			String where = "CFACLIFO.ID_CFACLIFO = " + idPessoa;
 			
-			dadosPessoaCompleto = listaPessoaResumido(where, tipoPessoa).get(0);
+			dadosPessoaCompleto = listaPessoaResumido(where, tipoPessoa, null).get(0);
 			
 			FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
 			

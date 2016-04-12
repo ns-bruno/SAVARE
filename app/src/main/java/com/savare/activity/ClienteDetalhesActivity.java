@@ -188,7 +188,7 @@ public class ClienteDetalhesActivity extends Activity implements OnChartGestureL
 			// Instancia a classe de funcoes sql para pessoa
 			PessoaRotinas pessoaRotinas = new PessoaRotinas(ClienteDetalhesActivity.this);
 			// Pega os dados de uma pessoa especifica
-			final PessoaBeans pessoa = pessoaRotinas.listaPessoaResumido("CODIGO_CLI = " + codigoCli, PessoaRotinas.KEY_TIPO_CLIENTE).get(0);
+			final PessoaBeans pessoa = pessoaRotinas.listaPessoaResumido("CODIGO_CLI = " + codigoCli, PessoaRotinas.KEY_TIPO_CLIENTE, null).get(0);
 			
 			// Cria um dialog para selecionar atacado ou varejo
 			AlertDialog.Builder mensagemAtacadoVarejo = new AlertDialog.Builder(ClienteDetalhesActivity.this);

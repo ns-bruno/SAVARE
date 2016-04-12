@@ -7,6 +7,7 @@ import com.savare.beans.PessoaBeans;
 import com.savare.funcoes.FuncoesPersonalizadas;
 import com.savare.funcoes.rotinas.OrcamentoRotinas;
 import com.savare.funcoes.rotinas.PessoaRotinas;
+import com.savare.funcoes.rotinas.UsuarioRotinas;
 import com.savare.funcoes.rotinas.async.EnviarCadastroClienteFtpAsyncRotinas;
 import com.savare.funcoes.rotinas.async.EnviarOrcamentoFtpAsyncRotinas;
 
@@ -28,12 +29,19 @@ public class ReceptorAlarmeEnviarOrcamentoBroadcastRotinas extends BroadcastRece
 	}
 	
 	private void enviarOrcamentoFtpAsync(){
-		OrcamentoRotinas orcamentoRotinas = new OrcamentoRotinas(context);
-		
+
+		UsuarioRotinas usuarioRotinas = new UsuarioRotinas(context);
+
 		FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
+
+		if (usuarioRotinas.quantidadeHorasUltimoEnvio() > 6){
+			funcoes.setValorXml("EnviandoDados", "N");
+		}
 
 		// Checa se esta enviando dados
 		if (!funcoes.getValorXml("EnviandoDados").equalsIgnoreCase("S")) {
+
+			OrcamentoRotinas orcamentoRotinas = new OrcamentoRotinas(context);
 
 			// Marca nos parametro internos que a aplicacao que esta enviando os dados
 			funcoes.setValorXml("EnviandoDados", "S");

@@ -620,7 +620,9 @@ public class ProdutoListaMDFragment extends Fragment {
             pesquisando = false;
         }
 
-    }
+    } // Fim LoaderProdutos
+
+
 
     public class LoaderImagemProdutos extends AsyncTask<Void, Void, Void> {
 
@@ -676,5 +678,5 @@ public class ProdutoListaMDFragment extends Fragment {
             }
             return null;
         }
-    }
+    } // Fim LoaderImagemProdutos
 }

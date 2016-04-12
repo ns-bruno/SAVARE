@@ -413,7 +413,7 @@ public class ClienteCadastroDadosFragment extends Fragment {
 
 				// Pega os dados do usuario
 				List<PessoaBeans> listaPessoas = new ArrayList<PessoaBeans>();
-				listaPessoas = pessoaRotinas.listaPessoaResumido("CFACLIFO.CODIGO_USU = " + funcoes.getValorXml("CodigoUsuario"), PessoaRotinas.KEY_TIPO_USUARIO);
+				listaPessoas = pessoaRotinas.listaPessoaResumido("CFACLIFO.CODIGO_USU = " + funcoes.getValorXml("CodigoUsuario"), PessoaRotinas.KEY_TIPO_USUARIO, null);
 
 				PessoaBeans dadosUsuario = null;
 

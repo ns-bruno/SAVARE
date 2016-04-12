@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -153,6 +154,7 @@ public class ClienteDetalhesGraficoVendasMesMDFragment extends Fragment {
 
         return viewGrafico;
     } // Fim onCreateView
+
 
     private void recuperarCamposTela(){
         barChartVendasMes = (BarChart) viewGrafico.findViewById(R.id.fragment_cliente_detalhes_grafico_vendas_mes_md_barChart_vendas_mes);

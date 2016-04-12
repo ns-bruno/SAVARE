@@ -167,7 +167,7 @@ public class InicioMDActivity extends AppCompatActivity {
 
                         case 1:
                             // Abre a tela de clientes
-                            Intent intent = new Intent(InicioMDActivity.this, ClienteListaActivity.class);
+                            Intent intent = new Intent(InicioMDActivity.this, ClienteListaMDActivity.class);
                             startActivity(intent);
                             return true;
                         //break;
@@ -291,7 +291,7 @@ public class InicioMDActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 // Abre a tela de detalhes do produto
-                Intent intent = new Intent(InicioMDActivity.this, ClienteListaActivity.class);
+                Intent intent = new Intent(InicioMDActivity.this, ClienteListaMDActivity.class);
                 intent.putExtra(ListaOrcamentoPedidoActivity.KEY_TELA_CHAMADA, ListaOrcamentoPedidoActivity.KEY_TELA_LISTA_ORCAMENTO_PEDIDO);
                 // Abre a activity aquardando uma resposta
                 startActivityForResult(intent, ListaOrcamentoPedidoActivity.SOLICITA_CLIENTE);

@@ -223,7 +223,7 @@ public class GerarPdfRotinas {
 			// Percentagem da largura da pagina
 			tabela.setWidthPercentage(100);
 			PessoaRotinas pessoaRotinas = new PessoaRotinas(context);
-			PessoaBeans pessoa = pessoaRotinas.listaPessoaResumido("CFACLIFO.ID_CFACLIFO = " + orcamento.getIdPessoa(), "cliente").get(0);
+			PessoaBeans pessoa = pessoaRotinas.listaPessoaResumido("CFACLIFO.ID_CFACLIFO = " + orcamento.getIdPessoa(), PessoaRotinas.KEY_TIPO_CLIENTE, null).get(0);
 			
 			// Preenche as celulas em asequencia
 			tabela.addCell("Orçamento/Pedido N�: " + orcamento.getIdOrcamento());

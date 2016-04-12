@@ -120,6 +120,12 @@
 
         <activity android:name=".activity.material.designer.ClienteDetalhesMDActivity"
             android:theme="@style/AppBaseTheme"/>
+        <activity android:name=".activity.material.designer.ClienteListaMDActivity"
+            android:theme="@style/AppBaseTheme">
+            <meta-data
+                android:name="android.app.searchable"
+                android:resource="@xml/searchable" />
+        </activity>
 
         <provider
             android:name=".sincronizacao.EnviarProvider"
@@ -209,6 +215,11 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </receiver>
+        <!-- ATTENTION: This was auto-generated to add Google Play services to your project for
+             App Indexing.  See https://g.co/AppIndexing/AndroidStudio for more information. -->
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
 
     </application>
 

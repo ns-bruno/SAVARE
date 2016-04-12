@@ -83,7 +83,7 @@ public class ClienteDetalhesMDActivity extends AppCompatActivity{
                 // Instancia a classe de funcoes sql para pessoa
                 PessoaRotinas pessoaRotinas = new PessoaRotinas(getApplicationContext());
                 // Pega os dados de uma pessoa especifica
-                final PessoaBeans pessoa = pessoaRotinas.listaPessoaResumido("CODIGO_CLI = " + codigoCli, PessoaRotinas.KEY_TIPO_CLIENTE).get(0);
+                final PessoaBeans pessoa = pessoaRotinas.listaPessoaResumido("CODIGO_CLI = " + codigoCli, PessoaRotinas.KEY_TIPO_CLIENTE, null).get(0);
 
                 // Cria um dialog para selecionar atacado ou varejo
                 AlertDialog.Builder mensagemAtacadoVarejo = new AlertDialog.Builder(v.getContext());
@@ -201,7 +201,7 @@ public class ClienteDetalhesMDActivity extends AppCompatActivity{
     }
 
     @Override
-    public boolean onContextItemSelected(MenuItem item) {
+    public boolean onOptionsItemSelected(MenuItem item) {
 
         switch (item.getItemId()){
 
@@ -212,8 +212,7 @@ public class ClienteDetalhesMDActivity extends AppCompatActivity{
             default:
                 break;
         }
-
-        return super.onContextItemSelected(item);
+        return super.onOptionsItemSelected(item);
     }
 
     private void recuperaCampos(){

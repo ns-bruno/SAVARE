@@ -88,7 +88,7 @@ public class InicioActivity extends Activity {
         dataList.add(new DrawerItem("Logs", R.drawable.ic_sim_alert));
         
         // set a custom shadow that overlays the main content when the drawer opens
-        mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow9, GravityCompat.START);
+        mDrawerLayout.setDrawerShadow(R.drawable.ic_drawer, GravityCompat.START);
                 adapter = new CustomDrawerAdapter(this, R.layout.drawer_listview_item, dataList);
         
         // set up the drawer's list view with items and click listener

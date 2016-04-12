@@ -3,10 +3,12 @@ package com.savare.funcoes.rotinas;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.util.Log;
+import android.widget.ProgressBar;
 
 import com.savare.R;
 import com.savare.banco.funcoesSql.ItemOrcamentoSql;
@@ -60,7 +62,7 @@ public class OrcamentoRotinas extends Rotinas {
 	 * @param idOrcamento
 	 * @return
 	 */
-	public List<ItemOrcamentoBeans> listaItemOrcamentoResumida(String where, String idOrcamento){
+	public List<ItemOrcamentoBeans> listaItemOrcamentoResumida(String where, String idOrcamento, final ProgressBar progressBarStatus){
 		
 		String sql = "SELECT AEAITORC.ID_AEAITORC, AEAITORC.ID_AEAORCAM, AEAPRODU.DESCRICAO AS DESCRICAO_PRODU, AEAMARCA.DESCRICAO AS DESCRICAO_MARCA, "
 				   + "AEAPRODU.ID_AEAPRODU, AEAPRODU.CODIGO_ESTRUTURAL, AEAITORC.QUANTIDADE, AEAITORC.FC_LIQUIDO_UN, (AEAITORC.VL_BRUTO / AEAITORC.QUANTIDADE) AS VL_BRUTO_UN, "
@@ -95,7 +97,20 @@ public class OrcamentoRotinas extends Rotinas {
 		if(cursor.getCount() > 0){
 			// Move para o primeiro registro
 			//cursor.moveToFirst();
-			
+			final int totalRegistro = cursor.getCount();
+
+			if (progressBarStatus != null){
+				((Activity) context).runOnUiThread(new Runnable() {
+					public void run() {
+						progressBarStatus.setIndeterminate(false);
+						progressBarStatus.setProgress(0);
+						progressBarStatus.setMax(totalRegistro);
+					}
+				});
+			}
+
+			int incrementoProgresso = 0;
+
 			while (cursor.moveToNext()) {
 				// Intancia a classe de Itens de orcamento para armazenar os dados de cada registro
 				ItemOrcamentoBeans item = new ItemOrcamentoBeans();
@@ -128,6 +143,18 @@ public class OrcamentoRotinas extends Rotinas {
 				
 				// Adiciona o item na lista
 				listaItemOrcamento.add(item);
+
+				incrementoProgresso ++;
+
+				// Incrementa a barra de progresso
+				if (progressBarStatus != null){
+					final int finalIncrementoProgresso = incrementoProgresso;
+					((Activity) context).runOnUiThread(new Runnable() {
+						public void run() {
+							progressBarStatus.setProgress(finalIncrementoProgresso);
+						}
+					});
+				}
 				
 			} // Fim do while
 			
@@ -1109,7 +1136,7 @@ public class OrcamentoRotinas extends Rotinas {
 		} else {
 			List<ItemOrcamentoBeans> listaItemOrcamento = new ArrayList<ItemOrcamentoBeans>();
 
-			listaItemOrcamento = listaItemOrcamentoResumida(null, idOrcamento);
+			listaItemOrcamento = listaItemOrcamentoResumida(null, idOrcamento, null);
 			// Checa se a lista foi preenchida com algum valor
 			if( (listaItemOrcamento != null) && (listaItemOrcamento.size() > 0) ){
 				// Pega o fator de desconto utilizado
@@ -1221,6 +1248,5 @@ public class OrcamentoRotinas extends Rotinas {
 		
 		return data;
 	}
-	
-	
+
 } // Fim da classe
