@@ -1,6 +1,7 @@
 package com.savare.activity.fragment;
 
 import com.savare.R;
+import com.savare.activity.material.designer.OrcamentoTabFragmentMDActivity;
 import com.savare.funcoes.FuncoesPersonalizadas;
 import com.savare.funcoes.rotinas.OrcamentoRotinas;
 
@@ -54,13 +55,13 @@ public class OrcamentoDescontoFragment extends Fragment {
 
 		if (parametro != null) {
 			// Seta o campo codigo consumo total com o que foi passado por parametro
-			textCodigoOrcamento.setText(parametro.getString(OrcamentoTabulacaoFragment.KEY_ID_ORCAMENTO));
+			textCodigoOrcamento.setText(parametro.getString(OrcamentoTabFragmentMDActivity.KEY_ID_ORCAMENTO));
 			//codigoPessoa = parametro.getString("ID_CFACLIFO");
 			//razaoSocial = parametro.getString("NOME_RAZAO");
-			if(parametro.getString(OrcamentoTabulacaoFragment.KEY_ATACADO_VAREJO).equals("0")){
+			if(parametro.getString(OrcamentoTabFragmentMDActivity.KEY_ATACADO_VAREJO).equals("0")){
 				textAtacadoVarejo.setText("Atacado");
 			
-			}else if (parametro.getString(OrcamentoTabulacaoFragment.KEY_ATACADO_VAREJO).equals("1")){
+			}else if (parametro.getString(OrcamentoTabFragmentMDActivity.KEY_ATACADO_VAREJO).equals("1")){
 				textAtacadoVarejo.setText("Varejo");
 			}
 			
@@ -110,6 +111,7 @@ public class OrcamentoDescontoFragment extends Fragment {
 				return false;
 			}
 		});
+
 		// Executa toda vez que eh digitado alguma coisa no campo
 		editDescontoPercentual.addTextChangedListener(new TextWatcher() {
 			@Override

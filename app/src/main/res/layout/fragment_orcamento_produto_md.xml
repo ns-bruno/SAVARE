@@ -2,8 +2,9 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
-    android:padding="10dp" >
+    android:padding="10dp">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -42,8 +43,9 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical" >
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:layout_weight="1">
 
         <ProgressBar
             style="?android:attr/progressBarStyleHorizontal"
@@ -57,11 +59,24 @@
         <ListView
             android:id="@+id/fragment_orcamento_produto_md_list_produto_orcamento"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:choiceMode="multipleChoice"
             android:divider="@color/azul"
             android:dividerHeight="2dp" >
         </ListView>
     </LinearLayout>
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/fragment_orcamento_produto_md_toolbar_rodape"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:layout_alignParentBottom="true"
+            android:background="?attr/colorPrimary"
+            android:elevation="4dp"
+            android:minHeight="?attr/actionBarSize"
+            app:popupTheme="@style/MaterialDrawerTheme.Light.DarkToolbar"
+            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" >
+
+        </android.support.v7.widget.Toolbar>
 
 </LinearLayout>

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/menu_orcamento_tab_md_pesquisa"
+        android:orderInCategory="0"
+        android:icon="@mipmap/ic_magnify_dark"
+        android:title="@string/pesquisar"
+        app:showAsAction="always"
+        app:actionViewClass="android.support.v7.widget.SearchView" />
+
+    <item
+        android:id="@+id/menu_orcamento_tab_md_adicionar"
+        android:orderInCategory="1"
+        android:icon="@mipmap/ic_plus_dark"
+        android:title="@string/adicionar_produto"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/menu_orcamento_tab_md_atualizar"
+        android:orderInCategory="2"
+        android:icon="@mipmap/ic_refresh_dark"
+        android:title="@string/atualizar"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/menu_orcamento_tab_md_enviar_email"
+        android:orderInCategory="3"
+        android:icon="@mipmap/ic_email_dark"
+        android:title="@string/enviar_email"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/menu_orcamento_tab_md_salvar"
+        android:orderInCategory="4"
+        android:icon="@mipmap/ic_content_save_dark"
+        android:title="@string/salvar"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/menu_orcamento_tab_md_rateio_preco"
+        android:orderInCategory="101"
+        android:icon="@mipmap/ic_coin_dark"
+        android:title="@string/rateio_preco"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/menu_orcamento_tab_md_transformar_pedido"
+        android:orderInCategory="102"
+        android:title="@string/transformar_pedido"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/menu_orcamento_tab_md_trocar_cliente"
+        android:orderInCategory="103"
+        android:title="@string/trocar_cliente"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/menu_orcamento_tab_md_visualizar_logs"
+        android:orderInCategory="999"
+        android:title="@string/visualizar_logs"
+        app:showAsAction="never" />
+
+</menu>

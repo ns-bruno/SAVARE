@@ -14,7 +14,7 @@
         app:civ_border_color="@color/branco"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
-        android:visibility="visible" />
+        android:visibility="gone" />
 
     <TextView
         android:id="@+id/layout_item_universal_text_descricao"

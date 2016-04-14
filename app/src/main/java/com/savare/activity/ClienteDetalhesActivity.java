@@ -1,9 +1,5 @@
 package com.savare.activity;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ContentValues;
@@ -23,29 +19,29 @@ import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
-import com.github.mikephil.charting.interfaces.ChartInterface;
 import com.github.mikephil.charting.listener.OnChartGestureListener;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 import com.github.mikephil.charting.utils.ColorTemplate;
 import com.github.mikephil.charting.utils.Highlight;
 import com.savare.R;
-import com.savare.activity.fragment.OrcamentoTabulacaoFragment;
 import com.savare.activity.material.designer.ListaTitulosMDActivity;
+import com.savare.activity.material.designer.OrcamentoTabFragmentMDActivity;
 import com.savare.adapter.ItemUniversalAdapter;
-import com.savare.beans.OrcamentoBeans;
 import com.savare.beans.PessoaBeans;
 import com.savare.beans.PlanoPagamentoBeans;
 import com.savare.beans.PortadorBancoBeans;
 import com.savare.beans.RamoAtividadeBeans;
 import com.savare.beans.TipoClienteBeans;
 import com.savare.beans.TipoDocumentoBeans;
-import com.savare.beans.TitulosListaBeans;
 import com.savare.beans.TotalMensal;
 import com.savare.funcoes.FuncoesPersonalizadas;
-import com.savare.funcoes.LocalizacaoFuncoes;
 import com.savare.funcoes.rotinas.OrcamentoRotinas;
 import com.savare.funcoes.rotinas.PessoaRotinas;
 import com.savare.funcoes.rotinas.async.EnviarCadastroClienteFtpAsyncRotinas;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 public class ClienteDetalhesActivity extends Activity implements OnChartGestureListener, OnChartValueSelectedListener {
 	
@@ -232,7 +228,7 @@ public class ClienteDetalhesActivity extends Activity implements OnChartGestureL
 					// Verifica se retornou algum numero
 					if(numeroOracmento > 0){
 						
-						Bundle bundle = new Bundle();
+						/*Bundle bundle = new Bundle();
 						bundle.putString(OrcamentoTabulacaoFragment.KEY_ID_ORCAMENTO, String.valueOf(numeroOracmento));
 						bundle.putString(OrcamentoTabulacaoFragment.KEY_NOME_RAZAO, pessoa.getNomeRazao());
 						bundle.putString(OrcamentoTabulacaoFragment.KEY_ID_PESSOA, String.valueOf(pessoa.getIdPessoa()));
@@ -240,6 +236,16 @@ public class ClienteDetalhesActivity extends Activity implements OnChartGestureL
 						bundle.putString("AV", "0");
 						
 						Intent i = new Intent(ClienteDetalhesActivity.this, OrcamentoTabulacaoFragment.class);
+						i.putExtras(bundle);*/
+
+						Bundle bundle = new Bundle();
+						bundle.putString(OrcamentoTabFragmentMDActivity.KEY_ID_ORCAMENTO, String.valueOf(numeroOracmento));
+						bundle.putString(OrcamentoTabFragmentMDActivity.KEY_NOME_RAZAO, pessoa.getNomeRazao());
+						bundle.putString(OrcamentoTabFragmentMDActivity.KEY_ID_PESSOA, String.valueOf(pessoa.getIdPessoa()));
+						bundle.putString(OrcamentoTabFragmentMDActivity.KEY_ATACADO_VAREJO, String.valueOf(which));
+						bundle.putString("AV", "0");
+
+						Intent i = new Intent(ClienteDetalhesActivity.this, OrcamentoTabFragmentMDActivity.class);
 						i.putExtras(bundle);
 						
 						// Abre outra tela

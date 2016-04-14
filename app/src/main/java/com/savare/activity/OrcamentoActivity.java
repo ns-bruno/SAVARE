@@ -328,7 +328,7 @@ public class OrcamentoActivity extends Activity {
 		
 		OrcamentoRotinas orcamentoRotinas = new OrcamentoRotinas(OrcamentoActivity.this);
 		// Pega todos os produtos do orcamento
-		listaItemOrcamento = orcamentoRotinas.listaItemOrcamentoResumida(null, textCodigoOrcamento.getText().toString());
+		listaItemOrcamento = orcamentoRotinas.listaItemOrcamentoResumida(null, textCodigoOrcamento.getText().toString(), null);
 		
 		adapterItemOrcamento = new ItemUniversalAdapter(OrcamentoActivity.this, ItemUniversalAdapter.ITEM_ORCAMENTO, listaItemOrcamento);
 		

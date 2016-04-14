@@ -14,7 +14,6 @@ import android.view.View;
 import com.github.clans.fab.FloatingActionButton;
 import com.ogaclejapan.smarttablayout.SmartTabLayout;
 import com.savare.R;
-import com.savare.activity.fragment.OrcamentoTabulacaoFragment;
 import com.savare.adapter.ClienteDetalhesFragmentAdapter;
 import com.savare.beans.PessoaBeans;
 import com.savare.funcoes.FuncoesPersonalizadas;
@@ -128,13 +127,13 @@ public class ClienteDetalhesMDActivity extends AppCompatActivity{
                             if(numeroOracmento > 0){
 
                                 Bundle bundle = new Bundle();
-                                bundle.putString(OrcamentoTabulacaoFragment.KEY_ID_ORCAMENTO, String.valueOf(numeroOracmento));
-                                bundle.putString(OrcamentoTabulacaoFragment.KEY_NOME_RAZAO, pessoa.getNomeRazao());
-                                bundle.putString(OrcamentoTabulacaoFragment.KEY_ID_PESSOA, String.valueOf(pessoa.getIdPessoa()));
-                                bundle.putString(OrcamentoTabulacaoFragment.KEY_ATACADO_VAREJO, String.valueOf(which));
+                                bundle.putString(OrcamentoTabFragmentMDActivity.KEY_ID_ORCAMENTO, String.valueOf(numeroOracmento));
+                                bundle.putString(OrcamentoTabFragmentMDActivity.KEY_NOME_RAZAO, pessoa.getNomeRazao());
+                                bundle.putString(OrcamentoTabFragmentMDActivity.KEY_ID_PESSOA, String.valueOf(pessoa.getIdPessoa()));
+                                bundle.putString(OrcamentoTabFragmentMDActivity.KEY_ATACADO_VAREJO, String.valueOf(which));
                                 bundle.putString("AV", "0");
 
-                                Intent i = new Intent(getApplicationContext(), OrcamentoTabulacaoFragment.class);
+                                Intent i = new Intent(getApplicationContext(), OrcamentoTabFragmentMDActivity.class);
                                 i.putExtras(bundle);
 
                                 // Abre outra tela

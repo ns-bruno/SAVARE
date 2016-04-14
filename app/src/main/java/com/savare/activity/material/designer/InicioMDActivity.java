@@ -43,7 +43,6 @@ import com.savare.activity.ListaOrcamentoPedidoActivity;
 import com.savare.activity.LogActivity;
 import com.savare.activity.SincronizacaoActivity;
 import com.savare.activity.fragment.ClienteCadastroFragment;
-import com.savare.activity.fragment.OrcamentoTabulacaoFragment;
 import com.savare.banco.funcoesSql.UsuarioSQL;
 import com.savare.beans.EmpresaBeans;
 import com.savare.beans.UsuarioBeans;
@@ -516,13 +515,13 @@ public class InicioMDActivity extends AppCompatActivity {
                         if(numeroOracmento > 0){
 
                             Bundle bundle = new Bundle();
-                            bundle.putString(OrcamentoTabulacaoFragment.KEY_ID_ORCAMENTO, String.valueOf(numeroOracmento));
-                            bundle.putString(OrcamentoTabulacaoFragment.KEY_NOME_RAZAO, dadosRetornado.getStringExtra("NOME_CLIENTE"));
-                            bundle.putString(OrcamentoTabulacaoFragment.KEY_ID_PESSOA, dadosRetornado.getStringExtra("ID_CFACLIFO"));
-                            bundle.putString(OrcamentoTabulacaoFragment.KEY_ATACADO_VAREJO, String.valueOf(which));
+                            bundle.putString(OrcamentoTabFragmentMDActivity.KEY_ID_ORCAMENTO, String.valueOf(numeroOracmento));
+                            bundle.putString(OrcamentoTabFragmentMDActivity.KEY_NOME_RAZAO, dadosRetornado.getStringExtra("NOME_CLIENTE"));
+                            bundle.putString(OrcamentoTabFragmentMDActivity.KEY_ID_PESSOA, dadosRetornado.getStringExtra("ID_CFACLIFO"));
+                            bundle.putString(OrcamentoTabFragmentMDActivity.KEY_ATACADO_VAREJO, String.valueOf(which));
                             bundle.putString("AV", "0");
 
-                            Intent i = new Intent(InicioMDActivity.this, OrcamentoTabulacaoFragment.class);
+                            Intent i = new Intent(InicioMDActivity.this, OrcamentoTabFragmentMDActivity.class);
                             i.putExtras(bundle);
 
                             // Abre outra tela

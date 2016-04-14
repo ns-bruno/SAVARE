@@ -1,13 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="5dp">
+        android:padding="5dp"
+        android:layout_weight="1">
 
         <LinearLayout
             android:orientation="horizontal"
@@ -20,7 +23,7 @@
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:text="@string/codigo"
-                android:id="@+id/fragment_orcamento_observacao_text_id_orcamento"
+                android:id="@+id/fragment_orcamento_observacao_md_text_id_orcamento"
                 android:layout_weight="1" />
 
             <TextView
@@ -28,7 +31,7 @@
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:text="@string/atacado_varejo"
-                android:id="@+id/fragment_orcamento_observacao_text_atacado_varejo"
+                android:id="@+id/fragment_orcamento_observacao_md_text_atacado_varejo"
                 android:layout_weight="1"
                 android:gravity="right" />
         </LinearLayout>
@@ -52,7 +55,7 @@
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:text="@string/total_liquido"
-                android:id="@+id/fragment_orcamento_observacao_text_total_liquido"
+                android:id="@+id/fragment_orcamento_observacao_md_text_total_liquido"
                 android:layout_weight="1"
                 android:gravity="right" />
         </LinearLayout>
@@ -66,10 +69,30 @@
             <EditText
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:id="@+id/fragment_orcamento_observacao_edit_observacao"
+                android:id="@+id/fragment_orcamento_observacao_md_edit_observacao"
                 android:inputType="textMultiLine"
                 android:hint="@string/observacao" />
         </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:orientation="horizontal" >
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/fragment_orcamento_observacao_md_toolbar_rodape"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"
+            android:elevation="4dp"
+            android:minHeight="?attr/actionBarSize"
+            app:popupTheme="@style/MaterialDrawerTheme.Light.DarkToolbar"
+            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+
+        </android.support.v7.widget.Toolbar>
+
     </LinearLayout>
 
 </LinearLayout>

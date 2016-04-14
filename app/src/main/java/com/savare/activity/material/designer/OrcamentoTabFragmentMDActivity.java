@@ -16,7 +16,7 @@ import com.savare.funcoes.rotinas.OrcamentoRotinas;
  */
 public class OrcamentoTabFragmentMDActivity extends AppCompatActivity {
 
-    private Toolbar toolbarCabecalho, toolbarRodape;
+    private Toolbar toolbarCabecalho;
     private String  idOrcamento,
                     atacadoVarejo = "0",
                     idPessoa,
@@ -51,11 +51,11 @@ public class OrcamentoTabFragmentMDActivity extends AppCompatActivity {
 
         } else {
             // Seta o titulo da action bar com a razao do cliente
-            getActionBar().setTitle("Selecione um Cliente");
+            toolbarCabecalho.setTitle("Selecione um Cliente");
 
         }
 
-        ViewPager viewPager = (ViewPager) findViewById(R.id.fragment_produto_lista_tab_md_pager);
+        ViewPager viewPager = (ViewPager) findViewById(R.id.fragment_orcamento_tab_md_pager);
 
         // Pega os parametros para passar para os fragmets
         Bundle parametros = new Bundle();
@@ -64,13 +64,13 @@ public class OrcamentoTabFragmentMDActivity extends AppCompatActivity {
         parametros.putString(KEY_ID_PESSOA, idPessoa);
         parametros.putString(KEY_NOME_RAZAO, razaoSocial);
 
-        OrcamentoTabFragmentMDAdapter orcamentoTabMDAdapter = new OrcamentoTabFragmentMDAdapter(getSupportFragmentManager(), parametros);
+        OrcamentoTabFragmentMDAdapter orcamentoTabMDAdapter = new OrcamentoTabFragmentMDAdapter(getApplicationContext(), getSupportFragmentManager(), parametros);
 
         // Seta o adapter dentro da viewPager
         viewPager.setAdapter(orcamentoTabMDAdapter);
 
         // Recupera os campos tabs
-        SmartTabLayout tabLayout = (SmartTabLayout) findViewById(R.id.fragment_produto_lista_tab_md_tab_layout);
+        SmartTabLayout tabLayout = (SmartTabLayout) findViewById(R.id.fragment_orcamento_tab_md_tab_layout);
         // Seta as paginas nas tabs
         tabLayout.setViewPager(viewPager);
 
@@ -95,12 +95,6 @@ public class OrcamentoTabFragmentMDActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             // Respond to the action bar's Up/Home button
             case android.R.id.home:
-				/*// Abre a tela inicial do sistema
-				Intent intentInicio = new Intent(OrcamentoTabulacaoFragment.this, InicioMDActivity.class);
-				// Tira a acitivity da pilha e inicia uma nova
-				intentInicio.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-				startActivity(intentInicio);*/
-
                 finish();
                 break;
         }
@@ -111,11 +105,10 @@ public class OrcamentoTabFragmentMDActivity extends AppCompatActivity {
     private void recuperarCampos(){
         toolbarCabecalho = (Toolbar) findViewById(R.id.fragment_orcamento_tab_md_toolbar_cabecalho);
         toolbarCabecalho.setTitleTextColor(getResources().getColor(R.color.branco));
+        toolbarCabecalho.setTitle(this.getResources().getString(R.string.app_name));
         // Seta uma toolBar para esta activiy(tela)
         setSupportActionBar(toolbarCabecalho);
         // Adiciona o botao voltar no toolbar
-        getSupportActionBar().setHomeButtonEnabled(true);
-
-        toolbarRodape = (Toolbar) findViewById(R.id.fragment_orcamento_tab_md_toolbar_rodape);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 }

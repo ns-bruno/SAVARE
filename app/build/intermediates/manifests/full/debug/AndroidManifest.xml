@@ -130,6 +130,10 @@
                 android:name="android.app.searchable"
                 android:resource="@xml/searchable" />
         </activity>
+        <activity
+            android:name="com.savare.activity.material.designer.OrcamentoTabFragmentMDActivity"
+            android:theme="@style/AppBaseTheme" >
+        </activity>
 
         <provider
             android:name="com.savare.sincronizacao.EnviarProvider"

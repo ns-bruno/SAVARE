@@ -1,18 +1,9 @@
 package com.savare.activity;
 
-import java.io.File;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
-import java.util.UUID;
-
 import android.app.ActionBar;
 import android.app.ActionBar.OnNavigationListener;
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.AlertDialog.Builder;
 import android.app.DatePickerDialog;
 import android.app.DatePickerDialog.OnDateSetListener;
 import android.app.Dialog;
@@ -20,12 +11,10 @@ import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.ActionMode;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -39,19 +28,25 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.savare.R;
-import com.savare.activity.fragment.OrcamentoTabulacaoFragment;
 import com.savare.activity.material.designer.ClienteListaMDActivity;
+import com.savare.activity.material.designer.OrcamentoTabFragmentMDActivity;
 import com.savare.adapter.DescricaoSimplesAdapter;
 import com.savare.adapter.ItemUniversalAdapter;
 import com.savare.banco.funcoesSql.OrcamentoSql;
 import com.savare.beans.OrcamentoBeans;
-import com.savare.beans.PessoaBeans;
 import com.savare.funcoes.FuncoesPersonalizadas;
-import com.savare.funcoes.LocalizacaoFuncoes;
 import com.savare.funcoes.rotinas.GerarPdfRotinas;
 import com.savare.funcoes.rotinas.OrcamentoRotinas;
 import com.savare.funcoes.rotinas.PessoaRotinas;
 import com.savare.funcoes.rotinas.async.EnviarOrcamentoFtpAsyncRotinas;
+
+import java.io.File;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
+import java.util.UUID;
 
 public class ListaOrcamentoPedidoActivity extends Activity implements OnNavigationListener {
 	
@@ -175,17 +170,27 @@ public class ListaOrcamentoPedidoActivity extends Activity implements OnNavigati
 				} else {
 					//Pega os dados da pessoa que foi clicado
 					OrcamentoBeans orcamento = (OrcamentoBeans) parent.getItemAtPosition(position);
-					
-					// Cria uma intent para abrir uma nova activity
+
+					/*// Cria uma intent para abrir uma nova activity
 					Bundle bundle = new Bundle();
 					bundle.putString(OrcamentoTabulacaoFragment.KEY_ID_ORCAMENTO, String.valueOf(orcamento.getIdOrcamento()));
 					bundle.putString(OrcamentoTabulacaoFragment.KEY_NOME_RAZAO, orcamento.getNomeRazao());
 					bundle.putString(OrcamentoTabulacaoFragment.KEY_ID_PESSOA, String.valueOf(orcamento.getIdPessoa()));
 					bundle.putString(OrcamentoTabulacaoFragment.KEY_ATACADO_VAREJO, String.valueOf(orcamento.getTipoVenda()));
-					
-					Intent i = new Intent(ListaOrcamentoPedidoActivity.this, OrcamentoTabulacaoFragment.class);
+
+					Intent i = new Intent(ListaOrcamentoPedidoActivity.this, OrcamentoTabulacaoFragment.class);*/
+
+
+					Bundle bundle = new Bundle();
+					bundle.putString(OrcamentoTabFragmentMDActivity.KEY_ID_ORCAMENTO, String.valueOf(orcamento.getIdOrcamento()));
+					bundle.putString(OrcamentoTabFragmentMDActivity.KEY_NOME_RAZAO, orcamento.getNomeRazao());
+					bundle.putString(OrcamentoTabFragmentMDActivity.KEY_ID_PESSOA, String.valueOf(orcamento.getIdPessoa()));
+					bundle.putString(OrcamentoTabFragmentMDActivity.KEY_ATACADO_VAREJO, String.valueOf(orcamento.getTipoVenda()));
+
+					Intent i = new Intent(ListaOrcamentoPedidoActivity.this, OrcamentoTabFragmentMDActivity.class);
+
 					i.putExtras(bundle);
-					
+
 					// Abre outra tela
 					startActivity(i);
 				}
@@ -850,7 +855,7 @@ public class ListaOrcamentoPedidoActivity extends Activity implements OnNavigati
 						// Verifica se retornou algum numero
 						if(numeroOracmento > 0){
 							
-							Bundle bundle = new Bundle();
+							/*Bundle bundle = new Bundle();
 							bundle.putString(OrcamentoTabulacaoFragment.KEY_ID_ORCAMENTO, String.valueOf(numeroOracmento));
 							bundle.putString(OrcamentoTabulacaoFragment.KEY_NOME_RAZAO, dadosRetornado.getStringExtra("NOME_CLIENTE"));
 							bundle.putString(OrcamentoTabulacaoFragment.KEY_ID_PESSOA, dadosRetornado.getStringExtra("ID_CFACLIFO"));
@@ -858,6 +863,16 @@ public class ListaOrcamentoPedidoActivity extends Activity implements OnNavigati
 							bundle.putString("AV", "0");
 							
 							Intent i = new Intent(ListaOrcamentoPedidoActivity.this, OrcamentoTabulacaoFragment.class);
+							i.putExtras(bundle);*/
+
+							Bundle bundle = new Bundle();
+							bundle.putString(OrcamentoTabFragmentMDActivity.KEY_ID_ORCAMENTO, String.valueOf(numeroOracmento));
+							bundle.putString(OrcamentoTabFragmentMDActivity.KEY_NOME_RAZAO, dadosRetornado.getStringExtra("NOME_CLIENTE"));
+							bundle.putString(OrcamentoTabFragmentMDActivity.KEY_ID_PESSOA, dadosRetornado.getStringExtra("ID_CFACLIFO"));
+							bundle.putString(OrcamentoTabFragmentMDActivity.KEY_ATACADO_VAREJO, String.valueOf(which));
+							bundle.putString("AV", "0");
+
+							Intent i = new Intent(ListaOrcamentoPedidoActivity.this, OrcamentoTabFragmentMDActivity.class);
 							i.putExtras(bundle);
 							
 							// Abre outra tela
@@ -920,7 +935,7 @@ public class ListaOrcamentoPedidoActivity extends Activity implements OnNavigati
     		// Envia os dados do orcamento
     		gerarPdfRotinas.setOrcamento(orcamento);
     		// Envia a lista de produtos que pertence ao orcamento
-    		gerarPdfRotinas.setListaItensOrcamento(orcamentoRotinas.listaItemOrcamentoResumida(null, ""+orcamento.getIdOrcamento()));
+    		gerarPdfRotinas.setListaItensOrcamento(orcamentoRotinas.listaItemOrcamentoResumida(null, ""+orcamento.getIdOrcamento(), null));
     		
     		// Cria o pdf e pega o caminho do arquivo
     		String retornoCaminho = gerarPdfRotinas.criaArquivoPdf();

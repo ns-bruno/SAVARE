@@ -198,6 +198,8 @@
     <string name="nao_achamos_nenhum_valor">Não Achamos Nenhum Valor.</string>
     <string name="vendas_realizadas_mensal">Vendas Realizadas Mensal</string>
     <string name="enviando_pedidos">Enviando o Pedidos</string>
+    <string name="nao">Não</string>
+    <string name="sim">Sim</string>
     <string-array name="tab_produto_md">
         <item>Produtos</item>
         <item>+ Vendidos Cidade</item>

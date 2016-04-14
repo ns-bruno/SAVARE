@@ -127,6 +127,11 @@
                 android:resource="@xml/searchable" />
         </activity>
 
+        <activity
+            android:name=".activity.material.designer.OrcamentoTabFragmentMDActivity"
+            android:theme="@style/AppBaseTheme" >
+        </activity>
+
         <provider
             android:name=".sincronizacao.EnviarProvider"
             android:authorities="@string/content_authority"

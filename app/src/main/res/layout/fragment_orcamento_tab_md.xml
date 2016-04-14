@@ -37,7 +37,7 @@
         android:layout_weight="1">
 
         <com.ogaclejapan.smarttablayout.SmartTabLayout
-            android:id="@+id/fragment_fragment_orcamento_tab_md_tab_layout"
+            android:id="@+id/fragment_orcamento_tab_md_tab_layout"
             android:layout_width="match_parent"
             android:layout_height="48dp"
             android:background="?attr/colorPrimary"
@@ -71,29 +71,10 @@
             android:id="@+id/fragment_orcamento_tab_md_pager"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_below="@id/fragment_fragment_orcamento_tab_md_tab_layout" />
+            android:layout_below="@id/fragment_orcamento_tab_md_tab_layout" />
 
         </LinearLayout>
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:layout_weight="5">
-
-            <android.support.v7.widget.Toolbar
-                android:id="@+id/fragment_orcamento_tab_md_toolbar_rodape"
-                android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                android:layout_alignParentLeft="true"
-                android:background="?attr/colorPrimary"
-                android:elevation="4dp"
-                android:minHeight="?attr/actionBarSize"
-                app:popupTheme="@style/MaterialDrawerTheme.Light.DarkToolbar"
-                android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
-
-            </android.support.v7.widget.Toolbar>
-        </LinearLayout>
 
     </LinearLayout>
 
