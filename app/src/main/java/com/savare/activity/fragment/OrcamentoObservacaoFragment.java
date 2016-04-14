@@ -19,6 +19,7 @@ import com.savare.funcoes.rotinas.OrcamentoRotinas;
 /**
  * Created by Bruno Nogueira Silva on 10/08/2015.
  */
+@Deprecated
 public class OrcamentoObservacaoFragment extends Fragment {
 
     private TextView textCodigoOrcamento, textTotal, textAtacadoVarejo;

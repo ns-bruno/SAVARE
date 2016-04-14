@@ -48,6 +48,7 @@ import android.widget.AbsListView.MultiChoiceModeListener;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.SearchView.OnQueryTextListener;
 
+@Deprecated
 public class OrcamentoFragment extends Fragment {
 	
 	private TextView textCodigoOrcamento, textTotal, textAtacadoVarejo;

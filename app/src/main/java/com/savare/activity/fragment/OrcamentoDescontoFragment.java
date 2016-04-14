@@ -20,7 +20,7 @@ import android.view.ViewGroup;
 import android.view.View.OnTouchListener;
 import android.widget.EditText;
 import android.widget.TextView;
-
+@Deprecated
 public class OrcamentoDescontoFragment extends Fragment {
 	
 	View viewOrcamentoDesconto;

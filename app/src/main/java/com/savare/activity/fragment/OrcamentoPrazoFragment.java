@@ -22,6 +22,7 @@ import com.savare.funcoes.rotinas.TipoDocumentoRotinas;
 /**
  * Created by Bruno Nogueira Silva on 08/08/2015.
  */
+@Deprecated
 public class OrcamentoPrazoFragment extends Fragment {
 
     private View viewOrcamentoPrazo;

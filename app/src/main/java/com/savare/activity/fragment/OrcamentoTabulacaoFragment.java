@@ -39,7 +39,7 @@ import com.savare.funcoes.LocalizacaoFuncoes;
 import com.savare.funcoes.rotinas.GerarPdfRotinas;
 import com.savare.funcoes.rotinas.OrcamentoRotinas;
 import com.savare.funcoes.rotinas.PessoaRotinas;
-
+@Deprecated
 public class OrcamentoTabulacaoFragment extends FragmentActivity {
 
 	public static final String KEY_ID_ORCAMENTO = "ID_ORCAMENTO",
