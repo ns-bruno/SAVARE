@@ -30,9 +30,9 @@ import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.savare.R;
-import com.savare.activity.ListaOrcamentoPedidoActivity;
 import com.savare.activity.OrcamentoProdutoDetalhesActivity;
 import com.savare.activity.fragment.OrcamentoFragment;
+import com.savare.activity.material.designer.ListaOrcamentoPedidoMDActivity;
 import com.savare.activity.material.designer.ProdutoListaMDActivity;
 import com.savare.adapter.ItemUniversalAdapter;
 import com.savare.banco.funcoesSql.ProdutoRecomendadoSql;
@@ -178,9 +178,9 @@ public class ProdutoListaMDFragment extends Fragment {
                     produtoVendaClicado.setAtacadoVarejo((atacadoVarejo != null) ? atacadoVarejo.charAt(0) : atacadoVarejoAuxiliar.charAt(0));
 
                     // Abre a tela de detalhes do produto
-                    Intent intent = new Intent(getContext(), ListaOrcamentoPedidoActivity.class);
-                    intent.putExtra(ListaOrcamentoPedidoActivity.KEY_ORCAMENTO_PEDIDO, "O");
-                    intent.putExtra(ListaOrcamentoPedidoActivity.KEY_RETORNA_VALOR, ListaOrcamentoPedidoActivity.TELA_LISTA_PRODUTOS);
+                    Intent intent = new Intent(getContext(), ListaOrcamentoPedidoMDActivity.class);
+                    intent.putExtra(ListaOrcamentoPedidoMDActivity.KEY_ORCAMENTO_PEDIDO, "O");
+                    intent.putExtra(ListaOrcamentoPedidoMDActivity.KEY_RETORNA_VALOR, ListaOrcamentoPedidoMDActivity.TELA_LISTA_PRODUTOS);
                     // Abre a activity aquardando uma resposta
                     startActivityForResult(intent, 1);
                 }

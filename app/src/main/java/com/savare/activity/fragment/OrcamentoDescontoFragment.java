@@ -30,8 +30,6 @@ public class OrcamentoDescontoFragment extends Fragment {
 					 textAtacadoVarejo;
 	private EditText editDescontoPercentual,
 	 				 editTotalLiquido;
-	//private String codigoPessoa,
-	//   			   razaoSocial;
 	private String tipoOrcamentoPedido;
 	private double totalBruto = 0,
 			   	   totalLiquidoAuxiliar = 0,

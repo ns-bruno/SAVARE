@@ -18,12 +18,13 @@ public class PercentualRotinas extends Rotinas {
 		double percentual = -1;
 		
 		FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
-		
-		String sql = "SELECT IFNULL(AEAPERCE.MARKUP_ATAC, 0) AS MARKUP_ATAC FROM AEAPERCE "
-				   + "LEFT OUTER JOIN CFAPARAM ON (AEAPERCE.ID_CFAPARAM_VENDEDOR = CFAPARAM.ID_CFAPARAM) "
-				   + "LEFT OUTER JOIN CFACLIFO ON (CFAPARAM.ID_CFACLIFO = CFACLIFO.ID_CFACLIFO) "
-				   + "WHERE (CFACLIFO.CODIGO_USU = " + codigoUsuario + ") AND (CFACLIFO.USUARIO = '1') AND "
-				   + "(AEAPERCE.ID_SMAEMPRE = " + funcoes.getValorXml("CodigoEmpresa") + ")";
+
+		int codigoEmpresa = (!funcoes.getValorXml("CodigoEmpresa").equalsIgnoreCase(funcoes.NAO_ENCONTRADO)) ? Integer.parseInt(funcoes.getValorXml("CodigoEmpresa")) : -1;
+
+		String sql =  "SELECT IFNULL(AEAPERCE.MARKUP_ATAC, 0) AS MARKUP_ATAC FROM AEAPERCE "
+					+ "LEFT OUTER JOIN CFAPARAM ON (AEAPERCE.ID_CFAPARAM_VENDEDOR = CFAPARAM.ID_CFAPARAM) \n"
+					+ "LEFT OUTER JOIN CFACLIFO ON (CFAPARAM.ID_CFACLIFO = CFACLIFO.ID_CFACLIFO) \n"
+					+ "WHERE (CFACLIFO.CODIGO_FUN = " + codigoUsuario + ") AND (CFACLIFO.FUNCIONARIO = '1') AND (CFACLIFO.ID_SMAEMPRE = " + codigoEmpresa + ")";
 		
 		PercentualSql percentualSql = new PercentualSql(context);
 		
@@ -44,12 +45,13 @@ public class PercentualRotinas extends Rotinas {
 		double percentual = -1;
 		
 		FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
-		
+
+		int codigoEmpresa = (!funcoes.getValorXml("CodigoEmpresa").equalsIgnoreCase(funcoes.NAO_ENCONTRADO)) ? Integer.parseInt(funcoes.getValorXml("CodigoEmpresa")) : -1;
+
 		String sql = "SELECT IFNULL(AEAPERCE.MARKUP_VARE, 0) AS MARKUP_VARE FROM AEAPERCE "
-				   + "LEFT OUTER JOIN CFAPARAM ON (AEAPERCE.ID_CFAPARAM_VENDEDOR = CFAPARAM.ID_CFAPARAM) "
-				   + "LEFT OUTER JOIN CFACLIFO ON (CFAPARAM.ID_CFACLIFO = CFACLIFO.ID_CFACLIFO) "
-				   + "WHERE (CFACLIFO.CODIGO_USU = " + codigoUsuario + ") AND (CFACLIFO.USUARIO = '1') AND "
-				   + "(AEAPERCE.ID_SMAEMPRE = " + funcoes.getValorXml("CodigoEmpresa") + ")";
+				+ "LEFT OUTER JOIN CFAPARAM ON (AEAPERCE.ID_CFAPARAM_VENDEDOR = CFAPARAM.ID_CFAPARAM) \n"
+				+ "LEFT OUTER JOIN CFACLIFO ON (CFAPARAM.ID_CFACLIFO = CFACLIFO.ID_CFACLIFO) \n"
+				+ "WHERE (CFACLIFO.CODIGO_FUN = " + codigoUsuario + ") AND (CFACLIFO.FUNCIONARIO = '1') AND (CFACLIFO.ID_SMAEMPRE = " + codigoEmpresa + ")";
 		
 		PercentualSql percentualSql = new PercentualSql(context);
 		

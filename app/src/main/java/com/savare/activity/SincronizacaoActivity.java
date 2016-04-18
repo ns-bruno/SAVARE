@@ -16,7 +16,7 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-
+@Deprecated
 public class SincronizacaoActivity extends Activity {
 
 	private ProgressBar progressReceberDados,

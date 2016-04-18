@@ -1,8 +1,5 @@
 package com.savare.adapter;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
@@ -14,19 +11,16 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
 import android.widget.Filter;
 import android.widget.Filterable;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 
 import com.savare.R;
-import com.savare.activity.ListaOrcamentoPedidoActivity;
-import com.savare.activity.ProdutoDetalhesActivity;
+import com.savare.activity.material.designer.ListaOrcamentoPedidoMDActivity;
 import com.savare.activity.material.designer.ProdutoDetalhesMDActivity;
 import com.savare.beans.AreaBeans;
 import com.savare.beans.CidadeBeans;
@@ -49,6 +43,9 @@ import com.savare.beans.TipoDocumentoBeans;
 import com.savare.funcoes.FuncoesPersonalizadas;
 import com.savare.funcoes.rotinas.OrcamentoRotinas;
 import com.savare.funcoes.rotinas.ProdutoRotinas;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -996,15 +993,15 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 			viewRodape.setVisibility(View.INVISIBLE);
 			viewTopo.setVisibility(View.INVISIBLE);
 			
-			if((orcamento.getStatusRetorno() != null) && (orcamento.getStatusRetorno().equals(ListaOrcamentoPedidoActivity.TIPO_PEDIDO_RETORNADO_BLOQUEADO))){
+			if((orcamento.getStatusRetorno() != null) && (orcamento.getStatusRetorno().equals(ListaOrcamentoPedidoMDActivity.TIPO_PEDIDO_RETORNADO_BLOQUEADO))){
 				viewTopo.setVisibility(View.VISIBLE);
 				viewTopo.setBackgroundColor(context.getResources().getColor(R.color.vermelho_escuro));
 				
-			} else if((orcamento.getStatusRetorno() != null) && (orcamento.getStatusRetorno().equals(ListaOrcamentoPedidoActivity.TIPO_PEDIDO_RETORNADO_LIBERADO))){
+			} else if((orcamento.getStatusRetorno() != null) && (orcamento.getStatusRetorno().equals(ListaOrcamentoPedidoMDActivity.TIPO_PEDIDO_RETORNADO_LIBERADO))){
 				viewTopo.setVisibility(View.VISIBLE);
 				viewTopo.setBackgroundColor(context.getResources().getColor(R.color.verde_escuro));
 				
-			} else if((orcamento.getStatusRetorno() != null) && (orcamento.getStatusRetorno().equals(ListaOrcamentoPedidoActivity.TIPO_PEDIDO_RETORNADO_EXCLUIDO))){
+			} else if((orcamento.getStatusRetorno() != null) && (orcamento.getStatusRetorno().equals(ListaOrcamentoPedidoMDActivity.TIPO_PEDIDO_RETORNADO_EXCLUIDO))){
 				textDescricao.setPaintFlags(textDescricao.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
 				textAbaixoDescricaoEsqueda.setPaintFlags(textAbaixoDescricaoEsqueda.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
 				textAbaixoDescricaoDireita.setPaintFlags(textAbaixoDescricaoDireita.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);

@@ -47,7 +47,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.UUID;
-
+@Deprecated
 public class ListaOrcamentoPedidoActivity extends Activity implements OnNavigationListener {
 	
 	private ListView listViewListaOrcamentoPedido;
@@ -1048,11 +1048,13 @@ public class ListaOrcamentoPedidoActivity extends Activity implements OnNavigati
 	private void carregarListaCidade(){
 		// Instancia a classe para manipular dados do orcamento
 		OrcamentoRotinas orcamentoRotinas = new OrcamentoRotinas(ListaOrcamentoPedidoActivity.this);
-		
-		adapterCidade = new DescricaoSimplesAdapter(ListaOrcamentoPedidoActivity.this, orcamentoRotinas.listaCidadeOrcamentoPedido(this.tipoOrcamentoPedido, null));
+
+		ItemUniversalAdapter adapterCidadePadrao = new ItemUniversalAdapter(ListaOrcamentoPedidoActivity.this, ItemUniversalAdapter.CIDADE);
+		adapterCidadePadrao.setListaCidade(orcamentoRotinas.listaCidadeOrcamentoPedido(this.tipoOrcamentoPedido, null));
+		//adapterCidade = new DescricaoSimplesAdapter(ListaOrcamentoPedidoActivity.this, orcamentoRotinas.listaCidadeOrcamentoPedido(this.tipoOrcamentoPedido, null));
 		
 		// Preenche o spinner da action bar com as cidades
-		actionBar.setListNavigationCallbacks(adapterCidade, this);
+		actionBar.setListNavigationCallbacks(adapterCidadePadrao, this);
 		// Posiciona o spinner na primeira posicao da lista
 		actionBar.setSelectedNavigationItem(0);
 	}

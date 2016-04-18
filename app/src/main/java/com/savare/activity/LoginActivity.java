@@ -16,7 +16,7 @@ import com.savare.activity.material.designer.InicioMDActivity;
 import com.savare.banco.funcoesSql.UsuarioSQL;
 import com.savare.funcoes.FuncoesPersonalizadas;
 import com.savare.funcoes.Rotinas;
-
+@Deprecated
 public class LoginActivity extends Activity {
 	
 	// Variaveis globais

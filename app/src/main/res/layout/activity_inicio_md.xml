@@ -53,7 +53,9 @@
                 fab:menu_colorNormal="@color/colorAccent"
                 fab:menu_colorPressed="@color/colorPrimary"
                 fab:menu_labels_ellipsize="end"
-                fab:menu_labels_singleLine="true">
+                fab:menu_labels_singleLine="true"
+                app:fab_showAnimation="@anim/fab_scale_up"
+                app:fab_hideAnimation="@anim/fab_scale_down">
 
                 <com.github.clans.fab.FloatingActionButton
                     android:id="@+id/activity_inicio_md_menu_item_novo_orcamento"

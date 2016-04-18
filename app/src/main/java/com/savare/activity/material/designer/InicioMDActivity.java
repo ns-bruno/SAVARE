@@ -25,6 +25,7 @@ import com.dexafree.materialList.card.action.TextViewAction;
 import com.dexafree.materialList.listeners.RecyclerItemClickListener;
 import com.dexafree.materialList.view.MaterialListView;
 import com.github.clans.fab.FloatingActionButton;
+import com.github.clans.fab.FloatingActionMenu;
 import com.mikepenz.materialdrawer.AccountHeader;
 import com.mikepenz.materialdrawer.AccountHeaderBuilder;
 import com.mikepenz.materialdrawer.Drawer;
@@ -37,11 +38,7 @@ import com.mikepenz.materialdrawer.model.SwitchDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 import com.savare.R;
-import com.savare.activity.ClienteListaActivity;
-import com.savare.activity.ConfiguracoesActivity;
-import com.savare.activity.ListaOrcamentoPedidoActivity;
 import com.savare.activity.LogActivity;
-import com.savare.activity.SincronizacaoActivity;
 import com.savare.activity.fragment.ClienteCadastroFragment;
 import com.savare.banco.funcoesSql.UsuarioSQL;
 import com.savare.beans.EmpresaBeans;
@@ -64,6 +61,8 @@ public class InicioMDActivity extends AppCompatActivity {
     private AccountHeader cabecalhoDrawer;
     private MaterialListView mListView;
     private int cliqueVoltar = 0;
+    private int mPreviousVisibleItem;
+    FloatingActionMenu menuFloatOpcoes;
 
 
     @TargetApi(Build.VERSION_CODES.M)
@@ -83,6 +82,10 @@ public class InicioMDActivity extends AppCompatActivity {
 
         //getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
+
+        menuFloatOpcoes = (FloatingActionMenu) findViewById(R.id.activity_inicio_md_menu_float);
+        FloatingActionButton itemMenuNovoOrcamento = (FloatingActionButton) findViewById(R.id.activity_inicio_md_menu_item_novo_orcamento);
+        FloatingActionButton itemMenuNovoCliente = (FloatingActionButton) findViewById(R.id.activity_inicio_md_menu_item_novo_cliente);
 
         FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(InicioMDActivity.this);
 
@@ -148,7 +151,7 @@ public class InicioMDActivity extends AppCompatActivity {
                         new PrimaryDrawerItem().withName(R.string.logs).withIcon(R.drawable.ic_sim_alert),
                         new SwitchDrawerItem().withName(R.string.enviar_automatico).withIcon(R.mipmap.ic_upload).withChecked(enviaAutomatico).withOnCheckedChangeListener(mOnCheckedChangeListener).withTag("enviar"),
                         new SwitchDrawerItem().withName(R.string.receber_automatico).withIcon(R.mipmap.ic_download).withChecked(recebeAutomatico).withOnCheckedChangeListener(mOnCheckedChangeListener).withTag("receber"),
-                        new SwitchDrawerItem().withName(R.string.imagem_produto).withIcon(R.mipmap.ic_image).withChecked(imagemProduto).withOnCheckedChangeListener(mOnCheckedChangeListener).withTag("imagem_produto")
+                        new SwitchDrawerItem().withName(R.string.imagem_produto).withIcon(R.mipmap.ic_image_dark).withChecked(imagemProduto).withOnCheckedChangeListener(mOnCheckedChangeListener).withTag("imagem_produto")
 
                 )
             .withDisplayBelowStatusBar(true)
@@ -162,6 +165,9 @@ public class InicioMDActivity extends AppCompatActivity {
                 @Override
                 public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
 
+                    // Fecha o menu drawer
+                    navegacaoDrawerEsquerdo.closeDrawer();
+
                     switch (position) {
 
                         case 1:
@@ -173,7 +179,7 @@ public class InicioMDActivity extends AppCompatActivity {
 
                         case 2:
                             // Abre a tela Lista de Orcamento
-                            Intent intentListaOrcamentoPedido = new Intent(InicioMDActivity.this, ListaOrcamentoPedidoActivity.class);
+                            Intent intentListaOrcamentoPedido = new Intent(InicioMDActivity.this, ListaOrcamentoPedidoMDActivity.class);
                             // Salva um valor para transferir para outrao Activity(Tela)
                             intentListaOrcamentoPedido.putExtra("ORCAMENTO_PEDIDO", OrcamentoRotinas.ORCAMENTO);
                             // Abre outra tela
@@ -215,7 +221,7 @@ public class InicioMDActivity extends AppCompatActivity {
 
                         case 5:
                             // Tela de Lista de Pedidos nao enviados
-                            Intent intentListaPedido = new Intent(InicioMDActivity.this, ListaOrcamentoPedidoActivity.class);
+                            Intent intentListaPedido = new Intent(InicioMDActivity.this, ListaOrcamentoPedidoMDActivity.class);
                             // Salva um valor para transferir para outrao Activity(Tela)
                             intentListaPedido.putExtra("ORCAMENTO_PEDIDO", OrcamentoRotinas.PEDIDO_NAO_ENVIADO);
                             // Abre outra tela
@@ -224,7 +230,7 @@ public class InicioMDActivity extends AppCompatActivity {
 
                         case 6:
                             // Tela de Lista de Pedidos nao enviados
-                            Intent intentListaPedidoEnviado = new Intent(InicioMDActivity.this, ListaOrcamentoPedidoActivity.class);
+                            Intent intentListaPedidoEnviado = new Intent(InicioMDActivity.this, ListaOrcamentoPedidoMDActivity.class);
                             // Salva um valor para transferir para outrao Activity(Tela)
                             intentListaPedidoEnviado.putExtra("ORCAMENTO_PEDIDO", OrcamentoRotinas.PEDIDO_ENVIADO);
                             // Abre outra tela
@@ -233,7 +239,7 @@ public class InicioMDActivity extends AppCompatActivity {
 
                         case 7:
                             // Tela de orcamentos excluidos(lixeira)
-                            Intent intentListaExcluido = new Intent(InicioMDActivity.this, ListaOrcamentoPedidoActivity.class);
+                            Intent intentListaExcluido = new Intent(InicioMDActivity.this, ListaOrcamentoPedidoMDActivity.class);
                             // Salva um valor para transferir para outrao Activity(Tela)
                             intentListaExcluido.putExtra("ORCAMENTO_PEDIDO", OrcamentoRotinas.EXCLUIDO);
                             // Abre outra tela
@@ -242,14 +248,14 @@ public class InicioMDActivity extends AppCompatActivity {
 
                         case 8:
                             // Tela de sincronização
-                            Intent intentListaSincronizacao = new Intent(InicioMDActivity.this, SincronizacaoActivity.class);
+                            Intent intentListaSincronizacao = new Intent(InicioMDActivity.this, SincronizacaoMDActivity.class);
                             // Abre outra tela
                             startActivity(intentListaSincronizacao);
                             return true;
 
                         case 9:
                             // Tela de sincronização
-                            Intent intentListaConfiguracoes = new Intent(InicioMDActivity.this, ConfiguracoesActivity.class);
+                            Intent intentListaConfiguracoes = new Intent(InicioMDActivity.this, ConfiguracoesMDActivity.class);
                             // Abre outra tela
                             startActivity(intentListaConfiguracoes);
                             return true;
@@ -283,24 +289,43 @@ public class InicioMDActivity extends AppCompatActivity {
             }
         });
 
-        //FloatingActionMenu menuFloat = (FloatingActionMenu) findViewById(R.id.activity_inicio_md_menu_float);
+        mListView.setOnScrollChangeListener(new View.OnScrollChangeListener() {
+            @Override
+            public void onScrollChange(View v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
+                // Funcao para ocultar o float button quando rolar a lista de orcamento/pedido
+                if (scrollX > mPreviousVisibleItem) {
+                    menuFloatOpcoes.hideMenu(true);
+                } else if (scrollX < mPreviousVisibleItem) {
+                    menuFloatOpcoes.showMenu(true);
+                }
+                mPreviousVisibleItem = scrollX;
+            }
+        });
 
-        FloatingActionButton itemMenuNovoOrcamento = (FloatingActionButton) findViewById(R.id.activity_inicio_md_menu_item_novo_orcamento);
+
         itemMenuNovoOrcamento.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // Abre a tela de detalhes do produto
                 Intent intent = new Intent(InicioMDActivity.this, ClienteListaMDActivity.class);
-                intent.putExtra(ListaOrcamentoPedidoActivity.KEY_TELA_CHAMADA, ListaOrcamentoPedidoActivity.KEY_TELA_LISTA_ORCAMENTO_PEDIDO);
+                intent.putExtra(ListaOrcamentoPedidoMDActivity.KEY_TELA_CHAMADA, ListaOrcamentoPedidoMDActivity.KEY_TELA_LISTA_ORCAMENTO_PEDIDO);
+
+                // Fecha o menu
+                menuFloatOpcoes.close(true);
+
                 // Abre a activity aquardando uma resposta
-                startActivityForResult(intent, ListaOrcamentoPedidoActivity.SOLICITA_CLIENTE);
+                startActivityForResult(intent, ListaOrcamentoPedidoMDActivity.SOLICITA_CLIENTE);
             }
         });
 
-        FloatingActionButton itemMenuNovoCliente = (FloatingActionButton) findViewById(R.id.activity_inicio_md_menu_item_novo_cliente);
+
         itemMenuNovoCliente.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                // Fecha o menu
+                menuFloatOpcoes.close(true);
+
                 // Abre a tela inicial do sistema
                 Intent intentNovo = new Intent(InicioMDActivity.this, ClienteCadastroFragment.class);
                 startActivity(intentNovo);
@@ -469,9 +494,9 @@ public class InicioMDActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
 
         // Checa se eh um retorno
-        if(requestCode == ListaOrcamentoPedidoActivity.SOLICITA_CLIENTE){
+        if(requestCode == ListaOrcamentoPedidoMDActivity.SOLICITA_CLIENTE){
             // Checa se eh um retorno da tela de clientes
-            if(resultCode == ListaOrcamentoPedidoActivity.RETORNA_CLIENTE){
+            if(resultCode == ListaOrcamentoPedidoMDActivity.RETORNA_CLIENTE){
 
                 final Intent dadosRetornado = data;
 

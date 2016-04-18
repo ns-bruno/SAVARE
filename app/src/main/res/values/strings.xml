@@ -200,6 +200,11 @@
     <string name="enviando_pedidos">Enviando o Pedidos</string>
     <string name="nao">Não</string>
     <string name="sim">Sim</string>
+    <string name="tem_certeza_que_deseja_excluir_pedido">Tem certeza que deseja excluir o(s) pedido(s)?</string>
+    <string name="nao_foi_possivel_deletar_orcamento_selecionado">NÃO FOI POSSÍVEL DELETAR O(S) ORÇAMENTO(S) SELECIONADO(S).</string>
+    <string name="data_inicial">Data Inicial: </string>
+    <string name="data_final">Data Final: </string>
+    <string name="existe_titulos_vencidos">Existe títulos vencidos.</string>
     <string-array name="tab_produto_md">
         <item>Produtos</item>
         <item>+ Vendidos Cidade</item>

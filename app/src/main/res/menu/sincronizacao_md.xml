@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/menu_sincronizacao_md_atualizar"
+        android:orderInCategory="1"
+        android:icon="@mipmap/ic_refresh_dark"
+        android:title="@string/atualizar"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/menu_sincronizacao_md_desmarcar_transmissao_dados"
+        android:orderInCategory="100"
+        android:title="@string/desmarcar_transmissao_dados"
+        app:showAsAction="never" />
+
+
+</menu>

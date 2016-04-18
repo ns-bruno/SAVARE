@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/menu_lista_orcamento_md_atualizar"
+        android:orderInCategory="0"
+        android:icon="@mipmap/ic_refresh_dark"
+        android:title="@string/atualizar"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/menu_lista_orcamento_md_filtrar_periodo"
+        android:orderInCategory="1"
+        android:icon="@mipmap/ic_filter_dark"
+        android:title="@string/filtrar_periodo"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/menu_lista_orcamento_md_ordem_crescente"
+        android:orderInCategory="100"
+        android:icon="@mipmap/ic_sort_ascending_dark"
+        android:title="@string/ordem_crescente"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/menu_lista_orcamento_md_ordem_decrescente"
+        android:orderInCategory="101"
+        android:icon="@mipmap/ic_sort_descending_dark"
+        android:title="@string/ordem_decrescente"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/menu_lista_orcamento_md_somente_enviados"
+        android:orderInCategory="102"
+        android:title="@string/somente_enviados"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/menu_lista_orcamento_md_nao_enviados"
+        android:orderInCategory="103"
+        android:title="@string/nao_enviados"
+        app:showAsAction="never" />
+
+</menu>

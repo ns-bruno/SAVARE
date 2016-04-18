@@ -20,6 +20,7 @@ import com.savare.R;
 import com.savare.activity.fragment.ClienteCadastroFragment;
 import com.savare.activity.fragment.OrcamentoFragment;
 import com.savare.activity.material.designer.ClienteDetalhesMDActivity;
+import com.savare.activity.material.designer.ListaOrcamentoPedidoMDActivity;
 import com.savare.adapter.DescricaoSimplesAdapter;
 import com.savare.adapter.PessoaAdapter;
 import com.savare.beans.PessoaBeans;
@@ -28,7 +29,7 @@ import com.savare.funcoes.rotinas.OrcamentoRotinas;
 import com.savare.funcoes.rotinas.PessoaRotinas;
 
 import java.util.List;
-
+@Deprecated
 public class ClienteListaActivity extends Activity implements OnNavigationListener{
 	
 	private ListView listViewPessoa;
@@ -52,7 +53,7 @@ public class ClienteListaActivity extends Activity implements OnNavigationListen
 		Bundle intentParametro = getIntent().getExtras();
 		if (intentParametro != null) {
 			
-			this.telaChamou = intentParametro.getString(ListaOrcamentoPedidoActivity.KEY_TELA_CHAMADA);
+			this.telaChamou = intentParametro.getString(ListaOrcamentoPedidoMDActivity.KEY_TELA_CHAMADA);
 			
 			if(telaChamou.equals(OrcamentoFragment.KEY_TELA_ORCAMENTO_FRAGMENTO)){
 				idOrcamento = intentParametro.getString(OrcamentoFragment.KEY_ID_ORCAMENTO);
@@ -86,7 +87,7 @@ public class ClienteListaActivity extends Activity implements OnNavigationListen
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 				
-				if((telaChamou != null) && (telaChamou.equals(ListaOrcamentoPedidoActivity.KEY_TELA_LISTA_ORCAMENTO_PEDIDO))){
+				if((telaChamou != null) && (telaChamou.equals(ListaOrcamentoPedidoMDActivity.KEY_TELA_LISTA_ORCAMENTO_PEDIDO))){
 					
 					PessoaBeans pessoa = new PessoaBeans();
 					pessoa = (PessoaBeans) listViewPessoa.getAdapter().getItem(position);
@@ -113,7 +114,7 @@ public class ClienteListaActivity extends Activity implements OnNavigationListen
 					if (pessoa.isCadastroNovo()){
 						returnIntent.putExtra("CADASTRO_NOVO", "S");
 					}
-					setResult(ListaOrcamentoPedidoActivity.RETORNA_CLIENTE, returnIntent);
+					setResult(ListaOrcamentoPedidoMDActivity.RETORNA_CLIENTE, returnIntent);
 					// Fecha a tela de detalhes de produto
 					finish();
 					

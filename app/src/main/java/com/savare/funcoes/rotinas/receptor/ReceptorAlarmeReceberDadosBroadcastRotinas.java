@@ -1,6 +1,5 @@
 package com.savare.funcoes.rotinas.receptor;
 
-import com.savare.activity.SincronizacaoActivity;
 import com.savare.funcoes.FuncoesPersonalizadas;
 import com.savare.funcoes.rotinas.async.ReceberDadosFtpAsyncRotinas;
 

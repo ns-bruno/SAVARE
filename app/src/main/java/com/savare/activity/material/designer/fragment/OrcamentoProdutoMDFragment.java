@@ -33,6 +33,7 @@ import com.savare.R;
 import com.savare.activity.LogActivity;
 import com.savare.activity.OrcamentoProdutoDetalhesActivity;
 import com.savare.activity.material.designer.ClienteListaMDActivity;
+import com.savare.activity.material.designer.ListaTitulosMDActivity;
 import com.savare.activity.material.designer.OrcamentoTabFragmentMDActivity;
 import com.savare.activity.material.designer.ProdutoListaMDActivity;
 import com.savare.adapter.ItemUniversalAdapter;
@@ -43,6 +44,7 @@ import com.savare.beans.OrcamentoBeans;
 import com.savare.funcoes.FuncoesPersonalizadas;
 import com.savare.funcoes.rotinas.GerarPdfRotinas;
 import com.savare.funcoes.rotinas.OrcamentoRotinas;
+import com.savare.funcoes.rotinas.ParcelaRotinas;
 import com.savare.funcoes.rotinas.PessoaRotinas;
 import com.savare.funcoes.rotinas.async.GerarPdfAsyncRotinas;
 
@@ -655,6 +657,7 @@ public class OrcamentoProdutoMDFragment extends Fragment {
                 ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(data.getStringExtra("ID_CFACLIFO") + " - " + data.getStringExtra("NOME_CLIENTE"));
                 //getActivity().getActionBar().setTitle(data.getStringExtra("ID_CFACLIFO") + " - " + data.getStringExtra("NOME_CLIENTE"));
                 razaoSocial = data.getStringExtra("NOME_CLIENTE");
+                idPessoa = data.getStringExtra("ID_CFACLIFO");
 
             } else if(requestCode == ERRO_RETORNA_CLIENTE){
                 // Dados da mensagem
@@ -760,6 +763,19 @@ public class OrcamentoProdutoMDFragment extends Fragment {
             }
             if (totalOrcamento != null){
                 textTotal.setText("Total: " + totalOrcamento);
+            }
+            ParcelaRotinas parcelaRotinas = new ParcelaRotinas(getContext());
+            // Checa se tem algum titulo vencido
+            if (parcelaRotinas.totalReceberPagarCliente(idPessoa, ParcelaRotinas.TITULOS_EM_ABERTO_VENCIDOS, ParcelaRotinas.RECEBER, null) > 0){
+
+                FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(getContext());
+
+                ContentValues mensagem = new ContentValues();
+                mensagem.put("comando", 2);
+                mensagem.put("tela", "OrcamentoProdutoMDFragment");
+                mensagem.put("mensagem", getResources().getString(R.string.existe_titulos_vencidos));
+
+                funcoes.menssagem(mensagem);
             }
             progressBarStatus.setVisibility(View.GONE);
         }

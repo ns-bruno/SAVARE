@@ -40,7 +40,7 @@ import com.savare.beans.ProdutoListaBeans;
 import com.savare.funcoes.FuncoesPersonalizadas;
 import com.savare.funcoes.rotinas.ProdutoRotinas;
 import com.savare.funcoes.rotinas.async.PesquisaListaProdutoAsyncRotinas;
-
+@Deprecated
 public class ProdutoListaActivity extends Activity implements OnNavigationListener {
 	
 	private TextView textCodigoOrcamento, textCodigoPessoa, textNomeRazao, textAtacadoVarejo, textProcessoPesquisa;

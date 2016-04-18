@@ -134,6 +134,18 @@
             android:name="com.savare.activity.material.designer.OrcamentoTabFragmentMDActivity"
             android:theme="@style/AppBaseTheme" >
         </activity>
+        <activity
+            android:name="com.savare.activity.material.designer.ListaOrcamentoPedidoMDActivity"
+            android:theme="@style/AppBaseTheme" >
+        </activity>
+        <activity
+            android:name="com.savare.activity.material.designer.SincronizacaoMDActivity"
+            android:theme="@style/AppBaseTheme" >
+        </activity>
+        <activity
+            android:name="com.savare.activity.material.designer.ConfiguracoesMDActivity"
+            android:theme="@style/AppBaseTheme" >
+        </activity>
 
         <provider
             android:name="com.savare.sincronizacao.EnviarProvider"

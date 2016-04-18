@@ -1,5 +1,6 @@
 package com.savare.activity.material.designer;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
@@ -22,6 +23,7 @@ public class OrcamentoTabFragmentMDActivity extends AppCompatActivity {
                     idPessoa,
                     razaoSocial,
                     tipoOrcamentoPedido;
+    private boolean abertoTitulosPriveiraVez = false;
     public static final String  KEY_ID_ORCAMENTO = "ID_ORCAMENTO",
                                 KEY_ATACADO_VAREJO = "AEACADO_VAREJO",
                                 KEY_NOME_RAZAO = "NOME_RAZAO",
@@ -85,6 +87,15 @@ public class OrcamentoTabFragmentMDActivity extends AppCompatActivity {
         OrcamentoRotinas orcamentoRotinas = new OrcamentoRotinas(OrcamentoTabFragmentMDActivity.this);
         // Pega o status do orcamento
         this.tipoOrcamentoPedido = orcamentoRotinas.statusOrcamento(idOrcamento);
+
+        if (abertoTitulosPriveiraVez == false) {
+
+            abertoTitulosPriveiraVez = true;
+            // Cria uma intent para abrir uma nova activity
+            Intent intentTitulos = new Intent(getApplicationContext(), ListaTitulosMDActivity.class);
+            intentTitulos.putExtra("ID_CFACLIFO", idPessoa);
+            startActivity(intentTitulos);
+        }
 
     }
 

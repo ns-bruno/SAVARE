@@ -6,7 +6,7 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.widget.TabHost;
 import android.widget.TabHost.TabSpec;
-
+@Deprecated
 public class OrcamentoTabulacaoActivity extends Activity {
 
 	private TabHost myTabHost;

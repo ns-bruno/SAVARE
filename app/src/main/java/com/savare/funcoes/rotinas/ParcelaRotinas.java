@@ -15,6 +15,9 @@ import com.savare.funcoes.Rotinas;
 
 public class ParcelaRotinas extends Rotinas {
 
+	public static final char TITULOS_EM_ABERTO = '0', TITULOS_BAIXADOS = '1', TITULOS_EM_ABERTO_VENCIDOS = '2';
+	public static final char RECEBER = '0', PAGAR = '1';
+
 	public ParcelaRotinas(Context context) {
 		super(context);
 		

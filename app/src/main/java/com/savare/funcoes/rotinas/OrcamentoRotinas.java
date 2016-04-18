@@ -13,9 +13,11 @@ import android.widget.ProgressBar;
 import com.savare.R;
 import com.savare.banco.funcoesSql.ItemOrcamentoSql;
 import com.savare.banco.funcoesSql.OrcamentoSql;
+import com.savare.banco.funcoesSql.PessoaSql;
 import com.savare.beans.CidadeBeans;
 import com.savare.beans.DescricaoSimplesBeans;
 import com.savare.beans.EnderecoBeans;
+import com.savare.beans.EstadoBeans;
 import com.savare.beans.ItemOrcamentoBeans;
 import com.savare.beans.OrcamentoBeans;
 import com.savare.beans.PessoaBeans;
@@ -357,7 +359,7 @@ public class OrcamentoRotinas extends Rotinas {
 			
 			// Adiciona a clausula where
 			if(where != null){
-				sql = sql + " AND ( " + where + " )";
+				sql = sql + " AND " + where + " ";
 			}
 			// Adiciona um ordem no sql
 			sql = sql + " ORDER BY AEAORCAM.DT_CAD ";
@@ -570,53 +572,113 @@ public class OrcamentoRotinas extends Rotinas {
 	 * @param where
 	 * @return
 	 */
-	public List<DescricaoSimplesBeans> listaCidadeOrcamentoPedido(String tipo, String where){
+//	public List<DescricaoSimplesBeans> listaCidadeOrcamentoPedido(String tipo, String where){
+//		// Cria uma lista para retornar as cidades
+//		List<DescricaoSimplesBeans> lista = new ArrayList<DescricaoSimplesBeans>();
+//
+//
+//		String sql = "SELECT CFAESTAD.UF, CFACIDAD.DESCRICAO "
+//				   + "FROM AEAORCAM "
+//				   + "LEFT OUTER JOIN CFAESTAD CFAESTAD ON(AEAORCAM.ID_CFAESTAD = CFAESTAD.ID_CFAESTAD) "
+//				   + "LEFT OUTER JOIN CFACIDAD CFACIDAD ON(AEAORCAM.ID_CFACIDAD = CFACIDAD.ID_CFACIDAD) "
+//				   + "WHERE (AEAORCAM.STATUS = '" + tipo + "') ";
+//
+//		/*// Checa se eh para listar todos os pedidos
+//		if(tipo.equalsIgnoreCase("TP")){
+//			sql += "WHERE (AEAORCAM.STATUS = 'P') OR (AEAORCAM.STATUS = 'N')";
+//		} else {
+//			sql += "WHERE (AEAORCAM.STATUS = '" + tipo + "') ";
+//		}*/
+//
+//		// Adiciona a clausula where
+//		if(where != null){
+//			sql = sql + " AND ( " + where + " )";
+//		}
+//		// Adiciona um ordem no sql
+//		sql = sql + " GROUP BY CFAESTAD.UF, CFACIDAD.DESCRICAO ORDER BY CFAESTAD.UF, CFACIDAD.DESCRICAO ";
+//
+//		OrcamentoSql orcamentoSql = new OrcamentoSql(context);
+//		// Executa o sql e armazena os registro em um Cursor
+//		Cursor cursor = orcamentoSql.sqlSelect(sql);
+//
+//		if((cursor != null) && (cursor.getCount() > 0)){
+//
+//			while (cursor.moveToNext()) {
+//				// Instancia a classe para salvar o nome da cidade
+//				DescricaoSimplesBeans cidade = new DescricaoSimplesBeans();
+//				// Seta o texto principal com o nome da cidade
+//				cidade.setTextoPrincipal(cursor.getString(cursor.getColumnIndex("UF")) + " - " + cursor.getString(cursor.getColumnIndex("DESCRICAO")));
+//				// Adiciona a cidade em uma lista
+//				lista.add(cidade);
+//			}
+//
+//		} else {
+//			lista.add(new DescricaoSimplesBeans("Nenhum valor encontrado"));
+//		}
+//
+//		// Adiciona um valor padrao para selecionar todas as cidades
+//		lista.add(new DescricaoSimplesBeans("Todas as Cidades"));
+//
+//		return lista;
+//	} // Fim listaCidadePessoa
+
+	/**
+	 * Retorna uma lista de cidades dos orcamentos ou pedidos que
+	 * estao no banco de dados.
+	 *
+	 * @param tipo - 'O' = ORCAMENTO, 'P' = PEDIDO, 'E' = EXCLUIDO, 'N' = ENVIADOS
+	 * @param where
+	 * @return
+	 */
+	public List<CidadeBeans> listaCidadeOrcamentoPedido(String tipo, String where){
 		// Cria uma lista para retornar as cidades
-		List<DescricaoSimplesBeans> lista = new ArrayList<DescricaoSimplesBeans>();
-		
-		
-		String sql = "SELECT CFAESTAD.UF, CFACIDAD.DESCRICAO "
-				   + "FROM AEAORCAM "
-				   + "LEFT OUTER JOIN CFAESTAD CFAESTAD ON(AEAORCAM.ID_CFAESTAD = CFAESTAD.ID_CFAESTAD) "
-				   + "LEFT OUTER JOIN CFACIDAD CFACIDAD ON(AEAORCAM.ID_CFACIDAD = CFACIDAD.ID_CFACIDAD) "
-				   + "WHERE (AEAORCAM.STATUS = '" + tipo + "') ";
-		
-		/*// Checa se eh para listar todos os pedidos
-		if(tipo.equalsIgnoreCase("TP")){
-			sql += "WHERE (AEAORCAM.STATUS = 'P') OR (AEAORCAM.STATUS = 'N')";
-		} else {
-			sql += "WHERE (AEAORCAM.STATUS = '" + tipo + "') ";
-		}*/
-		
+		List<CidadeBeans> lista = new ArrayList<CidadeBeans>();
+
+		String sql = "SELECT CFACIDAD.ID_CFACIDAD, CFACIDAD.DESCRICAO AS DESCRICAO_CIDAD, CFAESTAD.UF "
+				+ "FROM AEAORCAM "
+				+ "LEFT OUTER JOIN CFAESTAD CFAESTAD ON(AEAORCAM.ID_CFAESTAD = CFAESTAD.ID_CFAESTAD) "
+				+ "LEFT OUTER JOIN CFACIDAD CFACIDAD ON(AEAORCAM.ID_CFACIDAD = CFACIDAD.ID_CFACIDAD) "
+				+ "WHERE (AEAORCAM.STATUS = '" + tipo + "') ";
+
 		// Adiciona a clausula where
 		if(where != null){
 			sql = sql + " AND ( " + where + " )";
 		}
 		// Adiciona um ordem no sql
-		sql = sql + " GROUP BY CFAESTAD.UF, CFACIDAD.DESCRICAO ORDER BY CFAESTAD.UF, CFACIDAD.DESCRICAO ";
-		
+		sql = sql + " GROUP BY CFACIDAD.ID_CFACIDAD, CFACIDAD.DESCRICAO, CFAESTAD.UF ORDER BY CFAESTAD.UF, CFACIDAD.DESCRICAO ";
+
+		// Instancia a classe para manipular o banco de dados
 		OrcamentoSql orcamentoSql = new OrcamentoSql(context);
-		// Executa o sql e armazena os registro em um Cursor
+		// Executa a funcao para retornar os registro do banco de dados
 		Cursor cursor = orcamentoSql.sqlSelect(sql);
-		
+
 		if((cursor != null) && (cursor.getCount() > 0)){
-						
+
 			while (cursor.moveToNext()) {
 				// Instancia a classe para salvar o nome da cidade
-				DescricaoSimplesBeans cidade = new DescricaoSimplesBeans();
-				// Seta o texto principal com o nome da cidade
-				cidade.setTextoPrincipal(cursor.getString(cursor.getColumnIndex("UF")) + " - " + cursor.getString(cursor.getColumnIndex("DESCRICAO")));
+				CidadeBeans cidade = new CidadeBeans();
+				cidade.setIdCidade(cursor.getInt(cursor.getColumnIndex("ID_CFACIDAD")));
+				cidade.setDescricao(cursor.getString(cursor.getColumnIndex("DESCRICAO_CIDAD")));
+
+				EstadoBeans estado = new EstadoBeans();
+				estado.setSiglaEstado(cursor.getString(cursor.getColumnIndex("UF")));
+				cidade.setEstado(estado);
 				// Adiciona a cidade em uma lista
 				lista.add(cidade);
 			}
-			
+
 		} else {
-			lista.add(new DescricaoSimplesBeans("Nenhum valor encontrado"));
+			CidadeBeans cidade = new CidadeBeans();
+			cidade.setIdCidade(0);
+			cidade.setDescricao("Nenhum valor encontrado");
 		}
-		
+
 		// Adiciona um valor padrao para selecionar todas as cidades
-		lista.add(new DescricaoSimplesBeans("Todas as Cidades"));
-		
+		CidadeBeans cidade = new CidadeBeans();
+		cidade.setIdCidade(0);
+		cidade.setDescricao("Todas as Cidades");
+		lista.add(cidade);
+
 		return lista;
 	} // Fim listaCidadePessoa
 	

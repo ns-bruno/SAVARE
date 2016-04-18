@@ -4,7 +4,6 @@ import android.app.SearchManager;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -19,9 +18,7 @@ import android.widget.ProgressBar;
 import android.widget.Spinner;
 
 import com.github.clans.fab.FloatingActionButton;
-import com.github.clans.fab.FloatingActionMenu;
 import com.savare.R;
-import com.savare.activity.ListaOrcamentoPedidoActivity;
 import com.savare.activity.fragment.ClienteCadastroFragment;
 import com.savare.activity.fragment.OrcamentoFragment;
 import com.savare.adapter.ItemUniversalAdapter;
@@ -62,7 +59,7 @@ public class ClienteListaMDActivity extends AppCompatActivity {
         Bundle intentParametro = getIntent().getExtras();
         if (intentParametro != null) {
 
-            this.telaChamou = intentParametro.getString(ListaOrcamentoPedidoActivity.KEY_TELA_CHAMADA);
+            this.telaChamou = intentParametro.getString(ListaOrcamentoPedidoMDActivity.KEY_TELA_CHAMADA);
 
             if (telaChamou.equals(OrcamentoFragment.KEY_TELA_ORCAMENTO_FRAGMENTO)) {
                 idOrcamento = intentParametro.getString(OrcamentoFragment.KEY_ID_ORCAMENTO);
@@ -98,7 +95,7 @@ public class ClienteListaMDActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-                if((telaChamou != null) && (telaChamou.equals(ListaOrcamentoPedidoActivity.KEY_TELA_LISTA_ORCAMENTO_PEDIDO))){
+                if((telaChamou != null) && (telaChamou.equals(ListaOrcamentoPedidoMDActivity.KEY_TELA_LISTA_ORCAMENTO_PEDIDO))){
 
                     PessoaBeans pessoa = new PessoaBeans();
                     pessoa = (PessoaBeans) listViewPessoa.getAdapter().getItem(position);
@@ -125,7 +122,7 @@ public class ClienteListaMDActivity extends AppCompatActivity {
                     if (pessoa.isCadastroNovo()){
                         returnIntent.putExtra("CADASTRO_NOVO", "S");
                     }
-                    setResult(ListaOrcamentoPedidoActivity.RETORNA_CLIENTE, returnIntent);
+                    setResult(ListaOrcamentoPedidoMDActivity.RETORNA_CLIENTE, returnIntent);
                     // Fecha a tela de detalhes de produto
                     finish();
 

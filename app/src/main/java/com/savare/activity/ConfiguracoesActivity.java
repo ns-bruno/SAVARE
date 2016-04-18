@@ -19,7 +19,7 @@ import com.savare.banco.funcoesSql.EmpresaSql;
 import com.savare.banco.funcoesSql.PercentualSql;
 import com.savare.funcoes.FuncoesPersonalizadas;
 import com.savare.funcoes.rotinas.PercentualRotinas;
-
+@Deprecated
 public class ConfiguracoesActivity extends Activity {
 	
 	private Button buttonTamanhoFonte;

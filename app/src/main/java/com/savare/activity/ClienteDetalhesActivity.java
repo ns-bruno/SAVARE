@@ -42,7 +42,7 @@ import com.savare.funcoes.rotinas.async.EnviarCadastroClienteFtpAsyncRotinas;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-
+@Deprecated
 public class ClienteDetalhesActivity extends Activity implements OnChartGestureListener, OnChartValueSelectedListener {
 	
 	private TextView textCodigoPessoa,

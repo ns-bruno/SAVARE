@@ -168,6 +168,7 @@ public class ListaTitulosMDActivity extends AppCompatActivity{
 
         return super.onCreateOptionsMenu(menu);
     }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
@@ -344,7 +345,7 @@ public class ListaTitulosMDActivity extends AppCompatActivity{
         expandagleListaTitulos = (ExpandableListView) findViewById(R.id.activity_lista_titulos_md_expandable_lista_titulos);
         toolbarInicio = (Toolbar) findViewById(R.id.activity_lista_titulos_md_toolbar_cabecalho);
         // Adiciona uma titulo para toolbar
-        toolbarInicio.setTitle(this.getResources().getString(R.string.app_name));
+        toolbarInicio.setTitle(this.getResources().getString(R.string.titulos));
         toolbarInicio.setTitleTextColor(getResources().getColor(R.color.branco));
         setSupportActionBar(toolbarInicio);
     } // Fim do recuperaCampos

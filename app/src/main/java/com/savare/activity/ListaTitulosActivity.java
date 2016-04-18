@@ -34,7 +34,7 @@ import com.savare.funcoes.FuncoesPersonalizadas;
 import com.savare.funcoes.rotinas.OrcamentoRotinas;
 import com.savare.funcoes.rotinas.ParcelaRotinas;
 import com.savare.funcoes.rotinas.PessoaRotinas;
-
+@Deprecated
 public class ListaTitulosActivity extends Activity {
 	
 	private TextView textTotalAReceber,
