@@ -739,7 +739,24 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 			textBottonEsquerdo.setText("Unitário: " + funcoes.arredondarValor(item.getValorLiquidoUnitario()));
 			textBottonEsquerdoDois.setText(" | " + item.getUnidadeVenda().getSiglaUnidadeVenda());
 			textBottonDireito.setText("Total: " + funcoes.arredondarValor(String.valueOf(item.getValorLiquido())));
-			
+
+			// Checa se este item foi conferido ou ao menos faturado
+			if ( (item.getStatusRetorno() != null) && (item.getStatusRetorno().equalsIgnoreCase(ListaOrcamentoPedidoMDActivity.ITEM_NAO_CONFERIDO)) ){
+				textDescricao.setPaintFlags(textDescricao.getPaintFlags()| Paint.STRIKE_THRU_TEXT_FLAG);
+				textAbaixoDescricaoEsqueda.setPaintFlags(textAbaixoDescricaoEsqueda.getPaintFlags()| Paint.STRIKE_THRU_TEXT_FLAG);
+				textAbaixoDescricaoDireita.setPaintFlags(textAbaixoDescricaoDireita.getPaintFlags()| Paint.STRIKE_THRU_TEXT_FLAG);
+				textBottonEsquerdo.setPaintFlags(textBottonEsquerdo.getPaintFlags()| Paint.STRIKE_THRU_TEXT_FLAG);
+				textBottonEsquerdoDois.setPaintFlags(textBottonEsquerdoDois.getPaintFlags()| Paint.STRIKE_THRU_TEXT_FLAG);
+				textBottonDireito.setPaintFlags(textBottonDireito.getPaintFlags()| Paint.STRIKE_THRU_TEXT_FLAG);
+
+			}
+
+			if ((item.getStatusRetorno() != null) && (item.getStatusRetorno().equalsIgnoreCase(ListaOrcamentoPedidoMDActivity.TIPO_PEDIDO_FATURADO))){
+				textAbaixoDescricaoDireita.setText("Qtd. Fat.: " + (funcoes.arredondarValor(item.getQuantidadeFaturada())));
+				textBottonDireito.setText("T. Fat.: " + funcoes.arredondarValor(String.valueOf(item.getValorLiquidoFaturado())));
+				textBottonEsquerdo.setText("Unit. Fat.: " + funcoes.arredondarValor(item.getValorLiquidoFaturado() / item.getQuantidadeFaturada()));
+			}
+
 			viewTopo.setVisibility(View.INVISIBLE);
 			viewRodape.setVisibility(View.INVISIBLE);
 			
@@ -886,12 +903,32 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 			this.funcoes = new FuncoesPersonalizadas(context);
 			
 			textBottonEsquerdo.setText("Tab.: " + funcoes.arredondarValor(item.getValorTabela()) +
-									   " - Venda: " + funcoes.arredondarValor(item.getValorLiquido()));
+									   " - Ve.: " + funcoes.arredondarValor(item.getValorLiquido()));
 			textBottonEsquerdoDois.setText(" | " + item.getUnidadeVenda().getSiglaUnidadeVenda());
 			// Calcula a diferenca de preco entre o preco de tabela e o de venda
 			double diferenca = (item.getValorTabela() - item.getValorLiquido());
 			
 			textBottonDireito.setText("Dife.: " + funcoes.arredondarValor(String.valueOf(diferenca * -1)));
+
+			// Checa se este item foi conferido ou ao menos faturado
+			if ((item.getStatusRetorno() != null) && (item.getStatusRetorno().equalsIgnoreCase(ListaOrcamentoPedidoMDActivity.ITEM_NAO_CONFERIDO))){
+				textDescricao.setPaintFlags(textDescricao.getPaintFlags()| Paint.STRIKE_THRU_TEXT_FLAG);
+				textAbaixoDescricaoEsqueda.setPaintFlags(textAbaixoDescricaoEsqueda.getPaintFlags()| Paint.STRIKE_THRU_TEXT_FLAG);
+				textAbaixoDescricaoDireita.setPaintFlags(textAbaixoDescricaoDireita.getPaintFlags()| Paint.STRIKE_THRU_TEXT_FLAG);
+				textBottonEsquerdo.setPaintFlags(textBottonEsquerdo.getPaintFlags()| Paint.STRIKE_THRU_TEXT_FLAG);
+				textBottonEsquerdoDois.setPaintFlags(textBottonEsquerdoDois.getPaintFlags()| Paint.STRIKE_THRU_TEXT_FLAG);
+				textBottonDireito.setPaintFlags(textBottonDireito.getPaintFlags()| Paint.STRIKE_THRU_TEXT_FLAG);
+
+			}
+
+			if ((item.getStatusRetorno() != null) && ((item.getStatusRetorno().equalsIgnoreCase(ListaOrcamentoPedidoMDActivity.TIPO_PEDIDO_FATURADO)) || (item.getStatusRetorno().equalsIgnoreCase(ListaOrcamentoPedidoMDActivity.ITEM_CONFERIDO)))){
+				textAbaixoDescricaoDireita.setText("Qtd.: " + String.valueOf(item.getQuantidadeFaturada()));
+				textBottonEsquerdo.setText("Tab.: " + funcoes.arredondarValor(item.getValorTabelaFaturado()) +
+				  						   " - Ve.: " + funcoes.arredondarValor(item.getValorLiquidoFaturado()));
+				// Calcula a diferenca de preco entre o preco de tabela e o de venda
+				textBottonDireito.setText("Dife.: " + funcoes.arredondarValor(String.valueOf((item.getValorTabelaFaturado() - item.getValorLiquidoFaturado()) * -1)));
+			}
+
 			// Muda a cor da View de acordo com o resultado da diferenca
 			if(diferenca < 0){
 				//viewTopo.setVisibility(View.VISIBLE);
@@ -979,8 +1016,23 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 			textDescricao.setText(orcamento.getNomeRazao()); 
 			textAbaixoDescricaoEsqueda.setText("Nº " +  orcamento.getIdOrcamento());
 			textAbaixoDescricaoDireita.setText(orcamento.getSiglaEstado() + " - " + orcamento.getCidade());
-			textBottonDireito.setText(funcoes.arredondarValor(orcamento.getTotalOrcamento()));
-			
+			// Checa se o pedido ja teve retorno de faturado da empresa
+			if ((orcamento.getStatusRetorno() != null) && ((orcamento.getStatusRetorno().equalsIgnoreCase(ListaOrcamentoPedidoMDActivity.TIPO_PEDIDO_RETORNADO_LIBERADO)) ||
+					(orcamento.getStatusRetorno().equalsIgnoreCase(ListaOrcamentoPedidoMDActivity.TIPO_PEDIDO_FATURADO)) )){
+				// Mostra o valor faturado de retorno
+				textBottonDireito.setText(funcoes.arredondarValor(orcamento.getTotalOrcamentoFaturado()));
+
+				textDescricao.setPaintFlags(textDescricao.getPaintFlags()| Paint.UNDERLINE_TEXT_FLAG);
+				textAbaixoDescricaoEsqueda.setPaintFlags(textAbaixoDescricaoEsqueda.getPaintFlags()| Paint.UNDERLINE_TEXT_FLAG);
+				textAbaixoDescricaoDireita.setPaintFlags(textAbaixoDescricaoDireita.getPaintFlags()| Paint.UNDERLINE_TEXT_FLAG);
+				textBottonEsquerdo.setPaintFlags(textBottonEsquerdo.getPaintFlags()| Paint.UNDERLINE_TEXT_FLAG);
+				textBottonEsquerdoDois.setPaintFlags(textBottonEsquerdoDois.getPaintFlags()| Paint.UNDERLINE_TEXT_FLAG);
+				textBottonDireito.setPaintFlags(textBottonDireito.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
+
+			} else {
+				textBottonDireito.setText(funcoes.arredondarValor(orcamento.getTotalOrcamento()));
+			}
+
 			if(orcamento.getTipoVenda() == '0'){
 				textBottonEsquerdo.setText("A");
 				
@@ -989,6 +1041,18 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 			}
 			textBottonEsquerdoDois.setVisibility(View.VISIBLE);
 			textBottonEsquerdoDois.setText(" | " + orcamento.getDataCadastro());
+
+			if ((orcamento.getStatusRetorno() != null) &&
+					((orcamento.getStatusRetorno().equalsIgnoreCase(ListaOrcamentoPedidoMDActivity.TIPO_PEDIDO_RETORNADO_EXCLUIDO)) ||
+							(orcamento.getStatusRetorno().equalsIgnoreCase(ListaOrcamentoPedidoMDActivity.TIPO_PEDIDO_RETORNADO_BLOQUEADO)))){
+				// Rista no meio de todas as descricoes
+				textDescricao.setPaintFlags(textDescricao.getPaintFlags()| Paint.STRIKE_THRU_TEXT_FLAG);
+				textAbaixoDescricaoEsqueda.setPaintFlags(textAbaixoDescricaoEsqueda.getPaintFlags()| Paint.STRIKE_THRU_TEXT_FLAG);
+				textAbaixoDescricaoDireita.setPaintFlags(textAbaixoDescricaoDireita.getPaintFlags()| Paint.STRIKE_THRU_TEXT_FLAG);
+				textBottonEsquerdo.setPaintFlags(textBottonEsquerdo.getPaintFlags()| Paint.STRIKE_THRU_TEXT_FLAG);
+				textBottonEsquerdoDois.setPaintFlags(textBottonEsquerdoDois.getPaintFlags()| Paint.STRIKE_THRU_TEXT_FLAG);
+				textBottonDireito.setPaintFlags(textBottonDireito.getPaintFlags()| Paint.STRIKE_THRU_TEXT_FLAG);
+			}
 			
 			viewRodape.setVisibility(View.INVISIBLE);
 			viewTopo.setVisibility(View.INVISIBLE);
@@ -1488,7 +1552,7 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 				@Override
 				public void onClick(View v) {
 					// Checa se eh uma lista de produtos
-					if(tipoItem == PRODUTO){
+					if (tipoItem == PRODUTO) {
 						// Mostra um menu popup
 						showPopup(v, posicao);
 					}

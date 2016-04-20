@@ -78,7 +78,8 @@ public class ListaOrcamentoPedidoActivity extends Activity implements OnNavigati
     						   TIPO_PEDIDO_RETORNADO_BLOQUEADO = "RB",
     						   TIPO_PEDIDO_RETORNADO_LIBERADO = "RL",
 							   TIPO_PEDIDO_RETORNADO_EXCLUIDO = "RE",
-    						   TIPO_PEDIDO_FATURADO = "F";
+    						   TIPO_PEDIDO_FATURADO = "F",
+							   ITEM_NAO_CONFERIDO = "NC";
     public static final String KEY_TELA_LISTA_ORCAMENTO_PEDIDO = "ListaOrcamentoPedidosActivity",
     						   KEY_TELA_CHAMADA = "TELA_CHAMADA",
 							   KEY_RETORNA_VALOR = "RETORNA_VALOR",

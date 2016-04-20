@@ -219,11 +219,11 @@ public class FuncoesSql {
 			
 		} catch (SQLException e) {
 			
-			Log.e("ERRO_SAVARE", e.getMessage());
+			Log.e("SAVARE", e.getMessage());
 			
 		} catch (Exception e) {
 			
-			Log.e("ERRO_SAVARE", e.getMessage());
+			Log.e("SAVARE", e.getMessage());
 			
 		} finally{
 			

@@ -55,6 +55,8 @@ import com.savare.banco.funcoesSql.UnidadeVendaSql;
 import com.savare.banco.funcoesSql.UsuarioSQL;
 import com.savare.funcoes.FuncoesPersonalizadas;
 
+import br.com.goncalves.pugnotification.notification.PugNotification;
+
 public class ImportarDadosTxtRotinas {
 	
 	private Context context;
@@ -147,7 +149,7 @@ public class ImportarDadosTxtRotinas {
 		
 		//long tempoInicial = calendario.getTimeInMillis();
 		
-		FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
+		final FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
 		
 		try {
 			// Pego o arquivo txt e insiro um delimitador
@@ -819,14 +821,8 @@ public class ImportarDadosTxtRotinas {
 			mensagem += "Não foi possível escanear os dados do arquivo. \n" + e.getMessage();
 			
 			if(telaChamou != TELA_RECEPTOR_ALARME){
-				((Activity) context).runOnUiThread(new Runnable() {
-					public void run() {
-						progressRecebimentoDados.setVisibility(View.INVISIBLE);
-						textMensagemProcesso.setText(mensagem + "\n" + e.getMessage());
-					}
-				});
 
-				ContentValues dadosMensagem = new ContentValues();
+				final ContentValues dadosMensagem = new ContentValues();
 				
 		    	dadosMensagem.put("comando", 0);
 				dadosMensagem.put("tela", "ReceberDadosFtpAsyncRotinas");
@@ -835,8 +831,15 @@ public class ImportarDadosTxtRotinas {
 				dadosMensagem.put("usuario", funcoes.getValorXml("Usuario"));
 				dadosMensagem.put("empresa", funcoes.getValorXml("Empresa"));
 				dadosMensagem.put("email", funcoes.getValorXml("Email"));
-				 
-				funcoes.menssagem(dadosMensagem);
+
+				((Activity) context).runOnUiThread(new Runnable() {
+					public void run() {
+						progressRecebimentoDados.setVisibility(View.INVISIBLE);
+						textMensagemProcesso.setText(mensagem + "\n" + e.getMessage());
+						funcoes.menssagem(dadosMensagem);
+					}
+				});
+
 			}
 
 		} /*catch (final FileNotFoundException e) {
@@ -871,12 +874,24 @@ public class ImportarDadosTxtRotinas {
 		// Checa se que esta chamando esta classe eh o alarme
 		if( (mensagem != null) && (mensagem.length() > 0) && (telaChamou == TELA_RECEPTOR_ALARME)){
 			// Cria a intent com identificacao do alarme
-			Intent intent = new Intent("NOTIFICACAO_SAVARE");
+			/*Intent intent = new Intent("NOTIFICACAO_SAVARE");
 			intent.putExtra("TICKER", "Importação dos Dados");
 			intent.putExtra("TITULO", TAG);
 			intent.putExtra("MENSAGEM", mensagem);
 			
-			context.sendBroadcast(intent);
+			context.sendBroadcast(intent);*/
+
+			PugNotification.with(context)
+					.load()
+					.title(R.string.receber_todos_dados)
+					.message(mensagem)
+					.bigTextStyle("bigtext")
+					.smallIcon(R.drawable.ic_launcher)
+					.largeIcon(R.drawable.ic_launcher)
+					.flags(Notification.DEFAULT_ALL)
+					.vibrate(new long[]{150, 300, 150, 600})
+					.simple()
+					.build();
 		}
 	} // Fim importarDados
 	
@@ -2392,13 +2407,16 @@ public class ImportarDadosTxtRotinas {
 		
 		String FINALIDADE = scannerOrcamento.next();
 		final String guid = scannerOrcamento.next();
+		String idEmpre = scannerOrcamento.next();
 		String idClifo = scannerOrcamento.next();
 		String idEstado = scannerOrcamento.next();
 		String idCidade = scannerOrcamento.next();
 		String idRomaneio = scannerOrcamento.next();
 		String idTipoDocumento = scannerOrcamento.next();
 		String dataAlt = scannerOrcamento.next();
+		String atacVarejo = scannerOrcamento.next();
 		String numero = scannerOrcamento.next();
+		String valorTabelaFaturado = scannerOrcamento.next();
 		String valorFaturado = scannerOrcamento.next();
 		String pessoaCliente = scannerOrcamento.next();
 		String nomeCliente = scannerOrcamento.next();
@@ -2415,14 +2433,17 @@ public class ImportarDadosTxtRotinas {
 		
 		final ContentValues dadosOrcamento = new ContentValues();
 		dadosOrcamento.put("GUID", guid); 
+		dadosOrcamento.put("ID_SMAEMPRE", idEmpre);
 		dadosOrcamento.put("ID_CFACLIFO", idClifo);
 		dadosOrcamento.put("ID_CFAESTAD", idEstado);
 		dadosOrcamento.put("ID_CFACIDAD", idCidade);
 		dadosOrcamento.put("ID_AEAROMAN", idRomaneio);
 		dadosOrcamento.put("ID_CFATPDOC", idTipoDocumento);
 		dadosOrcamento.put("DT_ALT", dataAlt);
+		dadosOrcamento.put("ATAC_VAREJO", atacVarejo);
 		dadosOrcamento.put("NUMERO", numero);
-		dadosOrcamento.put("VL_FATURADO", valorFaturado);
+		dadosOrcamento.put("VL_TABELA_FATURADO", valorTabelaFaturado);
+		dadosOrcamento.put("FC_VL_TOTAL_FATURADO", valorFaturado);
 		dadosOrcamento.put("PESSOA_CLIENTE", pessoaCliente);
 		dadosOrcamento.put("NOME_CLIENTE", nomeCliente);
 		dadosOrcamento.put("IE_RG_CLIENTE", ieRgCliente);
@@ -2450,20 +2471,21 @@ public class ImportarDadosTxtRotinas {
 						orcamentoSql.insertOrReplaceFast(sql, argumentoSql);
 					}
 				});
+
 			} else {
 				orcamentoSql.insertOrReplaceFast(sql, argumentoSql);
-			}
 
+			}
 		// Checa se a finalidade eh atualizar
 		} else if(FINALIDADE.equalsIgnoreCase("U")){
 			if (telaChamou != TELA_RECEPTOR_ALARME) {
 				((Activity) context).runOnUiThread(new Runnable() {
 					public void run() {
-						orcamentoSql.update(dadosOrcamento, "GUID = " + guid);
+						orcamentoSql.update(dadosOrcamento, "GUID = '" + guid + "'");
 					}
 				});
 			} else {
-				orcamentoSql.update(dadosOrcamento, "GUID = " + guid);
+				orcamentoSql.update(dadosOrcamento, "GUID = '" + guid + "'");
 			}
 
 		// Checa se a finalidade eh deletar
@@ -2489,7 +2511,7 @@ public class ImportarDadosTxtRotinas {
 		String idEstoque = scannerOrcamento.next();
 		String idPlanoPagamento = scannerOrcamento.next();
 		String idUnidadeVenda = scannerOrcamento.next();
-		String dtAlt = scannerOrcamento.next();
+		//String dtAlt = scannerOrcamento.next();
 		String quantidade = scannerOrcamento.next();
 		String vlTabalaFaturado = scannerOrcamento.next();
 		String vlLiquidoFaturado = scannerOrcamento.next();
@@ -2503,7 +2525,7 @@ public class ImportarDadosTxtRotinas {
 		dadosItemOrcamento.put("ID_AEAESTOQ", idEstoque);
 		dadosItemOrcamento.put("ID_AEAPLPGT", idPlanoPagamento);
 		dadosItemOrcamento.put("ID_AEAUNVEN", idUnidadeVenda);
-		dadosItemOrcamento.put("DT_ALT", dtAlt);
+		//dadosItemOrcamento.put("DT_ALT", dtAlt);
 		dadosItemOrcamento.put("QUANTIDADE_FATURADA", quantidade);
 		dadosItemOrcamento.put("VL_TABELA_FATURADO", vlTabalaFaturado);
 		dadosItemOrcamento.put("FC_LIQUIDO_FATURADO", vlLiquidoFaturado);
@@ -2536,11 +2558,11 @@ public class ImportarDadosTxtRotinas {
 			if (telaChamou != TELA_RECEPTOR_ALARME) {
 				((Activity) context).runOnUiThread(new Runnable() {
 					public void run() {
-						itemOrcamentoSql.update(dadosItemOrcamento, "GUID = " + guid);
+						itemOrcamentoSql.update(dadosItemOrcamento, "GUID = '" + guid + "'");
 					}
 				});
 			} else {
-				itemOrcamentoSql.update(dadosItemOrcamento, "GUID = " + guid);
+				itemOrcamentoSql.update(dadosItemOrcamento, "GUID = '" + guid + "'");
 			}
 
 			// Checa se a finalidade eh deletar

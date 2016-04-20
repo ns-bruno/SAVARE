@@ -381,11 +381,10 @@ public class ReceberArquivoTxtServidorFtpRotinas {
 									// Checa qual classe chamou esta
 									if (telaChamou != TELA_RECEPTOR_ALARME) {
 
-										progressDownloads.setIndeterminate(false);
-										progressDownloads.setProgress(0);
-
 										((Activity) context).runOnUiThread(new Runnable() {
 											public void run() {
+												progressDownloads.setIndeterminate(false);
+												progressDownloads.setProgress(0);
 												// Atualiza a mensagem na tela de sincronizacao
 												textMensagemRetorno.setText("Achamos o arquivo " + dadosArquivoFtp.getName());
 											}

@@ -69,6 +69,7 @@ public class OrcamentoRotinas extends Rotinas {
 		String sql = "SELECT AEAITORC.ID_AEAITORC, AEAITORC.ID_AEAORCAM, AEAPRODU.DESCRICAO AS DESCRICAO_PRODU, AEAMARCA.DESCRICAO AS DESCRICAO_MARCA, "
 				   + "AEAPRODU.ID_AEAPRODU, AEAPRODU.CODIGO_ESTRUTURAL, AEAITORC.QUANTIDADE, AEAITORC.FC_LIQUIDO_UN, (AEAITORC.VL_BRUTO / AEAITORC.QUANTIDADE) AS VL_BRUTO_UN, "
 				   + "AEAITORC.VL_BRUTO, AEAITORC.VL_TABELA, AEAITORC.FC_LIQUIDO, AEAITORC.VL_DESCONTO, AEAITORC.FC_DESCONTO_UN, AEAITORC.COMPLEMENTO, "
+				   + "AEAITORC.VL_TABELA_FATURADO, QUANTIDADE_FATURADA, FC_LIQUIDO_FATURADO, STATUS_RETORNO, "
 				   + "AEAUNVEN.SIGLA SIGLA_EMBALAGEM "
 				   + "FROM AEAITORC AEAITORC "
 				   + "LEFT OUTER JOIN AEAUNVEN AEAUNVEN "
@@ -120,14 +121,18 @@ public class OrcamentoRotinas extends Rotinas {
 				item.setIdItemOrcamento(cursor.getInt(cursor.getColumnIndex("ID_AEAITORC")));
 				item.setIdOrcamento(cursor.getInt(cursor.getColumnIndex("ID_AEAORCAM")));
 				item.setQuantidade(cursor.getDouble(cursor.getColumnIndex("QUANTIDADE")));
+				item.setQuantidadeFaturada(cursor.getDouble(cursor.getColumnIndex("QUANTIDADE_FATURADA")));
 				item.setValorLiquidoUnitario(cursor.getDouble(cursor.getColumnIndex("FC_LIQUIDO_UN")));
 				item.setValorLiquido(cursor.getDouble(cursor.getColumnIndex("FC_LIQUIDO")));
+				item.setValorLiquidoFaturado(cursor.getDouble(cursor.getColumnIndex("FC_LIQUIDO_FATURADO")));
 				item.setValorBrutoUnitario(cursor.getDouble(cursor.getColumnIndex("VL_BRUTO_UN")));
 				item.setValorBruto(cursor.getDouble(cursor.getColumnIndex("VL_BRUTO")));
 				item.setValorTabela(cursor.getDouble(cursor.getColumnIndex("VL_TABELA")));
+				item.setValorTabelaFaturado(cursor.getDouble(cursor.getColumnIndex("VL_TABELA_FATURADO")));
 				item.setValorDesconto(cursor.getDouble(cursor.getColumnIndex("VL_DESCONTO")));
 				item.setValorDescontoUnitario(cursor.getDouble(cursor.getColumnIndex("FC_DESCONTO_UN")));
 				item.setComplemento(cursor.getString(cursor.getColumnIndex("COMPLEMENTO")));
+				item.setStatusRetorno(cursor.getString(cursor.getColumnIndex("STATUS_RETORNO")));
 				
 				// Instancia a classe de unidade de venda
 				UnidadeVendaBeans unidadeVenda = new UnidadeVendaBeans();

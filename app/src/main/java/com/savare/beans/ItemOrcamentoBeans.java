@@ -16,11 +16,14 @@ public class ItemOrcamentoBeans implements Parcelable {
 				idItemOrcamento,
 				seguencia;
 	private double quantidade,
+				   quantidadeFaturada,
 				   valorCusto,
 				   valorBruto,
 				   ValorDesconto,
 				   valorLiquido,
+				   valorLiquidoFaturado,
 				   valorTabela,
+				   valorTabelaFaturado,
 				   valorCustoUnitario,
 				   valorBrutoUnitario,
 				   valorDescontoUnitario,
@@ -29,7 +32,8 @@ public class ItemOrcamentoBeans implements Parcelable {
 				   dataCadastro,
 				   dataAlteracao,
 				   complemento,
-				   sequencialDesconto;
+				   sequencialDesconto,
+				   statusRetorno;
 	private char promocao,
 				 tipoProduto;
 	
@@ -437,6 +441,38 @@ public class ItemOrcamentoBeans implements Parcelable {
 
 	public void setPlanoPagamento(PlanoPagamentoBeans planoPagamento) {
 		this.planoPagamento = planoPagamento;
+	}
+
+	public double getQuantidadeFaturada() {
+		return quantidadeFaturada;
+	}
+
+	public void setQuantidadeFaturada(double quantidadeFaturada) {
+		this.quantidadeFaturada = quantidadeFaturada;
+	}
+
+	public double getValorTabelaFaturado() {
+		return valorTabelaFaturado;
+	}
+
+	public void setValorTabelaFaturado(double valorTabelaFaturado) {
+		this.valorTabelaFaturado = valorTabelaFaturado;
+	}
+
+	public double getValorLiquidoFaturado() {
+		return valorLiquidoFaturado;
+	}
+
+	public void setValorLiquidoFaturado(double valorLiquidoFaturado) {
+		this.valorLiquidoFaturado = valorLiquidoFaturado;
+	}
+
+	public String getStatusRetorno() {
+		return statusRetorno;
+	}
+
+	public void setStatusRetorno(String statusRetorno) {
+		this.statusRetorno = statusRetorno;
 	}
 
 	@Override
