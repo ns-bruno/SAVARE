@@ -27,12 +27,15 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.github.clans.fab.FloatingActionButton;
 import com.github.clans.fab.FloatingActionMenu;
 import com.savare.R;
 import com.savare.adapter.ItemUniversalAdapter;
 import com.savare.banco.funcoesSql.OrcamentoSql;
+import com.savare.banco.funcoesSql.PositivacaoSql;
 import com.savare.beans.CidadeBeans;
 import com.savare.beans.OrcamentoBeans;
 import com.savare.funcoes.FuncoesPersonalizadas;
@@ -242,41 +245,77 @@ public class ListaOrcamentoPedidoMDActivity extends AppCompatActivity{
                 switch (item.getItemId()) {
 
                     case R.id.menu_lista_orcamento_context_md_transformar_pedido:
-                        // Instancia a classe para manipular os orcamento no banco de dados
-                        OrcamentoSql orcamentoSql = new OrcamentoSql(ListaOrcamentoPedidoMDActivity.this);
-                        int totalAtualizado = 0;
-                        for (int i = 0; i < listaItemOrcamentoSelecionado.size(); i++) {
 
-                            ContentValues dadosPedido = new ContentValues();
-                            dadosPedido.put("STATUS", "P");
+                        new MaterialDialog.Builder(ListaOrcamentoPedidoMDActivity.this)
+                                .title(R.string.formar_venda)
+                                .items(R.array.forma_venda_positivacao)
+                                .itemsCallback(new MaterialDialog.ListCallback() {
+                                    @Override
+                                    public void onSelection(MaterialDialog dialog, View view, int which, CharSequence text) {
 
-                            totalAtualizado = totalAtualizado + orcamentoSql.update(dadosPedido, "AEAORCAM.ID_AEAORCAM = " +
-                                    adapterListaOrcamentoPedido.getListaOrcamentoPediso().get(listaItemOrcamentoSelecionado.get(i)).getIdOrcamento());
-                        }
-                        // Dados da mensagem
-                        ContentValues mensagem = new ContentValues();
-                        mensagem.put("comando", 2);
-                        mensagem.put("tela", "ListaOrcamentoPedidoMDActivity");
+                                        // Valida a opcao selecionada 1 = Visitou, mas, não comprou e 2 = Não estava
+                                        if ((which != 1) && (which != 2)) {
 
-                        // Verifica se foi deletado algum registro
-                        if (totalAtualizado > 0) {
-                            mensagem.put("mensagem", totalAtualizado + " Transformado(s) em Pedido(s). \n");
+                                            // Instancia a classe para manipular os orcamento no banco de dados
+                                            OrcamentoSql orcamentoSql = new OrcamentoSql(ListaOrcamentoPedidoMDActivity.this);
+                                            int totalAtualizado = 0;
+                                            for (int i = 0; i < listaItemOrcamentoSelecionado.size(); i++) {
 
-                            // Recarrega a lista de orcamento
-                            CarregarDadosOrcamentoPedido carregarDadosOrcamentoPedido = new CarregarDadosOrcamentoPedido(spinnerListaCidade.getSelectedItemPosition());
-                            carregarDadosOrcamentoPedido.execute();
+                                                ContentValues dadosPedido = new ContentValues();
+                                                dadosPedido.put("STATUS", "P");
 
-                        } else {
-                            mensagem.put("mensagem", "NÃO FOI POSSÍVEL TRANSFORMAR O(S) ORÇAMENTO(S) EM PEDIDO(S). \n");
-                        }
-                        // Esvazia a lista de selecionados
-                        //listaItemOrcamentoSelecionado = null;
+                                                totalAtualizado = totalAtualizado + orcamentoSql.update(dadosPedido, "AEAORCAM.ID_AEAORCAM = " +
+                                                        adapterListaOrcamentoPedido.getListaOrcamentoPediso().get(listaItemOrcamentoSelecionado.get(i)).getIdOrcamento());
+                                            }
+                                            // Dados da mensagem
+                                            ContentValues mensagem = new ContentValues();
+                                            mensagem.put("comando", 2);
+                                            mensagem.put("tela", "ListaOrcamentoPedidoMDActivity");
 
-                        // Instancia a classe  de funcoes para mostra a mensagem
-                        FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(ListaOrcamentoPedidoMDActivity.this);
-                        funcoes.menssagem(mensagem);
-                        // Fecha o menu context
-                        mode.finish();
+                                            // Verifica se foi deletado algum registro
+                                            if (totalAtualizado > 0) {
+                                                mensagem.put("mensagem", totalAtualizado + " Transformado(s) em Pedido(s). \n");
+
+                                                for (int i = 0; i < listaItemOrcamentoSelecionado.size(); i++) {
+
+                                                    int idOrcamento = adapterListaOrcamentoPedido.getListaOrcamentoPediso().get(listaItemOrcamentoSelecionado.get(i)).getIdOrcamento();
+
+                                                    // Pega os dados da positivacao
+                                                    String sqlInsert = "INSERT OR REPLACE INTO CFAPOSIT(STATUS, VALOR_VENDA, DATA_VISITA, ID_CFACLIFO, ID_AEAORCAM) VALUES " +
+                                                            "(" + which + ", " +
+                                                            "(SELECT AEAORCAM.FC_VL_TOTAL FROM AEAORCAM WHERE AEAORCAM.ID_AEAORCAM = " + idOrcamento + "), " +
+                                                            "(SELECT (DATE('NOW', 'localtime'))), " +
+                                                            "(SELECT AEAORCAM.ID_CFACLIFO FROM AEAORCAM WHERE AEAORCAM.ID_AEAORCAM = " + idOrcamento + "), " +
+                                                            idOrcamento + ")";
+
+                                                    PositivacaoSql positivacaoSql = new PositivacaoSql(ListaOrcamentoPedidoMDActivity.this);
+
+                                                    // Inseri a positivacao e checa se inseriu com sucesso
+                                                    positivacaoSql.execSQL(sqlInsert);
+                                                }
+
+                                                // Recarrega a lista de orcamento
+                                                CarregarDadosOrcamentoPedido carregarDadosOrcamentoPedido = new CarregarDadosOrcamentoPedido(spinnerListaCidade.getSelectedItemPosition());
+                                                carregarDadosOrcamentoPedido.execute();
+
+                                            } else {
+                                                mensagem.put("mensagem", getResources().getString(R.string.nao_foi_possivel_transformar_orcamento_pedido));
+                                            }
+                                            // Esvazia a lista de selecionados
+                                            //listaItemOrcamentoSelecionado = null;
+
+                                            // Instancia a classe  de funcoes para mostra a mensagem
+                                            FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(ListaOrcamentoPedidoMDActivity.this);
+                                            funcoes.menssagem(mensagem);
+                                            // Fecha o menu context
+                                            mode.finish();
+
+                                        } else {
+                                            Toast.makeText(ListaOrcamentoPedidoMDActivity.this, getResources().getString(R.string.opcao_positivacao_nao_valida_para_esta_tela), Toast.LENGTH_LONG).show();
+                                        }
+                                    }
+                                })
+                                .show();
 
                         break;
 

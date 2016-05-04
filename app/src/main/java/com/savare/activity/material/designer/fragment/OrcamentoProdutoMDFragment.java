@@ -28,17 +28,19 @@ import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.savare.R;
 import com.savare.activity.LogActivity;
 import com.savare.activity.OrcamentoProdutoDetalhesActivity;
 import com.savare.activity.material.designer.ClienteListaMDActivity;
-import com.savare.activity.material.designer.ListaTitulosMDActivity;
 import com.savare.activity.material.designer.OrcamentoTabFragmentMDActivity;
 import com.savare.activity.material.designer.ProdutoListaMDActivity;
 import com.savare.adapter.ItemUniversalAdapter;
 import com.savare.banco.funcoesSql.ItemOrcamentoSql;
 import com.savare.banco.funcoesSql.OrcamentoSql;
+import com.savare.banco.funcoesSql.PositivacaoSql;
 import com.savare.beans.ItemOrcamentoBeans;
 import com.savare.beans.OrcamentoBeans;
 import com.savare.funcoes.FuncoesPersonalizadas;
@@ -481,56 +483,91 @@ public class OrcamentoProdutoMDFragment extends Fragment {
                         break;
 
                     case R.id.menu_orcamento_tab_md_transformar_pedido:
-                        // Instancia a classe de funcoes
-                        FuncoesPersonalizadas funcoes;
+
 
                         // Checa se eh um orcamento
                         if (tipoOrcamentoPedido.equals("O")) {
 
-                            // Instancia a classe para manipular os orcamento no banco de dados
-                            OrcamentoSql orcamentoSql = new OrcamentoSql(getActivity());
-                            int totalAtualizado = 0;
+                            new MaterialDialog.Builder(getActivity())
+                                    .title(R.string.formar_venda)
+                                    .items(R.array.forma_venda_positivacao)
+                                    .itemsCallback(new MaterialDialog.ListCallback() {
+                                        @Override
+                                        public void onSelection(MaterialDialog dialog, View view, int which, CharSequence text) {
 
-                            ContentValues dadosPedido = new ContentValues();
-                            dadosPedido.put("STATUS", "P");
+                                            // Valida a opcao selecionada 1 = Visitou, mas, não comprou e 2 = Não estava
+                                            if ((which != 1) && (which != 2)) {
 
-                            totalAtualizado = totalAtualizado + orcamentoSql.update(dadosPedido, "AEAORCAM.ID_AEAORCAM = " + textCodigoOrcamento.getText());
+                                                // Instancia a classe para manipular os orcamento no banco de dados
+                                                OrcamentoSql orcamentoSql = new OrcamentoSql(getActivity());
+                                                int totalAtualizado = 0;
 
-                            // Dados da mensagem
-                            ContentValues mensagem = new ContentValues();
-                            mensagem.put("comando", 2);
-                            mensagem.put("tela", "OrcamentoFragment");
+                                                ContentValues dadosPedido = new ContentValues();
+                                                dadosPedido.put("STATUS", "P");
 
-                            // Verifica se foi deletado algum registro
-                            if (totalAtualizado > 0) {
-                                mensagem.put("mensagem", totalAtualizado + " Transformado(s) em Pedido(s). \n");
+                                                totalAtualizado = totalAtualizado + orcamentoSql.update(dadosPedido, "AEAORCAM.ID_AEAORCAM = " + textCodigoOrcamento.getText());
 
-                                tipoOrcamentoPedido = "P";
+                                                // Dados da mensagem
+                                                ContentValues mensagem = new ContentValues();
+                                                mensagem.put("comando", 2);
+                                                mensagem.put("tela", "OrcamentoFragment");
 
-                                GerarPdfAsyncRotinas gerarPdfSalvar = new GerarPdfAsyncRotinas(getActivity());
-                                // Seta(envia) os dados do orcamento
-                                gerarPdfSalvar.setOrcamento(preencheDadosOrcamento());
-                                // Seta(envia) a lista de produtos do orcamento
-                                gerarPdfSalvar.setListaItensOrcamento(adapterItemOrcamento.getListaItemOrcamento());
+                                                // Verifica se foi deletado algum registro
+                                                if (totalAtualizado > 0) {
+                                                    mensagem.put("mensagem", totalAtualizado + " Transformado(s) em Pedido(s). \n");
 
-                                gerarPdfSalvar.execute("");
+                                                    tipoOrcamentoPedido = "P";
 
-                                // Fecha a view
-                                //finish();
+                                                    // Pega os dados da positivacao
+                                                    String sqlInsert = "INSERT OR REPLACE INTO CFAPOSIT(STATUS, VALOR_VENDA, DATA_VISITA, ID_CFACLIFO, ID_AEAORCAM) VALUES " +
+                                                            "(" + which + ", " +
+                                                            "(SELECT AEAORCAM.FC_VL_TOTAL FROM AEAORCAM WHERE AEAORCAM.ID_AEAORCAM = " + idOrcamento + "), " +
+                                                            "(SELECT (DATE('NOW', 'localtime'))), " +
+                                                            "(SELECT AEAORCAM.ID_CFACLIFO FROM AEAORCAM WHERE AEAORCAM.ID_AEAORCAM = " + idOrcamento + "), " +
+                                                            idOrcamento + ")";
 
-                            } else {
-                                mensagem.put("mensagem", "NÃO CONSEGUIMOS TRANSFORMAR O(S) ORÇAMENTO(S) EM PEDIDO(S). \n");
-                            }
+                                                    PositivacaoSql positivacaoSql = new PositivacaoSql(getContext());
 
-                            // Instancia a classe  de funcoes para mostra a mensagem
-                            funcoes = new FuncoesPersonalizadas(getActivity());
-                            funcoes.menssagem(mensagem);
+                                                    // Inseri a positivacao e checa se inseriu com sucesso
+                                                    positivacaoSql.execSQL(sqlInsert);
+
+                                                    GerarPdfAsyncRotinas gerarPdfSalvar = new GerarPdfAsyncRotinas(getActivity());
+                                                    // Seta(envia) os dados do orcamento
+                                                    gerarPdfSalvar.setOrcamento(preencheDadosOrcamento());
+                                                    // Seta(envia) a lista de produtos do orcamento
+                                                    gerarPdfSalvar.setListaItensOrcamento(adapterItemOrcamento.getListaItemOrcamento());
+
+                                                    gerarPdfSalvar.execute("");
+
+                                                    // Fecha a view
+                                                    //finish();
+
+                                                } else {
+                                                    mensagem.put("mensagem", getResources().getString(R.string.nao_foi_possivel_transformar_orcamento_pedido));
+                                                }
+                                                // Instancia a classe de funcoes
+                                                FuncoesPersonalizadas funcoes;
+
+                                                // Instancia a classe  de funcoes para mostra a mensagem
+                                                funcoes = new FuncoesPersonalizadas(getActivity());
+                                                funcoes.menssagem(mensagem);
+
+                                            } else {
+                                                Toast.makeText(getContext(), getResources().getString(R.string.opcao_positivacao_nao_valida_para_esta_tela), Toast.LENGTH_LONG).show();
+                                            }
+                                        }
+                                    })
+                                    .show();
+
 
                         } else {
                             ContentValues mensagem = new ContentValues();
                             mensagem.put("comando", 2);
                             mensagem.put("tela", "OrcamentoActivity");
                             mensagem.put("mensagem", getActivity().getResources().getString(R.string.nao_orcamento) + "\n");
+
+                            // Instancia a classe de funcoes
+                            FuncoesPersonalizadas funcoes;
 
                             funcoes = new FuncoesPersonalizadas(getActivity());
                             funcoes.menssagem(mensagem);
@@ -552,6 +589,9 @@ public class OrcamentoProdutoMDFragment extends Fragment {
                             mensagem.put("comando", 2);
                             mensagem.put("tela", "OrcamentoFragment");
                             mensagem.put("mensagem", getActivity().getResources().getString(R.string.nao_orcamento) + "\n");
+
+                            // Instancia a classe de funcoes
+                            FuncoesPersonalizadas funcoes;
 
                             funcoes = new FuncoesPersonalizadas(getActivity());
                             funcoes.menssagem(mensagem);

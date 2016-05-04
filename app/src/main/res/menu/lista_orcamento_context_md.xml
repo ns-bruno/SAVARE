@@ -5,6 +5,7 @@
     <item
         android:id="@+id/menu_lista_orcamento_context_md_transformar_pedido"
         android:orderInCategory="0"
+        android:icon="@mipmap/ic_transfer_dark"
         android:title="@string/transformar_pedido"
         app:showAsAction="never" />
 
@@ -13,14 +14,14 @@
         android:orderInCategory="1"
         android:icon="@mipmap/ic_delete_dark"
         android:title="@string/deletar"
-        app:showAsAction="always" />
+        app:showAsAction="never" />
 
     <item
         android:id="@+id/menu_lista_orcamento_context_md_enviar_email"
         android:orderInCategory="100"
         android:icon="@mipmap/ic_email_dark"
         android:title="@string/enviar_email"
-        app:showAsAction="always" />
+        app:showAsAction="never" />
 
 
 </menu>

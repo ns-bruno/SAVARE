@@ -205,6 +205,9 @@
     <string name="data_inicial">Data Inicial: </string>
     <string name="data_final">Data Final: </string>
     <string name="existe_titulos_vencidos">Existe títulos vencidos.</string>
+    <string name="formar_venda">Forma de Venda (Positivação).</string>
+    <string name="nao_foi_possivel_transformar_orcamento_pedido">NÃO FOI POSSÍVEL TRANSFORMAR O(S) ORÇAMENTO(S) EM PEDIDO(S).</string>
+    <string name="opcao_positivacao_nao_valida_para_esta_tela">Esta opção de positivação não é válida para esta tela.</string>
     <string-array name="tab_produto_md">
         <item>Produtos</item>
         <item>+ Vendidos Cidade</item>
@@ -222,6 +225,14 @@
         <item>Desconto</item>
         <item>Prazo</item>
         <item>Observação</item>
+    </string-array>
+
+    <string-array name="forma_venda_positivacao">
+        <item>Visitou e comprou</item>
+        <item>Visitou, mas, não comprou</item>
+        <item>Não estava</item>
+        <item>Pedido feito por telefone</item>
+        <item>Pedido feito por balcão/loja</item>
     </string-array>
 
 
