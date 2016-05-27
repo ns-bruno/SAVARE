@@ -30,9 +30,8 @@ import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.savare.R;
-import com.savare.activity.OrcamentoProdutoDetalhesActivity;
-import com.savare.activity.fragment.OrcamentoFragment;
 import com.savare.activity.material.designer.ListaOrcamentoPedidoMDActivity;
+import com.savare.activity.material.designer.OrcamentoProdutoDetalhesTabFragmentMDActivity;
 import com.savare.activity.material.designer.ProdutoListaMDActivity;
 import com.savare.adapter.ItemUniversalAdapter;
 import com.savare.banco.funcoesSql.ProdutoRecomendadoSql;
@@ -156,19 +155,26 @@ public class ProdutoListaMDFragment extends Fragment {
                     ProdutoListaBeans produtoVenda = (ProdutoListaBeans) parent.getItemAtPosition(position);
                     produtoVenda.setAtacadoVarejo((atacadoVarejo != null) ? atacadoVarejo.charAt(0) : atacadoVarejoAuxiliar.charAt(0));
 
-                    Bundle bundle = new Bundle();
-                    bundle.putParcelable("AEAORCAM", preencheDadosOrcamento());
-                    bundle.putString("ID_AEAPRODU", "" + produtoVenda.getProduto().getIdProduto());
-                    bundle.putString("ATAC_VARE", (atacadoVarejo != null) ? atacadoVarejo : atacadoVarejoAuxiliar);
-                    bundle.putInt("POSICAO", position);
-                    bundle.putLong("ID_AEAITORC", idItemOrcamento);
-                    bundle.putString("ID_AEAORCAM", idOrcamento);
-                    bundle.putString("ID_CFACLIFO", idCliente);
-                    bundle.putString("RAZAO_SOCIAL", nomeRazao);
+                    //Bundle bundle = new Bundle();
+                    //bundle.putParcelable("AEAORCAM", preencheDadosOrcamento());
+                    //bundle.putString("ID_AEAPRODU", "" + produtoVenda.getProduto().getIdProduto());
+                    //bundle.putString("ATAC_VARE", (atacadoVarejo != null) ? atacadoVarejo : atacadoVarejoAuxiliar);
+                    //bundle.putInt("POSICAO", position);
+                    //bundle.putLong("ID_AEAITORC", idItemOrcamento);
+                    //bundle.putString("ID_AEAORCAM", idOrcamento);
+                    //bundle.putString("ID_CFACLIFO", idCliente);
+                    //bundle.putString("RAZAO_SOCIAL", nomeRazao);
+                    //intent.putExtras(bundle);
 
                     // Abre a tela de detalhes do produto
-                    Intent intent = new Intent(getContext(), OrcamentoProdutoDetalhesActivity.class);
-                    intent.putExtras(bundle);
+                    Intent intent = new Intent(getContext(), OrcamentoProdutoDetalhesTabFragmentMDActivity.class);
+                    intent.putExtra(OrcamentoProdutoDetalhesTabFragmentMDActivity.KEY_ID_AEAORCAM, Integer.parseInt(idOrcamento));
+                    intent.putExtra(OrcamentoProdutoDetalhesTabFragmentMDActivity.KEY_ID_AEAPRODU, produtoVenda.getProduto().getIdProduto());
+                    intent.putExtra(OrcamentoProdutoDetalhesTabFragmentMDActivity.KEY_ID_CFACLIFO, Integer.parseInt(idCliente));
+                    intent.putExtra(OrcamentoProdutoDetalhesTabFragmentMDActivity.KEY_RAZAO_SOCIAL, nomeRazao);
+                    intent.putExtra(OrcamentoProdutoDetalhesTabFragmentMDActivity.KEY_POSICAO, position);
+                    intent.putExtra(OrcamentoProdutoDetalhesTabFragmentMDActivity.KEY_ID_AEAITORC, (int) idItemOrcamento);
+                    intent.putExtra(OrcamentoProdutoDetalhesTabFragmentMDActivity.KEY_ATACADO_VAREJO, (atacadoVarejo != null) ? atacadoVarejo : atacadoVarejoAuxiliar);
 
                     startActivityForResult(intent, 1);
 
@@ -311,16 +317,16 @@ public class ProdutoListaMDFragment extends Fragment {
                     textCodigoPessoa.setText("" + orcamento.getIdPessoa());
                     textAtacadoVarejo.setText("" + orcamento.getTipoVenda());
 
-                    Intent dadosParametro = new Intent(getContext(), OrcamentoProdutoDetalhesActivity.class);
+                    Intent dadosParametro = new Intent(getContext(), OrcamentoProdutoDetalhesTabFragmentMDActivity.class);
                     // Pega os dados para enviar para outra tela
-                    dadosParametro.putExtra("ID_AEAPRODU", "" + produtoVendaClicado.getProduto().getIdProduto());
-                    dadosParametro.putExtra("ID_AEAORCAM", idOrcamento);
-                    dadosParametro.putExtra("ID_CFACLIFO", "" + orcamento.getIdPessoa());
-                    dadosParametro.putExtra("RAZAO_SOCIAL", orcamento.getNomeRazao());
+                    dadosParametro.putExtra(OrcamentoProdutoDetalhesTabFragmentMDActivity.KEY_ID_AEAPRODU, produtoVendaClicado.getProduto().getIdProduto());
+                    dadosParametro.putExtra(OrcamentoProdutoDetalhesTabFragmentMDActivity.KEY_ID_AEAORCAM, orcamento.getIdOrcamento());
+                    dadosParametro.putExtra(OrcamentoProdutoDetalhesTabFragmentMDActivity.KEY_ID_CFACLIFO, orcamento.getIdPessoa());
+                    dadosParametro.putExtra(OrcamentoProdutoDetalhesTabFragmentMDActivity.KEY_RAZAO_SOCIAL, orcamento.getNomeRazao());
                     //dadosParametro.putExtra("POSICAO", position);
-                    dadosParametro.putExtra("ID_AEAITORC", "" + produtoVendaClicado.getProduto().getIdProduto());
-                    dadosParametro.putExtra("ATAC_VARE", atacadoVarejo);
-                    dadosParametro.putExtra(OrcamentoFragment.KEY_TELA_CHAMADA, KEY_TELA_PRODUTO_LISTA_ACTIVITY);
+                    dadosParametro.putExtra(OrcamentoProdutoDetalhesTabFragmentMDActivity.KEY_ID_AEAITORC, produtoVendaClicado.getProduto().getIdProduto());
+                    dadosParametro.putExtra(OrcamentoProdutoDetalhesTabFragmentMDActivity.KEY_ATACADO_VAREJO, atacadoVarejo);
+                    dadosParametro.putExtra(OrcamentoProdutoMDFragment.KEY_TELA_CHAMADA, KEY_TELA_PRODUTO_LISTA_ACTIVITY);
 
                     startActivityForResult(dadosParametro, 1);
                 }

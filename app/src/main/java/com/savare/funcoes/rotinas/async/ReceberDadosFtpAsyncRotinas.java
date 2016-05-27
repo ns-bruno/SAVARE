@@ -15,6 +15,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.savare.R;
+import com.savare.configuracao.ConfiguracoesInternas;
 import com.savare.funcoes.FuncoesPersonalizadas;
 import com.savare.funcoes.rotinas.ImportarDadosTxtRotinas;
 import com.savare.funcoes.rotinas.ReceberArquivoTxtServidorFtpRotinas;
@@ -60,28 +61,28 @@ public class ReceberDadosFtpAsyncRotinas extends AsyncTask<String, String, Integ
 		funcoes.setValorXml("RecebendoDados", "S");
 
 		try {
-			ReceberArquivoTxtServidorFtpRotinas receberArquivoTxt = null;
+			ReceberArquivoTxtServidorFtpRotinas receberArquivoTxtRotinas = null;
 
 			// Checa se que esta chamando esta classe eh o alarme
 			if(telaChamou == TELA_RECEPTOR_ALARME){
-				receberArquivoTxt = new ReceberArquivoTxtServidorFtpRotinas(context, TELA_RECEPTOR_ALARME);
+				receberArquivoTxtRotinas = new ReceberArquivoTxtServidorFtpRotinas(context, TELA_RECEPTOR_ALARME);
 			} else {
 				// Checa se a barra de progresso e o campos de mensagem estao vazio
 				if ((progressReceberDados != null) && (textMensagem != null)) {
-					receberArquivoTxt = new ReceberArquivoTxtServidorFtpRotinas(context, progressReceberDados, textMensagem);
+					receberArquivoTxtRotinas = new ReceberArquivoTxtServidorFtpRotinas(context, progressReceberDados, textMensagem);
 				}
 			}
 			
 			if((params != null) && (params.length > 0)){
-				receberArquivoTxt.setBlocoReceber(params[0]);
+				receberArquivoTxtRotinas.setBlocoReceber(params[0]);
 			}
 			// Cria variavel para armazenar uma lista dos locais dos arquivos a ser recebido
 			ArrayList<String> localDados = new ArrayList<String>();
 
 			// Checa se a classe para fazer o downloads dos arquivos foi instanciada
-			if (receberArquivoTxt != null) {
+			if (receberArquivoTxtRotinas != null) {
 				// Recebe uma lista de caminhos dos arquivos baixados do servidor FTP
-				localDados = receberArquivoTxt.downloadArquivoTxtServidorFtp();
+				localDados = receberArquivoTxtRotinas.downloadArquivoTxtServidorFtp();
 			}
 
 			if (telaChamou == TELA_INICIO){
@@ -164,13 +165,14 @@ public class ReceberDadosFtpAsyncRotinas extends AsyncTask<String, String, Integ
 
 					PugNotification.with(context)
 							.load()
+							.identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
 							.title(R.string.receber_todos_dados)
-							.message(mensagem)
-							.bigTextStyle("bigtext")
+							.bigTextStyle(mensagem)
 							.smallIcon(R.drawable.ic_launcher)
 							.largeIcon(R.drawable.ic_launcher)
 							.flags(Notification.DEFAULT_ALL)
-							.vibrate(new long[]{150, 300, 150, 600})
+							.vibrate(new long[]{1, 1, 1, 1})
+							.vibrate(null)
 							.simple()
 							.build();
 				}
@@ -249,13 +251,15 @@ public class ReceberDadosFtpAsyncRotinas extends AsyncTask<String, String, Integ
 		} else if ((mensagem != null) && (mensagem.length() > 1)){
 			PugNotification.with(context)
 					.load()
+					.identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
 					.title(R.string.receber_todos_dados)
 					.message(mensagem)
-					.bigTextStyle("bigtext")
+					.bigTextStyle(mensagem)
 					.smallIcon(R.drawable.ic_launcher)
 					.largeIcon(R.drawable.ic_launcher)
 					.flags(Notification.DEFAULT_ALL)
-					.vibrate(new long[]{150, 300, 150, 600})
+					.vibrate(new long[]{1, 1, 1, 1})
+					.vibrate(null)
 					.simple()
 					.build();
 		}

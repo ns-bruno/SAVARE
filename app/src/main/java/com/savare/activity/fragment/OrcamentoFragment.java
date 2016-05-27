@@ -314,7 +314,7 @@ public class OrcamentoFragment extends Fragment {
 		
 		OrcamentoRotinas orcamentoRotinas = new OrcamentoRotinas(getActivity());
 		// Pega todos os produtos do orcamento
-		listaItemOrcamento = orcamentoRotinas.listaItemOrcamentoResumida(null, textCodigoOrcamento.getText().toString(), null);
+		listaItemOrcamento = orcamentoRotinas.listaItemOrcamentoResumida(null, textCodigoOrcamento.getText().toString(), null, null);
 		
 		adapterItemOrcamento = new ItemUniversalAdapter(getActivity(), ItemUniversalAdapter.ITEM_ORCAMENTO, listaItemOrcamento);
 		

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="10dp">
+
+    <ProgressBar
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/fragment_orcamento_produto_detalhes_historico_preco_md_progress_status"
+        android:indeterminate="true"
+        android:visibility="gone"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="@string/nao_temos_historico_preco"
+        android:id="@+id/fragment_orcamento_produto_detalhes_historico_preco_md_text_mensagem"
+        android:gravity="center"
+        android:visibility="gone"/>
+
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/fragment_orcamento_produto_detalhes_historico_preco_md_list_hitorico_preco"
+        android:layout_gravity="center_horizontal" />
+</LinearLayout>

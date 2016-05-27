@@ -936,7 +936,7 @@ public class ListaOrcamentoPedidoActivity extends Activity implements OnNavigati
     		// Envia os dados do orcamento
     		gerarPdfRotinas.setOrcamento(orcamento);
     		// Envia a lista de produtos que pertence ao orcamento
-    		gerarPdfRotinas.setListaItensOrcamento(orcamentoRotinas.listaItemOrcamentoResumida(null, ""+orcamento.getIdOrcamento(), null));
+    		gerarPdfRotinas.setListaItensOrcamento(orcamentoRotinas.listaItemOrcamentoResumida(null, ""+orcamento.getIdOrcamento(), null, null));
     		
     		// Cria o pdf e pega o caminho do arquivo
     		String retornoCaminho = gerarPdfRotinas.criaArquivoPdf();

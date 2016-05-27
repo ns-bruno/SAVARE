@@ -168,6 +168,10 @@ public class ConexaoBancoDeDados extends SQLiteOpenHelper {
 		//log.info("  exec sql file: {}" + sqlFile);
 		Log.i("SAVARE", "Executar o SqlFile.");
 		for(String sqlInstruction : SqlParser.parseSqlFile(SQL_DIR + "/" + sqlFile, this.context.getAssets())) {
+			if (sqlInstruction.contains("S INSERT_CFACLIFO_ANT B")){
+				String s = sqlInstruction;
+				int i = sqlInstruction.length();
+			}
 			// Executa a instrucao sql
 			db.execSQL(sqlInstruction);
 		}

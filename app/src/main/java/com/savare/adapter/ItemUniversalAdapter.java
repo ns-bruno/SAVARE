@@ -73,7 +73,8 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 							STATUS = 19,
 							AREA = 20,
 							CIDADE_DARK = 21,
-							CLIENTE = 22;
+							CLIENTE = 22,
+							HISTORICO_PRECO_ITEM_ORCAMENTO = 23;
 	private Context context;
 	private int tipoItem, diasProdutoNovo;
 	private int campoAtualProduto = -1;
@@ -432,7 +433,7 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 	@Override
 	public int getCount() {
 		// Verifica o tipo de item
-		if((this.tipoItem == ITEM_ORCAMENTO) || (this.tipoItem == RATEIO_ITEM_ORCAMENTO)){
+		if((this.tipoItem == ITEM_ORCAMENTO) || (this.tipoItem == RATEIO_ITEM_ORCAMENTO) || (this.tipoItem == HISTORICO_PRECO_ITEM_ORCAMENTO)){
 			// Retorna a quantidade de item de orcamento da lista
 			return listaItemOrcamento.size();
 			
@@ -513,7 +514,7 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 	@Override
 	public Object getItem(int position) {
 		// Verifica o tipo de item
-		if((this.tipoItem == ITEM_ORCAMENTO) || (this.tipoItem == RATEIO_ITEM_ORCAMENTO)){
+		if((this.tipoItem == ITEM_ORCAMENTO) || (this.tipoItem == RATEIO_ITEM_ORCAMENTO) || (this.tipoItem == HISTORICO_PRECO_ITEM_ORCAMENTO)){
 			// Retorna um item do orcamento
 			return listaItemOrcamento.get(position);
 			
@@ -724,7 +725,7 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 		}
 		
 		// Verifica se o tipo de item universal eh para ITENS DO ORCAMENTO
-		if(this.tipoItem == ITEM_ORCAMENTO){
+		if( (this.tipoItem == ITEM_ORCAMENTO) || (this.tipoItem == HISTORICO_PRECO_ITEM_ORCAMENTO) ){
 			/**
 			 * Recupera dentro da lista de pessoas, uma pessoa(nome) especifica de acordo com a
 			 * posicao passada no parametro do getView
@@ -733,7 +734,8 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 			// Instancia a classe de funcoes para serem usadas
 			//funcoes = new FuncoesPersonalizadas(context);
 			
-			textDescricao.setText(item.getProduto().getDescricaoProduto() + " - " + item.getProduto().getDescricaoMarca());
+			textDescricao.setText(item.getProduto().getDescricaoProduto() + " - " + item.getProduto().getDescricaoMarca() +
+								( ( (this.tipoItem == HISTORICO_PRECO_ITEM_ORCAMENTO) && (item.getDataCadastro() != null) ) ? " (" + funcoes.formataDataHora(item.getDataCadastro()) + ")" : "" ));
 			textAbaixoDescricaoEsqueda.setText("Código: " + item.getProduto().getCodigoEstrutural());
 			textAbaixoDescricaoDireita.setText("Qtd.: " + (funcoes.arredondarValor(item.getQuantidade())));
 			textBottonEsquerdo.setText("Unitário: " + funcoes.arredondarValor(item.getValorLiquidoUnitario()));

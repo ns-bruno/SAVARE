@@ -125,6 +125,7 @@ public class PessoaRotinas extends Rotinas {
 			CidadeBeans cidade = new CidadeBeans();
 			cidade.setIdCidade(0);
 			cidade.setDescricao("Nenhum valor encontrado");
+			lista.add(cidade);
 		}
 
 		// Adiciona um valor padrao para selecionar todas as cidades
@@ -296,18 +297,23 @@ public class PessoaRotinas extends Rotinas {
 				
 			} // Fim do for
 		} else {
-			FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
+			final FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
 			// Cria uma variavem para inserir as propriedades da mensagem
-			ContentValues mensagem = new ContentValues();
+			final ContentValues mensagem = new ContentValues();
 			mensagem.put("comando", 2);
 			mensagem.put("tela", "Rotinas");
 			mensagem.put("mensagem", "Não existe registros cadastrados");
 			
 			// Executa a mensagem passando por parametro as propriedades
-			funcoes.menssagem(mensagem);
+			((Activity) context).runOnUiThread(new Runnable() {
+				public void run() {
+					funcoes.menssagem(mensagem);
+				}
+			});
+
 		}
-		
-					
+
+
 		return listaPessoas;
 	} // Fim listaPessoaResumido
 

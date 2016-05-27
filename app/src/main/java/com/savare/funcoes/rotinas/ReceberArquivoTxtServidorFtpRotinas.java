@@ -40,6 +40,7 @@ import com.savare.banco.funcoesSql.UsuarioSQL;
 import com.savare.configuracao.ConfiguracoesInternas;
 import com.savare.funcoes.FuncoesPersonalizadas;
 
+import br.com.goncalves.pugnotification.notification.Load;
 import br.com.goncalves.pugnotification.notification.PugNotification;
 
 public class ReceberArquivoTxtServidorFtpRotinas {
@@ -54,6 +55,7 @@ public class ReceberArquivoTxtServidorFtpRotinas {
 	private double tamanhoArquivo = 0;
 	private int telaChamou = -1;
     List<FTPFile> listaDadosArquivoFtp; // Cria uma vareavel para pegar a lista de arquivos que estao no servidor FTP
+	Load mLoad;
 	public static final int TELA_RECEPTOR_ALARME = 0;
 	public static final String EXTENCAO_DOWNLOADS_UNIVERSAL = ".SAVARE",
                                EXTENCAO_DOWNLOADS_BLOCO_S = "BLOCO_S.SAVARE",
@@ -123,7 +125,17 @@ public class ReceberArquivoTxtServidorFtpRotinas {
 
 
 	public ArrayList<String> downloadArquivoTxtServidorFtp(){
-		
+
+		// Cria uma notificacao para ser manipulado
+		mLoad = PugNotification.with(context).load()
+				.identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
+				.smallIcon(R.mipmap.ic_launcher)
+				.largeIcon(R.drawable.ic_launcher)
+				.title(R.string.importar_dados_recebidos)
+				.bigTextStyle("Estamos Conectando no Servidor em Nuvem...")
+				.vibrate(new long[]{1, 1, 1, 1})
+				.flags(Notification.DEFAULT_ALL);
+
 		ArrayList<String> localArquivoRecebido = new ArrayList<String>();
 		
 		final FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
@@ -157,6 +169,9 @@ public class ReceberArquivoTxtServidorFtpRotinas {
 					conexaoFtp.setConnectTimeout(10 * 1000);
 					conexaoFtp.setDefaultTimeout(30 * 1000);
 
+					// Indica que essa notificacao eh do tipo progress
+					mLoad.progress().value(0, 0, true).build();
+
 					if(telaChamou != TELA_RECEPTOR_ALARME){
 						((Activity) context).runOnUiThread(new Runnable() {
 							  public void run() {
@@ -164,26 +179,17 @@ public class ReceberArquivoTxtServidorFtpRotinas {
 									  textMensagemRetorno.setText("Estamos Conectando no Servidor em Nuvem...");
 							  }
 						});
-					} else {
-						PugNotification.with(context)
-								.load()
-								.identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
-								.smallIcon(R.drawable.ic_launcher)
-								.title(R.string.receber_todos_dados)
-								.message(R.string.estamos_conectanto_servidor_nuvem)
-								.progress()
-								.update(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO, 0, 0, true)
-								.build();
 					}
 					// Conecta com o servidor FTP usando a porta 21
 					conexaoFtp.connect(hostFtp);
-
-
 
 					boolean status = false;
 
 					//Checa o codigo de resposta, se for positivo, a conexao foi feita
 					if (FTPReply.isPositiveCompletion(conexaoFtp.getReplyCode())) {
+
+						// Atualiza a mensagem na notificacao
+						mLoad.bigTextStyle("Conseguimos Conectar no Servidor, agora vamos logar...").progress().build();
 
 						if(telaChamou != TELA_RECEPTOR_ALARME){
 							((Activity) context).runOnUiThread(new Runnable() {
@@ -192,20 +198,13 @@ public class ReceberArquivoTxtServidorFtpRotinas {
 									  textMensagemRetorno.setText("Conseguimos Conectar no Servidor, agora vamos logar...");
 								  }
 							});
-						} else {
-							PugNotification.with(context)
-									.load()
-									.identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
-									.smallIcon(R.drawable.ic_launcher)
-									.title(R.string.receber_todos_dados)
-									.message(R.string.estamos_conectanto_servidor_nuvem)
-									.progress()
-									.update(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO, 0, 0, true)
-									.build();
 						}
 						// Autenticacao com usuario e senha
 						status = conexaoFtp.login(usuarioFtp, funcoes.descriptografaSenha(senhaFtp));
 					} else {
+						// Atualiza a mensagem na notificacao
+						mLoad.bigTextStyle("Erro ao conectar no Servidor em Nuvem, nem conseguimos logar.").progress().build();
+
 						if(telaChamou != TELA_RECEPTOR_ALARME){
 							((Activity) context).runOnUiThread(new Runnable() {
 								  public void run() {
@@ -213,22 +212,15 @@ public class ReceberArquivoTxtServidorFtpRotinas {
 									  textMensagemRetorno.setText("Erro ao conectar no Servidor em Nuvem, nem conseguimos logar.");
 								  }
 							});
-						} else {
-							PugNotification.with(context)
-									.load()
-									.identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
-									.smallIcon(R.drawable.ic_launcher)
-									.title(R.string.receber_todos_dados)
-									.message(R.string.erro_conectar_servidor_nuvem)
-									.progress()
-									.update(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO, 0, 0, true)
-									.build();
 						}
 						// Atualiza a mensagem do progresso
 						mensagemErro = "Não foi possível conectar no servidor em nuvem, nem conseguimos logar. \n";
 					}
 
 					if (status){
+						// Atualiza a mensagem na notificacao
+						mLoad.bigTextStyle("Logado com sucesso.").progress().build();
+
 						if(telaChamou != TELA_RECEPTOR_ALARME){
 							((Activity) context).runOnUiThread(new Runnable() {
 								  public void run() {
@@ -236,16 +228,6 @@ public class ReceberArquivoTxtServidorFtpRotinas {
 									  textMensagemRetorno.setText("Logado com sucesso.");
 								  }
 							});
-						}else {
-							PugNotification.with(context)
-									.load()
-									.identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
-									.smallIcon(R.drawable.ic_launcher)
-									.title(R.string.receber_todos_dados)
-									.message(R.string.logado_sucesso)
-									.progress()
-									.update(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO, 0, 0, true)
-									.build();
 						}
 						// Muda o modo de conexao para ativa
 						/*if (modoConexao.equalsIgnoreCase("A")){
@@ -268,8 +250,11 @@ public class ReceberArquivoTxtServidorFtpRotinas {
 						if(!conexaoFtp.changeWorkingDirectory(nomeDiretorioFtp)){
 							criarDiretorio(nomeDiretorioFtp);
 						}
-
 						if(telaChamou != TELA_RECEPTOR_ALARME){
+
+							// Atualiza a mensagem na notificacao
+							mLoad.bigTextStyle("Aquarde... Estamos solicitando os dados.").progress().build();
+
 							((Activity) context).runOnUiThread(new Runnable() {
 								public void run() {
 									// Atualiza a mensagem na tela de sincronizacao
@@ -296,6 +281,9 @@ public class ReceberArquivoTxtServidorFtpRotinas {
 									// Renomeia o arquivo enviado para checar se chegou no servidor FTP com  sucesso
 									if (renomeaArquivoFtp(nomeTemp, arquivoSolicitacao.getName())) {
 
+										// Atualiza a mensagem na notificacao
+										mLoad.bigTextStyle("Solicitação Enviada. 1ª Tentativa para receber os dados. Aguarde...").progress().build();
+
 										((Activity) context).runOnUiThread(new Runnable() {
 											public void run() {
 												// Atualiza a mensagem na tela de sincronizacao
@@ -314,6 +302,9 @@ public class ReceberArquivoTxtServidorFtpRotinas {
 								controle++;
 
 								if (controle == 3){
+									// Atualiza a mensagem na notificacao
+									mLoad.bigTextStyle("Solicitação Enviada. Última tentativa para receber os dados. Aguarde... ").progress().build();
+
 									((Activity) context).runOnUiThread(new Runnable() {
 										public void run() {
 											// Exibe o tempo restante
@@ -321,6 +312,9 @@ public class ReceberArquivoTxtServidorFtpRotinas {
 										}
 									});
 								} else {
+									// Atualiza a mensagem na notificacao
+									mLoad.bigTextStyle("Solicitação Enviada. " + controle + "ª Tentativa para receber os dados. Aguarde... ").progress().build();
+
 									final int finalControle = controle;
 									((Activity) context).runOnUiThread(new Runnable() {
 										public void run() {
@@ -378,6 +372,11 @@ public class ReceberArquivoTxtServidorFtpRotinas {
 								// Checa se nao esta vazio
 								if (dadosArquivoFtp != null) {
 
+									// Atualiza a mensagem na notificacao
+									mLoad.bigTextStyle("Achamos o arquivo " + dadosArquivoFtp.getName());
+									// Transforma a barra de progresso em determinado
+									mLoad.progress().value(0, (int) dadosArquivoFtp.getSize(), false).build();
+
 									// Checa qual classe chamou esta
 									if (telaChamou != TELA_RECEPTOR_ALARME) {
 
@@ -392,18 +391,7 @@ public class ReceberArquivoTxtServidorFtpRotinas {
 
 										// Seta um tamanho maximo da barra de progresso
 										progressDownloads.setMax((int) dadosArquivoFtp.getSize());
-									} else {
-										PugNotification.with(context)
-												.load()
-												.identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
-												.smallIcon(R.drawable.ic_launcher)
-												.title(R.string.receber_todos_dados)
-												.message(R.string.achamos_alguma_coisa + " " + dadosArquivoFtp.getName())
-												.progress()
-												.update(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO, 0, (int)dadosArquivoFtp.getSize(), false)
-												.build();
 									}
-
 									tamanhoArquivo = (double) dadosArquivoFtp.getSize();
 
 									// Cria o nome do arquivo a ser baixado
@@ -427,6 +415,21 @@ public class ReceberArquivoTxtServidorFtpRotinas {
 								}
 							}
 						} else {
+							// Atualiza a mensagem na notificacao
+							//mLoad.bigTextStyle("Não achamos nenhum arquivo para fazer downloads.").simple().build();
+
+							// Cria uma notificacao para ser manipulado
+							mLoad = PugNotification.with(context)
+									.load()
+									.identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
+									.smallIcon(R.mipmap.ic_launcher)
+									.largeIcon(R.drawable.ic_launcher)
+									.title(R.string.importar_dados_recebidos)
+									.bigTextStyle("Não achamos nenhum arquivo para fazer downloads.")
+									.flags(Notification.DEFAULT_ALL);
+
+							mLoad.simple().build();
+
 							if(telaChamou != TELA_RECEPTOR_ALARME){
 								((Activity) context).runOnUiThread(new Runnable() {
 									public void run() {
@@ -436,23 +439,11 @@ public class ReceberArquivoTxtServidorFtpRotinas {
 								});
 								progressDownloads.setIndeterminate(true);
 
-							} else {
-								PugNotification.with(context)
-										.load()
-										.identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
-										.smallIcon(R.drawable.ic_launcher)
-										.largeIcon(R.drawable.ic_launcher)
-										.title(R.string.receber_todos_dados)
-										.message(R.string.nao_achamos_nenhum_arquivo_downloads)
-										.flags(Notification.DEFAULT_ALL)
-										.simple()
-										.build();
 							}
 						}
 
-
 					} else { // Fim if status
-						mensagemErro += "Talvez seja Usuário ou Senha incorretos";
+						mensagemErro += "Talvez o Usuário ou Senha esteja incorretos";
 					}
 					if(telaChamou != TELA_RECEPTOR_ALARME){
 						((Activity) context).runOnUiThread(new Runnable() {
@@ -489,7 +480,10 @@ public class ReceberArquivoTxtServidorFtpRotinas {
 		
 		// Exibe mensagem se existir
 		if( (mensagemErro != null) && (mensagemErro.length() > 1) ){
-			
+
+			// Atualiza a mensagem na notificacao
+			mLoad.bigTextStyle(mensagemErro).simple().build();
+
 			if(telaChamou != TELA_RECEPTOR_ALARME){
 				((Activity) context).runOnUiThread(new Runnable() {
 					  public void run() {
@@ -509,17 +503,6 @@ public class ReceberArquivoTxtServidorFtpRotinas {
 						funcoes.menssagem(dadosMensagem);
 					  }
 				});
-			} else {
-				PugNotification.with(context)
-						.load()
-						.identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
-						.smallIcon(R.drawable.ic_launcher)
-						.largeIcon(R.drawable.ic_launcher)
-						.title(R.string.receber_todos_dados)
-						.message(mensagemErro)
-						.flags(Notification.DEFAULT_ALL)
-						.simple()
-						.build();
 			}
 		}
 		
@@ -553,8 +536,13 @@ public class ReceberArquivoTxtServidorFtpRotinas {
 					// Converte o total transferido em double
 	        		double totalTransferido = (double) totalBytesTransferred;
 	        		// Calcula em percentual do total transferido do arquivo XML
-	        		final double percentual = ((totalTransferido / tamanhoArquivo) * 100); 
+	        		final double percentual = ((totalTransferido / tamanhoArquivo) * 100);
 
+					if (mLoad != null) {
+						// Atualiza a mensagem na notificacao
+						mLoad.bigTextStyle("Fazendo o Download do arquivo " + nomeAquivo + " ... " + format.format(percentual) + "% ");
+						mLoad.progress().value((int)totalBytesTransferred, (int) tamanhoArquivo, false).build();
+					}
 					if(telaChamou != TELA_RECEPTOR_ALARME){
 		        		((Activity) context).runOnUiThread(new Runnable() {
 	    					  public void run() {
@@ -581,7 +569,10 @@ public class ReceberArquivoTxtServidorFtpRotinas {
 	        
 	        //Cria o outputStream para ser passado como parametro, onde o arquivo sera salvo  
 	        FileOutputStream destinoFileStream = new FileOutputStream(pastaDestino + "/" + nomeAquivo);
-	        
+
+			// Atualiza a mensagem na notificacao
+			mLoad.bigTextStyle("Fazendo o Download... ").progress().build();
+
 	        if(telaChamou != TELA_RECEPTOR_ALARME){
 		        ((Activity) context).runOnUiThread(new Runnable() {
 					  public void run() {
@@ -599,6 +590,9 @@ public class ReceberArquivoTxtServidorFtpRotinas {
 	        
 	        // Checa se foi feito download com sucesso
 	        if(status){
+				// Atualiza a mensagem na notificacao
+				mLoad.bigTextStyle("Download do arquivo " + nomeAquivo + " efetuado com sucesso... ").progress().build();
+
 	        	if(telaChamou != TELA_RECEPTOR_ALARME){
 		        	((Activity) context).runOnUiThread(new Runnable() {
 						  public void run() {

@@ -1,5 +1,6 @@
 package com.savare.activity.material.designer;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ContentValues;
 import android.content.DialogInterface;
@@ -8,13 +9,18 @@ import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.InputType;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.github.clans.fab.FloatingActionButton;
+import com.github.clans.fab.FloatingActionMenu;
 import com.ogaclejapan.smarttablayout.SmartTabLayout;
 import com.savare.R;
 import com.savare.adapter.ClienteDetalhesFragmentAdapter;
+import com.savare.banco.funcoesSql.PositivacaoSql;
 import com.savare.beans.PessoaBeans;
 import com.savare.funcoes.FuncoesPersonalizadas;
 import com.savare.funcoes.rotinas.OrcamentoRotinas;
@@ -31,7 +37,8 @@ import java.util.UUID;
 public class ClienteDetalhesMDActivity extends AppCompatActivity{
 
     private Toolbar toolbarCabecalho;
-    private FloatingActionButton itemMenuNovoOrcamento, itemMenuTitulosCliente, itemMenuEnviarDados;
+    private FloatingActionButton itemMenuNovoOrcamento, itemMenuTitulosCliente, itemMenuEnviarDados, itemMenuPositivarCliente;
+    private FloatingActionMenu floatingMenu;
 
     private String codigoCli,
             codigoFun,
@@ -92,7 +99,7 @@ public class ClienteDetalhesMDActivity extends AppCompatActivity{
                 mensagemAtacadoVarejo.setTitle("Atacado ou Varejo").setItems(opcao, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        try{
+                        try {
                             // Instancia a classe de funcoes
                             FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(getApplicationContext());
 
@@ -124,7 +131,7 @@ public class ClienteDetalhesMDActivity extends AppCompatActivity{
                             long numeroOracmento = orcamentoRotinas.insertOrcamento(dadosCliente);
 
                             // Verifica se retornou algum numero
-                            if(numeroOracmento > 0){
+                            if (numeroOracmento > 0) {
 
                                 Bundle bundle = new Bundle();
                                 bundle.putString(OrcamentoTabFragmentMDActivity.KEY_ID_ORCAMENTO, String.valueOf(numeroOracmento));
@@ -149,7 +156,7 @@ public class ClienteDetalhesMDActivity extends AppCompatActivity{
                                 //funcoes = new FuncoesPersonalizadas(getApplicationContext());
                                 funcoes.menssagem(mensagem);
                             }
-                        }catch(Exception e){
+                        } catch (Exception e) {
                             // Dados da mensagem
                             ContentValues mensagem = new ContentValues();
                             mensagem.put("comando", 1);
@@ -160,7 +167,8 @@ public class ClienteDetalhesMDActivity extends AppCompatActivity{
                             funcoes.menssagem(mensagem);
                         }
 
-                    }});
+                    }
+                });
                 // Faz a mensagem (dialog) aparecer
                 mensagemAtacadoVarejo.show();
             }
@@ -197,7 +205,45 @@ public class ClienteDetalhesMDActivity extends AppCompatActivity{
             }
         });
 
-    }
+        itemMenuPositivarCliente.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                floatingMenu.close(true);
+
+                new MaterialDialog.Builder(v.getContext())
+                        .title(R.string.formar_venda)
+                        .items(R.array.forma_venda_positivacao)
+                        .itemsCallback(new MaterialDialog.ListCallback() {
+                            @Override
+                            public void onSelection(MaterialDialog dialog, View view, int which, CharSequence text) {
+
+                                // Valida a opcao selecionada 0 = Visitou e comprou | 3 = Pedido feito por telefone | 4 = Pedido feito pelo balcao/loja
+                                if ((which != 0) && (which != 3) && (which != 4)) {
+
+                                    // Pega os dados da positivacao
+                                    String sqlInsert = "INSERT OR REPLACE INTO CFAPOSIT(STATUS, DATA_VISITA, ID_CFACLIFO) VALUES " +
+                                            "(" + which + ", " +
+                                            "(SELECT (DATE('NOW', 'localtime'))), " +
+                                            idCliente + ")";
+
+                                    PositivacaoSql positivacaoSql = new PositivacaoSql(getApplicationContext());
+
+                                    // Inseri a positivacao e checa se inseriu com sucesso
+                                    positivacaoSql.execSQL(sqlInsert);
+
+                                    Toast.makeText(getApplicationContext(), getResources().getString(R.string.positivado_sucesso), Toast.LENGTH_LONG).show();
+
+                                } else {
+                                    Toast.makeText(getApplicationContext(), getResources().getString(R.string.opcao_positivacao_nao_valida_para_esta_tela), Toast.LENGTH_LONG).show();
+                                }
+                            }
+                        })
+                        .show();
+            }
+        });
+
+    } // Fim onCreate
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -223,5 +269,7 @@ public class ClienteDetalhesMDActivity extends AppCompatActivity{
         itemMenuNovoOrcamento = (FloatingActionButton) findViewById(R.id.fragment_cliente_detalhes_tab_md_menu_item_novo_orcamento);
         itemMenuTitulosCliente = (FloatingActionButton) findViewById(R.id.fragment_cliente_detalhes_tab_md_menu_item_titulos_cliente);
         itemMenuEnviarDados = (FloatingActionButton) findViewById(R.id.fragment_cliente_detalhes_tab_md_menu_item_enviar_dados_cliente);
+        itemMenuPositivarCliente = (FloatingActionButton) findViewById(R.id.fragment_cliente_detalhes_tab_md_menu_item_positivar_cliente);
+        floatingMenu = (FloatingActionMenu) findViewById(R.id.afragment_cliente_detalhes_tab_md_menu_float);
     }
 }

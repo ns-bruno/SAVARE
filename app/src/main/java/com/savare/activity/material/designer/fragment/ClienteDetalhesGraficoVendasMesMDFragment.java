@@ -49,7 +49,7 @@ public class ClienteDetalhesGraficoVendasMesMDFragment extends Fragment {
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(final LayoutInflater inflater, final ViewGroup container, Bundle savedInstanceState) {
 
         viewGrafico = inflater.inflate(R.layout.fragment_cliente_detalhes_grafico_vendas_mes_md, container, false);
 
@@ -123,6 +123,7 @@ public class ClienteDetalhesGraficoVendasMesMDFragment extends Fragment {
         buttonProximo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 int mes = Integer.parseInt(mesPesquisar);
                 int ano = Integer.parseInt(anoPesquisar);
 
@@ -192,7 +193,7 @@ public class ClienteDetalhesGraficoVendasMesMDFragment extends Fragment {
 
         OrcamentoRotinas orcamentoRotinas = new OrcamentoRotinas(getContext());
 
-        List<OrcamentoBeans> listaOrcamento = new ArrayList<OrcamentoBeans>();
+        List<OrcamentoBeans> listaOrcamento;
         // Pega a lista de orcamento
         listaOrcamento = orcamentoRotinas.listaTotalVendaDiarioCliente(idCliente, null, mes, ano);
 
@@ -219,7 +220,7 @@ public class ClienteDetalhesGraficoVendasMesMDFragment extends Fragment {
             dados.setBarSpacePercent(35f);
 
             BarData barData = new BarData(xValsDiasMesVenda, dados);
-
+            barChartVendasMes.setData(null);
             barChartVendasMes.setData(barData);
         } else {
             barChartVendasMes.setVisibility(View.INVISIBLE);

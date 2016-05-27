@@ -13,7 +13,7 @@ import com.savare.adapter.OrcamentoTabFragmentMDAdapter;
 import com.savare.funcoes.rotinas.OrcamentoRotinas;
 
 /**
- * Created by Faturamento on 11/04/2016.
+ * Created by Bruno Nogueira Silva on 11/04/2016.
  */
 public class OrcamentoTabFragmentMDActivity extends AppCompatActivity {
 

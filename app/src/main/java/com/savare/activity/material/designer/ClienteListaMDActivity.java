@@ -80,9 +80,12 @@ public class ClienteListaMDActivity extends AppCompatActivity {
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
                 CidadeBeans cidadeBeans = (CidadeBeans) parent.getSelectedItem();
+                // Checa se tem alguma lista de cidade
+                if (!cidadeBeans.getDescricao().contains("Nenhum valor encontrado")) {
 
-                LoaderPessoa carregarListaPessoa = new LoaderPessoa(ClienteListaMDActivity.this, cidadeBeans, null);
-                carregarListaPessoa.execute();
+                    LoaderPessoa carregarListaPessoa = new LoaderPessoa(ClienteListaMDActivity.this, cidadeBeans, null);
+                    carregarListaPessoa.execute();
+                }
             }
 
             @Override
@@ -233,7 +236,7 @@ public class ClienteListaMDActivity extends AppCompatActivity {
                             + "CFAENDER.BAIRRO LIKE '%" + query + "%' OR "
                             + "CFASTATU.DESCRICAO LIKE '%" + query + "%' ";
 
-                    PessoaRotinas pessoaRotinas = new PessoaRotinas(ClienteListaMDActivity.this);
+                    //PessoaRotinas pessoaRotinas = new PessoaRotinas(ClienteListaMDActivity.this);
 
                     CidadeBeans cidade = (CidadeBeans) spinnerListaCidade.getSelectedItem();
 
@@ -361,7 +364,7 @@ public class ClienteListaMDActivity extends AppCompatActivity {
                         listaPessoas = pessoaRotinas.listaPessoaResumido(null, PessoaRotinas.KEY_TIPO_CLIENTE, progressBarStatus);
                     }
                 }
-                if (listaPessoas != null) {
+                if ( (listaPessoas != null) && (listaPessoas.size() > 0) ) {
                     // Seta o adapter com a nova lista
                     adapterPessoa = new PessoaAdapter(context, listaPessoas, PessoaAdapter.KEY_CLIENTE);
 
@@ -388,12 +391,14 @@ public class ClienteListaMDActivity extends AppCompatActivity {
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
 
-            if (adapterPessoa != null & adapterPessoa.getCount() > 0){
+            progressBarStatus.setVisibility(View.GONE);
+            pesquisando = false;
+
+            if ( (adapterPessoa != null) && (adapterPessoa.getCount() > 0) ){
                 // Seta o listView com o novo adapter que ja esta com a nova lista
                 listViewPessoa.setAdapter(adapterPessoa);
             }
-            progressBarStatus.setVisibility(View.GONE);
-            pesquisando = false;
+
         }
     }
 

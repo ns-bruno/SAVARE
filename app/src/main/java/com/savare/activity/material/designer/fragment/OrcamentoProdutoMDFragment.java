@@ -33,8 +33,8 @@ import android.widget.Toast;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.savare.R;
 import com.savare.activity.LogActivity;
-import com.savare.activity.OrcamentoProdutoDetalhesActivity;
 import com.savare.activity.material.designer.ClienteListaMDActivity;
+import com.savare.activity.material.designer.OrcamentoProdutoDetalhesTabFragmentMDActivity;
 import com.savare.activity.material.designer.OrcamentoTabFragmentMDActivity;
 import com.savare.activity.material.designer.ProdutoListaMDActivity;
 import com.savare.adapter.ItemUniversalAdapter;
@@ -116,15 +116,15 @@ public class OrcamentoProdutoMDFragment extends Fragment {
 
                     if ((itemOrcamento != null) && (itemOrcamento.getProduto() != null)) {
                         // Abre a tela de detalhes do produto
-                        Intent intent = new Intent(getActivity(), OrcamentoProdutoDetalhesActivity.class);
+                        Intent intent = new Intent(getActivity(), OrcamentoProdutoDetalhesTabFragmentMDActivity.class);
 
-                        intent.putExtra("ID_AEAPRODU", "" + itemOrcamento.getProduto().getIdProduto());
-                        intent.putExtra("ID_AEAORCAM", idOrcamento);
-                        intent.putExtra("ID_CFACLIFO", idPessoa);
-                        intent.putExtra("RAZAO_SOCIAL", razaoSocial);
-                        intent.putExtra("POSICAO", position);
-                        intent.putExtra("ID_AEAITORC", itemOrcamento.getIdItemOrcamento());
-                        intent.putExtra("ATAC_VARE", textAtacadoVarejo.getText().toString());
+                        intent.putExtra(OrcamentoProdutoDetalhesTabFragmentMDActivity.KEY_ID_AEAPRODU, itemOrcamento.getProduto().getIdProduto());
+                        intent.putExtra(OrcamentoProdutoDetalhesTabFragmentMDActivity.KEY_ID_AEAORCAM, Integer.parseInt(idOrcamento));
+                        intent.putExtra(OrcamentoProdutoDetalhesTabFragmentMDActivity.KEY_ID_CFACLIFO, Integer.parseInt(idPessoa));
+                        intent.putExtra(OrcamentoProdutoDetalhesTabFragmentMDActivity.KEY_RAZAO_SOCIAL, razaoSocial);
+                        intent.putExtra(OrcamentoProdutoDetalhesTabFragmentMDActivity.KEY_POSICAO, position);
+                        intent.putExtra(OrcamentoProdutoDetalhesTabFragmentMDActivity.KEY_ID_AEAITORC, itemOrcamento.getIdItemOrcamento());
+                        intent.putExtra(OrcamentoProdutoDetalhesTabFragmentMDActivity.KEY_ATACADO_VAREJO, textAtacadoVarejo.getText().toString());
                         intent.putExtra(KEY_TELA_CHAMADA, KEY_TELA_ORCAMENTO_FRAGMENTO);
 
                         startActivityForResult(intent, 1);
@@ -445,7 +445,7 @@ public class OrcamentoProdutoMDFragment extends Fragment {
 
                     case R.id.menu_orcamento_tab_md_rateio_preco:
                         // Checa se existe produtos no orcamento
-                        if (adapterItemOrcamento.getListaItemOrcamento().size() > 0) {
+                        if ( (adapterItemOrcamento != null) && (adapterItemOrcamento.getListaItemOrcamento().size() > 0) ) {
 
                             if (adapterItemOrcamento.getTipoItem() == adapterItemOrcamento.RATEIO_ITEM_ORCAMENTO) {
                                 adapterItemOrcamento.setTipoItem(adapterItemOrcamento.ITEM_ORCAMENTO);
@@ -766,7 +766,7 @@ public class OrcamentoProdutoMDFragment extends Fragment {
 
                 OrcamentoRotinas orcamentoRotinas = new OrcamentoRotinas(getActivity());
                 // Pega todos os produtos do orcamento
-                listaItemOrcamento = orcamentoRotinas.listaItemOrcamentoResumida(null, codigoOrcamento, progressBarStatus);
+                listaItemOrcamento = orcamentoRotinas.listaItemOrcamentoResumida(null, codigoOrcamento, null, progressBarStatus);
 
                 // Verifica se existe algum dado na lista
                 if ((listaItemOrcamento != null) && (listaItemOrcamento.size() > 0)) {

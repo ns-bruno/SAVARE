@@ -36,7 +36,7 @@ import com.savare.funcoes.rotinas.EstoqueRotinas;
 import com.savare.funcoes.rotinas.OrcamentoRotinas;
 import com.savare.funcoes.rotinas.PlanoPagamentoRotinas;
 import com.savare.funcoes.rotinas.ProdutoRotinas;
-
+@Deprecated
 public class OrcamentoProdutoDetalhesActivity extends Activity {
 	
 	private TextView textDescricaoProduto, 

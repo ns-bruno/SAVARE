@@ -53,8 +53,10 @@ import com.savare.banco.funcoesSql.TipoClienteSql;
 import com.savare.banco.funcoesSql.TipoDocumentoSql;
 import com.savare.banco.funcoesSql.UnidadeVendaSql;
 import com.savare.banco.funcoesSql.UsuarioSQL;
+import com.savare.configuracao.ConfiguracoesInternas;
 import com.savare.funcoes.FuncoesPersonalizadas;
 
+import br.com.goncalves.pugnotification.notification.Load;
 import br.com.goncalves.pugnotification.notification.PugNotification;
 
 public class ImportarDadosTxtRotinas {
@@ -125,30 +127,29 @@ public class ImportarDadosTxtRotinas {
 		this.localDados = localDados;
 		this.progressRecebimentoDados = progressBar;
 		this.textMensagemProcesso = textMensagem;
-		
+
 		((Activity) context).runOnUiThread(new Runnable() {
-			  public void run() {
+			public void run() {
 				progressRecebimentoDados.setVisibility(View.VISIBLE);
 				progressRecebimentoDados.setIndeterminate(true);
 				textMensagemProcesso.setText("Validando os dados...");
-			  }
+			}
 		});
 	}
 	
 	public void importarDados(){
 		Log.i(TAG, "Executando a rotina importarDados - ImportarDadosTxtRotinas");
 
-		/*((Activity) context).runOnUiThread(new Runnable() {
-			public void run() {
-				//progressRecebimentoDados.setVisibility(View.VISIBLE);
-				progressRecebimentoDados.setIndeterminate(true);
-			}
-		});*/
+		// Cria uma notificacao para ser manipulado
+		Load mLoad = PugNotification.with(context).load()
+				.identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
+				.smallIcon(R.mipmap.ic_launcher)
+				.largeIcon(R.drawable.ic_launcher)
+				.title(R.string.importar_dados_recebidos)
+				.message("Importando os dados, aguarde...")
+				.vibrate(new long[]{1, 1, 1, 1})
+				.flags(Notification.DEFAULT_ALL);
 
-		//final Calendar calendario = Calendar.getInstance();
-		
-		//long tempoInicial = calendario.getTimeInMillis();
-		
 		final FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
 		
 		try {
@@ -176,6 +177,9 @@ public class ImportarDadosTxtRotinas {
 
 			final int finalTotalLinha = totalLinha;
 
+			// Indica que essa notificacao eh do tipo progress
+			mLoad.progress().value(0, totalLinha, false).build();
+
 			if (progressRecebimentoDados != null) {
 
 				((Activity) context).runOnUiThread(new Runnable() {
@@ -201,12 +205,12 @@ public class ImportarDadosTxtRotinas {
 
 				if (progressRecebimentoDados != null) {
 
-					//((Activity) context).runOnUiThread(new Runnable() {
-					//	public void run() {
+					((Activity) context).runOnUiThread(new Runnable() {
+						public void run() {
 							// Incrementa o progresso
 							progressRecebimentoDados.setProgress(finalIncremento);
-					///	}
-					//});
+						}
+					});
 				}
 				// Incrementa o numero de linha scaneadas
 				incremento ++;
@@ -214,13 +218,16 @@ public class ImportarDadosTxtRotinas {
 				// Pega a posicao da linha atual
 				final int posicaoLinhaAtual = incremento;
 				final int totalLinhaRegistro = totalLinha;
-				
+
 				// Pega apenas uma linha
 				Scanner scannerLinha = new Scanner(scannerDados.nextLine()).useDelimiter("\\|");
-				
+
 				// Pega o primeiro token da linha
 				String registro = scannerLinha.next();
-				
+
+				mLoad.message(posicaoLinhaAtual + " de " + totalLinhaRegistro + " Importando o registro " + registro);
+				mLoad.progress().value(posicaoLinhaAtual, totalLinhaRegistro, false).build();
+
 				// Checa se o registro pertence ao bloco 0000
 				if(registro.equalsIgnoreCase("0000")){
 					// Pega a linha completa
@@ -230,6 +237,8 @@ public class ImportarDadosTxtRotinas {
 					layoutValido = checaLayout(linha);
 					
 					if(layoutValido){
+						// Atualiza a mensagem na notificacao
+						mLoad.message("Layout Validado com sucesso.").progress().build();
 
 						if(telaChamou != TELA_RECEPTOR_ALARME){
 							((Activity) context).runOnUiThread(new Runnable() {
@@ -240,6 +249,8 @@ public class ImportarDadosTxtRotinas {
 							});
 						}
 					}else{
+						mLoad.message("Layout Invalidado.").progress().build();
+
 						if(telaChamou != TELA_RECEPTOR_ALARME){
 							((Activity) context).runOnUiThread(new Runnable() {
 		    					  public void run() {
@@ -819,7 +830,10 @@ public class ImportarDadosTxtRotinas {
 			funcoes.setValorXml("RecebendoDados", "N");
 
 			mensagem += "Não foi possível escanear os dados do arquivo. \n" + e.getMessage();
-			
+
+			// Atualiza a mensagem na notificacao
+			mLoad.bigTextStyle(mensagem, e.getMessage()).simple().build();
+
 			if(telaChamou != TELA_RECEPTOR_ALARME){
 
 				final ContentValues dadosMensagem = new ContentValues();
@@ -872,26 +886,19 @@ public class ImportarDadosTxtRotinas {
 			}
 		}*/
 		// Checa se que esta chamando esta classe eh o alarme
-		if( (mensagem != null) && (mensagem.length() > 0) && (telaChamou == TELA_RECEPTOR_ALARME)){
-			// Cria a intent com identificacao do alarme
-			/*Intent intent = new Intent("NOTIFICACAO_SAVARE");
-			intent.putExtra("TICKER", "Importação dos Dados");
-			intent.putExtra("TITULO", TAG);
-			intent.putExtra("MENSAGEM", mensagem);
-			
-			context.sendBroadcast(intent);*/
-
-			PugNotification.with(context)
+		if( (mensagem != null) && (mensagem.length() > 2) ){
+			// Cria uma notificacao para ser manipulado
+			mLoad = PugNotification.with(context)
 					.load()
-					.title(R.string.receber_todos_dados)
-					.message(mensagem)
-					.bigTextStyle("bigtext")
-					.smallIcon(R.drawable.ic_launcher)
+					.identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
+					.smallIcon(R.mipmap.ic_launcher)
 					.largeIcon(R.drawable.ic_launcher)
-					.flags(Notification.DEFAULT_ALL)
-					.vibrate(new long[]{150, 300, 150, 600})
-					.simple()
-					.build();
+					.title(R.string.importar_dados_recebidos)
+					.bigTextStyle(mensagem)
+					.vibrate(new long[]{1, 1, 1, 1})
+					.flags(Notification.DEFAULT_ALL);
+
+			mLoad.simple().build();
 		}
 	} // Fim importarDados
 	

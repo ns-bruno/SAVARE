@@ -87,11 +87,11 @@ public class CadastroUsuarioActivity extends Activity {
 					radioGroupModoConexao.check(R.id.activity_cadastro_radioButton_segundo_plano);
 				}
 			}
-		} else {
+		} /*else {
 			Log.i(TAG, "delete - CadastrousuarioActivity");
 			UsuarioSQL usuarioSQL = new UsuarioSQL(CadastroUsuarioActivity.this);
 			usuarioSQL.delete(null);
-		}
+		}*/
 	}
 	
 	/**

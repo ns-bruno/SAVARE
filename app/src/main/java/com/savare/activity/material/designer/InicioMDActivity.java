@@ -26,6 +26,7 @@ import com.dexafree.materialList.listeners.RecyclerItemClickListener;
 import com.dexafree.materialList.view.MaterialListView;
 import com.github.clans.fab.FloatingActionButton;
 import com.github.clans.fab.FloatingActionMenu;
+import com.github.mikephil.charting.charts.PieChart;
 import com.mikepenz.materialdrawer.AccountHeader;
 import com.mikepenz.materialdrawer.AccountHeaderBuilder;
 import com.mikepenz.materialdrawer.Drawer;
@@ -63,6 +64,7 @@ public class InicioMDActivity extends AppCompatActivity {
     private int cliqueVoltar = 0;
     private int mPreviousVisibleItem;
     FloatingActionMenu menuFloatOpcoes;
+    private PieChart mChart;
 
 
     @TargetApi(Build.VERSION_CODES.M)
@@ -289,7 +291,7 @@ public class InicioMDActivity extends AppCompatActivity {
             }
         });
 
-        mListView.setOnScrollChangeListener(new View.OnScrollChangeListener() {
+        /*mListView.setOnScrollChangeListener(new View.OnScrollChangeListener() {
             @Override
             public void onScrollChange(View v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
                 // Funcao para ocultar o float button quando rolar a lista de orcamento/pedido
@@ -300,7 +302,7 @@ public class InicioMDActivity extends AppCompatActivity {
                 }
                 mPreviousVisibleItem = scrollX;
             }
-        });
+        });*/
 
 
         itemMenuNovoOrcamento.setOnClickListener(new View.OnClickListener() {

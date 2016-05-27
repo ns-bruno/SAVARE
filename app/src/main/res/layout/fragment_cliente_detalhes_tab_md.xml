@@ -121,6 +121,16 @@
             fab:fab_colorNormal="#FFFFFF"
             fab:fab_colorPressed="@color/colorPrimary"/>
 
+        <com.github.clans.fab.FloatingActionButton
+            android:id="@+id/fragment_cliente_detalhes_tab_md_menu_item_positivar_cliente"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_action_person"
+            fab:fab_size="mini"
+            fab:fab_label="@string/positivar_cliente"
+            fab:fab_colorNormal="#FFFFFF"
+            fab:fab_colorPressed="@color/colorPrimary"/>
+
     </com.github.clans.fab.FloatingActionMenu>
 
 

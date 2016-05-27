@@ -64,9 +64,9 @@ public class OrcamentoRotinas extends Rotinas {
 	 * @param idOrcamento
 	 * @return
 	 */
-	public List<ItemOrcamentoBeans> listaItemOrcamentoResumida(String where, String idOrcamento, final ProgressBar progressBarStatus){
+	public List<ItemOrcamentoBeans> listaItemOrcamentoResumida(String where, String idOrcamento, String ordem, final ProgressBar progressBarStatus){
 		
-		String sql = "SELECT AEAITORC.ID_AEAITORC, AEAITORC.ID_AEAORCAM, AEAPRODU.DESCRICAO AS DESCRICAO_PRODU, AEAMARCA.DESCRICAO AS DESCRICAO_MARCA, "
+		String sql = "SELECT AEAITORC.DT_CAD, AEAITORC.ID_AEAITORC, AEAITORC.ID_AEAORCAM, AEAPRODU.DESCRICAO AS DESCRICAO_PRODU, AEAMARCA.DESCRICAO AS DESCRICAO_MARCA, "
 				   + "AEAPRODU.ID_AEAPRODU, AEAPRODU.CODIGO_ESTRUTURAL, AEAITORC.QUANTIDADE, AEAITORC.FC_LIQUIDO_UN, (AEAITORC.VL_BRUTO / AEAITORC.QUANTIDADE) AS VL_BRUTO_UN, "
 				   + "AEAITORC.VL_BRUTO, AEAITORC.VL_TABELA, AEAITORC.FC_LIQUIDO, AEAITORC.VL_DESCONTO, AEAITORC.FC_DESCONTO_UN, AEAITORC.COMPLEMENTO, "
 				   + "AEAITORC.VL_TABELA_FATURADO, QUANTIDADE_FATURADA, FC_LIQUIDO_FATURADO, STATUS_RETORNO, "
@@ -81,14 +81,28 @@ public class OrcamentoRotinas extends Rotinas {
 				   + "LEFT OUTER JOIN AEAPRODU AEAPRODU "
 				   + "ON  (AEAITORC.ID_AEAPRODU = AEAPRODU.ID_AEAPRODU) "
 				   + "LEFT OUTER JOIN AEAMARCA AEAMARCA "
-				   + "ON  (AEAMARCA.ID_AEAMARCA = AEAPRODU.ID_AEAMARCA) "
-				   + "WHERE (AEAITORC.ID_AEAORCAM = " + idOrcamento + ") ";
-		
-		if(where != null){
-			sql = sql + "AND (" + where + ") ";
+				   + "ON  (AEAMARCA.ID_AEAMARCA = AEAPRODU.ID_AEAMARCA) ";
+				   //+ "WHERE (AEAITORC.ID_AEAORCAM = " + idOrcamento + ") ";
+
+		// Checa se passou o idOrcamento
+		if (idOrcamento != null){
+			sql += " WHERE (AEAITORC.ID_AEAORCAM = " + idOrcamento + ") ";
+
+			// Checa se foi passado alguma clausula where por parametro
+			if (where != null){
+				sql += " AND (" + where + ") ";
+			}
+
+		} else if(where != null){
+			sql += " WHERE (" + where + ") ";
 		}
-		// Adiciona a clausula de ordem ao sql
-		sql = sql + "ORDER BY AEAITORC.SEQUENCIA ";
+		if (ordem != null){
+			sql += " ORDER BY " + ordem;
+
+		} else {
+			// Adiciona a clausula de ordem ao sql
+			sql += " ORDER BY AEAITORC.SEQUENCIA ";
+		}
 		
 		List<ItemOrcamentoBeans> listaItemOrcamento = new ArrayList<ItemOrcamentoBeans>();
 		
@@ -119,6 +133,7 @@ public class OrcamentoRotinas extends Rotinas {
 				ItemOrcamentoBeans item = new ItemOrcamentoBeans();
 				
 				item.setIdItemOrcamento(cursor.getInt(cursor.getColumnIndex("ID_AEAITORC")));
+				item.setDataCadastro(cursor.getString(cursor.getColumnIndex("DT_CAD")));
 				item.setIdOrcamento(cursor.getInt(cursor.getColumnIndex("ID_AEAORCAM")));
 				item.setQuantidade(cursor.getDouble(cursor.getColumnIndex("QUANTIDADE")));
 				item.setQuantidadeFaturada(cursor.getDouble(cursor.getColumnIndex("QUANTIDADE_FATURADA")));
@@ -1203,7 +1218,7 @@ public class OrcamentoRotinas extends Rotinas {
 		} else {
 			List<ItemOrcamentoBeans> listaItemOrcamento = new ArrayList<ItemOrcamentoBeans>();
 
-			listaItemOrcamento = listaItemOrcamentoResumida(null, idOrcamento, null);
+			listaItemOrcamento = listaItemOrcamentoResumida(null, idOrcamento, null, null);
 			// Checa se a lista foi preenchida com algum valor
 			if( (listaItemOrcamento != null) && (listaItemOrcamento.size() > 0) ){
 				// Pega o fator de desconto utilizado
