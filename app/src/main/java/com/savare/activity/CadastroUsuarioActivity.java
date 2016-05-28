@@ -2,6 +2,7 @@ package com.savare.activity;
 
 import android.app.Activity;
 import android.content.ContentValues;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.util.Log;
@@ -14,7 +15,9 @@ import android.widget.Spinner;
 
 import com.savare.R;
 import com.savare.banco.funcoesSql.UsuarioSQL;
+import com.savare.banco.local.ConexaoBancoDeDados;
 import com.savare.funcoes.FuncoesPersonalizadas;
+import com.savare.funcoes.VersionUtils;
 
 public class CadastroUsuarioActivity extends Activity {
 	
@@ -47,6 +50,22 @@ public class CadastroUsuarioActivity extends Activity {
 			recadastrar = intentParametro.getBoolean("RECADASTRAR");
 		}
 		recuperarCampoTela();
+
+		FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(CadastroUsuarioActivity.this);
+		// checa se o app ja foi aberto alguma vez
+		if (!funcoes.getValorXml("AbriuAppPriveiraVez").equalsIgnoreCase("S")){
+			try {
+				// Instancia a conexao com banco de dados
+				ConexaoBancoDeDados conexaoBancoDeDados = new ConexaoBancoDeDados(CadastroUsuarioActivity.this, VersionUtils.getVersionCode(CadastroUsuarioActivity.this));
+				// Abre o banco de dados para criar todas as tabelas
+				conexaoBancoDeDados.abrirBanco();
+				// Fecha o banco apos criar as tabelas
+				conexaoBancoDeDados.fechar();
+
+			} catch (PackageManager.NameNotFoundException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 	
 	@Override
@@ -214,6 +233,7 @@ public class CadastroUsuarioActivity extends Activity {
 		funcoes.setValorXml("EnviarAutomatico", "S");
 		funcoes.setValorXml("ReceberAutomatico", "S");
 		funcoes.setValorXml("ImagemProduto", "N");
+		funcoes.setValorXml("AbriuAppPriveiraVez", "S");
 		if (radioGroupModoConexao.getCheckedRadioButtonId() == R.id.activity_cadastro_radioButton_modo_ativo) {
 			funcoes.setValorXml("ModoConexao", "A");
 		} else if (radioGroupModoConexao.getCheckedRadioButtonId() == R.id.activity_cadastro_radioButton_modo_passivo) {
