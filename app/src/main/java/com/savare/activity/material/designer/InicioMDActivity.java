@@ -1,5 +1,6 @@
 package com.savare.activity.material.designer;
 
+import android.accounts.AccountManager;
 import android.annotation.TargetApi;
 import android.app.AlertDialog;
 import android.content.ContentValues;
@@ -26,6 +27,8 @@ import com.dexafree.materialList.listeners.RecyclerItemClickListener;
 import com.dexafree.materialList.view.MaterialListView;
 import com.github.clans.fab.FloatingActionButton;
 import com.github.clans.fab.FloatingActionMenu;
+import com.github.johnpersano.supertoasts.SuperToast;
+import com.github.johnpersano.supertoasts.util.Style;
 import com.github.mikephil.charting.charts.PieChart;
 import com.mikepenz.materialdrawer.AccountHeader;
 import com.mikepenz.materialdrawer.AccountHeaderBuilder;
@@ -64,8 +67,7 @@ public class InicioMDActivity extends AppCompatActivity {
     private int cliqueVoltar = 0;
     private int mPreviousVisibleItem;
     FloatingActionMenu menuFloatOpcoes;
-    private PieChart mChart;
-
+    AccountManager accountManager;
 
     @TargetApi(Build.VERSION_CODES.M)
     @Override
@@ -80,7 +82,7 @@ public class InicioMDActivity extends AppCompatActivity {
         toolbarInicio.setTitleTextColor(getResources().getColor(R.color.branco));
         //toolbarInicio.setLogo(R.drawable.ic_launcher);
         // Seta uma toolBar para esta activiy(tela)
-        setSupportActionBar(toolbarInicio);
+        setSupportActionBar(toolbarInicio); //
 
         //getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
@@ -570,7 +572,7 @@ public class InicioMDActivity extends AppCompatActivity {
 
             if (cliqueVoltar < 1){
                 // Mostra uma mensagem para clicar novamente em voltar
-                Toast.makeText(InicioMDActivity.this, getResources().getString(R.string.clique_sair_novamente_para_sair), Toast.LENGTH_LONG).show();
+                SuperToast.create(InicioMDActivity.this, getResources().getString(R.string.clique_sair_novamente_para_sair), SuperToast.Duration.LONG, Style.getStyle(Style.GRAY, SuperToast.Animations.POPUP)).show();
                 cliqueVoltar ++;
                 // Cria um temporizador para voltar a zero o clique depois que fechar a menssagem
                 Handler handler = new Handler();
