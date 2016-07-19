@@ -16,17 +16,24 @@ public class ReceptorAlarmeReceberDadosBroadcastRotinas extends BroadcastReceive
 
 		FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
 
+
 		if (!funcoes.getValorXml("RecebendoDados").equalsIgnoreCase("S")) {
-			// Marca nos parametro internos que a aplicacao que esta recebendo os dados
-			//funcoes.setValorXml("RecebendoDados", "S");
 
-			// Desavia o recebimento automatico
-			funcoes.criarAlarmeEnviarReceberDadosAutomatico(true, false);
+			// Checa se o tipo de conexao eh por webservice
+			if (funcoes.getValorXml("ModoConexao").equalsIgnoreCase("W")){
 
-			ReceberDadosFtpAsyncRotinas receberDadosFtpAsync = new ReceberDadosFtpAsyncRotinas(context, ReceberDadosFtpAsyncRotinas.TELA_RECEPTOR_ALARME);
-			receberDadosFtpAsync.execute();
+			} else {
+				// Marca nos parametro internos que a aplicacao que esta recebendo os dados
+				//funcoes.setValorXml("RecebendoDados", "S");
 
-			Log.i("SAVARE", "Executou a rotina para receber os dados. - ReceptorAlarmeReceberDadosBroadcastRotinas");
+				// Desavia o recebimento automatico
+				funcoes.criarAlarmeEnviarReceberDadosAutomatico(true, false);
+
+				ReceberDadosFtpAsyncRotinas receberDadosFtpAsync = new ReceberDadosFtpAsyncRotinas(context, ReceberDadosFtpAsyncRotinas.TELA_RECEPTOR_ALARME);
+				receberDadosFtpAsync.execute();
+
+				Log.i("SAVARE", "Executou a rotina para receber os dados. - ReceptorAlarmeReceberDadosBroadcastRotinas");
+			}
 		}
 
 	}

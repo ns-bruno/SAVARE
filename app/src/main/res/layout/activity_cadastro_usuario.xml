@@ -94,10 +94,31 @@
         <EditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:id="@+id/cadastro_usuario_edit_caminho_banco_dados"
+            android:hint="@string/caminho_banco_dados"/>
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/cadastro_usuario_edit_porta_banco"
+            android:hint="@string/porta_banco_dados"
+            android:inputType="number"
+            android:ems="10"/>
+
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:id="@+id/cadastro_usuario_edit_pasta_servidor"
             android:layout_gravity="center_horizontal"
             android:hint="@string/pasta_ftp"
             android:text="/" />
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/cadastro_usuario_edit_ip_servidor_webservice"
+            android:hint="@string/ip_servidor_webservice"/>
 
         <LinearLayout
             android:orientation="horizontal"
@@ -134,6 +155,12 @@
                     android:text="@string/ftp_modo_passivo"
                     android:id="@+id/activity_cadastro_radioButton_modo_passivo"
                     android:checked="false" />
+
+                <RadioButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/webservice"
+                    android:id="@+id/activity_cadastro_radioButton_webservice" />
 
             </RadioGroup>
 

@@ -27,6 +27,8 @@ import android.widget.DatePicker;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.github.johnpersano.supertoasts.SuperToast;
+import com.github.johnpersano.supertoasts.util.Style;
 import com.savare.R;
 import com.savare.activity.material.designer.ClienteListaMDActivity;
 import com.savare.activity.material.designer.OrcamentoTabFragmentMDActivity;
@@ -960,7 +962,7 @@ public class ListaOrcamentoPedidoActivity extends Activity implements OnNavigati
 			//dadosEmail.setType("text/plai");
 			dadosEmail.setType("message/rfc822");
 			dadosEmail.putExtra(Intent.EXTRA_EMAIL  , new String[]{pessoaRotinas.emailPessoa(""+orcamento.getIdPessoa())});
-			dadosEmail.putExtra(Intent.EXTRA_SUBJECT, "Or�amento/Pedido de N� " + orcamento.getIdOrcamento());
+			dadosEmail.putExtra(Intent.EXTRA_SUBJECT, getResources().getString(R.string.orcamento_pedido_numero) + orcamento.getIdOrcamento());
 			dadosEmail.putExtra(Intent.EXTRA_STREAM, listaCaminho);
 			dadosEmail.putExtra(Intent.EXTRA_TEXT   , "E-Mail enviado pelo App SAVARE.");
 			

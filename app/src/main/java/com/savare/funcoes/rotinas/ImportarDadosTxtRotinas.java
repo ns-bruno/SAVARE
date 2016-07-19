@@ -14,6 +14,7 @@ import android.app.Notification;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.media.RingtoneManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
@@ -147,8 +148,7 @@ public class ImportarDadosTxtRotinas {
 				.largeIcon(R.drawable.ic_launcher)
 				.title(R.string.importar_dados_recebidos)
 				.message("Importando os dados, aguarde...")
-				.vibrate(new long[]{1, 1, 1, 1})
-				.flags(Notification.DEFAULT_ALL);
+				.flags(Notification.DEFAULT_SOUND);
 
 		final FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
 		
@@ -895,8 +895,7 @@ public class ImportarDadosTxtRotinas {
 					.largeIcon(R.drawable.ic_launcher)
 					.title(R.string.importar_dados_recebidos)
 					.bigTextStyle(mensagem)
-					.vibrate(new long[]{1, 1, 1, 1})
-					.flags(Notification.DEFAULT_ALL);
+					.flags(Notification.DEFAULT_SOUND);
 
 			mLoad.simple().build();
 		}

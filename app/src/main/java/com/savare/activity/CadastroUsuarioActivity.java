@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.ContentValues;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -29,10 +30,13 @@ public class CadastroUsuarioActivity extends Activity {
 					 editSenha,
 					 editEmail,
 					 editIpServidor,
+					 editIpServidorWebservice,
 					 editSenhaServidor,
 					 editUsuarioServidor,
 					 editCodigoVendedor,
-					 editPastaServidor;
+					 editPastaServidor,
+					 editCaminhoBancoDados,
+					 editPortaBancoDados;
 	private RadioGroup radioGroupModoConexao;
 	private RadioButton radioButtonAtivo,
 						radioButtonPassivo;
@@ -55,11 +59,12 @@ public class CadastroUsuarioActivity extends Activity {
 		// checa se o app ja foi aberto alguma vez
 		if (!funcoes.getValorXml("AbriuAppPriveiraVez").equalsIgnoreCase("S")){
 			try {
-				// Instancia a conexao com banco de dados
 				ConexaoBancoDeDados conexaoBancoDeDados = new ConexaoBancoDeDados(CadastroUsuarioActivity.this, VersionUtils.getVersionCode(CadastroUsuarioActivity.this));
-				// Abre o banco de dados para criar todas as tabelas
-				conexaoBancoDeDados.abrirBanco();
-				// Fecha o banco apos criar as tabelas
+				// Pega o banco de dados do SAVARE
+				SQLiteDatabase bancoDados = conexaoBancoDeDados.abrirBanco();
+				// Executa o onCreate para criar todas as tabelas do banco de dados
+				conexaoBancoDeDados.onCreate(bancoDados);
+				// Fecha o banco
 				conexaoBancoDeDados.fechar();
 
 			} catch (PackageManager.NameNotFoundException e) {
@@ -91,10 +96,13 @@ public class CadastroUsuarioActivity extends Activity {
 				editSenha.setText(funcoes.descriptografaSenha(dadosUsuario.getString(dadosUsuario.getColumnIndex("SENHA_USUA"))));
 				editEmail.setText(dadosUsuario.getString(dadosUsuario.getColumnIndex("EMAIL_USUA")));
 				editIpServidor.setText(dadosUsuario.getString(dadosUsuario.getColumnIndex("IP_SERVIDOR_USUA")));
+				editIpServidorWebservice.setText(dadosUsuario.getString(dadosUsuario.getColumnIndex("IP_SERVIDOR_WEBSERVICE_USUA")));
 				editSenhaServidor.setText(funcoes.descriptografaSenha(dadosUsuario.getString(dadosUsuario.getColumnIndex("SENHA_SERVIDOR_USUA"))));
 				editUsuarioServidor.setText(dadosUsuario.getString(dadosUsuario.getColumnIndex("USUARIO_SERVIDOR_USUA")));
 				editCodigoVendedor.setText(dadosUsuario.getString(dadosUsuario.getColumnIndex("ID_USUA")));
 				editPastaServidor.setText(dadosUsuario.getString(dadosUsuario.getColumnIndex("PASTA_SERVIDOR_USUA")));
+				editCaminhoBancoDados.setText(dadosUsuario.getString(dadosUsuario.getColumnIndex("CAMINHO_BANCO_DADOS_USUA")));
+				editPortaBancoDados.setText(dadosUsuario.getString(dadosUsuario.getColumnIndex("PORTA_BANCO_DADOS_USUA")));
 
 				if (dadosUsuario.getString(dadosUsuario.getColumnIndex("MODO_CONEXAO")).equalsIgnoreCase("A")){
 					radioGroupModoConexao.check(R.id.activity_cadastro_radioButton_modo_ativo);
@@ -104,6 +112,9 @@ public class CadastroUsuarioActivity extends Activity {
 
 				} else if (dadosUsuario.getString(dadosUsuario.getColumnIndex("MODO_CONEXAO")).equalsIgnoreCase("S")){
 					radioGroupModoConexao.check(R.id.activity_cadastro_radioButton_segundo_plano);
+
+				} else if (dadosUsuario.getString(dadosUsuario.getColumnIndex("MODO_CONEXAO")).equalsIgnoreCase("W")){
+					radioGroupModoConexao.check(R.id.activity_cadastro_radioButton_webservice);
 				}
 			}
 		} /*else {
@@ -156,6 +167,21 @@ public class CadastroUsuarioActivity extends Activity {
 		} else if (id == R.id.menu_cadastro_usuario_cancelar) {
 			// Fecha a view(tela)
 			finish();
+
+		} else if (id == R.id.menu_cadastro_usuario_limpar_campos){
+			editChaveEmpresa.setText("");
+			editCodigoEmpresa.setText("");
+			editNomeCompleto.setText("");
+			editCodigoVendedor.setText("");
+			editSenha.setText("");
+			editEmail.setText("");
+			editIpServidor.setText("");
+			editUsuarioServidor.setText("");
+			editSenhaServidor.setText("");
+			editCaminhoBancoDados.setText("");
+			editPortaBancoDados.setText("");
+			editPastaServidor.setText("");
+			editIpServidorWebservice.setText("");
 		}
 		return true;
 	}
@@ -173,10 +199,13 @@ public class CadastroUsuarioActivity extends Activity {
 		editSenha = (EditText) findViewById(R.id.cadastro_usuario_edit_senha);
 		editEmail = (EditText) findViewById(R.id.cadastro_usuario_edit_email);
 		editIpServidor = (EditText) findViewById(R.id.cadastro_usuario_edit_ip_servidor);
+		editIpServidorWebservice = (EditText) findViewById(R.id.cadastro_usuario_edit_ip_servidor_webservice);
 		editSenhaServidor = (EditText) findViewById(R.id.cadastro_usuario_edit_senha_servidor);
 		editUsuarioServidor = (EditText) findViewById(R.id.cadastro_usuario_edit_usuario_servidor);
 		editCodigoVendedor = (EditText) findViewById(R.id.cadastro_usuario_edit_codigo_vendedor);
 		editPastaServidor = (EditText) findViewById(R.id.cadastro_usuario_edit_pasta_servidor);
+		editCaminhoBancoDados = (EditText) findViewById(R.id.cadastro_usuario_edit_caminho_banco_dados);
+		editPortaBancoDados = (EditText) findViewById(R.id.cadastro_usuario_edit_porta_banco);
 		radioGroupModoConexao = (RadioGroup) findViewById(R.id.activity_cadastro_usuario_radio_group_modo_conexao);
 	}
 	
@@ -192,17 +221,22 @@ public class CadastroUsuarioActivity extends Activity {
 			valores.put("senha_usua", this.funcoes.criptografaSenha(editSenha.getText().toString()));
 			valores.put("email_usua", editEmail.getText().toString());
 			valores.put("ip_servidor_usua", editIpServidor.getText().toString());
+			valores.put("ip_servidor_webservice_usua", editIpServidorWebservice.getText().toString());
 			valores.put("senha_servidor_usua", this.funcoes.criptografaSenha(editSenhaServidor.getText().toString()));
 			valores.put("usuario_servidor_usua", editUsuarioServidor.getText().toString());
 			valores.put("id_usua", editCodigoVendedor.getText().toString());
 			valores.put("id_smaempre", editCodigoEmpresa.getText().toString());
 			valores.put("pasta_servidor_usua", editPastaServidor.getText().toString());
+			valores.put("CAMINHO_BANCO_DADOS_USUA", editCaminhoBancoDados.getText().toString());
+			valores.put("PORTA_BANCO_DADOS_USUA", editPortaBancoDados.getText().toString());
 			if (radioGroupModoConexao.getCheckedRadioButtonId() == R.id.activity_cadastro_radioButton_modo_ativo) {
 				valores.put("modo_conexao", "A");
 			} else if (radioGroupModoConexao.getCheckedRadioButtonId() == R.id.activity_cadastro_radioButton_modo_passivo) {
 				valores.put("modo_conexao", "P");
 			} else if (radioGroupModoConexao.getCheckedRadioButtonId() == R.id.activity_cadastro_radioButton_segundo_plano){
 				valores.put("modo_conexao", "S");
+			} else if (radioGroupModoConexao.getCheckedRadioButtonId() == R.id.activity_cadastro_radioButton_webservice){
+				valores.put("modo_conexao", "W");
 			}
 
 		} catch (Exception e){
@@ -234,14 +268,21 @@ public class CadastroUsuarioActivity extends Activity {
 		funcoes.setValorXml("ReceberAutomatico", "S");
 		funcoes.setValorXml("ImagemProduto", "N");
 		funcoes.setValorXml("AbriuAppPriveiraVez", "S");
+		funcoes.setValorXml("IPServidorWebservice", editIpServidorWebservice.getText().toString());
+		funcoes.setValorXml("IPServidor", editIpServidor.getText().toString());
+		funcoes.setValorXml("CaminhoBancoDados", editCaminhoBancoDados.getText().toString());
+		funcoes.setValorXml("PortaBancoDados", editPortaBancoDados.getText().toString());
+		funcoes.setValorXml("UsuarioServidor", editUsuarioServidor.getText().toString());
+		funcoes.setValorXml("SenhaServidor", editSenhaServidor.getText().toString());
 		if (radioGroupModoConexao.getCheckedRadioButtonId() == R.id.activity_cadastro_radioButton_modo_ativo) {
 			funcoes.setValorXml("ModoConexao", "A");
 		} else if (radioGroupModoConexao.getCheckedRadioButtonId() == R.id.activity_cadastro_radioButton_modo_passivo) {
 			funcoes.setValorXml("ModoConexao", "P");
 		} else if (radioGroupModoConexao.getCheckedRadioButtonId() == R.id.activity_cadastro_radioButton_segundo_plano){
 			funcoes.setValorXml("ModoConexao", "S");
+		} else if (radioGroupModoConexao.getCheckedRadioButtonId() == R.id.activity_cadastro_radioButton_webservice){
+			funcoes.setValorXml("ModoConexao", "W");
 		}
-
 
 		finish();
 	}

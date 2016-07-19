@@ -32,6 +32,8 @@ import android.widget.Toast;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.github.clans.fab.FloatingActionButton;
 import com.github.clans.fab.FloatingActionMenu;
+import com.github.johnpersano.supertoasts.SuperToast;
+import com.github.johnpersano.supertoasts.util.Style;
 import com.savare.R;
 import com.savare.adapter.ItemUniversalAdapter;
 import com.savare.banco.funcoesSql.OrcamentoSql;
@@ -311,7 +313,7 @@ public class ListaOrcamentoPedidoMDActivity extends AppCompatActivity{
                                             mode.finish();
 
                                         } else {
-                                            Toast.makeText(ListaOrcamentoPedidoMDActivity.this, getResources().getString(R.string.opcao_positivacao_nao_valida_para_esta_tela), Toast.LENGTH_LONG).show();
+                                            SuperToast.create(ListaOrcamentoPedidoMDActivity.this, getResources().getString(R.string.opcao_positivacao_nao_valida_para_esta_tela), SuperToast.Duration.LONG, Style.getStyle(Style.RED, SuperToast.Animations.FLYIN)).show();
                                         }
                                     }
                                 })
@@ -1033,15 +1035,15 @@ public class ListaOrcamentoPedidoMDActivity extends AppCompatActivity{
             //dadosEmail.setType("text/plai");
             dadosEmail.setType("message/rfc822");
             dadosEmail.putExtra(Intent.EXTRA_EMAIL  , new String[]{pessoaRotinas.emailPessoa(""+orcamento.getIdPessoa())});
-            dadosEmail.putExtra(Intent.EXTRA_SUBJECT, "Or�amento/Pedido de N� " + orcamento.getIdOrcamento());
+            dadosEmail.putExtra(Intent.EXTRA_SUBJECT, getResources().getString(R.string.orcamento_pedido_numero) + orcamento.getIdOrcamento());
             dadosEmail.putExtra(Intent.EXTRA_STREAM, listaCaminho);
-            dadosEmail.putExtra(Intent.EXTRA_TEXT   , "E-Mail enviado pelo App SAVARE.");
+            dadosEmail.putExtra(Intent.EXTRA_TEXT   , "Enviado pelo App SAVARE.");
 
             try {
                 startActivity(Intent.createChooser(dadosEmail, "Enviar e-mail..."));
 
             } catch (android.content.ActivityNotFoundException ex) {
-                //Toast.makeText(OrcamentoActivity.this, "There are no email clients installed.", Toast.LENGTH_SHORT).show();
+                SuperToast.create(ListaOrcamentoPedidoMDActivity.this, getResources().getString(R.string.nao_possivel_compartilhar_arquivo), SuperToast.Duration.LONG, Style.getStyle(Style.RED, SuperToast.Animations.FLYIN)).show();
             }
         }
     } // Fim enviar email

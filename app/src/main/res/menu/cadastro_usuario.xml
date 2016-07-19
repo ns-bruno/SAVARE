@@ -1,17 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
         android:id="@+id/menu_cadastro_usuario_salvar"
         android:icon="@drawable/ic_action_save"
         android:orderInCategory="1"
-        android:showAsAction="always"
+        app:showAsAction="always"
         android:title="@string/salvar"/>
     <item
-        android:id="@+id/menu_cadastro_usuario_cancelar"
+    android:id="@+id/menu_cadastro_usuario_cancelar"
+    android:icon="@drawable/ic_action_cancel"
+    android:orderInCategory="100"
+    app:showAsAction="always"
+    android:title="@string/cancelar"/>
+
+    <item
+        android:id="@+id/menu_cadastro_usuario_limpar_campos"
         android:icon="@drawable/ic_action_cancel"
         android:orderInCategory="100"
-        android:showAsAction="always"
-        android:title="@string/cancelar"/>
+        app:showAsAction="never"
+        android:title="@string/limpar_campos"/>
 
 </menu>

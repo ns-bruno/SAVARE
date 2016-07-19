@@ -1,6 +1,6 @@
 <resources>
 
-    <string name="app_name">SAVARE</string>
+    <string name="app_name" translatable="false">SAVARE</string>
     <string name="sync_account_type">sync.savare.com</string>
     <string name="content_authority">com.savare.sync.contaautenticador</string>
     <string name="pref_setup_complete">setup_complete</string>
@@ -211,6 +211,14 @@
     <string name="positivar_cliente">Positivar Cliente</string>
     <string name="positivado_sucesso">Positivado com Sucesso.</string>
     <string name="nao_temos_historico_preco">Não temos histórico de preço</string>
+    <string name="orcamento_pedido_numero">Orçamento/Pedido de Nº </string>
+    <string name="nao_possivel_compartilhar_arquivo">Não é possível compartilhar o arquivo</string>
+    <string name="webservice">WebService</string>
+    <string name="ip_servidor_webservice">IP Servidor WebService</string>
+    <string name="caminho_banco_dados">Caminho do Banco de Dados</string>
+    <string name="porta_banco_dados">Porta do Banco de Dados</string>
+    <string name="limpar_campos">Limpar Campos</string>
+
     <string-array name="tab_produto_md">
         <item>Produtos</item>
         <item>+ Vendidos Cidade</item>

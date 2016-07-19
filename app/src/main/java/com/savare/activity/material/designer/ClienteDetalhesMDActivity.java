@@ -17,6 +17,8 @@ import android.widget.Toast;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.github.clans.fab.FloatingActionButton;
 import com.github.clans.fab.FloatingActionMenu;
+import com.github.johnpersano.supertoasts.SuperToast;
+import com.github.johnpersano.supertoasts.util.Style;
 import com.ogaclejapan.smarttablayout.SmartTabLayout;
 import com.savare.R;
 import com.savare.adapter.ClienteDetalhesFragmentAdapter;
@@ -232,10 +234,10 @@ public class ClienteDetalhesMDActivity extends AppCompatActivity{
                                     // Inseri a positivacao e checa se inseriu com sucesso
                                     positivacaoSql.execSQL(sqlInsert);
 
-                                    Toast.makeText(getApplicationContext(), getResources().getString(R.string.positivado_sucesso), Toast.LENGTH_LONG).show();
+                                    SuperToast.create(getApplicationContext(), getResources().getString(R.string.positivado_sucesso), SuperToast.Duration.LONG, Style.getStyle(Style.GREEN, SuperToast.Animations.POPUP)).show();
 
                                 } else {
-                                    Toast.makeText(getApplicationContext(), getResources().getString(R.string.opcao_positivacao_nao_valida_para_esta_tela), Toast.LENGTH_LONG).show();
+                                    SuperToast.create(getApplicationContext(), getResources().getString(R.string.opcao_positivacao_nao_valida_para_esta_tela), SuperToast.Duration.LONG, Style.getStyle(Style.RED, SuperToast.Animations.FLYIN)).show();
                                 }
                             }
                         })

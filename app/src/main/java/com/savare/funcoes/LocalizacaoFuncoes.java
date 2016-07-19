@@ -226,15 +226,15 @@ public class LocalizacaoFuncoes {
 
 			@Override
 			public void onStatusChanged(String provider, int status, Bundle extras) {
-				Toast.makeText(context.getApplicationContext(), "Status: " + status, Toast.LENGTH_LONG).show();
+				SuperToast.create(getContext(), getResources().getString(R.string.opcao_positivacao_nao_valida_para_esta_tela), SuperToast.Duration.LONG, Style.getStyle(Style.RED, SuperToast.Animations.FLYIN)).show();
 			}
 			@Override
 			public void onProviderEnabled(String provider) {
-				Toast.makeText(context.getApplicationContext(), "Provider: " + provider, Toast.LENGTH_LONG).show();
+				SuperToast.create(getContext(), getResources().getString(R.string.opcao_positivacao_nao_valida_para_esta_tela), SuperToast.Duration.LONG, Style.getStyle(Style.RED, SuperToast.Animations.FLYIN)).show();
 			}
 			@Override
 			public void onProviderDisabled(String provider) {
-				Toast.makeText(context.getApplicationContext(), "Provider: " + provider, Toast.LENGTH_LONG).show();
+				SuperToast.create(getContext(), getResources().getString(R.string.opcao_positivacao_nao_valida_para_esta_tela), SuperToast.Duration.LONG, Style.getStyle(Style.RED, SuperToast.Animations.FLYIN)).show();
 			}
 			
 		}, null);*/

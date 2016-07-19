@@ -9,6 +9,8 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.github.johnpersano.supertoasts.SuperToast;
+import com.github.johnpersano.supertoasts.util.Style;
 import com.ogaclejapan.smarttablayout.SmartTabLayout;
 import com.savare.R;
 import com.savare.adapter.ProdutoTabMDAdapter;
@@ -120,7 +122,7 @@ public class ProdutoListaMDActivity extends AppCompatActivity {
                 // Limpa o historico de palavras pesquisadas
                 searchRecentSuggestions.clearHistory();
 
-                Toast.makeText(this, "Cookies removidos", Toast.LENGTH_LONG).show();
+                SuperToast.create(ProdutoListaMDActivity.this, "Cookies removidos", SuperToast.Duration.LONG, Style.getStyle(Style.GREEN, SuperToast.Animations.POPUP)).show();
                 break;
 
             default:

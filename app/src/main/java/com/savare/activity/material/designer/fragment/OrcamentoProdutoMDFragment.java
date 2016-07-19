@@ -31,6 +31,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.github.johnpersano.supertoasts.SuperToast;
+import com.github.johnpersano.supertoasts.util.Style;
 import com.savare.R;
 import com.savare.activity.LogActivity;
 import com.savare.activity.material.designer.ClienteListaMDActivity;
@@ -387,7 +389,7 @@ public class OrcamentoProdutoMDFragment extends Fragment {
                                     startActivity(Intent.createChooser(dadosEmail, "Enviar e-mail..."));
 
                                 } catch (android.content.ActivityNotFoundException ex) {
-                                    //Toast.makeText(OrcamentoActivity.this, "There are no email clients installed.", Toast.LENGTH_SHORT).show();
+                                    SuperToast.create(getContext(), getResources().getString(R.string.nao_possivel_compartilhar_arquivo), SuperToast.Duration.LONG, Style.getStyle(Style.RED, SuperToast.Animations.FLYIN)).show();
                                 }
                             } else {
                                 progress.dismiss();
@@ -553,7 +555,7 @@ public class OrcamentoProdutoMDFragment extends Fragment {
                                                 funcoes.menssagem(mensagem);
 
                                             } else {
-                                                Toast.makeText(getContext(), getResources().getString(R.string.opcao_positivacao_nao_valida_para_esta_tela), Toast.LENGTH_LONG).show();
+                                                SuperToast.create(getContext(), getResources().getString(R.string.opcao_positivacao_nao_valida_para_esta_tela), SuperToast.Duration.LONG, Style.getStyle(Style.RED, SuperToast.Animations.FLYIN)).show();
                                             }
                                         }
                                     })

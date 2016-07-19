@@ -170,9 +170,7 @@ public class ReceberDadosFtpAsyncRotinas extends AsyncTask<String, String, Integ
 							.bigTextStyle(mensagem)
 							.smallIcon(R.drawable.ic_launcher)
 							.largeIcon(R.drawable.ic_launcher)
-							.flags(Notification.DEFAULT_ALL)
-							.vibrate(new long[]{1, 1, 1, 1})
-							.vibrate(null)
+							.flags(Notification.DEFAULT_SOUND)
 							.simple()
 							.build();
 				}
@@ -224,6 +222,7 @@ public class ReceberDadosFtpAsyncRotinas extends AsyncTask<String, String, Integ
 		// Marca que a aplicacao nao esta mais recebendo dados
 		funcoes.setValorXml("RecebendoDados", "N");
 
+		// Cria navamente o alarme
 		funcoes.criarAlarmeEnviarReceberDadosAutomatico(true, true);
 
 		// Checa se que esta chamando esta classe eh o alarme
@@ -257,9 +256,7 @@ public class ReceberDadosFtpAsyncRotinas extends AsyncTask<String, String, Integ
 					.bigTextStyle(mensagem)
 					.smallIcon(R.drawable.ic_launcher)
 					.largeIcon(R.drawable.ic_launcher)
-					.flags(Notification.DEFAULT_ALL)
-					.vibrate(new long[]{1, 1, 1, 1})
-					.vibrate(null)
+					.flags(Notification.DEFAULT_SOUND)
 					.simple()
 					.build();
 		}

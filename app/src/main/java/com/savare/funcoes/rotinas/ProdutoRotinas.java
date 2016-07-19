@@ -524,7 +524,7 @@ public class ProdutoRotinas extends Rotinas {
 		final Cursor cursor = produtoSql.sqlSelect(sql);
 		
 		// Se o cursor tiver algum valor entra no laco
-		if(cursor.getCount() > 0){
+		if( (cursor != null) && (cursor.getCount() > 0) ){
 			// Move o foco para o primeiro registro que esta dentro do cursor
 			//cursor.moveToFirst();
 
@@ -571,7 +571,7 @@ public class ProdutoRotinas extends Rotinas {
 					}
 					produto.setDiasCadastro(cursor.getInt(cursor.getColumnIndex("DIAS_CADASTRO")));
 
-					final String descProduto = produto.getDescricaoProduto();
+					//final String descProduto = produto.getDescricaoProduto();
 
 					/*if (textProgresso != null){
 						((Activity) context).runOnUiThread(new Runnable() {
@@ -670,10 +670,9 @@ public class ProdutoRotinas extends Rotinas {
 						
 						// Adiciona uma lista de embalagens no produto
 						produto.setListaEmbalagem(listaEmbalagem);
-						
-						// Adiciona o produto a lista
-						produtoLista.setProduto(produto);
 					}
+					// Adiciona o produto a lista
+					produtoLista.setProduto(produto);
 					
 					listaProduto.add(produtoLista);
 				} // Fim primeiro while
@@ -917,6 +916,21 @@ public class ProdutoRotinas extends Rotinas {
 		descricaoDupla.setTextoSecundario("Classe/Grupo");
 		// Adiciona a lista
 		listaDetalhes.add(descricaoDupla);
+
+		EmbalagemRotinas embalagemRotinas = new EmbalagemRotinas(context);
+		// Pega todas as embalagens do produto
+		List<EmbalagemBeans> listaEmbalagem = embalagemRotinas.selectEmbalagensProduto(idProduto);
+
+		if ( (listaEmbalagem != null) && (listaEmbalagem.size() > 0) ){
+
+			for(int i = 0; i < listaEmbalagem.size(); i++){
+				descricaoDupla = new DescricaoDublaBeans();
+				descricaoDupla.setTextoPrincipal(listaEmbalagem.get(i).getUnidadeVendaEmbalagem().getSiglaUnidadeVenda() + " - " + listaEmbalagem.get(i).getDescricaoEmbalagem());
+				descricaoDupla.setTextoSecundario("Embalagem do Produto");
+				// Adiciona a lista
+				listaDetalhes.add(descricaoDupla);
+			}
+		}
 		
 		return listaDetalhes;
 	}

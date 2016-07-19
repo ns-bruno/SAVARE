@@ -155,7 +155,8 @@
         <provider
             android:name=".sincronizacao.EnviarProvider"
             android:authorities="@string/content_authority"
-            android:exported="false" />
+            android:exported="false"
+            android:syncable="true"/>
 
         <provider
             android:authorities="com.savare.provider.SearchableProvider"
@@ -163,7 +164,7 @@
 
         <!-- Servico de sincronizacao -->
         <service
-            android:name=".sincronizacao.SyncService"
+            android:name=".sincronizacao.SavareSyncService"
             android:exported="true"
             android:process=":sync">
 
@@ -172,16 +173,16 @@
             as needed.
             -->
             <intent-filter>
-                <action android:name="android.content.SyncAdapter" />
+                <action android:name="android.content.SavareSyncAdapter" />
             </intent-filter>
-            <!-- This points to a required XML file which describes our SyncAdapter. -->
+            <!-- This points to a required XML file which describes our SavareSyncAdapter. -->
             <meta-data
-                android:name="android.content.SyncAdapter"
+                android:name="android.content.SavareSyncAdapter"
                 android:resource="@xml/syncadapter" />
         </service>
 
         <!-- Servico de autenticacao -->
-        <service android:name=".sincronizacao.ContaService">
+        <service android:name=".sincronizacao.SavareAutenticadorService">
 
             <!-- Required filter used by the system to launch our account service. -->
             <intent-filter>
@@ -202,6 +203,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </receiver>
+
         <receiver
             android:name=".funcoes.rotinas.receptor.ReceptorNotificarAparelhoRotinas"
             android:label="ReceptorNotificarAparelhoRotinas">
@@ -211,6 +213,7 @@
                 <action android:name="NOTIFICACAO_SAVARE" />
             </intent-filter>
         </receiver>
+
         <receiver
             android:name=".funcoes.rotinas.receptor.ReceptorCriarAlarmeRebootRotinas"
             android:label="ReceptorCriarAlarmeRebootRotinas">
@@ -222,6 +225,7 @@
                 <action android:name="android.intent.action.REBOOT" />
             </intent-filter>
         </receiver>
+
         <receiver
             android:name=".funcoes.rotinas.receptor.ReceptorAlarmeReceberDadosBroadcastRotinas"
             android:label="ReceptorAlarmeReceberDadosBroadcastRotinas">
@@ -231,6 +235,7 @@
                 <action android:name="RECEBER_DADOS_SAVARE" />
             </intent-filter>
         </receiver>
+
         <receiver
             android:name=".funcoes.rotinas.receptor.ReceptorAlarmeEnviarCadastroPessoaBroadcastRotinas"
             android:label="ReceptorAlarmeEnviarCadastroPessoaBroadcastRotinas">
@@ -240,6 +245,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </receiver>
+
         <!-- ATTENTION: This was auto-generated to add Google Play services to your project for
              App Indexing.  See https://g.co/AppIndexing/AndroidStudio for more information. -->
         <meta-data

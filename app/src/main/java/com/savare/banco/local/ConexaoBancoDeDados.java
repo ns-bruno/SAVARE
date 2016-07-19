@@ -129,7 +129,8 @@ public class ConexaoBancoDeDados extends SQLiteOpenHelper {
 		if (bancoSavare == null || !bancoSavare.isOpen()) {
 			bancoSavare = SQLiteDatabase.openDatabase(bancoDados, null, SQLiteDatabase.ENABLE_WRITE_AHEAD_LOGGING|
 																		SQLiteDatabase.NO_LOCALIZED_COLLATORS|
-																		SQLiteDatabase.CREATE_IF_NECESSARY);
+																		SQLiteDatabase.CREATE_IF_NECESSARY|
+																		SQLiteDatabase.OPEN_READWRITE);
 			
 			//bancoSavare = getWritableDatabase();
 			//bancoSavare = SQLiteDatabase.openDatabase(bancoDados, null, 0);
@@ -166,12 +167,12 @@ public class ConexaoBancoDeDados extends SQLiteOpenHelper {
 
 	protected void execSqlFile(String sqlFile, SQLiteDatabase db ) throws SQLException, IOException {
 		//log.info("  exec sql file: {}" + sqlFile);
-		Log.i("SAVARE", "Executar o SqlFile.");
+		Log.i("SAVARE", "Executar o SqlFile. - ConexaoBancoDeDados");
 		for(String sqlInstruction : SqlParser.parseSqlFile(SQL_DIR + "/" + sqlFile, this.context.getAssets())) {
-			if (sqlInstruction.contains("S INSERT_CFACLIFO_ANT B")){
+			/*if (sqlInstruction.contains("S INSERT_CFACLIFO_ANT B")){
 				String s = sqlInstruction;
 				int i = sqlInstruction.length();
-			}
+			}*/
 			// Executa a instrucao sql
 			db.execSQL(sqlInstruction);
 		}

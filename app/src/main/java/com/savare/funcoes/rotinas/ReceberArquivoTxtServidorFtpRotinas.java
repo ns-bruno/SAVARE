@@ -133,8 +133,7 @@ public class ReceberArquivoTxtServidorFtpRotinas {
 				.largeIcon(R.drawable.ic_launcher)
 				.title(R.string.importar_dados_recebidos)
 				.bigTextStyle("Estamos Conectando no Servidor em Nuvem...")
-				.vibrate(new long[]{1, 1, 1, 1})
-				.flags(Notification.DEFAULT_ALL);
+				.flags(Notification.DEFAULT_SOUND);
 
 		ArrayList<String> localArquivoRecebido = new ArrayList<String>();
 		
@@ -426,7 +425,7 @@ public class ReceberArquivoTxtServidorFtpRotinas {
 									.largeIcon(R.drawable.ic_launcher)
 									.title(R.string.importar_dados_recebidos)
 									.bigTextStyle("Não achamos nenhum arquivo para fazer downloads.")
-									.flags(Notification.DEFAULT_ALL);
+									.flags(Notification.DEFAULT_SOUND);
 
 							mLoad.simple().build();
 

@@ -46,13 +46,14 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.widget.EditText;
-import android.widget.Toast;
 
+import com.github.johnpersano.supertoasts.SuperToast;
+import com.github.johnpersano.supertoasts.util.Style;
 import com.savare.R;
 import com.savare.banco.local.ConexaoBancoDeDados;
 import com.savare.banco.ConexaoTask;
 import com.savare.configuracao.ServicosWeb;
-import com.savare.sincronizacao.ContaService;
+import com.savare.sincronizacao.SavareAutenticadorService;
 
 public class FuncoesPersonalizadas {
 
@@ -216,8 +217,7 @@ public class FuncoesPersonalizadas {
 	 */
 	private void menssagemRapida(ContentValues contentValues){
 		
-		Toast.makeText(this.context, contentValues.getAsString("mensagem"), Toast.LENGTH_SHORT).show();
-		
+		SuperToast.create(context, contentValues.getAsString("mensagem"), SuperToast.Duration.LONG, Style.getStyle(Style.GRAY, SuperToast.Animations.POPUP)).show();
 	}
 	
 	
@@ -323,7 +323,7 @@ public class FuncoesPersonalizadas {
 	
 	
 	/**
-	 * Tirar a formatacao do padr�o brasileiro de numeros.
+	 * Tirar a formatacao do padrao brasileiro de numeros.
 	 * Por exemplo: 
 	 * R$ 1.025,35 retorna 1025.35
 	 * 1.025,30 retorna 1025.3
@@ -861,7 +861,7 @@ public class FuncoesPersonalizadas {
 	 */
 	public boolean validaCNPJ(String CNPJ) {
 		CNPJ = CNPJ.replace(".", "").replace("-","").replace("/", "");
-// considera-se erro CNPJ's formados por uma sequencia de numeros iguais
+		// considera-se erro CNPJ's formados por uma sequencia de numeros iguais
 		if (CNPJ.equals("00000000000000") || CNPJ.equals("11111111111111")
 				|| CNPJ.equals("22222222222222") || CNPJ.equals("33333333333333")
 				|| CNPJ.equals("44444444444444") || CNPJ.equals("55555555555555")
@@ -874,15 +874,15 @@ public class FuncoesPersonalizadas {
 		char verificador13, verificador14;
 		int soma, controle, resto, num, valores_defenidos;
 
-// "try" - protege o código para eventuais erros de conversao de tipo (int)
+		// "try" - protege o código para eventuais erros de conversao de tipo (int)
 		try {
-// Calculo do 1o. Digito Verificador
+			// Calculo do 1o. Digito Verificador
 			soma = 0;
 			valores_defenidos = 2;
 			for (controle = 11; controle >= 0; controle--) {
-// converte o i-ésimo caractere do CNPJ em um número:
-// por exemplo, transforma o caractere '0' no inteiro 0
-// (48 eh a posição de '0' na tabela ASCII)
+				// converte o i-ésimo caractere do CNPJ em um número:
+				// por exemplo, transforma o caractere '0' no inteiro 0
+				// (48 eh a posição de '0' na tabela ASCII)
 				num = (int) (CNPJ.charAt(controle) - 48);
 				soma = soma + (num * valores_defenidos);
 				valores_defenidos = valores_defenidos + 1;
@@ -898,7 +898,7 @@ public class FuncoesPersonalizadas {
 				verificador13 = (char) ((11 - resto) + 48);
 			}
 
-// Calculo do 2o. Digito Verificador
+			// Calculo do 2o. Digito Verificador
 			soma = 0;
 			valores_defenidos = 2;
 			for (controle = 12; controle >= 0; controle--) {
@@ -917,7 +917,7 @@ public class FuncoesPersonalizadas {
 				verificador14 = (char) ((11 - resto) + 48);
 			}
 
-// Verifica se os dígitos calculados conferem com os dígitos informados.
+			// Verifica se os dígitos calculados conferem com os dígitos informados.
 			if ((verificador13 == CNPJ.charAt(12)) && (verificador14 == CNPJ.charAt(13))) {
 				return (true);
 			} else {
@@ -937,7 +937,7 @@ public class FuncoesPersonalizadas {
 	 */
 	public boolean validaCPF(String CPF) {
 		CPF = CPF.replace(".", "").replace("-","");
-// considera-se erro CPF's formados por uma sequencia de numeros iguais
+		// considera-se erro CPF's formados por uma sequencia de numeros iguais
 		if (CPF.equals("00000000000") || CPF.equals("11111111111")
 				|| CPF.equals("22222222222") || CPF.equals("33333333333")
 				|| CPF.equals("44444444444") || CPF.equals("55555555555")
@@ -950,15 +950,15 @@ public class FuncoesPersonalizadas {
 		char verificador10, verificador11;
 		int soma, controle, resto, num, valores_defenidos;
 
-// "try" - protege o codigo para eventuais erros de conversao de tipo (int)
+		// "try" - protege o codigo para eventuais erros de conversao de tipo (int)
 		try {
-// Calculo do 1o. Digito Verificador
+			// Calculo do 1o. Digito Verificador
 			soma = 0;
 			valores_defenidos = 10;
 			for (controle = 0; controle < 9; controle++) {
-// converte o i-esimo caractere do CPF em um numero:
-// por exemplo, transforma o caractere '0' no inteiro 0
-// (48 eh a posicao de '0' na tabela ASCII)
+				// converte o i-esimo caractere do CPF em um numero:
+				// por exemplo, transforma o caractere '0' no inteiro 0
+				// (48 eh a posicao de '0' na tabela ASCII)
 				num = (int) (CPF.charAt(controle) - 48);
 				soma = soma + (num * valores_defenidos);
 				valores_defenidos = valores_defenidos - 1;
@@ -970,7 +970,7 @@ public class FuncoesPersonalizadas {
 			} else {
 				verificador10 = (char) (resto + 48); // converte no respectivo caractere numerico
 			}
-// Calculo do 2o. Digito Verificador
+			// Calculo do 2o. Digito Verificador
 			soma = 0;
 			valores_defenidos = 11;
 			for (controle = 0; controle < 10; controle++) {
@@ -986,7 +986,7 @@ public class FuncoesPersonalizadas {
 				verificador11 = (char) (resto + 48);
 			}
 
-// Verifica se os digitos calculados conferem com os digitos informados.
+			// Verifica se os digitos calculados conferem com os digitos informados.
 			if ((verificador10 == CPF.charAt(9)) && (verificador11 == CPF.charAt(10))) {
 				return (true);
 			} else {
@@ -1064,15 +1064,15 @@ public class FuncoesPersonalizadas {
 		b.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
 		b.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
 
-		ContaService contaService = new ContaService();
-		Account c = ContaService.GetAccount(context);
+		SavareAutenticadorService savareAutenticadorService = new SavareAutenticadorService();
+		Account c = SavareAutenticadorService.GetAccount(context);
 
 		ContentResolver.requestSync(c, context.getResources().getString(R.string.content_authority), b);
 	}
 
 	public boolean statusSincronizacaoPlano(){
-		ContaService contaService = new ContaService();
-		Account c = ContaService.GetAccount(context);
+		SavareAutenticadorService savareAutenticadorService = new SavareAutenticadorService();
+		Account c = SavareAutenticadorService.GetAccount(context);
 
 		if (ContentResolver.getIsSyncable(c, context.getResources().getString(R.string.content_authority)) > 0){
 			return true;
@@ -1082,8 +1082,8 @@ public class FuncoesPersonalizadas {
 	}
 
 	public void cancelarSincronizacaoSegundoPlano(){
-		ContaService contaService = new ContaService();
-		Account c = ContaService.GetAccount(context);
+		SavareAutenticadorService savareAutenticadorService = new SavareAutenticadorService();
+		Account c = SavareAutenticadorService.GetAccount(context);
 
 		ContentResolver.cancelSync(c, context.getResources().getString(R.string.content_authority));
 	}

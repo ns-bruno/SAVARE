@@ -54,4 +54,5 @@ dependencies {
     compile 'com.ogaclejapan.smarttablayout:library:1.6.0@aar'
     compile 'com.github.arimorty:floatingsearchview:1.1.2'
     compile('com.github.afollestad.material-dialogs:core:0.8.5.3@aar'){ transitive = true }
+    compile 'com.github.johnpersano:supertoasts:1.3.4@aar'
 }

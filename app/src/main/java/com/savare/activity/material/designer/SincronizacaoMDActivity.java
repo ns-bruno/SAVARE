@@ -109,7 +109,7 @@ public class SincronizacaoMDActivity extends AppCompatActivity {
         super.onResume();
 
         UsuarioRotinas usuarioRotinas = new UsuarioRotinas(SincronizacaoMDActivity.this);
-        // Pega o modo de sincronizacao dos dados. FTP ou SyncAdapter
+        // Pega o modo de sincronizacao dos dados. FTP ou SavareSyncAdapter
         modoConexao = usuarioRotinas.modoConexao();
 
         if (modoConexao.equalsIgnoreCase("S")){
@@ -153,7 +153,7 @@ public class SincronizacaoMDActivity extends AppCompatActivity {
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
 
-        // Checo se o modo de conexao eh diferente de SyncAdapter
+        // Checo se o modo de conexao eh diferente de SavareSyncAdapter
         if (!modoConexao.equalsIgnoreCase("S")){
             menu.getItem(0).setVisible(false);
         }
