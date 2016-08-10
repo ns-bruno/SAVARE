@@ -31,7 +31,6 @@ class SavareSyncAdapter extends AbstractThreadedSyncAdapter {
     /**
      * Constructor. Obtains handle to content resolver for later use.
      */
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     public SavareSyncAdapter(Context context, boolean autoInitialize, boolean allowParallelSyncs) {
         super(context, autoInitialize, allowParallelSyncs);
         mContentResolver = context.getContentResolver();

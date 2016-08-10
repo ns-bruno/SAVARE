@@ -12,7 +12,6 @@ import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
-import android.widget.Spinner;
 
 import com.savare.R;
 import com.savare.banco.funcoesSql.UsuarioSQL;
@@ -23,7 +22,7 @@ import com.savare.funcoes.VersionUtils;
 public class CadastroUsuarioActivity extends Activity {
 	
 	private static String TAG = "SAVARE";
-	private EditText editChaveEmpresa,
+	private EditText editChaveUsuario,
 					 editCodigoEmpresa,
 					 editNomeCompleto,
 					 editNomeLogin,
@@ -88,7 +87,7 @@ public class CadastroUsuarioActivity extends Activity {
 				
 				FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(CadastroUsuarioActivity.this);
 				
-				editChaveEmpresa.setText(dadosUsuario.getString(dadosUsuario.getColumnIndex("CHAVE_USUA")));
+				editChaveUsuario.setText(dadosUsuario.getString(dadosUsuario.getColumnIndex("CHAVE_USUA")));
 				//editCodigoEmpresa.setText(funcoes.getValorXml("CodigoEmpresa"));
 				editCodigoEmpresa.setText(dadosUsuario.getString(dadosUsuario.getColumnIndex("ID_SMAEMPRE")));
 				editNomeCompleto.setText(dadosUsuario.getString(dadosUsuario.getColumnIndex("NOME_USUA")));
@@ -169,7 +168,7 @@ public class CadastroUsuarioActivity extends Activity {
 			finish();
 
 		} else if (id == R.id.menu_cadastro_usuario_limpar_campos){
-			editChaveEmpresa.setText("");
+			editChaveUsuario.setText("");
 			editCodigoEmpresa.setText("");
 			editNomeCompleto.setText("");
 			editCodigoVendedor.setText("");
@@ -192,7 +191,7 @@ public class CadastroUsuarioActivity extends Activity {
 	 */
 	private void recuperarCampoTela(){
 		
-		editChaveEmpresa = (EditText) findViewById(R.id.cadastro_usuario_edit_chave);
+		editChaveUsuario = (EditText) findViewById(R.id.cadastro_usuario_edit_chave);
 		editCodigoEmpresa = (EditText) findViewById(R.id.cadastro_usuario_edit_codigo_empresa);
 		editNomeCompleto = (EditText) findViewById(R.id.cadastro_usuario_edit_nome);
 		editNomeLogin = (EditText) findViewById(R.id.cadastro_usuario_edit_login);
@@ -215,7 +214,7 @@ public class CadastroUsuarioActivity extends Activity {
 		try{
 			this.funcoes = new FuncoesPersonalizadas(CadastroUsuarioActivity.this);
 			
-			valores.put("chave_usua", editChaveEmpresa.getText().toString());
+			valores.put("chave_usua", editChaveUsuario.getText().toString());
 			valores.put("nome_usua", editNomeCompleto.getText().toString());
 			valores.put("login_usua", editNomeLogin.getText().toString());
 			valores.put("senha_usua", this.funcoes.criptografaSenha(editSenha.getText().toString()));
@@ -261,7 +260,7 @@ public class CadastroUsuarioActivity extends Activity {
 		funcoes = new FuncoesPersonalizadas(CadastroUsuarioActivity.this);
 		funcoes.setValorXml("CodigoUsuario", editCodigoVendedor.getText().toString());
 		funcoes.setValorXml("Usuario", editNomeLogin.getText().toString());
-		funcoes.setValorXml("ChaveEmpresa", editChaveEmpresa.getText().toString());
+		funcoes.setValorXml("ChaveUsuario", editChaveUsuario.getText().toString());
 		funcoes.setValorXml("CodigoEmpresa", editCodigoEmpresa.getText().toString());
 		funcoes.setValorXml("Email", editEmail.getText().toString());
 		funcoes.setValorXml("EnviarAutomatico", "S");

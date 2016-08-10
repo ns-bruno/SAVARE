@@ -18,6 +18,7 @@
     <item name="amarelo" type="color">#FF8800</item>
     <item name="cinza_platina" type="color">#d6d6d6</item>
     <item name="cinza_escuro" type="color">#727272</item>
+    <item name="cinza_claro" type="color">#BDBDBD</item>
     <item name="lilas_escuro" type="color">#9933CC</item>
     <item name="lilas" type="color">#AA66CC</item>
     <item name="preto" type="color">#000000</item>
@@ -26,6 +27,4 @@
     <item name="colorPrimaryDark" type="color">#303F9F</item>
     <item name="colorAccent" type="color">#03A9F4</item>
 
-
-    
 </resources>

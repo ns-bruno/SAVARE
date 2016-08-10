@@ -3,6 +3,7 @@ package com.savare.activity.material.designer;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -18,8 +19,11 @@ import android.widget.TextView;
 import com.savare.R;
 import com.savare.activity.CadastroUsuarioActivity;
 import com.savare.banco.funcoesSql.UsuarioSQL;
+import com.savare.banco.local.ConexaoBancoDeDados;
 import com.savare.funcoes.FuncoesPersonalizadas;
 import com.savare.funcoes.Rotinas;
+import com.savare.funcoes.VersionUtils;
+import com.savare.funcoes.rotinas.async.ReceberDadosWebserviceAsyncRotinas;
 
 /**
  * Created by Bruno Nogueira Silva on 11/12/2015.
@@ -70,8 +74,14 @@ public class LoginMDActivity extends AppCompatActivity {
         super.onResume();
         try {
             if (!camposObrigatorioPreenchido()) {
+                ConexaoBancoDeDados conexaoBancoDeDados = new ConexaoBancoDeDados(LoginMDActivity.this, VersionUtils.getVersionCode(LoginMDActivity.this));
+                // Pega o banco de dados do SAVARE
+                SQLiteDatabase bancoDados = conexaoBancoDeDados.abrirBanco();
+                // Executa o onCreate para criar todas as tabelas do banco de dados
+                conexaoBancoDeDados.onCreate(bancoDados);
+
                 // Abre a tela inicial do sistema
-                Intent intent = new Intent(LoginMDActivity.this, CadastroUsuarioActivity.class);
+                Intent intent = new Intent(LoginMDActivity.this, RegistroChaveUsuarioMDActivity.class);
                 startActivity(intent);
                 return;
             }
@@ -86,8 +96,16 @@ public class LoginMDActivity extends AppCompatActivity {
 
             // Verfifica se existe algum usuario cadastrado, ou
             if ((rotinas.existeUsuario() == false) || (codigoUsuario.equalsIgnoreCase(funcoes.NAO_ENCONTRADO))) {
+
+                ConexaoBancoDeDados conexaoBancoDeDados = new ConexaoBancoDeDados(LoginMDActivity.this, VersionUtils.getVersionCode(LoginMDActivity.this));
+                // Pega o banco de dados do SAVARE
+                SQLiteDatabase bancoDados = conexaoBancoDeDados.abrirBanco();
+                // Executa o onCreate para criar todas as tabelas do banco de dados
+                conexaoBancoDeDados.onCreate(bancoDados);
+
                 // Abre a tela inicial do sistema
-                Intent intent = new Intent(LoginMDActivity.this, CadastroUsuarioActivity.class);
+                //Intent intent = new Intent(LoginMDActivity.this, CadastroUsuarioActivity.class);
+                Intent intent = new Intent(LoginMDActivity.this, RegistroChaveUsuarioMDActivity.class);
                 startActivity(intent);
 
             } else {
@@ -159,6 +177,9 @@ public class LoginMDActivity extends AppCompatActivity {
 
                 break;
 
+            case R.id.menu_login_atualizar_dados:
+                ReceberDadosWebserviceAsyncRotinas receberDadosWebservice = new ReceberDadosWebserviceAsyncRotinas(LoginMDActivity.this);
+                receberDadosWebservice.execute();
 
 
             default:
@@ -189,7 +210,7 @@ public class LoginMDActivity extends AppCompatActivity {
         if ((funcoes.getValorXml("Usuario").equalsIgnoreCase(funcoes.NAO_ENCONTRADO)) ||
                 (funcoes.getValorXml("CodigoUsuario").equalsIgnoreCase(funcoes.NAO_ENCONTRADO)) ||
                 (funcoes.getValorXml("CodigoEmpresa").equalsIgnoreCase(funcoes.NAO_ENCONTRADO)) ||
-                (funcoes.getValorXml("ChaveEmpresa").equalsIgnoreCase(funcoes.NAO_ENCONTRADO)) ||
+                (funcoes.getValorXml("ChaveUsuario").equalsIgnoreCase(funcoes.NAO_ENCONTRADO)) ||
                 (funcoes.getValorXml("ModoConexao").equalsIgnoreCase(funcoes.NAO_ENCONTRADO))){
             retorno = false;
 

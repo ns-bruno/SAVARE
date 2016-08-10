@@ -1,10 +1,19 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="${packageName}.${activityClass}" >
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context="${packageName}.${activityClass}">
 
     <item
         android:id="@+id/menu_login_cadastro_usuario"
-        android:showAsAction="never"
+        app:showAsAction="never"
         android:title="@string/cadastro_usuario"/>
+
+    <item
+        android:id="@+id/menu_login_atualizar_dados"
+        android:orderInCategory="100"
+        android:title="Atualizar dados"
+        android:icon="@mipmap/ic_refresh"
+        app:showAsAction="always">
+    </item>
 
 </menu>

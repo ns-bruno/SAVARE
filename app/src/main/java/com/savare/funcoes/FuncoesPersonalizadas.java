@@ -2,6 +2,9 @@ package com.savare.funcoes;
 
 import java.io.File;
 import java.math.BigDecimal;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
 import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.text.ParseException;
@@ -9,6 +12,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Enumeration;
 import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Locale;
@@ -44,6 +48,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.text.format.Formatter;
 import android.util.Log;
 import android.widget.EditText;
 
@@ -854,6 +859,10 @@ public class FuncoesPersonalizadas {
 			}
 		}
 
+		if (erro.toLowerCase().contains("timeoutexception")){
+			erro = context.getResources().getString(R.string.demorou_demais_servidor_webservice_responter_internet_lenta) + "\n" + erro + "\n";
+		}
+
 		return erro;
 	} // Fim tratamentoErroBancoDados
 
@@ -1099,6 +1108,25 @@ public class FuncoesPersonalizadas {
 		}else {
 			return  UUID.randomUUID().toString();
 		}
+	}
+
+	public String getLocalIpAddress() {
+		try {
+			for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements();) {
+				NetworkInterface intf = en.nextElement();
+				for (Enumeration<InetAddress> enumIpAddr = intf.getInetAddresses(); enumIpAddr.hasMoreElements();) {
+					InetAddress inetAddress = enumIpAddr.nextElement();
+					if (!inetAddress.isLoopbackAddress()) {
+						String ip = Formatter.formatIpAddress(inetAddress.hashCode());
+						//Log.i(TAG, "***** IP="+ ip);
+						return ip;
+					}
+				}
+			}
+		} catch (SocketException ex) {
+			Log.e(TAG, ex.toString());
+		}
+		return null;
 	}
 
 } // Fecha classe

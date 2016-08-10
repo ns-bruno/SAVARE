@@ -1,5 +1,6 @@
 package com.savare.banco.funcoesSql;
 
+import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.pm.PackageManager;
@@ -39,6 +40,7 @@ public class FuncoesSql {
 	/**
 	 * Funcao para inserir no banco de dados. \n
 	 * Tem que ser passado por parametro os dados atraves de @values.
+	 * x
 	 * @param values - Dados que eh para ser inseridos
 	 * @return
 	 */
@@ -217,15 +219,47 @@ public class FuncoesSql {
             //statement.bindAllArgsAsStrings(bindArgs);
             id = statement.executeInsert();
 			
-		} catch (SQLException e) {
+		} catch (final SQLException e) {
 			
 			Log.e("SAVARE", e.getMessage());
+
+			final ContentValues contentValues = new ContentValues();
+			contentValues.put("comando", 0);
+			contentValues.put("tela", "FuncoesSql");
+			contentValues.put("mensagem", e.toString());
+			contentValues.put("dados", e.toString());
+			// Pega os dados do usuario
+			//contentValues.put("usuario", funcoes.getValorXml("Usuario"));
+			//contentValues.put("empresa", funcoes.getValorXml("ChaveEmpresa"));
+			//contentValues.put("email", funcoes.getValorXml("Email"));
+
+			((Activity) context).runOnUiThread(new Runnable() {
+				public void run() {
+					funcoes.menssagem(contentValues);
+				}
+			});
 			
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			
 			Log.e("SAVARE", e.getMessage());
-			
-		} finally{
+
+			final ContentValues contentValues = new ContentValues();
+			contentValues.put("comando", 0);
+			contentValues.put("tela", "FuncoesSql");
+			contentValues.put("mensagem", e.toString());
+			contentValues.put("dados", e.toString());
+			// Pega os dados do usuario
+			//contentValues.put("usuario", funcoes.getValorXml("Usuario"));
+			//contentValues.put("empresa", funcoes.getValorXml("ChaveEmpresa"));
+			//contentValues.put("email", funcoes.getValorXml("Email"));
+
+			((Activity) context).runOnUiThread(new Runnable() {
+				public void run() {
+					funcoes.menssagem(contentValues);
+				}
+			});
+
+		} finally {
 			
 			bancoDados.setTransactionSuccessful();
 			bancoDados.endTransaction();
