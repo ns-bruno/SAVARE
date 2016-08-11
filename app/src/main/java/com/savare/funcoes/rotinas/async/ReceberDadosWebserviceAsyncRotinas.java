@@ -13,6 +13,8 @@ import android.widget.TextView;
 import com.savare.R;
 import com.savare.banco.funcoesSql.AreasSql;
 import com.savare.banco.funcoesSql.EmpresaSql;
+import com.savare.banco.funcoesSql.RamoAtividadeSql;
+import com.savare.banco.funcoesSql.StatusSql;
 import com.savare.banco.funcoesSql.UltimaAtualizacaoSql;
 import com.savare.banco.funcoesSql.UsuarioSQL;
 import com.savare.beans.RetornoWebServiceBeans;
@@ -26,6 +28,7 @@ import com.savare.webservice.WSSisinfoWebservice;
 import org.ksoap2.serialization.PropertyInfo;
 import org.ksoap2.serialization.SoapObject;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -66,6 +69,14 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
         void onTaskCompleted();
     }
 
+    public String[] getTabelaRecebeDados() {
+        return tabelaRecebeDados;
+    }
+
+    public void setTabelaRecebeDados(String[] tabelaRecebeDados) {
+        this.tabelaRecebeDados = tabelaRecebeDados;
+    }
+
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
@@ -94,7 +105,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
             try {
                 // Checa se a versao do savere eh compativel com o webservice
-                if ((checaVersao()) && (sincronizaUltimaAtualizacao())){
+                if (checaVersao()){
                     WSSisinfoWebservice webserviceSisInfo = new WSSisinfoWebservice(context);
 
                     // Recebe os dados da tabela CFAAREAS
@@ -109,9 +120,8 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                 }
                             });
                         }
-                        //String sqlUsuario = "SELECT * FROM USUARIO_USUA WHERE (USUARIO_USUA.CHAVE_USUA = '" + funcoes.getValorXml("ChaveUsuario") + "')";
-
-                        Vector<SoapObject> listaUsuarioObject = webserviceSisInfo.executarSelectWebservice(null, WSSisinfoWebservice.FUNCTION_SELECT_USUARIO_USUA, null);
+                        // Busca no servidor Webservice
+                        Vector<SoapObject> listaUsuarioObject = webserviceSisInfo.executarSelectWebservice(null, WSSisinfoWebservice.FUNCTION_SELECT_USUARIO_USUA, criaPropriedadeDataAlteracaoWebservice("USUARIO_USUA"));
 
                         // Checa se retornou alguma coisa
                         if (listaUsuarioObject != null && listaUsuarioObject.size() > 0) {
@@ -257,6 +267,22 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                         // Importa os dados da empresa
                         importaDadosEmpresa();
+                    }
+
+                    // Recebe os dados da tabela CFAAREAS
+                    if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SELECT_CFAATIVI))) ||
+                            (tabelaRecebeDados == null) ){
+
+                        // Importa os dados da empresa
+                        importarDadosAtividade();
+                    }
+
+                    // Recebe os dados da tabela CFASTATU
+                    if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SELECT_CFASTATU))) ||
+                            (tabelaRecebeDados == null) ){
+
+                        // Importa os dados da empresa
+                        importarDadosStatus();
                     }
                 }
             } catch (Exception e){
@@ -418,7 +444,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
     private void importaDadosEmpresa(){
         WSSisinfoWebservice webserviceSisInfo = new WSSisinfoWebservice(context);
         try {
-            Vector<SoapObject> listaEmpresaObject = webserviceSisInfo.executarSelectWebservice(null, WSSisinfoWebservice.FUNCTION_SELECT_CFAAREAS, null);
+            Vector<SoapObject> listaEmpresaObject = webserviceSisInfo.executarSelectWebservice(null, WSSisinfoWebservice.FUNCTION_SELECT_SMAEMPRE, criaPropriedadeDataAlteracaoWebservice("SMAEMPRE"));
 
             // Checa se retornou alguma coisa
             if (listaEmpresaObject != null && listaEmpresaObject.size() > 0) {
@@ -445,7 +471,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                     dadosEmpresa.put("DT_ALT", objeto.getProperty("dataAlt").toString());
                     dadosEmpresa.put("NOME_RAZAO", objeto.getProperty("nomeRazao").toString());
                     dadosEmpresa.put("NOME_FANTASIA", objeto.hasProperty("nomeFantasia") ? objeto.getProperty("nomeFantasia").toString() : "");
-                    dadosEmpresa.put("CPF_CGC", objeto.getProperty("CpfCnpj").toString());
+                    dadosEmpresa.put("CPF_CGC", objeto.getProperty("cpfCnpj").toString());
                     dadosEmpresa.put("ORC_SEM_ESTOQUE", objeto.getProperty("orcamentoSemEstoque").toString());
                     dadosEmpresa.put("DIAS_ATRAZO", Integer.parseInt(objeto.getProperty("diasAtrazo").toString()));
                     dadosEmpresa.put("SEM_MOVIMENTO", Integer.parseInt(objeto.getProperty("semMovimento").toString()));
@@ -512,7 +538,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
         try {
             WSSisinfoWebservice webserviceSisInfo = new WSSisinfoWebservice(context);
 
-            Vector<SoapObject> listaAreasObject = webserviceSisInfo.executarSelectWebservice(null, WSSisinfoWebservice.FUNCTION_SELECT_CFAAREAS, null);
+            Vector<SoapObject> listaAreasObject = webserviceSisInfo.executarSelectWebservice(null, WSSisinfoWebservice.FUNCTION_SELECT_CFAAREAS, criaPropriedadeDataAlteracaoWebservice("CFAAREAS"));
 
             // Checa se retornou alguma coisa
             if ((listaAreasObject != null) && (listaAreasObject.size() > 0)) {
@@ -571,6 +597,162 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             mLoad.simple().build();
         }
     }
+
+
+    private void importarDadosAtividade(){
+        try {
+            WSSisinfoWebservice webserviceSisInfo = new WSSisinfoWebservice(context);
+
+            Vector<SoapObject> listaAtividadeObject = webserviceSisInfo.executarSelectWebservice(null, WSSisinfoWebservice.FUNCTION_SELECT_CFAATIVI, criaPropriedadeDataAlteracaoWebservice("CFAATIVI"));
+
+            // Checa se retornou alguma coisa
+            if ((listaAtividadeObject != null) && (listaAtividadeObject.size() > 0)) {
+                // Vareavel para saber se todos os dados foram inseridos com sucesso
+                boolean todosSucesso = true;
+
+                // Passa por toda a lista
+                for (SoapObject objetoIndividual : listaAtividadeObject) {
+
+                    SoapObject objeto;
+
+                    if (objetoIndividual.hasProperty("return")) {
+                        objeto = (SoapObject) objetoIndividual.getProperty("return");
+                    } else {
+                        objeto = objetoIndividual;
+                    }
+
+                    ContentValues dadosAreas = new ContentValues();
+                    dadosAreas.put("ID_CFAATIVI", Integer.parseInt(objeto.getProperty("idRamoAtividade").toString()));
+                    dadosAreas.put("DT_ALT", objeto.getProperty("dataAlteracao").toString());
+                    dadosAreas.put("CODIGO", Integer.parseInt(objeto.getProperty("codigo").toString()));
+                    dadosAreas.put("DESCRICAO", objeto.getProperty("descricaoRamoAtividade").toString());
+                    dadosAreas.put("DESC_ATAC_VISTA", Double.parseDouble(objeto.getProperty("descontoAtacadoVista").toString()));
+                    dadosAreas.put("DESC_ATAC_PRAZO", Double.parseDouble(objeto.getProperty("descontoAtacadoPrazo").toString()));
+                    dadosAreas.put("DESC_VARE_VISTA", Double.parseDouble(objeto.getProperty("descontoVarejoVista").toString()));
+                    dadosAreas.put("DESC_VARE_PRAZO", Double.parseDouble(objeto.getProperty("descontoVarejoPrazo").toString()));
+                    if ((objeto.hasProperty("descontoPromocao"))) {
+                        dadosAreas.put("DESC_PROMOCAO", objeto.getProperty("descontoPromocao").toString());
+                    }
+
+                    RamoAtividadeSql atividadeSql = new RamoAtividadeSql(context);
+
+                    // Pega o sql para passar para o statement
+                    //final String sql = atividadeSql.construirSqlStatement(dadosAreas);
+                    // Pega o argumento para o statement
+                    //final String[] argumentoSql = atividadeSql.argumentoStatement(dadosAreas);
+
+                    if (atividadeSql.insertOrReplace(dadosAreas) <= 0) {
+                        todosSucesso = false;
+                    }
+                                /*((Activity) context).runOnUiThread(new Runnable() {
+                                    public void run() {
+                                        //atividadeSql.insertOrReplace(dadosAreas);
+                                        atividadeSql.insertOrReplaceFast(sql, argumentoSql);
+                                    }
+                                });*/
+                } // Fim do for
+                // Checa se todos foram inseridos/atualizados com sucesso
+                if (todosSucesso) {
+                    inserirUltimaAtualizacao("CFAATIVI");
+                }
+            }
+        }catch (Exception e){
+            // Cria uma notificacao para ser manipulado
+            Load mLoad = PugNotification.with(context).load()
+                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
+                    .smallIcon(R.mipmap.ic_launcher)
+                    .largeIcon(R.drawable.ic_launcher)
+                    .title(R.string.importar_dados_recebidos)
+                    .message(e.getMessage())
+                    .flags(Notification.DEFAULT_SOUND);
+            mLoad.simple().build();
+        }
+    }
+
+
+    private void importarDadosStatus(){
+        try {
+            WSSisinfoWebservice webserviceSisInfo = new WSSisinfoWebservice(context);
+
+            Vector<SoapObject> listaStatusObject = webserviceSisInfo.executarSelectWebservice(null, WSSisinfoWebservice.FUNCTION_SELECT_CFASTATU, criaPropriedadeDataAlteracaoWebservice("CFASTATU"));
+
+            // Checa se retornou alguma coisa
+            if ((listaStatusObject != null) && (listaStatusObject.size() > 0)) {
+                // Vareavel para saber se todos os dados foram inseridos com sucesso
+                boolean todosSucesso = true;
+
+                // Passa por toda a lista
+                for (SoapObject objetoIndividual : listaStatusObject) {
+
+                    SoapObject objeto;
+
+                    if (objetoIndividual.hasProperty("return")) {
+                        objeto = (SoapObject) objetoIndividual.getProperty("return");
+                    } else {
+                        objeto = objetoIndividual;
+                    }
+
+                    ContentValues dadosStatus = new ContentValues();
+                    dadosStatus.put("ID_CFASTATU", Integer.parseInt(objeto.getProperty("idStatus").toString()));
+                    dadosStatus.put("DT_ALT", objeto.getProperty("dataAlteracao").toString());
+                    dadosStatus.put("CODIGO", Integer.parseInt(objeto.getProperty("codigo").toString()));
+                    dadosStatus.put("DESCRICAO", objeto.getProperty("descricao").toString());
+                    if ((objeto.hasProperty("mensagem"))){
+                        dadosStatus.put("MENSAGEM", objeto.getProperty("mensagem").toString());
+                    }
+                    if ((objeto.hasProperty("bloqueia"))){
+                        dadosStatus.put("BLOQUEIA", objeto.getProperty("bloqueia").toString());
+                    }
+                    if ((objeto.hasProperty("parcelaEmAberto"))){
+                        dadosStatus.put("PARCELA_EM_ABERTO", objeto.getProperty("parcelaEmAberto").toString());
+                    }
+                    if ((objeto.hasProperty("vistaPrazo"))){
+                        dadosStatus.put("VISTA_PRAZO", objeto.getProperty("vistaPrazo").toString());
+                    }
+                    dadosStatus.put("DESC_ATAC_VISTA", Double.parseDouble(objeto.getProperty("descontoAtacadoVista").toString()));
+                    dadosStatus.put("DESC_ATAC_PRAZO", Double.parseDouble(objeto.getProperty("descontoAtacadoPrazo").toString()));
+                    dadosStatus.put("DESC_VARE_VISTA", Double.parseDouble(objeto.getProperty("descontoVarejoVista").toString()));
+                    dadosStatus.put("DESC_VARE_PRAZO", Double.parseDouble(objeto.getProperty("descontoVarejoPrazo").toString()));
+                    if ((objeto.hasProperty("descontoPromocao"))) {
+                        dadosStatus.put("DESC_PROMOCAO", objeto.getProperty("descontoPromocao").toString());
+                    }
+
+                    StatusSql statusSql = new StatusSql(context);
+
+                    // Pega o sql para passar para o statement
+                    //final String sql = statusSql.construirSqlStatement(dadosStatus);
+                    // Pega o argumento para o statement
+                    //final String[] argumentoSql = statusSql.argumentoStatement(dadosStatus);
+
+                    if (statusSql.insertOrReplace(dadosStatus) <= 0) {
+                        todosSucesso = false;
+                    }
+                    /*((Activity) context).runOnUiThread(new Runnable() {
+                        public void run() {
+                            //statusSql.insertOrReplace(dadosStatus);
+                            statusSql.insertOrReplaceFast(sql, argumentoSql);
+                        }
+                    });*/
+                } // Fim do for
+                // Checa se todos foram inseridos/atualizados com sucesso
+                if (todosSucesso) {
+                    inserirUltimaAtualizacao("CFASTATU");
+                }
+            }
+        }catch (Exception e){
+            // Cria uma notificacao para ser manipulado
+            Load mLoad = PugNotification.with(context).load()
+                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
+                    .smallIcon(R.mipmap.ic_launcher)
+                    .largeIcon(R.drawable.ic_launcher)
+                    .title(R.string.importar_dados_recebidos)
+                    .message(e.getMessage())
+                    .flags(Notification.DEFAULT_SOUND);
+            mLoad.simple().build();
+        }
+    }
+
+
     private boolean sincronizaUltimaAtualizacao(){
         ArrayList<UltimaAtualizacaoBeans> listaUltimaAtualizacaoDispositivo = null;
         //ArrayList<UltimaAtualizacaoBeans> listaUltimaAtualizacaoWebService = null;
@@ -610,9 +792,22 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                             for (UltimaAtualizacaoBeans ultima : listaUltimaAtualizacaoDispositivo) {
 
                                 // Checa se a tabela tem na lista do dispositivo
-                                if (ultima.getTabela() == objeto.getProperty("tabela")){
+                                if (ultima.getTabela().equalsIgnoreCase(objeto.getProperty("tabela").toString())){
 
-                                    if (objeto.hasProperty("")){
+                                    // Checa se tem salvo no banco local do dispositivo o id da ultima atualizacao
+                                    if ((objeto.hasProperty("idUltimaAtualizacao")) && (ultima.getIdUltimaAtualizacao() == 0)){
+
+                                        ultima.setIdUltimaAtualizacao(Integer.parseInt(objeto.getProperty("idUltimaAtualizacao").toString()));
+
+                                        ContentValues dataAtualizacao = new ContentValues();
+                                        dataAtualizacao.put("ID_ULTIMA_ATUALIZACAO_DISPOSITIVO", Integer.parseInt(objeto.getProperty("idUltimaAtualizacao").toString()));
+
+                                        UltimaAtualizacaoSql ultimaAtualizacaoSql = new UltimaAtualizacaoSql(context);
+                                        // Salva o id da ultima atualizacao que veio do webservice
+                                        ultimaAtualizacaoSql.updateFast(dataAtualizacao, "TABELA = '" + ultima.getTabela() + "'");
+                                    }
+
+                                    if (objeto.hasProperty("dataUltimaAtualizacao")){
                                         // Checa se o webservice eh diferente das datas do dispositivo local
                                         if (!ultima.getDataUltimaAtualizacao().equalsIgnoreCase(objeto.getProperty("dataUltimaAtualizacao").toString())){
 
@@ -637,6 +832,15 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                                 // Checa se o retorno teve insercao com sucesso
                                                 if (retorno.getCodigoRetorno() == 100){
 
+                                                    // Checa se tem o id no banco local
+                                                    if (ultima.getIdUltimaAtualizacao() <= 0) {
+                                                        ContentValues dataAtualizacao = new ContentValues();
+                                                        dataAtualizacao.put("ID_ULTIMA_ATUALIZACAO_DISPOSITIVO", Integer.parseInt(retorno.getExtra().toString()));
+
+                                                        UltimaAtualizacaoSql ultimaAtualizacaoSql = new UltimaAtualizacaoSql(context);
+                                                        // Salva o id da ultima atualizacao que veio do webservice
+                                                        ultimaAtualizacaoSql.updateFast(dataAtualizacao, "TABELA = '" + ultima.getTabela() + "'");
+                                                    }
                                                 }
                                             }
                                             break;
@@ -672,6 +876,16 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                             // Checa se o retorno teve insercao com sucesso
                             if (retorno.getCodigoRetorno() == 100){
 
+                                // Checa se tem o id no banco local
+                                if (ultima.getIdUltimaAtualizacao() <= 0) {
+
+                                    ContentValues dataAtualizacao = new ContentValues();
+                                    dataAtualizacao.put("ID_ULTIMA_ATUALIZACAO_DISPOSITIVO", Integer.parseInt(retorno.getExtra().toString()));
+
+                                    UltimaAtualizacaoSql ultimaAtualizacaoSql = new UltimaAtualizacaoSql(context);
+                                    // Salva o id da ultima atualizacao que veio do webservice
+                                    ultimaAtualizacaoSql.updateFast(dataAtualizacao, "TABELA = '" + ultima.getTabela() + "'");
+                                }
                             }
                         }
                     }
@@ -695,12 +909,53 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
     private void inserirUltimaAtualizacao(String tabela){
         TelephonyManager telephonyManager = (TelephonyManager) context.getSystemService(context.TELEPHONY_SERVICE);
 
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+        String dataInicioAtualizacao = sdf.format(calendario.getTime());
+
+        Calendar dtAlt = Calendar.getInstance();
+
         ContentValues dataAtualizacao = new ContentValues();
         dataAtualizacao.put("ID_DISPOSITIVO", telephonyManager.getDeviceId());
         dataAtualizacao.put("TABELA", tabela);
-        dataAtualizacao.put("DATA_ULTIMA_ATUALIZACAO", calendario.getTime().toString());
+        dataAtualizacao.put("DT_ALT", sdf.format(dtAlt.getTime()));
+        dataAtualizacao.put("DATA_ULTIMA_ATUALIZACAO", dataInicioAtualizacao);
 
         UltimaAtualizacaoSql ultimaAtualizacaoSql = new UltimaAtualizacaoSql(context);
+
         ultimaAtualizacaoSql.insertOrReplace(dataAtualizacao);
+    }
+
+    private List<PropertyInfo> criaPropriedadeDataAlteracaoWebservice(String tabela){
+
+        UltimaAtualizacaoRotinas ultimaAtualizacaoRotinas = new UltimaAtualizacaoRotinas(context);
+
+        ArrayList<UltimaAtualizacaoBeans> listaUltimaAtualizacaoDispositivo = ultimaAtualizacaoRotinas.listaUltimaAtualizacaoTabelas(null);
+
+        if ((listaUltimaAtualizacaoDispositivo != null) && (listaUltimaAtualizacaoDispositivo.size() > 0) && (listaUltimaAtualizacaoDispositivo.contains(tabela)) &&
+            (tabela != null) && (!tabela.isEmpty())) {
+
+            // Passa pela lista de atualizacoes
+            for (UltimaAtualizacaoBeans ultimaData : listaUltimaAtualizacaoDispositivo) {
+                // Checa se a tabela da atualizacao eh a requerida por parametro
+                if (ultimaData.getTabela().equalsIgnoreCase(tabela)){
+
+                    PropertyInfo propertyDataUltimaAtualizacao = new PropertyInfo();
+                    propertyDataUltimaAtualizacao.setName("dataUltimaAtualizacao");
+                    propertyDataUltimaAtualizacao.setValue(ultimaData.getDataUltimaAtualizacao());
+                    propertyDataUltimaAtualizacao.setType(ultimaData.getDataUltimaAtualizacao().getClass());
+
+                    // Cria uma lista para salvar todas as propriedades
+                    List<PropertyInfo> listaPropertyInfos = new ArrayList<PropertyInfo>();
+
+                    // Adiciona a propriedade na lista
+                    listaPropertyInfos.add(propertyDataUltimaAtualizacao);
+                    return listaPropertyInfos;
+                }
+            }
+        } else {
+            return null;
+        }
+        return null;
     }
 }

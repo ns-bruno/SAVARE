@@ -9,7 +9,7 @@ public class StatusBeans {
 				   descricao,
 				   mensagem;
 	
-	private char bloqueia,
+	private String bloqueia,
 				 descontoPromocao,
 				 parcelaEmAberto,
 				 vistaPrazo;
@@ -17,6 +17,7 @@ public class StatusBeans {
 	private double descontoAtacadoVista,
 				   descontoAtacadoPrazo,
 				   descontoVarejoVista,
+				   descontoVarejoPrazo,
 				   descontoServicoVista,
 				   descontoServicoPrazo;
 
@@ -93,56 +94,56 @@ public class StatusBeans {
 	/**
 	 * @return the bloqueia
 	 */
-	public char getBloqueia() {
+	public String getBloqueia() {
 		return bloqueia;
 	}
 
 	/**
 	 * @param bloqueia the bloqueia to set
 	 */
-	public void setBloqueia(char bloqueia) {
+	public void setBloqueia(String bloqueia) {
 		this.bloqueia = bloqueia;
 	}
 
 	/**
 	 * @return the descontoPromocao
 	 */
-	public char getDescontoPromocao() {
+	public String getDescontoPromocao() {
 		return descontoPromocao;
 	}
 
 	/**
 	 * @param descontoPromocao the descontoPromocao to set
 	 */
-	public void setDescontoPromocao(char descontoPromocao) {
+	public void setDescontoPromocao(String descontoPromocao) {
 		this.descontoPromocao = descontoPromocao;
 	}
 
 	/**
 	 * @return the parcelaEmAberto
 	 */
-	public char getParcelaEmAberto() {
+	public String getParcelaEmAberto() {
 		return parcelaEmAberto;
 	}
 
 	/**
 	 * @param parcelaEmAberto the parcelaEmAberto to set
 	 */
-	public void setParcelaEmAberto(char parcelaEmAberto) {
+	public void setParcelaEmAberto(String parcelaEmAberto) {
 		this.parcelaEmAberto = parcelaEmAberto;
 	}
 
 	/**
 	 * @return the vistaPrazo
 	 */
-	public char getVistaPrazo() {
+	public String getVistaPrazo() {
 		return vistaPrazo;
 	}
 
 	/**
 	 * @param vistaPrazo the vistaPrazo to set
 	 */
-	public void setVistaPrazo(char vistaPrazo) {
+	public void setVistaPrazo(String vistaPrazo) {
 		this.vistaPrazo = vistaPrazo;
 	}
 
@@ -215,7 +216,12 @@ public class StatusBeans {
 	public void setDescontoServicoPrazo(double descontoServicoPrazo) {
 		this.descontoServicoPrazo = descontoServicoPrazo;
 	}
-	
-	
 
+	public double getDescontoVarejoPrazo() {
+		return descontoVarejoPrazo;
+	}
+
+	public void setDescontoVarejoPrazo(double descontoVarejoPrazo) {
+		this.descontoVarejoPrazo = descontoVarejoPrazo;
+	}
 }

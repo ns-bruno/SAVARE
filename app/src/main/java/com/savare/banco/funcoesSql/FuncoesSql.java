@@ -159,7 +159,7 @@ public class FuncoesSql {
 			// Pega os dados do usuario
 			this.funcoes = new FuncoesPersonalizadas(context);
 			contentValues.put("usuario", funcoes.getValorXml("Usuario"));
-			contentValues.put("empresa", funcoes.getValorXml("ChaveEmpresa"));
+			contentValues.put("empresa", funcoes.getValorXml("ChaveUsuario"));
 			contentValues.put("email", funcoes.getValorXml("Email"));
 			
 			this.funcoes.menssagem(contentValues);
@@ -398,6 +398,50 @@ public class FuncoesSql {
 			contentValues.put("empresa", funcoes.getValorXml("ChaveEmpresa"));
 			contentValues.put("email", funcoes.getValorXml("Email"));
 			
+			this.funcoes.menssagem(contentValues);
+		} finally{
+			conexaoBanco.fechar();
+			bancoDados.close();
+		}
+		return qtdAtualizado;
+	} // Fim do update
+
+	public int updateFast(ContentValues dados, String where){
+		int qtdAtualizado = 0;
+		bancoDados = conexaoBanco.abrirBanco();
+
+		try {
+			qtdAtualizado = bancoDados.updateWithOnConflict(tabela, dados, where, null, 0);
+
+		} catch (SQLException e) {
+			this.funcoes = new FuncoesPersonalizadas(context);
+
+			// Armazena as informacoes para para serem exibidas e enviadas
+			ContentValues contentValues = new ContentValues();
+			contentValues.put("comando", 0);
+			contentValues.put("tela", tabela);
+			contentValues.put("mensagem", funcoes.tratamentoErroBancoDados(e.getMessage()));
+			contentValues.put("dados", dados.toString());
+			// Pega os dados do usuario
+			contentValues.put("usuario", funcoes.getValorXml("Usuario"));
+			contentValues.put("empresa", funcoes.getValorXml("ChaveEmpresa"));
+			contentValues.put("email", funcoes.getValorXml("Email"));
+
+			this.funcoes.menssagem(contentValues);
+
+		} catch (Exception e) {
+			// Armazena as informacoes para para serem exibidas e enviadas
+			ContentValues contentValues = new ContentValues();
+			contentValues.put("comando", 0);
+			contentValues.put("tela", tabela);
+			contentValues.put("mensagem", funcoes.tratamentoErroBancoDados(e.getMessage()));
+			contentValues.put("dados", dados.toString());
+			// Pega os dados do usuario
+			this.funcoes = new FuncoesPersonalizadas(context);
+			contentValues.put("usuario", funcoes.getValorXml("Usuario"));
+			contentValues.put("empresa", funcoes.getValorXml("ChaveEmpresa"));
+			contentValues.put("email", funcoes.getValorXml("Email"));
+
 			this.funcoes.menssagem(contentValues);
 		} finally{
 			conexaoBanco.fechar();

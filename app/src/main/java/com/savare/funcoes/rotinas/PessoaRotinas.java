@@ -265,13 +265,13 @@ public class PessoaRotinas extends Rotinas {
 				status.setDescricao(dadosPessoa.getString(dadosPessoa.getColumnIndex("DESCRICAO_STATU")));
 				// Checa se tem algum dados
 				if ((dadosPessoa.getString(dadosPessoa.getColumnIndex("BLOQUEIA")) != null) && (!dadosPessoa.getString(dadosPessoa.getColumnIndex("BLOQUEIA")).equals(""))) {
-					status.setBloqueia(dadosPessoa.getString(dadosPessoa.getColumnIndex("BLOQUEIA")).charAt(0));
+					status.setBloqueia(dadosPessoa.getString(dadosPessoa.getColumnIndex("BLOQUEIA")));
 				}
 				if ((dadosPessoa.getString(dadosPessoa.getColumnIndex("PARCELA_EM_ABERTO")) != null) && (!dadosPessoa.getString(dadosPessoa.getColumnIndex("PARCELA_EM_ABERTO")).equals(""))) {
-					status.setParcelaEmAberto(dadosPessoa.getString(dadosPessoa.getColumnIndex("PARCELA_EM_ABERTO")).charAt(0));
+					status.setParcelaEmAberto(dadosPessoa.getString(dadosPessoa.getColumnIndex("PARCELA_EM_ABERTO")));
 				}
 				if ((dadosPessoa.getString(dadosPessoa.getColumnIndex("VISTA_PRAZO")) != null) && (!dadosPessoa.getString(dadosPessoa.getColumnIndex("VISTA_PRAZO")).equals(""))) {
-					status.setVistaPrazo(dadosPessoa.getString(dadosPessoa.getColumnIndex("VISTA_PRAZO")).charAt(0));
+					status.setVistaPrazo(dadosPessoa.getString(dadosPessoa.getColumnIndex("VISTA_PRAZO")));
 				}
 				// Adiciona o status na pessoa
 				pessoa.setStatusPessoa(status);

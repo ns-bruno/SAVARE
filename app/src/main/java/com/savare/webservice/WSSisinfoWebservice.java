@@ -38,6 +38,8 @@ public class WSSisinfoWebservice {
     public static final String FUNCTION_SELECT_ULTIMA_ATUALIZACAO = "selectUltimaAtualizacao";
     public static final String FUNCTION_INSERT_ULTIMA_ATUALIZACAO = "insertUltimaAtualizacao";
     public static final String FUNCTION_SELECT_SMAEMPRE = "selectEmpresa";
+    public static final String FUNCTION_SELECT_CFAATIVI = "selectRamoAtividade";
+    public static final String FUNCTION_SELECT_CFASTATU = "selectStatusClifo";
 
     public WSSisinfoWebservice(Context context) {
         this.context = context;

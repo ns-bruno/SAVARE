@@ -24,6 +24,7 @@ import com.savare.funcoes.FuncoesPersonalizadas;
 import com.savare.funcoes.Rotinas;
 import com.savare.funcoes.VersionUtils;
 import com.savare.funcoes.rotinas.async.ReceberDadosWebserviceAsyncRotinas;
+import com.savare.webservice.WSSisinfoWebservice;
 
 /**
  * Created by Bruno Nogueira Silva on 11/12/2015.
@@ -178,7 +179,9 @@ public class LoginMDActivity extends AppCompatActivity {
                 break;
 
             case R.id.menu_login_atualizar_dados:
+                String[] tabelaRecebeDados = {WSSisinfoWebservice.FUNCTION_SELECT_CFASTATU};
                 ReceberDadosWebserviceAsyncRotinas receberDadosWebservice = new ReceberDadosWebserviceAsyncRotinas(LoginMDActivity.this);
+                //receberDadosWebservice.setTabelaRecebeDados(tabelaRecebeDados);
                 receberDadosWebservice.execute();
 
 
