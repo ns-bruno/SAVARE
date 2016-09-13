@@ -24,9 +24,13 @@ public class ItemOrcamentoBeans implements Parcelable {
 				   valorLiquidoFaturado,
 				   valorTabela,
 				   valorTabelaFaturado,
+				   valorTabelaFaturadoUnitario,
+				   valorTabelaUnitario,
 				   valorCustoUnitario,
 				   valorBrutoUnitario,
 				   valorDescontoUnitario,
+				   pesoBruto,
+				   pesoLiquido,
 				   valorLiquidoUnitario;
 	private String guid,
 				   dataCadastro,
@@ -473,6 +477,38 @@ public class ItemOrcamentoBeans implements Parcelable {
 
 	public void setStatusRetorno(String statusRetorno) {
 		this.statusRetorno = statusRetorno;
+	}
+
+	public double getValorTabelaFaturadoUnitario() {
+		return valorTabelaFaturadoUnitario;
+	}
+
+	public void setValorTabelaFaturadoUnitario(double valorTabelaFaturadoUnitario) {
+		this.valorTabelaFaturadoUnitario = valorTabelaFaturadoUnitario;
+	}
+
+	public double getValorTabelaUnitario() {
+		return valorTabelaUnitario;
+	}
+
+	public void setValorTabelaUnitario(double valorTabelaUnitario) {
+		this.valorTabelaUnitario = valorTabelaUnitario;
+	}
+
+	public double getPesoBruto() {
+		return pesoBruto;
+	}
+
+	public void setPesoBruto(double pesoBruto) {
+		this.pesoBruto = pesoBruto;
+	}
+
+	public double getPesoLiquido() {
+		return pesoLiquido;
+	}
+
+	public void setPesoLiquido(double pesoLiquido) {
+		this.pesoLiquido = pesoLiquido;
 	}
 
 	@Override

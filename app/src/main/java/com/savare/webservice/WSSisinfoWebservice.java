@@ -6,13 +6,10 @@ import android.content.Context;
 import android.os.Build;
 import android.telephony.TelephonyManager;
 
-import com.savare.banco.funcoesSql.UsuarioSQL;
 import com.savare.beans.DispositivoBeans;
 import com.savare.beans.RetornoWebServiceBeans;
-import com.savare.configuracao.ConfiguracoesInternas;
 import com.savare.configuracao.ServicosWeb;
 import com.savare.funcoes.FuncoesPersonalizadas;
-import com.savare.funcoes.rotinas.UsuarioRotinas;
 
 import org.ksoap2.SoapEnvelope;
 import org.ksoap2.serialization.PropertyInfo;
@@ -33,13 +30,42 @@ public class WSSisinfoWebservice {
     private Context context;
     private DispositivoBeans dispositivoBeans;
     public static final String FUNCTION_SELECT_USUARIO_USUA = "selectUsuario";
-    public static final String FUNCTION_SELECT_CFAAREAS = "selectAreas";
     public static final String FUNCTION_SELECT_VERSAO_SAVARE = "selectVersaoSavare";
     public static final String FUNCTION_SELECT_ULTIMA_ATUALIZACAO = "selectUltimaAtualizacao";
     public static final String FUNCTION_INSERT_ULTIMA_ATUALIZACAO = "insertUltimaAtualizacao";
+    public static final String FUNCTION_SELECT_CFAAREAS = "selectAreas";
     public static final String FUNCTION_SELECT_SMAEMPRE = "selectEmpresa";
     public static final String FUNCTION_SELECT_CFAATIVI = "selectRamoAtividade";
     public static final String FUNCTION_SELECT_CFASTATU = "selectStatusClifo";
+    public static final String FUNCTION_SELECT_CFATPDOC = "selectTipoDocumento";
+    public static final String FUNCTION_SELECT_CFACCRED = "selectCartaoCredito";
+    public static final String FUNCTION_SELECT_CFAPORTA = "selectPortador";
+    public static final String FUNCTION_SELECT_CFAPROFI = "selectProfissao";
+    public static final String FUNCTION_SELECT_CFATPCLI = "selectTipoCliente";
+    public static final String FUNCTION_SELECT_CFATPCOB = "selectTipoCobranca";
+    public static final String FUNCTION_SELECT_CFAESTAD = "selectEstado";
+    public static final String FUNCTION_SELECT_CFACIDAD = "selectCidade";
+    public static final String FUNCTION_SELECT_CFACLIFO = "selectClienteFornecedor";
+    public static final String FUNCTION_SELECT_CFAENDER = "selectEndereco";
+    public static final String FUNCTION_SELECT_CFAPARAM = "selectParametro";
+    public static final String FUNCTION_SELECT_CFAFOTOS = "selectFotos";
+    public static final String FUNCTION_SELECT_AEAPLPGT = "selectPlanoPagamento";
+    public static final String FUNCTION_SELECT_AEACLASE = "selectClasseProdutos";
+    public static final String FUNCTION_SELECT_AEAUNVEN = "selectUnidadeVenda";
+    public static final String FUNCTION_SELECT_AEAGRADE = "selectGrade";
+    public static final String FUNCTION_SELECT_AEAMARCA = "selectMarca";
+    public static final String FUNCTION_SELECT_AEACODST = "selectCodigoSituacaoTributaria";
+    public static final String FUNCTION_SELECT_AEAPRODU = "selectProduto";
+    public static final String FUNCTION_SELECT_AEAEMBAL = "selectEmbalagemProduto";
+    public static final String FUNCTION_SELECT_AEAPLOJA = "selectProdutoPorLoja";
+    public static final String FUNCTION_SELECT_AEALOCES = "selectLocalEstoque";
+    public static final String FUNCTION_SELECT_AEAESTOQ = "selectEstoque";
+    public static final String FUNCTION_SELECT_AEAORCAM = "selectOrcamento";
+    public static final String FUNCTION_SELECT_AEAITORC = "selectItemOrcamento";
+    public static final String FUNCTION_SELECT_AEAPERCE = "selectPercentual";
+    public static final String FUNCTION_SELECT_AEAFATOR = "selectFator";
+    public static final String FUNCTION_SELECT_AEAPRREC = "selectProdutoRecomendado";
+    public static final String FUNCTION_SELECT_RPAPARCE = "selectParcelas";
 
     public WSSisinfoWebservice(Context context) {
         this.context = context;
@@ -215,7 +241,7 @@ public class WSSisinfoWebservice {
             }
             String enderecoWebService = "http://" + ipServidor + ":8080/" + ServicosWeb.WS_ENDERECO_WEBSERVICE;
 
-            HttpTransportSE httpTransporte = new HttpTransportSE(enderecoWebService, 30000);
+            HttpTransportSE httpTransporte = new HttpTransportSE(enderecoWebService, 100000);
 
             // Requisicao dos dados
             httpTransporte.call(funcao, envelope);

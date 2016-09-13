@@ -1,16 +1,11 @@
 package com.savare.funcoes.rotinas;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.database.SQLException;
 import android.widget.ProgressBar;
 
-import com.savare.R;
 import com.savare.banco.funcoesSql.PessoaSql;
 import com.savare.beans.CidadeBeans;
 import com.savare.beans.DescricaoSimplesBeans;
@@ -26,6 +21,9 @@ import com.savare.beans.TipoClienteBeans;
 import com.savare.beans.TipoDocumentoBeans;
 import com.savare.funcoes.FuncoesPersonalizadas;
 import com.savare.funcoes.Rotinas;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class PessoaRotinas extends Rotinas {
 
@@ -232,17 +230,17 @@ public class PessoaRotinas extends Rotinas {
 				pessoa.setCpfCnpj(dadosPessoa.getString(dadosPessoa.getColumnIndex("CPF_CNPJ")));
 				pessoa.setIeRg(dadosPessoa.getString(dadosPessoa.getColumnIndex("IE_RG")));
 				// Checa se a pessoa eh um cadastro novo
-				if (dadosPessoa.getString(dadosPessoa.getColumnIndex("STATUS_CADASTRO_NOVO")).equalsIgnoreCase("N")){
+				if ( (!dadosPessoa.isNull(dadosPessoa.getColumnIndex("STATUS_CADASTRO_NOVO"))) && (dadosPessoa.getString(dadosPessoa.getColumnIndex("STATUS_CADASTRO_NOVO")).equalsIgnoreCase("N")) ){
 					pessoa.setCadastroNovo(true);
 				} else {
 					pessoa.setCadastroNovo(false);
 				}
 				if ((dadosPessoa.getString(dadosPessoa.getColumnIndex("CLIENTE")) != null) && (dadosPessoa.getString(dadosPessoa.getColumnIndex("CLIENTE")).length() > 0)) {
-					pessoa.setCliente(dadosPessoa.getString(dadosPessoa.getColumnIndex("CLIENTE")).charAt(0));
+					pessoa.setCliente(dadosPessoa.getString(dadosPessoa.getColumnIndex("CLIENTE")));
 				}
 				// Checa se retornou algum valor
 				if ((dadosPessoa.getString(dadosPessoa.getColumnIndex("PESSOA")) != null) && (!dadosPessoa.getString(dadosPessoa.getColumnIndex("PESSOA")).equals(""))) {
-					pessoa.setPessoa(dadosPessoa.getString(dadosPessoa.getColumnIndex("PESSOA")).charAt(0));
+					pessoa.setPessoa(dadosPessoa.getString(dadosPessoa.getColumnIndex("PESSOA")));
 				}
 
 				// Instancia a classe de cidade
@@ -279,7 +277,7 @@ public class PessoaRotinas extends Rotinas {
 				// Instancia a classe de endereco
 				EnderecoBeans endereco = new EnderecoBeans();
 				if ((dadosPessoa.getString(dadosPessoa.getColumnIndex("TIPO")) != null) && (dadosPessoa.getString(dadosPessoa.getColumnIndex("TIPO")).length() > 0)) {
-					endereco.setTipoEndereco(dadosPessoa.getString(dadosPessoa.getColumnIndex("TIPO")).charAt(0));
+					endereco.setTipoEndereco(dadosPessoa.getString(dadosPessoa.getColumnIndex("TIPO")));
 				}
 				endereco.setBairro(dadosPessoa.getString(dadosPessoa.getColumnIndex("BAIRRO")));
 				endereco.setCep(dadosPessoa.getString(dadosPessoa.getColumnIndex("CEP")));
@@ -398,10 +396,10 @@ public class PessoaRotinas extends Rotinas {
 				tipoClienteBeans.setDescontoVarejoPrazo(cursor.getDouble(cursor.getColumnIndex("DESC_VARE_PRAZO_TP_CLIENTE")));
 				tipoClienteBeans.setDescontoVarejoVista(cursor.getDouble(cursor.getColumnIndex("DESC_VARE_VISTA_TP_CLIENTE")));
 				if(cursor.getString(cursor.getColumnIndex("DESC_PROMOCAO_TP_CLIENTE")) != null){
-					tipoClienteBeans.setDescontoPromocao(cursor.getString(cursor.getColumnIndex("DESC_PROMOCAO_TP_CLIENTE")).charAt(0));
+					tipoClienteBeans.setDescontoPromocao(cursor.getString(cursor.getColumnIndex("DESC_PROMOCAO_TP_CLIENTE")));
 				}
 				if(cursor.getString(cursor.getColumnIndex("VENDE_ATAC_VAREJO_TP_CLIENTE")) != null){
-					tipoClienteBeans.setVendeAtacadoVarejo(cursor.getString(cursor.getColumnIndex("VENDE_ATAC_VAREJO_TP_CLIENTE")).charAt(0));
+					tipoClienteBeans.setVendeAtacadoVarejo(cursor.getString(cursor.getColumnIndex("VENDE_ATAC_VAREJO_TP_CLIENTE")));
 				}
 				
 				dadosPessoaCompleto.setTipoClientePessoa(tipoClienteBeans);
@@ -462,12 +460,12 @@ public class PessoaRotinas extends Rotinas {
 				portadorBancoBeans.setIdPortadorBanco(cursor.getInt(cursor.getColumnIndex("ID_CFAPORTA")));
 				portadorBancoBeans.setCodigoPortadorBanco(cursor.getInt(cursor.getColumnIndex("CODIGO_PORTA")));
 				if(cursor.getString(cursor.getColumnIndex("DG")) != null){
-					portadorBancoBeans.setDigitoPortador(cursor.getString(cursor.getColumnIndex("DG")).charAt(0));
+					portadorBancoBeans.setDigitoPortador(cursor.getString(cursor.getColumnIndex("DG")));
 				}
 				portadorBancoBeans.setDescricaoPortador(cursor.getString(cursor.getColumnIndex("DESCRICAO_PORTA")));
 				portadorBancoBeans.setSiglaPortador(cursor.getString(cursor.getColumnIndex("SIGLA_PORTA")));
 				if(cursor.getString(cursor.getColumnIndex("TIPO_PORTA")) != null){
-					portadorBancoBeans.setTipo(cursor.getString(cursor.getColumnIndex("TIPO_PORTA")).charAt(0));
+					portadorBancoBeans.setTipo(cursor.getString(cursor.getColumnIndex("TIPO_PORTA")));
 				}
 				
 				// Adiciona aos dados do cliente
@@ -479,16 +477,16 @@ public class PessoaRotinas extends Rotinas {
 				planoPagamentoBeans.setIdEmpresa(cursor.getInt(cursor.getColumnIndex("ID_SMAEMPRE_PLPGT")));
 				planoPagamentoBeans.setCodigoPlanoPagamento(cursor.getInt(cursor.getColumnIndex("CODIGO_PLPGT")));
 				planoPagamentoBeans.setDescricaoPlanoPagamento(cursor.getString(cursor.getColumnIndex("DESCRICAO_PLPGT")));
-				planoPagamentoBeans.setAtacadoVarejo(cursor.getString(cursor.getColumnIndex("ATAC_VAREJO")).charAt(0));
-				planoPagamentoBeans.setAtivo(cursor.getString(cursor.getColumnIndex("ATIVO_PLPGT")).charAt(0));
+				planoPagamentoBeans.setAtacadoVarejo(cursor.getString(cursor.getColumnIndex("ATAC_VAREJO")));
+				planoPagamentoBeans.setAtivo(cursor.getString(cursor.getColumnIndex("ATIVO_PLPGT")));
 				if(cursor.getString(cursor.getColumnIndex("DESC_PROMOCAO_PLPGT")) != null){
-					planoPagamentoBeans.setDescontoPromocao(cursor.getString(cursor.getColumnIndex("DESC_PROMOCAO_PLPGT")).charAt(0));
+					planoPagamentoBeans.setDescontoPromocao(cursor.getString(cursor.getColumnIndex("DESC_PROMOCAO_PLPGT")));
 				}
 				planoPagamentoBeans.setJurosAtacado(cursor.getDouble(cursor.getColumnIndex("JURO_MEDIO_ATAC")));
 				planoPagamentoBeans.setJurosVarejo(cursor.getDouble(cursor.getColumnIndex("JURO_MEDIO_VARE")));
 				planoPagamentoBeans.setDescontoAtacado(cursor.getDouble(cursor.getColumnIndex("PERC_DESC_ATAC")));
 				planoPagamentoBeans.setDescontoVarejo(cursor.getDouble(cursor.getColumnIndex("PERC_DESC_VARE")));
-				planoPagamentoBeans.setVista_prazo(cursor.getString(cursor.getColumnIndex("VISTA_PRAZO_PLPGT")).charAt(0));
+				planoPagamentoBeans.setVistaPrazo(cursor.getString(cursor.getColumnIndex("VISTA_PRAZO_PLPGT")));
 				
 				// Adiciona aos dados do cliente
 				dadosPessoaCompleto.setPlanoPagamentoPessoa(planoPagamentoBeans);

@@ -1,28 +1,5 @@
 package com.savare.funcoes;
 
-import java.io.File;
-import java.math.BigDecimal;
-import java.net.InetAddress;
-import java.net.NetworkInterface;
-import java.net.SocketException;
-import java.text.DateFormat;
-import java.text.NumberFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Enumeration;
-import java.util.InputMismatchException;
-import java.util.List;
-import java.util.Locale;
-import java.util.Scanner;
-import java.util.UUID;
-
-import org.apache.http.NameValuePair;
-import org.apache.http.message.BasicNameValuePair;
-import org.jasypt.util.text.BasicTextEncryptor;
-
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.annotation.TargetApi;
@@ -55,10 +32,33 @@ import android.widget.EditText;
 import com.github.johnpersano.supertoasts.SuperToast;
 import com.github.johnpersano.supertoasts.util.Style;
 import com.savare.R;
-import com.savare.banco.local.ConexaoBancoDeDados;
 import com.savare.banco.ConexaoTask;
+import com.savare.banco.local.ConexaoBancoDeDados;
 import com.savare.configuracao.ServicosWeb;
 import com.savare.sincronizacao.SavareAutenticadorService;
+
+import org.apache.http.NameValuePair;
+import org.apache.http.message.BasicNameValuePair;
+import org.jasypt.util.text.BasicTextEncryptor;
+
+import java.io.File;
+import java.math.BigDecimal;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.text.DateFormat;
+import java.text.NumberFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Enumeration;
+import java.util.InputMismatchException;
+import java.util.List;
+import java.util.Locale;
+import java.util.Scanner;
+import java.util.UUID;
 
 public class FuncoesPersonalizadas {
 
@@ -288,8 +288,9 @@ public class FuncoesPersonalizadas {
 			double vlDouble = Double.parseDouble(valor);
 			
 			//Pega o valor e faz arredondamento com tres casas decimais
-			BigDecimal valorFinal = new BigDecimal(vlDouble).setScale(3, BigDecimal.ROUND_HALF_EVEN);
-			
+			//BigDecimal valorFinal = new BigDecimal(vlDouble).setScale(3, BigDecimal.ROUND_HALF_EVEN);
+			BigDecimal valorFinal = new BigDecimal(vlDouble);
+
 			//Crica uma vareavel colo o local
 			Locale localPtBr = new Locale("pt", "BR");
 			NumberFormat formatarNumero = NumberFormat.getInstance(localPtBr);

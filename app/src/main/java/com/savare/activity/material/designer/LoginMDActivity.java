@@ -178,13 +178,6 @@ public class LoginMDActivity extends AppCompatActivity {
 
                 break;
 
-            case R.id.menu_login_atualizar_dados:
-                String[] tabelaRecebeDados = {WSSisinfoWebservice.FUNCTION_SELECT_CFASTATU};
-                ReceberDadosWebserviceAsyncRotinas receberDadosWebservice = new ReceberDadosWebserviceAsyncRotinas(LoginMDActivity.this);
-                //receberDadosWebservice.setTabelaRecebeDados(tabelaRecebeDados);
-                receberDadosWebservice.execute();
-
-
             default:
                 break;
         }

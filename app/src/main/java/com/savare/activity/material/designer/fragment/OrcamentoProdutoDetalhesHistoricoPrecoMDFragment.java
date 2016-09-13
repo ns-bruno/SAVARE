@@ -30,6 +30,7 @@ public class OrcamentoProdutoDetalhesHistoricoPrecoMDFragment extends Fragment {
     private TextView textMensagem;
     private ItemUniversalAdapter listaHistoricoPrecoAdapter;
     private int idProduto = -1;
+    private int idClifo = -1;
 
     @Nullable
     @Override
@@ -46,6 +47,7 @@ public class OrcamentoProdutoDetalhesHistoricoPrecoMDFragment extends Fragment {
         // Checa se realmente foi passado dados por parametro
         if (parametro != null){
             idProduto = parametro.getInt(OrcamentoProdutoDetalhesTabFragmentMDActivity.KEY_ID_AEAPRODU);
+            idClifo = parametro.getInt(OrcamentoProdutoDetalhesTabFragmentMDActivity.KEY_ID_CFACLIFO);
         }
 
         return viewHistorico;
@@ -85,7 +87,10 @@ public class OrcamentoProdutoDetalhesHistoricoPrecoMDFragment extends Fragment {
             if (idProduto > 0) {
                 OrcamentoRotinas orcamentoRotinas = new OrcamentoRotinas(getActivity());
                 // Pega todos os produtos do orcamento
-                listaItemOrcamento = orcamentoRotinas.listaItemOrcamentoResumida("AEAPRODU.ID_AEAPRODU = " + idProduto, null, "AEAITORC.DT_CAD DESC", progressStatus);
+                listaItemOrcamento = orcamentoRotinas.listaItemOrcamentoResumida("(AEAPRODU.ID_AEAPRODU = " + idProduto+") AND (AEAORCAM.ID_CFACLIFO = " + idClifo +") AND (AEAORCAM.STATUS NOT IN('O', 'D'))",
+                                                                                 null,
+                                                                                 "AEAITORC.DT_CAD DESC",
+                                                                                 progressStatus);
 
                 // Verifica se existe algum dado na lista
                 if ((listaItemOrcamento != null) && (listaItemOrcamento.size() > 0)) {

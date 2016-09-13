@@ -87,7 +87,7 @@ public class EnviarOrcamentoSyncAdapterRotinas {
                         orcamento.setTotalEncargosFinanceiros(dadosOrcamento.getDouble(dadosOrcamento.getColumnIndex("VL_ENCARGOS_FINANCEIROS")));
                         orcamento.setTotalOrcamento(dadosOrcamento.getDouble(dadosOrcamento.getColumnIndex("FC_VL_TOTAL")));
                         if (dadosOrcamento.getString(dadosOrcamento.getColumnIndex("ATAC_VAREJO")) != null && dadosOrcamento.getString(dadosOrcamento.getColumnIndex("ATAC_VAREJO")).length() > 0) {
-                            orcamento.setTipoVenda(dadosOrcamento.getString(dadosOrcamento.getColumnIndex("ATAC_VAREJO")).charAt(0));
+                            orcamento.setTipoVenda(dadosOrcamento.getString(dadosOrcamento.getColumnIndex("ATAC_VAREJO")));
                         }
                         orcamento.setPessoaCliente(dadosOrcamento.getString(dadosOrcamento.getColumnIndex("PESSOA_CLIENTE")));
                         orcamento.setNomeRazao(dadosOrcamento.getString(dadosOrcamento.getColumnIndex("NOME_CLIENTE")));

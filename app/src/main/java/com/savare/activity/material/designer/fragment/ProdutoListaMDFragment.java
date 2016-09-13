@@ -451,7 +451,7 @@ public class ProdutoListaMDFragment extends Fragment {
         orcamento.setIdEmpresa(Integer.valueOf(funcoes.getValorXml("CodigoEmpresa")));
         orcamento.setIdPessoa(Integer.valueOf(idCliente));
         orcamento.setNomeRazao(nomeRazao);
-        orcamento.setTipoVenda((atacadoVarejo != null) ? atacadoVarejo.charAt(0) : atacadoVarejoAuxiliar.charAt(0));
+        orcamento.setTipoVenda((atacadoVarejo != null) ? atacadoVarejo : atacadoVarejoAuxiliar);
 
         return orcamento;
     }
@@ -509,7 +509,7 @@ public class ProdutoListaMDFragment extends Fragment {
                         // Cria a lista de produto sem verificar se o produto existe no orcamento
                         listaProdutos = produtoRotinas.listaProduto(where, null, null, progressBarListaProdutos, null);
                     }
-                // Checa a tela que esta chamando esta funcao (Mais Vendidos por Cidade)
+                // Checa a tela que esta chamando esta funcao (Mais Vendidos por area)
                 } else if (tipoTela == TELA_MAIS_VENDIDOS_AREA) {
                     // Checa se nao pegou uma selecao vazia
                     if (area != null){

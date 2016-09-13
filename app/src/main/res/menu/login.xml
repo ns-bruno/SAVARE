@@ -8,12 +8,5 @@
         app:showAsAction="never"
         android:title="@string/cadastro_usuario"/>
 
-    <item
-        android:id="@+id/menu_login_atualizar_dados"
-        android:orderInCategory="100"
-        android:title="Atualizar dados"
-        android:icon="@mipmap/ic_refresh"
-        app:showAsAction="always">
-    </item>
 
 </menu>

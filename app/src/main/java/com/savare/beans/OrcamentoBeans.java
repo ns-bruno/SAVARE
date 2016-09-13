@@ -12,7 +12,9 @@ public class OrcamentoBeans implements Parcelable {
 				idPessoaVendedor,
 				idEstado,
 				idCidade,
-				idTipoDocumento;
+				idRomaneio,
+				idTipoDocumento,
+				numero;
 	private String nomeRazao,
 				   siglaEstado,
 				   cidade,
@@ -32,11 +34,12 @@ public class OrcamentoBeans implements Parcelable {
 				   horarioLocalizacao,
 				   tipoLocalizacao;
 	
-	private char tipoVenda;
+	private String tipoVenda;
 	
 	private double totalOrcamento,
 				   totalOrcamentoFaturado,
 				   totalOrcamentoBruto,
+				   totalOrcamentoCusto,
 				   totalTabela,
 				   totalTabelaFaturado,
 				   totalDesconto,
@@ -45,6 +48,8 @@ public class OrcamentoBeans implements Parcelable {
 				   totalOutros,
 				   totalEncargosFinanceiros,
 				   latitude,
+				   pesoLiquido,
+				   pesoBruto,
 				   longitude,
 				   altitude,
 				   precisaoLocalizacao;
@@ -58,7 +63,7 @@ public class OrcamentoBeans implements Parcelable {
 		this.idPessoa = dados.readInt();
 		this.idPessoaVendedor = dados.readInt();
 		this.nomeRazao = dados.readString();
-		this.tipoVenda = dados.readString().charAt(0);
+		this.tipoVenda = dados.readString();
 	}
 	
 	public OrcamentoBeans() {
@@ -114,11 +119,11 @@ public class OrcamentoBeans implements Parcelable {
 	 * Pega se o orçamento/pedido eh para o atacado ou varejo
 	 * @return
 	 */
-	public char getTipoVenda() {
+	public String getTipoVenda() {
 		return tipoVenda;
 	}
 
-	public void setTipoVenda(char tipoVenda) {
+	public void setTipoVenda(String tipoVenda) {
 		this.tipoVenda = tipoVenda;
 	}
 
@@ -476,6 +481,46 @@ public class OrcamentoBeans implements Parcelable {
 
 	public void setPrecisaoLocalizacao(double precisaoLocalizacao) {
 		this.precisaoLocalizacao = precisaoLocalizacao;
+	}
+
+	public int getIdRomaneio() {
+		return idRomaneio;
+	}
+
+	public void setIdRomaneio(int idRomaneio) {
+		this.idRomaneio = idRomaneio;
+	}
+
+	public int getNumero() {
+		return numero;
+	}
+
+	public void setNumero(int numero) {
+		this.numero = numero;
+	}
+
+	public double getTotalOrcamentoCusto() {
+		return totalOrcamentoCusto;
+	}
+
+	public void setTotalOrcamentoCusto(double totalOrcamentoCusto) {
+		this.totalOrcamentoCusto = totalOrcamentoCusto;
+	}
+
+	public double getPesoLiquido() {
+		return pesoLiquido;
+	}
+
+	public void setPesoLiquido(double pesoLiquido) {
+		this.pesoLiquido = pesoLiquido;
+	}
+
+	public double getPesoBruto() {
+		return pesoBruto;
+	}
+
+	public void setPesoBruto(double pesoBruto) {
+		this.pesoBruto = pesoBruto;
 	}
 
 	/**

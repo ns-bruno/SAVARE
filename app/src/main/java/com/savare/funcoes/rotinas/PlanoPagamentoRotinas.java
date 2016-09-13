@@ -60,14 +60,14 @@ public class PlanoPagamentoRotinas extends Rotinas {
 					plano.setCodigoPlanoPagamento(cursor.getInt(cursor.getColumnIndex("CODIGO")));
 					plano.setDescricaoPlanoPagamento(cursor.getString(cursor.getColumnIndex("DESCRICAO")));
 					if((cursor.getString(cursor.getColumnIndex("ATAC_VAREJO")) != null) && (cursor.getString(cursor.getColumnIndex("ATAC_VAREJO")).length() > 0)){
-						plano.setAtacadoVarejo(cursor.getString(cursor.getColumnIndex("ATAC_VAREJO")).charAt(0));
+						plano.setAtacadoVarejo(cursor.getString(cursor.getColumnIndex("ATAC_VAREJO")));
 					}
 					String s = cursor.getString(cursor.getColumnIndex("DESC_PROMOCAO"));
 					if((cursor.getString(cursor.getColumnIndex("DESC_PROMOCAO")) != null) && (cursor.getString(cursor.getColumnIndex("DESC_PROMOCAO")).length() > 0)){
-						plano.setDescontoPromocao(cursor.getString(cursor.getColumnIndex("DESC_PROMOCAO")).charAt(0));
+						plano.setDescontoPromocao(cursor.getString(cursor.getColumnIndex("DESC_PROMOCAO")));
 					}
 					if((cursor.getString(cursor.getColumnIndex("VISTA_PRAZO")) != null) && (cursor.getString(cursor.getColumnIndex("VISTA_PRAZO")).length() > 0)){
-						plano.setVista_prazo(cursor.getString(cursor.getColumnIndex("VISTA_PRAZO")).charAt(0));
+						plano.setVistaPrazo(cursor.getString(cursor.getColumnIndex("VISTA_PRAZO")));
 					}
 					plano.setDescontoAtacado(cursor.getDouble(cursor.getColumnIndex("PERC_DESC_ATAC")));
 					plano.setDescontoVarejo(cursor.getDouble(cursor.getColumnIndex("PERC_DESC_VARE")));

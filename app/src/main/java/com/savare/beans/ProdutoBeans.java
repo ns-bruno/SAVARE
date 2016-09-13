@@ -13,16 +13,21 @@ public class ProdutoBeans implements Parcelable {
 	private List<EmbalagemBeans> listaEmbalagem;
 	
 	private int idProduto,
-				diasCadastro;
+				diasCadastro,
+				idMarca,
+				idClasse;
 	private String descricaoProduto,
+				   dataAlteracao,
+				   dataCadastro,
 				   codigoEstrutural,
 				   codigoBarras,
 				   referencia,
 				   descricaoMarca,
-				   descricaoAuxiliar;
+				   descricaoAuxiliar,
+				   ativo;
 	private double pesoBruto,
 				   pesoLiquido;
-	private char tipoProduto;
+	private String tipoProduto;
 
 	private FotosBeans imagemProduto;
 	
@@ -246,15 +251,54 @@ public class ProdutoBeans implements Parcelable {
 	/**
 	 * @return the tipoProduto
 	 */
-	public char getTipoProduto() {
+	public String getTipoProduto() {
 		return tipoProduto;
 	}
 
 	/**
 	 * @param tipoProduto the tipoProduto to set
 	 */
-	public void setTipoProduto(char tipoProduto) {
+	public void setTipoProduto(String tipoProduto) {
 		this.tipoProduto = tipoProduto;
 	}
-	
+
+	public int getIdMarca() {
+		return idMarca;
+	}
+
+	public void setIdMarca(int idMarca) {
+		this.idMarca = idMarca;
+	}
+
+	public int getIdClasse() {
+		return idClasse;
+	}
+
+	public void setIdClasse(int idClasse) {
+		this.idClasse = idClasse;
+	}
+
+	public String getDataAlteracao() {
+		return dataAlteracao;
+	}
+
+	public void setDataAlteracao(String dataAlteracao) {
+		this.dataAlteracao = dataAlteracao;
+	}
+
+	public String getDataCadastro() {
+		return dataCadastro;
+	}
+
+	public void setDataCadastro(String dataCadastro) {
+		this.dataCadastro = dataCadastro;
+	}
+
+	public String getAtivo() {
+		return ativo;
+	}
+
+	public void setAtivo(String ativo) {
+		this.ativo = ativo;
+	}
 }

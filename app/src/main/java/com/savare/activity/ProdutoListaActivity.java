@@ -466,7 +466,7 @@ public class ProdutoListaActivity extends Activity implements OnNavigationListen
 		orcamento.setIdEmpresa(Integer.valueOf(funcoes.getValorXml("CodigoEmpresa")));
 		orcamento.setIdPessoa(Integer.valueOf(textCodigoPessoa.getText().toString()));
 		orcamento.setNomeRazao(textNomeRazao.getText().toString());
-		orcamento.setTipoVenda(textAtacadoVarejo.getText().charAt(0));
+		orcamento.setTipoVenda(textAtacadoVarejo.getText().toString());
 		
 		return orcamento;
 	}

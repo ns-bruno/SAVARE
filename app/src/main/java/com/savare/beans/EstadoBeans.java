@@ -5,7 +5,10 @@ public class EstadoBeans {
 	private int codigoEstado,
 				idEstado;
 	private String siglaEstado,
-				   descricaoEstado;
+				   descricaoEstado,
+					dataAlteracao,
+					tipoIpiSaida;
+	private double icmsSaida, ipiSaida;
 	/**
 	 * @return the codigoEstado
 	 */
@@ -55,7 +58,36 @@ public class EstadoBeans {
 	public void setIdEstado(int idEstado) {
 		this.idEstado = idEstado;
 	}
-	
-	
 
+	public String getDataAlteracao() {
+		return dataAlteracao;
+	}
+
+	public void setDataAlteracao(String dataAlteracao) {
+		this.dataAlteracao = dataAlteracao;
+	}
+
+	public String getTipoIpiSaida() {
+		return tipoIpiSaida;
+	}
+
+	public void setTipoIpiSaida(String tipoIpiSaida) {
+		this.tipoIpiSaida = tipoIpiSaida;
+	}
+
+	public double getIcmsSaida() {
+		return icmsSaida;
+	}
+
+	public void setIcmsSaida(double icmsSaida) {
+		this.icmsSaida = icmsSaida;
+	}
+
+	public double getIpiSaida() {
+		return ipiSaida;
+	}
+
+	public void setIpiSaida(double ipiSaida) {
+		this.ipiSaida = ipiSaida;
+	}
 }

@@ -151,7 +151,7 @@ public class FuncoesSql {
 		} catch (SQLException e) {
 			
 			// Armazena as informacoes para para serem exibidas e enviadas
-			ContentValues contentValues = new ContentValues();
+			final ContentValues contentValues = new ContentValues();
 			contentValues.put("comando", 0);
 			contentValues.put("tela", tabela);
 			contentValues.put("mensagem", funcoes.tratamentoErroBancoDados(e.getMessage()));
@@ -161,13 +161,17 @@ public class FuncoesSql {
 			contentValues.put("usuario", funcoes.getValorXml("Usuario"));
 			contentValues.put("empresa", funcoes.getValorXml("ChaveUsuario"));
 			contentValues.put("email", funcoes.getValorXml("Email"));
-			
-			this.funcoes.menssagem(contentValues);
+
+			((Activity) context).runOnUiThread(new Runnable() {
+				public void run() {
+					funcoes.menssagem(contentValues);
+				}
+			});
 			
 		} catch (Exception e) {
 			
 			// Armazena as informacoes para para serem exibidas e enviadas
-			ContentValues contentValues = new ContentValues();
+			final ContentValues contentValues = new ContentValues();
 			contentValues.put("comando", 0);
 			contentValues.put("tela", tabela);
 			contentValues.put("mensagem", funcoes.tratamentoErroBancoDados(e.getMessage()));
@@ -177,8 +181,12 @@ public class FuncoesSql {
 			contentValues.put("usuario", funcoes.getValorXml("Usuario"));
 			contentValues.put("empresa", funcoes.getValorXml("ChaveEmpresa"));
 			contentValues.put("email", funcoes.getValorXml("Email"));
-			
-			this.funcoes.menssagem(contentValues);
+
+			((Activity) context).runOnUiThread(new Runnable() {
+				public void run() {
+					funcoes.menssagem(contentValues);
+				}
+			});
 			
 		} finally{
 			conexaoBanco.fechar();
@@ -518,6 +526,8 @@ public class FuncoesSql {
 	 * @return - Retorna um Cursor com os dados recuperados.
 	 */
 	public Cursor query(String where, String ordem){
+		Log.i("SAVARE", "FuncoesSql - " + where + " - " + ordem);
+
 		Cursor cursor = null;
 		bancoDados = conexaoBanco.abrirBanco();
 		try {
@@ -573,6 +583,8 @@ public class FuncoesSql {
 	 * @param sql
 	 */
 	public void execSQL(String sql){
+		Log.i("SAVARE", sql);
+
 		bancoDados = conexaoBanco.abrirBanco();
 		try {
 			
@@ -623,6 +635,7 @@ public class FuncoesSql {
 	 * 
 	 */
 	public Cursor sqlSelect(String sql){
+		Log.i("SAVARE", sql);
 		Cursor cursor = null;
 		bancoDados = conexaoBanco.abrirBanco();
 		try {
@@ -640,7 +653,7 @@ public class FuncoesSql {
 				this.funcoes = new FuncoesPersonalizadas(context);
 
 				// Armazena as informacoes para para serem exibidas e enviadas
-				ContentValues contentValues = new ContentValues();
+				final ContentValues contentValues = new ContentValues();
 				contentValues.put("comando", 0);
 				contentValues.put("tela", tabela + " - FuncoesSql");
 				contentValues.put("mensagem", funcoes.tratamentoErroBancoDados(e.getMessage()));
@@ -649,13 +662,17 @@ public class FuncoesSql {
 				contentValues.put("usuario", funcoes.getValorXml("Usuario"));
 				contentValues.put("empresa", funcoes.getValorXml("ChaveEmpresa"));
 				contentValues.put("email", funcoes.getValorXml("Email"));
-				
-				this.funcoes.menssagem(contentValues);
+
+				((Activity) context).runOnUiThread(new Runnable() {
+					public void run() {
+						funcoes.menssagem(contentValues);
+					}
+				});
 			}
 			
 		} catch (Exception e) {
 			// Armazena as informacoes para para serem exibidas e enviadas
-			ContentValues contentValues = new ContentValues();
+			final ContentValues contentValues = new ContentValues();
 			contentValues.put("comando", 0);
 			contentValues.put("tela", tabela + " - FuncoesSql");
 			contentValues.put("mensagem", funcoes.tratamentoErroBancoDados(e.getMessage()));
@@ -665,8 +682,12 @@ public class FuncoesSql {
 			contentValues.put("usuario", funcoes.getValorXml("Usuario"));
 			contentValues.put("empresa", funcoes.getValorXml("ChaveEmpresa"));
 			contentValues.put("email", funcoes.getValorXml("Email"));
-			
-			this.funcoes.menssagem(contentValues);
+
+			((Activity) context).runOnUiThread(new Runnable() {
+				public void run() {
+					funcoes.menssagem(contentValues);
+				}
+			});
 			
 		} finally {
 			bancoDados.close();

@@ -5,8 +5,10 @@
 
     <ImageView
         android:layout_width="match_parent"
-        android:layout_height="300dp"
+        android:layout_height="wrap_content"
         android:id="@+id/fragment_produto_detalhe_imagem_md_imageView_foto"
         android:background="@android:color/transparent"
+        android:adjustViewBounds="true"
+        android:scaleType="fitCenter"
         android:layout_gravity="bottom"/>
 </LinearLayout>

@@ -495,7 +495,7 @@ public class OrcamentoProdutoDetalhesActivity extends Activity {
 					produto.put("QUANTIDADE", quantidade);
 					produto.put("VL_CUSTO", vlCusto);
 					produto.put("VL_BRUTO", vlBruto);
-					if(this.orcamento.getTipoVenda() == '0'){
+					if(this.orcamento.getTipoVenda() == "0"){
 						produto.put("VL_TABELA", this.produto.getValorTabelaAtacado() * quantidade);
 						produto.put("VL_TABELA_UN", this.produto.getValorTabelaAtacado());
 					} else {
@@ -707,7 +707,7 @@ public class OrcamentoProdutoDetalhesActivity extends Activity {
 					if(precoPromocao > 0){
 						
 						// Checa se aplica desconto para produtos de promocao
-						if(this.listaPlanoPagamentoPreco.get(i).getDescontoPromocao() == '1'){
+						if(this.listaPlanoPagamentoPreco.get(i).getDescontoPromocao() == "1"){
 							// Aplica o desconto no preco ja com o juros
 							precoVenda = (precoPromocao + (precoPromocao * (this.listaPlanoPagamentoPreco.get(i).getJurosAtacado() / 100))) - 
 										 (precoPromocao * (this.listaPlanoPagamentoPreco.get(i).getDescontoAtacado() / 100));
@@ -732,7 +732,7 @@ public class OrcamentoProdutoDetalhesActivity extends Activity {
 					if(precoPromocao > 0){
 						
 						// Checa se aplica desconto para produtos de promocao
-						if(this.listaPlanoPagamentoPreco.get(i).getDescontoPromocao() == '1'){
+						if(this.listaPlanoPagamentoPreco.get(i).getDescontoPromocao() == "1"){
 							// Aplica o desconto no preco ja com o juros
 							precoVenda = (precoPromocao + (precoPromocao * (this.listaPlanoPagamentoPreco.get(i).getJurosVarejo() / 100))) - 
 										 (precoPromocao * (this.listaPlanoPagamentoPreco.get(i).getDescontoVarejo() / 100));

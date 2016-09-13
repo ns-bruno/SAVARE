@@ -7,7 +7,7 @@ public class PortadorBancoBeans {
 	private String dataAlteracao,
 				   descricaoPortador,
 				   siglaPortador;
-	private char digitoPortador,
+	private String digitoPortador,
 				 tipo;
 
 	public PortadorBancoBeans() {
@@ -87,28 +87,28 @@ public class PortadorBancoBeans {
 	/**
 	 * @return the digitoPortador
 	 */
-	public char getDigitoPortador() {
+	public String getDigitoPortador() {
 		return digitoPortador;
 	}
 
 	/**
 	 * @param digitoPortador the digitoPortador to set
 	 */
-	public void setDigitoPortador(char digitoPortador) {
+	public void setDigitoPortador(String digitoPortador) {
 		this.digitoPortador = digitoPortador;
 	}
 
 	/**
 	 * @return the tipo
 	 */
-	public char getTipo() {
+	public String getTipo() {
 		return tipo;
 	}
 
 	/**
 	 * @param tipo the tipo to set
 	 */
-	public void setTipo(char tipo) {
+	public void setTipo(String tipo) {
 		this.tipo = tipo;
 	}
 	

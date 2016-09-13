@@ -979,9 +979,9 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 			textDescricao.setText(planoPagamento.getDescricaoPlanoPagamento());
 			textAbaixoDescricaoEsqueda.setText("" + planoPagamento.getCodigoPlanoPagamento());
 			
-			if(planoPagamento.getVista_prazo() == '0'){
+			if(planoPagamento.getVistaPrazo().equalsIgnoreCase("0")){
 				textAbaixoDescricaoDireita.setText("A Vista");
-			} else if(planoPagamento.getVista_prazo() == '1'){
+			} else if(planoPagamento.getVistaPrazo().equalsIgnoreCase("1")){
 				textAbaixoDescricaoDireita.setText("A Prazo");
 			} else {
 				textAbaixoDescricaoDireita.setText("");
@@ -1035,10 +1035,10 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 				textBottonDireito.setText(funcoes.arredondarValor(orcamento.getTotalOrcamento()));
 			}
 
-			if(orcamento.getTipoVenda() == '0'){
+			if(orcamento.getTipoVenda().equalsIgnoreCase("0")){
 				textBottonEsquerdo.setText("A");
 				
-			}else if(orcamento.getTipoVenda() == '1'){
+			}else if(orcamento.getTipoVenda().equalsIgnoreCase("1")){
 				textBottonEsquerdo.setText("V");
 			}
 			textBottonEsquerdoDois.setVisibility(View.VISIBLE);
@@ -1251,13 +1251,13 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 			//textAbaixoDescricaoEsqueda.setText("D.A.V.: " + tipoCLiente.getDescontoAtacadoVista() + " - D.A.P.: " + tipoCLiente.getDescontoAtacadoPrazo());
 			//textAbaixoDescricaoDireita.setText("D.V.V.: " + tipoCLiente.getDescontoVarejoVista() + " - D.V.P.: " + tipoCLiente.getDescontoVarejoPrazo());
 			
-			if(tipoCLiente.getVendeAtacadoVarejo() == '0'){
+			if(tipoCLiente.getVendeAtacadoVarejo().equalsIgnoreCase("0")){
 				textBottonEsquerdo.setText("Atacado");
 				
-			}else if(tipoCLiente.getVendeAtacadoVarejo() == '1'){
+			}else if(tipoCLiente.getVendeAtacadoVarejo().equalsIgnoreCase("1")){
 				textBottonEsquerdo.setText("Varejo");
 			
-			} else if(tipoCLiente.getVendeAtacadoVarejo() == '2'){
+			} else if(tipoCLiente.getVendeAtacadoVarejo().equalsIgnoreCase("2")){
 				textBottonEsquerdo.setText("Atacado e Varejo");
 			}
 
@@ -1279,10 +1279,10 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 			
 			textAbaixoDescricaoEsqueda.setText("Sigla: " + portadorBanco.getSiglaPortador());
 			
-			if(portadorBanco.getTipo() == '0'){
+			if(portadorBanco.getTipo().equalsIgnoreCase("0")){
 				textAbaixoDescricaoDireita.setText("Banco");
 			
-			} else if(portadorBanco.getTipo() == '1'){
+			} else if(portadorBanco.getTipo().equalsIgnoreCase("1")){
 				textAbaixoDescricaoDireita.setText("Carteira");
 			}
 						
@@ -1522,12 +1522,12 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 			textBottonDireito.setText(pessoa.getCpfCnpj());
 
 			// Verifica se o campo bloqueia eh NAO(0) e  o campo PARCELA EM ABERTO eh VENDE(1)
-			if((pessoa.getStatusPessoa().getBloqueia() == "0" ) && (pessoa.getStatusPessoa().getParcelaEmAberto() == "1")){
+			if((pessoa.getStatusPessoa().getBloqueia().equalsIgnoreCase("0")) && (pessoa.getStatusPessoa().getParcelaEmAberto().equalsIgnoreCase("1"))){
 				// Muda a cor da View
 				viewRodape.setBackgroundColor(context.getResources().getColor(R.color.verde_escuro));
 
 				// Verifica se o campo bloqueia eh SIM(1) e  o campo PARCELA EM ABERTO eh diferente de VENDE(1)
-			} else if((pessoa.getStatusPessoa().getBloqueia() == "1") && (pessoa.getStatusPessoa().getParcelaEmAberto() != "1")){
+			} else if((pessoa.getStatusPessoa().getBloqueia().equalsIgnoreCase("1")) && (!pessoa.getStatusPessoa().getParcelaEmAberto().equalsIgnoreCase("1"))){
 				// Muda a cor da View para vermelho
 				viewRodape.setBackgroundColor(context.getResources().getColor(R.color.vermelho_escuro));
 				//textStatus.setTypeface(null, Typeface.BOLD_ITALIC);

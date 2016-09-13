@@ -1,7 +1,5 @@
 package com.savare.activity.material.designer;
 
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.app.Fragment;
@@ -11,7 +9,6 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
-import android.widget.ImageView;
 
 import com.dexafree.materialList.card.Card;
 import com.dexafree.materialList.card.CardProvider;
@@ -95,13 +92,23 @@ public class ProdutoDetalhesMDActivity extends AppCompatActivity{
         super.onResume();
         ProdutoRotinas produtoRotinas = new ProdutoRotinas(ProdutoDetalhesMDActivity.this);
 
+        // Pega os dados do produto
+        ProdutoBeans produto = produtoRotinas.detalhesProduto(idProduto);
+        // Atualiza o titulo do collapsing
+        collapsingToolbar.setTitle(produto.getDescricaoProduto());
+        // Inseri um novo estilo de texto para quando o collapsing estiver expandido
+        collapsingToolbar.setExpandedTitleTextAppearance(R.style.ExpandedAppBar);
+
         List<DescricaoDublaBeans> listaDetalhes = new ArrayList<DescricaoDublaBeans>();
 
         listaDetalhes = produtoRotinas.listaDetalhesProduto(idProduto);
 
         // Checa se tem alguma coisa na lista
         if ((listaDetalhes != null) && (listaDetalhes.size() > 0)){
-
+            // Limpa a lista
+            mListView.getAdapter().clearAll();
+            
+            List<Card> listaCards = new ArrayList<>();
             for (DescricaoDublaBeans descricao : listaDetalhes) {
 
                 Card cardDetalhe = new Card.Builder(getApplicationContext())
@@ -121,18 +128,13 @@ public class ProdutoDetalhesMDActivity extends AppCompatActivity{
                         .endConfig()
                         .build();
                 // Adiciona o card view em uma lista
-                mListView.getAdapter().add(cardDetalhe);
+                listaCards.add(cardDetalhe);
+                //mListView.getAdapter().add(cardDetalhe);
             } // Fim do forarch
+            mListView.getAdapter().addAll(listaCards);
         }
-        // Pega os dados do produto
-        ProdutoBeans produto = produtoRotinas.detalhesProduto(idProduto);
-        // Atualiza o titulo do collapsing
-        collapsingToolbar.setTitle(produto.getDescricaoProduto());
-        // Inseri um novo estipo de texto para quando o collapsing estiver expandido
-        collapsingToolbar.setExpandedTitleTextAppearance(R.style.ExpandedAppBar);
-
         // Posiciona a lista de cards no primeiro card
-        mListView.smoothScrollToPosition(0);
+        //mListView.smoothScrollToPosition(0);
     } // Fim onResume
 
     @Override

@@ -236,7 +236,7 @@
 <string name="orientacao_registrar_usuario">Se você adquiriu uma chave/licença para usar o SAVARE clique no botão \"EU TENHO UMA CHAVE DE LICENÇA\", ou se você quer fazer
     um teste primeiro basta ir para o próximo passo.</string>
     <string name="terminamos_primeiros_passos">Terminamos os primeiros passos</string>
-    <string name="pronto_para_iniciar_savare">Pronto, terminamos os primeiros passos, agora vamos iniciar o SAVARE</string>
+    <string name="pronto_para_iniciar_savare">Pronto, terminamos os primeiros passos, agora vamos iniciar o SAVARE e receber uma gama de dados.</string>
     <string name="escanear_codigo_barras">Escanear código de barras</string>
     <string name="cancelado">Cancelado</string>
     <string name="registrar">Registrar</string>
@@ -246,6 +246,43 @@
     <string name="nao_conseguimos_atualizar_usuario">Não conseguimos atualizar o usuário, tente novamente, se persistir entre em contato com o suporte SAVARE.</string>
     <string name="nome_login_invalido">Nome de login inválido, tente outro sem espaço e sem caracteres especiais.</string>
     <string name="tamanho_chave_nao_permitido">Tamanho da chave não é permitida</string>
+    <string name="recebendo_dados">Aguarde, Recebendo os dados ...</string>
+    <string name="recebendo_dados_areas">Aguarde, Recebendo os dados da(s) Área(s) ...</string>
+    <string name="recebendo_dados_empresa">Aguarde, Recebendo os dados da(s) Empresa(s) ...</string>
+    <string name="recebendo_dados_atividade">Recebendo os dados da(s) Atividade(s)...</string>
+    <string name="recebendo_dados_status">Recebendo os dados do(s) Statu(s) de Cliente(s)...</string>
+    <string name="recebendo_dados_tipo_documento">Recebendo os dados do(s) Tipo(s) de Documento(s)...</string>
+    <string name="recebendo_dados_cartao">Recebendo os dados do(s) Cartao(ões) de Crédito(s)...</string>
+    <string name="recebendo_dados_portador">Recebendo os dados do(s) Portador(es)...</string>
+    <string name="recebendo_dados_profisao">Recebendo os dados da(s) Profissão(ões)...</string>
+    <string name="recebendo_dados_tipo_cliente">Recebendo os dados do(s) Tipo(s) de Cliente(s)...</string>
+    <string name="recebendo_dados_tipo_cobranca">Recebendo os dados do(s) Tipo(s) de Cobrança(s)...</string>
+    <string name="recebendo_dados_estado">Recebendo os dados do(s) Estado(s)...</string>
+    <string name="recebendo_dados_cidade">Recebendo os dados da(s) Cidade(s)...</string>
+    <string name="recebendo_dados_cliente">Recebendo os dados do(s) Cliente(s)...</string>
+    <string name="recebendo_dados_endereco">Recebendo os dados do(s) Endereço(s)...</string>
+    <string name="recebendo_dados_parametro">Recebendo os dados do(s) Parâmetro(s)...</string>
+    <string name="recebendo_dados_fotos">Recebendo os dados da(s) Imagem(ens)...</string>
+    <string name="recebendo_dados_plano_pagamento">Recebendo os dados do(s) Plano(s) de Pagamento(s)...</string>
+    <string name="recebendo_dados_classe_produto">Recebendo os dados da(s) Classe(s) do(s) Produto(s)...</string>
+    <string name="recebendo_dados_unidade_venda">Recebendo os dados da(s) Unidade(s) de Venda(s)...</string>
+    <string name="recebendo_dados_grade">Recebendo os dados da(s) Grade(s)...</string>
+    <string name="recebendo_dados_marca">Recebendo os dados da(s) Marca(s)...</string>
+    <string name="recebendo_dados_situacao_tributaria">Recebendo os dados da(s) Situação(ões) Tributária(s)...</string>
+    <string name="recebendo_dados_produto">Recebendo os dados do(s) Produto(s)...</string>
+    <string name="recebendo_dados_embalagem">Recebendo os dados da(s) Embalagem(ens)...</string>
+    <string name="recebendo_dados_produto_loja">Recebendo os dados do(s) Produto(s) por Loja(s)...</string>
+    <string name="recebendo_dados_local_estoque">Recebendo os dados do(s) Local(is) do(s) Estoque(s)...</string>
+    <string name="recebendo_dados_estoque">Recebendo os dados do(s) Estoque(s)...</string>
+    <string name="recebendo_dados_orcamento">Recebendo os dados do(s) Pedido/Oçamento(s)...</string>
+    <string name="recebendo_dados_item_orcamento">Recebendo os dados do(s) Item(ns) Pedido/Oçamento(s)...</string>
+    <string name="recebendo_dados_percentual">Recebendo os dados do(s) Percentual(is)...</string>
+    <string name="recebendo_dados_fator">Recebendo os dados do(s) Fator(es)...</string>
+    <string name="recebendo_dados_recomendado">Recebendo os dados do(s) Produto(s) Recomendado(s)...</string>
+    <string name="recebendo_dados_parcela">Recebendo os dados da(s) Parcela(s)...</string>
+    <string name="aguarde_mais_um_pouco_proxima_etapa">Aguarde mais um pouco, vamos para próxima etapa ...</string>
+    <string name="nao_conseguimos_validar_versao">Não conseguimos validar a versão do SAVARE, por favor, entre em contato com o suporte SAVARE.</string>
+    <string name="terminamos_receber_dados">Terminamos de receber os primeiros dados, pode ir em frente e usar o SAVARE.</string>
 
     <string-array name="tab_produto_md">
         <item>Produtos</item>

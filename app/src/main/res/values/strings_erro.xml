@@ -28,5 +28,6 @@
     <string name="nao_conseguimo_carregar_dados_vendas">Não conseguimos carregar os dados/valores de vendas.</string>
     <string name="demorou_demais_servidor_webservice_responter_internet_lenta">Demorou demais para o servidor Webservice responder.
                                                                       Talvez a internet esteja lenta, sujerimos que tente novamente ou entre em contanto com o departamento de T.I.</string>
+    <string name="erro_id_produto_loja_nao_informado">ID do Produto por Loja não foi informado no parametro.</string>
 
 </resources>

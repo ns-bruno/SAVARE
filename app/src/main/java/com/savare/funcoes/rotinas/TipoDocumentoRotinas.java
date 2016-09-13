@@ -57,7 +57,7 @@ public class TipoDocumentoRotinas extends Rotinas {
 				tipoDocumento.setIdEmpresa(cursor.getInt(cursor.getColumnIndex("ID_SMAEMPRE")));
 				tipoDocumento.setDescricaoTipoDocumento(cursor.getString(cursor.getColumnIndex("DESCRICAO")));
 				tipoDocumento.setSiglaTipoDocumento(cursor.getString(cursor.getColumnIndex("SIGLA")));
-				tipoDocumento.setTipoVenda(cursor.getString(cursor.getColumnIndex("TIPO")).charAt(0));
+				tipoDocumento.setTipoVenda(cursor.getString(cursor.getColumnIndex("TIPO")));
 				
 				listaTipoDocumento.add(tipoDocumento);
 			}

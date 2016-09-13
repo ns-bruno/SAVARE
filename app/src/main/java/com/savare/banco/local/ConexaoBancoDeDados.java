@@ -1,8 +1,5 @@
 package com.savare.banco.local;
 
-import java.io.File;
-import java.io.IOException;
-
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.SQLException;
@@ -13,6 +10,9 @@ import android.util.Log;
 
 import com.savare.banco.AssetUtils;
 import com.savare.funcoes.FuncoesPersonalizadas;
+
+import java.io.File;
+import java.io.IOException;
 
 public class ConexaoBancoDeDados extends SQLiteOpenHelper {
 
@@ -121,7 +121,7 @@ public class ConexaoBancoDeDados extends SQLiteOpenHelper {
 	 * @return
 	 */
 	public SQLiteDatabase abrirBanco() {
-		Log.i("SAVARE", "abrirBanco");
+		Log.i("SAVARE", "ConexaoBancoDeDados - abrirBanco");
 
 		String bancoDados = PATH_BANCO + NOME_BANCO;
 		//File s = context.getExternalFilesDir(null);

@@ -69,9 +69,11 @@ public class OrcamentoRotinas extends Rotinas {
 		String sql = "SELECT AEAITORC.DT_CAD, AEAITORC.ID_AEAITORC, AEAITORC.ID_AEAORCAM, AEAPRODU.DESCRICAO AS DESCRICAO_PRODU, AEAMARCA.DESCRICAO AS DESCRICAO_MARCA, "
 				   + "AEAPRODU.ID_AEAPRODU, AEAPRODU.CODIGO_ESTRUTURAL, AEAITORC.QUANTIDADE, AEAITORC.FC_LIQUIDO_UN, (AEAITORC.VL_BRUTO / AEAITORC.QUANTIDADE) AS VL_BRUTO_UN, "
 				   + "AEAITORC.VL_BRUTO, AEAITORC.VL_TABELA, AEAITORC.FC_LIQUIDO, AEAITORC.VL_DESCONTO, AEAITORC.FC_DESCONTO_UN, AEAITORC.COMPLEMENTO, "
-				   + "AEAITORC.VL_TABELA_FATURADO, QUANTIDADE_FATURADA, FC_LIQUIDO_FATURADO, STATUS_RETORNO, "
+				   + "AEAITORC.VL_TABELA_FATURADO, AEAITORC.QUANTIDADE_FATURADA, AEAITORC.FC_LIQUIDO_FATURADO, AEAITORC.STATUS_RETORNO, "
 				   + "AEAUNVEN.SIGLA SIGLA_EMBALAGEM "
 				   + "FROM AEAITORC AEAITORC "
+				   + "LEFT OUTER JOIN AEAORCAM AEAORCAM "
+				   + "ON  (AEAITORC.ID_AEAORCAM = AEAORCAM.ID_AEAORCAM) "
 				   + "LEFT OUTER JOIN AEAUNVEN AEAUNVEN "
 				   + "ON  (AEAITORC.ID_AEAUNVEN = AEAUNVEN.ID_AEAUNVEN) "
 				   + "LEFT OUTER JOIN AEAESTOQ AEAESTOQ "
@@ -410,7 +412,7 @@ public class OrcamentoRotinas extends Rotinas {
 					orcamento.setTotalOrcamentoBruto(cursor.getDouble(cursor.getColumnIndex("VL_MERC_BRUTO")));
 					orcamento.setTotalTabela(cursor.getDouble(cursor.getColumnIndex("VL_TABELA")));
 					orcamento.setTotalTabelaFaturado(cursor.getDouble(cursor.getColumnIndex("VL_TABELA_FATURADO")));
-					orcamento.setTipoVenda(cursor.getString(cursor.getColumnIndex("ATAC_VAREJO")).charAt(0));
+					orcamento.setTipoVenda(cursor.getString(cursor.getColumnIndex("ATAC_VAREJO")));
 					orcamento.setStatus(cursor.getString(cursor.getColumnIndex("STATUS")));
 					orcamento.setSiglaEstado(cursor.getString(cursor.getColumnIndex("UF")));
 					orcamento.setCidade(cursor.getString(cursor.getColumnIndex("DESCRICAO")));

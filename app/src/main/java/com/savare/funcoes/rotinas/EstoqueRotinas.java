@@ -50,7 +50,7 @@ public class EstoqueRotinas {
 				estoque.setIdLocacao(cursor.getInt(cursor.getColumnIndex("ID_AEALOCES")));
 				estoque.setEstoqueLocacao(cursor.getDouble(cursor.getColumnIndex("ESTOQUE")));
 				estoque.setRetidoLocacao(cursor.getDouble(cursor.getColumnIndex("RETIDO")));
-				estoque.setAtivo(cursor.getString(cursor.getColumnIndex("ATIVO")).charAt(0));
+				estoque.setAtivo(cursor.getString(cursor.getColumnIndex("ATIVO")));
 				
 				// Adiciona na lista de estoque
 				listaEstoque.add(estoque);

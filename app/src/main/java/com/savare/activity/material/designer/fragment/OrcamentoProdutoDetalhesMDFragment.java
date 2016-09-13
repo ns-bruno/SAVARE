@@ -429,7 +429,7 @@ public class OrcamentoProdutoDetalhesMDFragment extends Fragment {
                         produto.put("QUANTIDADE", quantidade);
                         produto.put("VL_CUSTO", vlCusto);
                         produto.put("VL_BRUTO", vlBruto);
-                        if(this.orcamento.getTipoVenda() == '0'){
+                        if(this.orcamento.getTipoVenda().equalsIgnoreCase("0")){
                             produto.put("VL_TABELA", this.produto.getValorTabelaAtacado() * quantidade);
                             produto.put("VL_TABELA_UN", this.produto.getValorTabelaAtacado());
                         } else {
@@ -565,6 +565,7 @@ public class OrcamentoProdutoDetalhesMDFragment extends Fragment {
                     // Insere o total do orcamento varaviavel orcamento
                     orcamento.setTotalOrcamento(total);
                     orcamento.setDataCadastro(orcamentoRotinas.dataCadastroOrcamento(String.valueOf(idOrcamento)));
+                    orcamento.setTipoVenda(atacadoVarejo);
 
                 } else {
                     // Pega lista sem associar com um orcamento
@@ -733,7 +734,7 @@ public class OrcamentoProdutoDetalhesMDFragment extends Fragment {
                     if(precoPromocao > 0){
 
                         // Checa se aplica desconto para produtos de promocao
-                        if(this.listaPlanoPagamentoPreco.get(i).getDescontoPromocao() == '1'){
+                        if(this.listaPlanoPagamentoPreco.get(i).getDescontoPromocao().equalsIgnoreCase("1")){
                             // Aplica o desconto no preco ja com o juros
                             precoVenda = (precoPromocao + (precoPromocao * (this.listaPlanoPagamentoPreco.get(i).getJurosAtacado() / 100))) -
                                     (precoPromocao * (this.listaPlanoPagamentoPreco.get(i).getDescontoAtacado() / 100));
@@ -758,7 +759,7 @@ public class OrcamentoProdutoDetalhesMDFragment extends Fragment {
                     if(precoPromocao > 0){
 
                         // Checa se aplica desconto para produtos de promocao
-                        if(this.listaPlanoPagamentoPreco.get(i).getDescontoPromocao() == '1'){
+                        if(this.listaPlanoPagamentoPreco.get(i).getDescontoPromocao().equalsIgnoreCase("1")){
                             // Aplica o desconto no preco ja com o juros
                             precoVenda = (precoPromocao + (precoPromocao * (this.listaPlanoPagamentoPreco.get(i).getJurosVarejo() / 100))) -
                                     (precoPromocao * (this.listaPlanoPagamentoPreco.get(i).getDescontoVarejo() / 100));

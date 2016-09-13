@@ -12,6 +12,8 @@ import com.heinrichreimersoftware.materialintro.slide.SimpleSlide;
 import com.heinrichreimersoftware.materialintro.slide.Slide;
 import com.savare.R;
 import com.savare.activity.material.designer.fragment.LoginFragment;
+import com.savare.activity.material.designer.fragment.RecebeDadosWebserviceFragment;
+import com.savare.configuracao.ConfiguracoesInternas;
 import com.savare.funcoes.FuncoesPersonalizadas;
 
 import me.sudar.zxingorient.ZxingOrient;
@@ -99,6 +101,16 @@ public class RegistroChaveUsuarioMDActivity extends IntroActivity {
                 .backgroundDark(R.color.md_purple_A400)
                 .scrollable(scrollable)
                 .build());
+
+        Slide receberDadosSlide = new FragmentSlide.Builder()
+                .background(R.color.md_deep_orange_900)
+                .backgroundDark(R.color.md_deep_orange_500)
+                .fragment(RecebeDadosWebserviceFragment.newInstance())
+                .build();
+        addSlide(receberDadosSlide);
+
+        FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(RegistroChaveUsuarioMDActivity.this);
+        funcoes.setValorXml("ChaveUsuario", ConfiguracoesInternas.CHAVE_USUARIO_PUBLICO_WEBSERVICE);
     }
 
     @Override
