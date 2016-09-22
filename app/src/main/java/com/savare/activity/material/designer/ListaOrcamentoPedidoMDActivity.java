@@ -44,6 +44,7 @@ import com.savare.funcoes.FuncoesPersonalizadas;
 import com.savare.funcoes.rotinas.GerarPdfRotinas;
 import com.savare.funcoes.rotinas.OrcamentoRotinas;
 import com.savare.funcoes.rotinas.PessoaRotinas;
+import com.savare.funcoes.rotinas.async.EnviarDadosWebserviceAsyncRotinas;
 import com.savare.funcoes.rotinas.async.EnviarOrcamentoFtpAsyncRotinas;
 
 import java.io.File;
@@ -455,9 +456,12 @@ public class ListaOrcamentoPedidoMDActivity extends AppCompatActivity{
                         for (int i = 0; i < listaItemOrcamentoSelecionado.size(); i++) {
                             idOrcamento[i] = String.valueOf(adapterListaOrcamentoPedido.getListaOrcamentoPediso().get(listaItemOrcamentoSelecionado.get(i)).getIdOrcamento());
                         }
+                        EnviarDadosWebserviceAsyncRotinas enviarDadosWebservice = new EnviarDadosWebserviceAsyncRotinas(ListaOrcamentoPedidoMDActivity.this);
+                        enviarDadosWebservice.setIdOrcamentoSelecionado(idOrcamento);
+                        enviarDadosWebservice.execute();
 
-                        EnviarOrcamentoFtpAsyncRotinas enviarOrcamento = new EnviarOrcamentoFtpAsyncRotinas(ListaOrcamentoPedidoMDActivity.this);
-                        enviarOrcamento.execute(idOrcamento);
+                        //EnviarOrcamentoFtpAsyncRotinas enviarOrcamento = new EnviarOrcamentoFtpAsyncRotinas(ListaOrcamentoPedidoMDActivity.this);
+                        //enviarOrcamento.execute(idOrcamento);
 
                         break;
 

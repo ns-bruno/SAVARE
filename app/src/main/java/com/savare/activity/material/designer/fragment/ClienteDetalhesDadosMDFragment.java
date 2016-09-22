@@ -36,6 +36,7 @@ import com.savare.beans.TipoDocumentoBeans;
 import com.savare.beans.TotalMensal;
 import com.savare.funcoes.FuncoesPersonalizadas;
 import com.savare.funcoes.rotinas.OrcamentoRotinas;
+import com.savare.funcoes.rotinas.ParcelaRotinas;
 import com.savare.funcoes.rotinas.PessoaRotinas;
 
 import java.util.ArrayList;
@@ -145,7 +146,9 @@ public class ClienteDetalhesDadosMDFragment extends Fragment {
             // Carrega o grafico que mosta os totais vendidos para este cliente por mes
             carregarGraficoVendasPedidoMes();
 
-            if (abertoTitulosPriveiraVez == false) {
+            ParcelaRotinas parcelaRotinas = new ParcelaRotinas(getContext());
+
+            if ((abertoTitulosPriveiraVez == false) && (parcelaRotinas.listaTitulos(idCliente, ParcelaRotinas.TITULOS_EM_ABERTO, ParcelaRotinas.RECEBER, null).size() > 0)) {
 
                 abertoTitulosPriveiraVez = true;
                 // Cria uma intent para abrir uma nova activity

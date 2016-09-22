@@ -4,7 +4,12 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.os.Parcelable.Creator;
 
-public class OrcamentoBeans implements Parcelable {
+import org.ksoap2.serialization.KvmSerializable;
+import org.ksoap2.serialization.PropertyInfo;
+
+import java.util.Hashtable;
+
+public class OrcamentoBeans implements Parcelable, KvmSerializable {
 	
 	private int idOrcamento,
 				idEmpresa,
@@ -559,4 +564,268 @@ public class OrcamentoBeans implements Parcelable {
 		
 	};
 
+	@Override
+	public Object getProperty(int i) {
+
+        switch (i){
+            case 0:
+                return this.guid;
+            case 1:
+                return this.idEmpresa;
+            case 2:
+                return this.idPessoa;
+            case 3:
+                return this.idEstado;
+            case 4:
+                return this.idCidade;
+            case 5:
+                return this.idTipoDocumento;
+            case 6:
+                return ""+this.totalOrcamentoCusto;
+            case 7:
+                return ""+this.totalTabela;
+            case 8:
+                return ""+this.totalDesconto;
+            case 9:
+                return ""+this.totalFrete;
+            case 10:
+                return ""+this.totalSeguro;
+            case 11:
+                return ""+this.totalOutros;
+            case 12:
+                return this.tipoVenda;
+            case 13:
+                return this.pessoaCliente;
+            case 14:
+                return this.nomeRazao;
+            case 15:
+                return this.rgIe;
+            case 16:
+                return this.cpfCnpj;
+            case 17:
+                return this.enderecoCliente;
+            case 18:
+                return this.bairroCliente;
+            case 19:
+                return this.cepCliente;
+            case 20:
+                return this.observacao;
+            case 21:
+                return this.dataCadastro;
+        }
+		return null;
+	}
+
+	@Override
+	public int getPropertyCount() {
+		return 22;
+	}
+
+	@Override
+	public void setProperty(int i, Object o) {
+        switch (i){
+            case 0:
+                this.guid = o.toString();
+                break;
+
+            case 1:
+                this.idEmpresa = Integer.parseInt(o.toString());
+                break;
+
+            case 2:
+                this.idPessoa = Integer.parseInt(o.toString());
+                break;
+
+            case 3:
+                this.idEstado = Integer.parseInt(o.toString());
+                break;
+
+            case 4:
+                this.idCidade = Integer.parseInt(o.toString());
+                break;
+
+            case 5:
+                this.idTipoDocumento = Integer.parseInt(o.toString());
+                break;
+
+            case 6:
+                this.totalOrcamentoCusto = Double.parseDouble(o.toString());
+                break;
+
+            case 7:
+                this.totalOrcamentoBruto = Double.parseDouble(o.toString());
+                break;
+
+            case 8:
+                this.totalDesconto = Double.parseDouble(o.toString());
+                break;
+
+            case 9:
+                this.totalFrete = Double.parseDouble(o.toString());
+                break;
+
+            case 10:
+                this.totalSeguro = Double.parseDouble(o.toString());
+                break;
+
+            case 11:
+                this.totalOutros = Double.parseDouble(o.toString());
+                break;
+
+            case 12:
+                this.tipoVenda = o.toString();
+                break;
+
+            case 13:
+                this.pessoaCliente = o.toString();
+                break;
+
+            case 14:
+                this.nomeRazao = o.toString();
+                break;
+
+            case 15:
+                this.rgIe = o.toString();
+                break;
+
+            case 16:
+                this.cpfCnpj = o.toString();
+                break;
+
+            case 17:
+                this.enderecoCliente = o.toString();
+                break;
+
+            case 18:
+                this.bairroCliente = o.toString();
+                break;
+
+            case 19:
+                this.cepCliente = o.toString();
+                break;
+
+            case 20:
+                this.observacao = o.toString();
+                break;
+
+            case 21:
+                this.dataCadastro = o.toString();
+                break;
+        }
+	}
+
+	@Override
+	public void getPropertyInfo(int i, Hashtable hashtable, PropertyInfo propertyInfo) {
+        switch (i){
+            case 0:
+                propertyInfo.type = PropertyInfo.STRING_CLASS;
+                propertyInfo.name = "guid";
+                break;
+
+            case 1:
+                propertyInfo.type = PropertyInfo.INTEGER_CLASS;
+                propertyInfo.name = "idEmpresa";
+                break;
+
+            case 2:
+                propertyInfo.type = PropertyInfo.INTEGER_CLASS;
+                propertyInfo.name = "idPessoa";
+                break;
+
+            case 3:
+                propertyInfo.type = PropertyInfo.INTEGER_CLASS;
+                propertyInfo.name = "idEstado";
+                break;
+
+            case 4:
+                propertyInfo.type = PropertyInfo.INTEGER_CLASS;
+                propertyInfo.name = "idCidade";
+                break;
+
+            case 5:
+                propertyInfo.type = PropertyInfo.INTEGER_CLASS;
+                propertyInfo.name = "idTipoDocumento";
+                break;
+
+            case 6:
+                propertyInfo.type = Double.class;
+                propertyInfo.name = "totalOrcamentoCusto";
+                break;
+
+            case 7:
+                propertyInfo.type = Double.class;
+                propertyInfo.name = "totalOrcamentoBruto";
+                break;
+
+            case 8:
+                propertyInfo.type = Double.class;
+                propertyInfo.name = "totalDesconto";
+                break;
+
+            case 9:
+                propertyInfo.type = Double.class;
+                propertyInfo.name = "totalFrete";
+                break;
+
+            case 10:
+                propertyInfo.type = Double.class;
+                propertyInfo.name = "totalSeguro";
+                break;
+
+            case 11:
+                propertyInfo.type = Double.class;
+                propertyInfo.name = "totalOutros";
+                break;
+
+            case 12:
+                propertyInfo.type = PropertyInfo.STRING_CLASS;
+                propertyInfo.name = "tipoVenda";
+                break;
+
+            case 13:
+                propertyInfo.type = PropertyInfo.STRING_CLASS;
+                propertyInfo.name = "pessoaCliente";
+                break;
+
+            case 14:
+                propertyInfo.type = PropertyInfo.STRING_CLASS;
+                propertyInfo.name = "nomeRazao";
+                break;
+
+            case 15:
+                propertyInfo.type = PropertyInfo.STRING_CLASS;
+                propertyInfo.name = "rgIe";
+                break;
+
+            case 16:
+                propertyInfo.type = PropertyInfo.STRING_CLASS;
+                propertyInfo.name = "cpfCnpj";
+                break;
+
+            case 17:
+                propertyInfo.type = PropertyInfo.STRING_CLASS;
+                propertyInfo.name = "enderecoCliente";
+                break;
+
+            case 18:
+                propertyInfo.type = PropertyInfo.STRING_CLASS;
+                propertyInfo.name = "bairroCliente";
+                break;
+
+            case 19:
+                propertyInfo.type = PropertyInfo.STRING_CLASS;
+                propertyInfo.name = "cepCliente";
+                break;
+
+            case 20:
+                propertyInfo.type = PropertyInfo.STRING_CLASS;
+                propertyInfo.name = "observacao";
+                break;
+
+            case 21:
+                propertyInfo.type = PropertyInfo.STRING_CLASS;
+                propertyInfo.name = "dataCadastro";
+                break;
+        }
+	}
 }

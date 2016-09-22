@@ -56,7 +56,7 @@ public class ReceptorAlarmeEnviarOrcamentoBroadcastRotinas extends BroadcastRece
 			if (quatidadeOrcamentoEnviar > 0) {
 				List<String> lista = new ArrayList<String>();
 
-				lista = orcamentoRotinas.listaIdOrcamento("P", null, null);
+				lista = orcamentoRotinas.listaIdOrcamento("P", OrcamentoRotinas.TABELA_ORCAMENTO, null, null);
 
 				String[] listaOrcamento = new String[lista.size()];
 

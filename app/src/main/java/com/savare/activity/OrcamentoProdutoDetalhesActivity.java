@@ -16,17 +16,12 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.EditText;
-import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.savare.R;
 import com.savare.activity.fragment.OrcamentoFragment;
-import com.savare.adapter.DescricaoDuplaAdapter;
-import com.savare.adapter.DescricaoSimplesAdapter;
 import com.savare.adapter.ItemUniversalAdapter;
-import com.savare.beans.DescricaoDublaBeans;
-import com.savare.beans.DescricaoSimplesBeans;
 import com.savare.beans.ItemOrcamentoBeans;
 import com.savare.beans.OrcamentoBeans;
 import com.savare.beans.PlanoPagamentoBeans;
@@ -662,7 +657,7 @@ public class OrcamentoProdutoDetalhesActivity extends Activity {
 			editObservacao.setText(itemOrcamentoBeans.getComplemento());
 			editDesconto.setText(funcoes.arredondarValor(((((itemOrcamentoBeans.getValorLiquido() / itemOrcamentoBeans.getValorBruto())*100)-100)* -1)));
 			editValorDesconto.setText(funcoes.arredondarValor(itemOrcamentoBeans.getValorDesconto()));
-			textSequencial.setText(""+itemOrcamentoBeans.getSeguencia());
+			textSequencial.setText(""+itemOrcamentoBeans.getSequencia());
 			textCodigoUnico.setText(itemOrcamentoBeans.getGuid());
 			this.idItemOrcamento = itemOrcamentoBeans.getIdItemOrcamento();
 			//this.valorUnitarioVendaAux = Double.valueOf(funcoes.arredondarValor(String.valueOf((itemOrcamentoBeans.getValorLiquido() / itemOrcamentoBeans.getQuantidade()))).replace(".", "").replace(",", "."));

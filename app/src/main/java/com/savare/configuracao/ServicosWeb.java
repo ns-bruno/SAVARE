@@ -10,6 +10,6 @@ public class ServicosWeb {
 	public static final String URL_ENVIAR_DADOS = "http://www.parceiraodistribuidora.com.br/teste_android_volley.php";
 	public static final String WS_NAME_SPACE = "http://ws/";
 	public static final String WS_ENDERECO_WEBSERVICE = "WebserviceSisInfoSavare/WebserviceSavare?wsdl";
-	public static final String IP_SERVIDOR_WEBSERVICE = "172.16.0.4";
+	public static final String IP_SERVIDOR_WEBSERVICE = "savarewebservice.ddns.net";
 
 }

@@ -11,7 +11,7 @@ public class PlanoPagamentoBeans implements Parcelable{
 	private String descricaoPlanoPagamento, dataAlteracao;
 	private String ativo,
 				 atacadoVarejo,
-			vistaPrazo,
+				 vistaPrazo,
 				 descontoPromocao;
 	private double descontoAtacado,
 				   descontoVarejo,

@@ -458,7 +458,7 @@ public class OrcamentoProdutoDetalhesMDFragment extends Fragment {
                                 // Fecha a tela de detalhes de produto
                                 getActivity().finish();
                             }
-                            // Envia os dados do produto para inserir no banco de dados
+                        // Envia os dados do produto para inserir no banco de dados
                         } else{
                             // Salva a proxima sequencia do item
                             produto.put("SEQUENCIA", orcamentoRotinas.proximoSequencial(String.valueOf(this.orcamento.getIdOrcamento())));
@@ -688,7 +688,7 @@ public class OrcamentoProdutoDetalhesMDFragment extends Fragment {
             editObservacao.setText(itemOrcamentoBeans.getComplemento());
             editDesconto.setText(funcoes.arredondarValor(((((itemOrcamentoBeans.getValorLiquido() / itemOrcamentoBeans.getValorBruto())*100)-100)* -1)));
             editValorDesconto.setText(funcoes.arredondarValor(itemOrcamentoBeans.getValorDesconto()));
-            textSequencial.setText(""+itemOrcamentoBeans.getSeguencia());
+            textSequencial.setText(""+itemOrcamentoBeans.getSequencia());
             textCodigoUnico.setText(itemOrcamentoBeans.getGuid());
             this.idItemOrcamento = itemOrcamentoBeans.getIdItemOrcamento();
             //this.valorUnitarioVendaAux = Double.valueOf(funcoes.arredondarValor(String.valueOf((itemOrcamentoBeans.getValorLiquido() / itemOrcamentoBeans.getQuantidade()))).replace(".", "").replace(",", "."));

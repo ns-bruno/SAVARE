@@ -13,14 +13,14 @@ import android.widget.ProgressBar;
 import com.savare.R;
 import com.savare.banco.funcoesSql.ItemOrcamentoSql;
 import com.savare.banco.funcoesSql.OrcamentoSql;
-import com.savare.banco.funcoesSql.PessoaSql;
 import com.savare.beans.CidadeBeans;
-import com.savare.beans.DescricaoSimplesBeans;
 import com.savare.beans.EnderecoBeans;
 import com.savare.beans.EstadoBeans;
+import com.savare.beans.EstoqueBeans;
 import com.savare.beans.ItemOrcamentoBeans;
 import com.savare.beans.OrcamentoBeans;
 import com.savare.beans.PessoaBeans;
+import com.savare.beans.PlanoPagamentoBeans;
 import com.savare.beans.ProdutoBeans;
 import com.savare.beans.TotalMensal;
 import com.savare.beans.UnidadeVendaBeans;
@@ -39,6 +39,8 @@ public class OrcamentoRotinas extends Rotinas {
 			  				   PEDIDO_FATURADO = "F";
 	public static final String ORDEM_DECRESCENTE = "D";
 	public static final String ORDEM_CRESCENTE = "C";
+	public static final String TABELA_ORCAMENTO = "AEAORCAM";
+	public static final String TABELA_ITEM_ORCAMENTO = "AEAITORC";
 
 	public OrcamentoRotinas(Context context) {
 		super(context);
@@ -66,10 +68,13 @@ public class OrcamentoRotinas extends Rotinas {
 	 */
 	public List<ItemOrcamentoBeans> listaItemOrcamentoResumida(String where, String idOrcamento, String ordem, final ProgressBar progressBarStatus){
 		
-		String sql = "SELECT AEAITORC.DT_CAD, AEAITORC.ID_AEAITORC, AEAITORC.ID_AEAORCAM, AEAPRODU.DESCRICAO AS DESCRICAO_PRODU, AEAMARCA.DESCRICAO AS DESCRICAO_MARCA, "
+		String sql = "SELECT AEAITORC.GUID, AEAORCAM.GUID AS GUID_ORCAMENTO, AEAITORC.DT_CAD, AEAITORC.ID_AEAITORC, AEAITORC.ID_AEAORCAM, " +
+				     "AEAITORC.ID_AEAESTOQ, AEAITORC.ID_AEAPLPGT, AEAITORC.ID_AEAUNVEN, AEAITORC.ID_CFACLIFO_VENDEDOR, " +
+					 "AEAPRODU.DESCRICAO AS DESCRICAO_PRODU, AEAMARCA.DESCRICAO AS DESCRICAO_MARCA, "
 				   + "AEAPRODU.ID_AEAPRODU, AEAPRODU.CODIGO_ESTRUTURAL, AEAITORC.QUANTIDADE, AEAITORC.FC_LIQUIDO_UN, (AEAITORC.VL_BRUTO / AEAITORC.QUANTIDADE) AS VL_BRUTO_UN, "
 				   + "AEAITORC.VL_BRUTO, AEAITORC.VL_TABELA, AEAITORC.FC_LIQUIDO, AEAITORC.VL_DESCONTO, AEAITORC.FC_DESCONTO_UN, AEAITORC.COMPLEMENTO, "
-				   + "AEAITORC.VL_TABELA_FATURADO, AEAITORC.QUANTIDADE_FATURADA, AEAITORC.FC_LIQUIDO_FATURADO, AEAITORC.STATUS_RETORNO, "
+				   + "AEAITORC.VL_TABELA_FATURADO, AEAITORC.QUANTIDADE_FATURADA, AEAITORC.FC_LIQUIDO_FATURADO, AEAITORC.STATUS_RETORNO, " +
+                     "AEAITORC.VL_CUSTO, AEAITORC.SEQUENCIA, AEAITORC.PROMOCAO, AEAITORC.TIPO_PRODUTO, "
 				   + "AEAUNVEN.SIGLA SIGLA_EMBALAGEM "
 				   + "FROM AEAITORC AEAITORC "
 				   + "LEFT OUTER JOIN AEAORCAM AEAORCAM "
@@ -103,86 +108,105 @@ public class OrcamentoRotinas extends Rotinas {
 
 		} else {
 			// Adiciona a clausula de ordem ao sql
-			sql += " ORDER BY AEAITORC.SEQUENCIA ";
+			sql += " ORDER BY AEAITORC.SEQUENCIA ASC";
 		}
-		
-		List<ItemOrcamentoBeans> listaItemOrcamento = new ArrayList<ItemOrcamentoBeans>();
-		
-		OrcamentoSql orcamentoSql = new OrcamentoSql(context);
-		// Executa o sql e armazena os registro em um Cursor
-		Cursor cursor = orcamentoSql.sqlSelect(sql);
-		
-		// Verifica se retornou algum registro
-		if(cursor.getCount() > 0){
-			// Move para o primeiro registro
-			//cursor.moveToFirst();
-			final int totalRegistro = cursor.getCount();
 
-			if (progressBarStatus != null){
-				((Activity) context).runOnUiThread(new Runnable() {
-					public void run() {
-						progressBarStatus.setIndeterminate(false);
-						progressBarStatus.setProgress(0);
-						progressBarStatus.setMax(totalRegistro);
-					}
-				});
-			}
+        List<ItemOrcamentoBeans> listaItemOrcamento = new ArrayList<ItemOrcamentoBeans>();
 
-			int incrementoProgresso = 0;
+        try {
+            OrcamentoSql orcamentoSql = new OrcamentoSql(context);
+            // Executa o sql e armazena os registro em um Cursor
+            Cursor cursor = orcamentoSql.sqlSelect(sql);
 
-			while (cursor.moveToNext()) {
-				// Intancia a classe de Itens de orcamento para armazenar os dados de cada registro
-				ItemOrcamentoBeans item = new ItemOrcamentoBeans();
-				
-				item.setIdItemOrcamento(cursor.getInt(cursor.getColumnIndex("ID_AEAITORC")));
-				item.setDataCadastro(cursor.getString(cursor.getColumnIndex("DT_CAD")));
-				item.setIdOrcamento(cursor.getInt(cursor.getColumnIndex("ID_AEAORCAM")));
-				item.setQuantidade(cursor.getDouble(cursor.getColumnIndex("QUANTIDADE")));
-				item.setQuantidadeFaturada(cursor.getDouble(cursor.getColumnIndex("QUANTIDADE_FATURADA")));
-				item.setValorLiquidoUnitario(cursor.getDouble(cursor.getColumnIndex("FC_LIQUIDO_UN")));
-				item.setValorLiquido(cursor.getDouble(cursor.getColumnIndex("FC_LIQUIDO")));
-				item.setValorLiquidoFaturado(cursor.getDouble(cursor.getColumnIndex("FC_LIQUIDO_FATURADO")));
-				item.setValorBrutoUnitario(cursor.getDouble(cursor.getColumnIndex("VL_BRUTO_UN")));
-				item.setValorBruto(cursor.getDouble(cursor.getColumnIndex("VL_BRUTO")));
-				item.setValorTabela(cursor.getDouble(cursor.getColumnIndex("VL_TABELA")));
-				item.setValorTabelaFaturado(cursor.getDouble(cursor.getColumnIndex("VL_TABELA_FATURADO")));
-				item.setValorDesconto(cursor.getDouble(cursor.getColumnIndex("VL_DESCONTO")));
-				item.setValorDescontoUnitario(cursor.getDouble(cursor.getColumnIndex("FC_DESCONTO_UN")));
-				item.setComplemento(cursor.getString(cursor.getColumnIndex("COMPLEMENTO")));
-				item.setStatusRetorno(cursor.getString(cursor.getColumnIndex("STATUS_RETORNO")));
-				
-				// Instancia a classe de unidade de venda
-				UnidadeVendaBeans unidadeVenda = new UnidadeVendaBeans();
-				unidadeVenda.setSiglaUnidadeVenda(cursor.getString(cursor.getColumnIndex("SIGLA_EMBALAGEM")));
-				item.setUnidadeVenda(unidadeVenda);
-				
-				
-				// Intancia a classe de produto
-				ProdutoBeans produto = new ProdutoBeans();
-				produto.setDescricaoProduto(cursor.getString(cursor.getColumnIndex("DESCRICAO_PRODU")));
-				produto.setDescricaoMarca(cursor.getString(cursor.getColumnIndex("DESCRICAO_MARCA")));
-				produto.setCodigoEstrutural(cursor.getString(cursor.getColumnIndex("CODIGO_ESTRUTURAL")));
-				produto.setIdProduto(cursor.getInt(cursor.getColumnIndex("ID_AEAPRODU")));
-				item.setProduto(produto);
-				
-				// Adiciona o item na lista
-				listaItemOrcamento.add(item);
+            // Verifica se retornou algum registro
+            if (cursor.getCount() > 0) {
+                // Move para o primeiro registro
+                //cursor.moveToFirst();
+                final int totalRegistro = cursor.getCount();
 
-				incrementoProgresso ++;
+                if (progressBarStatus != null) {
+                    ((Activity) context).runOnUiThread(new Runnable() {
+                        public void run() {
+                            progressBarStatus.setIndeterminate(false);
+                            progressBarStatus.setProgress(0);
+                            progressBarStatus.setMax(totalRegistro);
+                        }
+                    });
+                }
 
-				// Incrementa a barra de progresso
-				if (progressBarStatus != null){
-					final int finalIncrementoProgresso = incrementoProgresso;
-					((Activity) context).runOnUiThread(new Runnable() {
-						public void run() {
-							progressBarStatus.setProgress(finalIncrementoProgresso);
-						}
-					});
-				}
-				
-			} // Fim do while
-			
-		} /*else {
+                int incrementoProgresso = 0;
+
+                while (cursor.moveToNext()) {
+                    // Intancia a classe de Itens de orcamento para armazenar os dados de cada registro
+                    ItemOrcamentoBeans item = new ItemOrcamentoBeans();
+
+                    item.setIdItemOrcamento(cursor.getInt(cursor.getColumnIndex("ID_AEAITORC")));
+                    item.setDataCadastro(cursor.getString(cursor.getColumnIndex("DT_CAD")));
+                    item.setGuid(cursor.getString(cursor.getColumnIndex("GUID")));
+                    item.setGuidOrcamento(cursor.getString(cursor.getColumnIndex("GUID_ORCAMENTO")));
+                    item.setIdOrcamento(cursor.getInt(cursor.getColumnIndex("ID_AEAORCAM")));
+                    item.setSequencia(cursor.getInt(cursor.getColumnIndex("SEQUENCIA")));
+                    item.setQuantidade(cursor.getDouble(cursor.getColumnIndex("QUANTIDADE")));
+                    item.setQuantidadeFaturada(cursor.getDouble(cursor.getColumnIndex("QUANTIDADE_FATURADA")));
+                    item.setValorLiquidoUnitario(cursor.getDouble(cursor.getColumnIndex("FC_LIQUIDO_UN")));
+                    item.setValorLiquido(cursor.getDouble(cursor.getColumnIndex("FC_LIQUIDO")));
+                    item.setValorLiquidoFaturado(cursor.getDouble(cursor.getColumnIndex("FC_LIQUIDO_FATURADO")));
+                    item.setValorBrutoUnitario(cursor.getDouble(cursor.getColumnIndex("VL_BRUTO_UN")));
+                    item.setValorBruto(cursor.getDouble(cursor.getColumnIndex("VL_BRUTO")));
+                    item.setValorTabela(cursor.getDouble(cursor.getColumnIndex("VL_TABELA")));
+                    item.setValorCusto(cursor.getDouble(cursor.getColumnIndex("VL_CUSTO")));
+                    item.setValorTabelaFaturado(cursor.getDouble(cursor.getColumnIndex("VL_TABELA_FATURADO")));
+                    item.setValorDesconto(cursor.getDouble(cursor.getColumnIndex("VL_DESCONTO")));
+                    item.setValorDescontoUnitario(cursor.getDouble(cursor.getColumnIndex("FC_DESCONTO_UN")));
+                    item.setComplemento(cursor.getString(cursor.getColumnIndex("COMPLEMENTO")));
+                    item.setStatusRetorno(cursor.getString(cursor.getColumnIndex("STATUS_RETORNO")));
+                    item.setTipoProduto(cursor.getString(cursor.getColumnIndex("TIPO_PRODUTO")));
+                    item.setPromocao(cursor.getString(cursor.getColumnIndex("PROMOCAO")));
+
+                    // Instancia a classe de unidade de venda
+                    UnidadeVendaBeans unidadeVenda = new UnidadeVendaBeans();
+                    unidadeVenda.setIdUnidadeVenda(cursor.getInt(cursor.getColumnIndex("ID_AEAUNVEN")));
+                    unidadeVenda.setSiglaUnidadeVenda(cursor.getString(cursor.getColumnIndex("SIGLA_EMBALAGEM")));
+                    item.setUnidadeVenda(unidadeVenda);
+
+                    EstoqueBeans estoque = new EstoqueBeans();
+                    estoque.setIdEstoque(cursor.getInt(cursor.getColumnIndex("ID_AEAESTOQ")));
+                    item.setEstoqueVenda(estoque);
+
+                    PlanoPagamentoBeans plano = new PlanoPagamentoBeans();
+                    plano.setIdPlanoPagamento(cursor.getInt(cursor.getColumnIndex("ID_AEAPLPGT")));
+                    item.setPlanoPagamento(plano);
+
+                    PessoaBeans vendedor = new PessoaBeans();
+                    vendedor.setIdPessoa(cursor.getInt(cursor.getColumnIndex("ID_CFACLIFO_VENDEDOR")));
+                    item.setPessoaVendedor(vendedor);
+
+                    // Intancia a classe de produto
+                    ProdutoBeans produto = new ProdutoBeans();
+                    produto.setDescricaoProduto(cursor.getString(cursor.getColumnIndex("DESCRICAO_PRODU")));
+                    produto.setDescricaoMarca(cursor.getString(cursor.getColumnIndex("DESCRICAO_MARCA")));
+                    produto.setCodigoEstrutural(cursor.getString(cursor.getColumnIndex("CODIGO_ESTRUTURAL")));
+                    produto.setIdProduto(cursor.getInt(cursor.getColumnIndex("ID_AEAPRODU")));
+                    item.setProduto(produto);
+
+                    // Adiciona o item na lista
+                    listaItemOrcamento.add(item);
+
+                    incrementoProgresso++;
+
+                    // Incrementa a barra de progresso
+                    if (progressBarStatus != null) {
+                        final int finalIncrementoProgresso = incrementoProgresso;
+                        ((Activity) context).runOnUiThread(new Runnable() {
+                            public void run() {
+                                progressBarStatus.setProgress(finalIncrementoProgresso);
+                            }
+                        });
+                    }
+
+                } // Fim do while
+
+            } /*else {
 			FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
 			// Cria uma variavem para inserir as propriedades da mensagem
 			ContentValues mensagem = new ContentValues();
@@ -193,7 +217,17 @@ public class OrcamentoRotinas extends Rotinas {
 			// Executa a mensagem passando por parametro as propriedades
 			funcoes.menssagem(mensagem);
 		}*/
-		
+        }catch (Exception e){
+            FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
+            // Cria uma variavem para inserir as propriedades da mensagem
+            ContentValues mensagem = new ContentValues();
+            mensagem.put("comando", 2);
+            mensagem.put("tela", "OrcamentoRotinas");
+            mensagem.put("mensagem", "Não existe registros cadastrados" + e.getMessage());
+
+            // Executa a mensagem passando por parametro as propriedades
+            funcoes.menssagem(mensagem);
+        }
 		return listaItemOrcamento;
 	} // Fim da funcao listaItemOrcamentoResumida
 	
@@ -276,24 +310,34 @@ public class OrcamentoRotinas extends Rotinas {
 	
 	
 	/**
-	 * Retorno um lista de ids de orcamentos de acordo com o tipo
+	 * Retorno um lista de ids de orcamentos de acordo com o status
 	 * de orcamento passado por paramentro.
 	 * 
-	 * @param tipo - O = Orcamento, P = Pedido, E = Excluido, N = Pedidos Enviados
+	 * @param status - O = Orcamento, P = Pedido, E = Excluido, N = Pedidos Enviados
+     * @param orcamentoItemOrcamento - Tabela que eh para pegar os ids, orcamento(AEAORCAM) ou item de orcamento (AEAITORC)
 	 * @param where
 	 * @return
 	 */
-	public List<String> listaIdOrcamento(String tipo, String where, String tipoOrdem){
+	public List<String> listaIdOrcamento(String status, String orcamentoItemOrcamento, String where, String tipoOrdem){
 		// Cria uma lista para armazenar os codigos
 		List<String> listaIdOrcamento = new ArrayList<String>();
 		
 		try {
-			// Constroi um sql
-			String sql = "SELECT AEAORCAM.ID_AEAORCAM "
-					   + "FROM AEAORCAM "
-					   + "LEFT OUTER JOIN CFAESTAD CFAESTAD ON(AEAORCAM.ID_CFAESTAD = CFAESTAD.ID_CFAESTAD) "
-					   + "LEFT OUTER JOIN CFACIDAD CFACIDAD ON(AEAORCAM.ID_CFACIDAD = CFACIDAD.ID_CFACIDAD) "
-					   + "WHERE (AEAORCAM.STATUS = '" + tipo + "') ";
+            String sql = null;
+
+            if (orcamentoItemOrcamento.equalsIgnoreCase(TABELA_ORCAMENTO)) {
+                // Constroi um sql
+                sql = "SELECT AEAORCAM.ID_AEAORCAM "
+                    + "FROM AEAORCAM "
+                    + "LEFT OUTER JOIN CFAESTAD CFAESTAD ON(AEAORCAM.ID_CFAESTAD = CFAESTAD.ID_CFAESTAD) "
+                    + "LEFT OUTER JOIN CFACIDAD CFACIDAD ON(AEAORCAM.ID_CFACIDAD = CFACIDAD.ID_CFACIDAD) "
+                    + "WHERE (AEAORCAM.STATUS = '" + status + "') ";
+
+            } else if (orcamentoItemOrcamento.equalsIgnoreCase(TABELA_ITEM_ORCAMENTO)) {
+                sql =   "SELECT AEAITORC.ID_AEAORCAM FROM AEAITORC " +
+                        "WHERE (AEAITORC.STATUS = '" + status + "') " +
+                        "GROUP BY AEAITORC.ID_AEAORCAM";
+            }
 			
 			// Adiciona a clausula where
 			if(where != null){
@@ -303,9 +347,18 @@ public class OrcamentoRotinas extends Rotinas {
 			sql = sql + " ORDER BY AEAORCAM.DT_CAD ";
 			
 			if((tipoOrdem != null) && (tipoOrdem.equals(ORDEM_DECRESCENTE))){
-				sql += " DESC, AEAORCAM.ID_AEAORCAM DESC";
+                if (orcamentoItemOrcamento.equalsIgnoreCase(TABELA_ORCAMENTO)) {
+                    sql += " DESC, AEAORCAM.ID_AEAORCAM DESC";
+                } else if (orcamentoItemOrcamento.equalsIgnoreCase(TABELA_ITEM_ORCAMENTO)){
+                    sql += " DESC, AEAITORC.SEQUENCIA DESC";
+                }
 			} else {
-				sql += " ASC, AEAORCAM.ID_AEAORCAM ASC";
+                if (orcamentoItemOrcamento.equalsIgnoreCase(TABELA_ORCAMENTO)) {
+                    sql += " ASC, AEAORCAM.ID_AEAORCAM ASC";
+
+                } else if (orcamentoItemOrcamento.equalsIgnoreCase(TABELA_ITEM_ORCAMENTO)){
+                    sql += " DESC, AEAITORC.SEQUENCIA ASC";
+                }
 			}
 			
 			OrcamentoSql orcamentoSql = new OrcamentoSql(context);
@@ -331,13 +384,13 @@ public class OrcamentoRotinas extends Rotinas {
 	/**
 	 * Retorna uma lista de orcamento ou pedido, de acordo com o tipo passado por paramento.
 	 * @param tipoOrdem é um parametro para ordernar o resultado, por padrao a ordem eh ASC (Crescente),
-	 * para escolher a ordem decrescente para colocar como parametro a letra D outro usar a 
+	 * para escolher a ordem decrescente para colocar como parametro basta colocar a letra D ou usar a
 	 * variavel public {@value}ORDEM_DECRESCENTE.
 	 * 
 	 * @param listaTipo - 'O' = ORCAMENTO, 'P' = PEDIDO, 'E' = EXCLUIDO, 'N' = ENVIADOS
 	 * @param where
-	 * @param tipoOrdem
-	 * @return
+	 * @param tipoOrdem - ORDEM_CRESCENTE - ORDEM_DECRESCENTE
+	 * @return List<OrcamentoBeans>
 	 */
 	public List<OrcamentoBeans> listaOrcamentoPedido(String[] listaTipo, String where, String tipoOrdem){
 		// Cria uma vareavel para salvar uma lista
@@ -345,8 +398,16 @@ public class OrcamentoRotinas extends Rotinas {
 		
 		try {
 			// Constroi um sql
-			String sql = "SELECT AEAORCAM.ID_AEAORCAM, AEAORCAM.DT_CAD, AEAORCAM.ID_CFACLIFO, AEAORCAM.NOME_CLIENTE, AEAORCAM.FC_VL_TOTAL, AEAORCAM.FC_VL_TOTAL_FATURADO, AEAORCAM.ATAC_VAREJO, "
-					   + "AEAORCAM.VL_MERC_BRUTO, AEAORCAM.VL_TABELA, AEAORCAM.VL_TABELA_FATURADO, AEAORCAM.STATUS, CFAESTAD.UF, CFACIDAD.DESCRICAO, AEAORCAM.STATUS_RETORNO "
+			String sql = "SELECT AEAORCAM.ID_AEAORCAM, AEAORCAM.GUID, AEAORCAM.ID_SMAEMPRE, AEAORCAM.ID_CFAESTAD, " +
+						 "AEAORCAM.ID_CFACIDAD, AEAORCAM.ID_CFATPDOC, AEAORCAM.DT_CAD, AEAORCAM.ID_CFACLIFO, " +
+						 "AEAORCAM.NOME_CLIENTE, AEAORCAM.ATAC_VAREJO, AEAORCAM.PESSOA_CLIENTE, AEAORCAM.IE_RG_CLIENTE, " +
+						 "AEAORCAM.CPF_CGC_CLIENTE, AEAORCAM.ENDERECO_CLIENTE, AEAORCAM.BAIRRO_CLIENTE, " +
+						 "AEAORCAM.CEP_CLIENTE, AEAORCAM.OBS, " +
+						 "AEAORCAM.FC_VL_TOTAL, AEAORCAM.FC_VL_TOTAL_FATURADO, "
+					   + "AEAORCAM.VL_MERC_CUSTO, AEAORCAM.VL_MERC_BRUTO, AEAORCAM.VL_MERC_DESCONTO, " +
+						 "AEAORCAM.VL_TABELA, AEAORCAM.VL_TABELA_FATURADO, AEAORCAM.VL_FRETE, AEAORCAM.VL_SEGURO, " +
+						 "AEAORCAM.VL_OUTROS, " +
+						 "AEAORCAM.STATUS, CFAESTAD.UF, CFACIDAD.DESCRICAO, AEAORCAM.STATUS_RETORNO "
 					   + "FROM AEAORCAM "
 					   + "LEFT OUTER JOIN CFAESTAD CFAESTAD ON(AEAORCAM.ID_CFAESTAD = CFAESTAD.ID_CFAESTAD) "
 					   + "LEFT OUTER JOIN CFACIDAD CFACIDAD ON(AEAORCAM.ID_CFACIDAD = CFACIDAD.ID_CFACIDAD) ";
@@ -405,18 +466,35 @@ public class OrcamentoRotinas extends Rotinas {
 					OrcamentoBeans orcamento = new OrcamentoBeans();
 					// Pega os dados do orcamento
 					orcamento.setIdOrcamento(cursor.getInt(cursor.getColumnIndex("ID_AEAORCAM")));
-					orcamento.setNomeRazao(cursor.getString(cursor.getColumnIndex("NOME_CLIENTE")));
-					orcamento.setDataCadastro(funcoes.formataDataHora(cursor.getString(cursor.getColumnIndex("DT_CAD"))));
-					orcamento.setTotalOrcamento(cursor.getDouble(cursor.getColumnIndex("FC_VL_TOTAL")));
-					orcamento.setTotalOrcamentoFaturado(cursor.getDouble(cursor.getColumnIndex("FC_VL_TOTAL_FATURADO")));
-					orcamento.setTotalOrcamentoBruto(cursor.getDouble(cursor.getColumnIndex("VL_MERC_BRUTO")));
-					orcamento.setTotalTabela(cursor.getDouble(cursor.getColumnIndex("VL_TABELA")));
-					orcamento.setTotalTabelaFaturado(cursor.getDouble(cursor.getColumnIndex("VL_TABELA_FATURADO")));
-					orcamento.setTipoVenda(cursor.getString(cursor.getColumnIndex("ATAC_VAREJO")));
-					orcamento.setStatus(cursor.getString(cursor.getColumnIndex("STATUS")));
-					orcamento.setSiglaEstado(cursor.getString(cursor.getColumnIndex("UF")));
-					orcamento.setCidade(cursor.getString(cursor.getColumnIndex("DESCRICAO")));
-					orcamento.setIdPessoa(cursor.getInt(cursor.getColumnIndex("ID_CFACLIFO")));
+					orcamento.setIdEmpresa(cursor.getInt(cursor.getColumnIndex("ID_SMAEMPRE")));
+                    orcamento.setIdPessoa(cursor.getInt(cursor.getColumnIndex("ID_CFACLIFO")));
+                    orcamento.setIdEstado(cursor.getInt(cursor.getColumnIndex("ID_CFAESTAD")));
+                    orcamento.setIdCidade(cursor.getInt(cursor.getColumnIndex("ID_CFACIDAD")));
+                    orcamento.setIdTipoDocumento(cursor.getInt(cursor.getColumnIndex("ID_CFATPDOC")));
+                    orcamento.setGuid(cursor.getString(cursor.getColumnIndex("GUID")));
+                    orcamento.setTotalOrcamento(cursor.getDouble(cursor.getColumnIndex("FC_VL_TOTAL")));
+                    orcamento.setTotalOrcamentoFaturado(cursor.getDouble(cursor.getColumnIndex("FC_VL_TOTAL_FATURADO")));
+                    orcamento.setTotalOrcamentoCusto(cursor.getDouble(cursor.getColumnIndex("VL_MERC_CUSTO")));
+                    orcamento.setTotalOrcamentoBruto(cursor.getDouble(cursor.getColumnIndex("VL_MERC_BRUTO")));
+                    orcamento.setTotalDesconto(cursor.getDouble(cursor.getColumnIndex("VL_MERC_DESCONTO")));
+                    orcamento.setTotalTabela(cursor.getDouble(cursor.getColumnIndex("VL_TABELA")));
+                    orcamento.setTotalTabelaFaturado(cursor.getDouble(cursor.getColumnIndex("VL_TABELA_FATURADO")));
+                    orcamento.setTotalFrete(cursor.getDouble(cursor.getColumnIndex("VL_FRETE")));
+                    orcamento.setTotalSeguro(cursor.getDouble(cursor.getColumnIndex("VL_SEGURO")));
+                    orcamento.setTotalOutros(cursor.getDouble(cursor.getColumnIndex("VL_OUTROS")));
+                    orcamento.setDataCadastro(funcoes.formataDataHora(cursor.getString(cursor.getColumnIndex("DT_CAD"))));
+                    orcamento.setTipoVenda(cursor.getString(cursor.getColumnIndex("ATAC_VAREJO")));
+                    orcamento.setNomeRazao(cursor.getString(cursor.getColumnIndex("NOME_CLIENTE")));
+                    orcamento.setPessoaCliente(cursor.getString(cursor.getColumnIndex("PESSOA_CLIENTE")));
+                    orcamento.setRgIe(cursor.getString(cursor.getColumnIndex("IE_RG_CLIENTE")));
+                    orcamento.setCpfCnpj(cursor.getString(cursor.getColumnIndex("CPF_CGC_CLIENTE")));
+                    orcamento.setEnderecoCliente(cursor.getString(cursor.getColumnIndex("ENDERECO_CLIENTE")));
+                    orcamento.setBairroCliente(cursor.getString(cursor.getColumnIndex("BAIRRO_CLIENTE")));
+                    orcamento.setCepCliente(cursor.getString(cursor.getColumnIndex("CEP_CLIENTE")));
+                    orcamento.setObservacao(cursor.getString(cursor.getColumnIndex("OBS")));
+                    orcamento.setStatus(cursor.getString(cursor.getColumnIndex("STATUS")));
+                    orcamento.setSiglaEstado(cursor.getString(cursor.getColumnIndex("UF")));
+                    orcamento.setCidade(cursor.getString(cursor.getColumnIndex("DESCRICAO")));
 					orcamento.setStatusRetorno(cursor.getString(cursor.getColumnIndex("STATUS_RETORNO")));
 					
 					// Adiciona os dados do orcamento em uma lista
@@ -808,7 +886,7 @@ public class OrcamentoRotinas extends Rotinas {
 		// Instacia a classe para manipular os itens do orcamento no banco de dados
 		ItemOrcamentoSql itemOrcamentoSql = new ItemOrcamentoSql(context);
 		// Pega os dados
-		Cursor cursor = itemOrcamentoSql.sqlSelect("SELECT MAX(SEQUENCIA) AS SEQUENCIA FROM AEAITORC WHERE ID_AEAITORC = " + idOrcamento);
+		Cursor cursor = itemOrcamentoSql.sqlSelect("SELECT IFNULL((MAX(SEQUENCIA)), 0) + 1 AS SEQUENCIA FROM AEAITORC WHERE ID_AEAORCAM = " + idOrcamento);
 		
 		if((cursor.getCount() > 0) && (cursor != null)){
 			// Move o cursor para o primeiro registro
@@ -816,7 +894,7 @@ public class OrcamentoRotinas extends Rotinas {
 			// Pega a sequencia retornada do banco de dados
 			int sequencia = cursor.getInt(cursor.getColumnIndex("SEQUENCIA"));
 			
-			return sequencia + 1;
+			return sequencia;
 		}
 		
 		return 0;
@@ -846,10 +924,10 @@ public class OrcamentoRotinas extends Rotinas {
 		itemOrcamentoBeans.setIdOrcamento(cursor.getInt(cursor.getColumnIndex("ID_AEAORCAM")));
 		itemOrcamentoBeans.setIdItemOrcamento(cursor.getInt(cursor.getColumnIndex("ID_AEAITORC")));
 		if(cursor.getString(cursor.getColumnIndex("PROMOCAO")) != null){
-			itemOrcamentoBeans.setPromocao(cursor.getString(cursor.getColumnIndex("PROMOCAO")).charAt(0));
+			itemOrcamentoBeans.setPromocao(cursor.getString(cursor.getColumnIndex("PROMOCAO")));
 		}
 		itemOrcamentoBeans.setQuantidade(cursor.getDouble(cursor.getColumnIndex("QUANTIDADE")));
-		itemOrcamentoBeans.setSeguencia(cursor.getInt(cursor.getColumnIndex("SEQUENCIA")));
+		itemOrcamentoBeans.setSequencia(cursor.getInt(cursor.getColumnIndex("SEQUENCIA")));
 		itemOrcamentoBeans.setGuid(cursor.getString(cursor.getColumnIndex("GUID")));
 		itemOrcamentoBeans.setValorLiquido(cursor.getDouble(cursor.getColumnIndex("FC_LIQUIDO")));
 		itemOrcamentoBeans.setValorBruto(cursor.getDouble(cursor.getColumnIndex("VL_BRUTO")));

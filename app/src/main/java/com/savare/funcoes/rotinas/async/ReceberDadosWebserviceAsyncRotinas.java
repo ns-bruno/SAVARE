@@ -48,11 +48,13 @@ import com.savare.banco.funcoesSql.TipoDocumentoSql;
 import com.savare.banco.funcoesSql.UltimaAtualizacaoSql;
 import com.savare.banco.funcoesSql.UnidadeVendaSql;
 import com.savare.banco.funcoesSql.UsuarioSQL;
+import com.savare.beans.OrcamentoBeans;
 import com.savare.beans.RetornoWebServiceBeans;
 import com.savare.beans.UltimaAtualizacaoBeans;
 import com.savare.configuracao.ConfiguracoesInternas;
 import com.savare.funcoes.FuncoesPersonalizadas;
 import com.savare.funcoes.VersionUtils;
+import com.savare.funcoes.rotinas.OrcamentoRotinas;
 import com.savare.funcoes.rotinas.UltimaAtualizacaoRotinas;
 import com.savare.webservice.WSSisinfoWebservice;
 
@@ -80,6 +82,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
     private TextView textStatus = null;
     private OnTaskCompleted listenerTaskCompleted;
     private Calendar calendario;
+    private String[] idOrcamentoSelecionado = null;
 
     public ReceberDadosWebserviceAsyncRotinas(Context context) {
         this.context = context;
@@ -119,6 +122,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             ((Activity) context).runOnUiThread(new Runnable() {
                 public void run() {
                     textStatus.setVisibility(View.VISIBLE);
+                    textStatus.setText(context.getResources().getText(R.string.aguarde_estamos_checando_se_existe_internet));
                 }
             });
         }
@@ -153,7 +157,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
             try {
                 // Checa se a versao do savere eh compativel com o webservice
-                if (checaVersao()){
+                if (funcoes.checaVersao()){
                     WSSisinfoWebservice webserviceSisInfo = new WSSisinfoWebservice(context);
 
                     // Recebe os dados da tabela CFAAREAS
@@ -240,7 +244,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                     dadosUsuario.put("IP_SERVIDOR_USUA", (objeto.hasProperty("ipServidor")) ? objeto.getProperty("ipServidor").toString() : "");
                                     dadosUsuario.put("IP_SERVIDOR_WEBSERVICE_USUA", (objeto.hasProperty("ipServidorWebservice")) ? objeto.getProperty("ipServidorWebservice").toString() : "");
                                     dadosUsuario.put("USUARIO_SERVIDOR_USUA", (objeto.hasProperty("usuarioServidor")) ? objeto.getProperty("usuarioServidor").toString() : "");
-                                    dadosUsuario.put("SENHA_SERVIDOR_USUA", (objeto.hasProperty("senhaServidor")) ? objeto.getProperty("senhaServidor").toString() : "");
+                                    dadosUsuario.put("SENHA_SERVIDOR_USUA", (objeto.hasProperty("senhaServidor")) ? funcoes.criptografaSenha(objeto.getProperty("senhaServidor").toString()) : "");
                                     dadosUsuario.put("PASTA_SERVIDOR_USUA", (objeto.hasProperty("pastaServidor")) ? objeto.getProperty("pastaServidor").toString() : "/");
                                     dadosUsuario.put("MODO_CONEXAO", (objeto.hasProperty("modoConexao")) ? objeto.getProperty("modoConexao").toString() : "W");
                                     dadosUsuario.put("CAMINHO_BANCO_DADOS_USUA", (objeto.hasProperty("caminhoBancoDados")) ? objeto.getProperty("caminhoBancoDados").toString() : "");
@@ -566,6 +570,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                         // Importa os dados
                         importarDadosParcela();
                     }
+
                 }else {
                     // Armazena as informacoes para para serem exibidas e enviadas
                     final ContentValues contentValues = new ContentValues();
@@ -585,7 +590,23 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                         }
                     });
                 }
-            } catch (Exception e){
+            } catch (final Exception e){
+
+                // Checo se o texto de status foi passado pro parametro
+                if (textStatus != null){
+                    ((Activity) context).runOnUiThread(new Runnable() {
+                        public void run() {
+                            textStatus.setText(context.getResources().getString(R.string.msg_error) + e.getMessage());
+                        }
+                    });
+                }
+                if (progressBarStatus != null){
+                    ((Activity) context).runOnUiThread(new Runnable() {
+                        public void run() {
+                            progressBarStatus.setVisibility(View.INVISIBLE);
+                        }
+                    });
+                }
 
                 // Armazena as informacoes para para serem exibidas e enviadas
                 final ContentValues contentValues = new ContentValues();
@@ -611,9 +632,17 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 ((Activity) context).runOnUiThread(new Runnable() {
                     public void run() {
                         textStatus.setText("Não existe conexão com a internet.");
+
+
                     }
                 });
             }
+            ContentValues mensagem = new ContentValues();
+            mensagem.put("comando", 2);
+            mensagem.put("tela", "ReceberDadosWebServiceAsyncRotinas");
+            mensagem.put("mensagem", (context.getResources().getString((R.string.nao_existe_conexao_internet))));
+
+            funcoes.menssagem(mensagem);
         }
 
         return null;
@@ -634,7 +663,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             listenerTaskCompleted.onTaskCompleted();
         }
 
-        if ((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (!Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SELECT_USUARIO_USUA))){
+        //if ((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (!Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SELECT_USUARIO_USUA))){
             // Checo se o texto de status foi passado pro parametro
             if (textStatus != null){
                 ((Activity) context).runOnUiThread(new Runnable() {
@@ -651,87 +680,9 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                     }
                 });
             }
-        }
+        //}
 
     }
-
-    /**
-     * Funcao para checar a versao do savare com o servidor webservice.
-     *
-     * @return
-     */
-    private boolean checaVersao(){
-        boolean valido = false;
-        try {
-            WSSisinfoWebservice webserviceSisInfo = new WSSisinfoWebservice(context);
-            Vector<SoapObject> listaVersao = webserviceSisInfo.executarSelectWebservice(null, WSSisinfoWebservice.FUNCTION_SELECT_VERSAO_SAVARE, null);
-
-            // Checa se retornou alguma coisa
-            if ((listaVersao != null) && (listaVersao.size() > 0)) {
-
-                // Passa por toda a lista
-                for (SoapObject objetoIndividual : listaVersao) {
-                    // Cria uma vareavel para receber os dados retornado do webservice
-                    //SoapObject objeto;
-
-                    /*if (objetoIndividual.hasProperty("return")) {
-                        objeto = (SoapObject) objetoIndividual.getProperty("return");
-                    } else {
-                        objeto = objetoIndividual;
-                    }*/
-
-                    int versaoLocal = VersionUtils.getVersionCode(context);
-                    int versaoWebservice = Integer.parseInt(objetoIndividual.getProperty("return").toString());
-
-                    // Checa se o SAVARE esta desatualizado
-                    if (versaoLocal < versaoWebservice){
-
-                        // Cria uma notificacao para ser manipulado
-                        Load mLoad = PugNotification.with(context).load()
-                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
-                            .smallIcon(R.mipmap.ic_launcher)
-                            .largeIcon(R.drawable.ic_launcher)
-                            .title(R.string.versao_savare_desatualizada)
-                            .bigTextStyle(R.string.savare_desatualizado_favor_atualize)
-                            .flags(Notification.DEFAULT_LIGHTS);
-                        mLoad.simple().build();
-
-                    // Checa se o SAVARE esta mais atualizado que o webservice
-                    } else if (versaoLocal > versaoWebservice){
-
-                        // Cria uma notificacao para ser manipulado
-                        Load mLoad = PugNotification.with(context).load()
-                                .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
-                                .smallIcon(R.mipmap.ic_launcher)
-                                .largeIcon(R.drawable.ic_launcher)
-                                .title(R.string.versao_savare_desatualizada)
-                                .bigTextStyle(R.string.savare_mais_atualizado_que_webservice)
-                                .flags(Notification.DEFAULT_LIGHTS);
-                        mLoad.simple().build();
-
-                        valido = true;
-
-                    // Checa se o SAVARE esta na mesma versao que o webservice
-                    } else if (versaoLocal == versaoWebservice){
-                        valido = true;
-                    }
-                }
-            }
-        }catch (Exception e){
-            // Cria uma notificacao para ser manipulado
-            Load mLoad = PugNotification.with(context).load()
-                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
-                    .smallIcon(R.mipmap.ic_launcher)
-                    .largeIcon(R.drawable.ic_launcher)
-                    .title(R.string.versao_savare_desatualizada)
-                    .bigTextStyle(context.getResources().getString(R.string.erro_validar_versao) + " \n " + e.getMessage())
-                    .flags(Notification.DEFAULT_LIGHTS);
-            mLoad.simple().build();
-        }
-
-        return valido;
-    }
-
 
     private void salvarDadosXml(ContentValues usuario){
         FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
@@ -760,6 +711,8 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
     public void setTextStatus(TextView textStatus) {
         this.textStatus = textStatus;
     }
+
+    public void setIdOrcamento(String[] idOrcamentoSelecionado) { this.idOrcamentoSelecionado = idOrcamentoSelecionado; }
 
     private void importaDadosEmpresa(){
         WSSisinfoWebservice webserviceSisInfo = new WSSisinfoWebservice(context);
@@ -2489,6 +2442,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 }
             }
         }catch (Exception e){
+
             // Cria uma notificacao para ser manipulado
             Load mLoad = PugNotification.with(context).load()
                     .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
@@ -5507,7 +5461,6 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             mLoad.simple().build();
         }
     }
-
 
     private void inserirUltimaAtualizacao(String tabela){
         TelephonyManager telephonyManager = (TelephonyManager) context.getSystemService(context.TELEPHONY_SERVICE);

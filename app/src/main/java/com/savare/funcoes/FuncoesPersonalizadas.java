@@ -6,6 +6,7 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.AlertDialog;
+import android.app.Notification;
 import android.app.PendingIntent;
 import android.content.ContentResolver;
 import android.content.ContentValues;
@@ -34,12 +35,15 @@ import com.github.johnpersano.supertoasts.util.Style;
 import com.savare.R;
 import com.savare.banco.ConexaoTask;
 import com.savare.banco.local.ConexaoBancoDeDados;
+import com.savare.configuracao.ConfiguracoesInternas;
 import com.savare.configuracao.ServicosWeb;
 import com.savare.sincronizacao.SavareAutenticadorService;
+import com.savare.webservice.WSSisinfoWebservice;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 import org.jasypt.util.text.BasicTextEncryptor;
+import org.ksoap2.serialization.SoapObject;
 
 import java.io.File;
 import java.math.BigDecimal;
@@ -59,6 +63,10 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Scanner;
 import java.util.UUID;
+import java.util.Vector;
+
+import br.com.goncalves.pugnotification.notification.Load;
+import br.com.goncalves.pugnotification.notification.PugNotification;
 
 public class FuncoesPersonalizadas {
 
@@ -1128,6 +1136,78 @@ public class FuncoesPersonalizadas {
 			Log.e(TAG, ex.toString());
 		}
 		return null;
+	}
+
+	public boolean checaVersao(){
+		boolean valido = false;
+		try {
+			WSSisinfoWebservice webserviceSisInfo = new WSSisinfoWebservice(context);
+			Vector<SoapObject> listaVersao = webserviceSisInfo.executarSelectWebservice(null, WSSisinfoWebservice.FUNCTION_SELECT_VERSAO_SAVARE, null);
+
+			// Checa se retornou alguma coisa
+			if ((listaVersao != null) && (listaVersao.size() > 0)) {
+
+				// Passa por toda a lista
+				for (SoapObject objetoIndividual : listaVersao) {
+					// Cria uma vareavel para receber os dados retornado do webservice
+					//SoapObject objeto;
+
+                    /*if (objetoIndividual.hasProperty("return")) {
+                        objeto = (SoapObject) objetoIndividual.getProperty("return");
+                    } else {
+                        objeto = objetoIndividual;
+                    }*/
+
+					int versaoLocal = VersionUtils.getVersionCode(context);
+					int versaoWebservice = Integer.parseInt(objetoIndividual.getProperty("return").toString());
+
+					// Checa se o SAVARE esta desatualizado
+					if (versaoLocal < versaoWebservice){
+
+						// Cria uma notificacao para ser manipulado
+						Load mLoad = PugNotification.with(context).load()
+								.identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
+								.smallIcon(R.mipmap.ic_launcher)
+								.largeIcon(R.drawable.ic_launcher)
+								.title(R.string.versao_savare_desatualizada)
+								.bigTextStyle(R.string.savare_desatualizado_favor_atualize)
+								.flags(Notification.DEFAULT_LIGHTS);
+						mLoad.simple().build();
+
+						// Checa se o SAVARE esta mais atualizado que o webservice
+					} else if (versaoLocal > versaoWebservice){
+
+						// Cria uma notificacao para ser manipulado
+						Load mLoad = PugNotification.with(context).load()
+								.identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
+								.smallIcon(R.mipmap.ic_launcher)
+								.largeIcon(R.drawable.ic_launcher)
+								.title(R.string.versao_savare_desatualizada)
+								.bigTextStyle(R.string.savare_mais_atualizado_que_webservice)
+								.flags(Notification.DEFAULT_LIGHTS);
+						mLoad.simple().build();
+
+						valido = true;
+
+						// Checa se o SAVARE esta na mesma versao que o webservice
+					} else if (versaoLocal == versaoWebservice){
+						valido = true;
+					}
+				}
+			}
+		}catch (Exception e){
+			// Cria uma notificacao para ser manipulado
+			Load mLoad = PugNotification.with(context).load()
+					.identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
+					.smallIcon(R.mipmap.ic_launcher)
+					.largeIcon(R.drawable.ic_launcher)
+					.title(R.string.versao_savare_desatualizada)
+					.bigTextStyle(context.getResources().getString(R.string.erro_validar_versao) + " \n " + e.getMessage())
+					.flags(Notification.DEFAULT_LIGHTS);
+			mLoad.simple().build();
+		}
+
+		return valido;
 	}
 
 } // Fecha classe

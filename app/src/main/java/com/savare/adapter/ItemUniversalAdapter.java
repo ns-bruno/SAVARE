@@ -1077,7 +1077,7 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 			}
 			
 			
-			// Checa se eh um pedido normal sem ter sido enviado para o servidor FTP
+			// Checa se eh um pedido normal sem ter sido enviado para o servidor web
 			if(orcamento.getStatus().equalsIgnoreCase("P")){
 				textDescricao.setTextColor(context.getResources().getColor(R.color.lilas_escuro));
 				textAbaixoDescricaoEsqueda.setTextColor(context.getResources().getColor(R.color.lilas_escuro));
@@ -1086,7 +1086,7 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 				textBottonEsquerdo.setTextColor(context.getResources().getColor(R.color.lilas_escuro));
 				textBottonEsquerdoDois.setTextColor(context.getResources().getColor(R.color.lilas_escuro));
 				
-			// Checa se eh um pedido enviado para o servidor FTP
+			// Checa se eh um pedido enviado para o servidor web
 			} else if(orcamento.getStatus().equalsIgnoreCase("N")){
 				textDescricao.setTextColor(context.getResources().getColor(R.color.verde_escuro));
 				textAbaixoDescricaoEsqueda.setTextColor(context.getResources().getColor(R.color.verde_escuro));

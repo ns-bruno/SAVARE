@@ -161,6 +161,7 @@
     <string name="vamos_prepara_dados_para_enviar">Vamos preparar os dados coletados para enviar.</string>
     <string name="conseguimos_enviar_pedido">Conseguimos enviar o pedido de Nº </string>
     <string name="conseguimos_enviar_item">Conseguimos enviar o item </string>
+    <string name="pegando_item_pedido">Estamos pegando os item(ns) do pedidos.</string>
     <string name="pedido_numero">Pedido Nº </string>
     <string name="preparando_produtos">Preparando o(s) Produto(s)</string>
     <string name="periodo">Peíodo</string>
@@ -283,6 +284,8 @@
     <string name="aguarde_mais_um_pouco_proxima_etapa">Aguarde mais um pouco, vamos para próxima etapa ...</string>
     <string name="nao_conseguimos_validar_versao">Não conseguimos validar a versão do SAVARE, por favor, entre em contato com o suporte SAVARE.</string>
     <string name="terminamos_receber_dados">Terminamos de receber os primeiros dados, pode ir em frente e usar o SAVARE.</string>
+    <string name="listando_pedidos_para_enviar">Estamos listando os pedidos à serem enviados para nuvem.</string>
+    <string name="enviando_item_pedido">Enviando item(ns) do pedido</string>
 
     <string-array name="tab_produto_md">
         <item>Produtos</item>

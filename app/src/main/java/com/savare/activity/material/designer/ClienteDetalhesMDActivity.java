@@ -145,6 +145,9 @@ public class ClienteDetalhesMDActivity extends AppCompatActivity{
                                 Intent i = new Intent(getApplicationContext(), OrcamentoTabFragmentMDActivity.class);
                                 i.putExtras(bundle);
 
+                                // Fecha o floatMenu
+                                floatingMenu.close(true);
+
                                 // Abre outra tela
                                 startActivity(i);
 
@@ -183,6 +186,9 @@ public class ClienteDetalhesMDActivity extends AppCompatActivity{
                 Intent intentTitulos = new Intent(getApplicationContext(), ListaTitulosMDActivity.class);
                 intentTitulos.putExtra("ID_CFACLIFO", idCliente);
 
+                // Fecha o floatMenu
+                floatingMenu.close(true);
+
                 startActivity(intentTitulos);
             }
         });
@@ -210,7 +216,7 @@ public class ClienteDetalhesMDActivity extends AppCompatActivity{
         itemMenuPositivarCliente.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                // Fecha o menuFloating
                 floatingMenu.close(true);
 
                 new MaterialDialog.Builder(v.getContext())

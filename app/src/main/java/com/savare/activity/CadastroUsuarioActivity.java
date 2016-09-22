@@ -86,7 +86,7 @@ public class CadastroUsuarioActivity extends Activity {
 			if( (dadosUsuario != null) && (dadosUsuario.getCount() > 0) ){
 				
 				FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(CadastroUsuarioActivity.this);
-				
+
 				editChaveUsuario.setText(dadosUsuario.getString(dadosUsuario.getColumnIndex("CHAVE_USUA")));
 				//editCodigoEmpresa.setText(funcoes.getValorXml("CodigoEmpresa"));
 				editCodigoEmpresa.setText(dadosUsuario.getString(dadosUsuario.getColumnIndex("ID_SMAEMPRE")));

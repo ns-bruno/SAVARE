@@ -3,7 +3,12 @@ package com.savare.beans;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-public class ItemOrcamentoBeans implements Parcelable {
+import org.ksoap2.serialization.KvmSerializable;
+import org.ksoap2.serialization.PropertyInfo;
+
+import java.util.Hashtable;
+
+public class ItemOrcamentoBeans implements Parcelable, KvmSerializable {
 	
 	private ProdutoBeans produto;
 	private PessoaBeans pessoaVendedor;
@@ -14,12 +19,16 @@ public class ItemOrcamentoBeans implements Parcelable {
 	
 	private int idOrcamento,
 				idItemOrcamento,
-				seguencia;
+				idVendedorTemp,
+				idUnidadeTemp,
+				idEstoqueTemp,
+				idPlanoPagamentoTemp,
+				sequencia;
 	private double quantidade,
 				   quantidadeFaturada,
 				   valorCusto,
 				   valorBruto,
-				   ValorDesconto,
+                   valorDesconto,
 				   valorLiquido,
 				   valorLiquidoFaturado,
 				   valorTabela,
@@ -33,13 +42,14 @@ public class ItemOrcamentoBeans implements Parcelable {
 				   pesoLiquido,
 				   valorLiquidoUnitario;
 	private String guid,
+				   guidOrcamento,
 				   dataCadastro,
 				   dataAlteracao,
 				   complemento,
 				   sequencialDesconto,
 				   statusRetorno;
-	private char promocao,
-				 tipoProduto;
+	private String promocao,
+				   tipoProduto;
 	
 	private boolean tagSelectContext,
 					tagEnviado;
@@ -51,11 +61,11 @@ public class ItemOrcamentoBeans implements Parcelable {
 		this.estoqueVenda = (EstoqueBeans) dados.readValue(EstoqueBeans.class.getClassLoader());
 		this.idOrcamento = dados.readInt();
 		this.idItemOrcamento = dados.readInt();
-		this.seguencia = dados.readInt();
+		this.sequencia = dados.readInt();
 		this.quantidade = dados.readDouble();
 		this.valorCusto = dados.readDouble();
 		this.valorBruto = dados.readDouble();
-		this.ValorDesconto = dados.readDouble();
+		this.valorDesconto = dados.readDouble();
 		this.valorLiquido = dados.readDouble();
 		this.valorCustoUnitario = dados.readDouble();
 		this.valorBrutoUnitario = dados.readDouble();
@@ -64,8 +74,8 @@ public class ItemOrcamentoBeans implements Parcelable {
 		this.guid = dados.readString();
 		this.complemento = dados.readString();
 		this.sequencialDesconto = dados.readString();
-		this.promocao = dados.readString().charAt(0);
-		this.tipoProduto = dados.readString().charAt(0);
+		this.promocao = dados.readString();
+		this.tipoProduto = dados.readString();
 	}
 	
 	public ItemOrcamentoBeans() {
@@ -152,17 +162,17 @@ public class ItemOrcamentoBeans implements Parcelable {
 	}
 
 	/**
-	 * @return the seguencia
+	 * @return the sequencia
 	 */
-	public int getSeguencia() {
-		return seguencia;
+	public int getSequencia() {
+		return sequencia;
 	}
 
 	/**
-	 * @param seguencia the seguencia to set
+	 * @param sequencia the sequencia to set
 	 */
-	public void setSeguencia(int seguencia) {
-		this.seguencia = seguencia;
+	public void setSequencia(int sequencia) {
+		this.sequencia = sequencia;
 	}
 
 	/**
@@ -211,14 +221,14 @@ public class ItemOrcamentoBeans implements Parcelable {
 	 * @return the valorDesconto
 	 */
 	public double getValorDesconto() {
-		return ValorDesconto;
+		return valorDesconto;
 	}
 
 	/**
 	 * @param valorDesconto the valorDesconto to set
 	 */
 	public void setValorDesconto(double valorDesconto) {
-		ValorDesconto = valorDesconto;
+		this.valorDesconto = valorDesconto;
 	}
 
 	/**
@@ -291,6 +301,14 @@ public class ItemOrcamentoBeans implements Parcelable {
 		this.guid = guid;
 	}
 
+	public String getGuidOrcamento() {
+		return guidOrcamento;
+	}
+
+	public void setGuidOrcamento(String guidOrcamento) {
+		this.guidOrcamento = guidOrcamento;
+	}
+
 	/**
 	 * @return the dataCadastro
 	 */
@@ -350,28 +368,28 @@ public class ItemOrcamentoBeans implements Parcelable {
 	/**
 	 * @return the promocao
 	 */
-	public char getPromocao() {
+	public String getPromocao() {
 		return promocao;
 	}
 
 	/**
 	 * @param promocao the promocao to set
 	 */
-	public void setPromocao(char promocao) {
+	public void setPromocao(String promocao) {
 		this.promocao = promocao;
 	}
 
 	/**
 	 * @return the tipoProduto
 	 */
-	public char getTipoProduto() {
+	public String getTipoProduto() {
 		return tipoProduto;
 	}
 
 	/**
 	 * @param tipoProduto the tipoProduto to set
 	 */
-	public void setTipoProduto(char tipoProduto) {
+	public void setTipoProduto(String tipoProduto) {
 		this.tipoProduto = tipoProduto;
 	}
 
@@ -511,7 +529,39 @@ public class ItemOrcamentoBeans implements Parcelable {
 		this.pesoLiquido = pesoLiquido;
 	}
 
-	@Override
+    public int getIdVendedorTemp() {
+        return idVendedorTemp;
+    }
+
+    public void setIdVendedorTemp(int idVendedorTemp) {
+        this.idVendedorTemp = idVendedorTemp;
+    }
+
+    public int getIdUnidadeTemp() {
+        return idUnidadeTemp;
+    }
+
+    public void setIdUnidadeTemp(int idUnidadeTemp) {
+        this.idUnidadeTemp = idUnidadeTemp;
+    }
+
+    public int getIdEstoqueTemp() {
+        return idEstoqueTemp;
+    }
+
+    public void setIdEstoqueTemp(int idEstoqueTemp) {
+        this.idEstoqueTemp = idEstoqueTemp;
+    }
+
+    public int getIdPlanoPagamentoTemp() {
+        return idPlanoPagamentoTemp;
+    }
+
+    public void setIdPlanoPagamentoTemp(int idPlanoPagamentoTemp) {
+        this.idPlanoPagamentoTemp = idPlanoPagamentoTemp;
+    }
+
+    @Override
 	public int describeContents() {
 		return 0;
 	}
@@ -526,11 +576,11 @@ public class ItemOrcamentoBeans implements Parcelable {
 		dest.writeValue(this.estoqueVenda);
 		dest.writeInt(this.idOrcamento);
 		dest.writeInt(this.idItemOrcamento);
-		dest.writeInt(this.seguencia);
+		dest.writeInt(this.sequencia);
 		dest.writeDouble(this.quantidade);
 		dest.writeDouble(this.valorCusto);
 		dest.writeDouble(this.valorBruto);
-		dest.writeDouble(this.ValorDesconto);
+		dest.writeDouble(this.valorDesconto);
 		dest.writeDouble(this.valorLiquido);
 		dest.writeDouble(this.valorCustoUnitario);
 		dest.writeDouble(this.valorBrutoUnitario);
@@ -557,8 +607,193 @@ public class ItemOrcamentoBeans implements Parcelable {
 		}
 		
 	};
-	
-	
-	
 
+
+	@Override
+	public Object getProperty(int i) {
+
+		switch (i){
+            case 0:
+                return guid;
+            case 1:
+                return idOrcamento;
+            case 2:
+                return idEstoqueTemp;
+            case 3:
+                return idPlanoPagamentoTemp;
+            case 4:
+                return idUnidadeTemp;
+            case 5:
+                return idVendedorTemp;
+            case 6:
+                return sequencia;
+            case 7:
+                return ""+quantidade;
+            case 8:
+                return ""+valorCusto;
+            case 9:
+                return ""+valorBruto;
+            case 10:
+                return ""+valorDesconto;
+            case 11:
+                return promocao;
+            case 12:
+                return tipoProduto;
+            case 13:
+                return complemento;
+            case 14:
+                return guidOrcamento;
+        }
+		return null;
+	}
+
+	@Override
+	public int getPropertyCount() {
+		return 15;
+	}
+
+	@Override
+	public void setProperty(int i, Object o) {
+        switch (i){
+            case 0:
+                this.guid = o.toString();
+                break;
+
+            case 1:
+                this.idOrcamento = Integer.parseInt(o.toString());
+                break;
+
+            case 2:
+                this.idEstoqueTemp = Integer.parseInt(o.toString());
+                break;
+
+            case 3:
+                this.idPlanoPagamentoTemp = Integer.parseInt(o.toString());
+                break;
+
+            case 4:
+                this.idUnidadeTemp = Integer.parseInt(o.toString());
+                break;
+
+            case 5:
+                this.idVendedorTemp = Integer.parseInt(o.toString());
+                break;
+
+            case 6:
+                this.sequencia = Integer.parseInt(o.toString());
+                break;
+
+            case 7:
+                this.quantidade = Double.parseDouble(o.toString());
+                break;
+
+            case 8:
+                this.valorCusto = Double.parseDouble(o.toString());
+                break;
+
+            case 9:
+                this.valorBruto = Double.parseDouble(o.toString());
+                break;
+
+            case 10:
+                this.valorDesconto = Double.parseDouble(o.toString());
+                break;
+
+            case 11:
+                this.promocao = o.toString();
+                break;
+
+            case 12:
+                this.tipoProduto = o.toString();
+                break;
+
+            case 13:
+                this.complemento = o.toString();
+                break;
+
+            case 14:
+                this.guidOrcamento = o.toString();
+                break;
+        }
+	}
+
+	@Override
+	public void getPropertyInfo(int i, Hashtable hashtable, PropertyInfo propertyInfo) {
+        switch (i){
+            case 0:
+                propertyInfo.type = PropertyInfo.STRING_CLASS;
+                propertyInfo.name = "guid";
+                break;
+
+            case 1:
+                propertyInfo.type = PropertyInfo.INTEGER_CLASS;
+                propertyInfo.name = "idOrcamento";
+                break;
+
+            case 2:
+                propertyInfo.type = PropertyInfo.INTEGER_CLASS;
+                propertyInfo.name = "idEstoqueTemp";
+                break;
+
+            case 3:
+                propertyInfo.type = PropertyInfo.INTEGER_CLASS;
+                propertyInfo.name = "idPlanoPagamentoTemp";
+                break;
+
+            case 4:
+                propertyInfo.type = PropertyInfo.INTEGER_CLASS;
+                propertyInfo.name = "idUnidadeTemp";
+                break;
+
+            case 5:
+                propertyInfo.type = PropertyInfo.INTEGER_CLASS;
+                propertyInfo.name = "idVendedorTemp";
+                break;
+
+            case 6:
+                propertyInfo.type = PropertyInfo.INTEGER_CLASS;
+                propertyInfo.name = "sequencia";
+                break;
+
+            case 7:
+                propertyInfo.type = Double.class;
+                propertyInfo.name = "quantidade";
+                break;
+
+            case 8:
+                propertyInfo.type = Double.class;
+                propertyInfo.name = "valorCusto";
+                break;
+
+            case 9:
+                propertyInfo.type = Double.class;
+                propertyInfo.name = "valorBruto";
+                break;
+
+            case 10:
+                propertyInfo.type = Double.class;
+                propertyInfo.name = "valorDesconto";
+                break;
+
+            case 11:
+                propertyInfo.type = PropertyInfo.STRING_CLASS;
+                propertyInfo.name = "promocao";
+                break;
+
+            case 12:
+                propertyInfo.type = PropertyInfo.STRING_CLASS;
+                propertyInfo.name = "tipoProduto";
+                break;
+
+            case 13:
+                propertyInfo.type = PropertyInfo.STRING_CLASS;
+                propertyInfo.name = "complemento";
+                break;
+
+            case 14:
+                propertyInfo.type = PropertyInfo.STRING_CLASS;
+                propertyInfo.name = "guidOrcamento";
+                break;
+        }
+	}
 }

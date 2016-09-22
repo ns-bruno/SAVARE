@@ -359,13 +359,17 @@ public class FuncoesSql {
 			//qtdAtualizado = bancoDados.update(tabela, dados, where, null);
 			
 			if(qtdAtualizado > 0){
-				ContentValues mensagem = new ContentValues();
+				final ContentValues mensagem = new ContentValues();
 				mensagem.put("comando", 2);
 				mensagem.put("mensagem", "Atualizado com sucesso! \n");
 				mensagem.put("tela", tabela);
 				
 				this.funcoes = new FuncoesPersonalizadas(context);
-				this.funcoes.menssagem(mensagem);
+                ((Activity) context).runOnUiThread(new Runnable() {
+                    public void run() {
+                        funcoes.menssagem(mensagem);
+                    }
+                });
 				
 			} else {
 				ContentValues mensagem = new ContentValues();
@@ -381,7 +385,7 @@ public class FuncoesSql {
 			this.funcoes = new FuncoesPersonalizadas(context);
 
 			// Armazena as informacoes para para serem exibidas e enviadas
-			ContentValues contentValues = new ContentValues();
+			final ContentValues contentValues = new ContentValues();
 			contentValues.put("comando", 0);
 			contentValues.put("tela", tabela);
 			contentValues.put("mensagem", funcoes.tratamentoErroBancoDados(e.getMessage()));
@@ -391,11 +395,16 @@ public class FuncoesSql {
 			contentValues.put("empresa", funcoes.getValorXml("ChaveEmpresa"));
 			contentValues.put("email", funcoes.getValorXml("Email"));
 			
-			this.funcoes.menssagem(contentValues);
+			//this.funcoes.menssagem(contentValues);
+            ((Activity) context).runOnUiThread(new Runnable() {
+                public void run() {
+                    funcoes.menssagem(contentValues);
+                }
+            });
 			
 		} catch (Exception e) {
 			// Armazena as informacoes para para serem exibidas e enviadas
-			ContentValues contentValues = new ContentValues();
+			final ContentValues contentValues = new ContentValues();
 			contentValues.put("comando", 0);
 			contentValues.put("tela", tabela);
 			contentValues.put("mensagem", funcoes.tratamentoErroBancoDados(e.getMessage()));
@@ -406,7 +415,12 @@ public class FuncoesSql {
 			contentValues.put("empresa", funcoes.getValorXml("ChaveEmpresa"));
 			contentValues.put("email", funcoes.getValorXml("Email"));
 			
-			this.funcoes.menssagem(contentValues);
+			//this.funcoes.menssagem(contentValues);
+			((Activity) context).runOnUiThread(new Runnable() {
+				public void run() {
+					funcoes.menssagem(contentValues);
+				}
+			});
 		} finally{
 			conexaoBanco.fechar();
 			bancoDados.close();
@@ -425,7 +439,7 @@ public class FuncoesSql {
 			this.funcoes = new FuncoesPersonalizadas(context);
 
 			// Armazena as informacoes para para serem exibidas e enviadas
-			ContentValues contentValues = new ContentValues();
+			final ContentValues contentValues = new ContentValues();
 			contentValues.put("comando", 0);
 			contentValues.put("tela", tabela);
 			contentValues.put("mensagem", funcoes.tratamentoErroBancoDados(e.getMessage()));
@@ -435,11 +449,16 @@ public class FuncoesSql {
 			contentValues.put("empresa", funcoes.getValorXml("ChaveEmpresa"));
 			contentValues.put("email", funcoes.getValorXml("Email"));
 
-			this.funcoes.menssagem(contentValues);
+			//this.funcoes.menssagem(contentValues);
+            ((Activity) context).runOnUiThread(new Runnable() {
+                public void run() {
+                    funcoes.menssagem(contentValues);
+                }
+            });
 
 		} catch (Exception e) {
 			// Armazena as informacoes para para serem exibidas e enviadas
-			ContentValues contentValues = new ContentValues();
+			final ContentValues contentValues = new ContentValues();
 			contentValues.put("comando", 0);
 			contentValues.put("tela", tabela);
 			contentValues.put("mensagem", funcoes.tratamentoErroBancoDados(e.getMessage()));
@@ -450,7 +469,12 @@ public class FuncoesSql {
 			contentValues.put("empresa", funcoes.getValorXml("ChaveEmpresa"));
 			contentValues.put("email", funcoes.getValorXml("Email"));
 
-			this.funcoes.menssagem(contentValues);
+			//this.funcoes.menssagem(contentValues);
+            ((Activity) context).runOnUiThread(new Runnable() {
+                public void run() {
+                    funcoes.menssagem(contentValues);
+                }
+            });
 		} finally{
 			conexaoBanco.fechar();
 			bancoDados.close();

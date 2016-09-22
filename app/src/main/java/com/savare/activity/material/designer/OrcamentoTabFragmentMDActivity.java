@@ -11,6 +11,7 @@ import com.ogaclejapan.smarttablayout.SmartTabLayout;
 import com.savare.R;
 import com.savare.adapter.OrcamentoTabFragmentMDAdapter;
 import com.savare.funcoes.rotinas.OrcamentoRotinas;
+import com.savare.funcoes.rotinas.ParcelaRotinas;
 
 /**
  * Created by Bruno Nogueira Silva on 11/04/2016.
@@ -88,7 +89,9 @@ public class OrcamentoTabFragmentMDActivity extends AppCompatActivity {
         // Pega o status do orcamento
         this.tipoOrcamentoPedido = orcamentoRotinas.statusOrcamento(idOrcamento);
 
-        if (abertoTitulosPriveiraVez == false) {
+        ParcelaRotinas parcelaRotinas = new ParcelaRotinas(getApplicationContext());
+
+        if ((abertoTitulosPriveiraVez == false) && (parcelaRotinas.listaTitulos(idPessoa, ParcelaRotinas.TITULOS_EM_ABERTO, ParcelaRotinas.RECEBER, null).size() > 0)) {
 
             abertoTitulosPriveiraVez = true;
             // Cria uma intent para abrir uma nova activity

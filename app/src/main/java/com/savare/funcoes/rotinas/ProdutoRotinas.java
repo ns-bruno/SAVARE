@@ -642,6 +642,8 @@ public class ProdutoRotinas extends Rotinas {
 							if(cursorUnVenda.getCount() > 0){
 								// Move para o primeiro registro
 								cursorUnVenda.moveToFirst();
+								// Instancia novamente a vareavel unidade de venda
+								unidadeVenda = new UnidadeVendaBeans();
 								// Preenche os dados da unidade de venda
 								unidadeVenda.setIdUnidadeVenda(cursorUnVenda.getInt(cursorUnVenda.getColumnIndex("ID_AEAUNVEN")));
 								unidadeVenda.setSiglaUnidadeVenda(cursorUnVenda.getString(cursorUnVenda.getColumnIndex("SIGLA")));

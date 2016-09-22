@@ -66,6 +66,8 @@ public class WSSisinfoWebservice {
     public static final String FUNCTION_SELECT_AEAFATOR = "selectFator";
     public static final String FUNCTION_SELECT_AEAPRREC = "selectProdutoRecomendado";
     public static final String FUNCTION_SELECT_RPAPARCE = "selectParcelas";
+    public static final String FUNCTION_INSERT_AEAORCAM = "insertOrcamento";
+    public static final String FUNCTION_INSERT_AEAITORC = "insertItemOrcamento";
 
     public WSSisinfoWebservice(Context context) {
         this.context = context;
