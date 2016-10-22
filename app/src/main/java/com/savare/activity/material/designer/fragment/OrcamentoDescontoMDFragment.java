@@ -1,6 +1,8 @@
 package com.savare.activity.material.designer.fragment;
 
+import android.app.Activity;
 import android.content.ContentValues;
+import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -8,11 +10,13 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -104,7 +108,7 @@ public class OrcamentoDescontoMDFragment extends Fragment {
                     // Dados da mensagem
                     ContentValues mensagem = new ContentValues();
                     mensagem.put("comando", 0);
-                    mensagem.put("tela", "OrcamentoPlanoPagamentoActivity");
+                    mensagem.put("tela", "OrcamentoDescontoMDActivity");
                     mensagem.put("mensagem", "Erro grave ao executar o addTextChangedListener do editDescontoPercentual. \n"
                             + e.getMessage() +"\n"
                             + getActivity().getResources().getString(R.string.favor_entrar_contato_responsavel_ti));
@@ -128,6 +132,20 @@ public class OrcamentoDescontoMDFragment extends Fragment {
             }
         }); // addTextChangedListener
 
+        editDescontoPercentual.setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+
+                if (keyCode == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN) {
+
+                    InputMethodManager imm = (InputMethodManager)getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+                    // Fecha o teclado
+                    imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
+                }
+
+                return false;
+            }
+        });
 
 
         editTotalLiquido.setOnTouchListener(new View.OnTouchListener() {
@@ -153,7 +171,7 @@ public class OrcamentoDescontoMDFragment extends Fragment {
                     // Dados da mensagem
                     ContentValues mensagem = new ContentValues();
                     mensagem.put("comando", 0);
-                    mensagem.put("tela", "OrcamentoDescontoActivity");
+                    mensagem.put("tela", "OrcamentoDescontoMDActivity");
                     mensagem.put("mensagem", "Erro grave ao executar o addTextChangedListener do editTotalLiquido. \n"
                             + e.getMessage() + "\n"
                             + getActivity().getResources().getString(R.string.favor_entrar_contato_responsavel_ti));
@@ -177,6 +195,19 @@ public class OrcamentoDescontoMDFragment extends Fragment {
             }
         });
 
+        editTotalLiquido.setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+
+                if (keyCode == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN) {
+
+                    InputMethodManager imm = (InputMethodManager)getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+                    // Fecha o teclado
+                    imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
+                }
+                return false;
+            }
+        });
 
 
         toolbarRodape.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
@@ -189,7 +220,8 @@ public class OrcamentoDescontoMDFragment extends Fragment {
                         // Checa se eh um orcamento
                         if (tipoOrcamentoPedido.equals("O")){
 
-                            salvarDesconto();
+                            SalvarDescontoOrcamento salvarDescontoOrcamento = new SalvarDescontoOrcamento(textCodigoOrcamento.getText().toString());
+                            salvarDescontoOrcamento.execute();
 
                         } else {
                             FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(getActivity());
@@ -240,33 +272,6 @@ public class OrcamentoDescontoMDFragment extends Fragment {
     }
 
 
-    private void salvarDesconto(){
-        OrcamentoRotinas orcamentoRotinas = new OrcamentoRotinas(getActivity());
-
-        if(orcamentoRotinas.distribuiDescontoItemOrcamento(textCodigoOrcamento.getText().toString(), totalLiquidoAuxiliar, totalBrutoAuxiliar)){
-
-            ContentValues mensagem = new ContentValues();
-            mensagem.put("comando", 2);
-            mensagem.put("tela", "OrcamentoPlanoPagamentoActivity");
-            mensagem.put("mensagem", "Desconto Distribuido com sucesso.");
-
-            FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(getActivity());
-            funcoes.menssagem(mensagem);
-            // Executa o onResume (todos os campos de valores)
-            onResume();
-
-        } else {
-            ContentValues mensagem = new ContentValues();
-            mensagem.put("comando", 2);
-            mensagem.put("tela", "OrcamentoPlanoPagamentoActivity");
-            mensagem.put("mensagem", "Não foi possível salvar os desconto e o plano de pagamento");
-
-            FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(getActivity());
-            funcoes.menssagem(mensagem);
-
-        }
-    }
-
     private void calculaTodosCampos(int campoChamada){
         double percentualDesconto = 0,
                 totalLiquido = 0;
@@ -280,7 +285,7 @@ public class OrcamentoDescontoMDFragment extends Fragment {
 
         // Checa se tem algum valor no campo de total liquido
         if((editTotalLiquido != null) && (editTotalLiquido.getText().length() > 0)){
-            totalLiquido = funcoes.desformatarValor(editDescontoPercentual.getText().toString());
+            totalLiquido = funcoes.desformatarValor(editTotalLiquido.getText().toString());
         }
 
         // Checa se o campo que chamou esta funcao foi o campo editDescontoPercentual
@@ -370,6 +375,68 @@ public class OrcamentoDescontoMDFragment extends Fragment {
 
             // Pega o status do orcamento
             tipoOrcamentoPedido = orcamentoRotinas.statusOrcamento(textCodigoOrcamento.getText().toString());
+
+            progressBarStatus.setVisibility(View.GONE);
+        }
+    }
+
+
+    public class SalvarDescontoOrcamento extends AsyncTask<Void, Void, Void> {
+        private String idOrcamento;
+
+        public SalvarDescontoOrcamento(String idOrcamento) {
+            this.idOrcamento = idOrcamento;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+            progressBarStatus.setVisibility(View.VISIBLE);
+            progressBarStatus.setIndeterminate(true);
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+
+            OrcamentoRotinas orcamentoRotinas = new OrcamentoRotinas(getActivity());
+
+            if(orcamentoRotinas.distribuiDescontoItemOrcamento(idOrcamento, totalLiquidoAuxiliar, totalBrutoAuxiliar)){
+
+                final ContentValues mensagem = new ContentValues();
+                mensagem.put("comando", 2);
+                mensagem.put("tela", "OrcamentoPlanoPagamentoActivity");
+                mensagem.put("mensagem", "Desconto Distribuido com sucesso.");
+
+                final FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(getActivity());
+                ((Activity) getContext()).runOnUiThread(new Runnable() {
+                    public void run() {
+                        funcoes.menssagem(mensagem);
+                    }
+                });
+                // Executa o onResume (todos os campos de valores)
+                onResume();
+
+            } else {
+                final ContentValues mensagem = new ContentValues();
+                mensagem.put("comando", 2);
+                mensagem.put("tela", "OrcamentoPlanoPagamentoActivity");
+                mensagem.put("mensagem", "Não foi possível salvar os desconto e o plano de pagamento");
+
+                final FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(getActivity());
+                ((Activity) getContext()).runOnUiThread(new Runnable() {
+                    public void run() {
+                        funcoes.menssagem(mensagem);
+                    }
+                });
+
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
 
             progressBarStatus.setVisibility(View.GONE);
         }

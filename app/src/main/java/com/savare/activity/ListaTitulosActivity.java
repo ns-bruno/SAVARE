@@ -82,7 +82,7 @@ public class ListaTitulosActivity extends Activity {
 		ParcelaRotinas parcelaRotinas = new ParcelaRotinas(ListaTitulosActivity.this);
 		
 		listaTitulos = new ArrayList<TitulosListaBeans>();
-		listaTitulos = parcelaRotinas.listaTitulos(idPessoa, tipoListagem, pagarReceber, null);
+		listaTitulos = parcelaRotinas.listaTitulos(idPessoa, tipoListagem, pagarReceber, null, null);
 		
 		adapterListaTitulos = new ListaTitulosExpandableAdapter(ListaTitulosActivity.this, listaTitulos);
 		expandagleListaTitulos.setAdapter(adapterListaTitulos);
@@ -138,7 +138,7 @@ public class ListaTitulosActivity extends Activity {
 				ParcelaRotinas parcelaRotinas = new ParcelaRotinas(ListaTitulosActivity.this);
 				
 				listaTitulos = new ArrayList<TitulosListaBeans>();
-				listaTitulos = parcelaRotinas.listaTitulos(idPessoa, tipoListagem, pagarReceber, where);
+				listaTitulos = parcelaRotinas.listaTitulos(idPessoa, tipoListagem, pagarReceber, where, null);
 				
 				// Atualiza o adapter com uma nova lista
 				adapterListaTitulos = new ListaTitulosExpandableAdapter(ListaTitulosActivity.this, listaTitulos);
@@ -177,7 +177,7 @@ public class ListaTitulosActivity extends Activity {
 			
 		case R.id.menu_lista_titulos_vencidos:
 			
-			listaTitulos = parcelaRotinas.listaTitulos(idPessoa, '2', pagarReceber, whereFiltroAuxiliar);
+			listaTitulos = parcelaRotinas.listaTitulos(idPessoa, '2', pagarReceber, whereFiltroAuxiliar, null);
 			adapterListaTitulos.setListaPessoasParent(listaTitulos);
 			expandagleListaTitulos.setAdapter(adapterListaTitulos);
 			onResume();
@@ -185,7 +185,7 @@ public class ListaTitulosActivity extends Activity {
 			
 		case R.id.menu_lista_titulos_aberto:
 			
-			listaTitulos = parcelaRotinas.listaTitulos(idPessoa, '0', pagarReceber, whereFiltroAuxiliar);
+			listaTitulos = parcelaRotinas.listaTitulos(idPessoa, '0', pagarReceber, whereFiltroAuxiliar, null);
 			adapterListaTitulos.setListaPessoasParent(listaTitulos);
 			expandagleListaTitulos.setAdapter(adapterListaTitulos);
 			onResume();
@@ -193,7 +193,7 @@ public class ListaTitulosActivity extends Activity {
 			
 		case R.id.menu_lista_titulos_baixados:
 			
-			listaTitulos = parcelaRotinas.listaTitulos(idPessoa, '1', '0', whereFiltroAuxiliar);
+			listaTitulos = parcelaRotinas.listaTitulos(idPessoa, '1', '0', whereFiltroAuxiliar, null);
 			adapterListaTitulos.setListaPessoasParent(listaTitulos);
 			expandagleListaTitulos.setAdapter(adapterListaTitulos);
 			onResume();
@@ -201,7 +201,7 @@ public class ListaTitulosActivity extends Activity {
 			
 		case R.id.menu_lista_titulos_credito:
 			
-			listaTitulos = parcelaRotinas.listaTitulos(idPessoa, '0', '1', whereFiltroAuxiliar);
+			listaTitulos = parcelaRotinas.listaTitulos(idPessoa, '0', '1', whereFiltroAuxiliar, null);
 			adapterListaTitulos.setListaPessoasParent(listaTitulos);
 			expandagleListaTitulos.setAdapter(adapterListaTitulos);
 			onResume();
@@ -387,7 +387,6 @@ public class ListaTitulosActivity extends Activity {
 	 * Carrega a lista completa dos or�amentos/pedidos de acordo com o
 	 * periodo selecionado e a cidade selecionada.
 	 * 
-	 * @param itemPosition
 	 */
 	private void carregarListaTitulosPeriodo(){
 		
@@ -396,7 +395,7 @@ public class ListaTitulosActivity extends Activity {
 		ParcelaRotinas parcelaRotinas = new ParcelaRotinas(ListaTitulosActivity.this);
 		
 		listaTitulos = new ArrayList<TitulosListaBeans>();
-		listaTitulos = parcelaRotinas.listaTitulos(idPessoa, tipoListagem, pagarReceber, wherePeriodo);
+		listaTitulos = parcelaRotinas.listaTitulos(idPessoa, tipoListagem, pagarReceber, wherePeriodo, null);
 		// Seta o adapter com uma nova lista
 		adapterListaTitulos = new ListaTitulosExpandableAdapter(ListaTitulosActivity.this, listaTitulos);
 		expandagleListaTitulos.setAdapter(adapterListaTitulos);

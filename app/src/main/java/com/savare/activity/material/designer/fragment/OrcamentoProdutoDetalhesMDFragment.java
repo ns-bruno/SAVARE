@@ -375,6 +375,49 @@ public class OrcamentoProdutoDetalhesMDFragment extends Fragment {
             }
         });
 
+        spinnerEmbalagem.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(getContext());
+
+                // Verifica se a venda eh do atacado
+                if(atacadoVarejo.equalsIgnoreCase("0")){
+
+                    // Armazena o valor final do produto de acordo com o plano de pagamento selecionado
+                    valorUnitarioVendaAux = carregarDadosPlanoPagamento(produto.getValorUnitarioAtacado(), produto.getValorPromocaoAtacado(), '0');
+
+                    // Preence o campo com o valor do produto
+                    editUnitarioLiquidoVenda.setText(funcoes.arredondarValor(valorUnitarioVendaAux));
+
+                    // Verifica se tem preco de promocao
+                    if(produto.getValorPromocaoAtacado() > 0){
+                        // Muda a cor do fundo para destacar que eh promocao
+                        spinnerPlanoPagamentoPreco.setBackgroundColor(getResources().getColor(R.color.amarelo));
+                    }
+
+                    // Verifica se a venda eh do varejo
+                }else if(atacadoVarejo.equalsIgnoreCase("1")){
+
+                    // Armazena o valor final do produto de acordo com o plano de pagamento selecionado
+                    valorUnitarioVendaAux = carregarDadosPlanoPagamento(produto.getValorUnitarioVarejo(), produto.getValorPromocaoVarejo(), '1');
+
+                    // Preence o campo com o valor do produto
+                    editUnitarioLiquidoVenda.setText(funcoes.arredondarValor(valorUnitarioVendaAux));
+
+                    // Verifica se tem preco de promocao
+                    if(produto.getValorPromocaoVarejo() > 0){
+                        // Muda a cor do fundo para destacar que eh promocao
+                        spinnerPlanoPagamentoPreco.setBackgroundColor(getResources().getColor(R.color.amarelo));
+                    }
+                } // Fim do if do varejo
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
 
         return viewOrcamento;
     } // Fim onCreate
@@ -402,7 +445,11 @@ public class OrcamentoProdutoDetalhesMDFragment extends Fragment {
 
             case R.id.menu_orcamento_produto_detalhes_md_fragment_salvar:
 
-                if((editQuantidade != null) && (!editQuantidade.getText().equals(""))){
+                SalvarDadosOrcamentoProduto salvarDadosORcamentoProduto = new SalvarDadosOrcamentoProduto();
+                salvarDadosORcamentoProduto.execute();
+
+
+                /*if((editQuantidade != null) && (!editQuantidade.getText().equals(""))){
                     FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(getContext());
 
                     // Checa os dados informado
@@ -411,6 +458,7 @@ public class OrcamentoProdutoDetalhesMDFragment extends Fragment {
                         double quantidade = funcoes.desformatarValor(editQuantidade.getText().toString()), //Double.parseDouble(editQuantidade.getText().toString()),
                                 vlCusto = (this.produto.getCustoCompleto() * quantidade),
                                 vlBruto = (this.valorUnitarioVendaAux * quantidade),
+                                vlTabela = 0,
                                 totalDigitadoLiquido = funcoes.desformatarValor(editTotal.getText().toString()),
                                 vlDesconto = vlBruto - totalDigitadoLiquido,
                                 fcCustoUn = vlCusto / quantidade,
@@ -418,6 +466,18 @@ public class OrcamentoProdutoDetalhesMDFragment extends Fragment {
                                 fcDescontoUn = vlDesconto / quantidade,
                                 fcLiquido = totalDigitadoLiquido;
 
+                        if ((adapterEmbalagem != null) && (adapterEmbalagem.getListaEmbalagem() != null) &&
+                            (adapterEmbalagem.getListaEmbalagem().get(spinnerEmbalagem.getSelectedItemPosition()) != null)) {
+
+                            double fatorConversao = adapterEmbalagem.getListaEmbalagem().get(spinnerEmbalagem.getSelectedItemPosition()).getFatorConversao();
+                            double fatorPreco = adapterEmbalagem.getListaEmbalagem().get(spinnerEmbalagem.getSelectedItemPosition()).getFatorPreco();
+                            // Checa se a venda eh no atacado
+                            if (atacadoVarejo.equalsIgnoreCase("0")) {
+                                vlTabela =  funcoes.desformatarValor(funcoes.arredondarValor(this.produto.getValorTabelaAtacado() * fatorConversao * fatorPreco));
+                            } else if (atacadoVarejo.equalsIgnoreCase("1")){
+                                vlTabela = funcoes.desformatarValor(funcoes.arredondarValor(this.produto.getValorTabelaVarejo() * fatorConversao * fatorPreco));
+                            }
+                        }
                         //Pega os dados do produto
                         ContentValues produto = new ContentValues();
                         produto.put("ID_AEAORCAM", this.orcamento.getIdOrcamento());
@@ -427,22 +487,17 @@ public class OrcamentoProdutoDetalhesMDFragment extends Fragment {
                         produto.put("ID_CFACLIFO_VENDEDOR", funcoes.getValorXml("CodigoUsuario"));
                         produto.put("ID_AEAPRODU", this.produto.getProduto().getIdProduto());
                         produto.put("QUANTIDADE", quantidade);
-                        produto.put("VL_CUSTO", vlCusto);
-                        produto.put("VL_BRUTO", vlBruto);
-                        if(this.orcamento.getTipoVenda() == '0'){
-                            produto.put("VL_TABELA", this.produto.getValorTabelaAtacado() * quantidade);
-                            produto.put("VL_TABELA_UN", this.produto.getValorTabelaAtacado());
-                        } else {
-                            produto.put("VL_TABELA", this.produto.getValorTabelaVarejo() * quantidade);
-                            produto.put("VL_TABELA_UN", this.produto.getValorTabelaVarejo());
-                        }
-                        produto.put("VL_DESCONTO", vlDesconto);
-                        produto.put("FC_DESCONTO_UN", (vlDesconto / quantidade));
-                        produto.put("FC_CUSTO_UN", fcCustoUn);
-                        produto.put("FC_BRUTO_UN", fcBrutoUn);
-                        produto.put("FC_DESCONTO_UN", fcDescontoUn);
-                        produto.put("FC_LIQUIDO", fcLiquido);
-                        produto.put("FC_LIQUIDO_UN", (fcLiquido / quantidade));
+                        produto.put("VL_CUSTO", funcoes.desformatarValor(funcoes.arredondarValor(vlCusto)));
+                        produto.put("VL_BRUTO", funcoes.desformatarValor(funcoes.arredondarValor(vlBruto)));
+                        produto.put("VL_TABELA", funcoes.desformatarValor(funcoes.arredondarValor(vlTabela * quantidade)));
+                        produto.put("VL_TABELA_UN", funcoes.desformatarValor(funcoes.arredondarValor(vlTabela)));
+                        produto.put("VL_DESCONTO", funcoes.desformatarValor(funcoes.arredondarValor(vlDesconto)));
+                        produto.put("FC_DESCONTO_UN", funcoes.desformatarValor(funcoes.arredondarValor((vlDesconto / quantidade))));
+                        produto.put("FC_CUSTO_UN", funcoes.desformatarValor(funcoes.arredondarValor(fcCustoUn)));
+                        produto.put("FC_BRUTO_UN", funcoes.desformatarValor(funcoes.arredondarValor(fcBrutoUn)));
+                        produto.put("FC_DESCONTO_UN", funcoes.desformatarValor(funcoes.arredondarValor(fcDescontoUn)));
+                        produto.put("FC_LIQUIDO", funcoes.desformatarValor(funcoes.arredondarValor(fcLiquido)));
+                        produto.put("FC_LIQUIDO_UN", funcoes.desformatarValor(funcoes.arredondarValor((fcLiquido / quantidade))));
                         produto.put("COMPLEMENTO", editObservacao.getText().toString());
                         produto.put("TIPO_PRODUTO", String.valueOf(this.produto.getProduto().getTipoProduto()));
                         // Instancia classe para manipular o orcamento
@@ -458,7 +513,7 @@ public class OrcamentoProdutoDetalhesMDFragment extends Fragment {
                                 // Fecha a tela de detalhes de produto
                                 getActivity().finish();
                             }
-                            // Envia os dados do produto para inserir no banco de dados
+                        // Envia os dados do produto para inserir no banco de dados
                         } else{
                             // Salva a proxima sequencia do item
                             produto.put("SEQUENCIA", orcamentoRotinas.proximoSequencial(String.valueOf(this.orcamento.getIdOrcamento())));
@@ -478,7 +533,6 @@ public class OrcamentoProdutoDetalhesMDFragment extends Fragment {
                                 } else {
                                     getActivity().setResult(getActivity().RESULT_OK, returnIntent);
                                 }
-
                                 funcoes.desbloqueiaOrientacaoTela();
                                 // Fecha a tela de detalhes de produto
                                 getActivity().finish();
@@ -494,7 +548,7 @@ public class OrcamentoProdutoDetalhesMDFragment extends Fragment {
                         funcoes = new FuncoesPersonalizadas(getContext());
                         funcoes.menssagem(mensagem);
                     }
-                }
+                }*/
 
                 break;
 
@@ -546,7 +600,7 @@ public class OrcamentoProdutoDetalhesMDFragment extends Fragment {
                 // Checa se passou algum numero de orcamento
                 if (idOrcamento > 0) {
 
-                    produto = produtoRotinas.listaProduto("AEAPRODU.ID_AEAPRODU = " + idProduto, null, "" + idOrcamento, null, null).get(0);
+                    produto = produtoRotinas.listaProduto("AEAPRODU.ID_AEAPRODU = " + idProduto, null, "" + idOrcamento, null, null, produtoRotinas.SIM).get(0);
 
                     orcamento = new OrcamentoBeans();
 
@@ -565,10 +619,11 @@ public class OrcamentoProdutoDetalhesMDFragment extends Fragment {
                     // Insere o total do orcamento varaviavel orcamento
                     orcamento.setTotalOrcamento(total);
                     orcamento.setDataCadastro(orcamentoRotinas.dataCadastroOrcamento(String.valueOf(idOrcamento)));
+                    orcamento.setTipoVenda(atacadoVarejo);
 
                 } else {
                     // Pega lista sem associar com um orcamento
-                    produto = produtoRotinas.listaProduto("AEAPRODU.ID_AEAPRODU = " + idProduto, null, null, null, null).get(0);
+                    produto = produtoRotinas.listaProduto("AEAPRODU.ID_AEAPRODU = " + idProduto, null, null, null, null, produtoRotinas.SIM).get(0);
                 }
                 // Pega se a venda eh no atacado ou varejo
                 produto.setAtacadoVarejo(atacadoVarejo.charAt(0));
@@ -617,6 +672,32 @@ public class OrcamentoProdutoDetalhesMDFragment extends Fragment {
         }
     } // CarregarDadosOrcamentoProduto
 
+
+    public class SalvarDadosOrcamentoProduto extends AsyncTask<Void, Void, Void> {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+            progressStatus.setVisibility(View.VISIBLE);
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+
+            salvarProdutoOrcamento();
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+
+            progressStatus.setVisibility(View.INVISIBLE);
+        }
+    }
+
     /**
      * Funcao para carregar os dados do produto em seu devidos campos.
      *
@@ -627,7 +708,8 @@ public class OrcamentoProdutoDetalhesMDFragment extends Fragment {
         ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(orcamento.getIdOrcamento() + " - " + orcamento.getNomeRazao());
 
         // Preenche o campos da descricao do produtos
-        textDescricaoProduto.setText(produtoVenda.getProduto().getCodigoEstrutural() + " - " + produtoVenda.getProduto().getDescricaoProduto() + " - " + produtoVenda.getProduto().getDescricaoMarca());
+        textDescricaoProduto.setText(produtoVenda.getProduto().getCodigoEstrutural() + " - " + produtoVenda.getProduto().getDescricaoProduto() + " - " +
+                (produtoVenda.getProduto().getDescricaoMarca() != null ? produtoVenda.getProduto().getDescricaoMarca() : ""));
         // Instanci classe de funcoes
         FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(getContext());
 
@@ -687,7 +769,7 @@ public class OrcamentoProdutoDetalhesMDFragment extends Fragment {
             editObservacao.setText(itemOrcamentoBeans.getComplemento());
             editDesconto.setText(funcoes.arredondarValor(((((itemOrcamentoBeans.getValorLiquido() / itemOrcamentoBeans.getValorBruto())*100)-100)* -1)));
             editValorDesconto.setText(funcoes.arredondarValor(itemOrcamentoBeans.getValorDesconto()));
-            textSequencial.setText(""+itemOrcamentoBeans.getSeguencia());
+            textSequencial.setText(""+itemOrcamentoBeans.getSequencia());
             textCodigoUnico.setText(itemOrcamentoBeans.getGuid());
             this.idItemOrcamento = itemOrcamentoBeans.getIdItemOrcamento();
             //this.valorUnitarioVendaAux = Double.valueOf(funcoes.arredondarValor(String.valueOf((itemOrcamentoBeans.getValorLiquido() / itemOrcamentoBeans.getQuantidade()))).replace(".", "").replace(",", "."));
@@ -733,7 +815,7 @@ public class OrcamentoProdutoDetalhesMDFragment extends Fragment {
                     if(precoPromocao > 0){
 
                         // Checa se aplica desconto para produtos de promocao
-                        if(this.listaPlanoPagamentoPreco.get(i).getDescontoPromocao() == '1'){
+                        if(this.listaPlanoPagamentoPreco.get(i).getDescontoPromocao().equalsIgnoreCase("1")){
                             // Aplica o desconto no preco ja com o juros
                             precoVenda = (precoPromocao + (precoPromocao * (this.listaPlanoPagamentoPreco.get(i).getJurosAtacado() / 100))) -
                                     (precoPromocao * (this.listaPlanoPagamentoPreco.get(i).getDescontoAtacado() / 100));
@@ -758,7 +840,7 @@ public class OrcamentoProdutoDetalhesMDFragment extends Fragment {
                     if(precoPromocao > 0){
 
                         // Checa se aplica desconto para produtos de promocao
-                        if(this.listaPlanoPagamentoPreco.get(i).getDescontoPromocao() == '1'){
+                        if(this.listaPlanoPagamentoPreco.get(i).getDescontoPromocao().equalsIgnoreCase("1")){
                             // Aplica o desconto no preco ja com o juros
                             precoVenda = (precoPromocao + (precoPromocao * (this.listaPlanoPagamentoPreco.get(i).getJurosVarejo() / 100))) -
                                     (precoPromocao * (this.listaPlanoPagamentoPreco.get(i).getDescontoVarejo() / 100));
@@ -773,7 +855,13 @@ public class OrcamentoProdutoDetalhesMDFragment extends Fragment {
                                 (preco * (this.listaPlanoPagamentoPreco.get(i).getDescontoVarejo() / 100));
                     }
                 }
+                if ((adapterEmbalagem != null) && (adapterEmbalagem.getListaEmbalagem() != null) &&
+                    (adapterEmbalagem.getListaEmbalagem().get(spinnerEmbalagem.getSelectedItemPosition()) != null)){
+                    double fatorConversao = adapterEmbalagem.getListaEmbalagem().get(spinnerEmbalagem.getSelectedItemPosition()).getFatorConversao();
+                    double fatorPreco = adapterEmbalagem.getListaEmbalagem().get(spinnerEmbalagem.getSelectedItemPosition()).getFatorPreco();
 
+                    precoVenda = (precoVenda * fatorConversao * fatorPreco);
+                }
                 this.listaPlanoPagamentoPreco.get(i).setPrecoProduto(precoVenda);
             }
 
@@ -795,7 +883,7 @@ public class OrcamentoProdutoDetalhesMDFragment extends Fragment {
 
         adapterEstoque = new ItemUniversalAdapter(getContext(), ItemUniversalAdapter.ESTOQUE);
         // Inseri uma lista dentro do adapter
-        adapterEstoque.setListaEstoque(estoqueRotinas.listaEstoqueProduto(idProduto, null));
+        adapterEstoque.setListaEstoque(estoqueRotinas.listaEstoqueProduto(idProduto, "AEALOCES.TIPO_VENDA = '" + atacadoVarejo + "'"));
         // Inseri o adapter dentro do spinner
         spinnerEstoque.setAdapter(adapterEstoque);
     }
@@ -982,4 +1070,106 @@ public class OrcamentoProdutoDetalhesMDFragment extends Fragment {
         return dadosValidos;
     } // Fim validarDados
 
+    private void salvarProdutoOrcamento(){
+        if((editQuantidade != null) && (!editQuantidade.getText().equals(""))){
+            FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(getContext());
+
+            // Checa os dados informado
+            if(validarDados()){
+                // Calcula os valores necessario para salvar no banco de dados
+                double quantidade = funcoes.desformatarValor(editQuantidade.getText().toString()), //Double.parseDouble(editQuantidade.getText().toString()),
+                        vlCusto = (this.produto.getCustoCompleto() * quantidade),
+                        vlBruto = (this.valorUnitarioVendaAux * quantidade),
+                        vlTabela = 0,
+                        totalDigitadoLiquido = funcoes.desformatarValor(editTotal.getText().toString()),
+                        vlDesconto = vlBruto - totalDigitadoLiquido,
+                        fcCustoUn = vlCusto / quantidade,
+                        fcBrutoUn = vlBruto / quantidade,
+                        fcDescontoUn = vlDesconto / quantidade,
+                        fcLiquido = totalDigitadoLiquido;
+
+                if ((adapterEmbalagem != null) && (adapterEmbalagem.getListaEmbalagem() != null) &&
+                        (adapterEmbalagem.getListaEmbalagem().get(spinnerEmbalagem.getSelectedItemPosition()) != null)) {
+
+                    double fatorConversao = adapterEmbalagem.getListaEmbalagem().get(spinnerEmbalagem.getSelectedItemPosition()).getFatorConversao();
+                    double fatorPreco = adapterEmbalagem.getListaEmbalagem().get(spinnerEmbalagem.getSelectedItemPosition()).getFatorPreco();
+                    // Checa se a venda eh no atacado
+                    if (atacadoVarejo.equalsIgnoreCase("0")) {
+                        vlTabela =  funcoes.desformatarValor(funcoes.arredondarValor(this.produto.getValorTabelaAtacado() * fatorConversao * fatorPreco));
+                    } else if (atacadoVarejo.equalsIgnoreCase("1")){
+                        vlTabela = funcoes.desformatarValor(funcoes.arredondarValor(this.produto.getValorTabelaVarejo() * fatorConversao * fatorPreco));
+                    }
+                }
+                //Pega os dados do produto
+                ContentValues produto = new ContentValues();
+                produto.put("ID_AEAORCAM", this.orcamento.getIdOrcamento());
+                produto.put("ID_AEAESTOQ", adapterEstoque.getListaEstoque().get(spinnerEstoque.getSelectedItemPosition()).getIdEstoque());
+                produto.put("ID_AEAPLPGT", this.listaPlanoPagamentoPreco.get(spinnerPlanoPagamentoPreco.getSelectedItemPosition()).getIdPlanoPagamento());
+                produto.put("ID_AEAUNVEN", this.produto.getProduto().getListaEmbalagem().get(spinnerEmbalagem.getSelectedItemPosition()).getUnidadeVendaEmbalagem().getIdUnidadeVenda());
+                produto.put("ID_CFACLIFO_VENDEDOR", funcoes.getValorXml("CodigoUsuario"));
+                produto.put("ID_AEAPRODU", this.produto.getProduto().getIdProduto());
+                produto.put("QUANTIDADE", quantidade);
+                produto.put("VL_CUSTO", funcoes.desformatarValor(funcoes.arredondarValor(vlCusto)));
+                produto.put("VL_BRUTO", funcoes.desformatarValor(funcoes.arredondarValor(vlBruto)));
+                produto.put("VL_TABELA", funcoes.desformatarValor(funcoes.arredondarValor(vlTabela * quantidade)));
+                produto.put("VL_TABELA_UN", funcoes.desformatarValor(funcoes.arredondarValor(vlTabela)));
+                produto.put("VL_DESCONTO", funcoes.desformatarValor(funcoes.arredondarValor(vlDesconto)));
+                produto.put("FC_DESCONTO_UN", funcoes.desformatarValor(funcoes.arredondarValor((vlDesconto / quantidade))));
+                produto.put("FC_CUSTO_UN", funcoes.desformatarValor(funcoes.arredondarValor(fcCustoUn)));
+                produto.put("FC_BRUTO_UN", funcoes.desformatarValor(funcoes.arredondarValor(fcBrutoUn)));
+                produto.put("FC_DESCONTO_UN", funcoes.desformatarValor(funcoes.arredondarValor(fcDescontoUn)));
+                produto.put("FC_LIQUIDO", funcoes.desformatarValor(funcoes.arredondarValor(fcLiquido)));
+                produto.put("FC_LIQUIDO_UN", funcoes.desformatarValor(funcoes.arredondarValor((fcLiquido / quantidade))));
+                produto.put("COMPLEMENTO", editObservacao.getText().toString());
+                produto.put("TIPO_PRODUTO", String.valueOf(this.produto.getProduto().getTipoProduto()));
+                // Instancia classe para manipular o orcamento
+                OrcamentoRotinas orcamentoRotinas = new OrcamentoRotinas(getContext());
+
+
+                // Verifica se o produto ja esta no orcamento
+                if(this.produto.getEstaNoOrcamento() == '1'){
+
+                    // Verifica se atualizou com sucesso
+                    if(orcamentoRotinas.updateItemOrcamento(produto, String.valueOf(this.idItemOrcamento)) > 0){
+                        funcoes.desbloqueiaOrientacaoTela();
+                        // Fecha a tela de detalhes de produto
+                        getActivity().finish();
+                    }
+                    // Envia os dados do produto para inserir no banco de dados
+                } else{
+                    // Salva a proxima sequencia do item
+                    produto.put("SEQUENCIA", orcamentoRotinas.proximoSequencial(String.valueOf(this.orcamento.getIdOrcamento())));
+                    produto.put("GUID", orcamentoRotinas.gerarGuid());
+
+                    if((this.idItemOrcamento = orcamentoRotinas.insertItemOrcamento(produto)) > 0){
+                        // Cria uma intent para returnar um valor para activity ProdutoLista
+                        Intent returnIntent = new Intent();
+                        returnIntent.putExtra("RESULTADO", '1');
+                        // Pega a posicao do deste produto na lista de produtos
+                        returnIntent.putExtra("POSICAO", posicao);
+                        returnIntent.putExtra("ID_AEAITORC", this.idItemOrcamento);
+
+                        // Checa se se quem chemou foi a tela de lista de de orçamento sem associacao de orcamento
+                        if ( (telaChamada != null) && (telaChamada.equalsIgnoreCase("ProdutoListaActivity")) ){
+                            getActivity().setResult(101, returnIntent);
+                        } else {
+                            getActivity().setResult(getActivity().RESULT_OK, returnIntent);
+                        }
+                        funcoes.desbloqueiaOrientacaoTela();
+                        // Fecha a tela de detalhes de produto
+                        getActivity().finish();
+                    }
+                }
+            } else {
+                // Dados da mensagem
+                ContentValues mensagem = new ContentValues();
+                mensagem.put("comando", 2);
+                mensagem.put("tela", "OrcamentoProdutoDetalhesActivity");
+                mensagem.put("mensagem", "Verifique se os campos obrigatorios estão preenchidos.\n");
+
+                funcoes = new FuncoesPersonalizadas(getContext());
+                funcoes.menssagem(mensagem);
+            }
+        }
+    }
 }

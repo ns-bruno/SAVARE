@@ -1,6 +1,5 @@
 package com.savare.funcoes.rotinas.sincronizacao;
 
-import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -87,7 +86,7 @@ public class EnviarOrcamentoSyncAdapterRotinas {
                         orcamento.setTotalEncargosFinanceiros(dadosOrcamento.getDouble(dadosOrcamento.getColumnIndex("VL_ENCARGOS_FINANCEIROS")));
                         orcamento.setTotalOrcamento(dadosOrcamento.getDouble(dadosOrcamento.getColumnIndex("FC_VL_TOTAL")));
                         if (dadosOrcamento.getString(dadosOrcamento.getColumnIndex("ATAC_VAREJO")) != null && dadosOrcamento.getString(dadosOrcamento.getColumnIndex("ATAC_VAREJO")).length() > 0) {
-                            orcamento.setTipoVenda(dadosOrcamento.getString(dadosOrcamento.getColumnIndex("ATAC_VAREJO")).charAt(0));
+                            orcamento.setTipoVenda(dadosOrcamento.getString(dadosOrcamento.getColumnIndex("ATAC_VAREJO")));
                         }
                         orcamento.setPessoaCliente(dadosOrcamento.getString(dadosOrcamento.getColumnIndex("PESSOA_CLIENTE")));
                         orcamento.setNomeRazao(dadosOrcamento.getString(dadosOrcamento.getColumnIndex("NOME_CLIENTE")));
@@ -194,7 +193,7 @@ public class EnviarOrcamentoSyncAdapterRotinas {
 
                                 final HashMap<String, String> paramItemOrcamento = new HashMap<String, String>();
                                 paramItemOrcamento.put("tipoDados", EnviarDadosJsonRotinas.TIPO_DADOS_ITENS_PEDIDO);
-                                paramItemOrcamento.put("sequencia", "" + listaOrcamentoComProdutos.get(i).getListaProdutosOrcamento().get(j).getSeguencia());
+                                paramItemOrcamento.put("sequencia", "" + listaOrcamentoComProdutos.get(i).getListaProdutosOrcamento().get(j).getSequencia());
                                 paramItemOrcamento.put("idOrcamItem", "" + listaOrcamentoComProdutos.get(i).getListaProdutosOrcamento().get(j).getIdItemOrcamento());
                                 paramItemOrcamento.put("idEstoq", "" + listaOrcamentoComProdutos.get(i).getListaProdutosOrcamento().get(j).getEstoqueVenda().getIdEstoque());
                                 paramItemOrcamento.put("idProdu", "" + listaOrcamentoComProdutos.get(i).getListaProdutosOrcamento().get(j).getProduto().getIdProduto());

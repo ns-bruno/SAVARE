@@ -2,14 +2,17 @@ package com.savare.beans;
 
 public class EnderecoBeans {
 	
-	private int idEndereco;
+	private int idEndereco, idClifoEndereco, idEmrpesa;
 	private String cep,
+				   dataAlteracao,
 				   bairro,
 				   logradouro,
 				   numero,
 				   complemento,
 				   email;
-	private char tipoEndereco;
+	private String tipoEndereco;
+	private CidadeBeans cidadeEndereco;
+	private EstadoBeans estadoEndereco;
 	
 	/**
 	 * @return the idEndereco
@@ -86,13 +89,13 @@ public class EnderecoBeans {
 	/**
 	 * @return the tipoEndereco
 	 */
-	public char getTipoEndereco() {
+	public String getTipoEndereco() {
 		return tipoEndereco;
 	}
 	/**
 	 * @param tipoEndereco the tipoEndereco to set
 	 */
-	public void setTipoEndereco(char tipoEndereco) {
+	public void setTipoEndereco(String tipoEndereco) {
 		this.tipoEndereco = tipoEndereco;
 	}
 
@@ -103,5 +106,45 @@ public class EnderecoBeans {
 
 	public void setEmail(String email) {
 		this.email = email;
+	}
+
+	public int getIdClifoEndereco() {
+		return idClifoEndereco;
+	}
+
+	public void setIdClifoEndereco(int idClifoEndereco) {
+		this.idClifoEndereco = idClifoEndereco;
+	}
+
+	public int getIdEmrpesa() {
+		return idEmrpesa;
+	}
+
+	public void setIdEmrpesa(int idEmrpesa) {
+		this.idEmrpesa = idEmrpesa;
+	}
+
+	public CidadeBeans getCidadeEndereco() {
+		return cidadeEndereco;
+	}
+
+	public void setCidadeEndereco(CidadeBeans cidadeEndereco) {
+		this.cidadeEndereco = cidadeEndereco;
+	}
+
+	public EstadoBeans getEstadoEndereco() {
+		return estadoEndereco;
+	}
+
+	public void setEstadoEndereco(EstadoBeans estadoEndereco) {
+		this.estadoEndereco = estadoEndereco;
+	}
+
+	public String getDataAlteracao() {
+		return dataAlteracao;
+	}
+
+	public void setDataAlteracao(String dataAlteracao) {
+		this.dataAlteracao = dataAlteracao;
 	}
 }

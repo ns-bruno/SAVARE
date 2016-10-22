@@ -4,6 +4,7 @@ import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.SearchManager;
 import android.content.Context;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.view.MenuItemCompat;
@@ -17,6 +18,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.ExpandableListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.savare.R;
@@ -36,6 +38,7 @@ import java.util.List;
  */
 public class ListaTitulosMDActivity extends AppCompatActivity{
 
+    private ProgressBar progressBarStatus;
     private Toolbar toolbarInicio;
     private TextView textTotalAReceber,
             textTotalCredito;
@@ -77,13 +80,16 @@ public class ListaTitulosMDActivity extends AppCompatActivity{
             idPessoa = "";
         }
 
-        ParcelaRotinas parcelaRotinas = new ParcelaRotinas(ListaTitulosMDActivity.this);
+        CarregarListaTitulos carregarListaTitulos = new CarregarListaTitulos();
+        carregarListaTitulos.execute();
+
+        /*ParcelaRotinas parcelaRotinas = new ParcelaRotinas(ListaTitulosMDActivity.this);
 
         listaTitulos = new ArrayList<TitulosListaBeans>();
         listaTitulos = parcelaRotinas.listaTitulos(idPessoa, tipoListagem, pagarReceber, null);
 
         adapterListaTitulos = new ListaTitulosExpandableAdapter(ListaTitulosMDActivity.this, listaTitulos);
-        expandagleListaTitulos.setAdapter(adapterListaTitulos);
+        expandagleListaTitulos.setAdapter(adapterListaTitulos);*/
 
     }  // fim onCreate
 
@@ -91,12 +97,12 @@ public class ListaTitulosMDActivity extends AppCompatActivity{
     protected void onResume() {
         super.onResume();
 
-        ParcelaRotinas parcelaRotinas = new ParcelaRotinas(ListaTitulosMDActivity.this);
+        /*ParcelaRotinas parcelaRotinas = new ParcelaRotinas(ListaTitulosMDActivity.this);
 
         FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(ListaTitulosMDActivity.this);
 
         textTotalAReceber.setText(funcoes.arredondarValor(parcelaRotinas.totalReceberPagarCliente(idPessoa, tipoListagem, '0', whereFiltroAuxiliar)));
-        textTotalCredito.setText(funcoes.arredondarValor(parcelaRotinas.totalReceberPagarCliente(idPessoa, tipoListagem, '1', whereFiltroAuxiliar)));
+        textTotalCredito.setText(funcoes.arredondarValor(parcelaRotinas.totalReceberPagarCliente(idPessoa, tipoListagem, '1', whereFiltroAuxiliar)));*/
     }
 
     @Override
@@ -145,7 +151,7 @@ public class ListaTitulosMDActivity extends AppCompatActivity{
                 ParcelaRotinas parcelaRotinas = new ParcelaRotinas(ListaTitulosMDActivity.this);
 
                 listaTitulos = new ArrayList<TitulosListaBeans>();
-                listaTitulos = parcelaRotinas.listaTitulos(idPessoa, tipoListagem, pagarReceber, where);
+                listaTitulos = parcelaRotinas.listaTitulos(idPessoa, tipoListagem, pagarReceber, where, progressBarStatus);
 
                 // Atualiza o adapter com uma nova lista
                 adapterListaTitulos = new ListaTitulosExpandableAdapter(ListaTitulosMDActivity.this, listaTitulos);
@@ -182,7 +188,7 @@ public class ListaTitulosMDActivity extends AppCompatActivity{
 
             case R.id.menu_lista_titulos_vencidos:
 
-                listaTitulos = parcelaRotinas.listaTitulos(idPessoa, '2', pagarReceber, whereFiltroAuxiliar);
+                listaTitulos = parcelaRotinas.listaTitulos(idPessoa, '2', pagarReceber, whereFiltroAuxiliar, progressBarStatus);
                 adapterListaTitulos.setListaPessoasParent(listaTitulos);
                 expandagleListaTitulos.setAdapter(adapterListaTitulos);
                 onResume();
@@ -190,7 +196,7 @@ public class ListaTitulosMDActivity extends AppCompatActivity{
 
             case R.id.menu_lista_titulos_aberto:
 
-                listaTitulos = parcelaRotinas.listaTitulos(idPessoa, '0', pagarReceber, whereFiltroAuxiliar);
+                listaTitulos = parcelaRotinas.listaTitulos(idPessoa, '0', pagarReceber, whereFiltroAuxiliar, progressBarStatus);
                 adapterListaTitulos.setListaPessoasParent(listaTitulos);
                 expandagleListaTitulos.setAdapter(adapterListaTitulos);
                 onResume();
@@ -198,7 +204,7 @@ public class ListaTitulosMDActivity extends AppCompatActivity{
 
             case R.id.menu_lista_titulos_baixados:
 
-                listaTitulos = parcelaRotinas.listaTitulos(idPessoa, '1', '0', whereFiltroAuxiliar);
+                listaTitulos = parcelaRotinas.listaTitulos(idPessoa, '1', '0', whereFiltroAuxiliar, progressBarStatus);
                 adapterListaTitulos.setListaPessoasParent(listaTitulos);
                 expandagleListaTitulos.setAdapter(adapterListaTitulos);
                 onResume();
@@ -206,7 +212,7 @@ public class ListaTitulosMDActivity extends AppCompatActivity{
 
             case R.id.menu_lista_titulos_credito:
 
-                listaTitulos = parcelaRotinas.listaTitulos(idPessoa, '0', '1', whereFiltroAuxiliar);
+                listaTitulos = parcelaRotinas.listaTitulos(idPessoa, '0', '1', whereFiltroAuxiliar, progressBarStatus);
                 adapterListaTitulos.setListaPessoasParent(listaTitulos);
                 expandagleListaTitulos.setAdapter(adapterListaTitulos);
                 onResume();
@@ -338,8 +344,49 @@ public class ListaTitulosMDActivity extends AppCompatActivity{
         return true;
     } // Fim
 
+    public class CarregarListaTitulos extends AsyncTask<Void, Void, Void> {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+            progressBarStatus.setVisibility(View.VISIBLE);
+            progressBarStatus.setIndeterminate(true);
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+
+            ParcelaRotinas parcelaRotinas = new ParcelaRotinas(ListaTitulosMDActivity.this);
+
+            listaTitulos = new ArrayList<TitulosListaBeans>();
+            listaTitulos = parcelaRotinas.listaTitulos(idPessoa, tipoListagem, pagarReceber, null, progressBarStatus);
+
+            adapterListaTitulos = new ListaTitulosExpandableAdapter(ListaTitulosMDActivity.this, listaTitulos);
+
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+
+            expandagleListaTitulos.setAdapter(adapterListaTitulos);
+
+            FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(ListaTitulosMDActivity.this);
+
+            ParcelaRotinas parcelaRotinas = new ParcelaRotinas(ListaTitulosMDActivity.this);
+
+            textTotalAReceber.setText(funcoes.arredondarValor(parcelaRotinas.totalReceberPagarCliente(idPessoa, tipoListagem, '0', whereFiltroAuxiliar)));
+            textTotalCredito.setText(funcoes.arredondarValor(parcelaRotinas.totalReceberPagarCliente(idPessoa, tipoListagem, '1', whereFiltroAuxiliar)));
+
+            progressBarStatus.setVisibility(View.GONE);
+        }
+    }
 
     private void recuperaCampos(){
+        progressBarStatus = (ProgressBar) findViewById(R.id.activity_lista_titulos_mdprogressBar_status);
         textTotalAReceber = (TextView) findViewById(R.id.activity_lista_titulos_md_text_total_a_receber);
         textTotalCredito = (TextView) findViewById(R.id.activity_lista_titulos_md_text_credito);
         expandagleListaTitulos = (ExpandableListView) findViewById(R.id.activity_lista_titulos_md_expandable_lista_titulos);
@@ -405,7 +452,7 @@ public class ListaTitulosMDActivity extends AppCompatActivity{
         ParcelaRotinas parcelaRotinas = new ParcelaRotinas(ListaTitulosMDActivity.this);
 
         listaTitulos = new ArrayList<TitulosListaBeans>();
-        listaTitulos = parcelaRotinas.listaTitulos(idPessoa, tipoListagem, pagarReceber, wherePeriodo);
+        listaTitulos = parcelaRotinas.listaTitulos(idPessoa, tipoListagem, pagarReceber, wherePeriodo, progressBarStatus);
         // Seta o adapter com uma nova lista
         adapterListaTitulos = new ListaTitulosExpandableAdapter(ListaTitulosMDActivity.this, listaTitulos);
         expandagleListaTitulos.setAdapter(adapterListaTitulos);

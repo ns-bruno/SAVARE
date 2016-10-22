@@ -2,17 +2,16 @@ package com.savare.beans;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.os.Parcelable.Creator;
 
 public class PlanoPagamentoBeans implements Parcelable{
 	
 	private int idPlanoPagamento,
 				idEmpresa,
-				codigoPlanoPagamento;
-	private String descricaoPlanoPagamento;
-	private char ativo,
+				codigoPlanoPagamento, diasMedios;
+	private String descricaoPlanoPagamento, dataAlteracao;
+	private String ativo,
 				 atacadoVarejo,
-				 vista_prazo,
+				 vistaPrazo,
 				 descontoPromocao;
 	private double descontoAtacado,
 				   descontoVarejo,
@@ -25,8 +24,8 @@ public class PlanoPagamentoBeans implements Parcelable{
 		this.idEmpresa = dados.readInt();
 		this.codigoPlanoPagamento = dados.readInt();
 		this.descricaoPlanoPagamento = dados.readString();
-		this.atacadoVarejo = dados.readString().charAt(0);
-		this.descontoPromocao = dados.readString().charAt(0);
+		this.atacadoVarejo = dados.readString();
+		this.descontoPromocao = dados.readString();
 		this.descontoAtacado = dados.readDouble();
 		this.descontoVarejo = dados.readDouble();
 		this.jurosAtacado = dados.readDouble();
@@ -111,57 +110,57 @@ public class PlanoPagamentoBeans implements Parcelable{
 	/**
 	 * @return the ativo
 	 */
-	public char getAtivo() {
+	public String getAtivo() {
 		return ativo;
 	}
 
 	/**
 	 * @param ativo the ativo to set
 	 */
-	public void setAtivo(char ativo) {
+	public void setAtivo(String ativo) {
 		this.ativo = ativo;
 	}
 
 	/**
 	 * @return the atacadoVarejo
 	 */
-	public char getAtacadoVarejo() {
+	public String getAtacadoVarejo() {
 		return atacadoVarejo;
 	}
 
 	/**
 	 * @param atacadoVarejo the atacadoVarejo to set
 	 */
-	public void setAtacadoVarejo(char atacadoVarejo) {
+	public void setAtacadoVarejo(String atacadoVarejo) {
 		this.atacadoVarejo = atacadoVarejo;
 	}
 	
 
 	/**
-	 * @return the vista_prazo
+	 * @return the vistaPrazo
 	 */
-	public char getVista_prazo() {
-		return vista_prazo;
+	public String getVistaPrazo() {
+		return vistaPrazo;
 	}
 
 	/**
-	 * @param vista_prazo the vista_prazo to set
+	 * @param vistaPrazo the vistaPrazo to set
 	 */
-	public void setVista_prazo(char vista_prazo) {
-		this.vista_prazo = vista_prazo;
+	public void setVistaPrazo(String vistaPrazo) {
+		this.vistaPrazo = vistaPrazo;
 	}
 
 	/**
 	 * @return the descontoPromocao
 	 */
-	public char getDescontoPromocao() {
+	public String getDescontoPromocao() {
 		return descontoPromocao;
 	}
 
 	/**
 	 * @param descontoPromocao the descontoPromocao to set
 	 */
-	public void setDescontoPromocao(char descontoPromocao) {
+	public void setDescontoPromocao(String descontoPromocao) {
 		this.descontoPromocao = descontoPromocao;
 	}
 
@@ -219,6 +218,22 @@ public class PlanoPagamentoBeans implements Parcelable{
 	 */
 	public void setJurosVarejo(double jurosVarejo) {
 		this.jurosVarejo = jurosVarejo;
+	}
+
+	public String getDataAlteracao() {
+		return dataAlteracao;
+	}
+
+	public void setDataAlteracao(String dataAlteracao) {
+		this.dataAlteracao = dataAlteracao;
+	}
+
+	public int getDiasMedios() {
+		return diasMedios;
+	}
+
+	public void setDiasMedios(int diasMedios) {
+		this.diasMedios = diasMedios;
 	}
 
 	@Override

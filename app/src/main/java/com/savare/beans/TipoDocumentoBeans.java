@@ -8,7 +8,7 @@ public class TipoDocumentoBeans {
 	private String descricaoTipoDocumento,
 				   siglaTipoDocumento,
 				   dataAlteracao;
-	private char tipoVenda;
+	private String tipoVenda;
 	
 	
 	/**
@@ -86,13 +86,13 @@ public class TipoDocumentoBeans {
 	/**
 	 * @return the tipoVenda
 	 */
-	public char getTipoVenda() {
+	public String getTipoVenda() {
 		return tipoVenda;
 	}
 	/**
 	 * @param tipoVenda the tipoVenda to set
 	 */
-	public void setTipoVenda(char tipoVenda) {
+	public void setTipoVenda(String tipoVenda) {
 		this.tipoVenda = tipoVenda;
 	}
 	

@@ -26,6 +26,7 @@
                 android:background="@color/branco"
                 android:text="@string/codigo"
                 android:textAppearance="?android:attr/textAppearanceLarge" />
+            <requestFocus></requestFocus>
 
             <TextView
                 android:id="@+id/fragment_cliente_detalhes_dados_md_text_status"

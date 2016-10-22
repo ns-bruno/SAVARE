@@ -16,6 +16,8 @@ import com.savare.funcoes.FuncoesPersonalizadas;
 import com.savare.funcoes.rotinas.ImportarDadosTxtRotinas;
 import com.savare.funcoes.rotinas.UsuarioRotinas;
 import com.savare.funcoes.rotinas.async.ReceberDadosFtpAsyncRotinas;
+import com.savare.funcoes.rotinas.async.ReceberDadosWebserviceAsyncRotinas;
+import com.savare.webservice.WSSisinfoWebservice;
 
 /**
  * Created by Bruno Nogueira Silva on 18/04/2016.
@@ -66,40 +68,109 @@ public class SincronizacaoMDActivity extends AppCompatActivity {
         buttonReceberDados.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ReceberDadosFtpAsyncRotinas receberDadosFtpAsync = new ReceberDadosFtpAsyncRotinas(SincronizacaoMDActivity.this, progressReceberDados, textReceberDados);
-                receberDadosFtpAsync.execute();
+                //ReceberDadosFtpAsyncRotinas receberDadosFtpAsync = new ReceberDadosFtpAsyncRotinas(SincronizacaoMDActivity.this, progressReceberDados, textReceberDados);
+                //receberDadosFtpAsync.execute();
+
+                ReceberDadosWebserviceAsyncRotinas receberDados = new ReceberDadosWebserviceAsyncRotinas(SincronizacaoMDActivity.this);
+                receberDados.setProgressBarStatus(progressReceberDados);
+                receberDados.setTextStatus(textReceberDados);
+                receberDados.execute();
             }
         });
 
         buttonReceberDadosEmpresa.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ReceberDadosFtpAsyncRotinas receberDadosFtpAsync = new ReceberDadosFtpAsyncRotinas(SincronizacaoMDActivity.this, progressReceberDadosEmpresa, textReceberDadosEmpresa);
-                receberDadosFtpAsync.execute(ImportarDadosTxtRotinas.BLOCO_S);
+                //ReceberDadosFtpAsyncRotinas receberDadosFtpAsync = new ReceberDadosFtpAsyncRotinas(SincronizacaoMDActivity.this, progressReceberDadosEmpresa, textReceberDadosEmpresa);
+                //receberDadosFtpAsync.execute(ImportarDadosTxtRotinas.BLOCO_S);
+
+                String[] tabelaRecebeDados = {  WSSisinfoWebservice.FUNCTION_SELECT_SMAEMPRE};
+
+                ReceberDadosWebserviceAsyncRotinas receberDados = new ReceberDadosWebserviceAsyncRotinas(SincronizacaoMDActivity.this);
+                receberDados.setProgressBarStatus(progressReceberDadosEmpresa);
+                receberDados.setTextStatus(textReceberDadosEmpresa);
+                receberDados.setTabelaRecebeDados(tabelaRecebeDados);
+                receberDados.execute();
             }
         });
 
         buttonReceberDadosClientes.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ReceberDadosFtpAsyncRotinas receberDadosFtpAsync = new ReceberDadosFtpAsyncRotinas(SincronizacaoMDActivity.this, progressReceberDadosClientes, textReceberDadosClientes);
-                receberDadosFtpAsync.execute(ImportarDadosTxtRotinas.BLOCO_C);
+                //ReceberDadosFtpAsyncRotinas receberDadosFtpAsync = new ReceberDadosFtpAsyncRotinas(SincronizacaoMDActivity.this, progressReceberDadosClientes, textReceberDadosClientes);
+                //receberDadosFtpAsync.execute(ImportarDadosTxtRotinas.BLOCO_C);
+
+
+                String[] tabelaRecebeDados = {  WSSisinfoWebservice.FUNCTION_SELECT_SMAEMPRE,
+                                                WSSisinfoWebservice.FUNCTION_SELECT_CFAAREAS,
+                                                WSSisinfoWebservice.FUNCTION_SELECT_SMAEMPRE,
+                                                WSSisinfoWebservice.FUNCTION_SELECT_CFAATIVI,
+                                                WSSisinfoWebservice.FUNCTION_SELECT_CFASTATU,
+                                                WSSisinfoWebservice.FUNCTION_SELECT_CFATPDOC,
+                                                WSSisinfoWebservice.FUNCTION_SELECT_CFACCRED,
+                                                WSSisinfoWebservice.FUNCTION_SELECT_CFAPORTA,
+                                                WSSisinfoWebservice.FUNCTION_SELECT_CFAPROFI,
+                                                WSSisinfoWebservice.FUNCTION_SELECT_CFATPCLI,
+                                                WSSisinfoWebservice.FUNCTION_SELECT_CFATPCOB,
+                                                WSSisinfoWebservice.FUNCTION_SELECT_CFAESTAD,
+                                                WSSisinfoWebservice.FUNCTION_SELECT_CFACIDAD,
+                                                WSSisinfoWebservice.FUNCTION_SELECT_CFACLIFO,
+                                                WSSisinfoWebservice.FUNCTION_SELECT_CFAENDER,
+                                                WSSisinfoWebservice.FUNCTION_SELECT_CFAPARAM,
+                                                WSSisinfoWebservice.FUNCTION_SELECT_CFAFOTOS};
+
+                ReceberDadosWebserviceAsyncRotinas receberDados = new ReceberDadosWebserviceAsyncRotinas(SincronizacaoMDActivity.this);
+                receberDados.setProgressBarStatus(progressReceberDadosClientes);
+                receberDados.setTextStatus(textReceberDadosClientes);
+                receberDados.setTabelaRecebeDados(tabelaRecebeDados);
+                receberDados.execute();
             }
         });
 
         buttonReceberDadosProdutos.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ReceberDadosFtpAsyncRotinas receberDadosFtpAsync = new ReceberDadosFtpAsyncRotinas(SincronizacaoMDActivity.this, progressReceberDadosProdutos, textReceberDadosProdutos);
-                receberDadosFtpAsync.execute(ImportarDadosTxtRotinas.BLOCO_A);
+                //ReceberDadosFtpAsyncRotinas receberDadosFtpAsync = new ReceberDadosFtpAsyncRotinas(SincronizacaoMDActivity.this, progressReceberDadosProdutos, textReceberDadosProdutos);
+                //receberDadosFtpAsync.execute(ImportarDadosTxtRotinas.BLOCO_A);
+
+                String[] tabelaRecebeDados = {  WSSisinfoWebservice.FUNCTION_SELECT_AEAPLPGT,
+                                                WSSisinfoWebservice.FUNCTION_SELECT_AEACLASE,
+                                                WSSisinfoWebservice.FUNCTION_SELECT_AEAUNVEN,
+                                                WSSisinfoWebservice.FUNCTION_SELECT_AEAGRADE,
+                                                WSSisinfoWebservice.FUNCTION_SELECT_AEAMARCA,
+                                                WSSisinfoWebservice.FUNCTION_SELECT_AEACODST,
+                                                WSSisinfoWebservice.FUNCTION_SELECT_AEAPRODU,
+                                                WSSisinfoWebservice.FUNCTION_SELECT_AEAEMBAL,
+                                                WSSisinfoWebservice.FUNCTION_SELECT_AEAPLOJA,
+                                                WSSisinfoWebservice.FUNCTION_SELECT_AEALOCES,
+                                                WSSisinfoWebservice.FUNCTION_SELECT_AEAESTOQ,
+                                                WSSisinfoWebservice.FUNCTION_SELECT_AEAORCAM,
+                                                WSSisinfoWebservice.FUNCTION_SELECT_AEAITORC,
+                                                WSSisinfoWebservice.FUNCTION_SELECT_AEAPERCE,
+                                                WSSisinfoWebservice.FUNCTION_SELECT_AEAFATOR,
+                                                WSSisinfoWebservice.FUNCTION_SELECT_AEAPRREC};
+
+                ReceberDadosWebserviceAsyncRotinas receberDados = new ReceberDadosWebserviceAsyncRotinas(SincronizacaoMDActivity.this);
+                receberDados.setProgressBarStatus(progressReceberDadosProdutos);
+                receberDados.setTextStatus(textReceberDadosProdutos);
+                receberDados.setTabelaRecebeDados(tabelaRecebeDados);
+                receberDados.execute();
             }
         });
 
         buttonReceberDadosTitulos.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ReceberDadosFtpAsyncRotinas receberDadosFtpAsync = new ReceberDadosFtpAsyncRotinas(SincronizacaoMDActivity.this, progressReceberDadosTitulos, textReceberDadosTitulos);
-                receberDadosFtpAsync.execute(ImportarDadosTxtRotinas.BLOCO_R);
+                //ReceberDadosFtpAsyncRotinas receberDadosFtpAsync = new ReceberDadosFtpAsyncRotinas(SincronizacaoMDActivity.this, progressReceberDadosTitulos, textReceberDadosTitulos);
+                //receberDadosFtpAsync.execute(ImportarDadosTxtRotinas.BLOCO_R);
+
+                String[] tabelaRecebeDados = {  WSSisinfoWebservice.FUNCTION_SELECT_RPAPARCE};
+
+                ReceberDadosWebserviceAsyncRotinas receberDados = new ReceberDadosWebserviceAsyncRotinas(SincronizacaoMDActivity.this);
+                receberDados.setProgressBarStatus(progressReceberDadosTitulos);
+                receberDados.setTextStatus(textReceberDadosTitulos);
+                receberDados.setTabelaRecebeDados(tabelaRecebeDados);
+                receberDados.execute();
             }
         });
     } // Fim onCreate

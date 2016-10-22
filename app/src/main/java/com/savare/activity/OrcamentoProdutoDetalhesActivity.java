@@ -16,17 +16,12 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.EditText;
-import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.savare.R;
 import com.savare.activity.fragment.OrcamentoFragment;
-import com.savare.adapter.DescricaoDuplaAdapter;
-import com.savare.adapter.DescricaoSimplesAdapter;
 import com.savare.adapter.ItemUniversalAdapter;
-import com.savare.beans.DescricaoDublaBeans;
-import com.savare.beans.DescricaoSimplesBeans;
 import com.savare.beans.ItemOrcamentoBeans;
 import com.savare.beans.OrcamentoBeans;
 import com.savare.beans.PlanoPagamentoBeans;
@@ -111,7 +106,7 @@ public class OrcamentoProdutoDetalhesActivity extends Activity {
 				// Checa se passou algum numero de orcamento
 				if (idOrcamento != null) {
 
-					produto = produtoRotinas.listaProduto("AEAPRODU.ID_AEAPRODU = " + idProduto, null, idOrcamento, null, null).get(0);
+					produto = produtoRotinas.listaProduto("AEAPRODU.ID_AEAPRODU = " + idProduto, null, idOrcamento, null, null, produtoRotinas.NAO).get(0);
 
 					orcamento = new OrcamentoBeans();
 					// Pega os dados do orcamento
@@ -119,7 +114,7 @@ public class OrcamentoProdutoDetalhesActivity extends Activity {
 
 				} else {
 					// Pega lista sem associar com um orcamento
-					produto = produtoRotinas.listaProduto("AEAPRODU.ID_AEAPRODU = " + idProduto, null, null, null, null).get(0);
+					produto = produtoRotinas.listaProduto("AEAPRODU.ID_AEAPRODU = " + idProduto, null, null, null, null, produtoRotinas.NAO).get(0);
 				}
 			}
 			if (getIntent().getExtras().getString("ATAC_VARE") != null && getIntent().getExtras().getString("ATAC_VARE").length() >0) {
@@ -495,7 +490,7 @@ public class OrcamentoProdutoDetalhesActivity extends Activity {
 					produto.put("QUANTIDADE", quantidade);
 					produto.put("VL_CUSTO", vlCusto);
 					produto.put("VL_BRUTO", vlBruto);
-					if(this.orcamento.getTipoVenda() == '0'){
+					if(this.orcamento.getTipoVenda() == "0"){
 						produto.put("VL_TABELA", this.produto.getValorTabelaAtacado() * quantidade);
 						produto.put("VL_TABELA_UN", this.produto.getValorTabelaAtacado());
 					} else {
@@ -662,7 +657,7 @@ public class OrcamentoProdutoDetalhesActivity extends Activity {
 			editObservacao.setText(itemOrcamentoBeans.getComplemento());
 			editDesconto.setText(funcoes.arredondarValor(((((itemOrcamentoBeans.getValorLiquido() / itemOrcamentoBeans.getValorBruto())*100)-100)* -1)));
 			editValorDesconto.setText(funcoes.arredondarValor(itemOrcamentoBeans.getValorDesconto()));
-			textSequencial.setText(""+itemOrcamentoBeans.getSeguencia());
+			textSequencial.setText(""+itemOrcamentoBeans.getSequencia());
 			textCodigoUnico.setText(itemOrcamentoBeans.getGuid());
 			this.idItemOrcamento = itemOrcamentoBeans.getIdItemOrcamento();
 			//this.valorUnitarioVendaAux = Double.valueOf(funcoes.arredondarValor(String.valueOf((itemOrcamentoBeans.getValorLiquido() / itemOrcamentoBeans.getQuantidade()))).replace(".", "").replace(",", "."));
@@ -707,7 +702,7 @@ public class OrcamentoProdutoDetalhesActivity extends Activity {
 					if(precoPromocao > 0){
 						
 						// Checa se aplica desconto para produtos de promocao
-						if(this.listaPlanoPagamentoPreco.get(i).getDescontoPromocao() == '1'){
+						if(this.listaPlanoPagamentoPreco.get(i).getDescontoPromocao() == "1"){
 							// Aplica o desconto no preco ja com o juros
 							precoVenda = (precoPromocao + (precoPromocao * (this.listaPlanoPagamentoPreco.get(i).getJurosAtacado() / 100))) - 
 										 (precoPromocao * (this.listaPlanoPagamentoPreco.get(i).getDescontoAtacado() / 100));
@@ -732,7 +727,7 @@ public class OrcamentoProdutoDetalhesActivity extends Activity {
 					if(precoPromocao > 0){
 						
 						// Checa se aplica desconto para produtos de promocao
-						if(this.listaPlanoPagamentoPreco.get(i).getDescontoPromocao() == '1'){
+						if(this.listaPlanoPagamentoPreco.get(i).getDescontoPromocao() == "1"){
 							// Aplica o desconto no preco ja com o juros
 							precoVenda = (precoPromocao + (precoPromocao * (this.listaPlanoPagamentoPreco.get(i).getJurosVarejo() / 100))) - 
 										 (precoPromocao * (this.listaPlanoPagamentoPreco.get(i).getDescontoVarejo() / 100));

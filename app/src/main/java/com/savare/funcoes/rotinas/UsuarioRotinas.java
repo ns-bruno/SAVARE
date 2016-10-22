@@ -146,6 +146,7 @@ public class UsuarioRotinas extends Rotinas {
                 usuario.setAtivoUsuario(dadosUsuario.getString(dadosUsuario.getColumnIndex("ATIVO_USUA")).charAt(0));
             }
             usuario.setIpServidor(dadosUsuario.getString(dadosUsuario.getColumnIndex("IP_SERVIDOR_USUA")));
+            usuario.setIpServidorWebservice(dadosUsuario.getString(dadosUsuario.getColumnIndex("IP_SERVIDOR_WEBSERVICE_USUA")));
             usuario.setUsuarioServidor(dadosUsuario.getString(dadosUsuario.getColumnIndex("USUARIO_SERVIDOR_USUA")));
             usuario.setSenhaServidor(dadosUsuario.getString(dadosUsuario.getColumnIndex("SENHA_SERVIDOR_USUA")));
             usuario.setPastaServidor(dadosUsuario.getString(dadosUsuario.getColumnIndex("PASTA_SERVIDOR_USUA")));
@@ -156,6 +157,8 @@ public class UsuarioRotinas extends Rotinas {
             usuario.setPercentualCreditoAtacado(dadosUsuario.getDouble(dadosUsuario.getColumnIndex("PERCENTUAL_CREDITO_ATACADO")));
             usuario.setPercentualCreditoVarejo(dadosUsuario.getDouble(dadosUsuario.getColumnIndex("PERCENTUAL_CREDITO_VAREJO")));
             usuario.setModoConexao(dadosUsuario.getString(dadosUsuario.getColumnIndex("MODO_CONEXAO")));
+            usuario.setCaminhoBancoDados(dadosUsuario.getString(dadosUsuario.getColumnIndex("CAMINHO_BANCO_DADOS_USUA")));
+            usuario.setPortaBancoDados(dadosUsuario.getString(dadosUsuario.getColumnIndex("PORTA_BANCO_DADOS_USUA")));
         }
 
         return usuario;
@@ -195,7 +198,7 @@ public class UsuarioRotinas extends Rotinas {
         // Checa se retornou algum registro
         if( (cursor != null) && (cursor.getCount() > 0) ){
             // Move para o primeiro registro
-            cursor.moveToFirst();
+            cursor.moveToNext();
             // Pega o valor salvo no cursor
             qtdHoras = cursor.getInt(cursor.getColumnIndex("HORAS"));
         }

@@ -2,6 +2,7 @@ package com.savare.funcoes.rotinas.receptor;
 
 import com.savare.funcoes.FuncoesPersonalizadas;
 import com.savare.funcoes.rotinas.async.ReceberDadosFtpAsyncRotinas;
+import com.savare.funcoes.rotinas.async.ReceberDadosWebserviceAsyncRotinas;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -29,8 +30,11 @@ public class ReceptorAlarmeReceberDadosBroadcastRotinas extends BroadcastReceive
 				// Desavia o recebimento automatico
 				funcoes.criarAlarmeEnviarReceberDadosAutomatico(true, false);
 
-				ReceberDadosFtpAsyncRotinas receberDadosFtpAsync = new ReceberDadosFtpAsyncRotinas(context, ReceberDadosFtpAsyncRotinas.TELA_RECEPTOR_ALARME);
-				receberDadosFtpAsync.execute();
+				//ReceberDadosFtpAsyncRotinas receberDadosFtpAsync = new ReceberDadosFtpAsyncRotinas(context, ReceberDadosFtpAsyncRotinas.TELA_RECEPTOR_ALARME);
+				//receberDadosFtpAsync.execute();
+
+				ReceberDadosWebserviceAsyncRotinas receberDadosWebservice = new ReceberDadosWebserviceAsyncRotinas(context);
+				receberDadosWebservice.execute();
 
 				Log.i("SAVARE", "Executou a rotina para receber os dados. - ReceptorAlarmeReceberDadosBroadcastRotinas");
 			}

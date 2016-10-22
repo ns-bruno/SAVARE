@@ -250,6 +250,9 @@ public class ProdutoListaMDFragment extends Fragment {
                             listViewProdutos.setAdapter(null);
                             // Executa
                             LoaderProdutos loaderProdutosAsync = new LoaderProdutos(where, spinnerFiltro);
+                            if ((loaderProdutosAsync.getStatus() == AsyncTask.Status.RUNNING)){
+                                loaderProdutosAsync.cancel(true);
+                            }
                             loaderProdutosAsync.execute();
 
                         } else {
@@ -257,6 +260,9 @@ public class ProdutoListaMDFragment extends Fragment {
                             listViewProdutos.setAdapter(null);
                             // Executa
                             LoaderProdutos loaderProdutosAsync = new LoaderProdutos(where, null);
+                            if ((loaderProdutosAsync.getStatus() == AsyncTask.Status.RUNNING)){
+                                loaderProdutosAsync.cancel(true);
+                            }
                             loaderProdutosAsync.execute();
                             // Tira o foco da searchView e fecha o teclado virtual
                             searchView.clearFocus();
@@ -451,7 +457,7 @@ public class ProdutoListaMDFragment extends Fragment {
         orcamento.setIdEmpresa(Integer.valueOf(funcoes.getValorXml("CodigoEmpresa")));
         orcamento.setIdPessoa(Integer.valueOf(idCliente));
         orcamento.setNomeRazao(nomeRazao);
-        orcamento.setTipoVenda((atacadoVarejo != null) ? atacadoVarejo.charAt(0) : atacadoVarejoAuxiliar.charAt(0));
+        orcamento.setTipoVenda((atacadoVarejo != null) ? atacadoVarejo : atacadoVarejoAuxiliar);
 
         return orcamento;
     }
@@ -503,13 +509,13 @@ public class ProdutoListaMDFragment extends Fragment {
                     if ((idOrcamento != null) && (idOrcamento.length() > 0)) {
 
                         // Cria a lista de produto e verifica se os produto existe no orcamento
-                        listaProdutos = produtoRotinas.listaProduto(where, null, idOrcamento, progressBarListaProdutos, null);
+                        listaProdutos = produtoRotinas.listaProduto(where, null, idOrcamento, progressBarListaProdutos, null, produtoRotinas.NAO);
 
                     } else {
                         // Cria a lista de produto sem verificar se o produto existe no orcamento
-                        listaProdutos = produtoRotinas.listaProduto(where, null, null, progressBarListaProdutos, null);
+                        listaProdutos = produtoRotinas.listaProduto(where, null, null, progressBarListaProdutos, null, produtoRotinas.NAO);
                     }
-                // Checa a tela que esta chamando esta funcao (Mais Vendidos por Cidade)
+                // Checa a tela que esta chamando esta funcao (Mais Vendidos por area)
                 } else if (tipoTela == TELA_MAIS_VENDIDOS_AREA) {
                     // Checa se nao pegou uma selecao vazia
                     if (area != null){
@@ -594,18 +600,22 @@ public class ProdutoListaMDFragment extends Fragment {
                 }
             }catch (Exception e) {
                 // Armazena as informacoes para para serem exibidas e enviadas
-                ContentValues contentValues = new ContentValues();
+                final ContentValues contentValues = new ContentValues();
                 contentValues.put("comando", 0);
                 contentValues.put("tela", "ProdutoListaMDFragment");
                 contentValues.put("mensagem", "Erro ao carregar os dados do produto. \n" + e.getMessage());
                 contentValues.put("dados", e.toString());
                 // Pega os dados do usuario
-                FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(getContext());
+                final FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(getContext());
                 contentValues.put("usuario", funcoes.getValorXml("Usuario"));
                 contentValues.put("empresa", funcoes.getValorXml("ChaveEmpresa"));
                 contentValues.put("email", funcoes.getValorXml("Email"));
                 // Exibe a mensagem
-                funcoes.menssagem(contentValues);
+                ((Activity) getContext()).runOnUiThread(new Runnable() {
+                    public void run() {
+                        funcoes.menssagem(contentValues);
+                    }
+                });
             }
             return null;
         }

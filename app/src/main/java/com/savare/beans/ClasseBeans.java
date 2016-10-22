@@ -4,7 +4,7 @@ public class ClasseBeans {
 	
 	private int idClasse,
 				codigoClasse;
-	private String descricaoClasse;
+	private String descricaoClasse, dataAlteracao;
 	/**
 	 * @return the idClasse
 	 */
@@ -41,7 +41,12 @@ public class ClasseBeans {
 	public void setDescricaoClasse(String descricaoClasse) {
 		this.descricaoClasse = descricaoClasse;
 	}
-	
-	
 
+	public String getDataAlteracao() {
+		return dataAlteracao;
+	}
+
+	public void setDataAlteracao(String dataAlteracao) {
+		this.dataAlteracao = dataAlteracao;
+	}
 }

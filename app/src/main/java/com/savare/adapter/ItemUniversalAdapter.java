@@ -791,9 +791,9 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 			
 			this.funcoes = new FuncoesPersonalizadas(context);
 			
-			textDescricao.setText(produto.getProduto().getDescricaoProduto() + " - " + produto.getProduto().getDescricaoMarca());
+			textDescricao.setText(produto.getProduto().getDescricaoProduto() + " - " + ((produto.getProduto().getDescricaoMarca() != null ) ? produto.getProduto().getDescricaoMarca() : ""));
 			textAbaixoDescricaoEsqueda.setText("Cód. " + produto.getProduto().getCodigoEstrutural());
-			textAbaixoDescricaoDireita.setText("Ref. " + produto.getProduto().getReferencia());
+			textAbaixoDescricaoDireita.setText("Ref. " + ((produto.getProduto().getReferencia() != null) ? produto.getProduto().getReferencia() : ""));
 			textBottonEsquerdoDois.setText(produto.getProduto().getUnidadeVendaProduto().getSiglaUnidadeVenda());
 			textBottonDireito.setText("Est.: " + this.funcoes.arredondarValor(produto.getEstoqueFisico()));
 			// Checa se tem alguma imagem salva no produto
@@ -979,9 +979,9 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 			textDescricao.setText(planoPagamento.getDescricaoPlanoPagamento());
 			textAbaixoDescricaoEsqueda.setText("" + planoPagamento.getCodigoPlanoPagamento());
 			
-			if(planoPagamento.getVista_prazo() == '0'){
+			if(planoPagamento.getVistaPrazo().equalsIgnoreCase("0")){
 				textAbaixoDescricaoDireita.setText("A Vista");
-			} else if(planoPagamento.getVista_prazo() == '1'){
+			} else if(planoPagamento.getVistaPrazo().equalsIgnoreCase("1")){
 				textAbaixoDescricaoDireita.setText("A Prazo");
 			} else {
 				textAbaixoDescricaoDireita.setText("");
@@ -1017,10 +1017,12 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 			
 			textDescricao.setText(orcamento.getNomeRazao()); 
 			textAbaixoDescricaoEsqueda.setText("Nº " +  orcamento.getIdOrcamento());
-			textAbaixoDescricaoDireita.setText(orcamento.getSiglaEstado() + " - " + orcamento.getCidade());
+			textAbaixoDescricaoDireita.setText((orcamento.getSiglaEstado() != null && orcamento.getCidade() != null) ? orcamento.getSiglaEstado() + " - " + orcamento.getCidade() : "");
+
 			// Checa se o pedido ja teve retorno de faturado da empresa
-			if ((orcamento.getStatusRetorno() != null) && ((orcamento.getStatusRetorno().equalsIgnoreCase(ListaOrcamentoPedidoMDActivity.TIPO_PEDIDO_RETORNADO_LIBERADO)) ||
-					(orcamento.getStatusRetorno().equalsIgnoreCase(ListaOrcamentoPedidoMDActivity.TIPO_PEDIDO_FATURADO)) )){
+			if ((orcamento.getStatus() != null) && (orcamento.getStatus().equalsIgnoreCase(ListaOrcamentoPedidoMDActivity.TIPO_PEDIDO_FATURADO)) ){
+
+				textAbaixoDescricaoEsqueda.setText(textAbaixoDescricaoEsqueda.getText() + " (Faturado)");
 				// Mostra o valor faturado de retorno
 				textBottonDireito.setText(funcoes.arredondarValor(orcamento.getTotalOrcamentoFaturado()));
 
@@ -1032,21 +1034,26 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 				textBottonDireito.setPaintFlags(textBottonDireito.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
 
 			} else {
-				textBottonDireito.setText(funcoes.arredondarValor(orcamento.getTotalOrcamento()));
+				if ((orcamento.getTotalOrcamento() <= 0) && (orcamento.getTotalOrcamentoFaturado() > 0)){
+					// Mostra o valor faturado de retorno
+					textBottonDireito.setText(funcoes.arredondarValor(orcamento.getTotalOrcamentoFaturado()));
+				} else {
+					textBottonDireito.setText(funcoes.arredondarValor(orcamento.getTotalOrcamento()));
+				}
 			}
 
-			if(orcamento.getTipoVenda() == '0'){
+			if(orcamento.getTipoVenda().equalsIgnoreCase("0")){
 				textBottonEsquerdo.setText("A");
 				
-			}else if(orcamento.getTipoVenda() == '1'){
+			}else if(orcamento.getTipoVenda().equalsIgnoreCase("1")){
 				textBottonEsquerdo.setText("V");
 			}
 			textBottonEsquerdoDois.setVisibility(View.VISIBLE);
 			textBottonEsquerdoDois.setText(" | " + orcamento.getDataCadastro());
 
-			if ((orcamento.getStatusRetorno() != null) &&
-					((orcamento.getStatusRetorno().equalsIgnoreCase(ListaOrcamentoPedidoMDActivity.TIPO_PEDIDO_RETORNADO_EXCLUIDO)) ||
-							(orcamento.getStatusRetorno().equalsIgnoreCase(ListaOrcamentoPedidoMDActivity.TIPO_PEDIDO_RETORNADO_BLOQUEADO)))){
+			if ((orcamento.getStatus() != null) &&
+					((orcamento.getStatus().equalsIgnoreCase(ListaOrcamentoPedidoMDActivity.TIPO_PEDIDO_RETORNADO_EXCLUIDO)) ||
+							(orcamento.getStatus().equalsIgnoreCase(ListaOrcamentoPedidoMDActivity.TIPO_PEDIDO_RETORNADO_BLOQUEADO)))){
 				// Rista no meio de todas as descricoes
 				textDescricao.setPaintFlags(textDescricao.getPaintFlags()| Paint.STRIKE_THRU_TEXT_FLAG);
 				textAbaixoDescricaoEsqueda.setPaintFlags(textAbaixoDescricaoEsqueda.getPaintFlags()| Paint.STRIKE_THRU_TEXT_FLAG);
@@ -1059,15 +1066,17 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 			viewRodape.setVisibility(View.INVISIBLE);
 			viewTopo.setVisibility(View.INVISIBLE);
 			
-			if((orcamento.getStatusRetorno() != null) && (orcamento.getStatusRetorno().equals(ListaOrcamentoPedidoMDActivity.TIPO_PEDIDO_RETORNADO_BLOQUEADO))){
+			if((orcamento.getStatus() != null) && (orcamento.getStatus().equals(ListaOrcamentoPedidoMDActivity.TIPO_PEDIDO_RETORNADO_BLOQUEADO))){
 				viewTopo.setVisibility(View.VISIBLE);
 				viewTopo.setBackgroundColor(context.getResources().getColor(R.color.vermelho_escuro));
+				textAbaixoDescricaoEsqueda.setText(textAbaixoDescricaoEsqueda.getText() + " (Bloqueado)");
 				
-			} else if((orcamento.getStatusRetorno() != null) && (orcamento.getStatusRetorno().equals(ListaOrcamentoPedidoMDActivity.TIPO_PEDIDO_RETORNADO_LIBERADO))){
+			} else if((orcamento.getStatus() != null) && (orcamento.getStatus().equals(ListaOrcamentoPedidoMDActivity.TIPO_PEDIDO_RETORNADO_LIBERADO))){
 				viewTopo.setVisibility(View.VISIBLE);
 				viewTopo.setBackgroundColor(context.getResources().getColor(R.color.verde_escuro));
+				textAbaixoDescricaoEsqueda.setText(textAbaixoDescricaoEsqueda.getText() + " (Liberado)");
 				
-			} else if((orcamento.getStatusRetorno() != null) && (orcamento.getStatusRetorno().equals(ListaOrcamentoPedidoMDActivity.TIPO_PEDIDO_RETORNADO_EXCLUIDO))){
+			} else if((orcamento.getStatus() != null) && (orcamento.getStatus().equals(ListaOrcamentoPedidoMDActivity.TIPO_PEDIDO_RETORNADO_EXCLUIDO))){
 				textDescricao.setPaintFlags(textDescricao.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
 				textAbaixoDescricaoEsqueda.setPaintFlags(textAbaixoDescricaoEsqueda.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
 				textAbaixoDescricaoDireita.setPaintFlags(textAbaixoDescricaoDireita.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
@@ -1077,7 +1086,7 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 			}
 			
 			
-			// Checa se eh um pedido normal sem ter sido enviado para o servidor FTP
+			// Checa se eh um pedido normal sem ter sido enviado para o servidor web
 			if(orcamento.getStatus().equalsIgnoreCase("P")){
 				textDescricao.setTextColor(context.getResources().getColor(R.color.lilas_escuro));
 				textAbaixoDescricaoEsqueda.setTextColor(context.getResources().getColor(R.color.lilas_escuro));
@@ -1085,8 +1094,10 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 				textBottonDireito.setTextColor(context.getResources().getColor(R.color.lilas_escuro));
 				textBottonEsquerdo.setTextColor(context.getResources().getColor(R.color.lilas_escuro));
 				textBottonEsquerdoDois.setTextColor(context.getResources().getColor(R.color.lilas_escuro));
+
+				textAbaixoDescricaoEsqueda.setText(textAbaixoDescricaoEsqueda.getText() + " (Não Enviado)");
 				
-			// Checa se eh um pedido enviado para o servidor FTP
+			// Checa se eh um pedido enviado para o servidor web
 			} else if(orcamento.getStatus().equalsIgnoreCase("N")){
 				textDescricao.setTextColor(context.getResources().getColor(R.color.verde_escuro));
 				textAbaixoDescricaoEsqueda.setTextColor(context.getResources().getColor(R.color.verde_escuro));
@@ -1094,8 +1105,21 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 				textBottonDireito.setTextColor(context.getResources().getColor(R.color.verde_escuro));
 				textBottonEsquerdo.setTextColor(context.getResources().getColor(R.color.verde_escuro));
 				textBottonEsquerdoDois.setTextColor(context.getResources().getColor(R.color.verde_escuro));
+
+				textAbaixoDescricaoEsqueda.setText(textAbaixoDescricaoEsqueda.getText() + " (Enviado)");
 			
 			// Padrao
+			} else if(orcamento.getStatus().equalsIgnoreCase("C")){
+				textDescricao.setTextColor(context.getResources().getColor(R.color.md_indigo_900));
+				textAbaixoDescricaoEsqueda.setTextColor(context.getResources().getColor(R.color.md_indigo_900));
+				textAbaixoDescricaoDireita.setTextColor(context.getResources().getColor(R.color.md_indigo_900));
+				textBottonDireito.setTextColor(context.getResources().getColor(R.color.md_indigo_900));
+				textBottonEsquerdo.setTextColor(context.getResources().getColor(R.color.md_indigo_900));
+				textBottonEsquerdoDois.setTextColor(context.getResources().getColor(R.color.md_indigo_900));
+
+				textAbaixoDescricaoEsqueda.setText(textAbaixoDescricaoEsqueda.getText() + " (Conferido)");
+
+				// Padrao
 			} else {
 				textDescricao.setTextColor(context.getResources().getColor(R.color.preto));
 				textAbaixoDescricaoEsqueda.setTextColor(context.getResources().getColor(R.color.preto));
@@ -1251,13 +1275,13 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 			//textAbaixoDescricaoEsqueda.setText("D.A.V.: " + tipoCLiente.getDescontoAtacadoVista() + " - D.A.P.: " + tipoCLiente.getDescontoAtacadoPrazo());
 			//textAbaixoDescricaoDireita.setText("D.V.V.: " + tipoCLiente.getDescontoVarejoVista() + " - D.V.P.: " + tipoCLiente.getDescontoVarejoPrazo());
 			
-			if(tipoCLiente.getVendeAtacadoVarejo() == '0'){
+			if(tipoCLiente.getVendeAtacadoVarejo().equalsIgnoreCase("0")){
 				textBottonEsquerdo.setText("Atacado");
 				
-			}else if(tipoCLiente.getVendeAtacadoVarejo() == '1'){
+			}else if(tipoCLiente.getVendeAtacadoVarejo().equalsIgnoreCase("1")){
 				textBottonEsquerdo.setText("Varejo");
 			
-			} else if(tipoCLiente.getVendeAtacadoVarejo() == '2'){
+			} else if(tipoCLiente.getVendeAtacadoVarejo().equalsIgnoreCase("2")){
 				textBottonEsquerdo.setText("Atacado e Varejo");
 			}
 
@@ -1279,10 +1303,10 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 			
 			textAbaixoDescricaoEsqueda.setText("Sigla: " + portadorBanco.getSiglaPortador());
 			
-			if(portadorBanco.getTipo() == '0'){
+			if(portadorBanco.getTipo().equalsIgnoreCase("0")){
 				textAbaixoDescricaoDireita.setText("Banco");
 			
-			} else if(portadorBanco.getTipo() == '1'){
+			} else if(portadorBanco.getTipo().equalsIgnoreCase("1")){
 				textAbaixoDescricaoDireita.setText("Carteira");
 			}
 						
@@ -1334,7 +1358,11 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 			EmbalagemBeans embalagem = listaEmbalagem.get(position);
 			
 			textDescricao.setText("Embalagem: " + embalagem.getUnidadeVendaEmbalagem().getSiglaUnidadeVenda());
-			textAbaixoDescricaoEsqueda.setText("Desc.: " + embalagem.getDescricaoEmbalagem());
+			if (embalagem.getDescricaoEmbalagem() != null) {
+				textAbaixoDescricaoEsqueda.setText("Desc.: " + embalagem.getDescricaoEmbalagem());
+			} else {
+                textAbaixoDescricaoEsqueda.setVisibility(View.INVISIBLE);
+            }
 			
 			textAbaixoDescricaoDireita.setVisibility(View.GONE);
 			textBottonDireito.setVisibility(View.GONE);
@@ -1445,23 +1473,21 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 		} else if(this.tipoItem == CIDADE_DARK){
 			CidadeBeans cidade = listaCidade.get(position);
 
-			textDescricao.setText(cidade.getDescricao());
+			textDescricao.setText(cidade.getDescricao() != null ? cidade.getDescricao() : "");
 			textDescricao.setTextColor(context.getResources().getColor(R.color.branco));
 
 			//view.setBackgroundColor(context.getResources().getColor(R.color.preto));
 
 			if ((cidade.getEstado() != null) && (cidade.getEstado().getSiglaEstado() != null)){
 				textAbaixoDescricaoEsqueda.setText(cidade.getEstado().getSiglaEstado());
-				textAbaixoDescricaoEsqueda.setTextColor(context.getResources().getColor(R.color.branco));
 
 			} else if (cidade.getIdCidade() >= 0){
 				textAbaixoDescricaoEsqueda.setText("Cod.: " + cidade.getIdCidade());
-				textAbaixoDescricaoEsqueda.setTextColor(context.getResources().getColor(R.color.branco));
 
 			} else {
-				textAbaixoDescricaoEsqueda.setVisibility(View.GONE);
+				textAbaixoDescricaoEsqueda.setText("Cidade Desconhecida");
 			}
-
+			textAbaixoDescricaoEsqueda.setTextColor(context.getResources().getColor(R.color.branco));
 			textAbaixoDescricaoDireita.setVisibility(View.GONE);
 			textBottonDireito.setVisibility(View.GONE);
 			textBottonEsquerdo.setVisibility(View.GONE);
@@ -1522,12 +1548,12 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 			textBottonDireito.setText(pessoa.getCpfCnpj());
 
 			// Verifica se o campo bloqueia eh NAO(0) e  o campo PARCELA EM ABERTO eh VENDE(1)
-			if((pessoa.getStatusPessoa().getBloqueia() == '0' ) && (pessoa.getStatusPessoa().getParcelaEmAberto() == '1')){
+			if((pessoa.getStatusPessoa().getBloqueia().equalsIgnoreCase("0")) && (pessoa.getStatusPessoa().getParcelaEmAberto().equalsIgnoreCase("1"))){
 				// Muda a cor da View
 				viewRodape.setBackgroundColor(context.getResources().getColor(R.color.verde_escuro));
 
 				// Verifica se o campo bloqueia eh SIM(1) e  o campo PARCELA EM ABERTO eh diferente de VENDE(1)
-			} else if((pessoa.getStatusPessoa().getBloqueia() == '1') && (pessoa.getStatusPessoa().getParcelaEmAberto() != '1')){
+			} else if((pessoa.getStatusPessoa().getBloqueia().equalsIgnoreCase("1")) && (!pessoa.getStatusPessoa().getParcelaEmAberto().equalsIgnoreCase("1"))){
 				// Muda a cor da View para vermelho
 				viewRodape.setBackgroundColor(context.getResources().getColor(R.color.vermelho_escuro));
 				//textStatus.setTypeface(null, Typeface.BOLD_ITALIC);

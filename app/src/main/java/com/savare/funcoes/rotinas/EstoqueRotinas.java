@@ -20,16 +20,19 @@ public class EstoqueRotinas {
 
 	public List<EstoqueBeans> listaEstoqueProduto(String idProduto, String where){
 		
-		String sql = "SELECT AEAESTOQ.ID_AEAESTOQ, AEAESTOQ.ID_AEAPLOJA, AEAESTOQ.ID_AEALOCES, AEAESTOQ.ESTOQUE, AEAESTOQ.RETIDO, AEAESTOQ.ATIVO "
-				   + "FROM AEAESTOQ "
-				   + "LEFT OUTER JOIN AEAPLOJA AEAPLOJA ON(AEAESTOQ.ID_AEAPLOJA = AEAPLOJA.ID_AEAPLOJA) "
-				   + "LEFT OUTER JOIN AEAPRODU AEAPRODU ON(AEAPLOJA.ID_AEAPRODU = AEAPRODU.ID_AEAPRODU) "
-				   + "WHERE AEAPRODU.ID_AEAPRODU = " + idProduto;
+		String sql = "SELECT AEAESTOQ.ID_AEAESTOQ, AEAESTOQ.ID_AEAPLOJA, AEAESTOQ.ID_AEALOCES, AEAESTOQ.ESTOQUE, AEAESTOQ.RETIDO, AEAESTOQ.ATIVO \n"
+				   + "FROM AEAESTOQ \n"
+				   + "LEFT OUTER JOIN AEAPLOJA AEAPLOJA ON(AEAESTOQ.ID_AEAPLOJA = AEAPLOJA.ID_AEAPLOJA) \n"
+				   + "LEFT OUTER JOIN AEAPRODU AEAPRODU ON(AEAPLOJA.ID_AEAPRODU = AEAPRODU.ID_AEAPRODU) \n"
+				   + "LEFT OUTER JOIN AEALOCES AEALOCES ON(AEALOCES.ID_AEALOCES = AEAESTOQ.ID_AEALOCES) \n"
+				   + "WHERE (AEAPRODU.ID_AEAPRODU = " + idProduto + ") ";
 		
 		if(where != null && where.length() > 1){
-			sql += " AND ( " + where + ")";
+			sql += " AND ( " + where + ") ";
 		}
-		
+
+		sql += " ORDER BY AEALOCES.CODIGO ASC, AEAESTOQ.ID_AEAESTOQ ASC ";
+
 		// Instancia a classe para pegar as informacoes do banco de dados
 		EstoqueSql estoqueSql = new EstoqueSql(context);
 		
@@ -50,7 +53,7 @@ public class EstoqueRotinas {
 				estoque.setIdLocacao(cursor.getInt(cursor.getColumnIndex("ID_AEALOCES")));
 				estoque.setEstoqueLocacao(cursor.getDouble(cursor.getColumnIndex("ESTOQUE")));
 				estoque.setRetidoLocacao(cursor.getDouble(cursor.getColumnIndex("RETIDO")));
-				estoque.setAtivo(cursor.getString(cursor.getColumnIndex("ATIVO")).charAt(0));
+				estoque.setAtivo(cursor.getString(cursor.getColumnIndex("ATIVO")));
 				
 				// Adiciona na lista de estoque
 				listaEstoque.add(estoque);

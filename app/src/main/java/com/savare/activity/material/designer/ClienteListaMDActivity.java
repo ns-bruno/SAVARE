@@ -307,7 +307,7 @@ public class ClienteListaMDActivity extends AppCompatActivity {
         // Adiciona uma titulo para toolbar
         toolbarCabecalho.setTitle(this.getResources().getString(R.string.app_name));
         toolbarCabecalho.setTitleTextColor(getResources().getColor(R.color.branco));
-        //toolbarInicio.setLogo(R.drawable.ic_launcher);
+        //toolbarInicio.setLogo(R.mipmap.ic_launcher);
         // Seta uma toolBar para esta activiy(tela)
         setSupportActionBar(toolbarCabecalho);
     }

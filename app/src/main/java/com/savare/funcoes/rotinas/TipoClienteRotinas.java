@@ -38,10 +38,10 @@ public class TipoClienteRotinas extends Rotinas {
 				tipoClienteBeans.setDescontoVarejoPrazo(dadosTipo.getDouble(dadosTipo.getColumnIndex("DESC_VARE_PRAZO")));
 				tipoClienteBeans.setDescontoVarejoVista(dadosTipo.getDouble(dadosTipo.getColumnIndex("DESC_VARE_VISTA")));
 				if(dadosTipo.getString(dadosTipo.getColumnIndex("DESC_PROMOCAO")) != null){
-					tipoClienteBeans.setDescontoPromocao(dadosTipo.getString(dadosTipo.getColumnIndex("DESC_PROMOCAO")).charAt(0));
+					tipoClienteBeans.setDescontoPromocao(dadosTipo.getString(dadosTipo.getColumnIndex("DESC_PROMOCAO")));
 				}
 				if(dadosTipo.getString(dadosTipo.getColumnIndex("VENDE_ATAC_VAREJO")) != null){
-					tipoClienteBeans.setVendeAtacadoVarejo(dadosTipo.getString(dadosTipo.getColumnIndex("VENDE_ATAC_VAREJO")).charAt(0));
+					tipoClienteBeans.setVendeAtacadoVarejo(dadosTipo.getString(dadosTipo.getColumnIndex("VENDE_ATAC_VAREJO")));
 				}
 				listaTipoCliente.add(tipoClienteBeans);
 			}

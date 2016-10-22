@@ -42,9 +42,9 @@ public class StatusRotinas extends Rotinas {
 				statusPessoa.setIdStatus(cursor.getInt(cursor.getColumnIndex("ID_CFASTATU")));
 				statusPessoa.setCodigo(cursor.getInt(cursor.getColumnIndex("CODIGO")));
 				statusPessoa.setDescricao(cursor.getString(cursor.getColumnIndex("DESCRICAO")));
-				statusPessoa.setBloqueia(cursor.getString(cursor.getColumnIndex("BLOQUEIA")).charAt(0));
-				statusPessoa.setParcelaEmAberto(cursor.getString(cursor.getColumnIndex("PARCELA_EM_ABERTO")).charAt(0));
-				statusPessoa.setVistaPrazo(cursor.getString(cursor.getColumnIndex("VISTA_PRAZO")).charAt(0));
+				statusPessoa.setBloqueia(cursor.getString(cursor.getColumnIndex("BLOQUEIA")));
+				statusPessoa.setParcelaEmAberto(cursor.getString(cursor.getColumnIndex("PARCELA_EM_ABERTO")));
+				statusPessoa.setVistaPrazo(cursor.getString(cursor.getColumnIndex("VISTA_PRAZO")));
 			}
 			
 		} catch (Exception e) {
@@ -72,9 +72,9 @@ public class StatusRotinas extends Rotinas {
 				statusPessoa.setCodigo(status.getInt(status.getColumnIndex("CODIGO")));
 				statusPessoa.setDescricao(status.getString(status.getColumnIndex("DESCRICAO")));
 				statusPessoa.setMensagem(status.getString(status.getColumnIndex("MENSAGEM")));
-				statusPessoa.setBloqueia(status.getString(status.getColumnIndex("BLOQUEIA")).charAt(0));
-				statusPessoa.setParcelaEmAberto(status.getString(status.getColumnIndex("PARCELA_EM_ABERTO")).charAt(0));
-				statusPessoa.setVistaPrazo(status.getString(status.getColumnIndex("VISTA_PRAZO")).charAt(0));
+				statusPessoa.setBloqueia(status.getString(status.getColumnIndex("BLOQUEIA")));
+				statusPessoa.setParcelaEmAberto(status.getString(status.getColumnIndex("PARCELA_EM_ABERTO")));
+				statusPessoa.setVistaPrazo(status.getString(status.getColumnIndex("VISTA_PRAZO")));
 				// Adiciona o status na lista
 				listaStatus.add(statusPessoa);
 			}

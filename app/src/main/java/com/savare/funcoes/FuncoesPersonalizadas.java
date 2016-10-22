@@ -1,30 +1,12 @@
 package com.savare.funcoes;
 
-import java.io.File;
-import java.math.BigDecimal;
-import java.text.DateFormat;
-import java.text.NumberFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.InputMismatchException;
-import java.util.List;
-import java.util.Locale;
-import java.util.Scanner;
-import java.util.UUID;
-
-import org.apache.http.NameValuePair;
-import org.apache.http.message.BasicNameValuePair;
-import org.jasypt.util.text.BasicTextEncryptor;
-
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.AlertDialog;
+import android.app.Notification;
 import android.app.PendingIntent;
 import android.content.ContentResolver;
 import android.content.ContentValues;
@@ -42,18 +24,52 @@ import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.telephony.TelephonyManager;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.text.format.Formatter;
 import android.util.Log;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
 import com.github.johnpersano.supertoasts.SuperToast;
 import com.github.johnpersano.supertoasts.util.Style;
 import com.savare.R;
-import com.savare.banco.local.ConexaoBancoDeDados;
 import com.savare.banco.ConexaoTask;
+import com.savare.banco.local.ConexaoBancoDeDados;
+import com.savare.beans.DispositivoBeans;
+import com.savare.configuracao.ConfiguracoesInternas;
 import com.savare.configuracao.ServicosWeb;
 import com.savare.sincronizacao.SavareAutenticadorService;
+import com.savare.webservice.WSSisinfoWebservice;
+
+import org.apache.http.NameValuePair;
+import org.apache.http.message.BasicNameValuePair;
+import org.jasypt.util.text.BasicTextEncryptor;
+import org.ksoap2.serialization.SoapObject;
+
+import java.io.File;
+import java.math.BigDecimal;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.text.DateFormat;
+import java.text.NumberFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Enumeration;
+import java.util.InputMismatchException;
+import java.util.List;
+import java.util.Locale;
+import java.util.Scanner;
+import java.util.UUID;
+import java.util.Vector;
+
+import br.com.goncalves.pugnotification.notification.Load;
+import br.com.goncalves.pugnotification.notification.PugNotification;
 
 public class FuncoesPersonalizadas {
 
@@ -283,8 +299,9 @@ public class FuncoesPersonalizadas {
 			double vlDouble = Double.parseDouble(valor);
 			
 			//Pega o valor e faz arredondamento com tres casas decimais
-			BigDecimal valorFinal = new BigDecimal(vlDouble).setScale(3, BigDecimal.ROUND_HALF_EVEN);
-			
+			//BigDecimal valorFinal = new BigDecimal(vlDouble).setScale(3, BigDecimal.ROUND_HALF_EVEN);
+			BigDecimal valorFinal = new BigDecimal(vlDouble);
+
 			//Crica uma vareavel colo o local
 			Locale localPtBr = new Locale("pt", "BR");
 			NumberFormat formatarNumero = NumberFormat.getInstance(localPtBr);
@@ -505,7 +522,7 @@ public class FuncoesPersonalizadas {
 				// Adiciona mais alguns segundo para executar o alarme depois de alguns segundo que esta Activity for abaerta
 				tempoInicio.add(Calendar.SECOND, 10);
 				// Cria um intervalo de quanto em quanto tempo o alarme vai repetir
-				long intervalo = 120 * 1000; // 2 Minutos
+				long intervalo = 1200 * 1000; // 20 Minutos
 				
 				AlarmManager alarmeEnviarOrcamento = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 				alarmeEnviarOrcamento.setRepeating(AlarmManager.RTC_WAKEUP, tempoInicio.getTimeInMillis(), intervalo, alarmIntent);
@@ -525,7 +542,7 @@ public class FuncoesPersonalizadas {
 				// Adiciona mais alguns segundo para executar o alarme depois de alguns segundo que esta Activity for abaerta
 				tempoInicio.add(Calendar.SECOND, 20);
 				// Cria um intervalo de quanto em quanto tempo o alarme vai repetir
-				long intervalo = 180 * 1000; // 3 Minutos
+				long intervalo = 1200 * 1000; // 20 Minutos
 
 				AlarmManager alarmeEnviarOrcamento = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 				alarmeEnviarOrcamento.setRepeating(AlarmManager.RTC_WAKEUP, tempoInicio.getTimeInMillis(), intervalo, alarmIntentOutros);
@@ -630,7 +647,7 @@ public class FuncoesPersonalizadas {
 		
 		try{
 			if(dataHora != null){
-				Scanner scannerParametro = new Scanner(dataHora.replace(" ", "-").replace(":", "-")).useDelimiter("\\-");
+				Scanner scannerParametro = new Scanner(dataHora.replace(" ", "-").replace(":", "-").replace(".", "-")).useDelimiter("\\-");
 				int ano = scannerParametro.nextInt();
 				int mes = scannerParametro.nextInt();
 				int dia = scannerParametro.nextInt();
@@ -835,6 +852,11 @@ public class FuncoesPersonalizadas {
 			erro = context.getResources().getString(R.string.erro_sqlite_code_1299) + "\n" + erro + "\n";
 		}
 
+		// Tratamento de erro para campo obrigatorio (not null)
+		if(erro.toLowerCase().contains("no permission for insert")){
+			erro = context.getResources().getString(R.string.erro_nao_tem_permissao_inserir) + "\n" + erro + "\n";
+		}
+
 		if ((erro.toLowerCase().contains("no such table")) || (erro.toLowerCase().contains("no such column"))){
 			erro = context.getResources().getString(R.string.nao_existe_tabela_banco_dados)  + "\n" + erro + "\n" + context.getResources().getString(R.string.vamos_executar_processo_criar_tabelas);
 			try {
@@ -847,6 +869,10 @@ public class FuncoesPersonalizadas {
 			} catch (PackageManager.NameNotFoundException e) {
 				erro = e.getMessage() + "\n" + erro;
 			}
+		}
+
+		if (erro.toLowerCase().contains("timeoutexception")){
+			erro = context.getResources().getString(R.string.demorou_demais_servidor_webservice_responter_internet_lenta) + "\n" + erro + "\n";
 		}
 
 		return erro;
@@ -1094,6 +1120,124 @@ public class FuncoesPersonalizadas {
 		}else {
 			return  UUID.randomUUID().toString();
 		}
+	}
+
+	public String getLocalIpAddress() {
+		try {
+			for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements();) {
+				NetworkInterface intf = en.nextElement();
+				for (Enumeration<InetAddress> enumIpAddr = intf.getInetAddresses(); enumIpAddr.hasMoreElements();) {
+					InetAddress inetAddress = enumIpAddr.nextElement();
+					if (!inetAddress.isLoopbackAddress()) {
+						String ip = Formatter.formatIpAddress(inetAddress.hashCode());
+						//Log.i(TAG, "***** IP="+ ip);
+						return ip;
+					}
+				}
+			}
+		} catch (SocketException ex) {
+			Log.e(TAG, ex.toString());
+		}
+		return null;
+	}
+
+	public boolean checaVersao(){
+		boolean valido = false;
+		try {
+			WSSisinfoWebservice webserviceSisInfo = new WSSisinfoWebservice(context);
+			Vector<SoapObject> listaVersao = webserviceSisInfo.executarSelectWebservice(null, WSSisinfoWebservice.FUNCTION_SELECT_VERSAO_SAVARE, null);
+
+			// Checa se retornou alguma coisa
+			if ((listaVersao != null) && (listaVersao.size() > 0)) {
+
+				// Passa por toda a lista
+				for (SoapObject objetoIndividual : listaVersao) {
+					// Cria uma vareavel para receber os dados retornado do webservice
+					//SoapObject objeto;
+
+                    /*if (objetoIndividual.hasProperty("return")) {
+                        objeto = (SoapObject) objetoIndividual.getProperty("return");
+                    } else {
+                        objeto = objetoIndividual;
+                    }*/
+
+					int versaoLocal = VersionUtils.getVersionCode(context);
+					int versaoWebservice = Integer.parseInt(objetoIndividual.getProperty("return").toString());
+
+					// Checa se o SAVARE esta desatualizado
+					if (versaoLocal < versaoWebservice){
+
+						// Cria uma notificacao para ser manipulado
+						Load mLoad = PugNotification.with(context).load()
+								.identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
+								.smallIcon(R.mipmap.ic_launcher)
+								.largeIcon(R.mipmap.ic_launcher)
+								.title(R.string.versao_savare_desatualizada)
+								.bigTextStyle(R.string.savare_desatualizado_favor_atualize)
+								.flags(Notification.DEFAULT_LIGHTS);
+						mLoad.simple().build();
+
+						// Checa se o SAVARE esta mais atualizado que o webservice
+					} else if (versaoLocal > versaoWebservice){
+
+						// Cria uma notificacao para ser manipulado
+						Load mLoad = PugNotification.with(context).load()
+								.identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
+								.smallIcon(R.mipmap.ic_launcher)
+								.largeIcon(R.mipmap.ic_launcher)
+								.title(R.string.versao_savare_desatualizada)
+								.bigTextStyle(R.string.savare_mais_atualizado_que_webservice)
+								.flags(Notification.DEFAULT_LIGHTS);
+						mLoad.simple().build();
+
+						valido = true;
+
+						// Checa se o SAVARE esta na mesma versao que o webservice
+					} else if (versaoLocal == versaoWebservice){
+						valido = true;
+					}
+				}
+			}
+		}catch (Exception e){
+			// Cria uma notificacao para ser manipulado
+			Load mLoad = PugNotification.with(context).load()
+					.identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
+					.smallIcon(R.mipmap.ic_launcher)
+					.largeIcon(R.mipmap.ic_launcher)
+					.title(R.string.versao_savare_desatualizada)
+					.bigTextStyle(context.getResources().getString(R.string.erro_validar_versao) + " \n " + e.getMessage())
+					.flags(Notification.DEFAULT_LIGHTS);
+			mLoad.simple().build();
+		}
+
+		return valido;
+	}
+
+	public DispositivoBeans dispositivo(){
+		DispositivoBeans dispositivoBeans = null;
+		if ((!getValorXml("ChaveUsuario").equalsIgnoreCase(NAO_ENCONTRADO)) && (getValorXml("ChaveUsuario").length() >= 36)) {
+
+			// Instancia uma classe para pegar os dados do dispositivo
+			dispositivoBeans = new DispositivoBeans();
+			dispositivoBeans.setChaveUsuario(getValorXml("ChaveUsuario"));
+			dispositivoBeans.setNomeDispositivo(android.os.Build.MODEL + " - "+ android.os.Build.PRODUCT);
+			dispositivoBeans.setSistemaOperacionalDispositivo(""+android.os.Build.VERSION.SDK_INT);
+			dispositivoBeans.setNumeroSerialDispositivo(Build.SERIAL.replace("unknown", ""));
+			dispositivoBeans.setMarcaDispositivo(android.os.Build.MANUFACTURER);
+			dispositivoBeans.setIpHost(getLocalIpAddress());
+
+			TelephonyManager telephonyManager = (TelephonyManager) context.getSystemService(context.TELEPHONY_SERVICE);
+			dispositivoBeans.setIdDispositivo(telephonyManager.getDeviceId());
+			dispositivoBeans.setOperadoraDispositivo(telephonyManager.getSimOperatorName());
+		}
+		return dispositivoBeans;
+	}
+
+	public void fecharTecladoVirtual(){
+		//criaListaDeProdutos(where, null, 1);
+		InputMethodManager imm = (InputMethodManager)context.getSystemService(Context.INPUT_METHOD_SERVICE);
+		// Fecha o teclado
+		imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
 	}
 
 } // Fecha classe

@@ -66,13 +66,6 @@ public class OrcamentoPrazoMDFragment extends Fragment{
             // Armazena a variavel de atacado varejo
             atacadoVarejo = parametro.getString(OrcamentoTabFragmentMDActivity.KEY_ATACADO_VAREJO);
 
-            // Instancia a classe de rotinas
-            OrcamentoRotinas orcamentoRotinas = new OrcamentoRotinas(getActivity());
-
-            FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(getActivity());
-            // Pega o total liquido do orcamento
-            textTotalLiquido.setText(orcamentoRotinas.totalOrcamentoLiquido(textCodigoOrcamento.getText().toString()));
-
         } else {
             // Dados da mensagem
             ContentValues mensagem = new ContentValues();
@@ -94,14 +87,16 @@ public class OrcamentoPrazoMDFragment extends Fragment{
                         // Checa se eh um orcamento
                         if (tipoOrcamentoPedido.equals("O")){
 
-                            salvarPrazo();
+                            //salvarPrazo();
+                            SalvarPrazoOrcamento salvarPrazoOrcamento = new SalvarPrazoOrcamento();
+                            salvarPrazoOrcamento.execute();
 
                         } else {
                             FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(getActivity());
                             // Cria uma variavem para inserir as propriedades da mensagem
                             ContentValues mensagem = new ContentValues();
                             mensagem.put("comando", 2);
-                            mensagem.put("tela", "OrcamentoPrazoFragment");
+                            mensagem.put("tela", "OrcamentoPrazoMDFragment");
                             mensagem.put("mensagem", getActivity().getResources().getString(R.string.nao_orcamento) + "\n" +
                                     getActivity().getResources().getString(R.string.nao_possivel_inserir_alterar_orcamento));
                             // Executa a mensagem passando por parametro as propriedades
@@ -118,6 +113,9 @@ public class OrcamentoPrazoMDFragment extends Fragment{
             }
         });
 
+        CarregarPrazoOrcamento carregarPrazoOrcamento = new CarregarPrazoOrcamento(textCodigoOrcamento.getText().toString(), textAtacadoVarejo.getText().toString());
+        carregarPrazoOrcamento.execute();
+
         return viewOrcamentoPrazo;
     } // Fim onCreate
 
@@ -125,8 +123,7 @@ public class OrcamentoPrazoMDFragment extends Fragment{
     public void onResume() {
         super.onResume();
 
-        CarregarPrazoOrcamento carregarPrazoOrcamento = new CarregarPrazoOrcamento(textCodigoOrcamento.getText().toString(), textAtacadoVarejo.getText().toString());
-        carregarPrazoOrcamento.execute();
+
     }
 
     private void recuperarCamposTela() {
@@ -199,7 +196,7 @@ public class OrcamentoPrazoMDFragment extends Fragment{
             // Pega o id do plano de pagamento
             idPlanoPagamento = orcamentoRotinas.idPlanoPagamentoOrcamento(codigoOrcamento);
 
-            // Pega o status do orcamento
+            // Pega o status do orcamento (se eh um orcamento ou um pedido ou um orcamento excluido)
             tipoOrcamentoPedido = orcamentoRotinas.statusOrcamento(codigoOrcamento);
 
             return null;
@@ -208,6 +205,12 @@ public class OrcamentoPrazoMDFragment extends Fragment{
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
+
+            // Instancia a classe para pegar os dados do orcamento
+            OrcamentoRotinas orcamentoRotinas = new OrcamentoRotinas(getActivity());
+
+            // Pega o total liquido do orcamento
+            textTotalLiquido.setText(orcamentoRotinas.totalOrcamentoLiquido(textCodigoOrcamento.getText().toString()));
 
             if (adapterTipoDocumento != null){
                 // Preenche o spinner com um adapter personalizado
@@ -251,6 +254,43 @@ public class OrcamentoPrazoMDFragment extends Fragment{
                     }
                 }
             }
+
+            progressBarStatus.setVisibility(View.GONE);
+        }
+    }
+
+    public class SalvarPrazoOrcamento extends AsyncTask<Void, Void, Void> {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            progressBarStatus.setVisibility(View.VISIBLE);
+            progressBarStatus.setIndeterminate(true);
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+
+            OrcamentoRotinas orcamentoRotinas = new OrcamentoRotinas(getActivity());
+            // Salva o tipo de documento selecionado
+            ContentValues valoresOrcamento = new ContentValues();
+            valoresOrcamento.put("ID_CFATPDOC", adapterTipoDocumento.getListaTipoDocumento().get(spinnerTipoDocumento.getSelectedItemPosition()).getIdTipoDocumento());
+            // Salva o tipo de documento no orcamento
+            orcamentoRotinas.updateOrcamento(valoresOrcamento, textCodigoOrcamento.getText().toString());
+
+            // Salva o plano de pagamento em todos os itens do orcamento
+            ContentValues valoresItemOrcamento = new ContentValues();
+            valoresItemOrcamento.put("ID_AEAPLPGT", adapterPlanoPagamento.getListaPlanoPagamento().get(spinnerPlanoPagamento.getSelectedItemPosition()).getIdPlanoPagamento());
+            // Salva o plano de pagamento nos itens do orcamento
+            orcamentoRotinas.updatePlanoPagamentoItemOrcamento(valoresItemOrcamento, textCodigoOrcamento.getText().toString());
 
             progressBarStatus.setVisibility(View.GONE);
         }

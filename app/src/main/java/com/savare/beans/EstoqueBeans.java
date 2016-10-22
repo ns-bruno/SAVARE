@@ -13,7 +13,7 @@ public class EstoqueBeans implements Parcelable  {
 				   dataAlteracao;
 	private double estoqueLocacao,
 				   retidoLocacao;
-	private char ativo;
+	private String ativo;
 	
 	public EstoqueBeans(Parcel dados) {
 		this.idEstoque = dados.readInt();
@@ -22,7 +22,7 @@ public class EstoqueBeans implements Parcelable  {
 		this.guid = dados.readString();
 		this.estoqueLocacao = dados.readDouble();
 		this.retidoLocacao = dados.readDouble();
-		this.ativo = dados.readString().charAt(0);
+		this.ativo = dados.readString();
 	}
 	
 	public EstoqueBeans() {
@@ -116,13 +116,13 @@ public class EstoqueBeans implements Parcelable  {
 	/**
 	 * @return the ativo
 	 */
-	public char getAtivo() {
+	public String getAtivo() {
 		return ativo;
 	}
 	/**
 	 * @param ativo the ativo to set
 	 */
-	public void setAtivo(char ativo) {
+	public void setAtivo(String ativo) {
 		this.ativo = ativo;
 	}
 	

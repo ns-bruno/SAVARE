@@ -1,16 +1,11 @@
 package com.savare.funcoes.rotinas;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.database.SQLException;
 import android.widget.ProgressBar;
 
-import com.savare.R;
 import com.savare.banco.funcoesSql.PessoaSql;
 import com.savare.beans.CidadeBeans;
 import com.savare.beans.DescricaoSimplesBeans;
@@ -26,6 +21,9 @@ import com.savare.beans.TipoClienteBeans;
 import com.savare.beans.TipoDocumentoBeans;
 import com.savare.funcoes.FuncoesPersonalizadas;
 import com.savare.funcoes.Rotinas;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class PessoaRotinas extends Rotinas {
 
@@ -182,137 +180,151 @@ public class PessoaRotinas extends Rotinas {
 		
 		// Instancia a classe para manipular o banco de dados
 		PessoaSql pessoaSql = new PessoaSql(context);
-		
-		final Cursor dadosPessoa = pessoaSql.sqlSelect(sql);
-		// Se o cursor tiver algum valor entra no laco
-		if (dadosPessoa != null && dadosPessoa.getCount() > 0){
+		try {
+			final Cursor dadosPessoa = pessoaSql.sqlSelect(sql);
+			// Se o cursor tiver algum valor entra no laco
+			if (dadosPessoa != null && dadosPessoa.getCount() > 0) {
 
-			// Checa se tem alguma barra de progresso
-			if (progresso != null){
-				((Activity) context).runOnUiThread(new Runnable() {
-					public void run() {
-						progresso.setIndeterminate(false);
-						progresso.setProgress(0);
-						progresso.setMax(dadosPessoa.getCount());
-					}
-				});
-			}
-
-			// Cria a variavel para salvar os dados da pesso
-			PessoaBeans pessoa;
-			
-			// Move o foco para o primeiro registro que esta dentro do cursor
-			dadosPessoa.moveToFirst();
-			
-			FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
-			
-			// Enquanto o cursor for para o proximo registro e entra no laco
-			for(int controle = 0; controle < dadosPessoa.getCount(); controle++){
-
+				// Checa se tem alguma barra de progresso
 				if (progresso != null) {
-
-					final int finalControle = controle;
 					((Activity) context).runOnUiThread(new Runnable() {
 						public void run() {
-							progresso.setProgress(finalControle);
+							progresso.setIndeterminate(false);
+							progresso.setProgress(0);
+							progresso.setMax(dadosPessoa.getCount());
 						}
 					});
 				}
-				// Instancia a classe de pessoa para armazenar os valores do banco
-				pessoa = new PessoaBeans();
-				// Preenche os dados da pessoa
-				pessoa.setIdPessoa(dadosPessoa.getInt(dadosPessoa.getColumnIndex("ID_CFACLIFO")));
-				pessoa.setCodigoCliente(dadosPessoa.getInt(dadosPessoa.getColumnIndex("CODIGO_CLI")));
-				pessoa.setCodigoFuncionario(dadosPessoa.getInt(dadosPessoa.getColumnIndex("CODIGO_FUN")));
-				pessoa.setCodigoUsuario(dadosPessoa.getInt(dadosPessoa.getColumnIndex("CODIGO_USU")));
-				pessoa.setCodigoTransportadora(dadosPessoa.getInt(dadosPessoa.getColumnIndex("CODIGO_TRA")));
-				pessoa.setNomeRazao(dadosPessoa.getString(dadosPessoa.getColumnIndex("NOME_RAZAO")));
-				pessoa.setNomeFantasia(dadosPessoa.getString(dadosPessoa.getColumnIndex("NOME_FANTASIA")));
-				pessoa.setDataUltimaCompra(funcoes.formataData(dadosPessoa.getString(dadosPessoa.getColumnIndex("DT_ULT_COMPRA"))));
-				pessoa.setCpfCnpj(dadosPessoa.getString(dadosPessoa.getColumnIndex("CPF_CNPJ")));
-				pessoa.setIeRg(dadosPessoa.getString(dadosPessoa.getColumnIndex("IE_RG")));
-				// Checa se a pessoa eh um cadastro novo
-				if (dadosPessoa.getString(dadosPessoa.getColumnIndex("STATUS_CADASTRO_NOVO")).equalsIgnoreCase("N")){
-					pessoa.setCadastroNovo(true);
-				} else {
-					pessoa.setCadastroNovo(false);
-				}
-				if ((dadosPessoa.getString(dadosPessoa.getColumnIndex("CLIENTE")) != null) && (dadosPessoa.getString(dadosPessoa.getColumnIndex("CLIENTE")).length() > 0)) {
-					pessoa.setCliente(dadosPessoa.getString(dadosPessoa.getColumnIndex("CLIENTE")).charAt(0));
-				}
-				// Checa se retornou algum valor
-				if ((dadosPessoa.getString(dadosPessoa.getColumnIndex("PESSOA")) != null) && (!dadosPessoa.getString(dadosPessoa.getColumnIndex("PESSOA")).equals(""))) {
-					pessoa.setPessoa(dadosPessoa.getString(dadosPessoa.getColumnIndex("PESSOA")).charAt(0));
-				}
 
-				// Instancia a classe de cidade
-				CidadeBeans cidade = new CidadeBeans();
-				cidade.setDescricao(dadosPessoa.getString(dadosPessoa.getColumnIndex("DESCRICAO_CIDAD")));
-				cidade.setIdCidade(dadosPessoa.getInt(dadosPessoa.getColumnIndex("ID_CFACIDAD")));
-				// Adiciona a cidade na pessoa
-				pessoa.setCidadePessoa(cidade);
-				
-				// Instancia a classe de estado
-				EstadoBeans estado = new EstadoBeans();
-				estado.setSiglaEstado(dadosPessoa.getString(dadosPessoa.getColumnIndex("UF")));
-				estado.setCodigoEstado(dadosPessoa.getInt(dadosPessoa.getColumnIndex("ID_CFAESTAD")));
-				// Adiciona o estado na pessoa
-				pessoa.setEstadoPessoa(estado);
-				
-				//Instancia a classe de status
-				StatusBeans status = new StatusBeans();
-				status.setIdStatus(dadosPessoa.getInt(dadosPessoa.getColumnIndex("ID_CFASTATU")));
-				status.setDescricao(dadosPessoa.getString(dadosPessoa.getColumnIndex("DESCRICAO_STATU")));
-				// Checa se tem algum dados
-				if ((dadosPessoa.getString(dadosPessoa.getColumnIndex("BLOQUEIA")) != null) && (!dadosPessoa.getString(dadosPessoa.getColumnIndex("BLOQUEIA")).equals(""))) {
-					status.setBloqueia(dadosPessoa.getString(dadosPessoa.getColumnIndex("BLOQUEIA")).charAt(0));
-				}
-				if ((dadosPessoa.getString(dadosPessoa.getColumnIndex("PARCELA_EM_ABERTO")) != null) && (!dadosPessoa.getString(dadosPessoa.getColumnIndex("PARCELA_EM_ABERTO")).equals(""))) {
-					status.setParcelaEmAberto(dadosPessoa.getString(dadosPessoa.getColumnIndex("PARCELA_EM_ABERTO")).charAt(0));
-				}
-				if ((dadosPessoa.getString(dadosPessoa.getColumnIndex("VISTA_PRAZO")) != null) && (!dadosPessoa.getString(dadosPessoa.getColumnIndex("VISTA_PRAZO")).equals(""))) {
-					status.setVistaPrazo(dadosPessoa.getString(dadosPessoa.getColumnIndex("VISTA_PRAZO")).charAt(0));
-				}
-				// Adiciona o status na pessoa
-				pessoa.setStatusPessoa(status);
-				
-				// Instancia a classe de endereco
-				EnderecoBeans endereco = new EnderecoBeans();
-				if ((dadosPessoa.getString(dadosPessoa.getColumnIndex("TIPO")) != null) && (dadosPessoa.getString(dadosPessoa.getColumnIndex("TIPO")).length() > 0)) {
-					endereco.setTipoEndereco(dadosPessoa.getString(dadosPessoa.getColumnIndex("TIPO")).charAt(0));
-				}
-				endereco.setBairro(dadosPessoa.getString(dadosPessoa.getColumnIndex("BAIRRO")));
-				endereco.setCep(dadosPessoa.getString(dadosPessoa.getColumnIndex("CEP")));
-				endereco.setLogradouro(dadosPessoa.getString(dadosPessoa.getColumnIndex("LOGRADOURO")));
-				endereco.setComplemento(dadosPessoa.getString(dadosPessoa.getColumnIndex("COMPLEMENTO")));
-				endereco.setEmail(dadosPessoa.getString(dadosPessoa.getColumnIndex("EMAIL")));
-				endereco.setNumero(dadosPessoa.getString(dadosPessoa.getColumnIndex("NUMERO")));
-				// Adiciona o endereco na pessoa
-				pessoa.setEnderecoPessoa(endereco);
-				
-				// passa para o proximo registro (pessoa)
-				dadosPessoa.moveToNext();
+				// Cria a variavel para salvar os dados da pesso
+				PessoaBeans pessoa;
 
-				listaPessoas.add(pessoa);
-				
-			} // Fim do for
-		} else {
+				// Move o foco para o primeiro registro que esta dentro do cursor
+				dadosPessoa.moveToFirst();
+
+				FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
+
+				// Enquanto o cursor for para o proximo registro e entra no laco
+				for (int controle = 0; controle < dadosPessoa.getCount(); controle++) {
+
+					if (progresso != null) {
+
+						final int finalControle = controle;
+						((Activity) context).runOnUiThread(new Runnable() {
+							public void run() {
+								progresso.setProgress(finalControle);
+							}
+						});
+					}
+					// Instancia a classe de pessoa para armazenar os valores do banco
+					pessoa = new PessoaBeans();
+					// Preenche os dados da pessoa
+					pessoa.setIdPessoa(dadosPessoa.getInt(dadosPessoa.getColumnIndex("ID_CFACLIFO")));
+					pessoa.setCodigoCliente(dadosPessoa.getInt(dadosPessoa.getColumnIndex("CODIGO_CLI")));
+					pessoa.setCodigoFuncionario(dadosPessoa.getInt(dadosPessoa.getColumnIndex("CODIGO_FUN")));
+					pessoa.setCodigoUsuario(dadosPessoa.getInt(dadosPessoa.getColumnIndex("CODIGO_USU")));
+					pessoa.setCodigoTransportadora(dadosPessoa.getInt(dadosPessoa.getColumnIndex("CODIGO_TRA")));
+					pessoa.setNomeRazao(dadosPessoa.getString(dadosPessoa.getColumnIndex("NOME_RAZAO")));
+					pessoa.setNomeFantasia(dadosPessoa.getString(dadosPessoa.getColumnIndex("NOME_FANTASIA")));
+					pessoa.setDataUltimaCompra(funcoes.formataData(dadosPessoa.getString(dadosPessoa.getColumnIndex("DT_ULT_COMPRA"))));
+					pessoa.setCpfCnpj(dadosPessoa.getString(dadosPessoa.getColumnIndex("CPF_CNPJ")));
+					pessoa.setIeRg(dadosPessoa.getString(dadosPessoa.getColumnIndex("IE_RG")));
+					// Checa se a pessoa eh um cadastro novo
+					if ((!dadosPessoa.isNull(dadosPessoa.getColumnIndex("STATUS_CADASTRO_NOVO"))) && (dadosPessoa.getString(dadosPessoa.getColumnIndex("STATUS_CADASTRO_NOVO")).equalsIgnoreCase("N"))) {
+						pessoa.setCadastroNovo(true);
+					} else {
+						pessoa.setCadastroNovo(false);
+					}
+					if ((dadosPessoa.getString(dadosPessoa.getColumnIndex("CLIENTE")) != null) && (dadosPessoa.getString(dadosPessoa.getColumnIndex("CLIENTE")).length() > 0)) {
+						pessoa.setCliente(dadosPessoa.getString(dadosPessoa.getColumnIndex("CLIENTE")));
+					}
+					// Checa se retornou algum valor
+					if ((dadosPessoa.getString(dadosPessoa.getColumnIndex("PESSOA")) != null) && (!dadosPessoa.getString(dadosPessoa.getColumnIndex("PESSOA")).equals(""))) {
+						pessoa.setPessoa(dadosPessoa.getString(dadosPessoa.getColumnIndex("PESSOA")));
+					}
+
+					// Instancia a classe de cidade
+					CidadeBeans cidade = new CidadeBeans();
+					cidade.setDescricao(dadosPessoa.getString(dadosPessoa.getColumnIndex("DESCRICAO_CIDAD")));
+					cidade.setIdCidade(dadosPessoa.getInt(dadosPessoa.getColumnIndex("ID_CFACIDAD")));
+					// Adiciona a cidade na pessoa
+					pessoa.setCidadePessoa(cidade);
+
+					// Instancia a classe de estado
+					EstadoBeans estado = new EstadoBeans();
+					estado.setSiglaEstado(dadosPessoa.getString(dadosPessoa.getColumnIndex("UF")));
+					estado.setCodigoEstado(dadosPessoa.getInt(dadosPessoa.getColumnIndex("ID_CFAESTAD")));
+					// Adiciona o estado na pessoa
+					pessoa.setEstadoPessoa(estado);
+
+					//Instancia a classe de status
+					StatusBeans status = new StatusBeans();
+					status.setIdStatus(dadosPessoa.getInt(dadosPessoa.getColumnIndex("ID_CFASTATU")));
+					status.setDescricao(dadosPessoa.getString(dadosPessoa.getColumnIndex("DESCRICAO_STATU")));
+					// Checa se tem algum dados
+					if ((dadosPessoa.getString(dadosPessoa.getColumnIndex("BLOQUEIA")) != null) && (!dadosPessoa.getString(dadosPessoa.getColumnIndex("BLOQUEIA")).equals(""))) {
+						status.setBloqueia(dadosPessoa.getString(dadosPessoa.getColumnIndex("BLOQUEIA")));
+					}
+					if ((dadosPessoa.getString(dadosPessoa.getColumnIndex("PARCELA_EM_ABERTO")) != null) && (!dadosPessoa.getString(dadosPessoa.getColumnIndex("PARCELA_EM_ABERTO")).equals(""))) {
+						status.setParcelaEmAberto(dadosPessoa.getString(dadosPessoa.getColumnIndex("PARCELA_EM_ABERTO")));
+					}
+					if ((dadosPessoa.getString(dadosPessoa.getColumnIndex("VISTA_PRAZO")) != null) && (!dadosPessoa.getString(dadosPessoa.getColumnIndex("VISTA_PRAZO")).equals(""))) {
+						status.setVistaPrazo(dadosPessoa.getString(dadosPessoa.getColumnIndex("VISTA_PRAZO")));
+					}
+					// Adiciona o status na pessoa
+					pessoa.setStatusPessoa(status);
+
+					// Instancia a classe de endereco
+					EnderecoBeans endereco = new EnderecoBeans();
+					if ((dadosPessoa.getString(dadosPessoa.getColumnIndex("TIPO")) != null) && (dadosPessoa.getString(dadosPessoa.getColumnIndex("TIPO")).length() > 0)) {
+						endereco.setTipoEndereco(dadosPessoa.getString(dadosPessoa.getColumnIndex("TIPO")));
+					}
+					endereco.setBairro(dadosPessoa.getString(dadosPessoa.getColumnIndex("BAIRRO")));
+					endereco.setCep(dadosPessoa.getString(dadosPessoa.getColumnIndex("CEP")));
+					endereco.setLogradouro(dadosPessoa.getString(dadosPessoa.getColumnIndex("LOGRADOURO")));
+					endereco.setComplemento(dadosPessoa.getString(dadosPessoa.getColumnIndex("COMPLEMENTO")));
+					endereco.setEmail(dadosPessoa.getString(dadosPessoa.getColumnIndex("EMAIL")));
+					endereco.setNumero(dadosPessoa.getString(dadosPessoa.getColumnIndex("NUMERO")));
+					// Adiciona o endereco na pessoa
+					pessoa.setEnderecoPessoa(endereco);
+
+					// passa para o proximo registro (pessoa)
+					dadosPessoa.moveToNext();
+
+					listaPessoas.add(pessoa);
+
+				} // Fim do for
+			} else {
+				final FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
+				// Cria uma variavem para inserir as propriedades da mensagem
+				final ContentValues mensagem = new ContentValues();
+				mensagem.put("comando", 2);
+				mensagem.put("tela", "PessoaRotinas");
+				mensagem.put("mensagem", "Não existe registros cadastrados");
+
+				// Executa a mensagem passando por parametro as propriedades
+				((Activity) context).runOnUiThread(new Runnable() {
+					public void run() {
+						funcoes.menssagem(mensagem);
+					}
+				});
+
+			}
+		}catch (Exception e){
 			final FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
 			// Cria uma variavem para inserir as propriedades da mensagem
 			final ContentValues mensagem = new ContentValues();
 			mensagem.put("comando", 2);
-			mensagem.put("tela", "Rotinas");
+			mensagem.put("tela", "PessoaRotinas");
 			mensagem.put("mensagem", "Não existe registros cadastrados");
-			
+
 			// Executa a mensagem passando por parametro as propriedades
 			((Activity) context).runOnUiThread(new Runnable() {
 				public void run() {
 					funcoes.menssagem(mensagem);
 				}
 			});
-
 		}
-
 
 		return listaPessoas;
 	} // Fim listaPessoaResumido
@@ -398,10 +410,10 @@ public class PessoaRotinas extends Rotinas {
 				tipoClienteBeans.setDescontoVarejoPrazo(cursor.getDouble(cursor.getColumnIndex("DESC_VARE_PRAZO_TP_CLIENTE")));
 				tipoClienteBeans.setDescontoVarejoVista(cursor.getDouble(cursor.getColumnIndex("DESC_VARE_VISTA_TP_CLIENTE")));
 				if(cursor.getString(cursor.getColumnIndex("DESC_PROMOCAO_TP_CLIENTE")) != null){
-					tipoClienteBeans.setDescontoPromocao(cursor.getString(cursor.getColumnIndex("DESC_PROMOCAO_TP_CLIENTE")).charAt(0));
+					tipoClienteBeans.setDescontoPromocao(cursor.getString(cursor.getColumnIndex("DESC_PROMOCAO_TP_CLIENTE")));
 				}
 				if(cursor.getString(cursor.getColumnIndex("VENDE_ATAC_VAREJO_TP_CLIENTE")) != null){
-					tipoClienteBeans.setVendeAtacadoVarejo(cursor.getString(cursor.getColumnIndex("VENDE_ATAC_VAREJO_TP_CLIENTE")).charAt(0));
+					tipoClienteBeans.setVendeAtacadoVarejo(cursor.getString(cursor.getColumnIndex("VENDE_ATAC_VAREJO_TP_CLIENTE")));
 				}
 				
 				dadosPessoaCompleto.setTipoClientePessoa(tipoClienteBeans);
@@ -462,12 +474,12 @@ public class PessoaRotinas extends Rotinas {
 				portadorBancoBeans.setIdPortadorBanco(cursor.getInt(cursor.getColumnIndex("ID_CFAPORTA")));
 				portadorBancoBeans.setCodigoPortadorBanco(cursor.getInt(cursor.getColumnIndex("CODIGO_PORTA")));
 				if(cursor.getString(cursor.getColumnIndex("DG")) != null){
-					portadorBancoBeans.setDigitoPortador(cursor.getString(cursor.getColumnIndex("DG")).charAt(0));
+					portadorBancoBeans.setDigitoPortador(cursor.getString(cursor.getColumnIndex("DG")));
 				}
 				portadorBancoBeans.setDescricaoPortador(cursor.getString(cursor.getColumnIndex("DESCRICAO_PORTA")));
 				portadorBancoBeans.setSiglaPortador(cursor.getString(cursor.getColumnIndex("SIGLA_PORTA")));
 				if(cursor.getString(cursor.getColumnIndex("TIPO_PORTA")) != null){
-					portadorBancoBeans.setTipo(cursor.getString(cursor.getColumnIndex("TIPO_PORTA")).charAt(0));
+					portadorBancoBeans.setTipo(cursor.getString(cursor.getColumnIndex("TIPO_PORTA")));
 				}
 				
 				// Adiciona aos dados do cliente
@@ -479,16 +491,16 @@ public class PessoaRotinas extends Rotinas {
 				planoPagamentoBeans.setIdEmpresa(cursor.getInt(cursor.getColumnIndex("ID_SMAEMPRE_PLPGT")));
 				planoPagamentoBeans.setCodigoPlanoPagamento(cursor.getInt(cursor.getColumnIndex("CODIGO_PLPGT")));
 				planoPagamentoBeans.setDescricaoPlanoPagamento(cursor.getString(cursor.getColumnIndex("DESCRICAO_PLPGT")));
-				planoPagamentoBeans.setAtacadoVarejo(cursor.getString(cursor.getColumnIndex("ATAC_VAREJO")).charAt(0));
-				planoPagamentoBeans.setAtivo(cursor.getString(cursor.getColumnIndex("ATIVO_PLPGT")).charAt(0));
+				planoPagamentoBeans.setAtacadoVarejo(cursor.getString(cursor.getColumnIndex("ATAC_VAREJO")));
+				planoPagamentoBeans.setAtivo(cursor.getString(cursor.getColumnIndex("ATIVO_PLPGT")));
 				if(cursor.getString(cursor.getColumnIndex("DESC_PROMOCAO_PLPGT")) != null){
-					planoPagamentoBeans.setDescontoPromocao(cursor.getString(cursor.getColumnIndex("DESC_PROMOCAO_PLPGT")).charAt(0));
+					planoPagamentoBeans.setDescontoPromocao(cursor.getString(cursor.getColumnIndex("DESC_PROMOCAO_PLPGT")));
 				}
 				planoPagamentoBeans.setJurosAtacado(cursor.getDouble(cursor.getColumnIndex("JURO_MEDIO_ATAC")));
 				planoPagamentoBeans.setJurosVarejo(cursor.getDouble(cursor.getColumnIndex("JURO_MEDIO_VARE")));
 				planoPagamentoBeans.setDescontoAtacado(cursor.getDouble(cursor.getColumnIndex("PERC_DESC_ATAC")));
 				planoPagamentoBeans.setDescontoVarejo(cursor.getDouble(cursor.getColumnIndex("PERC_DESC_VARE")));
-				planoPagamentoBeans.setVista_prazo(cursor.getString(cursor.getColumnIndex("VISTA_PRAZO_PLPGT")).charAt(0));
+				planoPagamentoBeans.setVistaPrazo(cursor.getString(cursor.getColumnIndex("VISTA_PRAZO_PLPGT")));
 				
 				// Adiciona aos dados do cliente
 				dadosPessoaCompleto.setPlanoPagamentoPessoa(planoPagamentoBeans);

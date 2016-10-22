@@ -38,7 +38,7 @@ public class ListaTitulosExpandableAdapter extends BaseExpandableListAdapter {
 	}
 
 	/**
-	 * @param listaPessoasParent the listaPessoasParent to set
+	 * @param listaTitulosParent the listaPessoasParent to set
 	 */
 	public void setListaPessoasParent(List<TitulosListaBeans> listaTitulosParent) {
 		this.listaTitulosParent = listaTitulosParent;
@@ -151,7 +151,7 @@ public class ListaTitulosExpandableAdapter extends BaseExpandableListAdapter {
 		textAbaixoDescricaoEsqueda.setText("Emissão: " + parcela.getDataEmissao());
 		textAbaixoDescricaoDireita.setText("Vl. Parcela: " + funcoes.arredondarValor(parcela.getValorParcela()));
 		textBottonEsquerdo.setText("Parcela: " + parcela.getParcela());
-		textBottonDireito.setText("Nosso N.: " + parcela.getNumero());
+		textBottonDireito.setText("Nosso N.: " +  ((parcela.getNumero() != null) ? parcela.getNumero() : ""));
 		
 		StatusRotinas statusRotinas = new StatusRotinas(context);
 		StatusBeans status = statusRotinas.statusCliente(String.valueOf(listaTitulosParent.get(groupPosition).getIdPessoa()));
@@ -159,12 +159,12 @@ public class ListaTitulosExpandableAdapter extends BaseExpandableListAdapter {
 		textBottonEsquerdoDois.setText(status.getDescricao());
 		
 		// Verifica se o campo bloqueia eh NAO(0) e  o campo PARCELA EM ABERTO eh VENDE(1)
-		if((status.getBloqueia() == '0' ) && (status.getParcelaEmAberto() == '1')){
+		if((status.getBloqueia() == "0" ) && (status.getParcelaEmAberto() == "1")){
 			// Muda a cor da View
 			textBottonEsquerdoDois.setTextColor(context.getResources().getColor(R.color.verde_escuro));
 			
 		// Verifica se o campo bloqueia eh SIM(1) e  o campo PARCELA EM ABERTO eh diferente de VENDE(1)
-		} else if((status.getBloqueia() == '1') && (status.getParcelaEmAberto() != '1')){
+		} else if((status.getBloqueia() == "1") && (status.getParcelaEmAberto() != "1")){
 			// Muda a cor da View para vermelho
 			textBottonEsquerdoDois.setTextColor(context.getResources().getColor(R.color.vermelho_escuro));
 			

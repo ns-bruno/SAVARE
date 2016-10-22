@@ -18,6 +18,8 @@ public class PessoaBeans implements Parcelable {
 	private PortadorBancoBeans portadorBancoPessoa;
 	private PlanoPagamentoBeans planoPagamentoPessoa;
 	private List<TelefoneBeans> listaTelefone;
+	private ProfissaoBeans profissaoPessoa;
+	private AreaBeans areaPessoa;
 	
 	private String dataAlteracao,
 				   cpfCnpj,
@@ -43,6 +45,7 @@ public class PessoaBeans implements Parcelable {
 				   dataUltimaVisita;
 	
 	private int idPessoa,
+				idEmpresa,
 				codigoCliente,
 				codigoFuncionario,
 				codigoUsuario,
@@ -51,7 +54,7 @@ public class PessoaBeans implements Parcelable {
 				numeroDependenteMaior,
 				numeroDependenteMenor;
 	
-	private char cliente,
+	private String cliente,
 				 fornecedor,
 				 funcionario,
 				 usuario,
@@ -577,210 +580,210 @@ public class PessoaBeans implements Parcelable {
 	/**
 	 * @return the cliente
 	 */
-	public char getCliente() {
+	public String getCliente() {
 		return cliente;
 	}
 
 	/**
 	 * @param cliente the cliente to set
 	 */
-	public void setCliente(char cliente) {
+	public void setCliente(String cliente) {
 		this.cliente = cliente;
 	}
 
 	/**
 	 * @return the fornecedor
 	 */
-	public char getFornecedor() {
+	public String getFornecedor() {
 		return fornecedor;
 	}
 
 	/**
 	 * @param fornecedor the fornecedor to set
 	 */
-	public void setFornecedor(char fornecedor) {
+	public void setFornecedor(String fornecedor) {
 		this.fornecedor = fornecedor;
 	}
 
 	/**
 	 * @return the funcionario
 	 */
-	public char getFuncionario() {
+	public String getFuncionario() {
 		return funcionario;
 	}
 
 	/**
 	 * @param funcionario the funcionario to set
 	 */
-	public void setFuncionario(char funcionario) {
+	public void setFuncionario(String funcionario) {
 		this.funcionario = funcionario;
 	}
 
 	/**
 	 * @return the usuario
 	 */
-	public char getUsuario() {
+	public String getUsuario() {
 		return usuario;
 	}
 
 	/**
 	 * @param usuario the usuario to set
 	 */
-	public void setUsuario(char usuario) {
+	public void setUsuario(String usuario) {
 		this.usuario = usuario;
 	}
 
 	/**
 	 * @return the representante
 	 */
-	public char getRepresentante() {
+	public String getRepresentante() {
 		return representante;
 	}
 
 	/**
 	 * @param representante the representante to set
 	 */
-	public void setRepresentante(char representante) {
+	public void setRepresentante(String representante) {
 		this.representante = representante;
 	}
 
 	/**
 	 * @return the concorrente
 	 */
-	public char getConcorrente() {
+	public String getConcorrente() {
 		return concorrente;
 	}
 
 	/**
 	 * @param concorrente the concorrente to set
 	 */
-	public void setConcorrente(char concorrente) {
+	public void setConcorrente(String concorrente) {
 		this.concorrente = concorrente;
 	}
 
 	/**
 	 * @return the transportadora
 	 */
-	public char getTransportadora() {
+	public String getTransportadora() {
 		return transportadora;
 	}
 
 	/**
 	 * @param transportadora the transportadora to set
 	 */
-	public void setTransportadora(char transportadora) {
+	public void setTransportadora(String transportadora) {
 		this.transportadora = transportadora;
 	}
 
 	/**
 	 * @return the sexo
 	 */
-	public char getSexo() {
+	public String getSexo() {
 		return sexo;
 	}
 
 	/**
 	 * @param sexo the sexo to set
 	 */
-	public void setSexo(char sexo) {
+	public void setSexo(String sexo) {
 		this.sexo = sexo;
 	}
 
 	/**
 	 * @return the pessoa
 	 */
-	public char getPessoa() {
+	public String getPessoa() {
 		return pessoa;
 	}
 
 	/**
 	 * @param pessoa the pessoa to set
 	 */
-	public void setPessoa(char pessoa) {
+	public void setPessoa(String pessoa) {
 		this.pessoa = pessoa;
 	}
 
 	/**
 	 * @return the civil
 	 */
-	public char getCivil() {
+	public String getCivil() {
 		return civil;
 	}
 
 	/**
 	 * @param civil the civil to set
 	 */
-	public void setCivil(char civil) {
+	public void setCivil(String civil) {
 		this.civil = civil;
 	}
 
 	/**
 	 * @return the orgaoEmissorConjuge
 	 */
-	public char getOrgaoEmissorConjuge() {
+	public String getOrgaoEmissorConjuge() {
 		return orgaoEmissorConjuge;
 	}
 
 	/**
 	 * @param orgaoEmissorConjuge the orgaoEmissorConjuge to set
 	 */
-	public void setOrgaoEmissorConjuge(char orgaoEmissorConjuge) {
+	public void setOrgaoEmissorConjuge(String orgaoEmissorConjuge) {
 		this.orgaoEmissorConjuge = orgaoEmissorConjuge;
 	}
 
 	/**
 	 * @return the ativo
 	 */
-	public char getAtivo() {
+	public String getAtivo() {
 		return ativo;
 	}
 
 	/**
 	 * @param ativo the ativo to set
 	 */
-	public void setAtivo(char ativo) {
+	public void setAtivo(String ativo) {
 		this.ativo = ativo;
 	}
 
 	/**
 	 * @return the enviarExtrato
 	 */
-	public char getEnviarExtrato() {
+	public String getEnviarExtrato() {
 		return enviarExtrato;
 	}
 
 	/**
 	 * @param enviarExtrato the enviarExtrato to set
 	 */
-	public void setEnviarExtrato(char enviarExtrato) {
+	public void setEnviarExtrato(String enviarExtrato) {
 		this.enviarExtrato = enviarExtrato;
 	}
 
 	/**
 	 * @return the tipoExtrato
 	 */
-	public char getTipoExtrato() {
+	public String getTipoExtrato() {
 		return tipoExtrato;
 	}
 
 	/**
 	 * @param tipoExtrato the tipoExtrato to set
 	 */
-	public void setTipoExtrato(char tipoExtrato) {
+	public void setTipoExtrato(String tipoExtrato) {
 		this.tipoExtrato = tipoExtrato;
 	}
 
 	/**
 	 * @return the conjugePodeComprar
 	 */
-	public char getConjugePodeComprar() {
+	public String getConjugePodeComprar() {
 		return conjugePodeComprar;
 	}
 
 	/**
 	 * @param conjugePodeComprar the conjugePodeComprar to set
 	 */
-	public void setConjugePodeComprar(char conjugePodeComprar) {
+	public void setConjugePodeComprar(String conjugePodeComprar) {
 		this.conjugePodeComprar = conjugePodeComprar;
 	}
 
@@ -1120,6 +1123,30 @@ public class PessoaBeans implements Parcelable {
 
 	public void setCadastroNovo(boolean cadastroNovo) {
 		this.cadastroNovo = cadastroNovo;
+	}
+
+	public ProfissaoBeans getProfissaoPessoa() {
+		return profissaoPessoa;
+	}
+
+	public void setProfissaoPessoa(ProfissaoBeans profissaoPessoa) {
+		this.profissaoPessoa = profissaoPessoa;
+	}
+
+	public AreaBeans getAreaPessoa() {
+		return areaPessoa;
+	}
+
+	public void setAreaPessoa(AreaBeans areaPessoa) {
+		this.areaPessoa = areaPessoa;
+	}
+
+	public int getIdEmpresa() {
+		return idEmpresa;
+	}
+
+	public void setIdEmpresa(int idEmpresa) {
+		this.idEmpresa = idEmpresa;
 	}
 
 	@Override

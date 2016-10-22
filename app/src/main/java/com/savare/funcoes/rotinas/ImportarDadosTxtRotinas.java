@@ -145,7 +145,7 @@ public class ImportarDadosTxtRotinas {
 		Load mLoad = PugNotification.with(context).load()
 				.identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
 				.smallIcon(R.mipmap.ic_launcher)
-				.largeIcon(R.drawable.ic_launcher)
+				.largeIcon(R.mipmap.ic_launcher)
 				.title(R.string.importar_dados_recebidos)
 				.message("Importando os dados, aguarde...")
 				.flags(Notification.DEFAULT_SOUND);
@@ -892,7 +892,7 @@ public class ImportarDadosTxtRotinas {
 					.load()
 					.identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
 					.smallIcon(R.mipmap.ic_launcher)
-					.largeIcon(R.drawable.ic_launcher)
+					.largeIcon(R.mipmap.ic_launcher)
 					.title(R.string.importar_dados_recebidos)
 					.bigTextStyle(mensagem)
 					.flags(Notification.DEFAULT_SOUND);

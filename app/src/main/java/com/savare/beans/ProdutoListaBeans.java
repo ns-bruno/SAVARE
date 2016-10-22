@@ -1,10 +1,10 @@
 package com.savare.beans;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import android.os.Parcel;
 import android.os.Parcelable;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class ProdutoListaBeans implements Parcelable {
 	
@@ -44,7 +44,7 @@ public class ProdutoListaBeans implements Parcelable {
 	    this.produto.setIdProduto(dados.readInt());
 	    this.produto.setDescricaoProduto(dados.readString());
 	    this.produto.setDescricaoMarca(dados.readString());
-	    this.produto.setTipoProduto(dados.readString().charAt(0));
+	    this.produto.setTipoProduto(dados.readString());
 	    List<EmbalagemBeans> listaEmbalagem = new ArrayList<EmbalagemBeans>();
 	    dados.readList(listaEmbalagem, EmbalagemBeans.class.getClassLoader());
 	    this.produto.setListaEmbalagem(listaEmbalagem);
@@ -82,7 +82,7 @@ public class ProdutoListaBeans implements Parcelable {
 	/**
 	 * Valor do produto ja com todos os acrecimos e/ou descontos.
 	 * 
-	 * @param valorUnitario the valorUnitario to set
+	 * @param valorUnitarioAtacado the valorUnitario to set
 	 */
 	public void setValorUnitarioAtacado(double valorUnitarioAtacado) {
 		this.valorUnitarioAtacado = valorUnitarioAtacado;
@@ -329,7 +329,7 @@ public class ProdutoListaBeans implements Parcelable {
 			p.setIdProduto(source.readInt());
 			p.setDescricaoProduto(source.readString());
 			p.setDescricaoMarca(source.readString());
-			p.setTipoProduto(source.readString().charAt(0));
+			p.setTipoProduto(source.readString());
 			List<EmbalagemBeans> embalagem = new ArrayList<EmbalagemBeans>();
 			source.readList(embalagem, EmbalagemBeans.class.getClassLoader());
 			// Adiciona a lista de embalagem no produto

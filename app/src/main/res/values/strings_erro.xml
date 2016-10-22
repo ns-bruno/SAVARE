@@ -21,10 +21,13 @@
     <string name="erro_sqlite_code_2067">Já existe no banco de dados.</string>
     <string name="erro_sqlite_code_1811">Abortamos a operação. Confira os detalhes da mensagem.</string>
     <string name="erro_sqlite_code_1299">Existe campos que são obrigatórios. Verifique quais.</string>
+    <string name="erro_nao_tem_permissao_inserir">O seu usuário não tem permissão para inserir novos registros.</string>
     <string name="favor_entrar_contato_responsavel_ti">Favor, entrar em contato com o responsável de T.I.</string>
     <string name="nao_existe_parametros_tabela_percentuais_usuario">Não existe nenhum parametro na tabela de percentuais(AEAPERCE) do usuário/funcionário, entrar em contato com o responsável de T.I.</string>
     <string name="nao_consegimos_carregar_imagem_produtos">Não conseguimos carregar as imagens dos produtos.</string>
     <string name="nao_conseguimo_carregar_dados_vendas">Não conseguimos carregar os dados/valores de vendas.</string>
+    <string name="demorou_demais_servidor_webservice_responter_internet_lenta">Demorou demais para o servidor Webservice responder.
+                                                                      Talvez a internet esteja lenta, sujerimos que tente novamente ou entre em contanto com o departamento de T.I.</string>
+    <string name="erro_id_produto_loja_nao_informado">ID do Produto por Loja não foi informado no parametro.</string>
 
-    
 </resources>

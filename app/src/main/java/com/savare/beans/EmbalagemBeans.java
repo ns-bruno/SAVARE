@@ -14,10 +14,10 @@ public class EmbalagemBeans implements Parcelable{
 				modulo,
 				decimais;
 	
-	private char principal,
+	private String principal,
 				 ativo;
 	
-	private String descricaoEmbalagem;
+	private String descricaoEmbalagem, dataAlteracao;
 	
 	private double fatorConversao,
 				   fatorPreco;
@@ -27,8 +27,8 @@ public class EmbalagemBeans implements Parcelable{
 		idProduto = dados.readInt();
 		modulo = dados.readInt();
 		decimais = dados.readInt();
-		principal = dados.readString().charAt(0);
-		ativo = dados.readString().charAt(0);
+		principal = dados.readString();
+		ativo = dados.readString();
 		descricaoEmbalagem = dados.readString();
 		fatorConversao = dados.readDouble();
 		fatorPreco = dados.readDouble();
@@ -112,28 +112,28 @@ public class EmbalagemBeans implements Parcelable{
 	/**
 	 * @return the principal
 	 */
-	public char getPrincipal() {
+	public String getPrincipal() {
 		return principal;
 	}
 
 	/**
 	 * @param principal the principal to set
 	 */
-	public void setPrincipal(char principal) {
+	public void setPrincipal(String principal) {
 		this.principal = principal;
 	}
 
 	/**
 	 * @return the ativo
 	 */
-	public char getAtivo() {
+	public String getAtivo() {
 		return ativo;
 	}
 
 	/**
 	 * @param ativo the ativo to set
 	 */
-	public void setAtivo(char ativo) {
+	public void setAtivo(String ativo) {
 		this.ativo = ativo;
 	}
 
@@ -191,6 +191,14 @@ public class EmbalagemBeans implements Parcelable{
 	 */
 	public void setIdUnidadeVenda(int idUnidadeVenda) {
 		this.idUnidadeVenda = idUnidadeVenda;
+	}
+
+	public String getDataAlteracao() {
+		return dataAlteracao;
+	}
+
+	public void setDataAlteracao(String dataAlteracao) {
+		this.dataAlteracao = dataAlteracao;
 	}
 
 	@Override

@@ -52,14 +52,14 @@ public class ReceptorNotificarAparelhoRotinas extends BroadcastReceiver {
 		builder.setTicker(ticker);
 		builder.setContentTitle(titulo);
 		builder.setContentText(descricao);
-		builder.setSmallIcon(R.drawable.ic_launcher);
-		builder.setLargeIcon(BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_launcher));
+		builder.setSmallIcon(R.mipmap.ic_launcher);
+		builder.setLargeIcon(BitmapFactory.decodeResource(context.getResources(), R.mipmap.ic_launcher));
 		builder.setContentIntent(p);
 		
 		Notification n = builder.build();
 		n.vibrate = new long[]{150, 300, 150, 600};
 		n.flags = Notification.FLAG_AUTO_CANCEL;
-		nm.notify(R.drawable.ic_launcher, n);
+		nm.notify(R.mipmap.ic_launcher, n);
 		
 		try{
 			Uri som = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);

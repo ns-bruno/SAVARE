@@ -33,12 +33,12 @@ public class PortadorBancoRotinas extends Rotinas {
 				portadorBancoBeans.setIdPortadorBanco(dadosPortador.getInt(dadosPortador.getColumnIndex("ID_CFAPORTA")));
 				portadorBancoBeans.setCodigoPortadorBanco(dadosPortador.getInt(dadosPortador.getColumnIndex("CODIGO")));
 				if(dadosPortador.getString(dadosPortador.getColumnIndex("DG")) != null){
-					portadorBancoBeans.setDigitoPortador(dadosPortador.getString(dadosPortador.getColumnIndex("DG")).charAt(0));
+					portadorBancoBeans.setDigitoPortador(dadosPortador.getString(dadosPortador.getColumnIndex("DG")));
 				}
 				portadorBancoBeans.setDescricaoPortador(dadosPortador.getString(dadosPortador.getColumnIndex("DESCRICAO")));
 				portadorBancoBeans.setSiglaPortador(dadosPortador.getString(dadosPortador.getColumnIndex("SIGLA")));
 				if(dadosPortador.getString(dadosPortador.getColumnIndex("TIPO")) != null){
-					portadorBancoBeans.setTipo(dadosPortador.getString(dadosPortador.getColumnIndex("TIPO")).charAt(0));
+					portadorBancoBeans.setTipo(dadosPortador.getString(dadosPortador.getColumnIndex("TIPO")));
 				}
 				listaPortadorBanco.add(portadorBancoBeans);
 			}

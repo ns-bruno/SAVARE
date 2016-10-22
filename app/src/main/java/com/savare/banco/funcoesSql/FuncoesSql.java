@@ -1,5 +1,6 @@
 package com.savare.banco.funcoesSql;
 
+import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.pm.PackageManager;
@@ -21,6 +22,8 @@ public class FuncoesSql {
 	private String tabela;
 	private FuncoesPersonalizadas funcoes;
 	private Context context;
+	private static final String[] CONFLICT_VALUES = new String[]
+			{"", " OR ROLLBACK ", " OR ABORT ", " OR FAIL ", " OR IGNORE ", " OR REPLACE "};
 
 	
 	public FuncoesSql(Context context, String tabela) {
@@ -35,10 +38,19 @@ public class FuncoesSql {
 		}
 	}
 
-	
+
+	public SQLiteDatabase getBancoDados() {
+		return bancoDados;
+	}
+
+	public void setBancoDados(SQLiteDatabase bancoDados) {
+		this.bancoDados = bancoDados;
+	}
+
 	/**
 	 * Funcao para inserir no banco de dados. \n
 	 * Tem que ser passado por parametro os dados atraves de @values.
+	 * x
 	 * @param values - Dados que eh para ser inseridos
 	 * @return
 	 */
@@ -149,7 +161,7 @@ public class FuncoesSql {
 		} catch (SQLException e) {
 			
 			// Armazena as informacoes para para serem exibidas e enviadas
-			ContentValues contentValues = new ContentValues();
+			final ContentValues contentValues = new ContentValues();
 			contentValues.put("comando", 0);
 			contentValues.put("tela", tabela);
 			contentValues.put("mensagem", funcoes.tratamentoErroBancoDados(e.getMessage()));
@@ -157,15 +169,19 @@ public class FuncoesSql {
 			// Pega os dados do usuario
 			this.funcoes = new FuncoesPersonalizadas(context);
 			contentValues.put("usuario", funcoes.getValorXml("Usuario"));
-			contentValues.put("empresa", funcoes.getValorXml("ChaveEmpresa"));
+			contentValues.put("empresa", funcoes.getValorXml("ChaveUsuario"));
 			contentValues.put("email", funcoes.getValorXml("Email"));
-			
-			this.funcoes.menssagem(contentValues);
+
+			((Activity) context).runOnUiThread(new Runnable() {
+				public void run() {
+					funcoes.menssagem(contentValues);
+				}
+			});
 			
 		} catch (Exception e) {
 			
 			// Armazena as informacoes para para serem exibidas e enviadas
-			ContentValues contentValues = new ContentValues();
+			final ContentValues contentValues = new ContentValues();
 			contentValues.put("comando", 0);
 			contentValues.put("tela", tabela);
 			contentValues.put("mensagem", funcoes.tratamentoErroBancoDados(e.getMessage()));
@@ -175,8 +191,12 @@ public class FuncoesSql {
 			contentValues.put("usuario", funcoes.getValorXml("Usuario"));
 			contentValues.put("empresa", funcoes.getValorXml("ChaveEmpresa"));
 			contentValues.put("email", funcoes.getValorXml("Email"));
-			
-			this.funcoes.menssagem(contentValues);
+
+			((Activity) context).runOnUiThread(new Runnable() {
+				public void run() {
+					funcoes.menssagem(contentValues);
+				}
+			});
 			
 		} finally{
 			conexaoBanco.fechar();
@@ -217,15 +237,47 @@ public class FuncoesSql {
             //statement.bindAllArgsAsStrings(bindArgs);
             id = statement.executeInsert();
 			
-		} catch (SQLException e) {
+		} catch (final SQLException e) {
 			
 			Log.e("SAVARE", e.getMessage());
+
+			final ContentValues contentValues = new ContentValues();
+			contentValues.put("comando", 0);
+			contentValues.put("tela", "FuncoesSql");
+			contentValues.put("mensagem", e.toString());
+			contentValues.put("dados", e.toString());
+			// Pega os dados do usuario
+			//contentValues.put("usuario", funcoes.getValorXml("Usuario"));
+			//contentValues.put("empresa", funcoes.getValorXml("ChaveEmpresa"));
+			//contentValues.put("email", funcoes.getValorXml("Email"));
+
+			((Activity) context).runOnUiThread(new Runnable() {
+				public void run() {
+					funcoes.menssagem(contentValues);
+				}
+			});
 			
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			
 			Log.e("SAVARE", e.getMessage());
-			
-		} finally{
+
+			final ContentValues contentValues = new ContentValues();
+			contentValues.put("comando", 0);
+			contentValues.put("tela", "FuncoesSql");
+			contentValues.put("mensagem", e.toString());
+			contentValues.put("dados", e.toString());
+			// Pega os dados do usuario
+			//contentValues.put("usuario", funcoes.getValorXml("Usuario"));
+			//contentValues.put("empresa", funcoes.getValorXml("ChaveEmpresa"));
+			//contentValues.put("email", funcoes.getValorXml("Email"));
+
+			((Activity) context).runOnUiThread(new Runnable() {
+				public void run() {
+					funcoes.menssagem(contentValues);
+				}
+			});
+
+		} finally {
 			
 			bancoDados.setTransactionSuccessful();
 			bancoDados.endTransaction();
@@ -317,13 +369,17 @@ public class FuncoesSql {
 			//qtdAtualizado = bancoDados.update(tabela, dados, where, null);
 			
 			if(qtdAtualizado > 0){
-				ContentValues mensagem = new ContentValues();
+				/*final ContentValues mensagem = new ContentValues();
 				mensagem.put("comando", 2);
 				mensagem.put("mensagem", "Atualizado com sucesso! \n");
 				mensagem.put("tela", tabela);
 				
 				this.funcoes = new FuncoesPersonalizadas(context);
-				this.funcoes.menssagem(mensagem);
+                ((Activity) context).runOnUiThread(new Runnable() {
+                    public void run() {
+                        funcoes.menssagem(mensagem);
+                    }
+                });*/
 				
 			} else {
 				ContentValues mensagem = new ContentValues();
@@ -339,7 +395,7 @@ public class FuncoesSql {
 			this.funcoes = new FuncoesPersonalizadas(context);
 
 			// Armazena as informacoes para para serem exibidas e enviadas
-			ContentValues contentValues = new ContentValues();
+			final ContentValues contentValues = new ContentValues();
 			contentValues.put("comando", 0);
 			contentValues.put("tela", tabela);
 			contentValues.put("mensagem", funcoes.tratamentoErroBancoDados(e.getMessage()));
@@ -349,11 +405,16 @@ public class FuncoesSql {
 			contentValues.put("empresa", funcoes.getValorXml("ChaveEmpresa"));
 			contentValues.put("email", funcoes.getValorXml("Email"));
 			
-			this.funcoes.menssagem(contentValues);
+			//this.funcoes.menssagem(contentValues);
+            ((Activity) context).runOnUiThread(new Runnable() {
+                public void run() {
+                    funcoes.menssagem(contentValues);
+                }
+            });
 			
 		} catch (Exception e) {
 			// Armazena as informacoes para para serem exibidas e enviadas
-			ContentValues contentValues = new ContentValues();
+			final ContentValues contentValues = new ContentValues();
 			contentValues.put("comando", 0);
 			contentValues.put("tela", tabela);
 			contentValues.put("mensagem", funcoes.tratamentoErroBancoDados(e.getMessage()));
@@ -364,7 +425,66 @@ public class FuncoesSql {
 			contentValues.put("empresa", funcoes.getValorXml("ChaveEmpresa"));
 			contentValues.put("email", funcoes.getValorXml("Email"));
 			
-			this.funcoes.menssagem(contentValues);
+			//this.funcoes.menssagem(contentValues);
+			((Activity) context).runOnUiThread(new Runnable() {
+				public void run() {
+					funcoes.menssagem(contentValues);
+				}
+			});
+		} finally{
+			conexaoBanco.fechar();
+			bancoDados.close();
+		}
+		return qtdAtualizado;
+	} // Fim do update
+
+	public int updateFast(ContentValues dados, String where){
+		int qtdAtualizado = 0;
+		bancoDados = conexaoBanco.abrirBanco();
+
+		try {
+			qtdAtualizado = bancoDados.updateWithOnConflict(tabela, dados, where, null, 0);
+
+		} catch (SQLException e) {
+			this.funcoes = new FuncoesPersonalizadas(context);
+
+			// Armazena as informacoes para para serem exibidas e enviadas
+			final ContentValues contentValues = new ContentValues();
+			contentValues.put("comando", 0);
+			contentValues.put("tela", tabela);
+			contentValues.put("mensagem", funcoes.tratamentoErroBancoDados(e.getMessage()));
+			contentValues.put("dados", dados.toString());
+			// Pega os dados do usuario
+			contentValues.put("usuario", funcoes.getValorXml("Usuario"));
+			contentValues.put("empresa", funcoes.getValorXml("ChaveEmpresa"));
+			contentValues.put("email", funcoes.getValorXml("Email"));
+
+			//this.funcoes.menssagem(contentValues);
+            ((Activity) context).runOnUiThread(new Runnable() {
+                public void run() {
+                    funcoes.menssagem(contentValues);
+                }
+            });
+
+		} catch (Exception e) {
+			// Armazena as informacoes para para serem exibidas e enviadas
+			final ContentValues contentValues = new ContentValues();
+			contentValues.put("comando", 0);
+			contentValues.put("tela", tabela);
+			contentValues.put("mensagem", funcoes.tratamentoErroBancoDados(e.getMessage()));
+			contentValues.put("dados", dados.toString());
+			// Pega os dados do usuario
+			this.funcoes = new FuncoesPersonalizadas(context);
+			contentValues.put("usuario", funcoes.getValorXml("Usuario"));
+			contentValues.put("empresa", funcoes.getValorXml("ChaveEmpresa"));
+			contentValues.put("email", funcoes.getValorXml("Email"));
+
+			//this.funcoes.menssagem(contentValues);
+            ((Activity) context).runOnUiThread(new Runnable() {
+                public void run() {
+                    funcoes.menssagem(contentValues);
+                }
+            });
 		} finally{
 			conexaoBanco.fechar();
 			bancoDados.close();
@@ -440,6 +560,8 @@ public class FuncoesSql {
 	 * @return - Retorna um Cursor com os dados recuperados.
 	 */
 	public Cursor query(String where, String ordem){
+		Log.i("SAVARE", "FuncoesSql - " + where + " - " + ordem);
+
 		Cursor cursor = null;
 		bancoDados = conexaoBanco.abrirBanco();
 		try {
@@ -495,11 +617,12 @@ public class FuncoesSql {
 	 * @param sql
 	 */
 	public void execSQL(String sql){
+		Log.i("SAVARE", sql);
+
 		bancoDados = conexaoBanco.abrirBanco();
 		try {
-			
 			bancoDados.execSQL(sql);
-			
+
 		} catch (SQLException e) {
 			// Armazena as informacoes para para serem exibidas e enviadas
 			ContentValues contentValues = new ContentValues();
@@ -512,9 +635,9 @@ public class FuncoesSql {
 			contentValues.put("usuario", funcoes.getValorXml("Usuario"));
 			contentValues.put("empresa", funcoes.getValorXml("ChaveEmpresa"));
 			contentValues.put("email", funcoes.getValorXml("Email"));
-			
+
 			this.funcoes.menssagem(contentValues);
-			
+
 		} catch (Exception e) {
 			// Armazena as informacoes para para serem exibidas e enviadas
 			ContentValues contentValues = new ContentValues();
@@ -527,13 +650,13 @@ public class FuncoesSql {
 			contentValues.put("usuario", funcoes.getValorXml("Usuario"));
 			contentValues.put("empresa", funcoes.getValorXml("ChaveEmpresa"));
 			contentValues.put("email", funcoes.getValorXml("Email"));
-			
+
 			this.funcoes.menssagem(contentValues);
-			
+
 		} finally {
 			bancoDados.close();
 		}
-		
+
 	} //Fim do execSQL
 	
 	
@@ -545,6 +668,7 @@ public class FuncoesSql {
 	 * 
 	 */
 	public Cursor sqlSelect(String sql){
+		Log.i("SAVARE", sql);
 		Cursor cursor = null;
 		bancoDados = conexaoBanco.abrirBanco();
 		try {
@@ -562,7 +686,7 @@ public class FuncoesSql {
 				this.funcoes = new FuncoesPersonalizadas(context);
 
 				// Armazena as informacoes para para serem exibidas e enviadas
-				ContentValues contentValues = new ContentValues();
+				final ContentValues contentValues = new ContentValues();
 				contentValues.put("comando", 0);
 				contentValues.put("tela", tabela + " - FuncoesSql");
 				contentValues.put("mensagem", funcoes.tratamentoErroBancoDados(e.getMessage()));
@@ -571,13 +695,17 @@ public class FuncoesSql {
 				contentValues.put("usuario", funcoes.getValorXml("Usuario"));
 				contentValues.put("empresa", funcoes.getValorXml("ChaveEmpresa"));
 				contentValues.put("email", funcoes.getValorXml("Email"));
-				
-				this.funcoes.menssagem(contentValues);
+
+				((Activity) context).runOnUiThread(new Runnable() {
+					public void run() {
+						funcoes.menssagem(contentValues);
+					}
+				});
 			}
 			
 		} catch (Exception e) {
 			// Armazena as informacoes para para serem exibidas e enviadas
-			ContentValues contentValues = new ContentValues();
+			final ContentValues contentValues = new ContentValues();
 			contentValues.put("comando", 0);
 			contentValues.put("tela", tabela + " - FuncoesSql");
 			contentValues.put("mensagem", funcoes.tratamentoErroBancoDados(e.getMessage()));
@@ -587,8 +715,12 @@ public class FuncoesSql {
 			contentValues.put("usuario", funcoes.getValorXml("Usuario"));
 			contentValues.put("empresa", funcoes.getValorXml("ChaveEmpresa"));
 			contentValues.put("email", funcoes.getValorXml("Email"));
-			
-			this.funcoes.menssagem(contentValues);
+
+			((Activity) context).runOnUiThread(new Runnable() {
+				public void run() {
+					funcoes.menssagem(contentValues);
+				}
+			});
 			
 		} finally {
 			bancoDados.close();
@@ -786,6 +918,89 @@ public class FuncoesSql {
         }
         sql.append(')');
         return sql.toString();
+	}
+
+	public String construirInsert(ContentValues values, int conflictAlgorithm){
+		StringBuilder sql = new StringBuilder();
+		sql.append("INSERT");
+		sql.append(CONFLICT_VALUES[conflictAlgorithm]);
+		sql.append(" INTO ");
+		sql.append(tabela);
+		sql.append('(');
+
+		int size = (values != null && values.size() > 0) ? values.size() : 0;
+
+		if (size > 0) {
+			int i = 0;
+			for (String colName : values.keySet()) {
+				sql.append(((i > 0) && (values.get(colName) != null) && (values.get(colName).toString().length() > 0)) ? ", " : "");
+				sql.append(((values.get(colName) != null) && (values.get(colName).toString().length() > 0)) ? colName : "");
+				// Incrementa o controle
+				if ((values.get(colName) != null) && (values.get(colName).toString().length() > 0)) {
+					i++;
+				}
+			}
+			sql.append(')');
+			sql.append(" VALUES (");
+			i = 0;
+			for (String colName : values.keySet()) {
+				sql.append(((i > 0) && (values.get(colName) != null) && (values.get(colName).toString().length() > 0)) ? ", " : "");
+				//sql.append((values.get(colName).toString().length() > 0) ? "?" : "");
+
+
+				if ((values.get(colName) != null) && (values.get(colName).toString().length() > 0)){
+					if (((values.get(colName).getClass().equals(String.class)) ||
+							(values.get(colName).getClass().equals(CharSequence.class))) &&
+							(!(((values.getAsString(colName).contains("SELECT")) && (values.getAsString(colName).contains("FROM"))) ||
+									((values.getAsString(colName).contains("select")) && (values.getAsString(colName).contains("from")))))){
+						sql.append("'" + values.getAsString(colName) + "'");
+					} else {
+						sql.append(values.getAsString(colName));
+					}
+				}
+				// Incrementa o controle
+				if ((values.get(colName) != null) && (values.get(colName).toString().length() > 0)) {
+					i++;
+				}
+			}
+		} else {
+			sql.append(null + ") VALUES (NULL");
+		}
+		sql.append(')');
+		return sql.toString();
+	}
+
+	public String construirUpdate(ContentValues values, String where, int conflictAlgorithm){
+		StringBuilder sql = new StringBuilder();
+		sql.append("UPDATE ");
+		sql.append(CONFLICT_VALUES[conflictAlgorithm]);
+		sql.append(this.tabela);
+		sql.append(" SET ");
+
+		int i = 0;
+		for (String colName : values.keySet()) {
+			sql.append(((i > 0) && (values.get(colName) != null) && (values.get(colName).toString().length() > 0)) ? "," : "");
+			sql.append(((values.get(colName) != null) && (values.get(colName).toString().length() > 0)) ? colName : "");
+			// Checa se tem valores
+			if ((values.get(colName) != null) && (values.get(colName).toString().length() > 0)){
+				// Checa se eh uma string
+				if (((values.get(colName).getClass().equals(String.class)) ||
+						(values.get(colName).getClass().equals(CharSequence.class))) &&
+						(!values.get(colName).equals("null"))){
+
+					sql.append(" = '" + values.getAsString(colName) + "'");
+
+				} else {
+					sql.append(" = " +  values.get(colName));
+				}
+				i++;
+			}
+		}
+		// Checa se o where passado por paramento nao esta vazia
+		if ((where != null) && (!where.isEmpty())){
+			sql.append(" WHERE (" + where + ")");
+		}
+		return sql.toString();
 	}
 	
 	

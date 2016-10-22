@@ -8,7 +8,8 @@ public class CidadeBeans {
 				codigoIbge;
 	
 	private String descricao,
-				   cep;
+				   cep,
+				   dataAlteracao;
 
 	private EstadoBeans estado;
 
@@ -104,4 +105,11 @@ public class CidadeBeans {
 		this.cep = cep;
 	}
 
+	public String getDataAlteracao() {
+		return dataAlteracao;
+	}
+
+	public void setDataAlteracao(String dataAlteracao) {
+		this.dataAlteracao = dataAlteracao;
+	}
 }

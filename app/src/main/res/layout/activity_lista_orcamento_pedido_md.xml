@@ -85,7 +85,9 @@
             android:layout_marginTop="10dp"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:id="@+id/activity_lista_orcamento_pedido_md_list_pessoa" />
+            android:id="@+id/activity_lista_orcamento_pedido_md_list_pessoa"
+            android:divider="@color/azul"
+            android:dividerHeight="2dp" />
 
         <com.github.clans.fab.FloatingActionMenu
             android:id="@+id/activity_lista_orcamento_pedido_md_menu_float"

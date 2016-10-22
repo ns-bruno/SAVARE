@@ -10,6 +10,7 @@ public class FotosBeans {
 
     private int idFotos, idCliente, idProduto;
     private byte[] fotos;
+    private String dataAlteracao;
 
     public int getIdFotos() {
         return idFotos;
@@ -41,6 +42,14 @@ public class FotosBeans {
 
     public void setFotos(byte[] fotos) {
         this.fotos = fotos;
+    }
+
+    public String getDataAlteracao() {
+        return dataAlteracao;
+    }
+
+    public void setDataAlteracao(String dataAlteracao) {
+        this.dataAlteracao = dataAlteracao;
     }
 
     public Bitmap getImagem(){

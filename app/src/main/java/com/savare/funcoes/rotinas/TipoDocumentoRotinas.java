@@ -7,6 +7,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 
+import com.savare.R;
 import com.savare.banco.funcoesSql.PlanoPagamentoSql;
 import com.savare.banco.funcoesSql.TipoDocumentoSql;
 import com.savare.beans.PlanoPagamentoBeans;
@@ -48,6 +49,16 @@ public class TipoDocumentoRotinas extends Rotinas {
 		listaTipoDocumento = new ArrayList<TipoDocumentoBeans>();
 		
 		if ( (cursor != null) && (cursor.getCount() > 0) ){
+
+			TipoDocumentoBeans tipoDocumentoSelecione = new TipoDocumentoBeans();
+			tipoDocumentoSelecione.setIdTipoDocumento(0);
+			tipoDocumentoSelecione.setCodigoTipoDocumento(0);
+			tipoDocumentoSelecione.setIdEmpresa(0);
+			tipoDocumentoSelecione.setDescricaoTipoDocumento(context.getResources().getString(R.string.selecione_tipo_documento));
+			tipoDocumentoSelecione.setSiglaTipoDocumento("Selecione");
+			tipoDocumentoSelecione.setTipoVenda("0");
+
+			listaTipoDocumento.add(tipoDocumentoSelecione);
 			
 			while(cursor.moveToNext()){
 				// Pega os dados recuperado do banco de dados
@@ -57,7 +68,7 @@ public class TipoDocumentoRotinas extends Rotinas {
 				tipoDocumento.setIdEmpresa(cursor.getInt(cursor.getColumnIndex("ID_SMAEMPRE")));
 				tipoDocumento.setDescricaoTipoDocumento(cursor.getString(cursor.getColumnIndex("DESCRICAO")));
 				tipoDocumento.setSiglaTipoDocumento(cursor.getString(cursor.getColumnIndex("SIGLA")));
-				tipoDocumento.setTipoVenda(cursor.getString(cursor.getColumnIndex("TIPO")).charAt(0));
+				tipoDocumento.setTipoVenda(cursor.getString(cursor.getColumnIndex("TIPO")));
 				
 				listaTipoDocumento.add(tipoDocumento);
 			}

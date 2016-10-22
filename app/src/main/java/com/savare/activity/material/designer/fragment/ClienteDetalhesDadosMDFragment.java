@@ -1,6 +1,7 @@
 package com.savare.activity.material.designer.fragment;
 
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -12,6 +13,7 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -36,6 +38,7 @@ import com.savare.beans.TipoDocumentoBeans;
 import com.savare.beans.TotalMensal;
 import com.savare.funcoes.FuncoesPersonalizadas;
 import com.savare.funcoes.rotinas.OrcamentoRotinas;
+import com.savare.funcoes.rotinas.ParcelaRotinas;
 import com.savare.funcoes.rotinas.PessoaRotinas;
 
 import java.util.ArrayList;
@@ -145,7 +148,9 @@ public class ClienteDetalhesDadosMDFragment extends Fragment {
             // Carrega o grafico que mosta os totais vendidos para este cliente por mes
             carregarGraficoVendasPedidoMes();
 
-            if (abertoTitulosPriveiraVez == false) {
+            ParcelaRotinas parcelaRotinas = new ParcelaRotinas(getContext());
+
+            if ((abertoTitulosPriveiraVez == false) && (parcelaRotinas.listaTitulos(idCliente, ParcelaRotinas.TITULOS_EM_ABERTO, ParcelaRotinas.RECEBER, null, null).size() > 0)) {
 
                 abertoTitulosPriveiraVez = true;
                 // Cria uma intent para abrir uma nova activity
@@ -311,12 +316,12 @@ public class ClienteDetalhesDadosMDFragment extends Fragment {
         }
 
         // Verifica se o campo bloqueia eh NAO(0) e  o campo PARCELA EM ABERTO eh VENDE(1)
-        if((pessoa.getStatusPessoa().getBloqueia() == '0' ) && (pessoa.getStatusPessoa().getParcelaEmAberto() == '1')){
+        if((pessoa.getStatusPessoa().getBloqueia() == "0" ) && (pessoa.getStatusPessoa().getParcelaEmAberto() == "1")){
             // Muda a cor da View
             textStatus.setTextColor(getResources().getColor(R.color.verde_escuro));
 
             // Verifica se o campo bloqueia eh SIM(1) e  o campo PARCELA EM ABERTO eh diferente de VENDE(1)
-        } else if((pessoa.getStatusPessoa().getBloqueia() == '1') && (pessoa.getStatusPessoa().getParcelaEmAberto() != '1')){
+        } else if((pessoa.getStatusPessoa().getBloqueia() == "1") && (pessoa.getStatusPessoa().getParcelaEmAberto() != "1")){
             // Muda a cor da View para vermelho
             textStatus.setTextColor(getResources().getColor(R.color.vermelho_escuro));
 

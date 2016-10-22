@@ -6,7 +6,8 @@ package com.savare.beans;
 public class UsuarioBeans {
 
     private int idUsuario,
-                idEmpresa;
+                idEmpresa,
+                quantidadeCasasDecimais;
     private String chave,
                    nomeUsuario,
                    loginUsuario,
@@ -14,12 +15,15 @@ public class UsuarioBeans {
                    email,
                    empresaUsuario,
                    ipServidor,
+                   ipServidorWebservice,
                    usuarioServidor,
                    senhaServidor,
                    pastaServidor,
                    dataUltimoRecebimento,
                    dataUltimoEnvio,
-                   modoConexao;
+                   modoConexao,
+                   caminhoBancoDados,
+                   portaBancoDados;
     private char vendeAtacadoUsuario,
                  vendeVarejoUsuario,
                  ativoUsuario;
@@ -202,5 +206,37 @@ public class UsuarioBeans {
 
     public void setModoConexao(String modoConexao) {
         this.modoConexao = modoConexao;
+    }
+
+    public String getIpServidorWebservice() {
+        return ipServidorWebservice;
+    }
+
+    public void setIpServidorWebservice(String ipServidorWebservice) {
+        this.ipServidorWebservice = ipServidorWebservice;
+    }
+
+    public String getCaminhoBancoDados() {
+        return caminhoBancoDados;
+    }
+
+    public void setCaminhoBancoDados(String caminhoBancoDados) {
+        this.caminhoBancoDados = caminhoBancoDados;
+    }
+
+    public String getPortaBancoDados() {
+        return portaBancoDados;
+    }
+
+    public void setPortaBancoDados(String portaBancoDados) {
+        this.portaBancoDados = portaBancoDados;
+    }
+
+    public int getQuantidadeCasasDecimais() {
+        return quantidadeCasasDecimais;
+    }
+
+    public void setQuantidadeCasasDecimais(int quantidadeCasasDecimais) {
+        this.quantidadeCasasDecimais = quantidadeCasasDecimais;
     }
 }

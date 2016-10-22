@@ -16,7 +16,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
-            android:hint="@string/chave_empresa" >
+            android:hint="@string/chave_usuario" >
 
             <requestFocus />
         </EditText>
@@ -74,14 +74,14 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
-            android:hint="@string/ip_servidor" />
+            android:hint="@string/ip_servidor_sisinfo" />
 
         <EditText
             android:id="@+id/cadastro_usuario_edit_usuario_servidor"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
-            android:hint="@string/usuario_servidor" />
+            android:hint="@string/usuario_servidor_sisinfo" />
 
         <EditText
             android:id="@+id/cadastro_usuario_edit_senha_servidor"
@@ -89,7 +89,7 @@
             android:layout_height="wrap_content"
             android:ems="10"
             android:inputType="textPassword"
-            android:hint="@string/senha_servidor" />
+            android:hint="@string/senha_servidor_sisinfo" />
 
         <EditText
             android:layout_width="match_parent"

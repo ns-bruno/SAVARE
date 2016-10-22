@@ -6,7 +6,7 @@ public class ProfissaoBeans {
 		codigoProfissao,
 		cbo;
 	
-	String descricaoProfissao;
+	String descricaoProfissao, dataAlteracao;
 	
 	double descontoAtacadoVista,
 		   descontoAtacadoPrazo,
@@ -15,7 +15,7 @@ public class ProfissaoBeans {
 		   descontoServicoVista,
 		   descontoServicoPrazo;
     
-	char promocao;
+	String promocao;
 
 	/**
 	 * @return the idProfissao
@@ -160,16 +160,22 @@ public class ProfissaoBeans {
 	/**
 	 * @return the promocao
 	 */
-	public char getPromocao() {
+	public String getPromocao() {
 		return promocao;
 	}
 
 	/**
 	 * @param promocao the promocao to set
 	 */
-	public void setPromocao(char promocao) {
+	public void setPromocao(String promocao) {
 		this.promocao = promocao;
 	}
-	
-	
+
+	public String getDataAlteracao() {
+		return dataAlteracao;
+	}
+
+	public void setDataAlteracao(String dataAlteracao) {
+		this.dataAlteracao = dataAlteracao;
+	}
 }

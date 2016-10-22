@@ -3,9 +3,11 @@ package com.savare.funcoes.rotinas;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.widget.ProgressBar;
 
 import com.savare.banco.funcoesSql.ParcelaSql;
 import com.savare.beans.ParcelaBeans;
@@ -31,7 +33,7 @@ public class ParcelaRotinas extends Rotinas {
 	 * @return
 	 */
 	@SuppressWarnings("resource")
-	public List<TitulosListaBeans> listaTitulos(String idPessoa, char tipoLitagem, char pagarReceber, String where){
+	public List<TitulosListaBeans> listaTitulos(String idPessoa, char tipoLitagem, char pagarReceber, String where, final ProgressBar progressBarStatus){
 		
 		List<TitulosListaBeans> listaTitulos = new ArrayList<TitulosListaBeans>();
 		
@@ -64,8 +66,26 @@ public class ParcelaRotinas extends Rotinas {
 			if( (cursor != null) && (cursor.getCount() > 0) ){
 				// Move para o primeiro cursor
 				//cursor.moveToFirst();
-				
+				final int totalLista = cursor.getCount();
+
+				if (progressBarStatus != null){
+
+					((Activity) context).runOnUiThread(new Runnable() {
+						public void run() {
+							progressBarStatus.setIndeterminate(false);
+							progressBarStatus.setMax(totalLista);
+						}
+					});
+				}
+				int controle = 0;
 			 	while(cursor.moveToNext()) {
+
+					final int finalControle = controle;
+					((Activity) context).runOnUiThread(new Runnable() {
+						public void run() {
+							progressBarStatus.setProgress(finalControle);
+						}
+					});
 			 		
 			 		TitulosListaBeans titulos = new TitulosListaBeans();
 			 		
@@ -97,6 +117,8 @@ public class ParcelaRotinas extends Rotinas {
 					titulos.setListaParcela(listaParcela);
 					
 					listaTitulos.add(titulos);
+
+					controle ++;
 				}
 			}
 				

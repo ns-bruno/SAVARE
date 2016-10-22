@@ -9,8 +9,9 @@ public class TipoClienteBeans {
 				   descontoAtacadoPrazo,
 				   descontoVarejoVista,
 				   descontoVarejoPrazo;
-	private char descontoPromocao,
-				 vendeAtacadoVarejo;
+	private String descontoPromocao,
+				 vendeAtacadoVarejo,
+				 dataAlteracao;
 	
 	public TipoClienteBeans() {
 		
@@ -117,30 +118,36 @@ public class TipoClienteBeans {
 	/**
 	 * @return the descontoPromocao
 	 */
-	public char getDescontoPromocao() {
+	public String getDescontoPromocao() {
 		return descontoPromocao;
 	}
 
 	/**
 	 * @param descontoPromocao the descontoPromocao to set
 	 */
-	public void setDescontoPromocao(char descontoPromocao) {
+	public void setDescontoPromocao(String descontoPromocao) {
 		this.descontoPromocao = descontoPromocao;
 	}
 
 	/**
 	 * @return the vendeAtacadoVarejo
 	 */
-	public char getVendeAtacadoVarejo() {
+	public String getVendeAtacadoVarejo() {
 		return vendeAtacadoVarejo;
 	}
 
 	/**
 	 * @param vendeAtacadoVarejo the vendeAtacadoVarejo to set
 	 */
-	public void setVendeAtacadoVarejo(char vendeAtacadoVarejo) {
+	public void setVendeAtacadoVarejo(String vendeAtacadoVarejo) {
 		this.vendeAtacadoVarejo = vendeAtacadoVarejo;
 	}
-	
-	
+
+	public String getDataAlteracao() {
+		return dataAlteracao;
+	}
+
+	public void setDataAlteracao(String dataAlteracao) {
+		this.dataAlteracao = dataAlteracao;
+	}
 }
