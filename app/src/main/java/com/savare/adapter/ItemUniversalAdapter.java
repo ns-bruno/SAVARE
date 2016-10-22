@@ -791,9 +791,9 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 			
 			this.funcoes = new FuncoesPersonalizadas(context);
 			
-			textDescricao.setText(produto.getProduto().getDescricaoProduto() + " - " + produto.getProduto().getDescricaoMarca());
+			textDescricao.setText(produto.getProduto().getDescricaoProduto() + " - " + ((produto.getProduto().getDescricaoMarca() != null ) ? produto.getProduto().getDescricaoMarca() : ""));
 			textAbaixoDescricaoEsqueda.setText("Cód. " + produto.getProduto().getCodigoEstrutural());
-			textAbaixoDescricaoDireita.setText("Ref. " + produto.getProduto().getReferencia());
+			textAbaixoDescricaoDireita.setText("Ref. " + ((produto.getProduto().getReferencia() != null) ? produto.getProduto().getReferencia() : ""));
 			textBottonEsquerdoDois.setText(produto.getProduto().getUnidadeVendaProduto().getSiglaUnidadeVenda());
 			textBottonDireito.setText("Est.: " + this.funcoes.arredondarValor(produto.getEstoqueFisico()));
 			// Checa se tem alguma imagem salva no produto
@@ -1017,10 +1017,12 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 			
 			textDescricao.setText(orcamento.getNomeRazao()); 
 			textAbaixoDescricaoEsqueda.setText("Nº " +  orcamento.getIdOrcamento());
-			textAbaixoDescricaoDireita.setText(orcamento.getSiglaEstado() + " - " + orcamento.getCidade());
+			textAbaixoDescricaoDireita.setText((orcamento.getSiglaEstado() != null && orcamento.getCidade() != null) ? orcamento.getSiglaEstado() + " - " + orcamento.getCidade() : "");
+
 			// Checa se o pedido ja teve retorno de faturado da empresa
-			if ((orcamento.getStatusRetorno() != null) && ((orcamento.getStatusRetorno().equalsIgnoreCase(ListaOrcamentoPedidoMDActivity.TIPO_PEDIDO_RETORNADO_LIBERADO)) ||
-					(orcamento.getStatusRetorno().equalsIgnoreCase(ListaOrcamentoPedidoMDActivity.TIPO_PEDIDO_FATURADO)) )){
+			if ((orcamento.getStatus() != null) && (orcamento.getStatus().equalsIgnoreCase(ListaOrcamentoPedidoMDActivity.TIPO_PEDIDO_FATURADO)) ){
+
+				textAbaixoDescricaoEsqueda.setText(textAbaixoDescricaoEsqueda.getText() + " (Faturado)");
 				// Mostra o valor faturado de retorno
 				textBottonDireito.setText(funcoes.arredondarValor(orcamento.getTotalOrcamentoFaturado()));
 
@@ -1032,7 +1034,12 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 				textBottonDireito.setPaintFlags(textBottonDireito.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
 
 			} else {
-				textBottonDireito.setText(funcoes.arredondarValor(orcamento.getTotalOrcamento()));
+				if ((orcamento.getTotalOrcamento() <= 0) && (orcamento.getTotalOrcamentoFaturado() > 0)){
+					// Mostra o valor faturado de retorno
+					textBottonDireito.setText(funcoes.arredondarValor(orcamento.getTotalOrcamentoFaturado()));
+				} else {
+					textBottonDireito.setText(funcoes.arredondarValor(orcamento.getTotalOrcamento()));
+				}
 			}
 
 			if(orcamento.getTipoVenda().equalsIgnoreCase("0")){
@@ -1044,9 +1051,9 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 			textBottonEsquerdoDois.setVisibility(View.VISIBLE);
 			textBottonEsquerdoDois.setText(" | " + orcamento.getDataCadastro());
 
-			if ((orcamento.getStatusRetorno() != null) &&
-					((orcamento.getStatusRetorno().equalsIgnoreCase(ListaOrcamentoPedidoMDActivity.TIPO_PEDIDO_RETORNADO_EXCLUIDO)) ||
-							(orcamento.getStatusRetorno().equalsIgnoreCase(ListaOrcamentoPedidoMDActivity.TIPO_PEDIDO_RETORNADO_BLOQUEADO)))){
+			if ((orcamento.getStatus() != null) &&
+					((orcamento.getStatus().equalsIgnoreCase(ListaOrcamentoPedidoMDActivity.TIPO_PEDIDO_RETORNADO_EXCLUIDO)) ||
+							(orcamento.getStatus().equalsIgnoreCase(ListaOrcamentoPedidoMDActivity.TIPO_PEDIDO_RETORNADO_BLOQUEADO)))){
 				// Rista no meio de todas as descricoes
 				textDescricao.setPaintFlags(textDescricao.getPaintFlags()| Paint.STRIKE_THRU_TEXT_FLAG);
 				textAbaixoDescricaoEsqueda.setPaintFlags(textAbaixoDescricaoEsqueda.getPaintFlags()| Paint.STRIKE_THRU_TEXT_FLAG);
@@ -1059,15 +1066,17 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 			viewRodape.setVisibility(View.INVISIBLE);
 			viewTopo.setVisibility(View.INVISIBLE);
 			
-			if((orcamento.getStatusRetorno() != null) && (orcamento.getStatusRetorno().equals(ListaOrcamentoPedidoMDActivity.TIPO_PEDIDO_RETORNADO_BLOQUEADO))){
+			if((orcamento.getStatus() != null) && (orcamento.getStatus().equals(ListaOrcamentoPedidoMDActivity.TIPO_PEDIDO_RETORNADO_BLOQUEADO))){
 				viewTopo.setVisibility(View.VISIBLE);
 				viewTopo.setBackgroundColor(context.getResources().getColor(R.color.vermelho_escuro));
+				textAbaixoDescricaoEsqueda.setText(textAbaixoDescricaoEsqueda.getText() + " (Bloqueado)");
 				
-			} else if((orcamento.getStatusRetorno() != null) && (orcamento.getStatusRetorno().equals(ListaOrcamentoPedidoMDActivity.TIPO_PEDIDO_RETORNADO_LIBERADO))){
+			} else if((orcamento.getStatus() != null) && (orcamento.getStatus().equals(ListaOrcamentoPedidoMDActivity.TIPO_PEDIDO_RETORNADO_LIBERADO))){
 				viewTopo.setVisibility(View.VISIBLE);
 				viewTopo.setBackgroundColor(context.getResources().getColor(R.color.verde_escuro));
+				textAbaixoDescricaoEsqueda.setText(textAbaixoDescricaoEsqueda.getText() + " (Liberado)");
 				
-			} else if((orcamento.getStatusRetorno() != null) && (orcamento.getStatusRetorno().equals(ListaOrcamentoPedidoMDActivity.TIPO_PEDIDO_RETORNADO_EXCLUIDO))){
+			} else if((orcamento.getStatus() != null) && (orcamento.getStatus().equals(ListaOrcamentoPedidoMDActivity.TIPO_PEDIDO_RETORNADO_EXCLUIDO))){
 				textDescricao.setPaintFlags(textDescricao.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
 				textAbaixoDescricaoEsqueda.setPaintFlags(textAbaixoDescricaoEsqueda.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
 				textAbaixoDescricaoDireita.setPaintFlags(textAbaixoDescricaoDireita.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
@@ -1085,6 +1094,8 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 				textBottonDireito.setTextColor(context.getResources().getColor(R.color.lilas_escuro));
 				textBottonEsquerdo.setTextColor(context.getResources().getColor(R.color.lilas_escuro));
 				textBottonEsquerdoDois.setTextColor(context.getResources().getColor(R.color.lilas_escuro));
+
+				textAbaixoDescricaoEsqueda.setText(textAbaixoDescricaoEsqueda.getText() + " (Não Enviado)");
 				
 			// Checa se eh um pedido enviado para o servidor web
 			} else if(orcamento.getStatus().equalsIgnoreCase("N")){
@@ -1094,8 +1105,21 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 				textBottonDireito.setTextColor(context.getResources().getColor(R.color.verde_escuro));
 				textBottonEsquerdo.setTextColor(context.getResources().getColor(R.color.verde_escuro));
 				textBottonEsquerdoDois.setTextColor(context.getResources().getColor(R.color.verde_escuro));
+
+				textAbaixoDescricaoEsqueda.setText(textAbaixoDescricaoEsqueda.getText() + " (Enviado)");
 			
 			// Padrao
+			} else if(orcamento.getStatus().equalsIgnoreCase("C")){
+				textDescricao.setTextColor(context.getResources().getColor(R.color.md_indigo_900));
+				textAbaixoDescricaoEsqueda.setTextColor(context.getResources().getColor(R.color.md_indigo_900));
+				textAbaixoDescricaoDireita.setTextColor(context.getResources().getColor(R.color.md_indigo_900));
+				textBottonDireito.setTextColor(context.getResources().getColor(R.color.md_indigo_900));
+				textBottonEsquerdo.setTextColor(context.getResources().getColor(R.color.md_indigo_900));
+				textBottonEsquerdoDois.setTextColor(context.getResources().getColor(R.color.md_indigo_900));
+
+				textAbaixoDescricaoEsqueda.setText(textAbaixoDescricaoEsqueda.getText() + " (Conferido)");
+
+				// Padrao
 			} else {
 				textDescricao.setTextColor(context.getResources().getColor(R.color.preto));
 				textAbaixoDescricaoEsqueda.setTextColor(context.getResources().getColor(R.color.preto));
@@ -1334,7 +1358,11 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 			EmbalagemBeans embalagem = listaEmbalagem.get(position);
 			
 			textDescricao.setText("Embalagem: " + embalagem.getUnidadeVendaEmbalagem().getSiglaUnidadeVenda());
-			textAbaixoDescricaoEsqueda.setText("Desc.: " + embalagem.getDescricaoEmbalagem());
+			if (embalagem.getDescricaoEmbalagem() != null) {
+				textAbaixoDescricaoEsqueda.setText("Desc.: " + embalagem.getDescricaoEmbalagem());
+			} else {
+                textAbaixoDescricaoEsqueda.setVisibility(View.INVISIBLE);
+            }
 			
 			textAbaixoDescricaoDireita.setVisibility(View.GONE);
 			textBottonDireito.setVisibility(View.GONE);
@@ -1445,23 +1473,21 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 		} else if(this.tipoItem == CIDADE_DARK){
 			CidadeBeans cidade = listaCidade.get(position);
 
-			textDescricao.setText(cidade.getDescricao());
+			textDescricao.setText(cidade.getDescricao() != null ? cidade.getDescricao() : "");
 			textDescricao.setTextColor(context.getResources().getColor(R.color.branco));
 
 			//view.setBackgroundColor(context.getResources().getColor(R.color.preto));
 
 			if ((cidade.getEstado() != null) && (cidade.getEstado().getSiglaEstado() != null)){
 				textAbaixoDescricaoEsqueda.setText(cidade.getEstado().getSiglaEstado());
-				textAbaixoDescricaoEsqueda.setTextColor(context.getResources().getColor(R.color.branco));
 
 			} else if (cidade.getIdCidade() >= 0){
 				textAbaixoDescricaoEsqueda.setText("Cod.: " + cidade.getIdCidade());
-				textAbaixoDescricaoEsqueda.setTextColor(context.getResources().getColor(R.color.branco));
 
 			} else {
-				textAbaixoDescricaoEsqueda.setVisibility(View.GONE);
+				textAbaixoDescricaoEsqueda.setText("Cidade Desconhecida");
 			}
-
+			textAbaixoDescricaoEsqueda.setTextColor(context.getResources().getColor(R.color.branco));
 			textAbaixoDescricaoDireita.setVisibility(View.GONE);
 			textBottonDireito.setVisibility(View.GONE);
 			textBottonEsquerdo.setVisibility(View.GONE);

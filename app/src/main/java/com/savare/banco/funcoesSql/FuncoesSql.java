@@ -22,6 +22,8 @@ public class FuncoesSql {
 	private String tabela;
 	private FuncoesPersonalizadas funcoes;
 	private Context context;
+	private static final String[] CONFLICT_VALUES = new String[]
+			{"", " OR ROLLBACK ", " OR ABORT ", " OR FAIL ", " OR IGNORE ", " OR REPLACE "};
 
 	
 	public FuncoesSql(Context context, String tabela) {
@@ -36,7 +38,15 @@ public class FuncoesSql {
 		}
 	}
 
-	
+
+	public SQLiteDatabase getBancoDados() {
+		return bancoDados;
+	}
+
+	public void setBancoDados(SQLiteDatabase bancoDados) {
+		this.bancoDados = bancoDados;
+	}
+
 	/**
 	 * Funcao para inserir no banco de dados. \n
 	 * Tem que ser passado por parametro os dados atraves de @values.
@@ -359,7 +369,7 @@ public class FuncoesSql {
 			//qtdAtualizado = bancoDados.update(tabela, dados, where, null);
 			
 			if(qtdAtualizado > 0){
-				final ContentValues mensagem = new ContentValues();
+				/*final ContentValues mensagem = new ContentValues();
 				mensagem.put("comando", 2);
 				mensagem.put("mensagem", "Atualizado com sucesso! \n");
 				mensagem.put("tela", tabela);
@@ -369,7 +379,7 @@ public class FuncoesSql {
                     public void run() {
                         funcoes.menssagem(mensagem);
                     }
-                });
+                });*/
 				
 			} else {
 				ContentValues mensagem = new ContentValues();
@@ -611,9 +621,8 @@ public class FuncoesSql {
 
 		bancoDados = conexaoBanco.abrirBanco();
 		try {
-			
 			bancoDados.execSQL(sql);
-			
+
 		} catch (SQLException e) {
 			// Armazena as informacoes para para serem exibidas e enviadas
 			ContentValues contentValues = new ContentValues();
@@ -626,9 +635,9 @@ public class FuncoesSql {
 			contentValues.put("usuario", funcoes.getValorXml("Usuario"));
 			contentValues.put("empresa", funcoes.getValorXml("ChaveEmpresa"));
 			contentValues.put("email", funcoes.getValorXml("Email"));
-			
+
 			this.funcoes.menssagem(contentValues);
-			
+
 		} catch (Exception e) {
 			// Armazena as informacoes para para serem exibidas e enviadas
 			ContentValues contentValues = new ContentValues();
@@ -641,13 +650,13 @@ public class FuncoesSql {
 			contentValues.put("usuario", funcoes.getValorXml("Usuario"));
 			contentValues.put("empresa", funcoes.getValorXml("ChaveEmpresa"));
 			contentValues.put("email", funcoes.getValorXml("Email"));
-			
+
 			this.funcoes.menssagem(contentValues);
-			
+
 		} finally {
 			bancoDados.close();
 		}
-		
+
 	} //Fim do execSQL
 	
 	
@@ -909,6 +918,89 @@ public class FuncoesSql {
         }
         sql.append(')');
         return sql.toString();
+	}
+
+	public String construirInsert(ContentValues values, int conflictAlgorithm){
+		StringBuilder sql = new StringBuilder();
+		sql.append("INSERT");
+		sql.append(CONFLICT_VALUES[conflictAlgorithm]);
+		sql.append(" INTO ");
+		sql.append(tabela);
+		sql.append('(');
+
+		int size = (values != null && values.size() > 0) ? values.size() : 0;
+
+		if (size > 0) {
+			int i = 0;
+			for (String colName : values.keySet()) {
+				sql.append(((i > 0) && (values.get(colName) != null) && (values.get(colName).toString().length() > 0)) ? ", " : "");
+				sql.append(((values.get(colName) != null) && (values.get(colName).toString().length() > 0)) ? colName : "");
+				// Incrementa o controle
+				if ((values.get(colName) != null) && (values.get(colName).toString().length() > 0)) {
+					i++;
+				}
+			}
+			sql.append(')');
+			sql.append(" VALUES (");
+			i = 0;
+			for (String colName : values.keySet()) {
+				sql.append(((i > 0) && (values.get(colName) != null) && (values.get(colName).toString().length() > 0)) ? ", " : "");
+				//sql.append((values.get(colName).toString().length() > 0) ? "?" : "");
+
+
+				if ((values.get(colName) != null) && (values.get(colName).toString().length() > 0)){
+					if (((values.get(colName).getClass().equals(String.class)) ||
+							(values.get(colName).getClass().equals(CharSequence.class))) &&
+							(!(((values.getAsString(colName).contains("SELECT")) && (values.getAsString(colName).contains("FROM"))) ||
+									((values.getAsString(colName).contains("select")) && (values.getAsString(colName).contains("from")))))){
+						sql.append("'" + values.getAsString(colName) + "'");
+					} else {
+						sql.append(values.getAsString(colName));
+					}
+				}
+				// Incrementa o controle
+				if ((values.get(colName) != null) && (values.get(colName).toString().length() > 0)) {
+					i++;
+				}
+			}
+		} else {
+			sql.append(null + ") VALUES (NULL");
+		}
+		sql.append(')');
+		return sql.toString();
+	}
+
+	public String construirUpdate(ContentValues values, String where, int conflictAlgorithm){
+		StringBuilder sql = new StringBuilder();
+		sql.append("UPDATE ");
+		sql.append(CONFLICT_VALUES[conflictAlgorithm]);
+		sql.append(this.tabela);
+		sql.append(" SET ");
+
+		int i = 0;
+		for (String colName : values.keySet()) {
+			sql.append(((i > 0) && (values.get(colName) != null) && (values.get(colName).toString().length() > 0)) ? "," : "");
+			sql.append(((values.get(colName) != null) && (values.get(colName).toString().length() > 0)) ? colName : "");
+			// Checa se tem valores
+			if ((values.get(colName) != null) && (values.get(colName).toString().length() > 0)){
+				// Checa se eh uma string
+				if (((values.get(colName).getClass().equals(String.class)) ||
+						(values.get(colName).getClass().equals(CharSequence.class))) &&
+						(!values.get(colName).equals("null"))){
+
+					sql.append(" = '" + values.getAsString(colName) + "'");
+
+				} else {
+					sql.append(" = " +  values.get(colName));
+				}
+				i++;
+			}
+		}
+		// Checa se o where passado por paramento nao esta vazia
+		if ((where != null) && (!where.isEmpty())){
+			sql.append(" WHERE (" + where + ")");
+		}
+		return sql.toString();
 	}
 	
 	

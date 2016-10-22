@@ -471,6 +471,7 @@ public class OrcamentoRotinas extends Rotinas {
                     orcamento.setIdEstado(cursor.getInt(cursor.getColumnIndex("ID_CFAESTAD")));
                     orcamento.setIdCidade(cursor.getInt(cursor.getColumnIndex("ID_CFACIDAD")));
                     orcamento.setIdTipoDocumento(cursor.getInt(cursor.getColumnIndex("ID_CFATPDOC")));
+					orcamento.setIdPessoaVendedor(Integer.parseInt(funcoes.getValorXml("CodigoUsuario")));
                     orcamento.setGuid(cursor.getString(cursor.getColumnIndex("GUID")));
                     orcamento.setTotalOrcamento(cursor.getDouble(cursor.getColumnIndex("FC_VL_TOTAL")));
                     orcamento.setTotalOrcamentoFaturado(cursor.getDouble(cursor.getColumnIndex("FC_VL_TOTAL_FATURADO")));
@@ -738,7 +739,7 @@ public class OrcamentoRotinas extends Rotinas {
 				+ "FROM AEAORCAM "
 				+ "LEFT OUTER JOIN CFAESTAD CFAESTAD ON(AEAORCAM.ID_CFAESTAD = CFAESTAD.ID_CFAESTAD) "
 				+ "LEFT OUTER JOIN CFACIDAD CFACIDAD ON(AEAORCAM.ID_CFACIDAD = CFACIDAD.ID_CFACIDAD) "
-				+ "WHERE (AEAORCAM.STATUS = '" + tipo + "') ";
+				+ "WHERE (AEAORCAM.STATUS IN (" + tipo + ")) ";
 
 		// Adiciona a clausula where
 		if(where != null){
@@ -1082,7 +1083,7 @@ public class OrcamentoRotinas extends Rotinas {
 		String sql = ("SELECT SUM(AEAORCAM.FC_VL_TOTAL) AS FC_VL_TOTAL "
 				    + "FROM AEAORCAM "
 					+ "LEFT OUTER JOIN CFACIDAD CFACIDAD ON(AEAORCAM.ID_CFACIDAD = CFACIDAD.ID_CFACIDAD) "
-					+ "WHERE (AEAORCAM.STATUS = '" + tipo + "') ");
+					+ "WHERE (AEAORCAM.STATUS IN (" + tipo + ")) ");
 		
 		/*// Checa se eh para listar todos os pedidos
 		if(tipo.equalsIgnoreCase("TP")){
@@ -1133,7 +1134,7 @@ public class OrcamentoRotinas extends Rotinas {
 		String sql = ("SELECT SUM(AEAORCAM.VL_MERC_BRUTO) AS VL_MERC_BRUTO "
 				    + "FROM AEAORCAM "
 					+ "LEFT OUTER JOIN CFACIDAD CFACIDAD ON(AEAORCAM.ID_CFACIDAD = CFACIDAD.ID_CFACIDAD) "
-					+ "WHERE (AEAORCAM.STATUS = '" + tipo + "') ");
+					+ "WHERE (AEAORCAM.STATUS IN (" + tipo + ")) ");
 		
 		/*// Checa se eh para listar todos os pedidos
 		if(tipo.equalsIgnoreCase("TP")){
@@ -1183,7 +1184,7 @@ public class OrcamentoRotinas extends Rotinas {
 		String sql = ("SELECT COUNT(*) AS QUANTIDADE_ORCAMENTO "
 			        + "FROM AEAORCAM "
 			        + "LEFT OUTER JOIN CFACIDAD CFACIDAD ON(AEAORCAM.ID_CFACIDAD = CFACIDAD.ID_CFACIDAD) "
-			        + "WHERE (AEAORCAM.STATUS = '" + tipo + "') ");
+			        + "WHERE (AEAORCAM.STATUS IN (" + tipo + ")) ");
 		
 		/*// Checa se eh para listar todos os pedidos
 		if(tipo.equalsIgnoreCase("TP")){
@@ -1202,11 +1203,13 @@ public class OrcamentoRotinas extends Rotinas {
 		
 		// Executa o sql
 		Cursor cursor = itemOrcamentoSql.sqlSelect(sql);
-		
-		// Move para o primeiro registro
-		cursor.moveToFirst();
+
 		// Checa se retornou algum registro
 		if( (cursor != null) && (cursor.getCount() > 0) ){
+
+			// Move para o primeiro registro
+			cursor.moveToFirst();
+
 			// Pega o valor salvo no cursor
 			valor = cursor.getString(cursor.getColumnIndex("QUANTIDADE_ORCAMENTO"));
 		} else {
@@ -1348,9 +1351,11 @@ public class OrcamentoRotinas extends Rotinas {
 		
 		Cursor cursor = orcamentoSql.sqlSelect("SELECT AEAORCAM.ID_CFATPDOC FROM AEAORCAM WHERE AEAORCAM.ID_AEAORCAM = " + idOrcamento);
 		
-		// Move para o primeiro registro
-		cursor.moveToFirst();
+
 		if( (cursor != null) && (cursor.getCount() > 0) ){
+			// Move para o primeiro registro
+			cursor.moveToFirst();
+
 			idTipoDocumento = cursor.getInt(cursor.getColumnIndex("ID_CFATPDOC"));
 		}
 		

@@ -57,7 +57,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by Faturamento on 12/04/2016.
+ * Created by Bruno Nogueira Silva on 12/04/2016.
  */
 public class OrcamentoProdutoMDFragment extends Fragment {
 
@@ -80,7 +80,7 @@ public class OrcamentoProdutoMDFragment extends Fragment {
                                 KEY_ID_ORCAMENTO = "ID_ORCAMENTO";
     public static final int SOLICITA_CLIENTE = 2,
                             RETORNA_CLIENTE = 100,
-    ERRO_RETORNA_CLIENTE = 101;
+                            ERRO_RETORNA_CLIENTE = 101;
 
 
     @Override
@@ -805,19 +805,6 @@ public class OrcamentoProdutoMDFragment extends Fragment {
             }
             if (totalOrcamento != null){
                 textTotal.setText("Total: " + totalOrcamento);
-            }
-            ParcelaRotinas parcelaRotinas = new ParcelaRotinas(getContext());
-            // Checa se tem algum titulo vencido
-            if (parcelaRotinas.totalReceberPagarCliente(idPessoa, ParcelaRotinas.TITULOS_EM_ABERTO_VENCIDOS, ParcelaRotinas.RECEBER, null) > 0){
-
-                FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(getContext());
-
-                ContentValues mensagem = new ContentValues();
-                mensagem.put("comando", 2);
-                mensagem.put("tela", "OrcamentoProdutoMDFragment");
-                mensagem.put("mensagem", getResources().getString(R.string.existe_titulos_vencidos));
-
-                funcoes.menssagem(mensagem);
             }
             progressBarStatus.setVisibility(View.GONE);
         }

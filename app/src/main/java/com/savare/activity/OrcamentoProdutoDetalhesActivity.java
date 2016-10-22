@@ -106,7 +106,7 @@ public class OrcamentoProdutoDetalhesActivity extends Activity {
 				// Checa se passou algum numero de orcamento
 				if (idOrcamento != null) {
 
-					produto = produtoRotinas.listaProduto("AEAPRODU.ID_AEAPRODU = " + idProduto, null, idOrcamento, null, null).get(0);
+					produto = produtoRotinas.listaProduto("AEAPRODU.ID_AEAPRODU = " + idProduto, null, idOrcamento, null, null, produtoRotinas.NAO).get(0);
 
 					orcamento = new OrcamentoBeans();
 					// Pega os dados do orcamento
@@ -114,7 +114,7 @@ public class OrcamentoProdutoDetalhesActivity extends Activity {
 
 				} else {
 					// Pega lista sem associar com um orcamento
-					produto = produtoRotinas.listaProduto("AEAPRODU.ID_AEAPRODU = " + idProduto, null, null, null, null).get(0);
+					produto = produtoRotinas.listaProduto("AEAPRODU.ID_AEAPRODU = " + idProduto, null, null, null, null, produtoRotinas.NAO).get(0);
 				}
 			}
 			if (getIntent().getExtras().getString("ATAC_VARE") != null && getIntent().getExtras().getString("ATAC_VARE").length() >0) {

@@ -46,6 +46,8 @@ import com.savare.funcoes.rotinas.OrcamentoRotinas;
 import com.savare.funcoes.rotinas.PessoaRotinas;
 import com.savare.funcoes.rotinas.async.EnviarDadosWebserviceAsyncRotinas;
 import com.savare.funcoes.rotinas.async.EnviarOrcamentoFtpAsyncRotinas;
+import com.savare.funcoes.rotinas.async.ReceberDadosWebserviceAsyncRotinas;
+import com.savare.webservice.WSSisinfoWebservice;
 
 import java.io.File;
 import java.text.DateFormat;
@@ -860,6 +862,25 @@ public class ListaOrcamentoPedidoMDActivity extends AppCompatActivity{
                 }
                 break;
 
+            case R.id.menu_lista_orcamento_md_sincronizar_web_service:
+
+                ReceberDadosWebserviceAsyncRotinas receberDadosWebservice = new ReceberDadosWebserviceAsyncRotinas(new ReceberDadosWebserviceAsyncRotinas.OnTaskCompleted() {
+                    @Override
+                    public void onTaskCompleted() {
+                        carregarListaCidade();
+                    }
+                },
+                ListaOrcamentoPedidoMDActivity.this);
+                receberDadosWebservice.setProgressBarStatus(progressBarStatus);
+
+                String[] tabelaRecebeDados = {  WSSisinfoWebservice.FUNCTION_SELECT_AEAORCAM,
+                                                WSSisinfoWebservice.FUNCTION_SELECT_AEAITORC};
+
+                receberDadosWebservice.setTabelaRecebeDados(tabelaRecebeDados);
+                receberDadosWebservice.execute();
+
+                break;
+
             default:
                 break;
         }
@@ -971,7 +992,13 @@ public class ListaOrcamentoPedidoMDActivity extends AppCompatActivity{
         // Instancia a classe para manipular dados do orcamento
         OrcamentoRotinas orcamentoRotinas = new OrcamentoRotinas(ListaOrcamentoPedidoMDActivity.this);
 
-        listaCidade = orcamentoRotinas.listaCidadeOrcamentoPedido(this.tipoOrcamentoPedido, null);
+        String tipoPedido = "";
+        if (tipoOrcamentoPedido.equalsIgnoreCase("N")){
+            tipoPedido = "'N', 'RB', 'RL', 'RE', 'F'";
+        } else {
+            tipoPedido = "'"+tipoOrcamentoPedido+"'";
+        }
+        listaCidade = orcamentoRotinas.listaCidadeOrcamentoPedido(tipoPedido, null);
 
         if ((listaCidade != null) && (listaCidade.size() > 0)) {
 
@@ -989,8 +1016,8 @@ public class ListaOrcamentoPedidoMDActivity extends AppCompatActivity{
         ProgressDialog progress = new ProgressDialog(ListaOrcamentoPedidoMDActivity.this);
         progress.setIndeterminate(true);
         progress.setTitle("Enviar e-mail");
-        progress.setMessage("Aguarde, todos os PDF est�o sendo gerados.\n"
-                + " Levar� um pouquinho mais de tempo.");
+        progress.setMessage("Aguarde, todos os PDF estão sendo gerados.\n"
+                          + "Vai levar um pouquinho mais de tempo.");
         progress.setCancelable(true);
 
         progress.show();
@@ -1095,12 +1122,21 @@ public class ListaOrcamentoPedidoMDActivity extends AppCompatActivity{
             // Cria uma variavel para armazenar a lista de orcamento
             List<OrcamentoBeans> listaOrcamentoPedido = new ArrayList<OrcamentoBeans>();
 
+            String[] tipoPedido = null;
+            if (tipoOrcamentoPedido.equalsIgnoreCase("N")){
+                tipoPedido = new String[]{"N", "RB", "RL", "RE", "F", "C"};
+            } else {
+                tipoPedido = new String[]{tipoOrcamentoPedido};
+            }
+
             // Checa se esta selecionado todos os orcamento/pedido
-            if(adapterCidade.getListaCidade().get(itemPosition).getDescricao().equalsIgnoreCase("Todas as Cidades")) {
+            if((adapterCidade.getListaCidade().get(itemPosition).getDescricao() != null) &&
+               (adapterCidade.getListaCidade().get(itemPosition).getDescricao().equalsIgnoreCase("Todas as Cidades"))) {
 
                 // Preenche a lista de pessoas
-                listaOrcamentoPedido = orcamentoRotinas.listaOrcamentoPedido(new String[]{tipoOrcamentoPedido}, wherePeriodoData(), tipoOrdem);
-            } else {
+                listaOrcamentoPedido = orcamentoRotinas.listaOrcamentoPedido(tipoPedido, wherePeriodoData(), tipoOrdem);
+
+            } else if ((adapterCidade.getListaCidade().get(itemPosition).getDescricao() != null)){
                 // Pega a palavra que eh para ser removida
                 //String remover = adapterCidade.getListaCidade().get(itemPosition).getDescricao().substring(0, 5);
 
@@ -1116,7 +1152,7 @@ public class ListaOrcamentoPedidoMDActivity extends AppCompatActivity{
                 // Instancia a classe
                 listaOrcamentoPedido = new ArrayList<OrcamentoBeans>();
                 // Preenche a lista de pessoas
-                listaOrcamentoPedido = orcamentoRotinas.listaOrcamentoPedido(new String[]{tipoOrcamentoPedido}, where, tipoOrdem);
+                listaOrcamentoPedido = orcamentoRotinas.listaOrcamentoPedido(tipoPedido, where, tipoOrdem);
             }
 
             if (listaOrcamentoPedido != null && listaOrcamentoPedido.size() > 0) {
@@ -1146,10 +1182,17 @@ public class ListaOrcamentoPedidoMDActivity extends AppCompatActivity{
             // Instancia a classe para manipular dados do orcamento
             OrcamentoRotinas orcamentoRotinas = new OrcamentoRotinas(ListaOrcamentoPedidoMDActivity.this);
 
-            cidade = (adapterCidade.getListaCidade().get(itemPosition).getDescricao().equalsIgnoreCase("Todas as Cidades")) ? null : adapterCidade.getListaCidade().get(itemPosition).getDescricao();
+            cidade = (((adapterCidade.getListaCidade().get(itemPosition).getDescricao() != null) && (adapterCidade.getListaCidade().get(itemPosition).getDescricao().equalsIgnoreCase("Todas as Cidades")))) ? null : adapterCidade.getListaCidade().get(itemPosition).getDescricao();
 
             // Pega o periodo selecionado no menu
             String periodo = wherePeriodoData();
+
+            String tipoPedido = "";
+            if (tipoOrcamentoPedido.equalsIgnoreCase(TIPO_PEDIDO_ENVIADO)){
+                tipoPedido = "'N', 'RB', 'RL', 'RE', 'F'";
+            } else {
+                tipoPedido = "'"+tipoOrcamentoPedido+"'";
+            }
 
             // Checa se faz parte da lista de pedido
             if ((tipoOrcamentoPedido.equals(TIPO_PEDIDO_NAO_ENVIADO)) || (tipoOrcamentoPedido.equals(TIPO_PEDIDO_ENVIADO))){
@@ -1161,14 +1204,14 @@ public class ListaOrcamentoPedidoMDActivity extends AppCompatActivity{
 
                     FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(ListaOrcamentoPedidoMDActivity.this);
 
-                    textTotal.setText(orcamentoRotinas.quantidadeListaOrcamento(tipoOrcamentoPedido, cidade, periodo) +
-                            " Pedido(s) | Tabela: " + orcamentoRotinas.totalListaOrcamentoBruto(tipoOrcamentoPedido, cidade, periodo) +
-                            " - Venda: " + orcamentoRotinas.totalListaOrcamentoLiquido(tipoOrcamentoPedido, cidade, periodo) +
+                    textTotal.setText(orcamentoRotinas.quantidadeListaOrcamento(tipoPedido, cidade, periodo) +
+                            " Pedido(s) | Tabela: " + orcamentoRotinas.totalListaOrcamentoBruto(tipoPedido, cidade, periodo) +
+                            " - Venda: " + orcamentoRotinas.totalListaOrcamentoLiquido(tipoPedido, cidade, periodo) +
                             " | Dif.: " + funcoes.arredondarValor(totalDiferenca));
 
                 } else {
-                    textTotal.setText(orcamentoRotinas.quantidadeListaOrcamento(tipoOrcamentoPedido, cidade, periodo) +
-                            " Pedido(s) | " + orcamentoRotinas.totalListaOrcamentoLiquido(tipoOrcamentoPedido, cidade, periodo));
+                    textTotal.setText(orcamentoRotinas.quantidadeListaOrcamento(tipoPedido, cidade, periodo) +
+                            " Pedido(s) | " + orcamentoRotinas.totalListaOrcamentoLiquido(tipoPedido, cidade, periodo));
                 }
 
                 // Checa se faz parte da lista de orcamento
@@ -1181,13 +1224,13 @@ public class ListaOrcamentoPedidoMDActivity extends AppCompatActivity{
 
                     FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(ListaOrcamentoPedidoMDActivity.this);
 
-                    textTotal.setText(orcamentoRotinas.quantidadeListaOrcamento(tipoOrcamentoPedido, cidade, periodo) +
-                            " Orçamento(s) | Tabela: " + orcamentoRotinas.totalListaOrcamentoBruto(tipoOrcamentoPedido, cidade, periodo) +
-                            " - Venda: " + orcamentoRotinas.totalListaOrcamentoLiquido(tipoOrcamentoPedido, cidade, periodo) +
+                    textTotal.setText(orcamentoRotinas.quantidadeListaOrcamento(tipoPedido, cidade, periodo) +
+                            " Orçamento(s) | Tabela: " + orcamentoRotinas.totalListaOrcamentoBruto(tipoPedido, cidade, periodo) +
+                            " - Venda: " + orcamentoRotinas.totalListaOrcamentoLiquido(tipoPedido, cidade, periodo) +
                             " | Dif.: " + funcoes.arredondarValor(totalDiferenca));
                 } else {
-                    textTotal.setText(orcamentoRotinas.quantidadeListaOrcamento(tipoOrcamentoPedido, cidade, periodo) +
-                            " Orçamento(s) | " + orcamentoRotinas.totalListaOrcamentoLiquido(tipoOrcamentoPedido, cidade, periodo));
+                    textTotal.setText(orcamentoRotinas.quantidadeListaOrcamento(tipoPedido, cidade, periodo) +
+                            " Orçamento(s) | " + orcamentoRotinas.totalListaOrcamentoLiquido(tipoPedido, cidade, periodo));
                 }
 
                 // Checa se faz parte da lista de orcamentos excluidos
@@ -1200,14 +1243,14 @@ public class ListaOrcamentoPedidoMDActivity extends AppCompatActivity{
 
                     FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(ListaOrcamentoPedidoMDActivity.this);
 
-                    textTotal.setText(orcamentoRotinas.quantidadeListaOrcamento(tipoOrcamentoPedido, cidade, periodo) +
-                            " Excluido(s) | Tabela: " + orcamentoRotinas.totalListaOrcamentoBruto(tipoOrcamentoPedido, cidade, periodo) +
-                            " - Venda: " + orcamentoRotinas.totalListaOrcamentoLiquido(tipoOrcamentoPedido, cidade, periodo) +
+                    textTotal.setText(orcamentoRotinas.quantidadeListaOrcamento(tipoPedido, cidade, periodo) +
+                            " Excluido(s) | Tabela: " + orcamentoRotinas.totalListaOrcamentoBruto(tipoPedido, cidade, periodo) +
+                            " - Venda: " + orcamentoRotinas.totalListaOrcamentoLiquido(tipoPedido, cidade, periodo) +
                             " | Dif.: " + funcoes.arredondarValor(totalDiferenca));
 
                 } else {
-                    textTotal.setText(orcamentoRotinas.quantidadeListaOrcamento(tipoOrcamentoPedido, cidade, periodo) +
-                            " Excluido(s) | " + orcamentoRotinas.totalListaOrcamentoLiquido(tipoOrcamentoPedido, cidade, periodo));
+                    textTotal.setText(orcamentoRotinas.quantidadeListaOrcamento(tipoPedido, cidade, periodo) +
+                            " Excluido(s) | " + orcamentoRotinas.totalListaOrcamentoLiquido(tipoPedido, cidade, periodo));
                 }
             } // Fim if (this.tipoOrcamentoPedido.equals("E"))
 

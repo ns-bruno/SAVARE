@@ -1,5 +1,7 @@
 package com.savare.configuracao;
 
+import com.savare.funcoes.FuncoesPersonalizadas;
+
 /**
  * Created by Bruno Nogueira Silva on 18/12/2015.
  */

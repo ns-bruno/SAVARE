@@ -1,6 +1,7 @@
 package com.savare.activity.material.designer.fragment;
 
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -12,6 +13,7 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -148,7 +150,7 @@ public class ClienteDetalhesDadosMDFragment extends Fragment {
 
             ParcelaRotinas parcelaRotinas = new ParcelaRotinas(getContext());
 
-            if ((abertoTitulosPriveiraVez == false) && (parcelaRotinas.listaTitulos(idCliente, ParcelaRotinas.TITULOS_EM_ABERTO, ParcelaRotinas.RECEBER, null).size() > 0)) {
+            if ((abertoTitulosPriveiraVez == false) && (parcelaRotinas.listaTitulos(idCliente, ParcelaRotinas.TITULOS_EM_ABERTO, ParcelaRotinas.RECEBER, null, null).size() > 0)) {
 
                 abertoTitulosPriveiraVez = true;
                 // Cria uma intent para abrir uma nova activity

@@ -42,7 +42,7 @@ public class ProdutoListaMDActivity extends AppCompatActivity {
         // Adiciona uma titulo para toolbar
         toolbarInicio.setTitle(this.getResources().getString(R.string.produtos));
         toolbarInicio.setTitleTextColor(getResources().getColor(R.color.branco));
-        //toolbarInicio.setLogo(R.drawable.ic_launcher);
+        //toolbarInicio.setLogo(R.mipmap.ic_launcher);
         // Seta uma toolBar para esta activiy(tela)
         setSupportActionBar(toolbarInicio);
         // Adiciona o botao voltar no toolbar

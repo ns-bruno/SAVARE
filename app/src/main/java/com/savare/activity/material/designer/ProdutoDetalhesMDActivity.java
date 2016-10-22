@@ -115,7 +115,7 @@ public class ProdutoDetalhesMDActivity extends AppCompatActivity{
                         .withProvider(new CardProvider())
                         .setLayout(R.layout.material_basic_buttons_card)
                         .setTitle(descricao.getTextoSecundario())
-                        .setDescription(descricao.getTextoPrincipal())
+                        .setDescription( (descricao.getTextoPrincipal() != null) ? descricao.getTextoPrincipal() : "")
                         /*.addAction(R.id.right_text_button, new TextViewAction(getApplicationContext())
                                 .setText("Action")
                                 .setListener(new OnActionClickListener() {

@@ -198,7 +198,7 @@ public class UsuarioRotinas extends Rotinas {
         // Checa se retornou algum registro
         if( (cursor != null) && (cursor.getCount() > 0) ){
             // Move para o primeiro registro
-            cursor.moveToFirst();
+            cursor.moveToNext();
             // Pega o valor salvo no cursor
             qtdHoras = cursor.getInt(cursor.getColumnIndex("HORAS"));
         }

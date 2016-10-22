@@ -6,13 +6,18 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Environment;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 
 import com.savare.banco.AssetUtils;
+import com.savare.beans.DispositivoBeans;
+import com.savare.configuracao.ConfiguracoesInternas;
 import com.savare.funcoes.FuncoesPersonalizadas;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ConexaoBancoDeDados extends SQLiteOpenHelper {
 
@@ -21,17 +26,15 @@ public class ConexaoBancoDeDados extends SQLiteOpenHelper {
 	//private static final Logger log = LoggerFactory.getLogger(ConexaoBancoDeDados.class);
 
 	private static final String SQL_DIR = "sql" ;
-
 	private static final String CREATEFILE = "create.sql";
-
 	private static final String UPGRADEFILE_PREFIX = "upgrade-";
-
 	private static final String UPGRADEFILE_SUFFIX = ".sql";
 
 	//private static int VERSAO = 1;
 	private static String NOME_BANCO = "DadosSavare.db";
 	private static String PATH_BANCO = Environment.getExternalStorageDirectory() + "/SAVARE/BancoDeDados/";
 	private SQLiteDatabase bancoSavare;
+	private List<String> listaInsertPadrao = null;
 
 	public ConexaoBancoDeDados(Context context, int versao) {
 		//super(context, PATH_BANCO + NOME_BANCO, null, VERSAO);
@@ -48,6 +51,13 @@ public class ConexaoBancoDeDados extends SQLiteOpenHelper {
 			//bd.execSQL(SQL_TABELAS[i]);
 			execSqlFile(CREATEFILE, bd);
 
+			criaListaInsertPadrao();
+
+			if (listaInsertPadrao != null) {
+				for (String insert : listaInsertPadrao) {
+					bd.execSQL(insert);
+				}
+			}
 		} catch (SQLException e) {
 			// Armazena as informacoes para para serem exibidas e enviadas
 			ContentValues contentValues = new ContentValues();
@@ -175,6 +185,18 @@ public class ConexaoBancoDeDados extends SQLiteOpenHelper {
 			}*/
 			// Executa a instrucao sql
 			db.execSQL(sqlInstruction);
+		}
+	}
+
+	protected void criaListaInsertPadrao(){
+		listaInsertPadrao = new ArrayList<String>();
+
+		TelephonyManager telephonyManager = (TelephonyManager) context.getSystemService(context.TELEPHONY_SERVICE);
+
+		if (telephonyManager != null) {
+			listaInsertPadrao.add("INSERT OR ABORT INTO ULTIMA_ATUALIZACAO_DISPOSITIVO (ID_DISPOSITIVO, TABELA, DATA_ULTIMA_ATUALIZACAO) VALUES ('" + telephonyManager.getDeviceId() + "', " + "'AEAORCAM', (DATETIME('NOW', 'localtime')));");
+			listaInsertPadrao.add("INSERT OR ABORT INTO ULTIMA_ATUALIZACAO_DISPOSITIVO (ID_DISPOSITIVO, TABELA, DATA_ULTIMA_ATUALIZACAO) VALUES ('" + telephonyManager.getDeviceId() + "', " + "'AEAITORC', (DATETIME('NOW', 'localtime')));");
+			listaInsertPadrao.add("INSERT OR ABORT INTO ULTIMA_ATUALIZACAO_DISPOSITIVO (ID_DISPOSITIVO, TABELA, DATA_ULTIMA_ATUALIZACAO) VALUES ('" + telephonyManager.getDeviceId() + "', " + "'RPAPARCE_BAIXA', (DATE('NOW', 'localtime')));");
 		}
 	}
 }

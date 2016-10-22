@@ -213,16 +213,18 @@ public class ProdutoRotinas extends Rotinas {
 					+ "LEFT OUTER JOIN CFACLIFO ON(CFAPARAM.ID_CFACLIFO = CFACLIFO.ID_CFACLIFO) WHERE CFACLIFO.CODIGO_FUN = " + codigoVendedor + "), 0)/100)), "
 					+ "(SELECT SMAEMPRE.QTD_CASAS_DECIMAIS FROM SMAEMPRE WHERE SMAEMPRE.ID_SMAEMPRE = " + idEmpresa + ")) AS VENDA_VARE_FINAL, "
 
+                    + "SMAEMPRE.QTD_DIAS_DESTACA_PRODUTO, "
 					+ "AEAPLOJA.PROMOCAO_ATAC, AEAPLOJA.PROMOCAO_VARE,"
 					+ "AEAPLOJA.CT_REPOSICAO_N, AEAPLOJA.CT_COMPLETO_N, "
 					+ "AEAPLOJA.ESTOQUE_F ESTOQUE_FISICO, AEAPLOJA.ESTOQUE_C ESTOQUE_CONTABIL, "
-					+ "AEACLASE.CODIGO AS CODIGO_CLASE, AEACLASE.DESCRICAO AS DESCRICAO_CLASE, AEAPRODU.PESO_BRUTO, AEAPRODU.PESO_LIQUIDO "
-					+ "FROM AEAPRREC AEAPRREC "
-					+ "LEFT OUTER JOIN AEAPRODU AEAPRODU ON  (AEAPRODU.ID_AEAPRODU = AEAPRREC.ID_AEAPRODU) "
-					+ "LEFT OUTER JOIN AEAPLOJA AEAPLOJA ON  (AEAPLOJA.ID_AEAPRODU = AEAPRODU.ID_AEAPRODU) "
-					+ "LEFT OUTER JOIN AEACLASE AEACLASE ON  (AEACLASE.ID_AEACLASE = AEAPRODU.ID_AEACLASE) "
-					+ "LEFT OUTER JOIN AEAMARCA AEAMARCA ON  (AEAMARCA.ID_AEAMARCA = AEAPRODU.ID_AEAMARCA) "
-					+ "LEFT OUTER JOIN AEAUNVEN AEAUNVEN ON  (AEAUNVEN.ID_AEAUNVEN = AEAPRODU.ID_AEAUNVEN) "
+					+ "AEACLASE.CODIGO AS CODIGO_CLASE, AEACLASE.DESCRICAO AS DESCRICAO_CLASE, AEAPRODU.PESO_BRUTO, AEAPRODU.PESO_LIQUIDO \n"
+					+ "FROM AEAPRREC AEAPRREC \n"
+					+ "LEFT OUTER JOIN AEAPRODU AEAPRODU ON  (AEAPRODU.ID_AEAPRODU = AEAPRREC.ID_AEAPRODU) \n"
+					+ "LEFT OUTER JOIN AEAPLOJA AEAPLOJA ON  (AEAPLOJA.ID_AEAPRODU = AEAPRODU.ID_AEAPRODU) \n"
+					+ "LEFT OUTER JOIN AEACLASE AEACLASE ON  (AEACLASE.ID_AEACLASE = AEAPRODU.ID_AEACLASE) \n"
+					+ "LEFT OUTER JOIN AEAMARCA AEAMARCA ON  (AEAMARCA.ID_AEAMARCA = AEAPRODU.ID_AEAMARCA) \n"
+					+ "LEFT OUTER JOIN AEAUNVEN AEAUNVEN ON  (AEAUNVEN.ID_AEAUNVEN = AEAPRODU.ID_AEAUNVEN) \n"
+					+ "LEFT OUTER JOIN SMAEMPRE SMAEMPRE ON  (SMAEMPRE.ID_SMAEMPRE = AEAPLOJA.ID_SMAEMPRE) \n"
 					+ "WHERE (AEAPRODU.ATIVO = '1') AND (AEAPRODU.DESCRICAO IS NOT NULL) ";
 
 		// Adiciona a clausula where passada por parametro no sql
@@ -375,6 +377,12 @@ public class ProdutoRotinas extends Rotinas {
 							produtoLista.setEstaNoOrcamento('1');
 						}
 					}
+                    int diasProdutoNovo = cursor.getInt(cursor.getColumnIndex("QTD_DIAS_DESTACA_PRODUTO"));
+
+                    if((diasProdutoNovo > 0) && (diasProdutoNovo >= produto.getDiasCadastro()) && (produtoLista.getEstaNoOrcamento() != '1')){
+                        produtoLista.setProdutoNovo(true);
+                    }
+
 					// Instancia a clesse de embalagens
 					EmbalagemSql embalagemSql = new EmbalagemSql(context);
 					Cursor cursorEmbalagem = embalagemSql.query("ID_AEAPRODU = " + produto.getIdProduto());
@@ -389,8 +397,10 @@ public class ProdutoRotinas extends Rotinas {
 							// Preenche os dados da embalagem
 							embalagem.setIdEmbalagem(cursorEmbalagem.getInt(cursorEmbalagem.getColumnIndex("ID_AEAEMBAL")));
 							embalagem.setIdUnidadeVenda(cursorEmbalagem.getInt(cursorEmbalagem.getColumnIndex("ID_AEAUNVEN")));
-							if((cursorEmbalagem.getString(cursorEmbalagem.getColumnIndex("ATIVO")) != null) && (cursorEmbalagem.getString(cursorEmbalagem.getColumnIndex("ATIVO")).length() > 0)){
-								embalagem.setAtivo(cursorEmbalagem.getString(cursorEmbalagem.getColumnIndex("ATIVO")));
+                            String ativo = "";
+                            ativo = cursorEmbalagem.getString(cursorEmbalagem.getColumnIndex("ATIVO"));
+							if(ativo.length() > 0){
+								embalagem.setAtivo(ativo);
 							}
 							if((cursorEmbalagem.getString(cursorEmbalagem.getColumnIndex("PRINCIPAL")) != null) && (cursorEmbalagem.getString(cursorEmbalagem.getColumnIndex("PRINCIPAL")).length() > 0)){
 								embalagem.setPrincipal(cursorEmbalagem.getString(cursorEmbalagem.getColumnIndex("PRINCIPAL")));
@@ -419,20 +429,12 @@ public class ProdutoRotinas extends Rotinas {
 							// Adiciona a embalagem a uma lista
 							listaEmbalagem.add(embalagem);
 						} // FIm do while
-
-						int diasProdutoNovo = diasProdutoNovo(idEmpresa);
-
-						if((diasProdutoNovo > 0) && (diasProdutoNovo >= produto.getDiasCadastro()) && (produtoLista.getEstaNoOrcamento() != '1')){
-							produtoLista.setProdutoNovo(true);
-						}
-
-						// Adiciona uma lista de embalagens no produto
-						produto.setListaEmbalagem(listaEmbalagem);
+                        // Adiciona uma lista de embalagens no produto
+                        produto.setListaEmbalagem(listaEmbalagem);
 
 						// Adiciona o produto a lista
 						produtoLista.setProduto(produto);
 					}
-
 					listaProduto.add(produtoLista);
 				} // Fim primeiro while
 
@@ -456,7 +458,7 @@ public class ProdutoRotinas extends Rotinas {
 	}
 
 
-	public List<ProdutoListaBeans> listaProduto(String where, String group, String idOrcamento, final ProgressBar progresso, final TextView textProgresso){
+	public List<ProdutoListaBeans> listaProduto(String where, String group, String idOrcamento, final ProgressBar progresso, final TextView textProgresso, String todasEmbalagens){
 
 		FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
 
@@ -477,17 +479,27 @@ public class ProdutoRotinas extends Rotinas {
 				   + "((AEAPLOJA.VENDA_VARE + (AEAPLOJA.VENDA_VARE * (IFNULL((SELECT AEAPERCE.MARKUP_VARE FROM AEAPERCE WHERE AEAPERCE.ID_SMAEMPRE = " + idEmpresa + "), 0)/100))) * "
 				   + "(IFNULL((SELECT AEAPERCE.MARKUP_VARE FROM AEAPERCE LEFT OUTER JOIN CFAPARAM ON(AEAPERCE.ID_CFAPARAM_VENDEDOR = CFAPARAM.ID_CFAPARAM) "
 				   + "LEFT OUTER JOIN CFACLIFO ON(CFAPARAM.ID_CFACLIFO = CFACLIFO.ID_CFACLIFO) WHERE CFACLIFO.CODIGO_FUN = " + codigoVendedor + "), 0)/100)), 3) AS VENDA_VARE_FINAL, "
-
+                   + "SMAEMPRE.QTD_DIAS_DESTACA_PRODUTO, "
 				   + "AEAPLOJA.PROMOCAO_ATAC, AEAPLOJA.PROMOCAO_VARE,"
 				   + "AEAPLOJA.CT_REPOSICAO_N, AEAPLOJA.CT_COMPLETO_N, "
 				   + "AEAPLOJA.ESTOQUE_F ESTOQUE_FISICO, AEAPLOJA.ESTOQUE_C ESTOQUE_CONTABIL, "
-				   + "AEACLASE.CODIGO AS CODIGO_CLASE, AEACLASE.DESCRICAO AS DESCRICAO_CLASE, AEAPRODU.PESO_BRUTO, AEAPRODU.PESO_LIQUIDO "
-				   + "FROM AEAPLOJA AEAPLOJA "
-				   + "LEFT OUTER JOIN AEAPRODU AEAPRODU ON  (AEAPRODU.ID_AEAPRODU = AEAPLOJA.ID_AEAPRODU) "
-				   + "LEFT OUTER JOIN AEACLASE AEACLASE ON  (AEACLASE.ID_AEACLASE = AEAPRODU.ID_AEACLASE) "
-				   + "LEFT OUTER JOIN AEAMARCA AEAMARCA ON  (AEAMARCA.ID_AEAMARCA = AEAPRODU.ID_AEAMARCA) "
-				   + "LEFT OUTER JOIN AEAUNVEN AEAUNVEN ON  (AEAUNVEN.ID_AEAUNVEN = AEAPRODU.ID_AEAUNVEN) "
-				   + "WHERE (AEAPRODU.ATIVO = '1') AND (AEAPRODU.DESCRICAO IS NOT NULL) ";
+				   + "AEACLASE.CODIGO AS CODIGO_CLASE, AEACLASE.DESCRICAO AS DESCRICAO_CLASE, AEAPRODU.PESO_BRUTO, AEAPRODU.PESO_LIQUIDO ";
+        if (todasEmbalagens.equalsIgnoreCase(NAO)){
+            sql +=   ",AEAEMBAL.ID_AEAEMBAL, AEAEMBAL.ID_AEAPRODU, AEAEMBAL.ID_AEAUNVEN, AEAEMBAL.DT_ALT, AEAEMBAL.PRINCIPAL, AEAEMBAL.DESCRICAO, \n" +
+                     "AEAEMBAL.FATOR_CONVERSAO, AEAEMBAL.FATOR_PRECO, AEAEMBAL.MODULO, AEAEMBAL.DECIMAIS, AEAEMBAL.ATIVO, \n" +
+                     "AEAUNVEN_EMBAL.SIGLA AS SIGLA_UNVEN, AEAUNVEN_EMBAL.DESCRICAO_SINGULAR AS DESCRICAO_SINGULAR_UNVEN, AEAUNVEN_EMBAL.DECIMAIS AS DECIMAIS_UNVEN \n";
+        }
+        sql +=       "FROM AEAPLOJA AEAPLOJA \n"
+				   + "LEFT OUTER JOIN AEAPRODU AEAPRODU ON  (AEAPRODU.ID_AEAPRODU = AEAPLOJA.ID_AEAPRODU) \n"
+				   + "LEFT OUTER JOIN AEACLASE AEACLASE ON  (AEACLASE.ID_AEACLASE = AEAPRODU.ID_AEACLASE) \n"
+				   + "LEFT OUTER JOIN AEAMARCA AEAMARCA ON  (AEAMARCA.ID_AEAMARCA = AEAPRODU.ID_AEAMARCA) \n"
+				   + "LEFT OUTER JOIN AEAUNVEN AEAUNVEN ON  (AEAUNVEN.ID_AEAUNVEN = AEAPRODU.ID_AEAUNVEN) \n"
+				   + "LEFT OUTER JOIN SMAEMPRE SMAEMPRE ON  (SMAEMPRE.ID_SMAEMPRE = AEAPLOJA.ID_SMAEMPRE) \n";
+        if (todasEmbalagens.equalsIgnoreCase(NAO)){
+            sql +=   "LEFT OUTER JOIN AEAEMBAL AEAEMBAL ON  (AEAEMBAL.ID_AEAPRODU = AEAPRODU.ID_AEAPRODU AND AEAEMBAL.ID_AEAUNVEN = AEAUNVEN.ID_AEAUNVEN) \n" +
+                     "LEFT OUTER JOIN AEAUNVEN AEAUNVEN_EMBAL ON(AEAEMBAL.ID_AEAUNVEN = AEAUNVEN_EMBAL.ID_AEAUNVEN)";
+        }
+        sql +=       "WHERE (AEAPRODU.ATIVO = '1') AND (AEAPRODU.DESCRICAO IS NOT NULL) \n";
 
 		// Checa se tem o id do orcamento
 		if (idOrcamento != null && idOrcamento.length() > 0){
@@ -546,9 +558,7 @@ public class ProdutoRotinas extends Rotinas {
 							}
 						});
 					}
-
 					// Preenche os dados do produto
-					ProdutoListaBeans produtoLista = new ProdutoListaBeans();
 					ProdutoBeans produto = new ProdutoBeans();
 					produto.setIdProduto(cursor.getInt(cursor.getColumnIndex("ID_AEAPRODU")));
 					produto.setCodigoEstrutural(cursor.getString(cursor.getColumnIndex("CODIGO_ESTRUTURAL")));
@@ -557,22 +567,16 @@ public class ProdutoRotinas extends Rotinas {
 					produto.setDescricaoMarca(cursor.getString(cursor.getColumnIndex("DESCRICAO_MARCA")));
 					produto.setPesoBruto(cursor.getDouble(cursor.getColumnIndex("PESO_BRUTO")));
 					produto.setPesoLiquido(cursor.getDouble(cursor.getColumnIndex("PESO_LIQUIDO")));
-					if(cursor.getString(cursor.getColumnIndex("TIPO")).length() > 0){
-						produto.setTipoProduto(cursor.getString(cursor.getColumnIndex("TIPO")));
+					String tipo = "";
+                    tipo = cursor.getString(cursor.getColumnIndex("TIPO"));
+					if((tipo != null) && (tipo.length() > 0)){
+						produto.setTipoProduto(tipo);
 					}else{
 						produto.setTipoProduto("P");
 					}
 					produto.setDiasCadastro(cursor.getInt(cursor.getColumnIndex("DIAS_CADASTRO")));
 
 					//final String descProduto = produto.getDescricaoProduto();
-
-					/*if (textProgresso != null){
-						((Activity) context).runOnUiThread(new Runnable() {
-							public void run() {
-								textProgresso.setText(descProduto);
-							}
-						});
-					}*/
 					// Pega a unidade de venda do produto
 					UnidadeVendaBeans unidadeVenda = new UnidadeVendaBeans();
 					unidadeVenda.setIdUnidadeVenda(cursor.getInt(cursor.getColumnIndex("ID_AEAUNVEN")));
@@ -589,7 +593,7 @@ public class ProdutoRotinas extends Rotinas {
 
 					// Adiciona o produto a lista
 					//produtoLista.setProduto(produto);
-
+                    ProdutoListaBeans produtoLista = new ProdutoListaBeans();
 					produtoLista.setValorTabelaAtacado(cursor.getDouble(cursor.getColumnIndex("VENDA_ATAC_TABELA")));
 					produtoLista.setValorTabelaVarejo(cursor.getDouble(cursor.getColumnIndex("VENDA_VARE_TABELA")));
 					produtoLista.setValorUnitarioAtacado(cursor.getDouble(cursor.getColumnIndex("VENDA_ATAC_FINAL")));
@@ -602,69 +606,110 @@ public class ProdutoRotinas extends Rotinas {
 					produtoLista.setEstoqueContabil(cursor.getDouble(cursor.getColumnIndex("ESTOQUE_CONTABIL")));
 
 					// Verifica se tem numero de orcamento para pesquisar
-					if(idOrcamento != null){
+					if((idOrcamento != null) && (idOrcamento.length() > 0)){
 						//Verifica se o produto esta dentro de um orcamento
 						if( marcaProdutoJaComprados(String.valueOf(produto.getIdProduto()), idOrcamento) ){
 							produtoLista.setEstaNoOrcamento('1');
 						}
 					}
+                    int diasProdutoNovo = cursor.getInt(cursor.getColumnIndex("QTD_DIAS_DESTACA_PRODUTO"));
 
-					// Instancia a clesse de embalagens
-					EmbalagemSql embalagemSql = new EmbalagemSql(context);
-					Cursor cursorEmbalagem = embalagemSql.query("ID_AEAPRODU = " + produto.getIdProduto());
+                    if((diasProdutoNovo > 0) && (diasProdutoNovo >= produto.getDiasCadastro()) && (produtoLista.getEstaNoOrcamento() != '1')){
+                        produtoLista.setProdutoNovo(true);
+                    }
 
-					// Verifica se retornou algum registro
-					if(cursorEmbalagem.getCount() > 0){
-						List<EmbalagemBeans> listaEmbalagem = new ArrayList<EmbalagemBeans>();
-						// Enquanto tiver registro vai para frente
-						while(cursorEmbalagem.moveToNext()){
-							// Instancia a classe de embalagem
-							EmbalagemBeans embalagem = new EmbalagemBeans();
-							// Preenche os dados da embalagem
-							embalagem.setIdEmbalagem(cursorEmbalagem.getInt(cursorEmbalagem.getColumnIndex("ID_AEAEMBAL")));
-							embalagem.setIdUnidadeVenda(cursorEmbalagem.getInt(cursorEmbalagem.getColumnIndex("ID_AEAUNVEN")));
-							if((cursorEmbalagem.getString(cursorEmbalagem.getColumnIndex("ATIVO")) != null) && (cursorEmbalagem.getString(cursorEmbalagem.getColumnIndex("ATIVO")).length() > 0)){
-								embalagem.setAtivo(cursorEmbalagem.getString(cursorEmbalagem.getColumnIndex("ATIVO")));
-							}
-							if((cursorEmbalagem.getString(cursorEmbalagem.getColumnIndex("PRINCIPAL")) != null) && (cursorEmbalagem.getString(cursorEmbalagem.getColumnIndex("PRINCIPAL")).length() > 0)){
-								embalagem.setPrincipal(cursorEmbalagem.getString(cursorEmbalagem.getColumnIndex("PRINCIPAL")));
-							}
-							embalagem.setDescricaoEmbalagem(cursorEmbalagem.getString(cursorEmbalagem.getColumnIndex("DESCRICAO")));
-							embalagem.setFatorConversao(cursorEmbalagem.getDouble(cursorEmbalagem.getColumnIndex("FATOR_CONVERSAO")));
-							embalagem.setFatorPreco(cursorEmbalagem.getDouble(cursorEmbalagem.getColumnIndex("FATOR_PRECO")));
-							embalagem.setModulo(cursorEmbalagem.getInt(cursorEmbalagem.getColumnIndex("MODULO")));
-							embalagem.setDecimais(cursorEmbalagem.getInt(cursorEmbalagem.getColumnIndex("DECIMAIS")));
+                    // Cria uma vareavel para salvar as embalagens
+                    List<EmbalagemBeans> listaEmbalagem = new ArrayList<EmbalagemBeans>();
 
-							// Instancia a classe de unidade de venda para manipular banco de dados
-							UnidadeVendaSql unidadeVendaSql = new UnidadeVendaSql(context);
-							Cursor cursorUnVenda = unidadeVendaSql.query("ID_AEAUNVEN = " + embalagem.getIdUnidadeVenda());
-							// Verifica se retornou registro
-							if(cursorUnVenda.getCount() > 0){
-								// Move para o primeiro registro
-								cursorUnVenda.moveToFirst();
-								// Instancia novamente a vareavel unidade de venda
-								unidadeVenda = new UnidadeVendaBeans();
-								// Preenche os dados da unidade de venda
-								unidadeVenda.setIdUnidadeVenda(cursorUnVenda.getInt(cursorUnVenda.getColumnIndex("ID_AEAUNVEN")));
-								unidadeVenda.setSiglaUnidadeVenda(cursorUnVenda.getString(cursorUnVenda.getColumnIndex("SIGLA")));
-								unidadeVenda.setDescricaoUnidadeVenda(cursorUnVenda.getString(cursorUnVenda.getColumnIndex("DESCRICAO_SINGULAR")));
-								unidadeVenda.setCasasDecimais(cursorUnVenda.getInt(cursorUnVenda.getColumnIndex("DECIMAIS")));
+                    if (todasEmbalagens.equalsIgnoreCase(NAO)){
+                        // Instancia a classe de embalagem
+                        EmbalagemBeans embalagem = new EmbalagemBeans();
+                        // Preenche os dados da embalagem
+                        embalagem.setIdEmbalagem(cursor.getInt(cursor.getColumnIndex("ID_AEAEMBAL")));
+                        embalagem.setIdUnidadeVenda(cursor.getInt(cursor.getColumnIndex("ID_AEAUNVEN")));
+                        String ativo = "";
+                        ativo = cursor.getString(cursor.getColumnIndex("ATIVO"));
+                        if((ativo != null) && (ativo.length() > 0)){
+                            embalagem.setAtivo(ativo);
+                        }
+                        String principal = "";
+                        principal = cursor.getString(cursor.getColumnIndex("PRINCIPAL"));
+                        if((principal != null) && (principal.length() > 0)){
+                            embalagem.setPrincipal(principal);
+                        }
+                        embalagem.setDescricaoEmbalagem(cursor.getString(cursor.getColumnIndex("DESCRICAO")));
+                        embalagem.setFatorConversao(cursor.getDouble(cursor.getColumnIndex("FATOR_CONVERSAO")));
+                        embalagem.setFatorPreco(cursor.getDouble(cursor.getColumnIndex("FATOR_PRECO")));
+                        embalagem.setModulo(cursor.getInt(cursor.getColumnIndex("MODULO")));
+                        embalagem.setDecimais(cursor.getInt(cursor.getColumnIndex("DECIMAIS")));
 
-								embalagem.setUnidadeVendaEmbalagem(unidadeVenda);
-							}
-							// Adiciona a embalagem a uma lista
-							listaEmbalagem.add(embalagem);
-						} // FIm do while
+                        // Instancia novamente a vareavel unidade de venda
+                        unidadeVenda = new UnidadeVendaBeans();
+                        // Preenche os dados da unidade de venda
+                        unidadeVenda.setIdUnidadeVenda(cursor.getInt(cursor.getColumnIndex("ID_AEAUNVEN")));
+                        unidadeVenda.setSiglaUnidadeVenda(cursor.getString(cursor.getColumnIndex("SIGLA_UNVEN")));
+                        unidadeVenda.setDescricaoUnidadeVenda(cursor.getString(cursor.getColumnIndex("DESCRICAO_SINGULAR_UNVEN")));
+                        unidadeVenda.setCasasDecimais(cursor.getInt(cursor.getColumnIndex("DECIMAIS_UNVEN")));
 
-						int diasProdutoNovo = diasProdutoNovo(idEmpresa);
+                        embalagem.setUnidadeVendaEmbalagem(unidadeVenda);
 
-						if((diasProdutoNovo > 0) && (diasProdutoNovo >= produto.getDiasCadastro()) && (produtoLista.getEstaNoOrcamento() != '1')){
-							produtoLista.setProdutoNovo(true);
-						}
+                        // Adiciona a embalagem a uma lista
+                        listaEmbalagem.add(embalagem);
 
-						// Adiciona uma lista de embalagens no produto
-						produto.setListaEmbalagem(listaEmbalagem);
-					}
+                        // Adiciona uma lista de embalagens no produto
+                        produto.setListaEmbalagem(listaEmbalagem);
+                    } else {
+                        // Instancia a clesse de embalagens
+                        EmbalagemSql embalagemSql = new EmbalagemSql(context);
+                        //Cursor cursorEmbalagem = embalagemSql.query("ID_AEAPRODU = " + produto.getIdProduto());
+                        Cursor cursorEmbalagem = embalagemSql.sqlSelect(
+                                "SELECT AEAEMBAL.ID_AEAEMBAL, AEAEMBAL.ID_AEAPRODU, AEAEMBAL.ID_AEAUNVEN, AEAEMBAL.DT_ALT, AEAEMBAL.PRINCIPAL, AEAEMBAL.DESCRICAO, \n" +
+                                        "AEAEMBAL.FATOR_CONVERSAO, AEAEMBAL.FATOR_PRECO, AEAEMBAL.MODULO, AEAEMBAL.DECIMAIS, AEAEMBAL.ATIVO, \n" +
+                                        "AEAUNVEN.SIGLA AS SIGLA_UNVEN, AEAUNVEN.DESCRICAO_SINGULAR AS DESCRICAO_SINGULAR_UNVEN, AEAUNVEN.DECIMAIS AS DECIMAIS_UNVEN \n" +
+                                        "FROM AEAEMBAL \n" +
+                                        "LEFT OUTER JOIN AEAUNVEN ON(AEAEMBAL.ID_AEAUNVEN = AEAUNVEN.ID_AEAUNVEN) \n" +
+                                        "WHERE (AEAEMBAL.ID_AEAPRODU = " + produto.getIdProduto() + ")");
+
+                        // Verifica se retornou algum registro
+                        if ((cursorEmbalagem != null) && (cursorEmbalagem.getCount() > 0)) {
+                            // Enquanto tiver registro vai para frente
+                            while (cursorEmbalagem.moveToNext()) {
+                                // Instancia a classe de embalagem
+                                EmbalagemBeans embalagem = new EmbalagemBeans();
+                                // Preenche os dados da embalagem
+                                embalagem.setIdEmbalagem(cursorEmbalagem.getInt(cursorEmbalagem.getColumnIndex("ID_AEAEMBAL")));
+                                embalagem.setIdUnidadeVenda(cursorEmbalagem.getInt(cursorEmbalagem.getColumnIndex("ID_AEAUNVEN")));
+                                String ativo = "";
+                                ativo = cursorEmbalagem.getString(cursorEmbalagem.getColumnIndex("ATIVO"));
+                                if ((ativo != null) && (ativo.length() > 0)) {
+                                    embalagem.setAtivo(ativo);
+                                }
+                                String principal = "";
+                                principal = cursorEmbalagem.getString(cursorEmbalagem.getColumnIndex("PRINCIPAL"));
+                                if ((principal != null) && (principal.length() > 0)) {
+                                    embalagem.setPrincipal(principal);
+                                }
+                                embalagem.setDescricaoEmbalagem(cursorEmbalagem.getString(cursorEmbalagem.getColumnIndex("DESCRICAO")));
+                                embalagem.setFatorConversao(cursorEmbalagem.getDouble(cursorEmbalagem.getColumnIndex("FATOR_CONVERSAO")));
+                                embalagem.setFatorPreco(cursorEmbalagem.getDouble(cursorEmbalagem.getColumnIndex("FATOR_PRECO")));
+                                embalagem.setModulo(cursorEmbalagem.getInt(cursorEmbalagem.getColumnIndex("MODULO")));
+                                embalagem.setDecimais(cursorEmbalagem.getInt(cursorEmbalagem.getColumnIndex("DECIMAIS")));
+                                // Instancia novamente a vareavel unidade de venda
+                                unidadeVenda = new UnidadeVendaBeans();
+                                // Preenche os dados da unidade de venda
+                                unidadeVenda.setIdUnidadeVenda(cursorEmbalagem.getInt(cursorEmbalagem.getColumnIndex("ID_AEAUNVEN")));
+                                unidadeVenda.setSiglaUnidadeVenda(cursorEmbalagem.getString(cursorEmbalagem.getColumnIndex("SIGLA_UNVEN")));
+                                unidadeVenda.setDescricaoUnidadeVenda(cursorEmbalagem.getString(cursorEmbalagem.getColumnIndex("DESCRICAO_SINGULAR_UNVEN")));
+                                unidadeVenda.setCasasDecimais(cursorEmbalagem.getInt(cursorEmbalagem.getColumnIndex("DECIMAIS_UNVEN")));
+
+                                embalagem.setUnidadeVendaEmbalagem(unidadeVenda);
+                                // Adiciona a embalagem a uma lista
+                                listaEmbalagem.add(embalagem);
+                            } // FIm do while Embalagem
+                            // Adiciona uma lista de embalagens no produto
+                            produto.setListaEmbalagem(listaEmbalagem);
+                        }
+                    }
 					// Adiciona o produto a lista
 					produtoLista.setProduto(produto);
 
@@ -753,23 +798,6 @@ public class ProdutoRotinas extends Rotinas {
 		return casasDecimais;
 	}
 
-	public int diasProdutoNovo(String idEmpresa){
-		// Cria variavel para pegar os dados da empresa
-		int quantidadeDias = 0;
-
-		// Variavel para manipular os dados do banco
-		EmpresaSql empresaSql = new EmpresaSql(context);
-
-		Cursor cursor = empresaSql.query("ID_SMAEMPRE = " + idEmpresa);
-
-		if( (cursor != null) && (cursor.getCount() > 0)){
-			cursor.moveToFirst();
-
-			quantidadeDias = cursor.getInt(cursor.getColumnIndex("QTD_DIAS_DESTACA_PRODUTO"));
-
-		}
-		return quantidadeDias;
-	} // Fim empresa
 
 	/**
 	 * Retorna os dados completos de um unico produtos,
@@ -919,7 +947,7 @@ public class ProdutoRotinas extends Rotinas {
 
 			for(int i = 0; i < listaEmbalagem.size(); i++){
 				descricaoDupla = new DescricaoDublaBeans();
-				descricaoDupla.setTextoPrincipal(listaEmbalagem.get(i).getUnidadeVendaEmbalagem().getSiglaUnidadeVenda() + " - " + listaEmbalagem.get(i).getDescricaoEmbalagem());
+				descricaoDupla.setTextoPrincipal(listaEmbalagem.get(i).getUnidadeVendaEmbalagem().getSiglaUnidadeVenda() + " - " + (listaEmbalagem.get(i).getDescricaoEmbalagem() != null ? listaEmbalagem.get(i).getDescricaoEmbalagem() : ""));
 				descricaoDupla.setTextoSecundario("Embalagem do Produto");
 				// Adiciona a lista
 				listaDetalhes.add(descricaoDupla);

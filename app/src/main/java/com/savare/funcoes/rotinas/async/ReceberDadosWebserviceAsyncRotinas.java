@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.app.Notification;
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.telephony.TelephonyManager;
 import android.util.Base64;
@@ -149,7 +151,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             /*Load mLoad = PugNotification.with(context).load()
                     .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
                     .smallIcon(R.mipmap.ic_launcher)
-                    .largeIcon(R.drawable.ic_launcher)
+                    .largeIcon(R.mipmap.ic_launcher)
                     .title(R.string.importar_dados_recebidos)
                     .message("Importando os dados, aguarde...")
                     .flags(Notification.DEFAULT_SOUND);
@@ -172,8 +174,16 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                 }
                             });
                         }
+
+                        List<PropertyInfo> listaPropriedade = null;
+
+                        if (!funcoes.getValorXml("CodigoUsuario").equalsIgnoreCase(funcoes.NAO_ENCONTRADO)) {
+
+                            listaPropriedade = criaPropriedadeDataAlteracaoWebservice("USUARIO_USUA");
+                        }
+
                         // Busca no servidor Webservice
-                        Vector<SoapObject> listaUsuarioObject = webserviceSisInfo.executarSelectWebservice(null, WSSisinfoWebservice.FUNCTION_SELECT_USUARIO_USUA, criaPropriedadeDataAlteracaoWebservice("USUARIO_USUA"));
+                        Vector<SoapObject> listaUsuarioObject = webserviceSisInfo.executarSelectWebservice(null, WSSisinfoWebservice.FUNCTION_SELECT_USUARIO_USUA, ((listaPropriedade != null) ? listaPropriedade : null));
 
                         // Checa se retornou alguma coisa
                         if (listaUsuarioObject != null && listaUsuarioObject.size() > 0) {
@@ -236,7 +246,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                     dadosUsuario.put("ID_USUA", Integer.parseInt(objeto.getProperty("idUsuario").toString()));
                                     dadosUsuario.put("ID_SMAEMPRE", Integer.parseInt(objeto.getProperty("idEmpresa").toString()));
                                     dadosUsuario.put("NOME_USUA", objeto.getProperty("nomeUsuario").toString());
-                                    dadosUsuario.put("EMAIL_USUA", objeto.getProperty("email").toString());
+                                    dadosUsuario.put("EMAIL_USUA", ((objeto.hasProperty("email")) ? objeto.getProperty("email").toString().replace("anyType{}", "") : ""));
                                     dadosUsuario.put("EMPRESA_USUA", objeto.getProperty("empresaUsuario").toString());
                                     dadosUsuario.put("VENDE_ATACADO_USUA", objeto.getProperty("vendeAtacadoUsuario").toString());
                                     dadosUsuario.put("VENDE_VAREJO_USUA", objeto.getProperty("vendeVarejoUsuario").toString());
@@ -264,9 +274,9 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                     final UsuarioSQL usuarioSql = new UsuarioSQL(context);
 
                                     // Pega o sql para passar para o statement
-                                    final String sql = usuarioSql.construirSqlStatement(dadosUsuario);
+                                    //final String sql = usuarioSql.construirSqlStatement(dadosUsuario);
                                     // Pega o argumento para o statement
-                                    final String[] argumentoSql = usuarioSql.argumentoStatement(dadosUsuario);
+                                    //final String[] argumentoSql = usuarioSql.argumentoStatement(dadosUsuario);
 
                                     //usuarioSql.insertOrReplace(dadosUsuario);
 
@@ -275,7 +285,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                                             // Inseri os dados do usuario no banco de dados interno
                                             //if (usuarioSql.insertOrReplaceFast(sql, argumentoSql) > 0) {
-                                            if (usuarioSql.insert(dadosUsuario) > 0) {
+                                            if (usuarioSql.insertOrReplace(dadosUsuario) > 0) {
 
                                                 // Salva os dados necessarios no xml de configuracao da app
                                                 salvarDadosXml(dadosUsuario);
@@ -536,7 +546,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                             (tabelaRecebeDados == null) ){
 
                         // Importa os dados
-                        importarDadosItemOrcamento();
+                        //importarDadosItemOrcamento();
                     }
 
                     // Recebe os dados da tabela AEAPERCE
@@ -716,6 +726,15 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
     private void importaDadosEmpresa(){
         WSSisinfoWebservice webserviceSisInfo = new WSSisinfoWebservice(context);
+
+        // Checo se o texto de status foi passado pro parametro
+        if (textStatus != null){
+            ((Activity) context).runOnUiThread(new Runnable() {
+                public void run() {
+                    textStatus.setText(context.getResources().getString(R.string.procurando_dados) + " Empresa");
+                }
+            });
+        }
         try {
             final Vector<SoapObject> listaEmpresaObject = webserviceSisInfo.executarSelectWebservice(null, WSSisinfoWebservice.FUNCTION_SELECT_SMAEMPRE, criaPropriedadeDataAlteracaoWebservice("SMAEMPRE"));
 
@@ -780,7 +799,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                     dadosEmpresa.put("DT_ALT", objeto.getProperty("dataAlt").toString());
                     dadosEmpresa.put("NOME_RAZAO", objeto.getProperty("nomeRazao").toString());
                     dadosEmpresa.put("NOME_FANTASIA", objeto.hasProperty("nomeFantasia") ? objeto.getProperty("nomeFantasia").toString() : "");
-                    dadosEmpresa.put("CPF_CGC", objeto.getProperty("cpfCnpj").toString());
+                    dadosEmpresa.put("CPF_CGC", objeto.hasProperty("cpfCnpj") ? objeto.getProperty("cpfCnpj").toString() : "");
                     dadosEmpresa.put("ORC_SEM_ESTOQUE", objeto.getProperty("orcamentoSemEstoque").toString());
                     dadosEmpresa.put("DIAS_ATRAZO", Integer.parseInt(objeto.getProperty("diasAtrazo").toString()));
                     dadosEmpresa.put("SEM_MOVIMENTO", Integer.parseInt(objeto.getProperty("semMovimento").toString()));
@@ -831,7 +850,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             Load mLoad = PugNotification.with(context).load()
                     .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
                     .smallIcon(R.mipmap.ic_launcher)
-                    .largeIcon(R.drawable.ic_launcher)
+                    .largeIcon(R.mipmap.ic_launcher)
                     .title(R.string.importar_dados_recebidos)
                     .bigTextStyle(e.getMessage())
                     .flags(Notification.DEFAULT_SOUND);
@@ -844,6 +863,14 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
     }
 
     private void importarDadosArea(){
+        // Checo se o texto de status foi passado pro parametro
+        if (textStatus != null){
+            ((Activity) context).runOnUiThread(new Runnable() {
+                public void run() {
+                    textStatus.setText(context.getResources().getString(R.string.procurando_dados) + " Área de Atuação");
+                }
+            });
+        }
         try {
             WSSisinfoWebservice webserviceSisInfo = new WSSisinfoWebservice(context);
 
@@ -950,7 +977,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             Load mLoad = PugNotification.with(context).load()
                     .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
                     .smallIcon(R.mipmap.ic_launcher)
-                    .largeIcon(R.drawable.ic_launcher)
+                    .largeIcon(R.mipmap.ic_launcher)
                     .title(R.string.importar_dados_recebidos)
                     .bigTextStyle(e.getMessage())
                     .flags(Notification.DEFAULT_SOUND);
@@ -960,6 +987,14 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
 
     private void importarDadosAtividade(){
+        // Checo se o texto de status foi passado pro parametro
+        if (textStatus != null){
+            ((Activity) context).runOnUiThread(new Runnable() {
+                public void run() {
+                    textStatus.setText(context.getResources().getString(R.string.procurando_dados) + " Ramo de Atividade");
+                }
+            });
+        }
         try {
             WSSisinfoWebservice webserviceSisInfo = new WSSisinfoWebservice(context);
 
@@ -1071,7 +1106,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             Load mLoad = PugNotification.with(context).load()
                     .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
                     .smallIcon(R.mipmap.ic_launcher)
-                    .largeIcon(R.drawable.ic_launcher)
+                    .largeIcon(R.mipmap.ic_launcher)
                     .title(R.string.importar_dados_recebidos)
                     .bigTextStyle(e.getMessage())
                     .flags(Notification.DEFAULT_SOUND);
@@ -1081,6 +1116,14 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
 
     private void importarDadosStatus(){
+        // Checo se o texto de status foi passado pro parametro
+        if (textStatus != null){
+            ((Activity) context).runOnUiThread(new Runnable() {
+                public void run() {
+                    textStatus.setText(context.getResources().getString(R.string.procurando_dados) + " Status");
+                }
+            });
+        }
         try {
             WSSisinfoWebservice webserviceSisInfo = new WSSisinfoWebservice(context);
 
@@ -1199,7 +1242,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             Load mLoad = PugNotification.with(context).load()
                     .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
                     .smallIcon(R.mipmap.ic_launcher)
-                    .largeIcon(R.drawable.ic_launcher)
+                    .largeIcon(R.mipmap.ic_launcher)
                     .title(R.string.importar_dados_recebidos)
                     .message(e.getMessage())
                     .flags(Notification.DEFAULT_SOUND);
@@ -1209,6 +1252,14 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
 
     private void importarDadosTipoDocumento(){
+        // Checo se o texto de status foi passado pro parametro
+        if (textStatus != null){
+            ((Activity) context).runOnUiThread(new Runnable() {
+                public void run() {
+                    textStatus.setText(context.getResources().getString(R.string.procurando_dados) + " Tipo Documento");
+                }
+            });
+        }
         try {
             WSSisinfoWebservice webserviceSisInfo = new WSSisinfoWebservice(context);
 
@@ -1323,7 +1374,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             Load mLoad = PugNotification.with(context).load()
                     .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
                     .smallIcon(R.mipmap.ic_launcher)
-                    .largeIcon(R.drawable.ic_launcher)
+                    .largeIcon(R.mipmap.ic_launcher)
                     .title(R.string.importar_dados_recebidos)
                     .message(e.getMessage())
                     .flags(Notification.DEFAULT_SOUND);
@@ -1333,6 +1384,14 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
 
     private void importarDadosCartaoCredito(){
+        // Checo se o texto de status foi passado pro parametro
+        if (textStatus != null){
+            ((Activity) context).runOnUiThread(new Runnable() {
+                public void run() {
+                    textStatus.setText(context.getResources().getString(R.string.procurando_dados) + " Cartão Credito");
+                }
+            });
+        }
         try {
             WSSisinfoWebservice webserviceSisInfo = new WSSisinfoWebservice(context);
 
@@ -1438,7 +1497,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             Load mLoad = PugNotification.with(context).load()
                     .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
                     .smallIcon(R.mipmap.ic_launcher)
-                    .largeIcon(R.drawable.ic_launcher)
+                    .largeIcon(R.mipmap.ic_launcher)
                     .title(R.string.importar_dados_recebidos)
                     .message(e.getMessage())
                     .flags(Notification.DEFAULT_SOUND);
@@ -1447,6 +1506,14 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
     }
 
     private void importarDadosPortador(){
+        // Checo se o texto de status foi passado pro parametro
+        if (textStatus != null){
+            ((Activity) context).runOnUiThread(new Runnable() {
+                public void run() {
+                    textStatus.setText(context.getResources().getString(R.string.procurando_dados) + " Portador (Banco)");
+                }
+            });
+        }
         try {
             WSSisinfoWebservice webserviceSisInfo = new WSSisinfoWebservice(context);
 
@@ -1564,7 +1631,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             Load mLoad = PugNotification.with(context).load()
                     .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
                     .smallIcon(R.mipmap.ic_launcher)
-                    .largeIcon(R.drawable.ic_launcher)
+                    .largeIcon(R.mipmap.ic_launcher)
                     .title(R.string.importar_dados_recebidos)
                     .message(e.getMessage())
                     .flags(Notification.DEFAULT_SOUND);
@@ -1573,6 +1640,14 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
     }
 
     private void importarDadosProfissao(){
+        // Checo se o texto de status foi passado pro parametro
+        if (textStatus != null){
+            ((Activity) context).runOnUiThread(new Runnable() {
+                public void run() {
+                    textStatus.setText(context.getResources().getString(R.string.procurando_dados) + " Profissão");
+                }
+            });
+        }
         try {
             WSSisinfoWebservice webserviceSisInfo = new WSSisinfoWebservice(context);
 
@@ -1688,7 +1763,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             Load mLoad = PugNotification.with(context).load()
                     .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
                     .smallIcon(R.mipmap.ic_launcher)
-                    .largeIcon(R.drawable.ic_launcher)
+                    .largeIcon(R.mipmap.ic_launcher)
                     .title(R.string.importar_dados_recebidos)
                     .message(e.getMessage())
                     .flags(Notification.DEFAULT_SOUND);
@@ -1698,6 +1773,14 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
 
     private void importarDadosTipoCliente(){
+        // Checo se o texto de status foi passado pro parametro
+        if (textStatus != null){
+            ((Activity) context).runOnUiThread(new Runnable() {
+                public void run() {
+                    textStatus.setText(context.getResources().getString(R.string.procurando_dados) + " Tipo Cliente");
+                }
+            });
+        }
         try {
             WSSisinfoWebservice webserviceSisInfo = new WSSisinfoWebservice(context);
 
@@ -1813,7 +1896,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             Load mLoad = PugNotification.with(context).load()
                     .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
                     .smallIcon(R.mipmap.ic_launcher)
-                    .largeIcon(R.drawable.ic_launcher)
+                    .largeIcon(R.mipmap.ic_launcher)
                     .title(R.string.importar_dados_recebidos)
                     .message(e.getMessage())
                     .flags(Notification.DEFAULT_SOUND);
@@ -1823,6 +1906,14 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
 
     private void importarDadosTipoCobranca(){
+        // Checo se o texto de status foi passado pro parametro
+        if (textStatus != null){
+            ((Activity) context).runOnUiThread(new Runnable() {
+                public void run() {
+                    textStatus.setText(context.getResources().getString(R.string.procurando_dados) + " Tipo de Cobrança");
+                }
+            });
+        }
         try {
             WSSisinfoWebservice webserviceSisInfo = new WSSisinfoWebservice(context);
 
@@ -1929,7 +2020,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             Load mLoad = PugNotification.with(context).load()
                     .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
                     .smallIcon(R.mipmap.ic_launcher)
-                    .largeIcon(R.drawable.ic_launcher)
+                    .largeIcon(R.mipmap.ic_launcher)
                     .title(R.string.importar_dados_recebidos)
                     .message(e.getMessage())
                     .flags(Notification.DEFAULT_SOUND);
@@ -1939,6 +2030,14 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
 
     private void importarDadosEstado(){
+        // Checo se o texto de status foi passado pro parametro
+        if (textStatus != null){
+            ((Activity) context).runOnUiThread(new Runnable() {
+                public void run() {
+                    textStatus.setText(context.getResources().getString(R.string.procurando_dados) + " Estado");
+                }
+            });
+        }
         try {
             WSSisinfoWebservice webserviceSisInfo = new WSSisinfoWebservice(context);
 
@@ -2053,7 +2152,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             Load mLoad = PugNotification.with(context).load()
                     .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
                     .smallIcon(R.mipmap.ic_launcher)
-                    .largeIcon(R.drawable.ic_launcher)
+                    .largeIcon(R.mipmap.ic_launcher)
                     .title(R.string.importar_dados_recebidos)
                     .message(e.getMessage())
                     .flags(Notification.DEFAULT_SOUND);
@@ -2063,6 +2162,14 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
 
     private void importarDadosCidade(){
+        // Checo se o texto de status foi passado pro parametro
+        if (textStatus != null){
+            ((Activity) context).runOnUiThread(new Runnable() {
+                public void run() {
+                    textStatus.setText(context.getResources().getString(R.string.procurando_dados) + " Cidade");
+                }
+            });
+        }
         try {
             WSSisinfoWebservice webserviceSisInfo = new WSSisinfoWebservice(context);
 
@@ -2169,7 +2276,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             Load mLoad = PugNotification.with(context).load()
                     .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
                     .smallIcon(R.mipmap.ic_launcher)
-                    .largeIcon(R.drawable.ic_launcher)
+                    .largeIcon(R.mipmap.ic_launcher)
                     .title(R.string.importar_dados_recebidos)
                     .message(e.getMessage())
                     .flags(Notification.DEFAULT_SOUND);
@@ -2179,6 +2286,14 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
 
     private void importarDadosClifo(){
+        // Checo se o texto de status foi passado pro parametro
+        if (textStatus != null){
+            ((Activity) context).runOnUiThread(new Runnable() {
+                public void run() {
+                    textStatus.setText(context.getResources().getString(R.string.procurando_dados) + " Cliente e Fornecedor");
+                }
+            });
+        }
         try {
             WSSisinfoWebservice webserviceSisInfo = new WSSisinfoWebservice(context);
 
@@ -2239,7 +2354,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                     ContentValues dadosClifo = new ContentValues();
                     dadosClifo.put("ID_CFACLIFO", Integer.parseInt(objeto.getProperty("idPessoa").toString()));
                     dadosClifo.put("ID_SMAEMPRE", Integer.parseInt(objeto.getProperty("idEmpresa").toString()));
-                    dadosClifo.put("CPF_CNPJ", objeto.getProperty("cpfCnpj").toString());
+                    dadosClifo.put("CPF_CNPJ", objeto.hasProperty("cpfCnpj") ? objeto.getProperty("cpfCnpj").toString() : "");
                     dadosClifo.put("DT_ALT", objeto.getProperty("dataAlteracao").toString());
                     if (objeto.hasProperty("ieRg")) {
                         dadosClifo.put("IE_RG", objeto.getProperty("ieRg").toString());
@@ -2447,7 +2562,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             Load mLoad = PugNotification.with(context).load()
                     .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
                     .smallIcon(R.mipmap.ic_launcher)
-                    .largeIcon(R.drawable.ic_launcher)
+                    .largeIcon(R.mipmap.ic_launcher)
                     .title(R.string.importar_dados_recebidos)
                     .message(e.getMessage())
                     .flags(Notification.DEFAULT_SOUND);
@@ -2457,6 +2572,14 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
 
     private void importarDadosEndereco(){
+        // Checo se o texto de status foi passado pro parametro
+        if (textStatus != null){
+            ((Activity) context).runOnUiThread(new Runnable() {
+                public void run() {
+                    textStatus.setText(context.getResources().getString(R.string.procurando_dados) + " Endereço");
+                }
+            });
+        }
         try {
             WSSisinfoWebservice webserviceSisInfo = new WSSisinfoWebservice(context);
 
@@ -2594,7 +2717,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             Load mLoad = PugNotification.with(context).load()
                     .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
                     .smallIcon(R.mipmap.ic_launcher)
-                    .largeIcon(R.drawable.ic_launcher)
+                    .largeIcon(R.mipmap.ic_launcher)
                     .title(R.string.importar_dados_recebidos)
                     .message(e.getMessage())
                     .flags(Notification.DEFAULT_SOUND);
@@ -2604,6 +2727,14 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
 
     private void importarDadosParametros(){
+        // Checo se o texto de status foi passado pro parametro
+        if (textStatus != null){
+            ((Activity) context).runOnUiThread(new Runnable() {
+                public void run() {
+                    textStatus.setText(context.getResources().getString(R.string.procurando_dados) + " Parametros");
+                }
+            });
+        }
         try {
             WSSisinfoWebservice webserviceSisInfo = new WSSisinfoWebservice(context);
 
@@ -2788,7 +2919,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             Load mLoad = PugNotification.with(context).load()
                     .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
                     .smallIcon(R.mipmap.ic_launcher)
-                    .largeIcon(R.drawable.ic_launcher)
+                    .largeIcon(R.mipmap.ic_launcher)
                     .title(R.string.importar_dados_recebidos)
                     .message(e.getMessage())
                     .flags(Notification.DEFAULT_SOUND);
@@ -2798,114 +2929,130 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
 
     private void importarDadosFotos(){
+        // Checo se o texto de status foi passado pro parametro
+        if (textStatus != null){
+            ((Activity) context).runOnUiThread(new Runnable() {
+                public void run() {
+                    textStatus.setText(context.getResources().getString(R.string.procurando_dados) + " Imagens");
+                }
+            });
+        }
         try {
-            WSSisinfoWebservice webserviceSisInfo = new WSSisinfoWebservice(context);
+            FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
+            // Checa se a configuracao eh para busca as imagens
+            if (funcoes.getValorXml("ImagemProduto").equalsIgnoreCase("S")) {
 
-            final Vector<SoapObject> listaFotosObject = webserviceSisInfo.executarSelectWebservice(null, WSSisinfoWebservice.FUNCTION_SELECT_CFAFOTOS, criaPropriedadeDataAlteracaoWebservice("CFAFOTOS"));
+                WSSisinfoWebservice webserviceSisInfo = new WSSisinfoWebservice(context);
 
-            // Checa se retornou alguma coisa
-            if ((listaFotosObject != null) && (listaFotosObject.size() > 0)) {
-                // Vareavel para saber se todos os dados foram inseridos com sucesso
-                boolean todosSucesso = true;
+                final Vector<SoapObject> listaFotosObject = webserviceSisInfo.executarSelectWebservice(null, WSSisinfoWebservice.FUNCTION_SELECT_CFAFOTOS, criaPropriedadeDataAlteracaoWebservice("CFAFOTOS"));
 
-                // Checo se o texto de status foi passado pro parametro
-                if (textStatus != null){
-                    ((Activity) context).runOnUiThread(new Runnable() {
-                        public void run() {
-                            textStatus.setText(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
-                        }
-                    });
-                }
-                if (progressBarStatus != null){
-                    ((Activity) context).runOnUiThread(new Runnable() {
-                        public void run() {
-                            progressBarStatus.setIndeterminate(false);
-                            progressBarStatus.setMax(listaFotosObject.size());
-                        }
-                    });
-                }
-                int controle = 0;
-
-                // Passa por toda a lista
-                for (SoapObject objetoIndividual : listaFotosObject) {
-                    final int finalControle = controle;
+                // Checa se retornou alguma coisa
+                if ((listaFotosObject != null) && (listaFotosObject.size() > 0)) {
+                    // Vareavel para saber se todos os dados foram inseridos com sucesso
+                    boolean todosSucesso = true;
 
                     // Checo se o texto de status foi passado pro parametro
-                    if (textStatus != null){
+                    if (textStatus != null) {
                         ((Activity) context).runOnUiThread(new Runnable() {
                             public void run() {
-                                textStatus.setText(context.getResources().getString(R.string.recebendo_dados_fotos) + " - " + (finalControle + 1) + "/" + listaFotosObject.size());
+                                textStatus.setText(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
                             }
                         });
                     }
-                    if (progressBarStatus != null){
+                    if (progressBarStatus != null) {
                         ((Activity) context).runOnUiThread(new Runnable() {
                             public void run() {
-                                progressBarStatus.setProgress(finalControle);
+                                progressBarStatus.setIndeterminate(false);
+                                progressBarStatus.setMax(listaFotosObject.size());
                             }
                         });
                     }
-                    controle ++;
+                    int controle = 0;
 
-                    SoapObject objeto;
+                    // Passa por toda a lista
+                    for (SoapObject objetoIndividual : listaFotosObject) {
+                        final int finalControle = controle;
 
-                    if (objetoIndividual.hasProperty("return")) {
-                        objeto = (SoapObject) objetoIndividual.getProperty("return");
-                    } else {
-                        objeto = objetoIndividual;
-                    }
-
-                    if (objeto.hasProperty("fotos")) {
-
-                        ContentValues dadosFotos = new ContentValues();
-                        dadosFotos.put("ID_CFAFOTOS", Integer.parseInt(objeto.getProperty("idFotos").toString()));
-                        dadosFotos.put("DT_ALT", objeto.getProperty("dataAlteracao").toString());
-                        if (objeto.hasProperty("idClifo")) {
-                            dadosFotos.put("ID_CFACLIFO", Integer.parseInt(objeto.getProperty("idClifo").toString()));
+                        // Checo se o texto de status foi passado pro parametro
+                        if (textStatus != null) {
+                            ((Activity) context).runOnUiThread(new Runnable() {
+                                public void run() {
+                                    textStatus.setText(context.getResources().getString(R.string.recebendo_dados_fotos) + " - " + (finalControle + 1) + "/" + listaFotosObject.size());
+                                }
+                            });
                         }
-                        if (objeto.hasProperty("idProduto")) {
-                            dadosFotos.put("ID_AEAPRODU", Integer.parseInt(objeto.getProperty("idProduto").toString()));
+                        if (progressBarStatus != null) {
+                            ((Activity) context).runOnUiThread(new Runnable() {
+                                public void run() {
+                                    progressBarStatus.setProgress(finalControle);
+                                }
+                            });
                         }
+                        controle++;
+
+                        SoapObject objeto;
+
+                        if (objetoIndividual.hasProperty("return")) {
+                            objeto = (SoapObject) objetoIndividual.getProperty("return");
+                        } else {
+                            objeto = objetoIndividual;
+                        }
+
                         if (objeto.hasProperty("fotos")) {
-                            dadosFotos.put("FOTO", Base64.decode(objeto.getProperty("fotos").toString(), Base64.DEFAULT));
+
+                            ContentValues dadosFotos = new ContentValues();
+                            dadosFotos.put("ID_CFAFOTOS", Integer.parseInt(objeto.getProperty("idFotos").toString()));
+                            dadosFotos.put("DT_ALT", objeto.getProperty("dataAlteracao").toString());
+                            if (objeto.hasProperty("idClifo")) {
+                                dadosFotos.put("ID_CFACLIFO", Integer.parseInt(objeto.getProperty("idClifo").toString()));
+                            }
+                            if (objeto.hasProperty("idProduto")) {
+                                dadosFotos.put("ID_AEAPRODU", Integer.parseInt(objeto.getProperty("idProduto").toString()));
+                            }
+                            if (objeto.hasProperty("fotos")) {
+                                dadosFotos.put("FOTO", Base64.decode(objeto.getProperty("fotos").toString(), Base64.DEFAULT));
+                            }
+
+                            FotosSql fotosSql = new FotosSql(context);
+
+                            // Pega o sql para passar para o statement
+                            //final String sql = fotosSql.construirSqlStatement(dadosFotos);
+                            // Pega o argumento para o statement
+                            //final String[] argumentoSql = fotosSql.argumentoStatement(dadosFotos);
+
+                            if (fotosSql.insertOrReplace(dadosFotos) <= 0) {
+                                todosSucesso = false;
+                            }
                         }
-
-                        FotosSql fotosSql = new FotosSql(context);
-
-                        // Pega o sql para passar para o statement
-                        //final String sql = fotosSql.construirSqlStatement(dadosFotos);
-                        // Pega o argumento para o statement
-                        //final String[] argumentoSql = fotosSql.argumentoStatement(dadosFotos);
-
-                        if (fotosSql.insertOrReplace(dadosFotos) <= 0) {
-                            todosSucesso = false;
-                        }
-                    }
                         /*((Activity) context).runOnUiThread(new Runnable() {
                         public void run() {
                             //fotosSql.insertOrReplace(dadosFotos);
                             fotosSql.insertOrReplaceFast(sql, argumentoSql);
                         }
                     });*/
-                } // Fim do for
-                // Checa se todos foram inseridos/atualizados com sucesso
-                if (todosSucesso) {
-                    inserirUltimaAtualizacao("CFAFOTOS");
-                }
-                // Checo se o texto de status foi passado pro parametro
-                if (textStatus != null){
-                    ((Activity) context).runOnUiThread(new Runnable() {
-                        public void run() {
-                            textStatus.setText(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
-                        }
-                    });
-                }
-                if (progressBarStatus != null){
-                    ((Activity) context).runOnUiThread(new Runnable() {
-                        public void run() {
-                            progressBarStatus.setIndeterminate(true);
-                        }
-                    });
+                    } // Fim do for
+                    if ((listaFotosObject != null) && (listaFotosObject.size() > 0)){
+                        listaFotosObject.clear();
+                    }
+                    // Checa se todos foram inseridos/atualizados com sucesso
+                    if (todosSucesso) {
+                        inserirUltimaAtualizacao("CFAFOTOS");
+                    }
+                    // Checo se o texto de status foi passado pro parametro
+                    if (textStatus != null) {
+                        ((Activity) context).runOnUiThread(new Runnable() {
+                            public void run() {
+                                textStatus.setText(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
+                            }
+                        });
+                    }
+                    if (progressBarStatus != null) {
+                        ((Activity) context).runOnUiThread(new Runnable() {
+                            public void run() {
+                                progressBarStatus.setIndeterminate(true);
+                            }
+                        });
+                    }
                 }
             }
         }catch (Exception e){
@@ -2913,7 +3060,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             Load mLoad = PugNotification.with(context).load()
                     .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
                     .smallIcon(R.mipmap.ic_launcher)
-                    .largeIcon(R.drawable.ic_launcher)
+                    .largeIcon(R.mipmap.ic_launcher)
                     .title(R.string.importar_dados_recebidos)
                     .message(e.getMessage())
                     .flags(Notification.DEFAULT_SOUND);
@@ -2923,6 +3070,14 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
 
     private void importarDadosPlanoPagamento(){
+        // Checo se o texto de status foi passado pro parametro
+        if (textStatus != null){
+            ((Activity) context).runOnUiThread(new Runnable() {
+                public void run() {
+                    textStatus.setText(context.getResources().getString(R.string.procurando_dados) + " Plano de Pagamento");
+                }
+            });
+        }
         try {
             WSSisinfoWebservice webserviceSisInfo = new WSSisinfoWebservice(context);
 
@@ -3040,7 +3195,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             Load mLoad = PugNotification.with(context).load()
                     .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
                     .smallIcon(R.mipmap.ic_launcher)
-                    .largeIcon(R.drawable.ic_launcher)
+                    .largeIcon(R.mipmap.ic_launcher)
                     .title(R.string.importar_dados_recebidos)
                     .message(e.getMessage())
                     .flags(Notification.DEFAULT_SOUND);
@@ -3192,7 +3347,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             Load mLoad = PugNotification.with(context).load()
                     .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
                     .smallIcon(R.mipmap.ic_launcher)
-                    .largeIcon(R.drawable.ic_launcher)
+                    .largeIcon(R.mipmap.ic_launcher)
                     .title(R.string.importar_dados_recebidos)
                     .message(e.getMessage())
                     .flags(Notification.DEFAULT_SOUND);
@@ -3202,6 +3357,14 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
     }
 
     private void importarDadosClasseProdutos(){
+        // Checo se o texto de status foi passado pro parametro
+        if (textStatus != null){
+            ((Activity) context).runOnUiThread(new Runnable() {
+                public void run() {
+                    textStatus.setText(context.getResources().getString(R.string.procurando_dados) + " Classe de Produto");
+                }
+            });
+        }
         try {
             WSSisinfoWebservice webserviceSisInfo = new WSSisinfoWebservice(context);
 
@@ -3307,7 +3470,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             Load mLoad = PugNotification.with(context).load()
                     .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
                     .smallIcon(R.mipmap.ic_launcher)
-                    .largeIcon(R.drawable.ic_launcher)
+                    .largeIcon(R.mipmap.ic_launcher)
                     .title(R.string.importar_dados_recebidos)
                     .message(e.getMessage())
                     .flags(Notification.DEFAULT_SOUND);
@@ -3317,6 +3480,14 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
 
     private void importarDadosUnidadeVenda(){
+        // Checo se o texto de status foi passado pro parametro
+        if (textStatus != null){
+            ((Activity) context).runOnUiThread(new Runnable() {
+                public void run() {
+                    textStatus.setText(context.getResources().getString(R.string.procurando_dados) + " Unidade de Venda");
+                }
+            });
+        }
         try {
             WSSisinfoWebservice webserviceSisInfo = new WSSisinfoWebservice(context);
 
@@ -3423,7 +3594,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             Load mLoad = PugNotification.with(context).load()
                     .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
                     .smallIcon(R.mipmap.ic_launcher)
-                    .largeIcon(R.drawable.ic_launcher)
+                    .largeIcon(R.mipmap.ic_launcher)
                     .title(R.string.importar_dados_recebidos)
                     .message(e.getMessage())
                     .flags(Notification.DEFAULT_SOUND);
@@ -3432,6 +3603,14 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
     }
 
     private void importarDadosGrade(){
+        // Checo se o texto de status foi passado pro parametro
+        if (textStatus != null){
+            ((Activity) context).runOnUiThread(new Runnable() {
+                public void run() {
+                    textStatus.setText(context.getResources().getString(R.string.procurando_dados) + " Grade de Produto");
+                }
+            });
+        }
         try {
             WSSisinfoWebservice webserviceSisInfo = new WSSisinfoWebservice(context);
 
@@ -3537,7 +3716,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             Load mLoad = PugNotification.with(context).load()
                     .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
                     .smallIcon(R.mipmap.ic_launcher)
-                    .largeIcon(R.drawable.ic_launcher)
+                    .largeIcon(R.mipmap.ic_launcher)
                     .title(R.string.importar_dados_recebidos)
                     .message(e.getMessage())
                     .flags(Notification.DEFAULT_SOUND);
@@ -3546,6 +3725,14 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
     }
 
     private void importarDadosMarca(){
+        // Checo se o texto de status foi passado pro parametro
+        if (textStatus != null){
+            ((Activity) context).runOnUiThread(new Runnable() {
+                public void run() {
+                    textStatus.setText(context.getResources().getString(R.string.procurando_dados) + " Marca");
+                }
+            });
+        }
         try {
             WSSisinfoWebservice webserviceSisInfo = new WSSisinfoWebservice(context);
 
@@ -3650,7 +3837,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             Load mLoad = PugNotification.with(context).load()
                     .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
                     .smallIcon(R.mipmap.ic_launcher)
-                    .largeIcon(R.drawable.ic_launcher)
+                    .largeIcon(R.mipmap.ic_launcher)
                     .title(R.string.importar_dados_recebidos)
                     .message(e.getMessage())
                     .flags(Notification.DEFAULT_SOUND);
@@ -3659,6 +3846,14 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
     }
 
     private void importarDadosCodigoSituacaoTributaria(){
+        // Checo se o texto de status foi passado pro parametro
+        if (textStatus != null){
+            ((Activity) context).runOnUiThread(new Runnable() {
+                public void run() {
+                    textStatus.setText(context.getResources().getString(R.string.procurando_dados) + " Situacao Tributaria");
+                }
+            });
+        }
         try {
             WSSisinfoWebservice webserviceSisInfo = new WSSisinfoWebservice(context);
 
@@ -3766,7 +3961,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             Load mLoad = PugNotification.with(context).load()
                     .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
                     .smallIcon(R.mipmap.ic_launcher)
-                    .largeIcon(R.drawable.ic_launcher)
+                    .largeIcon(R.mipmap.ic_launcher)
                     .title(R.string.importar_dados_recebidos)
                     .message(e.getMessage())
                     .flags(Notification.DEFAULT_SOUND);
@@ -3776,6 +3971,14 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
 
     private void importarDadosProduto(){
+        // Checo se o texto de status foi passado pro parametro
+        if (textStatus != null){
+            ((Activity) context).runOnUiThread(new Runnable() {
+                public void run() {
+                    textStatus.setText(context.getResources().getString(R.string.procurando_dados) + " Produto");
+                }
+            });
+        }
         try {
             WSSisinfoWebservice webserviceSisInfo = new WSSisinfoWebservice(context);
 
@@ -3910,7 +4113,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             Load mLoad = PugNotification.with(context).load()
                     .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
                     .smallIcon(R.mipmap.ic_launcher)
-                    .largeIcon(R.drawable.ic_launcher)
+                    .largeIcon(R.mipmap.ic_launcher)
                     .title(R.string.importar_dados_recebidos)
                     .message(e.getMessage())
                     .flags(Notification.DEFAULT_SOUND);
@@ -3919,6 +4122,14 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
     }
 
     private void importarDadosEmbalagem(){
+        // Checo se o texto de status foi passado pro parametro
+        if (textStatus != null){
+            ((Activity) context).runOnUiThread(new Runnable() {
+                public void run() {
+                    textStatus.setText(context.getResources().getString(R.string.procurando_dados) + " Embalagem de Produto");
+                }
+            });
+        }
         try {
             WSSisinfoWebservice webserviceSisInfo = new WSSisinfoWebservice(context);
 
@@ -4050,7 +4261,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             Load mLoad = PugNotification.with(context).load()
                     .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
                     .smallIcon(R.mipmap.ic_launcher)
-                    .largeIcon(R.drawable.ic_launcher)
+                    .largeIcon(R.mipmap.ic_launcher)
                     .title(R.string.importar_dados_recebidos)
                     .message(e.getMessage())
                     .flags(Notification.DEFAULT_SOUND);
@@ -4060,6 +4271,14 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
 
     private void importarDadosProdutosPorLoja(){
+        // Checo se o texto de status foi passado pro parametro
+        if (textStatus != null){
+            ((Activity) context).runOnUiThread(new Runnable() {
+                public void run() {
+                    textStatus.setText(context.getResources().getString(R.string.procurando_dados) + " Produto por Loja");
+                }
+            });
+        }
         try {
             WSSisinfoWebservice webserviceSisInfo = new WSSisinfoWebservice(context);
 
@@ -4208,7 +4427,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             Load mLoad = PugNotification.with(context).load()
                     .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
                     .smallIcon(R.mipmap.ic_launcher)
-                    .largeIcon(R.drawable.ic_launcher)
+                    .largeIcon(R.mipmap.ic_launcher)
                     .title(R.string.importar_dados_recebidos)
                     .message(e.getMessage())
                     .flags(Notification.DEFAULT_SOUND);
@@ -4218,6 +4437,14 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
 
     private void importarDadosLocalEstoque(){
+        // Checo se o texto de status foi passado pro parametro
+        if (textStatus != null){
+            ((Activity) context).runOnUiThread(new Runnable() {
+                public void run() {
+                    textStatus.setText(context.getResources().getString(R.string.procurando_dados) + " Local de Estoque");
+                }
+            });
+        }
         try {
             WSSisinfoWebservice webserviceSisInfo = new WSSisinfoWebservice(context);
 
@@ -4327,7 +4554,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             Load mLoad = PugNotification.with(context).load()
                     .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
                     .smallIcon(R.mipmap.ic_launcher)
-                    .largeIcon(R.drawable.ic_launcher)
+                    .largeIcon(R.mipmap.ic_launcher)
                     .title(R.string.importar_dados_recebidos)
                     .message(e.getMessage())
                     .flags(Notification.DEFAULT_SOUND);
@@ -4337,6 +4564,14 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
 
     private void importarDadosEstoque(){
+        // Checo se o texto de status foi passado pro parametro
+        if (textStatus != null){
+            ((Activity) context).runOnUiThread(new Runnable() {
+                public void run() {
+                    textStatus.setText(context.getResources().getString(R.string.procurando_dados) + " Estoque de Produto");
+                }
+            });
+        }
         try {
             WSSisinfoWebservice webserviceSisInfo = new WSSisinfoWebservice(context);
 
@@ -4448,7 +4683,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             Load mLoad = PugNotification.with(context).load()
                     .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
                     .smallIcon(R.mipmap.ic_launcher)
-                    .largeIcon(R.drawable.ic_launcher)
+                    .largeIcon(R.mipmap.ic_launcher)
                     .title(R.string.importar_dados_recebidos)
                     .message(e.getMessage())
                     .flags(Notification.DEFAULT_SOUND);
@@ -4458,6 +4693,14 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
 
     private void importarDadosOrcamento(){
+        // Checo se o texto de status foi passado pro parametro
+        if (textStatus != null){
+            ((Activity) context).runOnUiThread(new Runnable() {
+                public void run() {
+                    textStatus.setText(context.getResources().getString(R.string.procurando_dados) + " Orçamento");
+                }
+            });
+        }
         try {
             WSSisinfoWebservice webserviceSisInfo = new WSSisinfoWebservice(context);
 
@@ -4517,7 +4760,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                     }
 
                     ContentValues dadosOrcamento = new ContentValues();
-                    dadosOrcamento.put("ID_AEAORCAM", Integer.parseInt(objeto.getProperty("idOrcamento").toString()));
+                    //dadosOrcamento.put("ID_AEAORCAM", Integer.parseInt(objeto.getProperty("idOrcamento").toString()));
                     dadosOrcamento.put("ID_SMAEMPRE", Integer.parseInt(objeto.getProperty("idEmpresa").toString()));
                     if (objeto.hasProperty("idPessoa")) {
                         dadosOrcamento.put("ID_CFACLIFO", Integer.parseInt(objeto.getProperty("idPessoa").toString()));
@@ -4535,16 +4778,15 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                         dadosOrcamento.put("ID_CFATPDOC", Integer.parseInt(objeto.getProperty("idTipoDocumento").toString()));
                     }
                     dadosOrcamento.put("GUID", objeto.getProperty("guid").toString());
-                    dadosOrcamento.put("DT_CAD", objeto.getProperty("dataCadastro").toString());
-                    dadosOrcamento.put("DT_ALT", objeto.getProperty("dataAlteracao").toString());
+
                     dadosOrcamento.put("NUMERO", Integer.parseInt(objeto.getProperty("numero").toString()));
-                    if (objeto.hasProperty("totalOrcamentoCusto")) {
+                    /*if (objeto.hasProperty("totalOrcamentoCusto")) {
                         dadosOrcamento.put("VL_MERC_CUSTO", Double.parseDouble(objeto.getProperty("totalOrcamentoCusto").toString()));
                     }
                     dadosOrcamento.put("VL_MERC_BRUTO", Double.parseDouble(objeto.getProperty("totalOrcamentoBruto").toString()));
                     if (objeto.hasProperty("totalDesconto")) {
                         dadosOrcamento.put("VL_MERC_DESCONTO", Double.parseDouble(objeto.getProperty("totalDesconto").toString()));
-                    }
+                    }*/
                     if (objeto.hasProperty("totalFrete")) {
                         dadosOrcamento.put("VL_FRETE", Double.parseDouble(objeto.getProperty("totalFrete").toString()));
                     }
@@ -4557,55 +4799,68 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                     if (objeto.hasProperty("totalEncargoFinanceiros")) {
                         dadosOrcamento.put("VL_ENCARGOS_FINANCEIROS", Double.parseDouble(objeto.getProperty("totalEncargosFinanceiros").toString()));
                     }
-                    if (objeto.hasProperty("totalTabela")) {
-                        dadosOrcamento.put("VL_TABELA", Double.parseDouble(objeto.getProperty("totalTabela").toString()));
-                    }
                     if (objeto.hasProperty("totalTabelaFaturado")) {
                         dadosOrcamento.put("VL_TABELA_FATURADO", Double.parseDouble(objeto.getProperty("totalTabelaFaturado").toString()));
-                    }
-                    if (objeto.hasProperty("totalOrcamento")) {
-                        dadosOrcamento.put("FC_VL_TOTAL", Double.parseDouble(objeto.getProperty("totalOrcamento").toString()));
                     }
                     if (objeto.hasProperty("totalOrcamentoFaturado")) {
                         dadosOrcamento.put("FC_VL_TOTAL_FATURADO", Double.parseDouble(objeto.getProperty("totalOrcamentoFaturado").toString()));
                     }
                     dadosOrcamento.put("ATAC_VAREJO", objeto.getProperty("tipoVenda").toString());
                     if (objeto.hasProperty("pessoaCliente")) {
-                        dadosOrcamento.put("PESSOA_CLIENTE", objeto.getProperty("pessoaCliente").toString());
+                        dadosOrcamento.put("PESSOA_CLIENTE", objeto.getProperty("pessoaCliente").toString().replace("anyType{}", ""));
                     }
                     if (objeto.hasProperty("nomeRazao")) {
-                        dadosOrcamento.put("NOME_CLIENTE", objeto.getProperty("nomeRazao").toString());
+                        dadosOrcamento.put("NOME_CLIENTE", objeto.getProperty("nomeRazao").toString().replace("anyType{}", ""));
                     }
                     if (objeto.hasProperty("rgIe")) {
-                        dadosOrcamento.put("IE_RG_CLIENTE", objeto.getProperty("rgIe").toString());
+                        dadosOrcamento.put("IE_RG_CLIENTE", objeto.getProperty("rgIe").toString().replace("anyType{}", ""));
                     }
                     if (objeto.hasProperty("cpfCnpj")) {
-                        dadosOrcamento.put("CPF_CGC_CLIENTE", objeto.getProperty("cpfCnpj").toString());
+                        dadosOrcamento.put("CPF_CGC_CLIENTE", objeto.getProperty("cpfCnpj").toString().replace("anyType{}", ""));
                     }
                     if (objeto.hasProperty("enderecoCliente")) {
-                        dadosOrcamento.put("ENDERECO_CLIENTE", objeto.getProperty("enderecoCliente").toString());
+                        dadosOrcamento.put("ENDERECO_CLIENTE", objeto.getProperty("enderecoCliente").toString().replace("anyType{}", ""));
                     }
                     if (objeto.hasProperty("bairroCliente")) {
-                        dadosOrcamento.put("BAIRRO_CLIENTE", objeto.getProperty("bairroCliente").toString());
+                        dadosOrcamento.put("BAIRRO_CLIENTE", objeto.getProperty("bairroCliente").toString().replace("anyType{}", ""));
                     }
                     if (objeto.hasProperty("cepCliente")) {
-                        dadosOrcamento.put("CEP_CLIENTE", objeto.getProperty("cepCliente").toString());
+                        dadosOrcamento.put("CEP_CLIENTE", objeto.getProperty("cepCliente").toString().replace("anyType{}", ""));
                     }
                     //dadosOrcamento.put("FONE_CLIENTE", objeto.getProperty("ativo").toString());
                     if (objeto.hasProperty("observacao")) {
-                        dadosOrcamento.put("OBS", objeto.getProperty("observacao").toString());
+                        dadosOrcamento.put("OBS", objeto.getProperty("observacao").toString().replace("anyType{}", ""));
                     }
                     if (objeto.hasProperty("status")) {
-                        dadosOrcamento.put("STATUS", objeto.getProperty("status").toString());
+                        String situacao = objeto.getProperty("status").toString();
+
+                        if (situacao.equalsIgnoreCase("0") || situacao.equalsIgnoreCase("1")){
+                            // Marca o status como retorno liberado
+                            dadosOrcamento.put("STATUS", "RL");
+
+                        } else if (situacao.equalsIgnoreCase("6")){
+                            // Marca o status como retorno como excluido ou bloqueado
+                            dadosOrcamento.put("STATUS", "RB");
+
+                        } else if (situacao.equalsIgnoreCase("2")){
+                            // Marca o status como retorno como excluido ou bloqueado
+                            dadosOrcamento.put("STATUS", "C");
+
+                        } else if (situacao.equalsIgnoreCase("3") || situacao.equalsIgnoreCase("4")){
+                            // Marca o status como retorno como excluido ou bloqueado
+                            dadosOrcamento.put("STATUS", "F");
+
+                        } else if (situacao.equalsIgnoreCase("5")){
+                            // Marca o status como retorno como faturado
+                            dadosOrcamento.put("STATUS", "RE");
+
+                        } else {
+
+                            dadosOrcamento.put("STATUS", "RB");
+                        }
                     }
                     if (objeto.hasProperty("tipoEntrega")) {
-                        dadosOrcamento.put("TIPO_ENTREGA", objeto.getProperty("tipoEntrega").toString());
-                    }
-                    if (objeto.hasProperty("pesoLiquido")) {
-                        dadosOrcamento.put("PESO_LIQUISO", Double.parseDouble(objeto.getProperty("pesoLiquido").toString()));
-                    }
-                    if (objeto.hasProperty("pesoBruto")) {
-                        dadosOrcamento.put("PESO_BRUTO", Double.parseDouble(objeto.getProperty("pesoBruto").toString()));
+                        dadosOrcamento.put("TIPO_ENTREGA", objeto.getProperty("tipoEntrega").toString().replace("anyType{}", ""));
                     }
 
                     OrcamentoSql orcamentoSql = new OrcamentoSql(context);
@@ -4615,8 +4870,20 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                     // Pega o argumento para o statement
                     //final String[] argumentoSql = orcamentoSql.argumentoStatement(dadosOrcamento);
 
-                    if (orcamentoSql.insertOrReplace(dadosOrcamento) <= 0) {
-                        todosSucesso = false;
+                    if (orcamentoSql.updateFast(dadosOrcamento, "AEAORCAM.NUMERO = " + dadosOrcamento.getAsInteger("NUMERO")) == 0) {
+
+                        if (objeto.hasProperty("totalTabela")) {
+                            dadosOrcamento.put("VL_TABELA", Double.parseDouble(objeto.getProperty("totalTabela").toString()));
+                        }
+                        if (objeto.hasProperty("totalOrcamento")) {
+                            dadosOrcamento.put("FC_VL_TOTAL", Double.parseDouble(objeto.getProperty("totalOrcamento").toString()));
+                        }
+                        dadosOrcamento.put("DT_CAD", objeto.getProperty("dataCadastro").toString());
+                        dadosOrcamento.put("DT_ALT", objeto.getProperty("dataAlteracao").toString());
+
+                        if (orcamentoSql.insertOrReplace(dadosOrcamento) <= 0) {
+                            todosSucesso = false;
+                        }
                     }
                     /*((Activity) context).runOnUiThread(new Runnable() {
                         public void run() {
@@ -4650,7 +4917,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             Load mLoad = PugNotification.with(context).load()
                     .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
                     .smallIcon(R.mipmap.ic_launcher)
-                    .largeIcon(R.drawable.ic_launcher)
+                    .largeIcon(R.mipmap.ic_launcher)
                     .title(R.string.importar_dados_recebidos)
                     .message(e.getMessage())
                     .flags(Notification.DEFAULT_SOUND);
@@ -4660,6 +4927,14 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
 
     private void importarDadosItemOrcamento(){
+        // Checo se o texto de status foi passado pro parametro
+        if (textStatus != null){
+            ((Activity) context).runOnUiThread(new Runnable() {
+                public void run() {
+                    textStatus.setText(context.getResources().getString(R.string.procurando_dados) + " Item de Orçamento");
+                }
+            });
+        }
         try {
             WSSisinfoWebservice webserviceSisInfo = new WSSisinfoWebservice(context);
 
@@ -4711,6 +4986,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                     controle ++;
 
                     SoapObject objeto;
+                    String guidOrcamento = null;
 
                     if (objetoIndividual.hasProperty("return")) {
                         objeto = (SoapObject) objetoIndividual.getProperty("return");
@@ -4718,30 +4994,31 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                         objeto = objetoIndividual;
                     }
 
-                    ContentValues dadosItemOrcamento = new ContentValues();
-                    dadosItemOrcamento.put("ID_AEAITORC", Integer.parseInt(objeto.getProperty("idItemOrcamento").toString()));
-                    dadosItemOrcamento.put("ID_AEAORCAM", Integer.parseInt(objeto.getProperty("idOrcamento").toString()));
-                    if (objeto.hasProperty("estoqueVenda")) {
-                        SoapObject estoque = (SoapObject) objeto.getProperty("estoqueVenda");
-                        dadosItemOrcamento.put("ID_AEAESTOQ", Integer.parseInt(estoque.getProperty("idEstoque").toString()));
+                    final ContentValues dadosItemOrcamento = new ContentValues();
+
+                    if (objeto.hasProperty("idEstoqueTemp")) {
+                        //SoapObject estoque = (SoapObject) objeto.getProperty("estoqueVenda");
+                        dadosItemOrcamento.put("ID_AEAESTOQ", Integer.parseInt(objeto.getProperty("idEstoqueTemp").toString()));
                     }
-                    if (objeto.hasProperty("planoPagamento")) {
-                        SoapObject planoPagamento = (SoapObject) objeto.getProperty("planoPagamento");
-                        dadosItemOrcamento.put("ID_AEAPLPGT", Integer.parseInt(planoPagamento.getProperty("idPlanoPagamento").toString()));
+                    if (objeto.hasProperty("idPlanoPagamentoTemp")) {
+                        //SoapObject planoPagamento = (SoapObject) objeto.getProperty("planoPagamento");
+                        dadosItemOrcamento.put("ID_AEAPLPGT", Integer.parseInt(objeto.getProperty("idPlanoPagamentoTemp").toString()));
                     }
-                    if (objeto.hasProperty("unidadeVenda")) {
-                        SoapObject unidade = (SoapObject) objeto.getProperty("unidadeVenda");
-                        dadosItemOrcamento.put("ID_AEAUNVEN", Integer.parseInt(unidade.getProperty("idUnidadeVenda").toString()));
+                    if (objeto.hasProperty("idUnidadeTemp")) {
+                        //SoapObject unidade = (SoapObject) objeto.getProperty("unidadeVenda");
+                        dadosItemOrcamento.put("ID_AEAUNVEN", Integer.parseInt(objeto.getProperty("idUnidadeTemp").toString()));
                     }
-                    if (objeto.hasProperty("pessoaVendedor")) {
-                        SoapObject vendedor = (SoapObject) objeto.getProperty("pessoaVendedor");
-                        dadosItemOrcamento.put("ID_CFACLIFO_VENDEDOR", Integer.parseInt(vendedor.getProperty("idPessoa").toString()));
+                    if (objeto.hasProperty("idVendedorTemp")) {
+                        //SoapObject vendedor = (SoapObject) objeto.getProperty("pessoaVendedor");
+                        dadosItemOrcamento.put("ID_CFACLIFO_VENDEDOR", Integer.parseInt(objeto.getProperty("idVendedorTemp").toString()));
                     }
-                    dadosItemOrcamento.put("GUID", objeto.getProperty("dataAlteracao").toString());
+                    guidOrcamento = objeto.getProperty("guidOrcamento").toString();
+
+                    dadosItemOrcamento.put("GUID", objeto.getProperty("guid").toString());
                     dadosItemOrcamento.put("DT_CAD", objeto.getProperty("dataCadastro").toString());
                     dadosItemOrcamento.put("DT_ALT", objeto.getProperty("dataAlteracao").toString());
                     //dadosItemOrcamento.put("DT_ULTIMA_ATUALIZACAO", objeto.getProperty("").toString());
-                    dadosItemOrcamento.put("SEQUENCIA", Integer.parseInt(objeto.getProperty("seguencia").toString()));
+                    dadosItemOrcamento.put("SEQUENCIA", Integer.parseInt(objeto.getProperty("sequencia").toString()));
                     dadosItemOrcamento.put("QUANTIDADE", Double.parseDouble(objeto.getProperty("quantidade").toString()));
                     if (objeto.hasProperty("quantidadeFaturada")) {
                         dadosItemOrcamento.put("QUANTIDADE_FATURADA", Double.parseDouble(objeto.getProperty("quantidadeFaturada").toString()));
@@ -4786,43 +5063,64 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                         dadosItemOrcamento.put("FC_LIQUIDO_FATURADO", Double.parseDouble(objeto.getProperty("valorLiquidoFaturado").toString()));
                     }
                     if (objeto.hasProperty("promocao")) {
-                        dadosItemOrcamento.put("PROMOCAO", objeto.getProperty("promocao").toString());
+                        dadosItemOrcamento.put("PROMOCAO", objeto.getProperty("promocao").toString().replace("anyType{}", ""));
                     }
                     if (objeto.hasProperty("tipoProduto")) {
-                        dadosItemOrcamento.put("TIPO_PRODUTO", objeto.getProperty("tipoProduto").toString());
+                        dadosItemOrcamento.put("TIPO_PRODUTO", objeto.getProperty("tipoProduto").toString().replace("anyType{}", ""));
                     }
                     if (objeto.hasProperty("complemento")) {
-                        dadosItemOrcamento.put("COMPLEMENTO", objeto.getProperty("complemento").toString());
+                        dadosItemOrcamento.put("COMPLEMENTO", objeto.getProperty("complemento").toString().replace("anyType{}", ""));
                     }
                     //dadosItemOrcamento.put("SEQ_DESCONTO", objeto.getProperty("").toString());
-                    if (objeto.hasProperty("pesoLiquido")) {
-                        dadosItemOrcamento.put("PESO_LIQUIDO", Double.parseDouble(objeto.getProperty("pesoLiquido").toString()));
-                    }
-                    if (objeto.hasProperty("pesoBruto")) {
-                        dadosItemOrcamento.put("PESO_BRUTO", Double.parseDouble(objeto.getProperty("pesoBruto").toString()));
-                    }
-                    //dadosItemOrcamento.put("STATUS", objeto.getProperty("").toString());
+
                     if (objeto.hasProperty("statusRetorno")) {
-                        dadosItemOrcamento.put("STATUS_RETORNO", objeto.getProperty("statusRetorno").toString());
-                    }
 
+                        String situacao = objeto.getProperty("statusRetorno").toString();
 
-                    ItemOrcamentoSql itemOrcamentoSql = new ItemOrcamentoSql(context);
+                        if (situacao.equalsIgnoreCase("0") || situacao.equalsIgnoreCase("1")){
+                            // Marca o status como retorno liberado
+                            dadosItemOrcamento.put("STATUS", "RL");
 
-                    // Pega o sql para passar para o statement
-                    //final String sql = itemOrcamentoSql.construirSqlStatement(dadosItemOrcamento);
-                    // Pega o argumento para o statement
-                    //final String[] argumentoSql = itemOrcamentoSql.argumentoStatement(dadosItemOrcamento);
+                        } else if (situacao.equalsIgnoreCase("6")){
+                            // Marca o status como retorno como excluido ou bloqueado
+                            dadosItemOrcamento.put("STATUS", "RB");
 
-                    if (itemOrcamentoSql.insertOrReplace(dadosItemOrcamento) <= 0) {
-                        todosSucesso = false;
-                    }
-                    /*((Activity) context).runOnUiThread(new Runnable() {
-                        public void run() {
-                            //itemOrcamentoSql.insertOrReplace(dadosItemOrcamento);
-                            itemOrcamentoSql.insertOrReplaceFast(sql, argumentoSql);
+                        } else if (situacao.equalsIgnoreCase("2")){
+                            // Marca o status como retorno como excluido ou bloqueado
+                            dadosItemOrcamento.put("STATUS", "C");
+
+                        } else if (situacao.equalsIgnoreCase("3") || situacao.equalsIgnoreCase("4")){
+                            // Marca o status como retorno como excluido ou bloqueado
+                            dadosItemOrcamento.put("STATUS", "F");
+
+                        } else if (situacao.equalsIgnoreCase("5")){
+                            // Marca o status como retorno como faturado
+                            dadosItemOrcamento.put("STATUS", "RE");
+
+                        } else {
+
+                            dadosItemOrcamento.put("STATUS", "RB");
                         }
-                    });*/
+                    }
+
+                    final ItemOrcamentoSql itemOrcamentoSql = new ItemOrcamentoSql(context);
+
+                    OrcamentoSql orcamentoSql = new OrcamentoSql(context);
+
+                    // Busca o id do orcamento
+                    Cursor cursor = orcamentoSql.sqlSelect("SELECT AEAORCAM.ID_AEAORCAM FROM AEAORCAM WHERE (AEAORCAM.GUID LIKE '" + guidOrcamento + "')");
+
+                    if ((cursor != null) && (cursor.getCount() > 0) && (cursor.moveToFirst())){
+                        // Pega o id do orcamento/pedido
+                        dadosItemOrcamento.put("ID_AEAORCAM", cursor.getInt(cursor.getColumnIndex("ID_AEAORCAM")));
+                    }
+
+                    if (itemOrcamentoSql.update(dadosItemOrcamento, "AEAITORC.GUID LIKE '" + dadosItemOrcamento.getAsString("GUID") + "'") == 0) {
+
+                        if (itemOrcamentoSql.insertOrReplace(dadosItemOrcamento) <= 0) {
+                            todosSucesso = false;
+                        }
+                    }
                 } // Fim do for
                 // Checa se todos foram inseridos/atualizados com sucesso
                 if (todosSucesso) {
@@ -4849,7 +5147,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             Load mLoad = PugNotification.with(context).load()
                     .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
                     .smallIcon(R.mipmap.ic_launcher)
-                    .largeIcon(R.drawable.ic_launcher)
+                    .largeIcon(R.mipmap.ic_launcher)
                     .title(R.string.importar_dados_recebidos)
                     .message(e.getMessage())
                     .flags(Notification.DEFAULT_SOUND);
@@ -4859,6 +5157,14 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
 
     private void importarDadosPercentual(){
+        // Checo se o texto de status foi passado pro parametro
+        if (textStatus != null){
+            ((Activity) context).runOnUiThread(new Runnable() {
+                public void run() {
+                    textStatus.setText(context.getResources().getString(R.string.procurando_dados) + " Percentual");
+                }
+            });
+        }
         try {
             WSSisinfoWebservice webserviceSisInfo = new WSSisinfoWebservice(context);
 
@@ -4919,7 +5225,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                     ContentValues dadosPercentual = new ContentValues();
                     dadosPercentual.put("ID_AEAPERCE", Integer.parseInt(objeto.getProperty("idPercentual").toString()));
-                    dadosPercentual.put("ID_AEAPERCE_TABELA", Integer.parseInt(objeto.getProperty("idPercentualTabela").toString()));
+                    dadosPercentual.put("ID_AEATBPER_TABELA", Integer.parseInt(objeto.getProperty("idPercentualTabela").toString()));
                     if (objeto.hasProperty("idEmpresa")) {
                         dadosPercentual.put("ID_SMAEMPRE", Integer.parseInt(objeto.getProperty("idEmpresa").toString()));
                     }
@@ -5027,7 +5333,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             Load mLoad = PugNotification.with(context).load()
                     .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
                     .smallIcon(R.mipmap.ic_launcher)
-                    .largeIcon(R.drawable.ic_launcher)
+                    .largeIcon(R.mipmap.ic_launcher)
                     .title(R.string.importar_dados_recebidos)
                     .message(e.getMessage())
                     .flags(Notification.DEFAULT_SOUND);
@@ -5037,6 +5343,14 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
 
     private void importarDadosFator(){
+        // Checo se o texto de status foi passado pro parametro
+        if (textStatus != null){
+            ((Activity) context).runOnUiThread(new Runnable() {
+                public void run() {
+                    textStatus.setText(context.getResources().getString(R.string.procurando_dados) + " Fator");
+                }
+            });
+        }
         try {
             WSSisinfoWebservice webserviceSisInfo = new WSSisinfoWebservice(context);
 
@@ -5159,7 +5473,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             Load mLoad = PugNotification.with(context).load()
                     .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
                     .smallIcon(R.mipmap.ic_launcher)
-                    .largeIcon(R.drawable.ic_launcher)
+                    .largeIcon(R.mipmap.ic_launcher)
                     .title(R.string.importar_dados_recebidos)
                     .message(e.getMessage())
                     .flags(Notification.DEFAULT_SOUND);
@@ -5169,6 +5483,14 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
 
     private void importarDadosProdutoRecomendado(){
+        // Checo se o texto de status foi passado pro parametro
+        if (textStatus != null){
+            ((Activity) context).runOnUiThread(new Runnable() {
+                public void run() {
+                    textStatus.setText(context.getResources().getString(R.string.procurando_dados) + " Produto Recomendado");
+                }
+            });
+        }
         try {
             WSSisinfoWebservice webserviceSisInfo = new WSSisinfoWebservice(context);
 
@@ -5293,7 +5615,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             Load mLoad = PugNotification.with(context).load()
                     .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
                     .smallIcon(R.mipmap.ic_launcher)
-                    .largeIcon(R.drawable.ic_launcher)
+                    .largeIcon(R.mipmap.ic_launcher)
                     .title(R.string.importar_dados_recebidos)
                     .message(e.getMessage())
                     .flags(Notification.DEFAULT_SOUND);
@@ -5303,10 +5625,36 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
 
     private void importarDadosParcela(){
+        // Checo se o texto de status foi passado pro parametro
+        if (textStatus != null){
+            ((Activity) context).runOnUiThread(new Runnable() {
+                public void run() {
+                    textStatus.setText(context.getResources().getString(R.string.procurando_dados) + " Títulos à Receber/Pagar");
+                }
+            });
+        }
         try {
             WSSisinfoWebservice webserviceSisInfo = new WSSisinfoWebservice(context);
 
-            final Vector<SoapObject> listaParcelaObject = webserviceSisInfo.executarSelectWebservice(null, WSSisinfoWebservice.FUNCTION_SELECT_RPAPARCE, criaPropriedadeDataAlteracaoWebservice("RPAPARCE"));
+            List<PropertyInfo> listaPropriedadeParcela = criaPropriedadeDataAlteracaoWebservice("RPAPARCE");
+
+            if (listaPropriedadeParcela == null){
+                listaPropriedadeParcela = new ArrayList<PropertyInfo>();
+            }
+
+            UltimaAtualizacaoRotinas ultimaAtualizacaoRotinas = new UltimaAtualizacaoRotinas(context);
+            ArrayList<UltimaAtualizacaoBeans> lista = ultimaAtualizacaoRotinas.listaUltimaAtualizacaoTabelas("RPAPARCE_BAIXA");
+
+            if (lista != null && lista.size() > 0){
+                PropertyInfo propertyDataUltimaAtualizacao = new PropertyInfo();
+                propertyDataUltimaAtualizacao.setName("dataInicioBaixa");
+                propertyDataUltimaAtualizacao.setValue(lista.get(0).getDataUltimaAtualizacao());
+                propertyDataUltimaAtualizacao.setType(lista.get(0).getDataUltimaAtualizacao().getClass());
+
+                listaPropriedadeParcela.add(propertyDataUltimaAtualizacao);
+            }
+
+            final Vector<SoapObject> listaParcelaObject = webserviceSisInfo.executarSelectWebservice(null, WSSisinfoWebservice.FUNCTION_SELECT_RPAPARCE, listaPropriedadeParcela);
 
             // Checa se retornou alguma coisa
             if ((listaParcelaObject != null) && (listaParcelaObject.size() > 0)) {
@@ -5454,7 +5802,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             Load mLoad = PugNotification.with(context).load()
                     .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
                     .smallIcon(R.mipmap.ic_launcher)
-                    .largeIcon(R.drawable.ic_launcher)
+                    .largeIcon(R.mipmap.ic_launcher)
                     .title(R.string.importar_dados_recebidos)
                     .message(e.getMessage())
                     .flags(Notification.DEFAULT_SOUND);
@@ -5486,7 +5834,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
         UltimaAtualizacaoRotinas ultimaAtualizacaoRotinas = new UltimaAtualizacaoRotinas(context);
 
-        ArrayList<UltimaAtualizacaoBeans> listaUltimaAtualizacaoDispositivo = ultimaAtualizacaoRotinas.listaUltimaAtualizacaoTabelas(null);
+        ArrayList<UltimaAtualizacaoBeans> listaUltimaAtualizacaoDispositivo = ultimaAtualizacaoRotinas.listaUltimaAtualizacaoTabelas(tabela);
 
         if ((listaUltimaAtualizacaoDispositivo != null) && (listaUltimaAtualizacaoDispositivo.size() > 0) && (tabela != null) && (!tabela.isEmpty())) {
 

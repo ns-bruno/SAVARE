@@ -9,7 +9,9 @@ import com.savare.funcoes.rotinas.OrcamentoRotinas;
 import com.savare.funcoes.rotinas.PessoaRotinas;
 import com.savare.funcoes.rotinas.UsuarioRotinas;
 import com.savare.funcoes.rotinas.async.EnviarCadastroClienteFtpAsyncRotinas;
+import com.savare.funcoes.rotinas.async.EnviarDadosWebserviceAsyncRotinas;
 import com.savare.funcoes.rotinas.async.EnviarOrcamentoFtpAsyncRotinas;
+import com.savare.webservice.WSSisinfoWebservice;
 
 import android.app.Activity;
 import android.content.BroadcastReceiver;
@@ -33,8 +35,9 @@ public class ReceptorAlarmeEnviarOrcamentoBroadcastRotinas extends BroadcastRece
 		UsuarioRotinas usuarioRotinas = new UsuarioRotinas(context);
 
 		FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
-
-		if (usuarioRotinas.quantidadeHorasUltimoEnvio() > 6){
+		int horas = usuarioRotinas.quantidadeHorasUltimoEnvio();
+		// Checa se tem mais de 3 horas que foi enviado os ultimos dados
+		if (usuarioRotinas.quantidadeHorasUltimoEnvio() > 3){
 			funcoes.setValorXml("EnviandoDados", "N");
 		}
 
@@ -47,7 +50,7 @@ public class ReceptorAlarmeEnviarOrcamentoBroadcastRotinas extends BroadcastRece
 			funcoes.setValorXml("EnviandoDados", "S");
 
 			// Pega a quantidade de pedidos que precisam ser enviados
-			double quatidadeOrcamentoEnviar = funcoes.desformatarValor(orcamentoRotinas.quantidadeListaOrcamento("P", null, null));
+			double quatidadeOrcamentoEnviar = funcoes.desformatarValor(orcamentoRotinas.quantidadeListaOrcamento("'P'", null, null));
 
 			//final PessoaRotinas pessoaRotinas = new PessoaRotinas(context);
 			//double quantidadeCadastroNovo = pessoaRotinas.quantidadeCadastroPessoaNovo();
@@ -64,10 +67,17 @@ public class ReceptorAlarmeEnviarOrcamentoBroadcastRotinas extends BroadcastRece
 					listaOrcamento[i] = lista.get(i);
 				}
 
+				EnviarDadosWebserviceAsyncRotinas enviarDadosWebservice = new EnviarDadosWebserviceAsyncRotinas(context);
+				// Informa quais os pedidos a serem enviados
+				enviarDadosWebservice.setIdOrcamentoSelecionado(listaOrcamento);
+				// Informa que eh para enviar os dados apenas dos orcamentos e pedidos
+				enviarDadosWebservice.setTabelaEnviarDados(new String[]{WSSisinfoWebservice.FUNCTION_INSERT_AEAORCAM, WSSisinfoWebservice.FUNCTION_INSERT_AEAITORC});
+				enviarDadosWebservice.execute();
+
 				// Instancia a classe para executar metodo em segundo plano
-				EnviarOrcamentoFtpAsyncRotinas enviarOrcamentoFtpAsync = new EnviarOrcamentoFtpAsyncRotinas(context, EnviarOrcamentoFtpAsyncRotinas.TELA_RECEPTOR_ALARME);
+				//EnviarOrcamentoFtpAsyncRotinas enviarOrcamentoFtpAsync = new EnviarOrcamentoFtpAsyncRotinas(context, EnviarOrcamentoFtpAsyncRotinas.TELA_RECEPTOR_ALARME);
 				// Excuta tarefa em segundo plano e passa paramento com a lista de orcamento
-				enviarOrcamentoFtpAsync.execute(listaOrcamento);
+				//enviarOrcamentoFtpAsync.execute(listaOrcamento);
 			} else {
 				// Marca nos parametro internos que a aplicacao que nao esta enviando mais dados
 				funcoes.setValorXml("EnviandoDados", "N");

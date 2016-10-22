@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.savare"
-    android:versionCode="1002"
-    android:versionName="1.0.0.2">
+    package="com.savare">
 
     <uses-sdk
         android:minSdkVersion="15"
@@ -26,9 +24,10 @@
 
     <application
         android:allowBackup="true"
-        android:icon="@drawable/ic_launcher"
+        android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@android:style/Theme.Holo.Light">
+        android:theme="@android:style/Theme.Holo.Light"
+        android:largeHeap="true">
 
         <!-- Google Analytics Version v4 needs this value for easy tracking -->
         <meta-data
@@ -120,6 +119,7 @@
         </activity>
 
         <activity android:name=".activity.material.designer.ClienteDetalhesMDActivity"
+            android:windowSoftInputMode="stateHidden"
             android:theme="@style/AppBaseTheme"/>
         <activity android:name=".activity.material.designer.ClienteListaMDActivity"
             android:theme="@style/AppBaseTheme">

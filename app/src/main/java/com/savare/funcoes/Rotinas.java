@@ -11,6 +11,7 @@ import com.savare.banco.funcoesSql.UsuarioSQL;
 public class Rotinas {
 	
 	protected Context context;
+	public static final String SIM = "S", NAO = "N";
 	
 	public Rotinas(Context context) {
 		this.context = context;

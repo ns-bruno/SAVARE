@@ -88,7 +88,7 @@ public class EnviarOrcamentoFtpAsyncRotinas extends AsyncTask<String, String, In
 					   .title(R.string.enviando_pedidos)
 					   .bigTextStyle("Aguarde, gerando os arquivos necessários à serem enviados...")
 					   .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
-					   .smallIcon(R.drawable.ic_launcher)
+					   .smallIcon(R.mipmap.ic_launcher)
 					   .progress()
 					   .value(0, 0, true)
 					   .build();
@@ -112,7 +112,7 @@ public class EnviarOrcamentoFtpAsyncRotinas extends AsyncTask<String, String, In
 					.title(R.string.enviando_pedidos)
 					.bigTextStyle("Estamos verificando se existe alguma conexão com a internet, aguarde...")
 					.identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
-					.smallIcon(R.drawable.ic_launcher)
+					.smallIcon(R.mipmap.ic_launcher)
 					.progress()
 					.value(0, 0, true)
 					.build();
@@ -149,7 +149,7 @@ public class EnviarOrcamentoFtpAsyncRotinas extends AsyncTask<String, String, In
 							.title(R.string.enviando_pedidos)
 							.bigTextStyle("Estamos gerando o arquivo " + (i + 1) + " de " + params.length + ", aguarde...")
 							.identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
-							.smallIcon(R.drawable.ic_launcher)
+							.smallIcon(R.mipmap.ic_launcher)
 							.progress()
 							.value(0, 0, true)
 							.build();
@@ -167,7 +167,7 @@ public class EnviarOrcamentoFtpAsyncRotinas extends AsyncTask<String, String, In
 								.title(R.string.enviando_pedidos)
 								.bigTextStyle("O arquivo " + (i + 1) + " de " + params.length + " foi gerado com sucesso, estamos conectando com o servidor em nuvem, aguarde...")
 								.identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
-								.smallIcon(R.drawable.ic_launcher)
+								.smallIcon(R.mipmap.ic_launcher)
 								.progress()
 								.value(0, 0, true)
 								.build();
@@ -195,7 +195,7 @@ public class EnviarOrcamentoFtpAsyncRotinas extends AsyncTask<String, String, In
 										.title(R.string.enviando_pedidos)
 										.bigTextStyle("Não foi possível conectar no servidor em nuvem. Vamos para próxima etapa, aguarde...")
 										.identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
-										.smallIcon(R.drawable.ic_launcher)
+										.smallIcon(R.mipmap.ic_launcher)
 										.progress()
 										.value(0, 0, true)
 										.build();
@@ -211,7 +211,7 @@ public class EnviarOrcamentoFtpAsyncRotinas extends AsyncTask<String, String, In
 										.title(R.string.enviando_pedidos)
 										.bigTextStyle("Conectou com sucesso no servidor em nuvem. Estamos enviado o arquivo " + (i + 1) + " de " + params.length + ", aguarde...")
 										.identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
-										.smallIcon(R.drawable.ic_launcher)
+										.smallIcon(R.mipmap.ic_launcher)
 										.progress()
 										.value(0, 0, true)
 										.build();
@@ -242,7 +242,7 @@ public class EnviarOrcamentoFtpAsyncRotinas extends AsyncTask<String, String, In
 											.title(R.string.enviando_pedidos)
 											.bigTextStyle("Conectou com sucesso no servidor em nuvem. Estamos enviado o arquivo " + (i + 1) + " de " + params.length + ", aguarde...")
 											.identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
-											.smallIcon(R.drawable.ic_launcher)
+											.smallIcon(R.mipmap.ic_launcher)
 											.progress()
 											.value(0, (int) localXml.length(), false)
 											.build();
@@ -277,7 +277,7 @@ public class EnviarOrcamentoFtpAsyncRotinas extends AsyncTask<String, String, In
 													.title(R.string.enviando_pedidos)
 													.bigTextStyle("Transferindo o aquivo, aguarde...")
 													.identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
-													.smallIcon(R.drawable.ic_launcher)
+													.smallIcon(R.mipmap.ic_launcher)
 													.progress()
 													.value(bytesTransferred, (int) totalByteArquivo, false)
 													.build();
@@ -304,7 +304,7 @@ public class EnviarOrcamentoFtpAsyncRotinas extends AsyncTask<String, String, In
 												.title(R.string.enviando_pedidos)
 												.bigTextStyle("Confirmando o envio do arquivo " + (i + 1) + " de " + params.length + ", aguarde...")
 												.identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
-												.smallIcon(R.drawable.ic_launcher)
+												.smallIcon(R.mipmap.ic_launcher)
 												.progress()
 												.value(0, (int) localXml.length(), false)
 												.build();
@@ -320,7 +320,7 @@ public class EnviarOrcamentoFtpAsyncRotinas extends AsyncTask<String, String, In
 													.title(R.string.enviando_pedidos)
 													.bigTextStyle("Confirmando o envio do arquivo " + (i + 1) + " de " + params.length + ", aguarde...")
 													.identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
-													.smallIcon(R.drawable.ic_launcher)
+													.smallIcon(R.mipmap.ic_launcher)
 													.progress()
 													.value(0, 0, true)
 													.build();
@@ -349,7 +349,7 @@ public class EnviarOrcamentoFtpAsyncRotinas extends AsyncTask<String, String, In
 														.title(R.string.enviando_pedidos)
 														.bigTextStyle("Arquvio temporario " + (i + 1) + " de " + params.length + " eliminado com sucesso, vamos passar para o próximo, aguarde...")
 														.identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
-														.smallIcon(R.drawable.ic_launcher)
+														.smallIcon(R.mipmap.ic_launcher)
 														.progress()
 														.value(0, 0, true)
 														.build();
@@ -505,8 +505,8 @@ public class EnviarOrcamentoFtpAsyncRotinas extends AsyncTask<String, String, In
 					.identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
 					.title(R.string.enviando_pedidos)
 					.bigTextStyle(mensagemErro)
-					.smallIcon(R.drawable.ic_launcher)
-					.largeIcon(R.drawable.ic_launcher)
+					.smallIcon(R.mipmap.ic_launcher)
+					.largeIcon(R.mipmap.ic_launcher)
 					.flags(Notification.DEFAULT_ALL)
 					.simple()
 					.build();

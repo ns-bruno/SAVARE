@@ -3,6 +3,7 @@ package com.savare.funcoes.rotinas;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -41,17 +42,23 @@ public class PlanoPagamentoRotinas extends Rotinas {
 			where = "( (ATAC_VAREJO = '2') OR (ATAC_VAREJO = '" + tipoVenda + "') )";
 		}
 		// Cria uma variavel para salvar todos os planos de pagamentos
-		List<PlanoPagamentoBeans> listaPlanoPagamento = new ArrayList<PlanoPagamentoBeans>();
+		final List<PlanoPagamentoBeans> listaPlanoPagamento = new ArrayList<PlanoPagamentoBeans>();
 		
 		try{
 			// Executa o sql e armazena os registro em um Cursor
 			Cursor cursor = planoPagamentoSql.query(where, ordem);
 			
 			
-			if(cursor.getCount() > 0){
-				// Move para o primeiro registro
-				cursor.moveToFirst();
-				
+			if((cursor != null) && (cursor.getCount() > 0)){
+
+				PlanoPagamentoBeans planoPadrao = new PlanoPagamentoBeans();
+				planoPadrao.setIdPlanoPagamento(0);
+				planoPadrao.setCodigoPlanoPagamento(0);
+				planoPadrao.setDescricaoPlanoPagamento("Selecione um Plano de Pagamento");
+
+				// Adiciona o plano em uma lista
+				listaPlanoPagamento.add(planoPadrao);
+
 				while (cursor.moveToNext()) {
 					// Cria uma variavel para pegar os dados de cada plano do banco de dados
 					PlanoPagamentoBeans plano = new PlanoPagamentoBeans();
@@ -89,24 +96,31 @@ public class PlanoPagamentoRotinas extends Rotinas {
 				funcoes.menssagem(mensagem);
 			}
 		}catch(SQLException e){
-			FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
+			final FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
 			// Cria uma variavem para inserir as propriedades da mensagem
-			ContentValues mensagem = new ContentValues();
+			final ContentValues mensagem = new ContentValues();
 			mensagem.put("comando", 1);
 			mensagem.put("tela", "TipoDocumentoRotinas");
 			mensagem.put("mensagem", "Não foi possível carregar os dados do Plano de Pagamento. \n" + e.getMessage());
-			
-			funcoes.menssagem(mensagem);
+			((Activity) context).runOnUiThread(new Runnable() {
+				public void run() {
+					funcoes.menssagem(mensagem);
+				}
+			});
 		
 		}catch (Exception e) {
-			FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
+			final FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
 			// Cria uma variavem para inserir as propriedades da mensagem
-			ContentValues mensagem = new ContentValues();
+			final ContentValues mensagem = new ContentValues();
 			mensagem.put("comando", 1);
 			mensagem.put("tela", "TipoDocumentoRotinas");
 			mensagem.put("mensagem", "Não foi possivel carregar os dados do Plano de Pagamento. \n" + e.getMessage());
-			
-			funcoes.menssagem(mensagem);
+
+            ((Activity) context).runOnUiThread(new Runnable() {
+                public void run() {
+                    funcoes.menssagem(mensagem);
+                }
+            });
 		}
 		
 		return listaPlanoPagamento;
@@ -137,9 +151,9 @@ public class PlanoPagamentoRotinas extends Rotinas {
 			}
 			
 		} catch (Exception e) {
-			FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
+			final FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
 			// Cria uma variavem para inserir as propriedades da mensagem
-			ContentValues mensagem = new ContentValues();
+			final ContentValues mensagem = new ContentValues();
 			mensagem.put("comando", 0);
 			mensagem.put("tela", "TipoDocumentoRotinas");
 			mensagem.put("mensagem", "Erro ao descobrir posicao do documento da lista. \n" + e.getMessage());
@@ -148,7 +162,11 @@ public class PlanoPagamentoRotinas extends Rotinas {
 			mensagem.put("usuario", funcoes.getValorXml("ChaveEmpresa"));
 			mensagem.put("usuario", funcoes.getValorXml("Email"));
 			// Executa a mensagem passando por parametro as propriedades
-			funcoes.menssagem(mensagem);
+            ((Activity) context).runOnUiThread(new Runnable() {
+                public void run() {
+                    funcoes.menssagem(mensagem);
+                }
+            });
 		}
 		
 		return posicao;

@@ -643,13 +643,16 @@ public class ItemOrcamentoBeans implements Parcelable, KvmSerializable {
                 return complemento;
             case 14:
                 return guidOrcamento;
+
+			case 15:
+				return ""+valorTabela;
         }
 		return null;
 	}
 
 	@Override
 	public int getPropertyCount() {
-		return 15;
+		return 16;
 	}
 
 	@Override
@@ -714,6 +717,10 @@ public class ItemOrcamentoBeans implements Parcelable, KvmSerializable {
             case 14:
                 this.guidOrcamento = o.toString();
                 break;
+
+			case 15:
+				this.valorTabela = Double.parseDouble(o.toString());
+				break;
         }
 	}
 
@@ -794,6 +801,11 @@ public class ItemOrcamentoBeans implements Parcelable, KvmSerializable {
                 propertyInfo.type = PropertyInfo.STRING_CLASS;
                 propertyInfo.name = "guidOrcamento";
                 break;
+
+			case 15:
+				propertyInfo.type = Double.class;
+				propertyInfo.name = "valorTabela";
+				break;
         }
 	}
 }

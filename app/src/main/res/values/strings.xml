@@ -161,7 +161,7 @@
     <string name="vamos_prepara_dados_para_enviar">Vamos preparar os dados coletados para enviar.</string>
     <string name="conseguimos_enviar_pedido">Conseguimos enviar o pedido de Nº </string>
     <string name="conseguimos_enviar_item">Conseguimos enviar o item </string>
-    <string name="pegando_item_pedido">Estamos pegando os item(ns) do pedidos.</string>
+    <string name="pegando_item_pedido">Estamos pegando o(s) item(ns) do(s) pedido(s).</string>
     <string name="pedido_numero">Pedido Nº </string>
     <string name="preparando_produtos">Preparando o(s) Produto(s)</string>
     <string name="periodo">Peíodo</string>
@@ -286,6 +286,11 @@
     <string name="terminamos_receber_dados">Terminamos de receber os primeiros dados, pode ir em frente e usar o SAVARE.</string>
     <string name="listando_pedidos_para_enviar">Estamos listando os pedidos à serem enviados para nuvem.</string>
     <string name="enviando_item_pedido">Enviando item(ns) do pedido</string>
+    <string name="procurando_dados">Estamos procurando se tem dados, </string>
+    <string name="vamos_checar_pedido_enviado">Vamos checar se conseguimos enviar todos os pedidos</string>
+    <string name="estamos_checando_pedido_numero">Estamos checando o pedido Nº </string>
+    <string name="selecione_tipo_documento">Selecione o tipo de documento</string>
+    <string name="sincroniza_webservice">Sincronizar com Servidor Web</string>
 
     <string-array name="tab_produto_md">
         <item>Produtos</item>

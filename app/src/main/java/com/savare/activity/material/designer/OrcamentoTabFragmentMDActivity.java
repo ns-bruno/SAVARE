@@ -1,5 +1,6 @@
 package com.savare.activity.material.designer;
 
+import android.content.ContentValues;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
@@ -10,8 +11,11 @@ import android.view.MenuItem;
 import com.ogaclejapan.smarttablayout.SmartTabLayout;
 import com.savare.R;
 import com.savare.adapter.OrcamentoTabFragmentMDAdapter;
+import com.savare.funcoes.FuncoesPersonalizadas;
 import com.savare.funcoes.rotinas.OrcamentoRotinas;
 import com.savare.funcoes.rotinas.ParcelaRotinas;
+
+import static java.security.AccessController.getContext;
 
 /**
  * Created by Bruno Nogueira Silva on 11/04/2016.
@@ -91,9 +95,18 @@ public class OrcamentoTabFragmentMDActivity extends AppCompatActivity {
 
         ParcelaRotinas parcelaRotinas = new ParcelaRotinas(getApplicationContext());
 
-        if ((abertoTitulosPriveiraVez == false) && (parcelaRotinas.listaTitulos(idPessoa, ParcelaRotinas.TITULOS_EM_ABERTO, ParcelaRotinas.RECEBER, null).size() > 0)) {
+        if ((abertoTitulosPriveiraVez == false) && (parcelaRotinas.listaTitulos(idPessoa, ParcelaRotinas.TITULOS_EM_ABERTO, ParcelaRotinas.RECEBER, null, null).size() > 0)) {
 
             abertoTitulosPriveiraVez = true;
+
+            /*ContentValues mensagem = new ContentValues();
+            mensagem.put("comando", 2);
+            mensagem.put("tela", "OrcamentoProdutoMDFragment");
+            mensagem.put("mensagem", getResources().getString(R.string.existe_titulos_vencidos));
+
+            FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(getApplicationContext());
+            funcoes.menssagem(mensagem); */
+
             // Cria uma intent para abrir uma nova activity
             Intent intentTitulos = new Intent(getApplicationContext(), ListaTitulosMDActivity.class);
             intentTitulos.putExtra("ID_CFACLIFO", idPessoa);

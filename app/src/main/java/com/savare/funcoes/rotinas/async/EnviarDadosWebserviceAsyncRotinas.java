@@ -86,9 +86,9 @@ public class EnviarDadosWebserviceAsyncRotinas  extends AsyncTask<Void, Void, Vo
 
     @Override
     protected Void doInBackground(Void... params) {
-        FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
+        final FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
         // Marca que a aplicacao esta recebendo dados
-        funcoes.setValorXml("RecebendoDados", "S");
+        funcoes.setValorXml("EnviandoDados", "S");
 
         if (funcoes.existeConexaoInternet()) {
             try {
@@ -104,12 +104,16 @@ public class EnviarDadosWebserviceAsyncRotinas  extends AsyncTask<Void, Void, Vo
                     }
                 }
             } catch (Exception e) {
-                ContentValues mensagem = new ContentValues();
+                final ContentValues mensagem = new ContentValues();
                 mensagem.put("comando", 2);
                 mensagem.put("tela", "EnviarDadosWebServiceAsyncRotinas");
                 mensagem.put("mensagem", e.getMessage());
 
-                funcoes.menssagem(mensagem);
+                ((Activity) context).runOnUiThread(new Runnable() {
+                    public void run() {
+                        funcoes.menssagem(mensagem);
+                    }
+                });
             }
         }else {
             // Checa se o texto de status foi passado pro parametro
@@ -140,7 +144,7 @@ public class EnviarDadosWebserviceAsyncRotinas  extends AsyncTask<Void, Void, Vo
         FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
 
         // Marca que a aplicacao esta recebendo dados
-        funcoes.setValorXml("RecebendoDados", "N");
+        funcoes.setValorXml("EnviandoDados", "N");
 
         // Checo se o texto de status foi passado pro parametro
         if (textStatus != null){
@@ -158,6 +162,12 @@ public class EnviarDadosWebserviceAsyncRotinas  extends AsyncTask<Void, Void, Vo
                 }
             });
         }
+
+        ChecaDadosEnviadosWebserviceAsyncRotinas checaDadosEnviadosWebservice = new ChecaDadosEnviadosWebserviceAsyncRotinas(context);
+        if (idOrcamentoSelecionado != null && idOrcamentoSelecionado.length > 0){
+            checaDadosEnviadosWebservice.setIdOrcamentoSelecionado(idOrcamentoSelecionado);
+        }
+        checaDadosEnviadosWebservice.execute();
     }
 
     private void enviaPedido(){
@@ -202,10 +212,17 @@ public class EnviarDadosWebserviceAsyncRotinas  extends AsyncTask<Void, Void, Vo
             }
             String[] listaTipo = null;
             if (where != null){
-                listaTipo = new String[]{OrcamentoRotinas.PEDIDO_NAO_ENVIADO, OrcamentoRotinas.PEDIDO_ENVIADO};
+                listaTipo = new String[]{   OrcamentoRotinas.PEDIDO_NAO_ENVIADO,
+                                            OrcamentoRotinas.PEDIDO_ENVIADO,
+                                            OrcamentoRotinas.PEDIDO_RETORNADO_BLOQUEADO,
+                                            OrcamentoRotinas.PEDIDO_RETORNADO_LIBERADO,
+                                            OrcamentoRotinas.PEDIDO_RETORNADO_EXCLUIDO,
+                                            OrcamentoRotinas.PEDIDO_FATURADO};
+            } else {
+                listaTipo = new String[]{OrcamentoRotinas.PEDIDO_NAO_ENVIADO};
             }
             // Busca todos os pedidos nao enviados
-            listaOrcamento = orcamentoRotinas.listaOrcamentoPedido( (listaTipo != null && listaTipo.length > 0) ? listaTipo : (new String[]{OrcamentoRotinas.PEDIDO_NAO_ENVIADO}), where, OrcamentoRotinas.ORDEM_CRESCENTE);
+            listaOrcamento = orcamentoRotinas.listaOrcamentoPedido(listaTipo, where, OrcamentoRotinas.ORDEM_CRESCENTE);
 
             // Checa se retornou alguma coisa
             if ((listaOrcamento != null) && (listaOrcamento.size() > 0)){
@@ -240,12 +257,11 @@ public class EnviarDadosWebserviceAsyncRotinas  extends AsyncTask<Void, Void, Vo
                     }
                     WSSisinfoWebservice webserviceSisInfo = new WSSisinfoWebservice(context);
 
+                    // Envia o orcamento para o webservice
                     final Vector<SoapObject> listaRetornoWeb = webserviceSisInfo.executarSelectWebservice(null, WSSisinfoWebservice.FUNCTION_INSERT_AEAORCAM, listaPropertyInfos);
 
                     // Checa se retornou alguma coisa
                     if ((listaRetornoWeb != null) && (listaRetornoWeb.size() > 0)) {
-                        // Vareavel para saber se todos os dados foram inseridos com sucesso
-                        boolean todosSucesso = true;
 
                         // Checo se o texto de status foi passado pro parametro
                         if (textStatus != null){
@@ -296,6 +312,7 @@ public class EnviarDadosWebserviceAsyncRotinas  extends AsyncTask<Void, Void, Vo
                             }
                             // Checa se voltou algum codigo de retorno
                             if (objeto.hasProperty("codigoRetorno")){
+
                                 // Checa se o retorno foi o numero 100 (inserido com sucesso)
                                 if (Integer.parseInt(objeto.getProperty("codigoRetorno").toString()) == 100){
                                     // Cria uma vareavel para salvar o status do pedido
@@ -306,16 +323,16 @@ public class EnviarDadosWebserviceAsyncRotinas  extends AsyncTask<Void, Void, Vo
 
                                 } else {
                                     listaOrcamento.remove(listaOrcamento.indexOf(orcamento));
-                                    todosSucesso = false;
                                 }
                             }
                         } // Fim do for
                         // Checa se todos foram inseridos/atualizados com sucesso
-                        if (todosSucesso) {
-                            inserirUltimaAtualizacao("AEAORCAM");
+                        if ((listaOrcamento != null) && (listaOrcamento.size() > 0)) {
+
+                            inserirUltimaAtualizacao("AEAORCAM_ENVIAR");
                             // Checa se tem algum orcamento na lista
                             if (listaOrcamento.size() > 0){
-                                enviaItemPedido();
+                                enviaItemPedido(listaOrcamento);
                             }
                         }
                         // Checo se o texto de status foi passado pro parametro
@@ -341,7 +358,7 @@ public class EnviarDadosWebserviceAsyncRotinas  extends AsyncTask<Void, Void, Vo
             Load mLoad = PugNotification.with(context).load()
                     .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
                     .smallIcon(R.mipmap.ic_launcher)
-                    .largeIcon(R.drawable.ic_launcher)
+                    .largeIcon(R.mipmap.ic_launcher)
                     .title(R.string.importar_dados_recebidos)
                     .message(e.getMessage())
                     .flags(Notification.DEFAULT_SOUND);
@@ -350,199 +367,211 @@ public class EnviarDadosWebserviceAsyncRotinas  extends AsyncTask<Void, Void, Vo
     }
 
 
-    private void enviaItemPedido(){
+    private void enviaItemPedido(List<OrcamentoBeans> listaOrcamento){
         try {
-            // Checo se o texto de status foi passado pro parametro
-            if (textStatus != null){
-                ((Activity) context).runOnUiThread(new Runnable() {
-                    public void run() {
-                        textStatus.setText(context.getResources().getString(R.string.pegando_item_pedido));
-                    }
-                });
-            }
-            if (progressBarStatus != null){
-                ((Activity) context).runOnUiThread(new Runnable() {
-                    public void run() {
-                        progressBarStatus.setIndeterminate(true);
-                    }
-                });
-            }
-            final OrcamentoRotinas orcamentoRotinas = new OrcamentoRotinas(context);
+            // Passa por todos os orcamentos para enviar os itens
+            for (OrcamentoBeans orcamento : listaOrcamento) {
 
-            if ((idOrcamentoSelecionado == null) || ((idOrcamentoSelecionado != null) && (idOrcamentoSelecionado.length <= 0))){
-                // Pega todos os ids de orcamento aos quais nao foram enviados os itens do orcamento
-                List<String> listaIds = orcamentoRotinas.listaIdOrcamento(OrcamentoRotinas.PEDIDO_NAO_ENVIADO, OrcamentoRotinas.TABELA_ITEM_ORCAMENTO, null, OrcamentoRotinas.ORDEM_CRESCENTE);
+                // Cria uma vareavel para pegar todos os itens do orcamento
+                List<ItemOrcamentoBeans> listaItemOrcamento = new ArrayList<ItemOrcamentoBeans>();
+
+                OrcamentoRotinas orcamentoRotinas = new OrcamentoRotinas(context);
+
+                // Busta todos os itens do orcamento
+                listaItemOrcamento = orcamentoRotinas.listaItemOrcamentoResumida(null, ""+orcamento.getIdOrcamento(), null, null);
 
                 // Checa se retornou alguma coisa
-                if (listaIds != null && listaIds.size() > 0) {
-                    // Seta o tamanho do array
-                    idOrcamentoSelecionado = new String[listaIds.size()];
+                if ((listaItemOrcamento != null) && (listaItemOrcamento.size() > 0)){
 
-                    for (int i = 0; i < listaIds.size(); i++) {
-                        idOrcamentoSelecionado[i] = listaIds.get(i);
+                    // Passa por todos os registros
+                    for (int i = 0; i < listaItemOrcamento.size(); i++) {
+                        // Salva os ids mais importantes dentro da lista
+                        listaItemOrcamento.get(i).setIdEstoqueTemp(listaItemOrcamento.get(i).getEstoqueVenda().getIdEstoque());
+                        listaItemOrcamento.get(i).setIdVendedorTemp(listaItemOrcamento.get(i).getPessoaVendedor().getIdPessoa());
+                        listaItemOrcamento.get(i).setIdUnidadeTemp(listaItemOrcamento.get(i).getUnidadeVenda().getIdUnidadeVenda());
+                        listaItemOrcamento.get(i).setIdPlanoPagamentoTemp(listaItemOrcamento.get(i).getUnidadeVenda().getIdUnidadeVenda());
+                        listaItemOrcamento.get(i).setOrcamento(orcamento);
                     }
-                }
-            }
-            if ((idOrcamentoSelecionado != null) && (idOrcamentoSelecionado.length > 0)){
+                    // Vareavel para saber o total de enviados com sucesso
+                    int totalEnviadoSucesso = 0;
 
-                for (final String idOrcamento : idOrcamentoSelecionado) {
+                    for (int i = 0; i < listaItemOrcamento.size(); i ++){
+                    //for (final ItemOrcamentoBeans itemOrc : listaItemOrcamento) {
 
-                    List<ItemOrcamentoBeans> listaItemOrcamento = new ArrayList<ItemOrcamentoBeans>();
+                        final ItemOrcamentoBeans itemOrc = listaItemOrcamento.get(i);
 
-                    // Busta todos os itens do orcamento
-                    listaItemOrcamento = orcamentoRotinas.listaItemOrcamentoResumida(null, idOrcamento, null, null);
+                        // Cria uma lista para salvar todas as propriedades
+                        List<PropertyInfo> listaPropertyInfos = new ArrayList<PropertyInfo>();
 
-                    // Checa se retornou alguma coisa
-                    if ((listaItemOrcamento != null) && (listaItemOrcamento.size() > 0)){
+                        PropertyInfo propertyOrcamento = new PropertyInfo();
+                        propertyOrcamento.setName("itemOrcamento");
+                        propertyOrcamento.setValue(itemOrc);
+                        propertyOrcamento.setType(itemOrc.getClass());
 
-                        // Passa por todos os registros
-                        for (int i = 0; i < listaItemOrcamento.size(); i++) {
-                            // Salva os ids mais importantes dentro da lista
-                            listaItemOrcamento.get(i).setIdEstoqueTemp(listaItemOrcamento.get(i).getEstoqueVenda().getIdEstoque());
-                            listaItemOrcamento.get(i).setIdVendedorTemp(listaItemOrcamento.get(i).getPessoaVendedor().getIdPessoa());
-                            listaItemOrcamento.get(i).setIdUnidadeTemp(listaItemOrcamento.get(i).getUnidadeVenda().getIdUnidadeVenda());
-                            listaItemOrcamento.get(i).setIdPlanoPagamentoTemp(listaItemOrcamento.get(i).getUnidadeVenda().getIdUnidadeVenda());
+                        listaPropertyInfos.add(propertyOrcamento);
+
+                        // Checo se o texto de status foi passado pro parametro
+                        if (textStatus != null){
+                            ((Activity) context).runOnUiThread(new Runnable() {
+                                public void run() {
+                                    textStatus.setText(context.getResources().getString(R.string.enviando_item_pedido) + " Nº " + itemOrc.getIdItemOrcamento());
+                                }
+                            });
+                        }
+                        if (progressBarStatus != null){
+                            ((Activity) context).runOnUiThread(new Runnable() {
+                                public void run() {
+                                    progressBarStatus.setIndeterminate(true);
+                                }
+                            });
                         }
 
-                        for (final ItemOrcamentoBeans itemOrc : listaItemOrcamento) {
-                            // Cria uma lista para salvar todas as propriedades
-                            List<PropertyInfo> listaPropertyInfos = new ArrayList<PropertyInfo>();
+                        WSSisinfoWebservice webserviceSisInfo = new WSSisinfoWebservice(context);
 
-                            PropertyInfo propertyOrcamento = new PropertyInfo();
-                            propertyOrcamento.setName("itemOrcamento");
-                            propertyOrcamento.setValue(itemOrc);
-                            propertyOrcamento.setType(itemOrc.getClass());
+                        final Vector<SoapObject> listaRetornoWeb = webserviceSisInfo.executarSelectWebservice(null, WSSisinfoWebservice.FUNCTION_INSERT_AEAITORC, listaPropertyInfos);
 
-                            listaPropertyInfos.add(propertyOrcamento);
+                        // Checa se retornou alguma coisa
+                        if ((listaRetornoWeb != null) && (listaRetornoWeb.size() > 0)) {
+                            // Vareavel para saber se todos os dados foram inseridos com sucesso
+                            boolean todosSucesso = true;
 
                             // Checo se o texto de status foi passado pro parametro
                             if (textStatus != null){
                                 ((Activity) context).runOnUiThread(new Runnable() {
                                     public void run() {
-                                        textStatus.setText(context.getResources().getString(R.string.enviando_item_pedido) + " Nº " + itemOrc.getIdItemOrcamento());
+                                        textStatus.setText(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
                                     }
                                 });
                             }
                             if (progressBarStatus != null){
                                 ((Activity) context).runOnUiThread(new Runnable() {
                                     public void run() {
-                                        progressBarStatus.setIndeterminate(true);
+                                        progressBarStatus.setIndeterminate(false);
+                                        progressBarStatus.setMax(listaRetornoWeb.size());
                                     }
                                 });
                             }
+                            int controle = 0;
 
-                            WSSisinfoWebservice webserviceSisInfo = new WSSisinfoWebservice(context);
-
-                            final Vector<SoapObject> listaRetornoWeb = webserviceSisInfo.executarSelectWebservice(null, WSSisinfoWebservice.FUNCTION_INSERT_AEAITORC, listaPropertyInfos);
-
-                            // Checa se retornou alguma coisa
-                            if ((listaRetornoWeb != null) && (listaRetornoWeb.size() > 0)) {
-                                // Vareavel para saber se todos os dados foram inseridos com sucesso
-                                boolean todosSucesso = true;
+                            // Passa por toda a lista
+                            for (SoapObject objetoIndividual : listaRetornoWeb) {
+                                final int finalControle = controle;
 
                                 // Checo se o texto de status foi passado pro parametro
                                 if (textStatus != null){
                                     ((Activity) context).runOnUiThread(new Runnable() {
                                         public void run() {
-                                            textStatus.setText(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
+                                            textStatus.setText(context.getResources().getString(R.string.recebendo_dados_item_orcamento) + " - " + (finalControle + 1) + "/" + listaRetornoWeb.size());
                                         }
                                     });
                                 }
                                 if (progressBarStatus != null){
+
                                     ((Activity) context).runOnUiThread(new Runnable() {
                                         public void run() {
-                                            progressBarStatus.setIndeterminate(false);
-                                            progressBarStatus.setMax(listaRetornoWeb.size());
+                                            progressBarStatus.setProgress(finalControle);
                                         }
                                     });
                                 }
-                                int controle = 0;
+                                controle ++;
 
-                                // Passa por toda a lista
-                                for (SoapObject objetoIndividual : listaRetornoWeb) {
-                                    final int finalControle = controle;
+                                SoapObject objeto;
 
-                                    // Checo se o texto de status foi passado pro parametro
-                                    if (textStatus != null){
-                                        ((Activity) context).runOnUiThread(new Runnable() {
-                                            public void run() {
-                                                textStatus.setText(context.getResources().getString(R.string.recebendo_dados_item_orcamento) + " - " + (finalControle + 1) + "/" + listaRetornoWeb.size());
-                                            }
-                                        });
-                                    }
-                                    if (progressBarStatus != null){
-
-                                        ((Activity) context).runOnUiThread(new Runnable() {
-                                            public void run() {
-                                                progressBarStatus.setProgress(finalControle);
-                                            }
-                                        });
-                                    }
-                                    controle ++;
-
-                                    SoapObject objeto;
-
-                                    if (objetoIndividual.hasProperty("return")) {
-                                        objeto = (SoapObject) objetoIndividual.getProperty("return");
-                                    } else {
-                                        objeto = objetoIndividual;
-                                    }
-                                    // Checa se voltou algum codigo de retorno
-                                    if (objeto.hasProperty("codigoRetorno")){
-                                        // Checa se o retorno foi o numero 100 (inserido com sucesso)
-                                        if (Integer.parseInt(objeto.getProperty("codigoRetorno").toString()) == 100){
-
-                                            // Cria uma vareavel para salvar o status do pedido
-                                            ContentValues dadosPedido = new ContentValues();
-                                            dadosPedido.put("STATUS", "N");
-
-                                            ItemOrcamentoSql itemOrcamentoSql = new ItemOrcamentoSql(context);
-
-                                            if (itemOrcamentoSql.update(dadosPedido, "AEAITORC.ID_AEAITORC = " + itemOrc.getIdItemOrcamento()) <= 0){
-                                                todosSucesso = false;
-                                            }
-                                        }
-                                    }
-                                } // Fim do for SoapObject
-                                // Checa se todos foram inseridos/atualizados com sucesso
-                                /*if (todosSucesso) {
-                                    inserirUltimaAtualizacao("AEAITORC");
+                                if (objetoIndividual.hasProperty("return")) {
+                                    objeto = (SoapObject) objetoIndividual.getProperty("return");
+                                } else {
+                                    objeto = objetoIndividual;
                                 }
-                                // Checo se o texto de status foi passado pro parametro
-                                if (textStatus != null){
-                                    ((Activity) context).runOnUiThread(new Runnable() {
-                                        public void run() {
-                                            textStatus.setText(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
+                                // Checa se voltou algum codigo de retorno
+                                if (objeto.hasProperty("codigoRetorno")){
+                                    // Checa se o retorno foi o numero 100 (inserido com sucesso)
+                                    if (Integer.parseInt(objeto.getProperty("codigoRetorno").toString()) == 100){
+                                        // Incrementa o total de enviado com sucesso
+                                        totalEnviadoSucesso ++;
+
+                                        // Cria uma vareavel para salvar o status do pedido
+                                        ContentValues dadosPedido = new ContentValues();
+                                        dadosPedido.put("STATUS", "N");
+
+                                        ItemOrcamentoSql itemOrcamentoSql = new ItemOrcamentoSql(context);
+
+                                        if (itemOrcamentoSql.update(dadosPedido, "AEAITORC.ID_AEAITORC = " + itemOrc.getIdItemOrcamento()) <= 0){
+                                            todosSucesso = false;
                                         }
-                                    });
+                                    }
                                 }
-                                if (progressBarStatus != null){
-                                    ((Activity) context).runOnUiThread(new Runnable() {
-                                        public void run() {
-                                            progressBarStatus.setIndeterminate(true);
-                                        }
-                                    });
-                                }*/
-                            }
+                            } // Fim do for SoapObject
                         }
+                    }
+                    // Checa se foram todos enviados com sucesso
+                    if (totalEnviadoSucesso == listaItemOrcamento.size()){
 
+                        // Cria uma lista para salvar todas as propriedades
+                        List<PropertyInfo> listaPropertyInfos = new ArrayList<PropertyInfo>();
 
+                        PropertyInfo propertyOrcamento = new PropertyInfo();
+                        propertyOrcamento.setName("orcamento");
+                        propertyOrcamento.setValue(orcamento);
+                        propertyOrcamento.setType(orcamento.getClass());
+
+                        listaPropertyInfos.add(propertyOrcamento);
+
+                        WSSisinfoWebservice webserviceSisInfo = new WSSisinfoWebservice(context);
+
+                        final Vector<SoapObject> listaRetornoWeb = webserviceSisInfo.executarSelectWebservice(null, WSSisinfoWebservice.FUNCTION_UPDATE_STATUS_AEAORCAM, listaPropertyInfos);
+                        // Checa se retornou alguma coisa
+                        if ((listaRetornoWeb != null) && (listaRetornoWeb.size() > 0)) {
+                            // Passa por toda a lista
+                            for (SoapObject objetoIndividual : listaRetornoWeb) {
+
+                                SoapObject objeto;
+
+                                if (objetoIndividual.hasProperty("return")) {
+                                    objeto = (SoapObject) objetoIndividual.getProperty("return");
+                                } else {
+                                    objeto = objetoIndividual;
+                                }
+                                // Checa se voltou algum codigo de retorno
+                                if (objeto.hasProperty("codigoRetorno")){
+
+                                    // Checa se o retorno foi o numero 100 (inserido com sucesso)
+                                    if (Integer.parseInt(objeto.getProperty("codigoRetorno").toString()) == 101){
+
+                                        inserirUltimaAtualizacao("AEAITORC_ENVIAR");
+
+                                        // Cria uma vareavel para salvar o status do pedido
+                                        ContentValues dadosPedido = new ContentValues();
+                                        dadosPedido.put("STATUS", "RB");
+
+                                        ItemOrcamentoSql itemOrcamentoSql = new ItemOrcamentoSql(context);
+
+                                        if (itemOrcamentoSql.update(dadosPedido, "AEAITORC.ID_AEAORCAM = " + orcamento.getIdOrcamento()) > 0){
+                                            OrcamentoSql orcamentoSql = new OrcamentoSql(context);
+
+                                            orcamentoSql.update(dadosPedido, "AEAORCAM.ID_AEAORCAM = " + orcamento.getIdOrcamento());
+                                        }
+                                    }
+                                }
+                            } // Fim do for SoapObject
+                        }
                     }
                 }
-
             }
         }catch (Exception e){
             // Cria uma notificacao para ser manipulado
             Load mLoad = PugNotification.with(context).load()
                     .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
                     .smallIcon(R.mipmap.ic_launcher)
-                    .largeIcon(R.drawable.ic_launcher)
+                    .largeIcon(R.mipmap.ic_launcher)
                     .title(R.string.importar_dados_recebidos)
                     .message(e.getMessage())
                     .flags(Notification.DEFAULT_SOUND);
             mLoad.simple().build();
         }
     }
+
+
+
 
     private void inserirUltimaAtualizacao(String tabela){
         TelephonyManager telephonyManager = (TelephonyManager) context.getSystemService(context.TELEPHONY_SERVICE);

@@ -24,10 +24,12 @@ import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.telephony.TelephonyManager;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.text.format.Formatter;
 import android.util.Log;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
 import com.github.johnpersano.supertoasts.SuperToast;
@@ -35,6 +37,7 @@ import com.github.johnpersano.supertoasts.util.Style;
 import com.savare.R;
 import com.savare.banco.ConexaoTask;
 import com.savare.banco.local.ConexaoBancoDeDados;
+import com.savare.beans.DispositivoBeans;
 import com.savare.configuracao.ConfiguracoesInternas;
 import com.savare.configuracao.ServicosWeb;
 import com.savare.sincronizacao.SavareAutenticadorService;
@@ -519,7 +522,7 @@ public class FuncoesPersonalizadas {
 				// Adiciona mais alguns segundo para executar o alarme depois de alguns segundo que esta Activity for abaerta
 				tempoInicio.add(Calendar.SECOND, 10);
 				// Cria um intervalo de quanto em quanto tempo o alarme vai repetir
-				long intervalo = 120 * 1000; // 2 Minutos
+				long intervalo = 1200 * 1000; // 20 Minutos
 				
 				AlarmManager alarmeEnviarOrcamento = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 				alarmeEnviarOrcamento.setRepeating(AlarmManager.RTC_WAKEUP, tempoInicio.getTimeInMillis(), intervalo, alarmIntent);
@@ -539,7 +542,7 @@ public class FuncoesPersonalizadas {
 				// Adiciona mais alguns segundo para executar o alarme depois de alguns segundo que esta Activity for abaerta
 				tempoInicio.add(Calendar.SECOND, 20);
 				// Cria um intervalo de quanto em quanto tempo o alarme vai repetir
-				long intervalo = 180 * 1000; // 3 Minutos
+				long intervalo = 1200 * 1000; // 20 Minutos
 
 				AlarmManager alarmeEnviarOrcamento = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 				alarmeEnviarOrcamento.setRepeating(AlarmManager.RTC_WAKEUP, tempoInicio.getTimeInMillis(), intervalo, alarmIntentOutros);
@@ -644,7 +647,7 @@ public class FuncoesPersonalizadas {
 		
 		try{
 			if(dataHora != null){
-				Scanner scannerParametro = new Scanner(dataHora.replace(" ", "-").replace(":", "-")).useDelimiter("\\-");
+				Scanner scannerParametro = new Scanner(dataHora.replace(" ", "-").replace(":", "-").replace(".", "-")).useDelimiter("\\-");
 				int ano = scannerParametro.nextInt();
 				int mes = scannerParametro.nextInt();
 				int dia = scannerParametro.nextInt();
@@ -1168,7 +1171,7 @@ public class FuncoesPersonalizadas {
 						Load mLoad = PugNotification.with(context).load()
 								.identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
 								.smallIcon(R.mipmap.ic_launcher)
-								.largeIcon(R.drawable.ic_launcher)
+								.largeIcon(R.mipmap.ic_launcher)
 								.title(R.string.versao_savare_desatualizada)
 								.bigTextStyle(R.string.savare_desatualizado_favor_atualize)
 								.flags(Notification.DEFAULT_LIGHTS);
@@ -1181,7 +1184,7 @@ public class FuncoesPersonalizadas {
 						Load mLoad = PugNotification.with(context).load()
 								.identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
 								.smallIcon(R.mipmap.ic_launcher)
-								.largeIcon(R.drawable.ic_launcher)
+								.largeIcon(R.mipmap.ic_launcher)
 								.title(R.string.versao_savare_desatualizada)
 								.bigTextStyle(R.string.savare_mais_atualizado_que_webservice)
 								.flags(Notification.DEFAULT_LIGHTS);
@@ -1200,7 +1203,7 @@ public class FuncoesPersonalizadas {
 			Load mLoad = PugNotification.with(context).load()
 					.identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
 					.smallIcon(R.mipmap.ic_launcher)
-					.largeIcon(R.drawable.ic_launcher)
+					.largeIcon(R.mipmap.ic_launcher)
 					.title(R.string.versao_savare_desatualizada)
 					.bigTextStyle(context.getResources().getString(R.string.erro_validar_versao) + " \n " + e.getMessage())
 					.flags(Notification.DEFAULT_LIGHTS);
@@ -1208,6 +1211,33 @@ public class FuncoesPersonalizadas {
 		}
 
 		return valido;
+	}
+
+	public DispositivoBeans dispositivo(){
+		DispositivoBeans dispositivoBeans = null;
+		if ((!getValorXml("ChaveUsuario").equalsIgnoreCase(NAO_ENCONTRADO)) && (getValorXml("ChaveUsuario").length() >= 36)) {
+
+			// Instancia uma classe para pegar os dados do dispositivo
+			dispositivoBeans = new DispositivoBeans();
+			dispositivoBeans.setChaveUsuario(getValorXml("ChaveUsuario"));
+			dispositivoBeans.setNomeDispositivo(android.os.Build.MODEL + " - "+ android.os.Build.PRODUCT);
+			dispositivoBeans.setSistemaOperacionalDispositivo(""+android.os.Build.VERSION.SDK_INT);
+			dispositivoBeans.setNumeroSerialDispositivo(Build.SERIAL.replace("unknown", ""));
+			dispositivoBeans.setMarcaDispositivo(android.os.Build.MANUFACTURER);
+			dispositivoBeans.setIpHost(getLocalIpAddress());
+
+			TelephonyManager telephonyManager = (TelephonyManager) context.getSystemService(context.TELEPHONY_SERVICE);
+			dispositivoBeans.setIdDispositivo(telephonyManager.getDeviceId());
+			dispositivoBeans.setOperadoraDispositivo(telephonyManager.getSimOperatorName());
+		}
+		return dispositivoBeans;
+	}
+
+	public void fecharTecladoVirtual(){
+		//criaListaDeProdutos(where, null, 1);
+		InputMethodManager imm = (InputMethodManager)context.getSystemService(Context.INPUT_METHOD_SERVICE);
+		// Fecha o teclado
+		imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
 	}
 
 } // Fecha classe

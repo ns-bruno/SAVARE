@@ -168,8 +168,8 @@ public class ReceberDadosFtpAsyncRotinas extends AsyncTask<String, String, Integ
 							.identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
 							.title(R.string.receber_todos_dados)
 							.bigTextStyle(mensagem)
-							.smallIcon(R.drawable.ic_launcher)
-							.largeIcon(R.drawable.ic_launcher)
+							.smallIcon(R.mipmap.ic_launcher)
+							.largeIcon(R.mipmap.ic_launcher)
 							.flags(Notification.DEFAULT_SOUND)
 							.simple()
 							.build();
@@ -254,8 +254,8 @@ public class ReceberDadosFtpAsyncRotinas extends AsyncTask<String, String, Integ
 					.title(R.string.receber_todos_dados)
 					.message(mensagem)
 					.bigTextStyle(mensagem)
-					.smallIcon(R.drawable.ic_launcher)
-					.largeIcon(R.drawable.ic_launcher)
+					.smallIcon(R.mipmap.ic_launcher)
+					.largeIcon(R.mipmap.ic_launcher)
 					.flags(Notification.DEFAULT_SOUND)
 					.simple()
 					.build();

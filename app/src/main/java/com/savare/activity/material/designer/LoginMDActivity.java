@@ -48,7 +48,7 @@ public class LoginMDActivity extends AppCompatActivity {
         // Adiciona uma titulo para toolbar
         toolbarLogin.setTitle(this.getResources().getString(R.string.app_name));
         toolbarLogin.setTitleTextColor(getResources().getColor(R.color.branco));
-        //toolbarInicio.setLogo(R.drawable.ic_launcher);
+        //toolbarInicio.setLogo(R.mipmap.ic_launcher);
         // Seta uma toolBar para esta activiy(tela)
         setSupportActionBar(toolbarLogin);
 

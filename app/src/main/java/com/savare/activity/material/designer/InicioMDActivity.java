@@ -68,6 +68,9 @@ public class InicioMDActivity extends AppCompatActivity {
     private int mPreviousVisibleItem;
     FloatingActionMenu menuFloatOpcoes;
     AccountManager accountManager;
+    boolean enviaAutomatico = false;
+    boolean recebeAutomatico = false;
+    boolean imagemProduto = false;
 
     @TargetApi(Build.VERSION_CODES.M)
     @Override
@@ -80,7 +83,7 @@ public class InicioMDActivity extends AppCompatActivity {
         // Adiciona uma titulo para toolbar
         toolbarInicio.setTitle(this.getResources().getString(R.string.app_name));
         toolbarInicio.setTitleTextColor(getResources().getColor(R.color.branco));
-        //toolbarInicio.setLogo(R.drawable.ic_launcher);
+        //toolbarInicio.setLogo(R.mipmap.ic_launcher);
         // Seta uma toolBar para esta activiy(tela)
         setSupportActionBar(toolbarInicio); //
 
@@ -99,9 +102,6 @@ public class InicioMDActivity extends AppCompatActivity {
 
         // Pega o nome de login do usuario
         String nomeCompletoUsua = funcoes.getValorXml("Usuario");
-        boolean enviaAutomatico = false;
-        boolean recebeAutomatico = false;
-        boolean imagemProduto = false;
 
         if (funcoes.getValorXml("EnviarAutomatico").equalsIgnoreCase("S")){
             enviaAutomatico = true;
@@ -350,7 +350,7 @@ public class InicioMDActivity extends AppCompatActivity {
             //funcoes.setValorXml("RecebendoDados", "S");
 
             // Desavia o recebimento automatico
-            funcoes.criarAlarmeEnviarReceberDadosAutomatico(true, false);
+            funcoes.criarAlarmeEnviarReceberDadosAutomatico(enviaAutomatico, recebeAutomatico);
 
             ReceberDadosFtpAsyncRotinas receberDadosFtpAsync = new ReceberDadosFtpAsyncRotinas(InicioMDActivity.this, ReceberDadosFtpAsyncRotinas.TELA_INICIO);
             receberDadosFtpAsync.execute();
@@ -383,31 +383,31 @@ public class InicioMDActivity extends AppCompatActivity {
                 // Checa se o tipo de acumulo eh por valor para vendas no atacado
                 if (dadosEmpresa.getTitpoAcumuloCreditoAtacado().equalsIgnoreCase("V")) {
 
-                    descricaoCard += "Tpo de Acumulo de Crédito:  Por Valor. \n" +
-                            "Valor Acumulado: " + getResources().getString(R.string.sigla_real) + " " + funcoes.arredondarValor(dadosUsuario.getValorCreditoAtacado() + " \n");
+                    descricaoCard += "Tpo de Acumulo de Desconto:  Por Valor. \n" +
+                            "Valor Desconto: " + getResources().getString(R.string.sigla_real) + " " + funcoes.arredondarValor(dadosUsuario.getValorCreditoAtacado() + " \n");
 
                     // Checa se o tipo eh por percentual para vendas no atacado
                 } else if (dadosEmpresa.getTitpoAcumuloCreditoAtacado().equalsIgnoreCase("P")) {
 
-                    descricaoCard += "Tpo de Acumulo de Crédito:  Por Percentual. \n" +
-                            "Percentual Acumulado: " + funcoes.arredondarValor(dadosUsuario.getPercentualCreditoAtacado())+"%" + " \n";
+                    descricaoCard += "Tpo de Acumulo de Desconto:  Por Percentual. \n" +
+                            "Percentual Desconto: " + funcoes.arredondarValor(dadosUsuario.getPercentualCreditoAtacado())+"%" + " \n";
 
                 }
                 // Checa os periodo que vai ser acumulado os creditos para vendas no atacado
                 if (dadosEmpresa.getPeriodocrceditoAtacado().equalsIgnoreCase("M")) {
-                    descricaoCard += "\nPeríodo do Crédito está Mensal. \n";
+                    descricaoCard += "\nPeríodo do Desconto está Mensal. \n";
 
                 } else if (dadosEmpresa.getPeriodocrceditoAtacado().equalsIgnoreCase("Q")) {
-                    descricaoCard += "\n Período do Crédito está Quinzenal. \n";
+                    descricaoCard += "\n Período do Desconto está Quinzenal. \n";
 
                 } else if (dadosEmpresa.getPeriodocrceditoAtacado().equalsIgnoreCase("S")) {
-                    descricaoCard += "\n Período do Crédito está Semanal. \n";
+                    descricaoCard += "\n Período do Desconto está Semanal. \n";
 
                 } else if (dadosEmpresa.getPeriodocrceditoAtacado().equalsIgnoreCase("T")) {
-                    descricaoCard += "\n Período do Crédito está Semestral. \n";
+                    descricaoCard += "\n Período do Desconto está Semestral. \n";
 
                 } else if (dadosEmpresa.getPeriodocrceditoAtacado().equalsIgnoreCase("A")) {
-                    descricaoCard += "\n Período do Crédito está Anual. \n";
+                    descricaoCard += "\n Período do Desconto está Anual. \n";
                 }
 
                 Card cardCreditoAtacado = new Card.Builder(getApplicationContext())
@@ -436,30 +436,30 @@ public class InicioMDActivity extends AppCompatActivity {
                 String descricaoCard = "";
                 // Checa se o tipo eh por valor para vendas no varejo
                 if (dadosEmpresa.getTitpoAcumuloCreditoVarejo().equalsIgnoreCase("V")) {
-                    descricaoCard += "Tpo de Acumulo de Crédito:  Por Valor. \n" +
-                            "Valor Acumulado: " + getResources().getString(R.string.sigla_real) + " " + funcoes.arredondarValor(dadosUsuario.getValorCreditoVarejo() + "\n");
+                    descricaoCard += "Tpo de Acumulo de Desconto:  Por Valor. \n" +
+                            "Valor Desconto: " + getResources().getString(R.string.sigla_real) + " " + funcoes.arredondarValor(dadosUsuario.getValorCreditoVarejo() + "\n");
 
                     // Checa se o tipo eh por percentual para vendas no atacado
                 } else if (dadosEmpresa.getTitpoAcumuloCreditoVarejo().equalsIgnoreCase("P")) {
-                    descricaoCard += "Tpo de Acumulo de Crédito:  Por Percentual. \n" +
-                            "Percentual Acumulado: " + funcoes.arredondarValor(dadosUsuario.getPercentualCreditoVarejo())+"% \n";
+                    descricaoCard += "Tpo de Acumulo de Desconto:  Por Percentual. \n" +
+                            "Percentual Desconto: " + funcoes.arredondarValor(dadosUsuario.getPercentualCreditoVarejo())+"% \n";
                 }
 
                 // Checa os periodo que vai ser acumulado os creditos para vendas no atacado
                 if (dadosEmpresa.getPeriodocrceditoVarejo().equalsIgnoreCase("M")) {
-                    descricaoCard += "\n Período do Crédito está Mensal. \n";
+                    descricaoCard += "\n Período do Desconto está Mensal. \n";
 
                 } else if (dadosEmpresa.getPeriodocrceditoVarejo().equalsIgnoreCase("Q")) {
-                    descricaoCard += "\n Período do Crédito está Quinzenal. \n";
+                    descricaoCard += "\n Período do Desconto está Quinzenal. \n";
 
                 } else if (dadosEmpresa.getPeriodocrceditoVarejo().equalsIgnoreCase("S")) {
-                    descricaoCard += "\n Período do Crédito está Semanal. \n";
+                    descricaoCard += "\n Período do Desconto está Semanal. \n";
 
                 } else if (dadosEmpresa.getPeriodocrceditoVarejo().equalsIgnoreCase("T")) {
-                    descricaoCard += "\n Período do Crédito está Semestral. \n";
+                    descricaoCard += "\n Período do Desconto está Semestral. \n";
 
                 } else if (dadosEmpresa.getPeriodocrceditoVarejo().equalsIgnoreCase("A")) {
-                    descricaoCard += "\n Período do Crédito está Anual. \n";
+                    descricaoCard += "\n Período do Desconto está Anual. \n";
                 }
 
                 Card cardCreditoVarejo = new Card.Builder(getApplicationContext())

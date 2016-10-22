@@ -68,6 +68,8 @@ public class WSSisinfoWebservice {
     public static final String FUNCTION_SELECT_RPAPARCE = "selectParcelas";
     public static final String FUNCTION_INSERT_AEAORCAM = "insertOrcamento";
     public static final String FUNCTION_INSERT_AEAITORC = "insertItemOrcamento";
+    public static final String FUNCTION_UPDATE_STATUS_AEAORCAM = "updateStatusOrcamento";
+    public static final String FUNCTION_CHECK_SEND_AEAORCAM = "checkSendOrcamento";
 
     public WSSisinfoWebservice(Context context) {
         this.context = context;
@@ -231,6 +233,8 @@ public class WSSisinfoWebservice {
             SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
             // Adiciona os objetos/propriedades
             envelope.setOutputSoapObject(soap);
+            // Mapea a esta classe
+            envelope.addMapping(ServicosWeb.WS_NAME_SPACE, WSSisinfoWebservice.class.getSimpleName(), WSSisinfoWebservice.class);
 
             FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
 
@@ -248,7 +252,7 @@ public class WSSisinfoWebservice {
             // Requisicao dos dados
             httpTransporte.call(funcao, envelope);
 
-            if (envelope.getResponse() != null) {
+            if ((envelope.getResponse() != null) && (!((SoapObject) envelope.bodyIn).toString().contains("faultactor: 'null' detail: null"))) {
                 // Instancia a classe de vetor para salvar a lista
                 retorno = new Vector<SoapObject>();
 

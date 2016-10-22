@@ -79,7 +79,7 @@ public class LoginFragment extends SlideFragment {
                                             Rotinas rotinas = new Rotinas(getContext());
 
                                             // Verfifica se existe algum usuario cadastrado, ou
-                                            if ((rotinas.existeUsuario() == true) || (!funcoes.getValorXml("CodigoUsuario").equalsIgnoreCase(funcoes.NAO_ENCONTRADO))) {
+                                            if ((rotinas.existeUsuario() == true) && (!funcoes.getValorXml("CodigoUsuario").equalsIgnoreCase(funcoes.NAO_ENCONTRADO))) {
 
                                                 login.setText(R.string.logado_sucesso);
 

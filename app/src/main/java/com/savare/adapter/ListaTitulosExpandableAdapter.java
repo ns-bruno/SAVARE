@@ -38,7 +38,7 @@ public class ListaTitulosExpandableAdapter extends BaseExpandableListAdapter {
 	}
 
 	/**
-	 * @param listaPessoasParent the listaPessoasParent to set
+	 * @param listaTitulosParent the listaPessoasParent to set
 	 */
 	public void setListaPessoasParent(List<TitulosListaBeans> listaTitulosParent) {
 		this.listaTitulosParent = listaTitulosParent;
@@ -151,7 +151,7 @@ public class ListaTitulosExpandableAdapter extends BaseExpandableListAdapter {
 		textAbaixoDescricaoEsqueda.setText("Emissão: " + parcela.getDataEmissao());
 		textAbaixoDescricaoDireita.setText("Vl. Parcela: " + funcoes.arredondarValor(parcela.getValorParcela()));
 		textBottonEsquerdo.setText("Parcela: " + parcela.getParcela());
-		textBottonDireito.setText("Nosso N.: " + parcela.getNumero());
+		textBottonDireito.setText("Nosso N.: " +  ((parcela.getNumero() != null) ? parcela.getNumero() : ""));
 		
 		StatusRotinas statusRotinas = new StatusRotinas(context);
 		StatusBeans status = statusRotinas.statusCliente(String.valueOf(listaTitulosParent.get(groupPosition).getIdPessoa()));
