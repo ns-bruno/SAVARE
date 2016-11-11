@@ -1,5 +1,6 @@
 package com.savare.activity.material.designer.fragment;
 
+import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -447,109 +448,6 @@ public class OrcamentoProdutoDetalhesMDFragment extends Fragment {
 
                 SalvarDadosOrcamentoProduto salvarDadosORcamentoProduto = new SalvarDadosOrcamentoProduto();
                 salvarDadosORcamentoProduto.execute();
-
-
-                /*if((editQuantidade != null) && (!editQuantidade.getText().equals(""))){
-                    FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(getContext());
-
-                    // Checa os dados informado
-                    if(validarDados()){
-                        // Calcula os valores necessario para salvar no banco de dados
-                        double quantidade = funcoes.desformatarValor(editQuantidade.getText().toString()), //Double.parseDouble(editQuantidade.getText().toString()),
-                                vlCusto = (this.produto.getCustoCompleto() * quantidade),
-                                vlBruto = (this.valorUnitarioVendaAux * quantidade),
-                                vlTabela = 0,
-                                totalDigitadoLiquido = funcoes.desformatarValor(editTotal.getText().toString()),
-                                vlDesconto = vlBruto - totalDigitadoLiquido,
-                                fcCustoUn = vlCusto / quantidade,
-                                fcBrutoUn = vlBruto / quantidade,
-                                fcDescontoUn = vlDesconto / quantidade,
-                                fcLiquido = totalDigitadoLiquido;
-
-                        if ((adapterEmbalagem != null) && (adapterEmbalagem.getListaEmbalagem() != null) &&
-                            (adapterEmbalagem.getListaEmbalagem().get(spinnerEmbalagem.getSelectedItemPosition()) != null)) {
-
-                            double fatorConversao = adapterEmbalagem.getListaEmbalagem().get(spinnerEmbalagem.getSelectedItemPosition()).getFatorConversao();
-                            double fatorPreco = adapterEmbalagem.getListaEmbalagem().get(spinnerEmbalagem.getSelectedItemPosition()).getFatorPreco();
-                            // Checa se a venda eh no atacado
-                            if (atacadoVarejo.equalsIgnoreCase("0")) {
-                                vlTabela =  funcoes.desformatarValor(funcoes.arredondarValor(this.produto.getValorTabelaAtacado() * fatorConversao * fatorPreco));
-                            } else if (atacadoVarejo.equalsIgnoreCase("1")){
-                                vlTabela = funcoes.desformatarValor(funcoes.arredondarValor(this.produto.getValorTabelaVarejo() * fatorConversao * fatorPreco));
-                            }
-                        }
-                        //Pega os dados do produto
-                        ContentValues produto = new ContentValues();
-                        produto.put("ID_AEAORCAM", this.orcamento.getIdOrcamento());
-                        produto.put("ID_AEAESTOQ", adapterEstoque.getListaEstoque().get(spinnerEstoque.getSelectedItemPosition()).getIdEstoque());
-                        produto.put("ID_AEAPLPGT", this.listaPlanoPagamentoPreco.get(spinnerPlanoPagamentoPreco.getSelectedItemPosition()).getIdPlanoPagamento());
-                        produto.put("ID_AEAUNVEN", this.produto.getProduto().getListaEmbalagem().get(spinnerEmbalagem.getSelectedItemPosition()).getUnidadeVendaEmbalagem().getIdUnidadeVenda());
-                        produto.put("ID_CFACLIFO_VENDEDOR", funcoes.getValorXml("CodigoUsuario"));
-                        produto.put("ID_AEAPRODU", this.produto.getProduto().getIdProduto());
-                        produto.put("QUANTIDADE", quantidade);
-                        produto.put("VL_CUSTO", funcoes.desformatarValor(funcoes.arredondarValor(vlCusto)));
-                        produto.put("VL_BRUTO", funcoes.desformatarValor(funcoes.arredondarValor(vlBruto)));
-                        produto.put("VL_TABELA", funcoes.desformatarValor(funcoes.arredondarValor(vlTabela * quantidade)));
-                        produto.put("VL_TABELA_UN", funcoes.desformatarValor(funcoes.arredondarValor(vlTabela)));
-                        produto.put("VL_DESCONTO", funcoes.desformatarValor(funcoes.arredondarValor(vlDesconto)));
-                        produto.put("FC_DESCONTO_UN", funcoes.desformatarValor(funcoes.arredondarValor((vlDesconto / quantidade))));
-                        produto.put("FC_CUSTO_UN", funcoes.desformatarValor(funcoes.arredondarValor(fcCustoUn)));
-                        produto.put("FC_BRUTO_UN", funcoes.desformatarValor(funcoes.arredondarValor(fcBrutoUn)));
-                        produto.put("FC_DESCONTO_UN", funcoes.desformatarValor(funcoes.arredondarValor(fcDescontoUn)));
-                        produto.put("FC_LIQUIDO", funcoes.desformatarValor(funcoes.arredondarValor(fcLiquido)));
-                        produto.put("FC_LIQUIDO_UN", funcoes.desformatarValor(funcoes.arredondarValor((fcLiquido / quantidade))));
-                        produto.put("COMPLEMENTO", editObservacao.getText().toString());
-                        produto.put("TIPO_PRODUTO", String.valueOf(this.produto.getProduto().getTipoProduto()));
-                        // Instancia classe para manipular o orcamento
-                        OrcamentoRotinas orcamentoRotinas = new OrcamentoRotinas(getContext());
-
-
-                        // Verifica se o produto ja esta no orcamento
-                        if(this.produto.getEstaNoOrcamento() == '1'){
-
-                            // Verifica se atualizou com sucesso
-                            if(orcamentoRotinas.updateItemOrcamento(produto, String.valueOf(this.idItemOrcamento)) > 0){
-                                funcoes.desbloqueiaOrientacaoTela();
-                                // Fecha a tela de detalhes de produto
-                                getActivity().finish();
-                            }
-                        // Envia os dados do produto para inserir no banco de dados
-                        } else{
-                            // Salva a proxima sequencia do item
-                            produto.put("SEQUENCIA", orcamentoRotinas.proximoSequencial(String.valueOf(this.orcamento.getIdOrcamento())));
-                            produto.put("GUID", orcamentoRotinas.gerarGuid());
-
-                            if((this.idItemOrcamento = orcamentoRotinas.insertItemOrcamento(produto)) > 0){
-                                // Cria uma intent para returnar um valor para activity ProdutoLista
-                                Intent returnIntent = new Intent();
-                                returnIntent.putExtra("RESULTADO", '1');
-                                // Pega a posicao do deste produto na lista de produtos
-                                returnIntent.putExtra("POSICAO", posicao);
-                                returnIntent.putExtra("ID_AEAITORC", this.idItemOrcamento);
-
-                                // Checa se se quem chemou foi a tela de lista de de orçamento sem associacao de orcamento
-                                if ( (telaChamada != null) && (telaChamada.equalsIgnoreCase("ProdutoListaActivity")) ){
-                                    getActivity().setResult(101, returnIntent);
-                                } else {
-                                    getActivity().setResult(getActivity().RESULT_OK, returnIntent);
-                                }
-                                funcoes.desbloqueiaOrientacaoTela();
-                                // Fecha a tela de detalhes de produto
-                                getActivity().finish();
-                            }
-                        }
-                    } else {
-                        // Dados da mensagem
-                        ContentValues mensagem = new ContentValues();
-                        mensagem.put("comando", 2);
-                        mensagem.put("tela", "OrcamentoProdutoDetalhesActivity");
-                        mensagem.put("mensagem", "Verifique se os campos obrigatorios estão preenchidos.\n");
-
-                        funcoes = new FuncoesPersonalizadas(getContext());
-                        funcoes.menssagem(mensagem);
-                    }
-                }*/
-
                 break;
 
             default:
@@ -1059,11 +957,27 @@ public class OrcamentoProdutoDetalhesMDFragment extends Fragment {
             ContentValues mensagem = new ContentValues();
             mensagem.put("comando", 1);
             mensagem.put("tela", "OrcamentoProdutoDetalhesActivity");
-            mensagem.put("mensagem", "Não tem plano de pagamento selecionado."
-                    + "\n Favor, entrar em contato com o administrador de TI da empresa para que possa enviar os dados corretos do produto.");
+            mensagem.put("mensagem", "Não existe plano de pagamento. \n"
+                       + "Favor, entrar em contato com o administrador de TI da empresa para que possa enviar os dados corretos do produto.");
 
             FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(getContext());
             funcoes.menssagem(mensagem);
+
+            dadosValidos = false;
+        } else if((listaPlanoPagamentoPreco != null) && (listaPlanoPagamentoPreco.get(spinnerPlanoPagamentoPreco.getSelectedItemPosition()).getIdPlanoPagamento() == 0)){
+            // Dados da mensagem
+            final ContentValues mensagem = new ContentValues();
+            mensagem.put("comando", 1);
+            mensagem.put("tela", "OrcamentoProdutoDetalhesActivity");
+            mensagem.put("mensagem", "Não foi selecionado um plano de pagamento. \n"
+                       + "Favor, Selecione um plano de pagamento.");
+
+            final FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(getContext());
+            ((Activity) getContext()).runOnUiThread(new Runnable() {
+                public void run() {
+                    funcoes.menssagem(mensagem);
+                }
+            });
 
             dadosValidos = false;
         }

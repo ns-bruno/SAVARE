@@ -7,6 +7,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
@@ -107,7 +108,6 @@ public class ProdutoDetalhesMDActivity extends AppCompatActivity{
         if ((listaDetalhes != null) && (listaDetalhes.size() > 0)){
             // Limpa a lista
             mListView.getAdapter().clearAll();
-            
             List<Card> listaCards = new ArrayList<>();
             for (DescricaoDublaBeans descricao : listaDetalhes) {
 

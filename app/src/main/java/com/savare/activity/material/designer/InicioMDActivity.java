@@ -631,7 +631,7 @@ public class InicioMDActivity extends AppCompatActivity {
                 }
             }
             // Executa a funcao para criar os alarmes em background
-            funcoesP.criarAlarmeEnviarReceberDadosAutomatico(true, true);
+            funcoesP.criarAlarmeEnviarReceberDadosAutomatico(enviaAutomatico, recebeAutomatico);
         }
     };
 

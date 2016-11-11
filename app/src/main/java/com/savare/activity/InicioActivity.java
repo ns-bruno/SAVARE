@@ -354,9 +354,9 @@ public class InicioActivity extends Activity {
 			
 		case 9:
 			// Tela de sincronização
-			Intent intentListaSincronizacao = new Intent(InicioActivity.this, SincronizacaoActivity.class);
+			//Intent intentListaSincronizacao = new Intent(InicioActivity.this, SincronizacaoActivity.class);
 			// Abre outra tela
-			startActivity(intentListaSincronizacao);
+			//startActivity(intentListaSincronizacao);
 			break;
 			
 		case 10:

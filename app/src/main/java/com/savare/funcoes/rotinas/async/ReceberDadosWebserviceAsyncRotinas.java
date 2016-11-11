@@ -70,6 +70,7 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Vector;
 
+import br.com.goncalves.pugnotification.interfaces.PendingIntentNotification;
 import br.com.goncalves.pugnotification.notification.Load;
 import br.com.goncalves.pugnotification.notification.PugNotification;
 
@@ -85,6 +86,8 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
     private OnTaskCompleted listenerTaskCompleted;
     private Calendar calendario;
     private String[] idOrcamentoSelecionado = null;
+    // Cria uma notificacao para ser manipulado
+    Load mLoad;
 
     public ReceberDadosWebserviceAsyncRotinas(Context context) {
         this.context = context;
@@ -119,6 +122,16 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
         // Inicializa a data
         calendario = Calendar.getInstance();
 
+        mLoad = PugNotification.with(context).load()
+                .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR)
+                .smallIcon(R.mipmap.ic_launcher)
+                .largeIcon(R.mipmap.ic_launcher)
+                .title(R.string.importar_dados_recebidos)
+                .flags(Notification.DEFAULT_LIGHTS);
+
+        mLoad.bigTextStyle("Aguarde, vamor receber os dados. Primeiro vamos ver se tem internet...");
+        mLoad.progress().value(0, 0, true).build();
+
         // Checo se o texto de status foi passado pro parametro
         if (textStatus != null){
             ((Activity) context).runOnUiThread(new Runnable() {
@@ -145,485 +158,468 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
         // Marca que a aplicacao esta recebendo dados
         funcoes.setValorXml("RecebendoDados", "S");
 
-        if (funcoes.existeConexaoInternet()){
+        if (funcoes.existeConexaoInternet()) try {
+            // Checa se a versao do savere eh compativel com o webservice
+            if (funcoes.checaVersao()) {
+                WSSisinfoWebservice webserviceSisInfo = new WSSisinfoWebservice(context);
 
-            // Cria uma notificacao para ser manipulado
-            /*Load mLoad = PugNotification.with(context).load()
-                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
-                    .smallIcon(R.mipmap.ic_launcher)
-                    .largeIcon(R.mipmap.ic_launcher)
-                    .title(R.string.importar_dados_recebidos)
-                    .message("Importando os dados, aguarde...")
-                    .flags(Notification.DEFAULT_SOUND);
-                mLoad.simple().build();*/
+                // Recebe os dados da tabela CFAAREAS
+                if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SELECT_USUARIO_USUA))) ||
+                        (tabelaRecebeDados == null)) {
 
-            try {
-                // Checa se a versao do savere eh compativel com o webservice
-                if (funcoes.checaVersao()){
-                    WSSisinfoWebservice webserviceSisInfo = new WSSisinfoWebservice(context);
+                    // Indica que essa notificacao eh do tipo progress
+                    mLoad.bigTextStyle(context.getResources().getString(R.string.estamos_conectanto_servidor_nuvem));
+                    mLoad.progress().value(0, 0, true).build();
 
-                    // Recebe os dados da tabela CFAAREAS
-                    if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SELECT_USUARIO_USUA))) ||
-                            (tabelaRecebeDados == null) ){
+                    // Checo se o texto de status foi passado pro parametro
+                    if (textStatus != null) {
+                        ((Activity) context).runOnUiThread(new Runnable() {
+                            public void run() {
+                                textStatus.setText(context.getResources().getString(R.string.estamos_conectanto_servidor_nuvem));
+                            }
+                        });
+                    }
+
+                    List<PropertyInfo> listaPropriedade = null;
+
+                    if (!funcoes.getValorXml("CodigoUsuario").equalsIgnoreCase(funcoes.NAO_ENCONTRADO)) {
+
+                        listaPropriedade = criaPropriedadeDataAlteracaoWebservice("USUARIO_USUA");
+                    }
+
+                    // Busca no servidor Webservice
+                    Vector<SoapObject> listaUsuarioObject = webserviceSisInfo.executarSelectWebservice(null, WSSisinfoWebservice.FUNCTION_SELECT_USUARIO_USUA, ((listaPropriedade != null) ? listaPropriedade : null));
+
+                    // Checa se retornou alguma coisa
+                    if (listaUsuarioObject != null && listaUsuarioObject.size() > 0) {
+
+                        // Atualiza a notificacao
+                        mLoad.bigTextStyle(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
+                        mLoad.progress().value(0, 0, true).build();
 
                         // Checo se o texto de status foi passado pro parametro
-                        if (textStatus != null){
+                        if (textStatus != null) {
                             ((Activity) context).runOnUiThread(new Runnable() {
                                 public void run() {
-                                    textStatus.setText(context.getResources().getString(R.string.estamos_conectanto_servidor_nuvem));
+                                    textStatus.setText(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
                                 }
                             });
                         }
+                        // Passa por toda a lista
+                        for (final SoapObject objetoIndividual : listaUsuarioObject) {
 
-                        List<PropertyInfo> listaPropriedade = null;
+                            final SoapObject objeto;
 
-                        if (!funcoes.getValorXml("CodigoUsuario").equalsIgnoreCase(funcoes.NAO_ENCONTRADO)) {
+                            if (objetoIndividual.hasProperty("return")) {
+                                objeto = (SoapObject) objetoIndividual.getProperty("return");
 
-                            listaPropriedade = criaPropriedadeDataAlteracaoWebservice("USUARIO_USUA");
-                        }
+                            } else if (objetoIndividual.hasProperty("anyType")) {
+                                objeto = (SoapObject) objetoIndividual.getProperty("anyType");
 
-                        // Busca no servidor Webservice
-                        Vector<SoapObject> listaUsuarioObject = webserviceSisInfo.executarSelectWebservice(null, WSSisinfoWebservice.FUNCTION_SELECT_USUARIO_USUA, ((listaPropriedade != null) ? listaPropriedade : null));
+                            } else {
+                                objeto = objetoIndividual;
+                            }
 
-                        // Checa se retornou alguma coisa
-                        if (listaUsuarioObject != null && listaUsuarioObject.size() > 0) {
+                            // Atualiza a notificacao
+                            mLoad.bigTextStyle(context.getResources().getString(R.string.achamos_usuario_servidor_nuvem) + " - Usuário: " + objeto.getProperty("nomeUsuario").toString());
+                            mLoad.progress().value(0, 0, true).build();
 
-                            // Checo se o texto de status foi passado pro parametro
-                            if (textStatus != null){
+                            // Checa se o texto de status foi passado pro parametro
+                            if (textStatus != null) {
                                 ((Activity) context).runOnUiThread(new Runnable() {
                                     public void run() {
-                                        textStatus.setText(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
+                                        textStatus.setText(context.getResources().getString(R.string.achamos_usuario_servidor_nuvem) + " - " + objeto.getProperty("nomeUsuario").toString());
                                     }
                                 });
                             }
-                            // Passa por toda a lista
-                            for (final SoapObject objetoIndividual : listaUsuarioObject) {
+                            // Checa se o usuario esta ativo
+                            if (objeto.getProperty("ativoUsuario").toString().equalsIgnoreCase("0")) {
 
-                                final SoapObject objeto;
+                                final ContentValues contentValues = new ContentValues();
+                                contentValues.put("comando", 0);
+                                contentValues.put("tela", "ReceberDadosWebserviceAsyncRotinas");
+                                contentValues.put("mensagem", "O usuário dessa chave esta inativo, não podemos baixar os dados dele. Entre em contato com o suporte SAVARE.");
+                                contentValues.put("dados", "");
+                                // Pega os dados do usuario
 
-                                if (objetoIndividual.hasProperty("return")) {
-                                    objeto = (SoapObject) objetoIndividual.getProperty("return");
+                                contentValues.put("usuario", funcoes.getValorXml("Usuario"));
+                                contentValues.put("empresa", funcoes.getValorXml("ChaveUsuario"));
+                                contentValues.put("email", funcoes.getValorXml("Email"));
 
-                                } else if (objetoIndividual.hasProperty("anyType")) {
-                                    objeto = (SoapObject) objetoIndividual.getProperty("anyType");
+                                ((Activity) context).runOnUiThread(new Runnable() {
+                                    public void run() {
+                                        funcoes.menssagem(contentValues);
+                                    }
+                                });
 
-                                } else {
-                                    objeto = objetoIndividual;
+                                return null;
+
+                            } else {
+                                final ContentValues dadosUsuario = new ContentValues();
+                                dadosUsuario.put("ID_USUA", Integer.parseInt(objeto.getProperty("idUsuario").toString()));
+                                dadosUsuario.put("ID_SMAEMPRE", Integer.parseInt(objeto.getProperty("idEmpresa").toString()));
+                                dadosUsuario.put("NOME_USUA", objeto.getProperty("nomeUsuario").toString());
+                                dadosUsuario.put("EMAIL_USUA", ((objeto.hasProperty("email")) ? objeto.getProperty("email").toString().replace("anyType{}", "") : ""));
+                                dadosUsuario.put("EMPRESA_USUA", objeto.getProperty("empresaUsuario").toString());
+                                dadosUsuario.put("VENDE_ATACADO_USUA", objeto.getProperty("vendeAtacadoUsuario").toString());
+                                dadosUsuario.put("VENDE_VAREJO_USUA", objeto.getProperty("vendeVarejoUsuario").toString());
+                                dadosUsuario.put("ATIVO_USUA", objeto.getProperty("ativoUsuario").toString());
+                                dadosUsuario.put("IP_SERVIDOR_USUA", (objeto.hasProperty("ipServidor")) ? objeto.getProperty("ipServidor").toString() : "");
+                                dadosUsuario.put("IP_SERVIDOR_WEBSERVICE_USUA", (objeto.hasProperty("ipServidorWebservice")) ? objeto.getProperty("ipServidorWebservice").toString() : "");
+                                dadosUsuario.put("USUARIO_SERVIDOR_USUA", (objeto.hasProperty("usuarioServidor")) ? objeto.getProperty("usuarioServidor").toString() : "");
+                                dadosUsuario.put("SENHA_SERVIDOR_USUA", (objeto.hasProperty("senhaServidor")) ? funcoes.criptografaSenha(objeto.getProperty("senhaServidor").toString()) : "");
+                                dadosUsuario.put("PASTA_SERVIDOR_USUA", (objeto.hasProperty("pastaServidor")) ? objeto.getProperty("pastaServidor").toString() : "/");
+                                dadosUsuario.put("MODO_CONEXAO", (objeto.hasProperty("modoConexao")) ? objeto.getProperty("modoConexao").toString() : "W");
+                                dadosUsuario.put("CAMINHO_BANCO_DADOS_USUA", (objeto.hasProperty("caminhoBancoDados")) ? objeto.getProperty("caminhoBancoDados").toString() : "");
+                                dadosUsuario.put("PORTA_BANCO_DADOS_USUA", (objeto.hasProperty("portaBancoDados")) ? objeto.getProperty("portaBancoDados").toString() : "");
+                                dadosUsuario.put("QTDE_CASAS_DECIMAIS", (objeto.hasProperty("quantidadeCasasDecimais")) ? objeto.getProperty("quantidadeCasasDecimais").toString() : "3");
+
+                                if (!funcoes.getValorXml("SenhaUsuario").equalsIgnoreCase(funcoes.NAO_ENCONTRADO)) {
+                                    // Inclui a senha no registro do banco de dados
+                                    dadosUsuario.put("SENHA_USUA", funcoes.getValorXml("SenhaUsuario"));
                                 }
 
-                                // Checa se o texto de status foi passado pro parametro
-                                if (textStatus != null){
-                                    ((Activity) context).runOnUiThread(new Runnable() {
-                                        public void run() {
-                                            textStatus.setText(context.getResources().getString(R.string.achamos_usuario_servidor_nuvem) + " - " + objeto.getProperty("nomeUsuario").toString());
-                                        }
-                                    });
+                                if (!funcoes.getValorXml("Usuario").equalsIgnoreCase(funcoes.NAO_ENCONTRADO)) {
+                                    // Inclui a senha no registro do banco de dados
+                                    dadosUsuario.put("LOGIN_USUA", funcoes.getValorXml("Usuario"));
                                 }
-                                // Checa se o usuario esta ativo
-                                if (objeto.getProperty("ativoUsuario").toString().equalsIgnoreCase("0")){
 
-                                    final ContentValues contentValues = new ContentValues();
-                                    contentValues.put("comando", 0);
-                                    contentValues.put("tela", "ReceberDadosWebserviceAsyncRotinas");
-                                    contentValues.put("mensagem", "O usuário dessa chave esta inativo, não podemos baixar os dados dele. Entre em contato com o suporte SAVARE.");
-                                    contentValues.put("dados", "");
-                                    // Pega os dados do usuario
+                                final UsuarioSQL usuarioSql = new UsuarioSQL(context);
 
-                                    contentValues.put("usuario", funcoes.getValorXml("Usuario"));
-                                    contentValues.put("empresa", funcoes.getValorXml("ChaveUsuario"));
-                                    contentValues.put("email", funcoes.getValorXml("Email"));
+                                // Pega o sql para passar para o statement
+                                //final String sql = usuarioSql.construirSqlStatement(dadosUsuario);
+                                // Pega o argumento para o statement
+                                //final String[] argumentoSql = usuarioSql.argumentoStatement(dadosUsuario);
 
-                                    ((Activity) context).runOnUiThread(new Runnable() {
-                                        public void run() {
-                                            funcoes.menssagem(contentValues);
-                                        }
-                                    });
+                                //usuarioSql.insertOrReplace(dadosUsuario);
 
-                                    return null;
+                                ((Activity) context).runOnUiThread(new Runnable() {
+                                    public void run() {
 
-                                } else {
-                                    final ContentValues dadosUsuario = new ContentValues();
-                                    dadosUsuario.put("ID_USUA", Integer.parseInt(objeto.getProperty("idUsuario").toString()));
-                                    dadosUsuario.put("ID_SMAEMPRE", Integer.parseInt(objeto.getProperty("idEmpresa").toString()));
-                                    dadosUsuario.put("NOME_USUA", objeto.getProperty("nomeUsuario").toString());
-                                    dadosUsuario.put("EMAIL_USUA", ((objeto.hasProperty("email")) ? objeto.getProperty("email").toString().replace("anyType{}", "") : ""));
-                                    dadosUsuario.put("EMPRESA_USUA", objeto.getProperty("empresaUsuario").toString());
-                                    dadosUsuario.put("VENDE_ATACADO_USUA", objeto.getProperty("vendeAtacadoUsuario").toString());
-                                    dadosUsuario.put("VENDE_VAREJO_USUA", objeto.getProperty("vendeVarejoUsuario").toString());
-                                    dadosUsuario.put("ATIVO_USUA", objeto.getProperty("ativoUsuario").toString());
-                                    dadosUsuario.put("IP_SERVIDOR_USUA", (objeto.hasProperty("ipServidor")) ? objeto.getProperty("ipServidor").toString() : "");
-                                    dadosUsuario.put("IP_SERVIDOR_WEBSERVICE_USUA", (objeto.hasProperty("ipServidorWebservice")) ? objeto.getProperty("ipServidorWebservice").toString() : "");
-                                    dadosUsuario.put("USUARIO_SERVIDOR_USUA", (objeto.hasProperty("usuarioServidor")) ? objeto.getProperty("usuarioServidor").toString() : "");
-                                    dadosUsuario.put("SENHA_SERVIDOR_USUA", (objeto.hasProperty("senhaServidor")) ? funcoes.criptografaSenha(objeto.getProperty("senhaServidor").toString()) : "");
-                                    dadosUsuario.put("PASTA_SERVIDOR_USUA", (objeto.hasProperty("pastaServidor")) ? objeto.getProperty("pastaServidor").toString() : "/");
-                                    dadosUsuario.put("MODO_CONEXAO", (objeto.hasProperty("modoConexao")) ? objeto.getProperty("modoConexao").toString() : "W");
-                                    dadosUsuario.put("CAMINHO_BANCO_DADOS_USUA", (objeto.hasProperty("caminhoBancoDados")) ? objeto.getProperty("caminhoBancoDados").toString() : "");
-                                    dadosUsuario.put("PORTA_BANCO_DADOS_USUA", (objeto.hasProperty("portaBancoDados")) ? objeto.getProperty("portaBancoDados").toString() : "");
-                                    dadosUsuario.put("QTDE_CASAS_DECIMAIS", (objeto.hasProperty("quantidadeCasasDecimais")) ? objeto.getProperty("quantidadeCasasDecimais").toString() : "3");
+                                        // Inseri os dados do usuario no banco de dados interno
+                                        //if (usuarioSql.insertOrReplaceFast(sql, argumentoSql) > 0) {
+                                        if (usuarioSql.insertOrReplace(dadosUsuario) > 0) {
 
-                                    if (!funcoes.getValorXml("SenhaUsuario").equalsIgnoreCase(funcoes.NAO_ENCONTRADO)) {
-                                        // Inclui a senha no registro do banco de dados
-                                        dadosUsuario.put("SENHA_USUA", funcoes.getValorXml("SenhaUsuario"));
-                                    }
+                                            // Salva os dados necessarios no xml de configuracao da app
+                                            salvarDadosXml(dadosUsuario);
 
-                                    if (!funcoes.getValorXml("Usuario").equalsIgnoreCase(funcoes.NAO_ENCONTRADO)) {
-                                        // Inclui a senha no registro do banco de dados
-                                        dadosUsuario.put("LOGIN_USUA", funcoes.getValorXml("Usuario"));
-                                    }
+                                            inserirUltimaAtualizacao("USUARIO_USUA");
 
-                                    final UsuarioSQL usuarioSql = new UsuarioSQL(context);
+                                            // Atualiza a notificacao
+                                            mLoad.bigTextStyle(context.getResources().getString(R.string.usuario_atualizado_sucesso) + " Vamos para o próximo passo, Aguarde...");
+                                            mLoad.progress().value(0, 0, true).build();
 
-                                    // Pega o sql para passar para o statement
-                                    //final String sql = usuarioSql.construirSqlStatement(dadosUsuario);
-                                    // Pega o argumento para o statement
-                                    //final String[] argumentoSql = usuarioSql.argumentoStatement(dadosUsuario);
+                                            // Checa se o texto de status foi passado pro parametro
+                                            if (textStatus != null) {
+                                                ((Activity) context).runOnUiThread(new Runnable() {
+                                                    public void run() {
+                                                        textStatus.setText(context.getResources().getString(R.string.usuario_atualizado_sucesso));
+                                                    }
+                                                });
+                                            }
+                                        } else {
+                                            //mLoad.dismiss((PendingIntentNotification) context);
 
-                                    //usuarioSql.insertOrReplace(dadosUsuario);
+                                            PugNotification.with(context)
+                                                    .load()
+                                                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR)
+                                                    .title(R.string.importar_dados_recebidos)
+                                                    //.message(context.getResources().getString(R.string.nao_conseguimos_atualizar_usuario))
+                                                    .bigTextStyle(context.getResources().getString(R.string.nao_conseguimos_atualizar_usuario))
+                                                    .smallIcon(R.mipmap.ic_launcher)
+                                                    .largeIcon(R.mipmap.ic_launcher)
+                                                    .flags(Notification.DEFAULT_LIGHTS)
+                                                    .simple()
+                                                    .build();
 
-                                    ((Activity) context).runOnUiThread(new Runnable() {
-                                        public void run() {
+                                            // Checa se o texto de status foi passado pro parametro
+                                            if (textStatus != null) {
 
-                                            // Inseri os dados do usuario no banco de dados interno
-                                            //if (usuarioSql.insertOrReplaceFast(sql, argumentoSql) > 0) {
-                                            if (usuarioSql.insertOrReplace(dadosUsuario) > 0) {
-
-                                                // Salva os dados necessarios no xml de configuracao da app
-                                                salvarDadosXml(dadosUsuario);
-
-                                                inserirUltimaAtualizacao("USUARIO_USUA");
-
-                                                // Checa se o texto de status foi passado pro parametro
-                                                if (textStatus != null) {
-                                                    ((Activity) context).runOnUiThread(new Runnable() {
-                                                        public void run() {
-                                                            textStatus.setText(context.getResources().getString(R.string.usuario_atualizado_sucesso));
-                                                        }
-                                                    });
-                                                }
-                                            } else {
-                                                // Checa se o texto de status foi passado pro parametro
-                                                if (textStatus != null) {
-                                                    ((Activity) context).runOnUiThread(new Runnable() {
-                                                        public void run() {
-                                                            textStatus.setText(context.getResources().getString(R.string.nao_conseguimos_atualizar_usuario));
-                                                        }
-                                                    });
-                                                }
+                                                ((Activity) context).runOnUiThread(new Runnable() {
+                                                    public void run() {
+                                                        textStatus.setText(context.getResources().getString(R.string.nao_conseguimos_atualizar_usuario));
+                                                    }
+                                                });
                                             }
                                         }
-                                    });
-                                }
+                                    }
+                                });
                             }
                         }
                     }
-
-                    // Recebe os dados da tabela CFAAREAS
-                    if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SELECT_CFAAREAS))) ||
-                            (tabelaRecebeDados == null) ){
-
-                        importarDadosArea();
-                    }
-
-                    // Recebe os dados da tabela SMAEMPRES
-                    if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SELECT_SMAEMPRE))) ||
-                            (tabelaRecebeDados == null) ){
-
-                        // Importa os dados da empresa
-                        importaDadosEmpresa();
-                    }
-
-                    // Recebe os dados da tabela CFAAREAS
-                    if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SELECT_CFAATIVI))) ||
-                            (tabelaRecebeDados == null) ){
-
-                        // Importa os dados da empresa
-                        importarDadosAtividade();
-                    }
-
-                    // Recebe os dados da tabela CFASTATU
-                    if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SELECT_CFASTATU))) ||
-                            (tabelaRecebeDados == null) ){
-
-                        // Importa os dados
-                        importarDadosStatus();
-                    }
-
-
-                    // Recebe os dados da tabela CFATPDOC
-                    if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SELECT_CFATPDOC))) ||
-                            (tabelaRecebeDados == null) ){
-
-                        // Importa os dados
-                        importarDadosTipoDocumento();
-                    }
-
-                    // Recebe os dados da tabela CFACCRED
-                    if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SELECT_CFACCRED))) ||
-                            (tabelaRecebeDados == null) ){
-
-                        // Importa os dados
-                        importarDadosCartaoCredito();
-                    }
-
-                    // Recebe os dados da tabela CFAPORTA
-                    if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SELECT_CFAPORTA))) ||
-                            (tabelaRecebeDados == null) ){
-
-                        // Importa os dados
-                        importarDadosPortador();
-                    }
-
-                    // Recebe os dados da tabela CFAPORTA
-                    if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SELECT_CFAPROFI))) ||
-                            (tabelaRecebeDados == null) ){
-
-                        // Importa os dados
-                        importarDadosProfissao();
-                    }
-
-                    // Recebe os dados da tabela CFATPCLI
-                    if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SELECT_CFATPCLI))) ||
-                            (tabelaRecebeDados == null) ){
-
-                        // Importa os dados
-                        importarDadosTipoCliente();
-                    }
-
-                    // Recebe os dados da tabela CFATPCOB
-                    if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SELECT_CFATPCOB))) ||
-                            (tabelaRecebeDados == null) ){
-
-                        // Importa os dados
-                        importarDadosTipoCobranca();
-                    }
-
-                    // Recebe os dados da tabela CFAESTAD
-                    if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SELECT_CFAESTAD))) ||
-                            (tabelaRecebeDados == null) ){
-
-                        // Importa os dados
-                        importarDadosEstado();
-                    }
-
-                    // Recebe os dados da tabela CFACIDAD
-                    if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SELECT_CFACIDAD))) ||
-                            (tabelaRecebeDados == null) ){
-
-                        // Importa os dados
-                        importarDadosCidade();
-                    }
-
-                    // Recebe os dados da tabela CFACLIFO
-                    if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SELECT_CFACLIFO))) ||
-                            (tabelaRecebeDados == null) ){
-
-                        // Importa os dados
-                        importarDadosClifo();
-                    }
-
-                    // Recebe os dados da tabela CFAENDER
-                    if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SELECT_CFAENDER))) ||
-                            (tabelaRecebeDados == null) ){
-
-                        // Importa os dados
-                        importarDadosEndereco();
-                    }
-
-                    // Recebe os dados da tabela CFAPARAM
-                    if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SELECT_CFAPARAM))) ||
-                            (tabelaRecebeDados == null) ){
-
-                        // Importa os dados
-                        importarDadosParametros();
-                    }
-
-                    // Recebe os dados da tabela CFAFOTOS
-                    if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SELECT_CFAFOTOS))) ||
-                            (tabelaRecebeDados == null) ){
-
-                        // Importa os dados
-                        importarDadosFotos();
-                    }
-
-                    // Recebe os dados da tabela AEAPLPGT
-                    if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SELECT_AEAPLPGT))) ||
-                            (tabelaRecebeDados == null) ){
-
-                        // Importa os dados
-                        importarDadosPlanoPagamento();
-                    }
-
-                    // Recebe os dados da tabela AEACLASE
-                    if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SELECT_AEACLASE))) ||
-                            (tabelaRecebeDados == null) ){
-
-                        // Importa os dados
-                        importarDadosClasseProdutos();
-                    }
-
-                    // Recebe os dados da tabela AEAUNVEN
-                    if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SELECT_AEAUNVEN))) ||
-                            (tabelaRecebeDados == null) ){
-
-                        // Importa os dados
-                        importarDadosUnidadeVenda();
-                    }
-
-                    // Recebe os dados da tabela AEAUNVEN
-                    if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SELECT_AEAGRADE))) ||
-                            (tabelaRecebeDados == null) ){
-
-                        // Importa os dados
-                        importarDadosGrade();
-                    }
-
-                    // Recebe os dados da tabela AEAMARCA
-                    if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SELECT_AEAMARCA))) ||
-                            (tabelaRecebeDados == null) ){
-
-                        // Importa os dados
-                        importarDadosMarca();
-                    }
-
-                    // Recebe os dados da tabela AEACODST
-                    if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SELECT_AEACODST))) ||
-                            (tabelaRecebeDados == null) ){
-
-                        // Importa os dados
-                        importarDadosCodigoSituacaoTributaria();
-                    }
-
-                    // Recebe os dados da tabela AEAPRODU
-                    if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SELECT_AEAPRODU))) ||
-                            (tabelaRecebeDados == null) ){
-
-                        // Importa os dados
-                        importarDadosProduto();
-                    }
-
-                    // Recebe os dados da tabela AEAEMBAL
-                    if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SELECT_AEAEMBAL))) ||
-                            (tabelaRecebeDados == null) ){
-
-                        // Importa os dados
-                        importarDadosEmbalagem();
-                    }
-
-                    // Recebe os dados da tabela AEAPLOJA
-                    if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SELECT_AEAPLOJA))) ||
-                            (tabelaRecebeDados == null) ){
-
-                        // Importa os dados
-                        importarDadosProdutosPorLoja();
-                    }
-
-                    // Recebe os dados da tabela AEALOCES
-                    if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SELECT_AEALOCES))) ||
-                            (tabelaRecebeDados == null) ){
-
-                        // Importa os dados
-                        importarDadosLocalEstoque();
-                    }
-
-                    // Recebe os dados da tabela AEAESTOQ
-                    if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SELECT_AEAESTOQ))) ||
-                            (tabelaRecebeDados == null) ){
-
-                        // Importa os dados
-                        importarDadosEstoque();
-                    }
-
-                    // Recebe os dados da tabela AEAORCAM
-                    if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SELECT_AEAORCAM))) ||
-                            (tabelaRecebeDados == null) ){
-
-                        // Importa os dados
-                        importarDadosOrcamento();
-                    }
-
-                    // Recebe os dados da tabela AEAITORC
-                    if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SELECT_AEAITORC))) ||
-                            (tabelaRecebeDados == null) ){
-
-                        // Importa os dados
-                        //importarDadosItemOrcamento();
-                    }
-
-                    // Recebe os dados da tabela AEAPERCE
-                    if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SELECT_AEAPERCE))) ||
-                            (tabelaRecebeDados == null) ){
-
-                        // Importa os dados
-                        importarDadosPercentual();
-                    }
-
-                    // Recebe os dados da tabela AEAFATOR
-                    if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SELECT_AEAFATOR))) ||
-                            (tabelaRecebeDados == null) ){
-
-                        // Importa os dados
-                        importarDadosFator();
-                    }
-
-                    // Recebe os dados da tabela AEAPRREC
-                    if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SELECT_AEAPRREC))) ||
-                            (tabelaRecebeDados == null) ){
-
-                        // Importa os dados
-                        importarDadosProdutoRecomendado();
-                    }
-
-                    // Recebe os dados da tabela RPAPARCE
-                    if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SELECT_RPAPARCE))) ||
-                            (tabelaRecebeDados == null) ){
-
-                        // Importa os dados
-                        importarDadosParcela();
-                    }
-
-                }else {
-                    // Armazena as informacoes para para serem exibidas e enviadas
-                    final ContentValues contentValues = new ContentValues();
-                    contentValues.put("comando", 0);
-                    contentValues.put("tela", "ReceberDadosWebserviceAsyncRotinas");
-                    contentValues.put("mensagem", context.getResources().getString(R.string.nao_conseguimos_validar_versao));
-                    contentValues.put("dados", "");
-                    // Pega os dados do usuario
-
-                    contentValues.put("usuario", funcoes.getValorXml("Usuario"));
-                    contentValues.put("empresa", funcoes.getValorXml("ChaveEmpresa"));
-                    contentValues.put("email", funcoes.getValorXml("Email"));
-
-                    ((Activity) context).runOnUiThread(new Runnable() {
-                        public void run() {
-                            funcoes.menssagem(contentValues);
-                        }
-                    });
-                }
-            } catch (final Exception e){
-
-                // Checo se o texto de status foi passado pro parametro
-                if (textStatus != null){
-                    ((Activity) context).runOnUiThread(new Runnable() {
-                        public void run() {
-                            textStatus.setText(context.getResources().getString(R.string.msg_error) + e.getMessage());
-                        }
-                    });
-                }
-                if (progressBarStatus != null){
-                    ((Activity) context).runOnUiThread(new Runnable() {
-                        public void run() {
-                            progressBarStatus.setVisibility(View.INVISIBLE);
-                        }
-                    });
                 }
 
+                // Recebe os dados da tabela CFAAREAS
+                if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SELECT_CFAAREAS))) ||
+                        (tabelaRecebeDados == null)) {
+
+                    importarDadosArea();
+                }
+
+                // Recebe os dados da tabela SMAEMPRES
+                if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SELECT_SMAEMPRE))) ||
+                        (tabelaRecebeDados == null)) {
+
+                    // Importa os dados da empresa
+                    importaDadosEmpresa();
+                }
+
+                // Recebe os dados da tabela CFAAREAS
+                if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SELECT_CFAATIVI))) ||
+                        (tabelaRecebeDados == null)) {
+
+                    // Importa os dados da empresa
+                    importarDadosAtividade();
+                }
+
+                // Recebe os dados da tabela CFASTATU
+                if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SELECT_CFASTATU))) ||
+                        (tabelaRecebeDados == null)) {
+
+                    // Importa os dados
+                    importarDadosStatus();
+                }
+
+
+                // Recebe os dados da tabela CFATPDOC
+                if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SELECT_CFATPDOC))) ||
+                        (tabelaRecebeDados == null)) {
+
+                    // Importa os dados
+                    importarDadosTipoDocumento();
+                }
+
+                // Recebe os dados da tabela CFACCRED
+                if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SELECT_CFACCRED))) ||
+                        (tabelaRecebeDados == null)) {
+
+                    // Importa os dados
+                    importarDadosCartaoCredito();
+                }
+
+                // Recebe os dados da tabela CFAPORTA
+                if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SELECT_CFAPORTA))) ||
+                        (tabelaRecebeDados == null)) {
+
+                    // Importa os dados
+                    importarDadosPortador();
+                }
+
+                // Recebe os dados da tabela CFAPORTA
+                if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SELECT_CFAPROFI))) ||
+                        (tabelaRecebeDados == null)) {
+
+                    // Importa os dados
+                    importarDadosProfissao();
+                }
+
+                // Recebe os dados da tabela CFATPCLI
+                if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SELECT_CFATPCLI))) ||
+                        (tabelaRecebeDados == null)) {
+
+                    // Importa os dados
+                    importarDadosTipoCliente();
+                }
+
+                // Recebe os dados da tabela CFATPCOB
+                if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SELECT_CFATPCOB))) ||
+                        (tabelaRecebeDados == null)) {
+
+                    // Importa os dados
+                    importarDadosTipoCobranca();
+                }
+
+                // Recebe os dados da tabela CFAESTAD
+                if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SELECT_CFAESTAD))) ||
+                        (tabelaRecebeDados == null)) {
+
+                    // Importa os dados
+                    importarDadosEstado();
+                }
+
+                // Recebe os dados da tabela CFACIDAD
+                if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SELECT_CFACIDAD))) ||
+                        (tabelaRecebeDados == null)) {
+
+                    // Importa os dados
+                    importarDadosCidade();
+                }
+
+                // Recebe os dados da tabela CFACLIFO
+                if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SELECT_CFACLIFO))) ||
+                        (tabelaRecebeDados == null)) {
+
+                    // Importa os dados
+                    importarDadosClifo();
+                }
+
+                // Recebe os dados da tabela CFAENDER
+                if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SELECT_CFAENDER))) ||
+                        (tabelaRecebeDados == null)) {
+
+                    // Importa os dados
+                    importarDadosEndereco();
+                }
+
+                // Recebe os dados da tabela CFAPARAM
+                if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SELECT_CFAPARAM))) ||
+                        (tabelaRecebeDados == null)) {
+
+                    // Importa os dados
+                    importarDadosParametros();
+                }
+
+                // Recebe os dados da tabela CFAFOTOS
+                if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SELECT_CFAFOTOS))) ||
+                        (tabelaRecebeDados == null)) {
+
+                    // Importa os dados
+                    importarDadosFotos();
+                }
+
+                // Recebe os dados da tabela AEAPLPGT
+                if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SELECT_AEAPLPGT))) ||
+                        (tabelaRecebeDados == null)) {
+
+                    // Importa os dados
+                    importarDadosPlanoPagamento();
+                }
+
+                // Recebe os dados da tabela AEACLASE
+                if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SELECT_AEACLASE))) ||
+                        (tabelaRecebeDados == null)) {
+
+                    // Importa os dados
+                    importarDadosClasseProdutos();
+                }
+
+                // Recebe os dados da tabela AEAUNVEN
+                if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SELECT_AEAUNVEN))) ||
+                        (tabelaRecebeDados == null)) {
+
+                    // Importa os dados
+                    importarDadosUnidadeVenda();
+                }
+
+                // Recebe os dados da tabela AEAUNVEN
+                if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SELECT_AEAGRADE))) ||
+                        (tabelaRecebeDados == null)) {
+
+                    // Importa os dados
+                    importarDadosGrade();
+                }
+
+                // Recebe os dados da tabela AEAMARCA
+                if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SELECT_AEAMARCA))) ||
+                        (tabelaRecebeDados == null)) {
+
+                    // Importa os dados
+                    importarDadosMarca();
+                }
+
+                // Recebe os dados da tabela AEACODST
+                if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SELECT_AEACODST))) ||
+                        (tabelaRecebeDados == null)) {
+
+                    // Importa os dados
+                    importarDadosCodigoSituacaoTributaria();
+                }
+
+                // Recebe os dados da tabela AEAPRODU
+                if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SELECT_AEAPRODU))) ||
+                        (tabelaRecebeDados == null)) {
+
+                    // Importa os dados
+                    importarDadosProduto();
+                }
+
+                // Recebe os dados da tabela AEAEMBAL
+                if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SELECT_AEAEMBAL))) ||
+                        (tabelaRecebeDados == null)) {
+
+                    // Importa os dados
+                    importarDadosEmbalagem();
+                }
+
+                // Recebe os dados da tabela AEAPLOJA
+                if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SELECT_AEAPLOJA))) ||
+                        (tabelaRecebeDados == null)) {
+
+                    // Importa os dados
+                    importarDadosProdutosPorLoja();
+                }
+
+                // Recebe os dados da tabela AEALOCES
+                if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SELECT_AEALOCES))) ||
+                        (tabelaRecebeDados == null)) {
+
+                    // Importa os dados
+                    importarDadosLocalEstoque();
+                }
+
+                // Recebe os dados da tabela AEAESTOQ
+                if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SELECT_AEAESTOQ))) ||
+                        (tabelaRecebeDados == null)) {
+
+                    // Importa os dados
+                    importarDadosEstoque();
+                }
+
+                // Recebe os dados da tabela AEAORCAM
+                if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SELECT_AEAORCAM))) ||
+                        (tabelaRecebeDados == null)) {
+
+                    // Importa os dados
+                    importarDadosOrcamento();
+                }
+
+                // Recebe os dados da tabela AEAITORC
+                if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SELECT_AEAITORC))) ||
+                        (tabelaRecebeDados == null)) {
+
+                    // Importa os dados
+                    //importarDadosItemOrcamento();
+                }
+
+                // Recebe os dados da tabela AEAPERCE
+                if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SELECT_AEAPERCE))) ||
+                        (tabelaRecebeDados == null)) {
+
+                    // Importa os dados
+                    importarDadosPercentual();
+                }
+
+                // Recebe os dados da tabela AEAFATOR
+                if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SELECT_AEAFATOR))) ||
+                        (tabelaRecebeDados == null)) {
+
+                    // Importa os dados
+                    importarDadosFator();
+                }
+
+                // Recebe os dados da tabela AEAPRREC
+                if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SELECT_AEAPRREC))) ||
+                        (tabelaRecebeDados == null)) {
+
+                    // Importa os dados
+                    importarDadosProdutoRecomendado();
+                }
+
+                // Recebe os dados da tabela RPAPARCE
+                if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SELECT_RPAPARCE))) ||
+                        (tabelaRecebeDados == null)) {
+
+                    // Importa os dados
+                    importarDadosParcela();
+                }
+
+            } else {
                 // Armazena as informacoes para para serem exibidas e enviadas
                 final ContentValues contentValues = new ContentValues();
                 contentValues.put("comando", 0);
                 contentValues.put("tela", "ReceberDadosWebserviceAsyncRotinas");
-                contentValues.put("mensagem", funcoes.tratamentoErroBancoDados(e.toString()));
-                contentValues.put("dados", e.toString());
+                contentValues.put("mensagem", context.getResources().getString(R.string.nao_conseguimos_validar_versao));
+                contentValues.put("dados", "");
                 // Pega os dados do usuario
 
                 contentValues.put("usuario", funcoes.getValorXml("Usuario"));
@@ -636,7 +632,59 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                     }
                 });
             }
-        } else {
+        } catch (final Exception e) {
+
+            // Atualiza a notificacao
+            mLoad.bigTextStyle(context.getResources().getString(R.string.msg_error) + e.getMessage());
+            mLoad.progress().value(0, 0, true).build();
+
+            // Checo se o texto de status foi passado pro parametro
+            if (textStatus != null) {
+                ((Activity) context).runOnUiThread(new Runnable() {
+                    public void run() {
+                        textStatus.setText(context.getResources().getString(R.string.msg_error) + e.getMessage());
+                    }
+                });
+            }
+            if (progressBarStatus != null) {
+                ((Activity) context).runOnUiThread(new Runnable() {
+                    public void run() {
+                        progressBarStatus.setVisibility(View.INVISIBLE);
+                    }
+                });
+            }
+
+            // Armazena as informacoes para para serem exibidas e enviadas
+            final ContentValues contentValues = new ContentValues();
+            contentValues.put("comando", 0);
+            contentValues.put("tela", "ReceberDadosWebserviceAsyncRotinas");
+            contentValues.put("mensagem", funcoes.tratamentoErroBancoDados(e.toString()));
+            contentValues.put("dados", e.toString());
+            // Pega os dados do usuario
+
+            contentValues.put("usuario", funcoes.getValorXml("Usuario"));
+            contentValues.put("empresa", funcoes.getValorXml("ChaveEmpresa"));
+            contentValues.put("email", funcoes.getValorXml("Email"));
+
+            ((Activity) context).runOnUiThread(new Runnable() {
+                public void run() {
+                    funcoes.menssagem(contentValues);
+                }
+            });
+        }
+        else {
+
+            PugNotification.with(context)
+                    .load()
+                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR)
+                    .title(R.string.importar_dados_recebidos)
+                    .bigTextStyle("Não conseguimos identificar uma conexão de internet")
+                    .smallIcon(R.drawable.ic_launcher)
+                    .largeIcon(R.drawable.ic_launcher)
+                    .flags(Notification.DEFAULT_LIGHTS)
+                    .simple()
+                    .build();
+
             // Checa se o texto de status foi passado pro parametro
             if (textStatus != null){
                 ((Activity) context).runOnUiThread(new Runnable() {
@@ -673,7 +721,18 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             listenerTaskCompleted.onTaskCompleted();
         }
 
-        //if ((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (!Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SELECT_USUARIO_USUA))){
+        // Cria uma notificacao para ser manipulado
+        PugNotification.with(context)
+                .load()
+                .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR)
+                .title(R.string.importar_dados_recebidos)
+                .bigTextStyle(context.getResources().getString(R.string.terminamos_receber_dados))
+                .smallIcon(R.mipmap.ic_launcher)
+                .largeIcon(R.mipmap.ic_launcher)
+                .flags(Notification.DEFAULT_LIGHTS)
+                .simple()
+                .build();
+
             // Checo se o texto de status foi passado pro parametro
             if (textStatus != null){
                 ((Activity) context).runOnUiThread(new Runnable() {
@@ -690,8 +749,6 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                     }
                 });
             }
-        //}
-
     }
 
     private void salvarDadosXml(ContentValues usuario){
@@ -725,7 +782,9 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
     public void setIdOrcamento(String[] idOrcamentoSelecionado) { this.idOrcamentoSelecionado = idOrcamentoSelecionado; }
 
     private void importaDadosEmpresa(){
-        WSSisinfoWebservice webserviceSisInfo = new WSSisinfoWebservice(context);
+        // Atualiza a notificacao
+        mLoad.bigTextStyle(context.getResources().getString(R.string.procurando_dados) + " Empresa");
+        mLoad.progress().value(0, 0, true).build();
 
         // Checo se o texto de status foi passado pro parametro
         if (textStatus != null){
@@ -735,6 +794,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 }
             });
         }
+        WSSisinfoWebservice webserviceSisInfo = new WSSisinfoWebservice(context);
         try {
             final Vector<SoapObject> listaEmpresaObject = webserviceSisInfo.executarSelectWebservice(null, WSSisinfoWebservice.FUNCTION_SELECT_SMAEMPRE, criaPropriedadeDataAlteracaoWebservice("SMAEMPRE"));
 
@@ -742,6 +802,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             if (listaEmpresaObject != null && listaEmpresaObject.size() > 0) {
                 // Vareavel para saber se todos os dados foram inseridos com sucesso
                 boolean todosSucesso = true;
+
+                // Atualiza a notificacao
+                mLoad.bigTextStyle(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
+                mLoad.progress().value(0, listaEmpresaObject.size(), false).build();
 
                 // Checo se o texto de status foi passado pro parametro
                 if (textStatus != null){
@@ -764,6 +828,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 // Passa por toda a lista
                 for (SoapObject objetoIndividual : listaEmpresaObject) {
                     final int finalControle = controle;
+
+                    // Atualiza a notificacao
+                    mLoad.bigTextStyle(context.getResources().getString(R.string.recebendo_dados_empresa) + " - " + (finalControle + 1) + "/" + listaEmpresaObject.size());
+                    mLoad.progress().update(0, controle, listaEmpresaObject.size(), false).build();
 
                     // Checo se o texto de status foi passado pro parametro
                     if (textStatus != null){
@@ -840,29 +908,39 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                         }
                     });*/
                 } // Fim do for
+
+                // Atualiza a notificacao
+                mLoad.bigTextStyle(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
+                mLoad.progress().value(0, 0, true).build();
+
                 // Checa se todos foram inseridos/atualizados com sucesso
                 if (todosSucesso){
                     inserirUltimaAtualizacao("SMAEMPRE");
                 }
             }
         }catch (Exception e){
-            // Cria uma notificacao para ser manipulado
-            Load mLoad = PugNotification.with(context).load()
-                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
-                    .smallIcon(R.mipmap.ic_launcher)
-                    .largeIcon(R.mipmap.ic_launcher)
+            // Cria uma notificacao
+            PugNotification.with(context)
+                    .load()
+                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR)
                     .title(R.string.importar_dados_recebidos)
                     .bigTextStyle(e.getMessage())
-                    .flags(Notification.DEFAULT_SOUND);
-                mLoad.simple().build();
+                    .smallIcon(R.mipmap.ic_launcher)
+                    .largeIcon(R.mipmap.ic_launcher)
+                    .flags(Notification.DEFAULT_ALL)
+                    .simple()
+                    .build();
         } finally {
-            if (webserviceSisInfo != null) {
-                webserviceSisInfo = null;
-            }
+            webserviceSisInfo = null;
         }
     }
 
     private void importarDadosArea(){
+
+        // Atualiza a notificacao
+        mLoad.bigTextStyle(context.getResources().getString(R.string.procurando_dados) + " Área de Atuação");
+        mLoad.progress().value(0, 0, true).build();
+
         // Checo se o texto de status foi passado pro parametro
         if (textStatus != null){
             ((Activity) context).runOnUiThread(new Runnable() {
@@ -880,6 +958,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             if ((listaAreasObject != null) && (listaAreasObject.size() > 0)) {
                 // Vareavel para saber se todos os dados foram inseridos com sucesso
                 boolean todosSucesso = true;
+
+                // Atualiza a notificacao
+                mLoad.bigTextStyle(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
+                mLoad.progress().value(0, listaAreasObject.size(), false).build();
 
                 // Checo se o texto de status foi passado pro parametro
                 if (textStatus != null){
@@ -902,6 +984,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 // Passa por toda a lista
                 for (SoapObject objetoIndividual : listaAreasObject) {
                     final int finalControle = controle;
+
+                    // Atualiza a notificacao
+                    mLoad.bigTextStyle(context.getResources().getString(R.string.recebendo_dados_areas) + " - " + (finalControle + 1) + "/" + listaAreasObject.size());
+                    mLoad.progress().update(0, controle, listaAreasObject.size(), false).build();
 
                     // Checo se o texto de status foi passado pro parametro
                     if (textStatus != null){
@@ -937,25 +1023,18 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                     AreasSql areasSql = new AreasSql(context);
 
-                    // Pega o sql para passar para o statement
-                    //final String sql = areasSql.construirSqlStatement(dadosAreas);
-                    // Pega o argumento para o statement
-                    //final String[] argumentoSql = areasSql.argumentoStatement(dadosAreas);
-
                     if (areasSql.insertOrReplace(dadosAreas) <= 0) {
                         todosSucesso = false;
                     }
-                                /*((Activity) context).runOnUiThread(new Runnable() {
-                                    public void run() {
-                                        //areasSql.insertOrReplace(dadosAreas);
-                                        areasSql.insertOrReplaceFast(sql, argumentoSql);
-                                    }
-                                });*/
                 } // Fim do for
                 // Checa se todos foram inseridos/atualizados com sucesso
                 if (todosSucesso) {
                     inserirUltimaAtualizacao("CFAAREAS");
                 }
+                // Atualiza a notificacao
+                mLoad.bigTextStyle(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
+                mLoad.progress().value(0, 0, true).build();
+
                 // Checo se o texto de status foi passado pro parametro
                 if (textStatus != null){
                     ((Activity) context).runOnUiThread(new Runnable() {
@@ -974,19 +1053,26 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             }
         }catch (Exception e){
             // Cria uma notificacao para ser manipulado
-            Load mLoad = PugNotification.with(context).load()
-                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
-                    .smallIcon(R.mipmap.ic_launcher)
-                    .largeIcon(R.mipmap.ic_launcher)
+            PugNotification.with(context)
+                    .load()
+                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR)
                     .title(R.string.importar_dados_recebidos)
                     .bigTextStyle(e.getMessage())
-                    .flags(Notification.DEFAULT_SOUND);
-            mLoad.simple().build();
+                    .smallIcon(R.mipmap.ic_launcher)
+                    .largeIcon(R.mipmap.ic_launcher)
+                    .flags(Notification.DEFAULT_ALL)
+                    .simple()
+                    .build();
         }
     }
 
 
     private void importarDadosAtividade(){
+
+        // Atualiza a notificacao
+        mLoad.bigTextStyle(context.getResources().getString(R.string.procurando_dados) + " Ramo de Atividade");
+        mLoad.progress().value(0, 0, true).build();
+
         // Checo se o texto de status foi passado pro parametro
         if (textStatus != null){
             ((Activity) context).runOnUiThread(new Runnable() {
@@ -1004,6 +1090,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             if ((listaAtividadeObject != null) && (listaAtividadeObject.size() > 0)) {
                 // Vareavel para saber se todos os dados foram inseridos com sucesso
                 boolean todosSucesso = true;
+
+                // Atualiza a notificacao
+                mLoad.bigTextStyle(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
+                mLoad.progress().value(0, listaAtividadeObject.size(), false).build();
 
                 // Checo se o texto de status foi passado pro parametro
                 if (textStatus != null){
@@ -1026,6 +1116,11 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 // Passa por toda a lista
                 for (SoapObject objetoIndividual : listaAtividadeObject) {
                     final int finalControle = controle;
+
+                    // Atualiza a notificacao
+                    mLoad.bigTextStyle(context.getResources().getString(R.string.recebendo_dados_atividade) + " - " + (finalControle + 1) + "/" + listaAtividadeObject.size());
+                    mLoad.progress().update(0, controle, listaAtividadeObject.size(), false).build();
+
                     // Checo se o texto de status foi passado pro parametro
                     if (textStatus != null){
                         ((Activity) context).runOnUiThread(new Runnable() {
@@ -1074,17 +1169,15 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                     if (atividadeSql.insertOrReplace(dadosAreas) <= 0) {
                         todosSucesso = false;
                     }
-                                /*((Activity) context).runOnUiThread(new Runnable() {
-                                    public void run() {
-                                        //atividadeSql.insertOrReplace(dadosAreas);
-                                        atividadeSql.insertOrReplaceFast(sql, argumentoSql);
-                                    }
-                                });*/
                 } // Fim do for
                 // Checa se todos foram inseridos/atualizados com sucesso
                 if (todosSucesso) {
                     inserirUltimaAtualizacao("CFAATIVI");
                 }
+                // Atualiza a notificacao
+                mLoad.bigTextStyle(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
+                mLoad.progress().value(0, 0, true).build();
+
                 // Checo se o texto de status foi passado pro parametro
                 if (textStatus != null){
                     ((Activity) context).runOnUiThread(new Runnable() {
@@ -1103,19 +1196,25 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             }
         }catch (Exception e){
             // Cria uma notificacao para ser manipulado
-            Load mLoad = PugNotification.with(context).load()
-                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
-                    .smallIcon(R.mipmap.ic_launcher)
-                    .largeIcon(R.mipmap.ic_launcher)
+            PugNotification.with(context)
+                    .load()
+                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR)
                     .title(R.string.importar_dados_recebidos)
                     .bigTextStyle(e.getMessage())
-                    .flags(Notification.DEFAULT_SOUND);
-            mLoad.simple().build();
+                    .smallIcon(R.mipmap.ic_launcher)
+                    .largeIcon(R.mipmap.ic_launcher)
+                    .flags(Notification.DEFAULT_ALL)
+                    .simple()
+                    .build();
         }
     }
 
 
     private void importarDadosStatus(){
+        // Atualiza a notificacao
+        mLoad.bigTextStyle(context.getResources().getString(R.string.procurando_dados) + " Status");
+        mLoad.progress().value(0, 0, true).build();
+
         // Checo se o texto de status foi passado pro parametro
         if (textStatus != null){
             ((Activity) context).runOnUiThread(new Runnable() {
@@ -1133,6 +1232,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             if ((listaStatusObject != null) && (listaStatusObject.size() > 0)) {
                 // Vareavel para saber se todos os dados foram inseridos com sucesso
                 boolean todosSucesso = true;
+
+                // Atualiza a notificacao
+                mLoad.bigTextStyle(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
+                mLoad.progress().value(0, listaStatusObject.size(), false).build();
 
                 // Checo se o texto de status foi passado pro parametro
                 if (textStatus != null){
@@ -1155,6 +1258,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 // Passa por toda a lista
                 for (SoapObject objetoIndividual : listaStatusObject) {
                     final int finalControle = controle;
+
+                    // Atualiza a notificacao
+                    mLoad.bigTextStyle(context.getResources().getString(R.string.recebendo_dados_status) + " - " + (finalControle + 1) + "/" + listaStatusObject.size());
+                    mLoad.progress().update(0, controle, listaStatusObject.size(), false).build();
 
                     // Checo se o texto de status foi passado pro parametro
                     if (textStatus != null){
@@ -1216,22 +1323,27 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                     if (statusSql.insertOrReplace(dadosStatus) <= 0) {
                         todosSucesso = false;
                     }
-                    // Checo se o texto de status foi passado pro parametro
-                    if (textStatus != null){
-                        ((Activity) context).runOnUiThread(new Runnable() {
-                            public void run() {
-                                textStatus.setText(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
-                            }
-                        });
-                    }
-                    if (progressBarStatus != null){
-                        ((Activity) context).runOnUiThread(new Runnable() {
-                            public void run() {
-                                progressBarStatus.setIndeterminate(true);
-                            }
-                        });
-                    }
+
                 } // Fim do for
+                // Atualiza a notificacao
+                mLoad.bigTextStyle(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
+                mLoad.progress().value(0, 0, true).build();
+
+                // Checo se o texto de status foi passado pro parametro
+                if (textStatus != null){
+                    ((Activity) context).runOnUiThread(new Runnable() {
+                        public void run() {
+                            textStatus.setText(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
+                        }
+                    });
+                }
+                if (progressBarStatus != null){
+                    ((Activity) context).runOnUiThread(new Runnable() {
+                        public void run() {
+                            progressBarStatus.setIndeterminate(true);
+                        }
+                    });
+                }
                 // Checa se todos foram inseridos/atualizados com sucesso
                 if (todosSucesso) {
                     inserirUltimaAtualizacao("CFASTATU");
@@ -1239,19 +1351,25 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             }
         }catch (Exception e){
             // Cria uma notificacao para ser manipulado
-            Load mLoad = PugNotification.with(context).load()
-                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
+            PugNotification.with(context)
+                    .load()
+                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR)
+                    .title(R.string.importar_dados_recebidos)
+                    .bigTextStyle(e.getMessage())
                     .smallIcon(R.mipmap.ic_launcher)
                     .largeIcon(R.mipmap.ic_launcher)
-                    .title(R.string.importar_dados_recebidos)
-                    .message(e.getMessage())
-                    .flags(Notification.DEFAULT_SOUND);
-            mLoad.simple().build();
+                    .flags(Notification.DEFAULT_ALL)
+                    .simple()
+                    .build();
         }
     }
 
 
     private void importarDadosTipoDocumento(){
+        // Atualiza a notificacao
+        mLoad.bigTextStyle(context.getResources().getString(R.string.procurando_dados) + " Tipo Documento");
+        mLoad.progress().value(0, 0, true).build();
+
         // Checo se o texto de status foi passado pro parametro
         if (textStatus != null){
             ((Activity) context).runOnUiThread(new Runnable() {
@@ -1269,6 +1387,9 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             if ((listaDocumentoObject != null) && (listaDocumentoObject.size() > 0)) {
                 // Vareavel para saber se todos os dados foram inseridos com sucesso
                 boolean todosSucesso = true;
+                // Atualiza a notificacao
+                mLoad.bigTextStyle(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
+                mLoad.progress().value(0, listaDocumentoObject.size(), false).build();
 
                 // Checo se o texto de status foi passado pro parametro
                 if (textStatus != null){
@@ -1291,6 +1412,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 // Passa por toda a lista
                 for (SoapObject objetoIndividual : listaDocumentoObject) {
                     final int finalControle = controle;
+
+                    // Atualiza a notificacao
+                    mLoad.bigTextStyle(context.getResources().getString(R.string.recebendo_dados_tipo_documento) + " - " + (finalControle + 1) + "/" + listaDocumentoObject.size());
+                    mLoad.progress().update(0, controle, listaDocumentoObject.size(), false).build();
 
                     // Checo se o texto de status foi passado pro parametro
                     if (textStatus != null){
@@ -1353,6 +1478,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 if (todosSucesso) {
                     inserirUltimaAtualizacao("CFATPDOC");
                 }
+                // Atualiza a notificacao
+                mLoad.bigTextStyle(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
+                mLoad.progress().value(0, 0, true).build();
+
                 // Checo se o texto de status foi passado pro parametro
                 if (textStatus != null){
                     ((Activity) context).runOnUiThread(new Runnable() {
@@ -1371,19 +1500,25 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             }
         }catch (Exception e){
             // Cria uma notificacao para ser manipulado
-            Load mLoad = PugNotification.with(context).load()
-                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
+            PugNotification.with(context)
+                    .load()
+                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR)
+                    .title(R.string.importar_dados_recebidos)
+                    .bigTextStyle(e.getMessage())
                     .smallIcon(R.mipmap.ic_launcher)
                     .largeIcon(R.mipmap.ic_launcher)
-                    .title(R.string.importar_dados_recebidos)
-                    .message(e.getMessage())
-                    .flags(Notification.DEFAULT_SOUND);
-            mLoad.simple().build();
+                    .flags(Notification.DEFAULT_ALL)
+                    .simple()
+                    .build();
         }
     }
 
 
     private void importarDadosCartaoCredito(){
+        // Atualiza a notificacao
+        mLoad.bigTextStyle(context.getResources().getString(R.string.procurando_dados) + " Cartão Credito");
+        mLoad.progress().value(0, 0, true).build();
+
         // Checo se o texto de status foi passado pro parametro
         if (textStatus != null){
             ((Activity) context).runOnUiThread(new Runnable() {
@@ -1401,6 +1536,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             if ((listaCartaoCreditoObject != null) && (listaCartaoCreditoObject.size() > 0)) {
                 // Vareavel para saber se todos os dados foram inseridos com sucesso
                 boolean todosSucesso = true;
+
+                // Atualiza a notificacao
+                mLoad.bigTextStyle(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
+                mLoad.progress().value(0, listaCartaoCreditoObject.size(), false).build();
 
                 // Checo se o texto de status foi passado pro parametro
                 if (textStatus != null){
@@ -1423,6 +1562,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 // Passa por toda a lista
                 for (SoapObject objetoIndividual : listaCartaoCreditoObject) {
                     final int finalControle = controle;
+
+                    // Atualiza a notificacao
+                    mLoad.bigTextStyle(context.getResources().getString(R.string.recebendo_dados_cartao) + " - " + (finalControle + 1) + "/" + listaCartaoCreditoObject.size());
+                    mLoad.progress().update(0, controle, listaCartaoCreditoObject.size(), false).build();
 
                     // Checo se o texto de status foi passado pro parametro
                     if (textStatus != null){
@@ -1476,6 +1619,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 if (todosSucesso) {
                     inserirUltimaAtualizacao("CFACCRED");
                 }
+                // Atualiza a notificacao
+                mLoad.bigTextStyle(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
+                mLoad.progress().value(0, 0, true).build();
+
                 // Checo se o texto de status foi passado pro parametro
                 if (textStatus != null){
                     ((Activity) context).runOnUiThread(new Runnable() {
@@ -1494,18 +1641,24 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             }
         }catch (Exception e){
             // Cria uma notificacao para ser manipulado
-            Load mLoad = PugNotification.with(context).load()
-                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
+            PugNotification.with(context)
+                    .load()
+                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR)
+                    .title(R.string.importar_dados_recebidos)
+                    .bigTextStyle(e.getMessage())
                     .smallIcon(R.mipmap.ic_launcher)
                     .largeIcon(R.mipmap.ic_launcher)
-                    .title(R.string.importar_dados_recebidos)
-                    .message(e.getMessage())
-                    .flags(Notification.DEFAULT_SOUND);
-            mLoad.simple().build();
+                    .flags(Notification.DEFAULT_ALL)
+                    .simple()
+                    .build();
         }
     }
 
     private void importarDadosPortador(){
+        // Atualiza a notificacao
+        mLoad.bigTextStyle(context.getResources().getString(R.string.procurando_dados) + " Portador (Banco)");
+        mLoad.progress().value(0, 0, true).build();
+
         // Checo se o texto de status foi passado pro parametro
         if (textStatus != null){
             ((Activity) context).runOnUiThread(new Runnable() {
@@ -1523,6 +1676,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             if ((listaPortadorObject != null) && (listaPortadorObject.size() > 0)) {
                 // Vareavel para saber se todos os dados foram inseridos com sucesso
                 boolean todosSucesso = true;
+
+                // Atualiza a notificacao
+                mLoad.bigTextStyle(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
+                mLoad.progress().value(0, listaPortadorObject.size(), false).build();
 
                 // Checo se o texto de status foi passado pro parametro
                 if (textStatus != null){
@@ -1546,6 +1703,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 // Passa por toda a lista
                 for (SoapObject objetoIndividual : listaPortadorObject) {
                     final int finalControle = controle;
+
+                    // Atualiza a notificacao
+                    mLoad.bigTextStyle(context.getResources().getString(R.string.recebendo_dados_portador) + " - " + (finalControle + 1) + "/" + listaPortadorObject.size());
+                    mLoad.progress().update(0, controle, listaPortadorObject.size(), false).build();
 
                     // Checo se o texto de status foi passado pro parametro
                     if (textStatus != null){
@@ -1610,6 +1771,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 if (todosSucesso) {
                     inserirUltimaAtualizacao("CFAPORTA");
                 }
+                // Atualiza a notificacao
+                mLoad.bigTextStyle(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
+                mLoad.progress().value(0, 0, true).build();
+
                 // Checo se o texto de status foi passado pro parametro
                 if (textStatus != null){
                     ((Activity) context).runOnUiThread(new Runnable() {
@@ -1628,18 +1793,24 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             }
         }catch (Exception e){
             // Cria uma notificacao para ser manipulado
-            Load mLoad = PugNotification.with(context).load()
-                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
+            PugNotification.with(context)
+                    .load()
+                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR)
+                    .title(R.string.importar_dados_recebidos)
+                    .bigTextStyle(e.getMessage())
                     .smallIcon(R.mipmap.ic_launcher)
                     .largeIcon(R.mipmap.ic_launcher)
-                    .title(R.string.importar_dados_recebidos)
-                    .message(e.getMessage())
-                    .flags(Notification.DEFAULT_SOUND);
-            mLoad.simple().build();
+                    .flags(Notification.DEFAULT_ALL)
+                    .simple()
+                    .build();
         }
     }
 
     private void importarDadosProfissao(){
+        // Atualiza a notificacao
+        mLoad.bigTextStyle(context.getResources().getString(R.string.procurando_dados) + " Profissão");
+        mLoad.progress().value(0, 0, true).build();
+
         // Checo se o texto de status foi passado pro parametro
         if (textStatus != null){
             ((Activity) context).runOnUiThread(new Runnable() {
@@ -1657,6 +1828,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             if ((listaProfissaoObject != null) && (listaProfissaoObject.size() > 0)) {
                 // Vareavel para saber se todos os dados foram inseridos com sucesso
                 boolean todosSucesso = true;
+
+                // Atualiza a notificacao
+                mLoad.bigTextStyle(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
+                mLoad.progress().value(0, listaProfissaoObject.size(), false).build();
 
                 // Checo se o texto de status foi passado pro parametro
                 if (textStatus != null){
@@ -1679,6 +1854,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 // Passa por toda a lista
                 for (SoapObject objetoIndividual : listaProfissaoObject) {
                     final int finalControle = controle;
+
+                    // Atualiza a notificacao
+                    mLoad.bigTextStyle(context.getResources().getString(R.string.recebendo_dados_profisao) + " - " + (finalControle + 1) + "/" + listaProfissaoObject.size());
+                    mLoad.progress().update(0, controle, listaProfissaoObject.size(), false).build();
 
                     // Checo se o texto de status foi passado pro parametro
                     if (textStatus != null){
@@ -1742,6 +1921,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 if (todosSucesso) {
                     inserirUltimaAtualizacao("CFAPROFI");
                 }
+                // Atualiza a notificacao
+                mLoad.bigTextStyle(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
+                mLoad.progress().value(0, 0, true).build();
+
                 // Checo se o texto de status foi passado pro parametro
                 if (textStatus != null){
                     ((Activity) context).runOnUiThread(new Runnable() {
@@ -1760,19 +1943,26 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             }
         }catch (Exception e){
             // Cria uma notificacao para ser manipulado
-            Load mLoad = PugNotification.with(context).load()
-                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
+            PugNotification.with(context)
+                    .load()
+                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR)
+                    .title(R.string.importar_dados_recebidos)
+                    .bigTextStyle(e.getMessage())
                     .smallIcon(R.mipmap.ic_launcher)
                     .largeIcon(R.mipmap.ic_launcher)
-                    .title(R.string.importar_dados_recebidos)
-                    .message(e.getMessage())
-                    .flags(Notification.DEFAULT_SOUND);
-            mLoad.simple().build();
+                    .flags(Notification.DEFAULT_ALL)
+                    .simple()
+                    .build();
         }
     }
 
 
     private void importarDadosTipoCliente(){
+        // Atualiza a notificacao
+        mLoad.bigTextStyle(context.getResources().getString(R.string.procurando_dados) + " Tipo Cliente");
+        mLoad.progress().value(0, 0, true).build();
+
+
         // Checo se o texto de status foi passado pro parametro
         if (textStatus != null){
             ((Activity) context).runOnUiThread(new Runnable() {
@@ -1790,6 +1980,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             if ((listaTipoClienteObject != null) && (listaTipoClienteObject.size() > 0)) {
                 // Vareavel para saber se todos os dados foram inseridos com sucesso
                 boolean todosSucesso = true;
+
+                // Atualiza a notificacao
+                mLoad.bigTextStyle(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
+                mLoad.progress().value(0, listaTipoClienteObject.size(), false).build();
 
                 // Checo se o texto de status foi passado pro parametro
                 if (textStatus != null){
@@ -1812,6 +2006,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 // Passa por toda a lista
                 for (SoapObject objetoIndividual : listaTipoClienteObject) {
                     final int finalControle = controle;
+
+                    // Atualiza a notificacao
+                    mLoad.bigTextStyle(context.getResources().getString(R.string.recebendo_dados_tipo_cliente) + " - " + (finalControle + 1) + "/" + listaTipoClienteObject.size());
+                    mLoad.progress().update(0, controle, listaTipoClienteObject.size(), false).build();
 
                     // Checo se o texto de status foi passado pro parametro
                     if (textStatus != null){
@@ -1875,6 +2073,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 if (todosSucesso) {
                     inserirUltimaAtualizacao("CFATPCLI");
                 }
+                // Atualiza a notificacao
+                mLoad.bigTextStyle(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
+                mLoad.progress().value(0, 0, true).build();
+
                 // Checo se o texto de status foi passado pro parametro
                 if (textStatus != null){
                     ((Activity) context).runOnUiThread(new Runnable() {
@@ -1893,19 +2095,25 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             }
         }catch (Exception e){
             // Cria uma notificacao para ser manipulado
-            Load mLoad = PugNotification.with(context).load()
-                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
+            PugNotification.with(context)
+                    .load()
+                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR)
+                    .title(R.string.importar_dados_recebidos)
+                    .bigTextStyle(e.getMessage())
                     .smallIcon(R.mipmap.ic_launcher)
                     .largeIcon(R.mipmap.ic_launcher)
-                    .title(R.string.importar_dados_recebidos)
-                    .message(e.getMessage())
-                    .flags(Notification.DEFAULT_SOUND);
-            mLoad.simple().build();
+                    .flags(Notification.DEFAULT_ALL)
+                    .simple()
+                    .build();
         }
     }
 
 
     private void importarDadosTipoCobranca(){
+        // Atualiza a notificacao
+        mLoad.bigTextStyle(context.getResources().getString(R.string.procurando_dados) + " Tipo de Cobrança");
+        mLoad.progress().value(0, 0, true).build();
+
         // Checo se o texto de status foi passado pro parametro
         if (textStatus != null){
             ((Activity) context).runOnUiThread(new Runnable() {
@@ -1923,6 +2131,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             if ((listaTipoCobrancaObject != null) && (listaTipoCobrancaObject.size() > 0)) {
                 // Vareavel para saber se todos os dados foram inseridos com sucesso
                 boolean todosSucesso = true;
+
+                // Atualiza a notificacao
+                mLoad.bigTextStyle(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
+                mLoad.progress().value(0, listaTipoCobrancaObject.size(), false).build();
 
                 // Checo se o texto de status foi passado pro parametro
                 if (textStatus != null){
@@ -1945,6 +2157,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 // Passa por toda a lista
                 for (SoapObject objetoIndividual : listaTipoCobrancaObject) {
                     final int finalControle = controle;
+
+                    // Atualiza a notificacao
+                    mLoad.bigTextStyle(context.getResources().getString(R.string.recebendo_dados_tipo_cobranca) + " - " + (finalControle + 1) + "/" + listaTipoCobrancaObject.size());
+                    mLoad.progress().update(0, controle, listaTipoCobrancaObject.size(), false).build();
 
                     // Checo se o texto de status foi passado pro parametro
                     if (textStatus != null){
@@ -1999,6 +2215,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 if (todosSucesso) {
                     inserirUltimaAtualizacao("CFATPCOB");
                 }
+                // Atualiza a notificacao
+                mLoad.bigTextStyle(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
+                mLoad.progress().value(0, 0, true).build();
+
                 // Checo se o texto de status foi passado pro parametro
                 if (textStatus != null){
                     ((Activity) context).runOnUiThread(new Runnable() {
@@ -2017,19 +2237,25 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             }
         }catch (Exception e){
             // Cria uma notificacao para ser manipulado
-            Load mLoad = PugNotification.with(context).load()
-                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
+            PugNotification.with(context)
+                    .load()
+                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR)
+                    .title(R.string.importar_dados_recebidos)
+                    .bigTextStyle(e.getMessage())
                     .smallIcon(R.mipmap.ic_launcher)
                     .largeIcon(R.mipmap.ic_launcher)
-                    .title(R.string.importar_dados_recebidos)
-                    .message(e.getMessage())
-                    .flags(Notification.DEFAULT_SOUND);
-            mLoad.simple().build();
+                    .flags(Notification.DEFAULT_ALL)
+                    .simple()
+                    .build();
         }
     }
 
 
     private void importarDadosEstado(){
+        // Atualiza a notificacao
+        mLoad.bigTextStyle(context.getResources().getString(R.string.procurando_dados) + " Estado");
+        mLoad.progress().value(0, 0, true).build();
+
         // Checo se o texto de status foi passado pro parametro
         if (textStatus != null){
             ((Activity) context).runOnUiThread(new Runnable() {
@@ -2047,6 +2273,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             if ((listaEstadoObject != null) && (listaEstadoObject.size() > 0)) {
                 // Vareavel para saber se todos os dados foram inseridos com sucesso
                 boolean todosSucesso = true;
+
+                // Atualiza a notificacao
+                mLoad.bigTextStyle(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
+                mLoad.progress().value(0, listaEstadoObject.size(), false).build();
 
                 // Checo se o texto de status foi passado pro parametro
                 if (textStatus != null){
@@ -2069,6 +2299,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 // Passa por toda a lista
                 for (SoapObject objetoIndividual : listaEstadoObject) {
                     final int finalControle = controle;
+
+                    // Atualiza a notificacao
+                    mLoad.bigTextStyle(context.getResources().getString(R.string.recebendo_dados_estado) + " - " + (finalControle + 1) + "/" + listaEstadoObject.size());
+                    mLoad.progress().update(0, controle, listaEstadoObject.size(), false).build();
 
                     // Checo se o texto de status foi passado pro parametro
                     if (textStatus != null){
@@ -2131,6 +2365,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 if (todosSucesso) {
                     inserirUltimaAtualizacao("CFAESTAD");
                 }
+                // Atualiza a notificacao
+                mLoad.bigTextStyle(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
+                mLoad.progress().value(0, 0, true).build();
+
                 // Checo se o texto de status foi passado pro parametro
                 if (textStatus != null){
                     ((Activity) context).runOnUiThread(new Runnable() {
@@ -2149,19 +2387,25 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             }
         }catch (Exception e){
             // Cria uma notificacao para ser manipulado
-            Load mLoad = PugNotification.with(context).load()
-                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
+            PugNotification.with(context)
+                    .load()
+                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR)
+                    .title(R.string.importar_dados_recebidos)
+                    .bigTextStyle(e.getMessage())
                     .smallIcon(R.mipmap.ic_launcher)
                     .largeIcon(R.mipmap.ic_launcher)
-                    .title(R.string.importar_dados_recebidos)
-                    .message(e.getMessage())
-                    .flags(Notification.DEFAULT_SOUND);
-            mLoad.simple().build();
+                    .flags(Notification.DEFAULT_ALL)
+                    .simple()
+                    .build();
         }
     }
 
 
     private void importarDadosCidade(){
+        // Atualiza a notificacao
+        mLoad.bigTextStyle(context.getResources().getString(R.string.procurando_dados) + " Cidade");
+        mLoad.progress().value(0, 0, true).build();
+
         // Checo se o texto de status foi passado pro parametro
         if (textStatus != null){
             ((Activity) context).runOnUiThread(new Runnable() {
@@ -2179,6 +2423,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             if ((listaCidadeObject != null) && (listaCidadeObject.size() > 0)) {
                 // Vareavel para saber se todos os dados foram inseridos com sucesso
                 boolean todosSucesso = true;
+
+                // Atualiza a notificacao
+                mLoad.bigTextStyle(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
+                mLoad.progress().value(0, listaCidadeObject.size(), false).build();
 
                 // Checo se o texto de status foi passado pro parametro
                 if (textStatus != null){
@@ -2201,6 +2449,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 // Passa por toda a lista
                 for (SoapObject objetoIndividual : listaCidadeObject) {
                     final int finalControle = controle;
+
+                    // Atualiza a notificacao
+                    mLoad.bigTextStyle(context.getResources().getString(R.string.recebendo_dados_cidade) + " - " + (finalControle + 1) + "/" + listaCidadeObject.size());
+                    mLoad.progress().update(0, controle, listaCidadeObject.size(), false).build();
 
                     // Checo se o texto de status foi passado pro parametro
                     if (textStatus != null){
@@ -2255,6 +2507,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 if (todosSucesso) {
                     inserirUltimaAtualizacao("CFACIDAD");
                 }
+                // Atualiza a notificacao
+                mLoad.bigTextStyle(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
+                mLoad.progress().value(0, 0, true).build();
+
                 // Checo se o texto de status foi passado pro parametro
                 if (textStatus != null){
                     ((Activity) context).runOnUiThread(new Runnable() {
@@ -2273,19 +2529,25 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             }
         }catch (Exception e){
             // Cria uma notificacao para ser manipulado
-            Load mLoad = PugNotification.with(context).load()
-                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
+            PugNotification.with(context)
+                    .load()
+                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR)
+                    .title(R.string.importar_dados_recebidos)
+                    .bigTextStyle(e.getMessage())
                     .smallIcon(R.mipmap.ic_launcher)
                     .largeIcon(R.mipmap.ic_launcher)
-                    .title(R.string.importar_dados_recebidos)
-                    .message(e.getMessage())
-                    .flags(Notification.DEFAULT_SOUND);
-            mLoad.simple().build();
+                    .flags(Notification.DEFAULT_ALL)
+                    .simple()
+                    .build();
         }
     }
 
 
     private void importarDadosClifo(){
+        // Atualiza a notificacao
+        mLoad.bigTextStyle(context.getResources().getString(R.string.procurando_dados) + " Cliente e Fornecedor");
+        mLoad.progress().value(0, 0, true).build();
+
         // Checo se o texto de status foi passado pro parametro
         if (textStatus != null){
             ((Activity) context).runOnUiThread(new Runnable() {
@@ -2303,6 +2565,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             if ((listaClifoObject != null) && (listaClifoObject.size() > 0)) {
                 // Vareavel para saber se todos os dados foram inseridos com sucesso
                 boolean todosSucesso = true;
+
+                // Atualiza a notificacao
+                mLoad.bigTextStyle(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
+                mLoad.progress().value(0, listaClifoObject.size(), false).build();
 
                 // Checo se o texto de status foi passado pro parametro
                 if (textStatus != null){
@@ -2325,6 +2591,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 // Passa por toda a lista
                 for (SoapObject objetoIndividual : listaClifoObject) {
                     final int finalControle = controle;
+
+                    // Atualiza a notificacao
+                    mLoad.bigTextStyle(context.getResources().getString(R.string.recebendo_dados_cliente) + " - " + (finalControle + 1) + "/" + listaClifoObject.size());
+                    mLoad.progress().update(0, controle, listaClifoObject.size(), false).build();
 
                     // Checo se o texto de status foi passado pro parametro
                     if (textStatus != null){
@@ -2540,6 +2810,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 if (todosSucesso) {
                     inserirUltimaAtualizacao("CFACLIFO");
                 }
+                // Atualiza a notificacao
+                mLoad.bigTextStyle(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
+                mLoad.progress().value(0, 0, true).build();
+
                 // Checo se o texto de status foi passado pro parametro
                 if (textStatus != null){
                     ((Activity) context).runOnUiThread(new Runnable() {
@@ -2559,19 +2833,25 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
         }catch (Exception e){
 
             // Cria uma notificacao para ser manipulado
-            Load mLoad = PugNotification.with(context).load()
-                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
+            PugNotification.with(context)
+                    .load()
+                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR)
+                    .title(R.string.importar_dados_recebidos)
+                    .bigTextStyle(e.getMessage())
                     .smallIcon(R.mipmap.ic_launcher)
                     .largeIcon(R.mipmap.ic_launcher)
-                    .title(R.string.importar_dados_recebidos)
-                    .message(e.getMessage())
-                    .flags(Notification.DEFAULT_SOUND);
-            mLoad.simple().build();
+                    .flags(Notification.DEFAULT_ALL)
+                    .simple()
+                    .build();
         }
     }
 
 
     private void importarDadosEndereco(){
+        // Atualiza a notificacao
+        mLoad.bigTextStyle(context.getResources().getString(R.string.procurando_dados) + " Endereço");
+        mLoad.progress().value(0, 0, true).build();
+
         // Checo se o texto de status foi passado pro parametro
         if (textStatus != null){
             ((Activity) context).runOnUiThread(new Runnable() {
@@ -2589,6 +2869,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             if ((listaEnderecoObject != null) && (listaEnderecoObject.size() > 0)) {
                 // Vareavel para saber se todos os dados foram inseridos com sucesso
                 boolean todosSucesso = true;
+
+                // Atualiza a notificacao
+                mLoad.bigTextStyle(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
+                mLoad.progress().value(0, listaEnderecoObject.size(), false).build();
 
                 // Checo se o texto de status foi passado pro parametro
                 if (textStatus != null){
@@ -2611,6 +2895,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 // Passa por toda a lista
                 for (SoapObject objetoIndividual : listaEnderecoObject) {
                     final int finalControle = controle;
+
+                    // Atualiza a notificacao
+                    mLoad.bigTextStyle(context.getResources().getString(R.string.recebendo_dados_endereco) + " - " + (finalControle + 1) + "/" + listaEnderecoObject.size());
+                    mLoad.progress().update(0, controle, listaEnderecoObject.size(), false).build();
 
                     // Checo se o texto de status foi passado pro parametro
                     if (textStatus != null){
@@ -2696,6 +2984,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 if (todosSucesso) {
                     inserirUltimaAtualizacao("CFAENDER");
                 }
+                // Atualiza a notificacao
+                mLoad.bigTextStyle(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
+                mLoad.progress().value(0, 0, true).build();
+
                 // Checo se o texto de status foi passado pro parametro
                 if (textStatus != null){
                     ((Activity) context).runOnUiThread(new Runnable() {
@@ -2714,24 +3006,31 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             }
         }catch (Exception e){
             // Cria uma notificacao para ser manipulado
-            Load mLoad = PugNotification.with(context).load()
-                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
+            PugNotification.with(context)
+                    .load()
+                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR)
+                    .title(R.string.importar_dados_recebidos)
+                    .bigTextStyle(e.getMessage())
                     .smallIcon(R.mipmap.ic_launcher)
                     .largeIcon(R.mipmap.ic_launcher)
-                    .title(R.string.importar_dados_recebidos)
-                    .message(e.getMessage())
-                    .flags(Notification.DEFAULT_SOUND);
-            mLoad.simple().build();
+                    .flags(Notification.DEFAULT_ALL)
+                    .simple()
+                    .build();
+
         }
     }
 
 
     private void importarDadosParametros(){
+        // Atualiza a notificacao
+        mLoad.bigTextStyle(context.getResources().getString(R.string.procurando_dados) + " Parâmetros");
+        mLoad.progress().value(0, 0, true).build();
+
         // Checo se o texto de status foi passado pro parametro
         if (textStatus != null){
             ((Activity) context).runOnUiThread(new Runnable() {
                 public void run() {
-                    textStatus.setText(context.getResources().getString(R.string.procurando_dados) + " Parametros");
+                    textStatus.setText(context.getResources().getString(R.string.procurando_dados) + " Parâmetros");
                 }
             });
         }
@@ -2744,6 +3043,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             if ((listaParametroObject != null) && (listaParametroObject.size() > 0)) {
                 // Vareavel para saber se todos os dados foram inseridos com sucesso
                 boolean todosSucesso = true;
+
+                // Atualiza a notificacao
+                mLoad.bigTextStyle(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
+                mLoad.progress().value(0, listaParametroObject.size(), false).build();
 
                 // Checo se o texto de status foi passado pro parametro
                 if (textStatus != null){
@@ -2766,6 +3069,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 // Passa por toda a lista
                 for (SoapObject objetoIndividual : listaParametroObject) {
                     final int finalControle = controle;
+
+                    // Atualiza a notificacao
+                    mLoad.bigTextStyle(context.getResources().getString(R.string.recebendo_dados_parametro) + " - " + (finalControle + 1) + "/" + listaParametroObject.size());
+                    mLoad.progress().update(0, controle, listaParametroObject.size(), false).build();
 
                     // Checo se o texto de status foi passado pro parametro
                     if (textStatus != null){
@@ -2898,6 +3205,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 if (todosSucesso) {
                     inserirUltimaAtualizacao("CFAPARAM");
                 }
+                // Atualiza a notificacao
+                mLoad.bigTextStyle(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
+                mLoad.progress().value(0, 0, true).build();
+
                 // Checo se o texto de status foi passado pro parametro
                 if (textStatus != null){
                     ((Activity) context).runOnUiThread(new Runnable() {
@@ -2916,19 +3227,24 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             }
         }catch (Exception e){
             // Cria uma notificacao para ser manipulado
-            Load mLoad = PugNotification.with(context).load()
-                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
+            PugNotification.with(context)
+                    .load()
+                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR)
+                    .title(R.string.importar_dados_recebidos)
+                    .bigTextStyle(e.getMessage())
                     .smallIcon(R.mipmap.ic_launcher)
                     .largeIcon(R.mipmap.ic_launcher)
-                    .title(R.string.importar_dados_recebidos)
-                    .message(e.getMessage())
-                    .flags(Notification.DEFAULT_SOUND);
-            mLoad.simple().build();
+                    .flags(Notification.DEFAULT_ALL)
+                    .simple()
+                    .build();
         }
     }
 
 
     private void importarDadosFotos(){
+        // Atualiza a notificacao
+        mLoad.bigTextStyle(context.getResources().getString(R.string.procurando_dados) + " Imagens");
+        mLoad.progress().value(0, 0, true).build();
         // Checo se o texto de status foi passado pro parametro
         if (textStatus != null){
             ((Activity) context).runOnUiThread(new Runnable() {
@@ -2951,6 +3267,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                     // Vareavel para saber se todos os dados foram inseridos com sucesso
                     boolean todosSucesso = true;
 
+                    // Atualiza a notificacao
+                    mLoad.bigTextStyle(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
+                    mLoad.progress().value(0, listaFotosObject.size(), false).build();
+
                     // Checo se o texto de status foi passado pro parametro
                     if (textStatus != null) {
                         ((Activity) context).runOnUiThread(new Runnable() {
@@ -2972,6 +3292,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                     // Passa por toda a lista
                     for (SoapObject objetoIndividual : listaFotosObject) {
                         final int finalControle = controle;
+
+                        // Atualiza a notificacao
+                        mLoad.bigTextStyle(context.getResources().getString(R.string.recebendo_dados_fotos) + " - " + (finalControle + 1) + "/" + listaFotosObject.size());
+                        mLoad.progress().update(0, controle, listaFotosObject.size(), false).build();
 
                         // Checo se o texto de status foi passado pro parametro
                         if (textStatus != null) {
@@ -3038,6 +3362,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                     if (todosSucesso) {
                         inserirUltimaAtualizacao("CFAFOTOS");
                     }
+                    // Atualiza a notificacao
+                    mLoad.bigTextStyle(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
+                    mLoad.progress().value(0, 0, true).build();
+
                     // Checo se o texto de status foi passado pro parametro
                     if (textStatus != null) {
                         ((Activity) context).runOnUiThread(new Runnable() {
@@ -3057,19 +3385,25 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             }
         }catch (Exception e){
             // Cria uma notificacao para ser manipulado
-            Load mLoad = PugNotification.with(context).load()
-                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
+            PugNotification.with(context)
+                    .load()
+                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR)
+                    .title(R.string.importar_dados_recebidos)
+                    .bigTextStyle(e.getMessage())
                     .smallIcon(R.mipmap.ic_launcher)
                     .largeIcon(R.mipmap.ic_launcher)
-                    .title(R.string.importar_dados_recebidos)
-                    .message(e.getMessage())
-                    .flags(Notification.DEFAULT_SOUND);
-            mLoad.simple().build();
+                    .flags(Notification.DEFAULT_ALL)
+                    .simple()
+                    .build();
         }
     }
 
 
     private void importarDadosPlanoPagamento(){
+        // Atualiza a notificacao
+        mLoad.bigTextStyle(context.getResources().getString(R.string.procurando_dados) + " Plano de Pagamento");
+        mLoad.progress().value(0, 0, true).build();
+
         // Checo se o texto de status foi passado pro parametro
         if (textStatus != null){
             ((Activity) context).runOnUiThread(new Runnable() {
@@ -3087,6 +3421,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             if ((listaPlanoObject != null) && (listaPlanoObject.size() > 0)) {
                 // Vareavel para saber se todos os dados foram inseridos com sucesso
                 boolean todosSucesso = true;
+
+                // Atualiza a notificacao
+                mLoad.bigTextStyle(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
+                mLoad.progress().value(0, listaPlanoObject.size(), false).build();
 
                 // Checo se o texto de status foi passado pro parametro
                 if (textStatus != null){
@@ -3109,6 +3447,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 // Passa por toda a lista
                 for (SoapObject objetoIndividual : listaPlanoObject) {
                     final int finalControle = controle;
+
+                    // Atualiza a notificacao
+                    mLoad.bigTextStyle(context.getResources().getString(R.string.recebendo_dados_plano_pagamento) + " - " + (finalControle + 1) + "/" + listaPlanoObject.size());
+                    mLoad.progress().update(0, controle, listaPlanoObject.size(), false).build();
 
                     // Checo se o texto de status foi passado pro parametro
                     if (textStatus != null){
@@ -3174,6 +3516,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 if (todosSucesso) {
                     inserirUltimaAtualizacao("AEAPLPGT");
                 }
+                // Atualiza a notificacao
+                mLoad.bigTextStyle(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
+                mLoad.progress().value(0, 0, true).build();
+
                 // Checo se o texto de status foi passado pro parametro
                 if (textStatus != null){
                     ((Activity) context).runOnUiThread(new Runnable() {
@@ -3192,171 +3538,25 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             }
         }catch (Exception e){
             // Cria uma notificacao para ser manipulado
-            Load mLoad = PugNotification.with(context).load()
-                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
+            PugNotification.with(context)
+                    .load()
+                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR)
+                    .title(R.string.importar_dados_recebidos)
+                    .bigTextStyle(e.getMessage())
                     .smallIcon(R.mipmap.ic_launcher)
                     .largeIcon(R.mipmap.ic_launcher)
-                    .title(R.string.importar_dados_recebidos)
-                    .message(e.getMessage())
-                    .flags(Notification.DEFAULT_SOUND);
-            mLoad.simple().build();
+                    .flags(Notification.DEFAULT_ALL)
+                    .simple()
+                    .build();
         }
     }
 
-    private boolean sincronizaUltimaAtualizacao(){
-        ArrayList<UltimaAtualizacaoBeans> listaUltimaAtualizacaoDispositivo = null;
-        //ArrayList<UltimaAtualizacaoBeans> listaUltimaAtualizacaoWebService = null;
-        try {
-            UltimaAtualizacaoRotinas ultimaAtualizacaoRotinas = new UltimaAtualizacaoRotinas(context);
-
-            listaUltimaAtualizacaoDispositivo = ultimaAtualizacaoRotinas.listaUltimaAtualizacaoTabelas(null);
-
-            WSSisinfoWebservice webserviceSisInfo;
-
-            if (listaUltimaAtualizacaoDispositivo == null) {
-                return true;
-            } else {
-                webserviceSisInfo = new WSSisinfoWebservice(context);
-
-                Vector<SoapObject> listaAtualizacaoObject = webserviceSisInfo.executarSelectWebservice(null, WSSisinfoWebservice.FUNCTION_SELECT_ULTIMA_ATUALIZACAO, null);
-
-                // Checa se retornou alguma coisa
-                if (listaAtualizacaoObject != null && listaAtualizacaoObject.size() > 0) {
-
-                    // Instancia a lista do webservice
-                    //listaUltimaAtualizacaoWebService = new ArrayList<UltimaAtualizacaoBeans>();
-
-                    // Passa por toda a lista
-                    for (SoapObject objetoIndividual : listaAtualizacaoObject) {
-
-                        final SoapObject objeto;
-
-                        if (objetoIndividual.hasProperty("return")) {
-                            objeto = (SoapObject) objetoIndividual.getProperty("return");
-
-                        } else {
-                            objeto = objetoIndividual;
-                        }
-                        if (objeto.hasProperty("tabela")) {
-                            // Passa por todas as datas do dispositivo
-                            for (UltimaAtualizacaoBeans ultima : listaUltimaAtualizacaoDispositivo) {
-
-                                // Checa se a tabela tem na lista do dispositivo
-                                if (ultima.getTabela().equalsIgnoreCase(objeto.getProperty("tabela").toString())){
-
-                                    // Checa se tem salvo no banco local do dispositivo o id da ultima atualizacao
-                                    if ((objeto.hasProperty("idUltimaAtualizacao")) && (ultima.getIdUltimaAtualizacao() == 0)){
-
-                                        ultima.setIdUltimaAtualizacao(Integer.parseInt(objeto.getProperty("idUltimaAtualizacao").toString()));
-
-                                        ContentValues dataAtualizacao = new ContentValues();
-                                        dataAtualizacao.put("ID_ULTIMA_ATUALIZACAO_DISPOSITIVO", Integer.parseInt(objeto.getProperty("idUltimaAtualizacao").toString()));
-
-                                        UltimaAtualizacaoSql ultimaAtualizacaoSql = new UltimaAtualizacaoSql(context);
-                                        // Salva o id da ultima atualizacao que veio do webservice
-                                        ultimaAtualizacaoSql.updateFast(dataAtualizacao, "TABELA = '" + ultima.getTabela() + "'");
-                                    }
-
-                                    if (objeto.hasProperty("dataUltimaAtualizacao")){
-                                        // Checa se o webservice eh diferente das datas do dispositivo local
-                                        if (!ultima.getDataUltimaAtualizacao().equalsIgnoreCase(objeto.getProperty("dataUltimaAtualizacao").toString())){
-
-                                            PropertyInfo propertyDataUltimaAtualizacao = new PropertyInfo();
-                                            propertyDataUltimaAtualizacao.setName("dadosUltimaAtualizacao");
-                                            propertyDataUltimaAtualizacao.setValue(ultima);
-                                            propertyDataUltimaAtualizacao.setType(ultima.getClass());
-
-                                            // Cria uma lista para salvar todas as propriedades
-                                            List<PropertyInfo> listaPropertyInfos = new ArrayList<PropertyInfo>();
-
-                                            // Adiciona a propriedade na lista
-                                            listaPropertyInfos.add(propertyDataUltimaAtualizacao);
-
-                                            webserviceSisInfo = new WSSisinfoWebservice(context);
-
-                                            // Executa o webservice
-                                            RetornoWebServiceBeans retorno = webserviceSisInfo.executarWebservice(listaPropertyInfos, WSSisinfoWebservice.FUNCTION_INSERT_ULTIMA_ATUALIZACAO);
-
-                                            // Checa se retornou alguma coisa
-                                            if (retorno != null){
-                                                // Checa se o retorno teve insercao com sucesso
-                                                if (retorno.getCodigoRetorno() == 100){
-
-                                                    // Checa se tem o id no banco local
-                                                    if (ultima.getIdUltimaAtualizacao() <= 0) {
-                                                        ContentValues dataAtualizacao = new ContentValues();
-                                                        dataAtualizacao.put("ID_ULTIMA_ATUALIZACAO_DISPOSITIVO", Integer.parseInt(retorno.getExtra().toString()));
-
-                                                        UltimaAtualizacaoSql ultimaAtualizacaoSql = new UltimaAtualizacaoSql(context);
-                                                        // Salva o id da ultima atualizacao que veio do webservice
-                                                        ultimaAtualizacaoSql.updateFast(dataAtualizacao, "TABELA = '" + ultima.getTabela() + "'");
-                                                    }
-                                                }
-                                            }
-                                            break;
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    return true;
-                } else {
-                    // Passa por todas as datas do dispositivo
-                    for (UltimaAtualizacaoBeans ultima : listaUltimaAtualizacaoDispositivo) {
-
-                        PropertyInfo propertyDataUltimaAtualizacao = new PropertyInfo();
-                        propertyDataUltimaAtualizacao.setName("dadosUltimaAtualizacao");
-                        propertyDataUltimaAtualizacao.setValue(ultima);
-                        propertyDataUltimaAtualizacao.setType(ultima.getClass());
-
-                        // Cria uma lista para salvar todas as propriedades
-                        List<PropertyInfo> listaPropertyInfos = new ArrayList<PropertyInfo>();
-
-                        // Adiciona a propriedade na lista
-                        listaPropertyInfos.add(propertyDataUltimaAtualizacao);
-
-                        webserviceSisInfo = new WSSisinfoWebservice(context);
-
-                        // Executa o webservice
-                        RetornoWebServiceBeans retorno = webserviceSisInfo.executarWebservice(listaPropertyInfos, WSSisinfoWebservice.FUNCTION_INSERT_ULTIMA_ATUALIZACAO);
-
-                        // Checa se retornou alguma coisa
-                        if (retorno != null){
-                            // Checa se o retorno teve insercao com sucesso
-                            if (retorno.getCodigoRetorno() == 100){
-
-                                // Checa se tem o id no banco local
-                                if (ultima.getIdUltimaAtualizacao() <= 0) {
-
-                                    ContentValues dataAtualizacao = new ContentValues();
-                                    dataAtualizacao.put("ID_ULTIMA_ATUALIZACAO_DISPOSITIVO", Integer.parseInt(retorno.getExtra().toString()));
-
-                                    UltimaAtualizacaoSql ultimaAtualizacaoSql = new UltimaAtualizacaoSql(context);
-                                    // Salva o id da ultima atualizacao que veio do webservice
-                                    ultimaAtualizacaoSql.updateFast(dataAtualizacao, "TABELA = '" + ultima.getTabela() + "'");
-                                }
-                            }
-                        }
-                    }
-                    return true;
-                }
-            }
-        } catch (Exception e){
-            // Cria uma notificacao para ser manipulado
-            Load mLoad = PugNotification.with(context).load()
-                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
-                    .smallIcon(R.mipmap.ic_launcher)
-                    .largeIcon(R.mipmap.ic_launcher)
-                    .title(R.string.importar_dados_recebidos)
-                    .message(e.getMessage())
-                    .flags(Notification.DEFAULT_SOUND);
-            mLoad.simple().build();
-        }
-        return false;
-    }
 
     private void importarDadosClasseProdutos(){
+        // Atualiza a notificacao
+        mLoad.bigTextStyle(context.getResources().getString(R.string.procurando_dados) + " Classe de Produto");
+        mLoad.progress().value(0, 0, true).build();
+
         // Checo se o texto de status foi passado pro parametro
         if (textStatus != null){
             ((Activity) context).runOnUiThread(new Runnable() {
@@ -3374,6 +3574,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             if ((listaClasseObject != null) && (listaClasseObject.size() > 0)) {
                 // Vareavel para saber se todos os dados foram inseridos com sucesso
                 boolean todosSucesso = true;
+
+                // Atualiza a notificacao
+                mLoad.bigTextStyle(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
+                mLoad.progress().value(0, listaClasseObject.size(), false).build();
 
                 // Checo se o texto de status foi passado pro parametro
                 if (textStatus != null){
@@ -3396,6 +3600,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 // Passa por toda a lista
                 for (SoapObject objetoIndividual : listaClasseObject) {
                     final int finalControle = controle;
+
+                    // Atualiza a notificacao
+                    mLoad.bigTextStyle(context.getResources().getString(R.string.recebendo_dados_classe_produto) + " - " + (finalControle + 1) + "/" + listaClasseObject.size());
+                    mLoad.progress().update(0, controle, listaClasseObject.size(), false).build();
 
                     // Checo se o texto de status foi passado pro parametro
                     if (textStatus != null){
@@ -3449,6 +3657,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 if (todosSucesso) {
                     inserirUltimaAtualizacao("AEACLASE");
                 }
+                // Atualiza a notificacao
+                mLoad.bigTextStyle(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
+                mLoad.progress().value(0, 0, true).build();
+
                 // Checo se o texto de status foi passado pro parametro
                 if (textStatus != null){
                     ((Activity) context).runOnUiThread(new Runnable() {
@@ -3467,19 +3679,25 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             }
         }catch (Exception e){
             // Cria uma notificacao para ser manipulado
-            Load mLoad = PugNotification.with(context).load()
-                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
+            PugNotification.with(context)
+                    .load()
+                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR)
+                    .title(R.string.importar_dados_recebidos)
+                    .bigTextStyle(e.getMessage())
                     .smallIcon(R.mipmap.ic_launcher)
                     .largeIcon(R.mipmap.ic_launcher)
-                    .title(R.string.importar_dados_recebidos)
-                    .message(e.getMessage())
-                    .flags(Notification.DEFAULT_SOUND);
-            mLoad.simple().build();
+                    .flags(Notification.DEFAULT_ALL)
+                    .simple()
+                    .build();
         }
     }
 
 
     private void importarDadosUnidadeVenda(){
+        // Atualiza a notificacao
+        mLoad.bigTextStyle(context.getResources().getString(R.string.procurando_dados) + " Unidade de Venda");
+        mLoad.progress().value(0, 0, true).build();
+
         // Checo se o texto de status foi passado pro parametro
         if (textStatus != null){
             ((Activity) context).runOnUiThread(new Runnable() {
@@ -3497,6 +3715,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             if ((listaUnidadeVendaObject != null) && (listaUnidadeVendaObject.size() > 0)) {
                 // Vareavel para saber se todos os dados foram inseridos com sucesso
                 boolean todosSucesso = true;
+
+                // Atualiza a notificacao
+                mLoad.bigTextStyle(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
+                mLoad.progress().value(0, listaUnidadeVendaObject.size(), false).build();
 
                 // Checo se o texto de status foi passado pro parametro
                 if (textStatus != null){
@@ -3519,6 +3741,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 // Passa por toda a lista
                 for (SoapObject objetoIndividual : listaUnidadeVendaObject) {
                     final int finalControle = controle;
+
+                    // Atualiza a notificacao
+                    mLoad.bigTextStyle(context.getResources().getString(R.string.recebendo_dados_unidade_venda) + " - " + (finalControle + 1) + "/" + listaUnidadeVendaObject.size());
+                    mLoad.progress().update(0, controle, listaUnidadeVendaObject.size(), false).build();
 
                     // Checo se o texto de status foi passado pro parametro
                     if (textStatus != null){
@@ -3573,6 +3799,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 if (todosSucesso) {
                     inserirUltimaAtualizacao("AEAUNVEN");
                 }
+                // Atualiza a notificacao
+                mLoad.bigTextStyle(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
+                mLoad.progress().value(0, 0, true).build();
+
                 // Checo se o texto de status foi passado pro parametro
                 if (textStatus != null){
                     ((Activity) context).runOnUiThread(new Runnable() {
@@ -3591,18 +3821,24 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             }
         }catch (Exception e){
             // Cria uma notificacao para ser manipulado
-            Load mLoad = PugNotification.with(context).load()
-                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
+            PugNotification.with(context)
+                    .load()
+                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR)
+                    .title(R.string.importar_dados_recebidos)
+                    .bigTextStyle(e.getMessage())
                     .smallIcon(R.mipmap.ic_launcher)
                     .largeIcon(R.mipmap.ic_launcher)
-                    .title(R.string.importar_dados_recebidos)
-                    .message(e.getMessage())
-                    .flags(Notification.DEFAULT_SOUND);
-            mLoad.simple().build();
+                    .flags(Notification.DEFAULT_ALL)
+                    .simple()
+                    .build();
         }
     }
 
     private void importarDadosGrade(){
+        // Atualiza a notificacao
+        mLoad.bigTextStyle(context.getResources().getString(R.string.procurando_dados) + " Grade de Produto");
+        mLoad.progress().value(0, 0, true).build();
+
         // Checo se o texto de status foi passado pro parametro
         if (textStatus != null){
             ((Activity) context).runOnUiThread(new Runnable() {
@@ -3620,6 +3856,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             if ((listaGradeObject != null) && (listaGradeObject.size() > 0)) {
                 // Vareavel para saber se todos os dados foram inseridos com sucesso
                 boolean todosSucesso = true;
+
+                // Atualiza a notificacao
+                mLoad.bigTextStyle(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
+                mLoad.progress().value(0, listaGradeObject.size(), false).build();
 
                 // Checo se o texto de status foi passado pro parametro
                 if (textStatus != null){
@@ -3642,6 +3882,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 // Passa por toda a lista
                 for (SoapObject objetoIndividual : listaGradeObject) {
                     final int finalControle = controle;
+
+                    // Atualiza a notificacao
+                    mLoad.bigTextStyle(context.getResources().getString(R.string.recebendo_dados_grade) + " - " + (finalControle + 1) + "/" + listaGradeObject.size());
+                    mLoad.progress().update(0, controle, listaGradeObject.size(), false).build();
 
                     // Checo se o texto de status foi passado pro parametro
                     if (textStatus != null){
@@ -3695,6 +3939,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 if (todosSucesso) {
                     inserirUltimaAtualizacao("AEAGRADE");
                 }
+                // Atualiza a notificacao
+                mLoad.bigTextStyle(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
+                mLoad.progress().value(0, 0, true).build();
+
                 // Checo se o texto de status foi passado pro parametro
                 if (textStatus != null){
                     ((Activity) context).runOnUiThread(new Runnable() {
@@ -3713,18 +3961,24 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             }
         }catch (Exception e){
             // Cria uma notificacao para ser manipulado
-            Load mLoad = PugNotification.with(context).load()
-                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
+            PugNotification.with(context)
+                    .load()
+                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR)
+                    .title(R.string.importar_dados_recebidos)
+                    .bigTextStyle(e.getMessage())
                     .smallIcon(R.mipmap.ic_launcher)
                     .largeIcon(R.mipmap.ic_launcher)
-                    .title(R.string.importar_dados_recebidos)
-                    .message(e.getMessage())
-                    .flags(Notification.DEFAULT_SOUND);
-            mLoad.simple().build();
+                    .flags(Notification.DEFAULT_ALL)
+                    .simple()
+                    .build();
         }
     }
 
     private void importarDadosMarca(){
+        // Atualiza a notificacao
+        mLoad.bigTextStyle(context.getResources().getString(R.string.procurando_dados) + " Marca");
+        mLoad.progress().value(0, 0, true).build();
+
         // Checo se o texto de status foi passado pro parametro
         if (textStatus != null){
             ((Activity) context).runOnUiThread(new Runnable() {
@@ -3742,6 +3996,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             if ((listaMarcaObject != null) && (listaMarcaObject.size() > 0)) {
                 // Vareavel para saber se todos os dados foram inseridos com sucesso
                 boolean todosSucesso = true;
+
+                // Atualiza a notificacao
+                mLoad.bigTextStyle(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
+                mLoad.progress().value(0, listaMarcaObject.size(), false).build();
 
                 // Checo se o texto de status foi passado pro parametro
                 if (textStatus != null){
@@ -3764,6 +4022,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 // Passa por toda a lista
                 for (SoapObject objetoIndividual : listaMarcaObject) {
                     final int finalControle = controle;
+
+                    // Atualiza a notificacao
+                    mLoad.bigTextStyle(context.getResources().getString(R.string.recebendo_dados_marca) + " - " + (finalControle + 1) + "/" + listaMarcaObject.size());
+                    mLoad.progress().update(0, controle, listaMarcaObject.size(), false).build();
 
                     // Checo se o texto de status foi passado pro parametro
                     if (textStatus != null){
@@ -3816,6 +4078,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 if (todosSucesso) {
                     inserirUltimaAtualizacao("AEAMARCA");
                 }
+                // Atualiza a notificacao
+                mLoad.bigTextStyle(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
+                mLoad.progress().value(0, 0, true).build();
+
                 // Checo se o texto de status foi passado pro parametro
                 if (textStatus != null){
                     ((Activity) context).runOnUiThread(new Runnable() {
@@ -3834,18 +4100,24 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             }
         }catch (Exception e){
             // Cria uma notificacao para ser manipulado
-            Load mLoad = PugNotification.with(context).load()
-                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
+            PugNotification.with(context)
+                    .load()
+                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR)
+                    .title(R.string.importar_dados_recebidos)
+                    .bigTextStyle(e.getMessage())
                     .smallIcon(R.mipmap.ic_launcher)
                     .largeIcon(R.mipmap.ic_launcher)
-                    .title(R.string.importar_dados_recebidos)
-                    .message(e.getMessage())
-                    .flags(Notification.DEFAULT_SOUND);
-            mLoad.simple().build();
+                    .flags(Notification.DEFAULT_ALL)
+                    .simple()
+                    .build();
         }
     }
 
     private void importarDadosCodigoSituacaoTributaria(){
+        // Atualiza a notificacao
+        mLoad.bigTextStyle(context.getResources().getString(R.string.procurando_dados) + " Situação Tributária");
+        mLoad.progress().value(0, 0, true).build();
+
         // Checo se o texto de status foi passado pro parametro
         if (textStatus != null){
             ((Activity) context).runOnUiThread(new Runnable() {
@@ -3863,6 +4135,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             if ((listaSituacaoTributariaObject != null) && (listaSituacaoTributariaObject.size() > 0)) {
                 // Vareavel para saber se todos os dados foram inseridos com sucesso
                 boolean todosSucesso = true;
+
+                // Atualiza a notificacao
+                mLoad.bigTextStyle(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
+                mLoad.progress().value(0, listaSituacaoTributariaObject.size(), false).build();
 
                 // Checo se o texto de status foi passado pro parametro
                 if (textStatus != null){
@@ -3885,6 +4161,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 // Passa por toda a lista
                 for (SoapObject objetoIndividual : listaSituacaoTributariaObject) {
                     final int finalControle = controle;
+
+                    // Atualiza a notificacao
+                    mLoad.bigTextStyle(context.getResources().getString(R.string.recebendo_dados_situacao_tributaria) + " - " + (finalControle + 1) + "/" + listaSituacaoTributariaObject.size());
+                    mLoad.progress().update(0, controle, listaSituacaoTributariaObject.size(), false).build();
 
                     // Checo se o texto de status foi passado pro parametro
                     if (textStatus != null){
@@ -3940,6 +4220,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 if (todosSucesso) {
                     inserirUltimaAtualizacao("AEACODST");
                 }
+                // Atualiza a notificacao
+                mLoad.bigTextStyle(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
+                mLoad.progress().value(0, 0, true).build();
+
                 // Checo se o texto de status foi passado pro parametro
                 if (textStatus != null){
                     ((Activity) context).runOnUiThread(new Runnable() {
@@ -3958,19 +4242,25 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             }
         }catch (Exception e){
             // Cria uma notificacao para ser manipulado
-            Load mLoad = PugNotification.with(context).load()
-                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
+            PugNotification.with(context)
+                    .load()
+                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR)
+                    .title(R.string.importar_dados_recebidos)
+                    .bigTextStyle(e.getMessage())
                     .smallIcon(R.mipmap.ic_launcher)
                     .largeIcon(R.mipmap.ic_launcher)
-                    .title(R.string.importar_dados_recebidos)
-                    .message(e.getMessage())
-                    .flags(Notification.DEFAULT_SOUND);
-            mLoad.simple().build();
+                    .flags(Notification.DEFAULT_ALL)
+                    .simple()
+                    .build();
         }
     }
 
 
     private void importarDadosProduto(){
+        // Atualiza a notificacao
+        mLoad.bigTextStyle(context.getResources().getString(R.string.procurando_dados) + " Produto");
+        mLoad.progress().value(0, 0, true).build();
+
         // Checo se o texto de status foi passado pro parametro
         if (textStatus != null){
             ((Activity) context).runOnUiThread(new Runnable() {
@@ -3988,6 +4278,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             if ((listaProdutoObject != null) && (listaProdutoObject.size() > 0)) {
                 // Vareavel para saber se todos os dados foram inseridos com sucesso
                 boolean todosSucesso = true;
+
+                // Atualiza a notificacao
+                mLoad.bigTextStyle(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
+                mLoad.progress().value(0, listaProdutoObject.size(), false).build();
 
                 // Checo se o texto de status foi passado pro parametro
                 if (textStatus != null){
@@ -4010,6 +4304,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 // Passa por toda a lista
                 for (SoapObject objetoIndividual : listaProdutoObject) {
                     final int finalControle = controle;
+
+                    // Atualiza a notificacao
+                    mLoad.bigTextStyle(context.getResources().getString(R.string.recebendo_dados_produto) + " - " + (finalControle + 1) + "/" + listaProdutoObject.size());
+                    mLoad.progress().update(0, controle, listaProdutoObject.size(), false).build();
 
                     // Checo se o texto de status foi passado pro parametro
                     if (textStatus != null){
@@ -4092,6 +4390,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 if (todosSucesso) {
                     inserirUltimaAtualizacao("AEAPRODU");
                 }
+                // Atualiza a notificacao
+                mLoad.bigTextStyle(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
+                mLoad.progress().value(0, 0, true).build();
+
                 // Checo se o texto de status foi passado pro parametro
                 if (textStatus != null){
                     ((Activity) context).runOnUiThread(new Runnable() {
@@ -4110,18 +4412,24 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             }
         }catch (Exception e){
             // Cria uma notificacao para ser manipulado
-            Load mLoad = PugNotification.with(context).load()
-                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
+            PugNotification.with(context)
+                    .load()
+                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR)
+                    .title(R.string.importar_dados_recebidos)
+                    .bigTextStyle(e.getMessage())
                     .smallIcon(R.mipmap.ic_launcher)
                     .largeIcon(R.mipmap.ic_launcher)
-                    .title(R.string.importar_dados_recebidos)
-                    .message(e.getMessage())
-                    .flags(Notification.DEFAULT_SOUND);
-            mLoad.simple().build();
+                    .flags(Notification.DEFAULT_ALL)
+                    .simple()
+                    .build();
         }
     }
 
     private void importarDadosEmbalagem(){
+        // Atualiza a notificacao
+        mLoad.bigTextStyle(context.getResources().getString(R.string.procurando_dados) + " Embalagem de Produto");
+        mLoad.progress().value(0, 0, true).build();
+
         // Checo se o texto de status foi passado pro parametro
         if (textStatus != null){
             ((Activity) context).runOnUiThread(new Runnable() {
@@ -4139,6 +4447,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             if ((listaEmbalagemObject != null) && (listaEmbalagemObject.size() > 0)) {
                 // Vareavel para saber se todos os dados foram inseridos com sucesso
                 boolean todosSucesso = true;
+
+                // Atualiza a notificacao
+                mLoad.bigTextStyle(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
+                mLoad.progress().value(0, listaEmbalagemObject.size(), false).build();
 
                 // Checo se o texto de status foi passado pro parametro
                 if (textStatus != null){
@@ -4161,6 +4473,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 // Passa por toda a lista
                 for (SoapObject objetoIndividual : listaEmbalagemObject) {
                     final int finalControle = controle;
+
+                    // Atualiza a notificacao
+                    mLoad.bigTextStyle(context.getResources().getString(R.string.recebendo_dados_embalagem) + " - " + (finalControle + 1) + "/" + listaEmbalagemObject.size());
+                    mLoad.progress().update(0, controle, listaEmbalagemObject.size(), false).build();
 
                     // Checo se o texto de status foi passado pro parametro
                     if (textStatus != null){
@@ -4240,6 +4556,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 if (todosSucesso) {
                     inserirUltimaAtualizacao("AEAEMBAL");
                 }
+                // Atualiza a notificacao
+                mLoad.bigTextStyle(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
+                mLoad.progress().value(0, 0, true).build();
+
                 // Checo se o texto de status foi passado pro parametro
                 if (textStatus != null){
                     ((Activity) context).runOnUiThread(new Runnable() {
@@ -4258,19 +4578,25 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             }
         }catch (Exception e){
             // Cria uma notificacao para ser manipulado
-            Load mLoad = PugNotification.with(context).load()
-                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
+            PugNotification.with(context)
+                    .load()
+                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR)
+                    .title(R.string.importar_dados_recebidos)
+                    .bigTextStyle(e.getMessage())
                     .smallIcon(R.mipmap.ic_launcher)
                     .largeIcon(R.mipmap.ic_launcher)
-                    .title(R.string.importar_dados_recebidos)
-                    .message(e.getMessage())
-                    .flags(Notification.DEFAULT_SOUND);
-            mLoad.simple().build();
+                    .flags(Notification.DEFAULT_ALL)
+                    .simple()
+                    .build();
         }
     }
 
 
     private void importarDadosProdutosPorLoja(){
+        // Atualiza a notificacao
+        mLoad.bigTextStyle(context.getResources().getString(R.string.procurando_dados) + " Produto por Loja");
+        mLoad.progress().value(0, 0, true).build();
+
         // Checo se o texto de status foi passado pro parametro
         if (textStatus != null){
             ((Activity) context).runOnUiThread(new Runnable() {
@@ -4288,6 +4614,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             if ((listaProdutoLojaObject != null) && (listaProdutoLojaObject.size() > 0)) {
                 // Vareavel para saber se todos os dados foram inseridos com sucesso
                 boolean todosSucesso = true;
+
+                // Atualiza a notificacao
+                mLoad.bigTextStyle(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
+                mLoad.progress().value(0, listaProdutoLojaObject.size(), false).build();
 
                 // Checo se o texto de status foi passado pro parametro
                 if (textStatus != null){
@@ -4310,6 +4640,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 // Passa por toda a lista
                 for (SoapObject objetoIndividual : listaProdutoLojaObject) {
                     final int finalControle = controle;
+
+                    // Atualiza a notificacao
+                    mLoad.bigTextStyle(context.getResources().getString(R.string.recebendo_dados_produto_loja) + " - " + (finalControle + 1) + "/" + listaProdutoLojaObject.size());
+                    mLoad.progress().update(0, controle, listaProdutoLojaObject.size(), false).build();
 
                     // Checo se o texto de status foi passado pro parametro
                     if (textStatus != null){
@@ -4406,6 +4740,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 if (todosSucesso) {
                     inserirUltimaAtualizacao("AEAPLOJA");
                 }
+                // Atualiza a notificacao
+                mLoad.bigTextStyle(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
+                mLoad.progress().value(0, 0, true).build();
+
                 // Checo se o texto de status foi passado pro parametro
                 if (textStatus != null){
                     ((Activity) context).runOnUiThread(new Runnable() {
@@ -4424,19 +4762,25 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             }
         }catch (Exception e){
             // Cria uma notificacao para ser manipulado
-            Load mLoad = PugNotification.with(context).load()
-                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
+            PugNotification.with(context)
+                    .load()
+                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR)
+                    .title(R.string.importar_dados_recebidos)
+                    .bigTextStyle(e.getMessage())
                     .smallIcon(R.mipmap.ic_launcher)
                     .largeIcon(R.mipmap.ic_launcher)
-                    .title(R.string.importar_dados_recebidos)
-                    .message(e.getMessage())
-                    .flags(Notification.DEFAULT_SOUND);
-            mLoad.simple().build();
+                    .flags(Notification.DEFAULT_ALL)
+                    .simple()
+                    .build();
         }
     }
 
 
     private void importarDadosLocalEstoque(){
+        // Atualiza a notificacao
+        mLoad.bigTextStyle(context.getResources().getString(R.string.procurando_dados) + " Local de Estoque");
+        mLoad.progress().value(0, 0, true).build();
+
         // Checo se o texto de status foi passado pro parametro
         if (textStatus != null){
             ((Activity) context).runOnUiThread(new Runnable() {
@@ -4454,6 +4798,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             if ((listaLocalEstoqueObject != null) && (listaLocalEstoqueObject.size() > 0)) {
                 // Vareavel para saber se todos os dados foram inseridos com sucesso
                 boolean todosSucesso = true;
+
+                // Atualiza a notificacao
+                mLoad.bigTextStyle(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
+                mLoad.progress().value(0, listaLocalEstoqueObject.size(), false).build();
 
                 // Checo se o texto de status foi passado pro parametro
                 if (textStatus != null){
@@ -4476,6 +4824,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 // Passa por toda a lista
                 for (SoapObject objetoIndividual : listaLocalEstoqueObject) {
                     final int finalControle = controle;
+
+                    // Atualiza a notificacao
+                    mLoad.bigTextStyle(context.getResources().getString(R.string.recebendo_dados_local_estoque) + " - " + (finalControle + 1) + "/" + listaLocalEstoqueObject.size());
+                    mLoad.progress().update(0, controle, listaLocalEstoqueObject.size(), false).build();
 
                     // Checo se o texto de status foi passado pro parametro
                     if (textStatus != null){
@@ -4533,6 +4885,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 if (todosSucesso) {
                     inserirUltimaAtualizacao("AEALOCES");
                 }
+                // Atualiza a notificacao
+                mLoad.bigTextStyle(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
+                mLoad.progress().value(0, 0, true).build();
+
                 // Checo se o texto de status foi passado pro parametro
                 if (textStatus != null){
                     ((Activity) context).runOnUiThread(new Runnable() {
@@ -4551,19 +4907,25 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             }
         }catch (Exception e){
             // Cria uma notificacao para ser manipulado
-            Load mLoad = PugNotification.with(context).load()
-                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
+            PugNotification.with(context)
+                    .load()
+                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR)
+                    .title(R.string.importar_dados_recebidos)
+                    .bigTextStyle(e.getMessage())
                     .smallIcon(R.mipmap.ic_launcher)
                     .largeIcon(R.mipmap.ic_launcher)
-                    .title(R.string.importar_dados_recebidos)
-                    .message(e.getMessage())
-                    .flags(Notification.DEFAULT_SOUND);
-            mLoad.simple().build();
+                    .flags(Notification.DEFAULT_ALL)
+                    .simple()
+                    .build();
         }
     }
 
 
     private void importarDadosEstoque(){
+        // Atualiza a notificacao
+        mLoad.bigTextStyle(context.getResources().getString(R.string.procurando_dados) + " Estoque de Produto");
+        mLoad.progress().value(0, 0, true).build();
+
         // Checo se o texto de status foi passado pro parametro
         if (textStatus != null){
             ((Activity) context).runOnUiThread(new Runnable() {
@@ -4581,6 +4943,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             if ((listaEstoqueObject != null) && (listaEstoqueObject.size() > 0)) {
                 // Vareavel para saber se todos os dados foram inseridos com sucesso
                 boolean todosSucesso = true;
+
+                // Atualiza a notificacao
+                mLoad.bigTextStyle(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
+                mLoad.progress().value(0, listaEstoqueObject.size(), false).build();
 
                 // Checo se o texto de status foi passado pro parametro
                 if (textStatus != null){
@@ -4603,6 +4969,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 // Passa por toda a lista
                 for (SoapObject objetoIndividual : listaEstoqueObject) {
                     final int finalControle = controle;
+
+                    // Atualiza a notificacao
+                    mLoad.bigTextStyle(context.getResources().getString(R.string.recebendo_dados_estoque) + " - " + (finalControle + 1) + "/" + listaEstoqueObject.size());
+                    mLoad.progress().update(0, controle, listaEstoqueObject.size(), false).build();
 
                     // Checo se o texto de status foi passado pro parametro
                     if (textStatus != null){
@@ -4662,6 +5032,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 if (todosSucesso) {
                     inserirUltimaAtualizacao("AEAESTOQ");
                 }
+                // Atualiza a notificacao
+                mLoad.bigTextStyle(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
+                mLoad.progress().value(0, 0, true).build();
+
                 // Checo se o texto de status foi passado pro parametro
                 if (textStatus != null){
                     ((Activity) context).runOnUiThread(new Runnable() {
@@ -4680,19 +5054,25 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             }
         }catch (Exception e){
             // Cria uma notificacao para ser manipulado
-            Load mLoad = PugNotification.with(context).load()
-                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
+            PugNotification.with(context)
+                    .load()
+                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR)
+                    .title(R.string.importar_dados_recebidos)
+                    .bigTextStyle(e.getMessage())
                     .smallIcon(R.mipmap.ic_launcher)
                     .largeIcon(R.mipmap.ic_launcher)
-                    .title(R.string.importar_dados_recebidos)
-                    .message(e.getMessage())
-                    .flags(Notification.DEFAULT_SOUND);
-            mLoad.simple().build();
+                    .flags(Notification.DEFAULT_ALL)
+                    .simple()
+                    .build();
         }
     }
 
 
     private void importarDadosOrcamento(){
+        // Atualiza a notificacao
+        mLoad.bigTextStyle(context.getResources().getString(R.string.procurando_dados) + " Orçamento");
+        mLoad.progress().value(0, 0, true).build();
+
         // Checo se o texto de status foi passado pro parametro
         if (textStatus != null){
             ((Activity) context).runOnUiThread(new Runnable() {
@@ -4710,6 +5090,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             if ((listaOrcamentoObject != null) && (listaOrcamentoObject.size() > 0)) {
                 // Vareavel para saber se todos os dados foram inseridos com sucesso
                 boolean todosSucesso = true;
+
+                // Atualiza a notificacao
+                mLoad.bigTextStyle(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
+                mLoad.progress().value(0, listaOrcamentoObject.size(), false).build();
 
                 // Checo se o texto de status foi passado pro parametro
                 if (textStatus != null){
@@ -4732,6 +5116,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 // Passa por toda a lista
                 for (SoapObject objetoIndividual : listaOrcamentoObject) {
                     final int finalControle = controle;
+
+                    // Atualiza a notificacao
+                    mLoad.bigTextStyle(context.getResources().getString(R.string.recebendo_dados_orcamento) + " - " + (finalControle + 1) + "/" + listaOrcamentoObject.size());
+                    mLoad.progress().update(0, controle, listaOrcamentoObject.size(), false).build();
 
                     // Checo se o texto de status foi passado pro parametro
                     if (textStatus != null){
@@ -4896,6 +5284,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 if (todosSucesso) {
                     inserirUltimaAtualizacao("AEAORCAM");
                 }
+                // Atualiza a notificacao
+                mLoad.bigTextStyle(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
+                mLoad.progress().value(0, 0, true).build();
+
                 // Checo se o texto de status foi passado pro parametro
                 if (textStatus != null){
                     ((Activity) context).runOnUiThread(new Runnable() {
@@ -4914,19 +5306,25 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             }
         }catch (Exception e){
             // Cria uma notificacao para ser manipulado
-            Load mLoad = PugNotification.with(context).load()
-                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
+            PugNotification.with(context)
+                    .load()
+                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR)
+                    .title(R.string.importar_dados_recebidos)
+                    .bigTextStyle(e.getMessage())
                     .smallIcon(R.mipmap.ic_launcher)
                     .largeIcon(R.mipmap.ic_launcher)
-                    .title(R.string.importar_dados_recebidos)
-                    .message(e.getMessage())
-                    .flags(Notification.DEFAULT_SOUND);
-            mLoad.simple().build();
+                    .flags(Notification.DEFAULT_ALL)
+                    .simple()
+                    .build();
         }
     }
 
 
     private void importarDadosItemOrcamento(){
+        // Atualiza a notificacao
+        mLoad.bigTextStyle(context.getResources().getString(R.string.procurando_dados) + " Item de Orçamento");
+        mLoad.progress().value(0, 0, true).build();
+
         // Checo se o texto de status foi passado pro parametro
         if (textStatus != null){
             ((Activity) context).runOnUiThread(new Runnable() {
@@ -4944,6 +5342,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             if ((listaItemOrcamentoObject != null) && (listaItemOrcamentoObject.size() > 0)) {
                 // Vareavel para saber se todos os dados foram inseridos com sucesso
                 boolean todosSucesso = true;
+
+                // Atualiza a notificacao
+                mLoad.bigTextStyle(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
+                mLoad.progress().value(0, listaItemOrcamentoObject.size(), false).build();
 
                 // Checo se o texto de status foi passado pro parametro
                 if (textStatus != null){
@@ -4966,6 +5368,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 // Passa por toda a lista
                 for (SoapObject objetoIndividual : listaItemOrcamentoObject) {
                     final int finalControle = controle;
+
+                    // Atualiza a notificacao
+                    mLoad.bigTextStyle(context.getResources().getString(R.string.recebendo_dados_item_orcamento) + " - " + (finalControle + 1) + "/" + listaItemOrcamentoObject.size());
+                    mLoad.progress().update(0, controle, listaItemOrcamentoObject.size(), false).build();
 
                     // Checo se o texto de status foi passado pro parametro
                     if (textStatus != null){
@@ -5126,6 +5532,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 if (todosSucesso) {
                     inserirUltimaAtualizacao("AEAITORC");
                 }
+                // Atualiza a notificacao
+                mLoad.bigTextStyle(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
+                mLoad.progress().value(0, 0, true).build();
+
                 // Checo se o texto de status foi passado pro parametro
                 if (textStatus != null){
                     ((Activity) context).runOnUiThread(new Runnable() {
@@ -5144,19 +5554,25 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             }
         }catch (Exception e){
             // Cria uma notificacao para ser manipulado
-            Load mLoad = PugNotification.with(context).load()
-                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
+            PugNotification.with(context)
+                    .load()
+                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR)
+                    .title(R.string.importar_dados_recebidos)
+                    .bigTextStyle(e.getMessage())
                     .smallIcon(R.mipmap.ic_launcher)
                     .largeIcon(R.mipmap.ic_launcher)
-                    .title(R.string.importar_dados_recebidos)
-                    .message(e.getMessage())
-                    .flags(Notification.DEFAULT_SOUND);
-            mLoad.simple().build();
+                    .flags(Notification.DEFAULT_ALL)
+                    .simple()
+                    .build();;
         }
     }
 
 
     private void importarDadosPercentual(){
+        // Atualiza a notificacao
+        mLoad.bigTextStyle(context.getResources().getString(R.string.procurando_dados) + " Percentual");
+        mLoad.progress().value(0, 0, true).build();
+
         // Checo se o texto de status foi passado pro parametro
         if (textStatus != null){
             ((Activity) context).runOnUiThread(new Runnable() {
@@ -5174,6 +5590,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             if ((listaPercentualObject != null) && (listaPercentualObject.size() > 0)) {
                 // Vareavel para saber se todos os dados foram inseridos com sucesso
                 boolean todosSucesso = true;
+
+                // Atualiza a notificacao
+                mLoad.bigTextStyle(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
+                mLoad.progress().value(0, listaPercentualObject.size(), false).build();
 
                 // Checo se o texto de status foi passado pro parametro
                 if (textStatus != null){
@@ -5196,6 +5616,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 // Passa por toda a lista
                 for (SoapObject objetoIndividual : listaPercentualObject) {
                     final int finalControle = controle;
+
+                    // Atualiza a notificacao
+                    mLoad.bigTextStyle(context.getResources().getString(R.string.recebendo_dados_percentual) + " - " + (finalControle + 1) + "/" + listaPercentualObject.size());
+                    mLoad.progress().update(0, controle, listaPercentualObject.size(), false).build();
 
                     // Checo se o texto de status foi passado pro parametro
                     if (textStatus != null){
@@ -5312,6 +5736,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 if (todosSucesso) {
                     inserirUltimaAtualizacao("AEAPERCE");
                 }
+                // Atualiza a notificacao
+                mLoad.bigTextStyle(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
+                mLoad.progress().value(0, 0, true).build();
+
                 // Checo se o texto de status foi passado pro parametro
                 if (textStatus != null){
                     ((Activity) context).runOnUiThread(new Runnable() {
@@ -5330,19 +5758,25 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             }
         }catch (Exception e){
             // Cria uma notificacao para ser manipulado
-            Load mLoad = PugNotification.with(context).load()
-                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
+            PugNotification.with(context)
+                    .load()
+                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR)
+                    .title(R.string.importar_dados_recebidos)
+                    .bigTextStyle(e.getMessage())
                     .smallIcon(R.mipmap.ic_launcher)
                     .largeIcon(R.mipmap.ic_launcher)
-                    .title(R.string.importar_dados_recebidos)
-                    .message(e.getMessage())
-                    .flags(Notification.DEFAULT_SOUND);
-            mLoad.simple().build();
+                    .flags(Notification.DEFAULT_ALL)
+                    .simple()
+                    .build();;
         }
     }
 
 
     private void importarDadosFator(){
+        // Atualiza a notificacao
+        mLoad.bigTextStyle(context.getResources().getString(R.string.procurando_dados) + " Fator");
+        mLoad.progress().value(0, 0, true).build();
+
         // Checo se o texto de status foi passado pro parametro
         if (textStatus != null){
             ((Activity) context).runOnUiThread(new Runnable() {
@@ -5360,6 +5794,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             if ((listaFatorObject != null) && (listaFatorObject.size() > 0)) {
                 // Vareavel para saber se todos os dados foram inseridos com sucesso
                 boolean todosSucesso = true;
+
+                // Atualiza a notificacao
+                mLoad.bigTextStyle(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
+                mLoad.progress().value(0, listaFatorObject.size(), false).build();
 
                 // Checo se o texto de status foi passado pro parametro
                 if (textStatus != null){
@@ -5382,6 +5820,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 // Passa por toda a lista
                 for (SoapObject objetoIndividual : listaFatorObject) {
                     final int finalControle = controle;
+
+                    // Atualiza a notificacao
+                    mLoad.bigTextStyle(context.getResources().getString(R.string.recebendo_dados_fator) + " - " + (finalControle + 1) + "/" + listaFatorObject.size());
+                    mLoad.progress().update(0, controle, listaFatorObject.size(), false).build();
 
                     // Checo se o texto de status foi passado pro parametro
                     if (textStatus != null){
@@ -5452,6 +5894,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 if (todosSucesso) {
                     inserirUltimaAtualizacao("AEAFATOR");
                 }
+                // Atualiza a notificacao
+                mLoad.bigTextStyle(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
+                mLoad.progress().value(0, 0, true).build();
+
                 // Checo se o texto de status foi passado pro parametro
                 if (textStatus != null){
                     ((Activity) context).runOnUiThread(new Runnable() {
@@ -5470,19 +5916,25 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             }
         }catch (Exception e){
             // Cria uma notificacao para ser manipulado
-            Load mLoad = PugNotification.with(context).load()
-                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
+            PugNotification.with(context)
+                    .load()
+                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR)
+                    .title(R.string.importar_dados_recebidos)
+                    .bigTextStyle(e.getMessage())
                     .smallIcon(R.mipmap.ic_launcher)
                     .largeIcon(R.mipmap.ic_launcher)
-                    .title(R.string.importar_dados_recebidos)
-                    .message(e.getMessage())
-                    .flags(Notification.DEFAULT_SOUND);
-            mLoad.simple().build();
+                    .flags(Notification.DEFAULT_ALL)
+                    .simple()
+                    .build();
         }
     }
 
 
     private void importarDadosProdutoRecomendado(){
+        // Atualiza a notificacao
+        mLoad.bigTextStyle(context.getResources().getString(R.string.procurando_dados) + " Produto Recomendado");
+        mLoad.progress().value(0, 0, true).build();
+
         // Checo se o texto de status foi passado pro parametro
         if (textStatus != null){
             ((Activity) context).runOnUiThread(new Runnable() {
@@ -5500,6 +5952,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             if ((listaProdutoRecomendadoObject != null) && (listaProdutoRecomendadoObject.size() > 0)) {
                 // Vareavel para saber se todos os dados foram inseridos com sucesso
                 boolean todosSucesso = true;
+
+                // Atualiza a notificacao
+                mLoad.bigTextStyle(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
+                mLoad.progress().value(0, listaProdutoRecomendadoObject.size(), false).build();
 
                 // Checo se o texto de status foi passado pro parametro
                 if (textStatus != null){
@@ -5522,6 +5978,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 // Passa por toda a lista
                 for (SoapObject objetoIndividual : listaProdutoRecomendadoObject) {
                     final int finalControle = controle;
+
+                    // Atualiza a notificacao
+                    mLoad.bigTextStyle(context.getResources().getString(R.string.recebendo_dados_recomendado) + " - " + (finalControle + 1) + "/" + listaProdutoRecomendadoObject.size());
+                    mLoad.progress().update(0, controle, listaProdutoRecomendadoObject.size(), false).build();
 
                     // Checo se o texto de status foi passado pro parametro
                     if (textStatus != null){
@@ -5594,6 +6054,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 if (todosSucesso) {
                     inserirUltimaAtualizacao("AEAPRREC");
                 }
+                // Atualiza a notificacao
+                mLoad.bigTextStyle(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
+                mLoad.progress().value(0, 0, true).build();
+
                 // Checo se o texto de status foi passado pro parametro
                 if (textStatus != null){
                     ((Activity) context).runOnUiThread(new Runnable() {
@@ -5612,19 +6076,25 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             }
         }catch (Exception e){
             // Cria uma notificacao para ser manipulado
-            Load mLoad = PugNotification.with(context).load()
-                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
+            PugNotification.with(context)
+                    .load()
+                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR)
+                    .title(R.string.importar_dados_recebidos)
+                    .bigTextStyle(e.getMessage())
                     .smallIcon(R.mipmap.ic_launcher)
                     .largeIcon(R.mipmap.ic_launcher)
-                    .title(R.string.importar_dados_recebidos)
-                    .message(e.getMessage())
-                    .flags(Notification.DEFAULT_SOUND);
-            mLoad.simple().build();
+                    .flags(Notification.DEFAULT_ALL)
+                    .simple()
+                    .build();
         }
     }
 
 
     private void importarDadosParcela(){
+        // Atualiza a notificacao
+        mLoad.bigTextStyle(context.getResources().getString(R.string.procurando_dados) + " Títulos à Receber/Pagar");
+        mLoad.progress().value(0, 0, true).build();
+
         // Checo se o texto de status foi passado pro parametro
         if (textStatus != null){
             ((Activity) context).runOnUiThread(new Runnable() {
@@ -5661,6 +6131,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 // Vareavel para saber se todos os dados foram inseridos com sucesso
                 boolean todosSucesso = true;
 
+                // Atualiza a notificacao
+                mLoad.bigTextStyle(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
+                mLoad.progress().value(0, listaParcelaObject.size(), false).build();
+
                 // Checo se o texto de status foi passado pro parametro
                 if (textStatus != null){
                     ((Activity) context).runOnUiThread(new Runnable() {
@@ -5682,6 +6156,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 // Passa por toda a lista
                 for (SoapObject objetoIndividual : listaParcelaObject) {
                     final int finalControle = controle;
+
+                    // Atualiza a notificacao
+                    mLoad.bigTextStyle(context.getResources().getString(R.string.recebendo_dados_parcela) + " - " + (finalControle + 1) + "/" + listaParcelaObject.size());
+                    mLoad.progress().update(0, controle, listaParcelaObject.size(), false).build();
 
                     // Checo se o texto de status foi passado pro parametro
                     if (textStatus != null){
@@ -5781,6 +6259,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 if (todosSucesso) {
                     inserirUltimaAtualizacao("RPAPARCE");
                 }
+                // Atualiza a notificacao
+                mLoad.bigTextStyle(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
+                mLoad.progress().value(0, 0, true).build();
+
                 // Checo se o texto de status foi passado pro parametro
                 if (textStatus != null){
                     ((Activity) context).runOnUiThread(new Runnable() {
@@ -5799,14 +6281,16 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             }
         }catch (Exception e){
             // Cria uma notificacao para ser manipulado
-            Load mLoad = PugNotification.with(context).load()
-                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
+            PugNotification.with(context)
+                    .load()
+                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR)
+                    .title(R.string.importar_dados_recebidos)
+                    .bigTextStyle(e.getMessage())
                     .smallIcon(R.mipmap.ic_launcher)
                     .largeIcon(R.mipmap.ic_launcher)
-                    .title(R.string.importar_dados_recebidos)
-                    .message(e.getMessage())
-                    .flags(Notification.DEFAULT_SOUND);
-            mLoad.simple().build();
+                    .flags(Notification.DEFAULT_ALL)
+                    .simple()
+                    .build();
         }
     }
 

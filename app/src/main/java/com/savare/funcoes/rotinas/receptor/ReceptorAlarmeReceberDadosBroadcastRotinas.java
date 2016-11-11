@@ -1,6 +1,7 @@
 package com.savare.funcoes.rotinas.receptor;
 
 import com.savare.funcoes.FuncoesPersonalizadas;
+import com.savare.funcoes.rotinas.UsuarioRotinas;
 import com.savare.funcoes.rotinas.async.ReceberDadosFtpAsyncRotinas;
 import com.savare.funcoes.rotinas.async.ReceberDadosWebserviceAsyncRotinas;
 
@@ -17,11 +18,19 @@ public class ReceptorAlarmeReceberDadosBroadcastRotinas extends BroadcastReceive
 
 		FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
 
+		UsuarioRotinas usuarioRotinas = new UsuarioRotinas(context);
+
+		if (usuarioRotinas.quantidadeHorasUltimoRecebimento() > 3){
+			funcoes.setValorXml("RecebendoDados", "N");
+		}
 
 		if (!funcoes.getValorXml("RecebendoDados").equalsIgnoreCase("S")) {
 
 			// Checa se o tipo de conexao eh por webservice
 			if (funcoes.getValorXml("ModoConexao").equalsIgnoreCase("W")){
+
+				ReceberDadosWebserviceAsyncRotinas receberDadosWebservice = new ReceberDadosWebserviceAsyncRotinas(context);
+				receberDadosWebservice.execute();
 
 			} else {
 				// Marca nos parametro internos que a aplicacao que esta recebendo os dados

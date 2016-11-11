@@ -72,7 +72,7 @@ public class DialogProdutoPrecoCustom extends Dialog {
 	private void recuperaCampos(){
 		textUnitarioTabela = (TextView) findViewById(R.id.layout_dialog_produto_preco_custom_text_unitario_tabela);
 		textEmbalagem = (TextView) findViewById(R.id.layout_dialog_produto_preco_custom_text_embalagem);
-		textQuantidade = (EditText) findViewById(R.id.layout_dialog_produto_preco_custom_text_quantidade);
+		textQuantidade = (TextView) findViewById(R.id.layout_dialog_produto_preco_custom_text_quantidade);
 		editUnitarioVenda = (EditText) findViewById(R.id.layout_dialog_produto_preco_custom_edit_unitario_Liquido_venda);
 		editTotal = (EditText) findViewById(R.id.layout_dialog_produto_preco_custom_edit_total);
 		buttonZero = (Button) findViewById(R.id.layout_dialog_produto_preco_custom_button_zero);

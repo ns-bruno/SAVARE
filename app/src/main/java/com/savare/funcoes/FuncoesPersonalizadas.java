@@ -584,7 +584,7 @@ public class FuncoesPersonalizadas {
 				// Adiciona mais alguns segundo para executar o alarme depois de alguns segundo que esta Activity for abaerta
 				tempoInicio.add(Calendar.SECOND, 10);
 				
-				long intervalo = 600 * 1000; // 10 Minutos
+				long intervalo = 3600 * 1000; // 60 Minutos
 				
 				AlarmManager alarmeReceberOrcamento = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 				alarmeReceberOrcamento.setRepeating(AlarmManager.RTC_WAKEUP, tempoInicio.getTimeInMillis(), intervalo, alarmIntent);
@@ -1169,7 +1169,7 @@ public class FuncoesPersonalizadas {
 
 						// Cria uma notificacao para ser manipulado
 						Load mLoad = PugNotification.with(context).load()
-								.identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
+								.identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR)
 								.smallIcon(R.mipmap.ic_launcher)
 								.largeIcon(R.mipmap.ic_launcher)
 								.title(R.string.versao_savare_desatualizada)
@@ -1182,7 +1182,7 @@ public class FuncoesPersonalizadas {
 
 						// Cria uma notificacao para ser manipulado
 						Load mLoad = PugNotification.with(context).load()
-								.identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
+								.identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR)
 								.smallIcon(R.mipmap.ic_launcher)
 								.largeIcon(R.mipmap.ic_launcher)
 								.title(R.string.versao_savare_desatualizada)
@@ -1201,7 +1201,7 @@ public class FuncoesPersonalizadas {
 		}catch (Exception e){
 			// Cria uma notificacao para ser manipulado
 			Load mLoad = PugNotification.with(context).load()
-					.identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
+					.identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR)
 					.smallIcon(R.mipmap.ic_launcher)
 					.largeIcon(R.mipmap.ic_launcher)
 					.title(R.string.versao_savare_desatualizada)

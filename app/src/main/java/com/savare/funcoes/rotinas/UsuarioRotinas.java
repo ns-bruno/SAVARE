@@ -204,4 +204,24 @@ public class UsuarioRotinas extends Rotinas {
         }
         return qtdHoras;
     }
+
+
+    public int quantidadeHorasUltimoRecebimento(){
+        int qtdHoras = -1;
+        // Instancia a classe para manipular a tabela no banco de dados
+        UsuarioSQL usuarioSQL = new UsuarioSQL(context);
+
+        String sql = ("SELECT (((STRFTIME('%s','now') - STRFTIME('%s',USUARIO_USUA.DT_ULTIMO_RECEBIMENTO))/60)/60) AS HORAS FROM USUARIO_USUA");
+
+        Cursor cursor = usuarioSQL.sqlSelect(sql);
+
+        // Checa se retornou algum registro
+        if( (cursor != null) && (cursor.getCount() > 0) ){
+            // Move para o primeiro registro
+            cursor.moveToNext();
+            // Pega o valor salvo no cursor
+            qtdHoras = cursor.getInt(cursor.getColumnIndex("HORAS"));
+        }
+        return qtdHoras;
+    }
 }

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:fab="http://schemas.android.com/apk/res-auto"
-    xmlns:app="http://schemas.android.com/tools"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
@@ -24,7 +24,7 @@
                 android:background="?attr/colorPrimary"
                 android:elevation="4dp"
                 android:minHeight="?attr/actionBarSize"
-                app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+                tools:popupTheme="@style/ThemeOverlay.AppCompat.Light"
                 android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"/>
 
         </LinearLayout>
@@ -39,7 +39,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:id="@+id/activity_inicio_md_material_listview"
-                app:column_count="1" />
+                tools:column_count="1" />
 
             <com.github.clans.fab.FloatingActionMenu
                 android:id="@+id/activity_inicio_md_menu_float"
@@ -54,8 +54,8 @@
                 fab:menu_colorPressed="@color/colorPrimary"
                 fab:menu_labels_ellipsize="end"
                 fab:menu_labels_singleLine="true"
-                app:fab_showAnimation="@anim/fab_scale_up"
-                app:fab_hideAnimation="@anim/fab_scale_down">
+                tools:fab_showAnimation="@anim/fab_scale_up"
+                tools:fab_hideAnimation="@anim/fab_scale_down">
 
                 <com.github.clans.fab.FloatingActionButton
                     android:id="@+id/activity_inicio_md_menu_item_novo_orcamento"

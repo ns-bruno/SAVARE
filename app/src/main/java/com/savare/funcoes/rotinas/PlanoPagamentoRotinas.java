@@ -55,6 +55,7 @@ public class PlanoPagamentoRotinas extends Rotinas {
 				planoPadrao.setIdPlanoPagamento(0);
 				planoPadrao.setCodigoPlanoPagamento(0);
 				planoPadrao.setDescricaoPlanoPagamento("Selecione um Plano de Pagamento");
+				planoPadrao.setVistaPrazo("9");
 
 				// Adiciona o plano em uma lista
 				listaPlanoPagamento.add(planoPadrao);

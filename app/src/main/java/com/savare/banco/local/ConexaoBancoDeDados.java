@@ -94,9 +94,8 @@ public class ConexaoBancoDeDados extends SQLiteOpenHelper {
 	
 	@Override
 	public void onUpgrade(SQLiteDatabase bd, int versaoAntiga, int versaoNova) {
+        Log.i("SAVARE", "upgrade database from " + versaoAntiga + " to " + versaoNova);
 		try {
-			Log.i("SAVARE", "upgrade database from " + versaoAntiga + " to " + versaoNova);
-
 			for( String sqlFile : AssetUtils.list(SQL_DIR, this.context.getAssets())) {
 				if ( sqlFile.startsWith(UPGRADEFILE_PREFIX)) {
 					int fileVersion = Integer.parseInt(sqlFile.substring( UPGRADEFILE_PREFIX.length(),  sqlFile.length() - UPGRADEFILE_SUFFIX.length()));
@@ -123,8 +122,13 @@ public class ConexaoBancoDeDados extends SQLiteOpenHelper {
 		//onCreate(bd);
 	} // Fim onUpgrade
 
-	
-	
+
+	@Override
+	public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+		super.onDowngrade(db, oldVersion, newVersion);
+		Log.i("SAVARE", "upgrade database from " + oldVersion + " to " + newVersion);
+	}
+
 	/**
 	 * Funcao responsavel por abrir o banco de dados
 	 * 
@@ -137,12 +141,12 @@ public class ConexaoBancoDeDados extends SQLiteOpenHelper {
 		//File s = context.getExternalFilesDir(null);
 
 		if (bancoSavare == null || !bancoSavare.isOpen()) {
-			bancoSavare = SQLiteDatabase.openDatabase(bancoDados, null, SQLiteDatabase.ENABLE_WRITE_AHEAD_LOGGING|
+			/*bancoSavare = SQLiteDatabase.openDatabase(bancoDados, null, SQLiteDatabase.ENABLE_WRITE_AHEAD_LOGGING|
 																		SQLiteDatabase.NO_LOCALIZED_COLLATORS|
 																		SQLiteDatabase.CREATE_IF_NECESSARY|
-																		SQLiteDatabase.OPEN_READWRITE);
+																		SQLiteDatabase.OPEN_READWRITE);*/
 			
-			//bancoSavare = getWritableDatabase();
+			bancoSavare = getWritableDatabase();
 			//bancoSavare = SQLiteDatabase.openDatabase(bancoDados, null, 0);
 			// bancoSavare = getWritableDatabase();
 		}
@@ -194,9 +198,9 @@ public class ConexaoBancoDeDados extends SQLiteOpenHelper {
 		TelephonyManager telephonyManager = (TelephonyManager) context.getSystemService(context.TELEPHONY_SERVICE);
 
 		if (telephonyManager != null) {
-			listaInsertPadrao.add("INSERT OR ABORT INTO ULTIMA_ATUALIZACAO_DISPOSITIVO (ID_DISPOSITIVO, TABELA, DATA_ULTIMA_ATUALIZACAO) VALUES ('" + telephonyManager.getDeviceId() + "', " + "'AEAORCAM', (DATETIME('NOW', 'localtime')));");
-			listaInsertPadrao.add("INSERT OR ABORT INTO ULTIMA_ATUALIZACAO_DISPOSITIVO (ID_DISPOSITIVO, TABELA, DATA_ULTIMA_ATUALIZACAO) VALUES ('" + telephonyManager.getDeviceId() + "', " + "'AEAITORC', (DATETIME('NOW', 'localtime')));");
-			listaInsertPadrao.add("INSERT OR ABORT INTO ULTIMA_ATUALIZACAO_DISPOSITIVO (ID_DISPOSITIVO, TABELA, DATA_ULTIMA_ATUALIZACAO) VALUES ('" + telephonyManager.getDeviceId() + "', " + "'RPAPARCE_BAIXA', (DATE('NOW', 'localtime')));");
+			listaInsertPadrao.add("INSERT OR REPLACE INTO ULTIMA_ATUALIZACAO_DISPOSITIVO (ID_DISPOSITIVO, TABELA, DATA_ULTIMA_ATUALIZACAO) VALUES ('" + telephonyManager.getDeviceId() + "', " + "'AEAORCAM', (DATETIME('NOW', 'localtime')));");
+			listaInsertPadrao.add("INSERT OR REPLACE INTO ULTIMA_ATUALIZACAO_DISPOSITIVO (ID_DISPOSITIVO, TABELA, DATA_ULTIMA_ATUALIZACAO) VALUES ('" + telephonyManager.getDeviceId() + "', " + "'AEAITORC', (DATETIME('NOW', 'localtime')));");
+			listaInsertPadrao.add("INSERT OR REPLACE INTO ULTIMA_ATUALIZACAO_DISPOSITIVO (ID_DISPOSITIVO, TABELA, DATA_ULTIMA_ATUALIZACAO) VALUES ('" + telephonyManager.getDeviceId() + "', " + "'RPAPARCE_BAIXA', (DATE('NOW', 'localtime')));");
 		}
 	}
 }

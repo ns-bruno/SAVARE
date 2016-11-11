@@ -13,7 +13,6 @@ import android.os.Bundle;
 import android.util.Log;
 
 import com.savare.funcoes.FuncoesPersonalizadas;
-import com.savare.funcoes.rotinas.sincronizacao.EnviarOrcamentoSyncAdapterRotinas;
 
 /**
  * Created by Bruno Nogueira Silva on 17/09/2015.
@@ -42,8 +41,8 @@ class SavareSyncAdapter extends AbstractThreadedSyncAdapter {
         Log.i(TAG, "### onPerformSync - SavareSyncAdapter");
 
         try {
-            EnviarOrcamentoSyncAdapterRotinas enviarOrcamento = new EnviarOrcamentoSyncAdapterRotinas(getContext());
-            enviarOrcamento.execute();
+            //EnviarOrcamentoSyncAdapterRotinas enviarOrcamento = new EnviarOrcamentoSyncAdapterRotinas(getContext());
+            //enviarOrcamento.execute();
 
         }catch (Exception e){
             FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(getContext());

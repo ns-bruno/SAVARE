@@ -48,6 +48,10 @@ public class RegistroChaveUsuarioMDActivity extends IntroActivity {
         setButtonCtaVisible(getStartedEnabled);
         setButtonCtaTintMode(BUTTON_CTA_TINT_MODE_TEXT);
 
+        FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(RegistroChaveUsuarioMDActivity.this);
+
+        funcoes.bloqueiaOrientacaoTela();
+
         addSlide(new SimpleSlide.Builder()
                 .title(R.string.primeiros_passos_iniciar_savare)
                 .description(R.string.primeiro_passo)
@@ -109,7 +113,7 @@ public class RegistroChaveUsuarioMDActivity extends IntroActivity {
                 .build();
         addSlide(receberDadosSlide);
 
-        FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(RegistroChaveUsuarioMDActivity.this);
+
         funcoes.setValorXml("ChaveUsuario", ConfiguracoesInternas.CHAVE_USUARIO_PUBLICO_WEBSERVICE);
     }
 
@@ -143,5 +147,13 @@ public class RegistroChaveUsuarioMDActivity extends IntroActivity {
             // This is important, otherwise the retornoEscanerCodigoBarra will not be passed to the fragment
             super.onActivityResult(requestCode, resultCode, data);
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(RegistroChaveUsuarioMDActivity.this);
+        funcoes.desbloqueiaOrientacaoTela();
     }
 }
