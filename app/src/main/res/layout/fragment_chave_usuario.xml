@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_gravity="center"
+    android:gravity="center"
+    android:padding="10dp">
+
+    <TextView
+        android:text="@string/registrar_voce_como_usuario"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/fragment_chave_usuario_text_titulo"
+        android:gravity="center_horizontal"
+        android:textAppearance="@style/TextAppearance.AppCompat.Display1"
+        android:paddingBottom="30dp"
+        android:textColor="@color/white"/>
+
+    <TextView
+        android:text="@string/orientacao_registrar_usuario"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/fragment_chave_usuario_text_mensagem"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:paddingBottom="30dp"
+        android:gravity="center_horizontal"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:textColor="@color/white"
+        />
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:hint="@string/digite_chave"
+        android:textColor="@color/branco"
+        android:id="@+id/fragment_chave_usuario_editText_digitar_chave"
+        android:visibility="gone"
+        android:textColorHint="@color/branco"/>
+
+    <Button
+        android:text="@string/tenho_chave_licenca"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/fragment_chave_usuario_buttonTenhoChave"
+        android:background="@color/branco"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        android:textColor="@color/md_red_A400"
+        android:padding="15dp"/>
+
+    <Button
+        android:text="@string/digitar_chave"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/fragment_chave_usuario_buttonDigitarChave"
+        android:background="@color/transparent"
+        android:textColor="@color/branco"/>
+</LinearLayout>

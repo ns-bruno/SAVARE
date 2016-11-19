@@ -997,14 +997,14 @@ public class ListaOrcamentoPedidoActivity extends Activity implements OnNavigati
 				
 				FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(ListaOrcamentoPedidoActivity.this);
 				
-				textTipoOrcamentoPedido.setText(orcamentoRotinas.quantidadeListaOrcamento("'"+tipoOrcamentoPedido+"'", cidade, periodo) +
-											    " Pedido(s) | Tabela: " + orcamentoRotinas.totalListaOrcamentoBruto("'"+tipoOrcamentoPedido+"'", cidade, periodo) +
-											    " - Venda: " + orcamentoRotinas.totalListaOrcamentoLiquido("'"+tipoOrcamentoPedido+"'", cidade, periodo) +
+				textTipoOrcamentoPedido.setText(orcamentoRotinas.quantidadeListaOrcamento(new String[]{tipoOrcamentoPedido}, cidade, periodo) +
+											    " Pedido(s) | Tabela: " + orcamentoRotinas.totalListaOrcamentoBruto(new String[]{tipoOrcamentoPedido}, cidade, periodo) +
+											    " - Venda: " + orcamentoRotinas.totalListaOrcamentoLiquido(new String[]{tipoOrcamentoPedido}, cidade, periodo) +
 											    " | Dif.: " + funcoes.arredondarValor(totalDiferenca));
 				
 			} else {
-				textTipoOrcamentoPedido.setText(orcamentoRotinas.quantidadeListaOrcamento("'"+tipoOrcamentoPedido+"'", cidade, periodo) +
-					    					    " Pedido(s) | " + orcamentoRotinas.totalListaOrcamentoLiquido("'"+tipoOrcamentoPedido+"'", cidade, periodo));
+				textTipoOrcamentoPedido.setText(orcamentoRotinas.quantidadeListaOrcamento(new String[]{tipoOrcamentoPedido}, cidade, periodo) +
+					    					    " Pedido(s) | " + orcamentoRotinas.totalListaOrcamentoLiquido(new String[]{tipoOrcamentoPedido}, cidade, periodo));
 			}
 			
 			// Checa se faz parte da lista de orcamento
@@ -1017,13 +1017,13 @@ public class ListaOrcamentoPedidoActivity extends Activity implements OnNavigati
 				
 				FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(ListaOrcamentoPedidoActivity.this);
 				
-				textTipoOrcamentoPedido.setText(orcamentoRotinas.quantidadeListaOrcamento("'"+tipoOrcamentoPedido+"'", cidade, periodo) +
-											    " Orçamento(s) | Tabela: " + orcamentoRotinas.totalListaOrcamentoBruto("'"+tipoOrcamentoPedido+"'", cidade, periodo) +
-											    " - Venda: " + orcamentoRotinas.totalListaOrcamentoLiquido("'"+tipoOrcamentoPedido+"'", cidade, periodo) +
+				textTipoOrcamentoPedido.setText(orcamentoRotinas.quantidadeListaOrcamento(new String[]{tipoOrcamentoPedido}, cidade, periodo) +
+											    " Orçamento(s) | Tabela: " + orcamentoRotinas.totalListaOrcamentoBruto(new String[]{tipoOrcamentoPedido}, cidade, periodo) +
+											    " - Venda: " + orcamentoRotinas.totalListaOrcamentoLiquido(new String[]{tipoOrcamentoPedido}, cidade, periodo) +
 											    " | Dif.: " + funcoes.arredondarValor(totalDiferenca));
 			} else {
-				textTipoOrcamentoPedido.setText(orcamentoRotinas.quantidadeListaOrcamento("'"+tipoOrcamentoPedido+"'", cidade, periodo) +
-					    					    " Orçamento(s) | " + orcamentoRotinas.totalListaOrcamentoLiquido("'"+tipoOrcamentoPedido+"'", cidade, periodo));
+				textTipoOrcamentoPedido.setText(orcamentoRotinas.quantidadeListaOrcamento(new String[]{tipoOrcamentoPedido}, cidade, periodo) +
+					    					    " Orçamento(s) | " + orcamentoRotinas.totalListaOrcamentoLiquido(new String[]{tipoOrcamentoPedido}, cidade, periodo));
 			}
 			
 			// Checa se faz parte da lista de orcamentos excluidos
@@ -1036,14 +1036,14 @@ public class ListaOrcamentoPedidoActivity extends Activity implements OnNavigati
 				
 				FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(ListaOrcamentoPedidoActivity.this);
 				
-				textTipoOrcamentoPedido.setText(orcamentoRotinas.quantidadeListaOrcamento("'"+tipoOrcamentoPedido+"'", cidade, periodo) +
-											    " Excluido(s) | Tabela: " + orcamentoRotinas.totalListaOrcamentoBruto("'"+tipoOrcamentoPedido+"'", cidade, periodo) +
-											    " - Venda: " + orcamentoRotinas.totalListaOrcamentoLiquido("'"+tipoOrcamentoPedido+"'", cidade, periodo) +
+				textTipoOrcamentoPedido.setText(orcamentoRotinas.quantidadeListaOrcamento(new String[]{tipoOrcamentoPedido}, cidade, periodo) +
+											    " Excluido(s) | Tabela: " + orcamentoRotinas.totalListaOrcamentoBruto(new String[]{tipoOrcamentoPedido}, cidade, periodo) +
+											    " - Venda: " + orcamentoRotinas.totalListaOrcamentoLiquido(new String[]{tipoOrcamentoPedido}, cidade, periodo) +
 											    " | Dif.: " + funcoes.arredondarValor(totalDiferenca));
 				
 			} else {
-				textTipoOrcamentoPedido.setText(orcamentoRotinas.quantidadeListaOrcamento("'"+tipoOrcamentoPedido+"'", cidade, periodo) +
-					    					    " Excluido(s) | " + orcamentoRotinas.totalListaOrcamentoLiquido("'"+tipoOrcamentoPedido+"'", cidade, periodo));
+				textTipoOrcamentoPedido.setText(orcamentoRotinas.quantidadeListaOrcamento(new String[]{tipoOrcamentoPedido}, cidade, periodo) +
+					    					    " Excluido(s) | " + orcamentoRotinas.totalListaOrcamentoLiquido(new String[]{tipoOrcamentoPedido}, cidade, periodo));
 			}
 		} // Fim if (this.tipoOrcamentoPedido.equals("E"))
 	}
@@ -1053,7 +1053,7 @@ public class ListaOrcamentoPedidoActivity extends Activity implements OnNavigati
 		OrcamentoRotinas orcamentoRotinas = new OrcamentoRotinas(ListaOrcamentoPedidoActivity.this);
 
 		ItemUniversalAdapter adapterCidadePadrao = new ItemUniversalAdapter(ListaOrcamentoPedidoActivity.this, ItemUniversalAdapter.CIDADE);
-		adapterCidadePadrao.setListaCidade(orcamentoRotinas.listaCidadeOrcamentoPedido("'"+this.tipoOrcamentoPedido+"'", null));
+		adapterCidadePadrao.setListaCidade(orcamentoRotinas.listaCidadeOrcamentoPedido(new String[]{tipoOrcamentoPedido}, null));
 		//adapterCidade = new DescricaoSimplesAdapter(ListaOrcamentoPedidoActivity.this, orcamentoRotinas.listaCidadeOrcamentoPedido("'"+this.tipoOrcamentoPedido+"'", null));
 		
 		// Preenche o spinner da action bar com as cidades

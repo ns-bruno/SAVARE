@@ -353,7 +353,10 @@ public class OrcamentoProdutoMDFragment extends Fragment {
                         break;
 
                     case R.id.menu_orcamento_tab_md_enviar_email:
+                        EnviarEmailOrcamentoPedido enviarEmailOrcamentoPedido = new EnviarEmailOrcamentoPedido();
+                        enviarEmailOrcamentoPedido.execute();
 
+                        /*
                         try {
                             //Cria novo um ProgressDialogo e exibe
                             ProgressDialog progress = new ProgressDialog(getActivity());
@@ -397,7 +400,7 @@ public class OrcamentoProdutoMDFragment extends Fragment {
 
                         } catch (Exception e) {
 
-                        }
+                        }*/
 
                         break;
 
@@ -728,6 +731,7 @@ public class OrcamentoProdutoMDFragment extends Fragment {
         orcamento.setNomeRazao(razaoSocial);
         // Instancia a classe de rotinas do orcamento para manipular os dados com o banco
         OrcamentoRotinas orcamentoRotinas = new OrcamentoRotinas(getActivity());
+
         // Pega a obs do banco de dados
         orcamento.setObservacao(orcamentoRotinas.selectObservacaoOrcamento(textCodigoOrcamento.getText().toString()));
         // Pega o total do orcamento no banco de dados
@@ -735,6 +739,8 @@ public class OrcamentoProdutoMDFragment extends Fragment {
         // Insere o total do orcamento varaviavel orcamento
         orcamento.setTotalOrcamento(total);
         orcamento.setDataCadastro(orcamentoRotinas.dataCadastroOrcamento(textCodigoOrcamento.getText().toString()));
+
+        orcamento.setIdTipoDocumento(orcamentoRotinas.idTipoDocumentoOrcamento(textCodigoOrcamento.getText().toString()));
 
         return orcamento;
     }
@@ -809,4 +815,83 @@ public class OrcamentoProdutoMDFragment extends Fragment {
             progressBarStatus.setVisibility(View.GONE);
         }
     } // CarregarDadosOrcamentoProduto
+
+
+
+    public class EnviarEmailOrcamentoPedido extends AsyncTask<Void, Void, Void> {
+
+        private ProgressDialog progress;
+        private String retornoCaminho = "";
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+            //Cria novo um ProgressDialogo e exibe
+            progress = new ProgressDialog(getActivity());
+            progress.setMessage("Aguarde, o PDF está sendo Gerado...");
+            progress.setCancelable(false);
+            progress.show();
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            try {
+                GerarPdfRotinas gerarPdfRotinas = new GerarPdfRotinas(getActivity());
+                // Envia a lista de produtos que pertence ao orcamento
+                gerarPdfRotinas.setListaItensOrcamento(adapterItemOrcamento.getListaItemOrcamento());
+                // Envia os dados do orcamento
+                gerarPdfRotinas.setOrcamento(preencheDadosOrcamento());
+
+                retornoCaminho = gerarPdfRotinas.criaArquivoPdf();
+
+            }catch (Exception e){
+                final FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(getContext());
+
+                // Armazena as informacoes para para serem exibidas e enviadas
+                final ContentValues contentValues = new ContentValues();
+                contentValues.put("comando", 0);
+                contentValues.put("tela", "OrcamentoProdutoMDFragment");
+                contentValues.put("mensagem", e.getMessage());
+
+                ((Activity) getContext()).runOnUiThread(new Runnable() {
+                    public void run() {
+                        funcoes.menssagem(contentValues);
+                    }
+                });
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+
+            if (retornoCaminho.length() > 0) {
+                // Fecha a barra de progresso
+                progress.dismiss();
+
+                File arquivo = new File(retornoCaminho);
+
+                PessoaRotinas pessoaRotinas = new PessoaRotinas(getActivity());
+
+                Intent dadosEmail = new Intent(Intent.ACTION_SEND);
+                //dadosEmail.setType("message/rfc822");
+                dadosEmail.setType("text/plain");
+                dadosEmail.putExtra(Intent.EXTRA_EMAIL, new String[]{pessoaRotinas.emailPessoa(idPessoa)});
+                dadosEmail.putExtra(Intent.EXTRA_SUBJECT, "Orçamento/Pedido # " + textCodigoOrcamento.getText());
+                dadosEmail.putExtra(Intent.EXTRA_STREAM, Uri.parse("file://" + arquivo));
+                dadosEmail.putExtra(Intent.EXTRA_TEXT, "E-Mail enviado pelo App SAVARE.");
+
+                try {
+                    startActivity(Intent.createChooser(dadosEmail, "Enviar e-mail..."));
+
+                } catch (android.content.ActivityNotFoundException ex) {
+                    SuperToast.create(getContext(), getResources().getString(R.string.nao_possivel_compartilhar_arquivo), SuperToast.Duration.LONG, Style.getStyle(Style.RED, SuperToast.Animations.FLYIN)).show();
+                }
+            }
+
+            progress.dismiss();
+        }
+    }
 }

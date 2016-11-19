@@ -42,14 +42,15 @@ public class PlanoPagamentoRotinas extends Rotinas {
 			where = "( (ATAC_VAREJO = '2') OR (ATAC_VAREJO = '" + tipoVenda + "') )";
 		}
 		// Cria uma variavel para salvar todos os planos de pagamentos
-		final List<PlanoPagamentoBeans> listaPlanoPagamento = new ArrayList<PlanoPagamentoBeans>();
+		List<PlanoPagamentoBeans> listaPlanoPagamento = null;
 		
 		try{
 			// Executa o sql e armazena os registro em um Cursor
 			Cursor cursor = planoPagamentoSql.query(where, ordem);
-			
-			
+
 			if((cursor != null) && (cursor.getCount() > 0)){
+
+				listaPlanoPagamento = new ArrayList<PlanoPagamentoBeans>();
 
 				PlanoPagamentoBeans planoPadrao = new PlanoPagamentoBeans();
 				planoPadrao.setIdPlanoPagamento(0);
@@ -86,15 +87,19 @@ public class PlanoPagamentoRotinas extends Rotinas {
 					listaPlanoPagamento.add(plano);
 				}
 			}else {
-				FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
+				final FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
 				// Cria uma variavem para inserir as propriedades da mensagem
-				ContentValues mensagem = new ContentValues();
+				final ContentValues mensagem = new ContentValues();
 				mensagem.put("comando", 2);
 				mensagem.put("tela", "PlanoPagamentoRotinas");
 				mensagem.put("mensagem", "Não existe Planos cadastrados");
 				
 				// Executa a mensagem passando por parametro as propriedades
-				funcoes.menssagem(mensagem);
+				((Activity) context).runOnUiThread(new Runnable() {
+					public void run() {
+						funcoes.menssagem(mensagem);
+					}
+				});
 			}
 		}catch(SQLException e){
 			final FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);

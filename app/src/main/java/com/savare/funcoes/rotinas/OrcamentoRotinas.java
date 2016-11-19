@@ -731,15 +731,25 @@ public class OrcamentoRotinas extends Rotinas {
 	 * @param where
 	 * @return
 	 */
-	public List<CidadeBeans> listaCidadeOrcamentoPedido(String tipo, String where){
+	public List<CidadeBeans> listaCidadeOrcamentoPedido(String[] tipo, String where){
 		// Cria uma lista para retornar as cidades
 		List<CidadeBeans> lista = new ArrayList<CidadeBeans>();
 
-		String sql = "SELECT CFACIDAD.ID_CFACIDAD, CFACIDAD.DESCRICAO AS DESCRICAO_CIDAD, CFAESTAD.UF "
-				+ "FROM AEAORCAM "
-				+ "LEFT OUTER JOIN CFAESTAD CFAESTAD ON(AEAORCAM.ID_CFAESTAD = CFAESTAD.ID_CFAESTAD) "
-				+ "LEFT OUTER JOIN CFACIDAD CFACIDAD ON(AEAORCAM.ID_CFACIDAD = CFACIDAD.ID_CFACIDAD) "
-				+ "WHERE (AEAORCAM.STATUS IN (" + tipo + ")) ";
+		String sql =  "SELECT CFACIDAD.ID_CFACIDAD, CFACIDAD.DESCRICAO AS DESCRICAO_CIDAD, CFAESTAD.UF "
+                    + "FROM AEAORCAM "
+                    + "LEFT OUTER JOIN CFAESTAD CFAESTAD ON(AEAORCAM.ID_CFAESTAD = CFAESTAD.ID_CFAESTAD) "
+                    + "LEFT OUTER JOIN CFACIDAD CFACIDAD ON(AEAORCAM.ID_CFACIDAD = CFACIDAD.ID_CFACIDAD) ";
+
+        String tipoStatus = "";
+
+        if (tipo != null){
+            int total = 0;
+            for(String s:tipo) {
+                tipoStatus += (total > 0 ? ", " : "");
+                tipoStatus += "'" + s + "'";
+            }
+            sql += " WHERE (AEAORCAM.STATUS IN (" + tipoStatus + ")) ";
+        }
 
 		// Adiciona a clausula where
 		if(where != null){
@@ -1075,23 +1085,26 @@ public class OrcamentoRotinas extends Rotinas {
 	 * @param tipo - O = Orcamento, P = Pedido, E = Excluido
 	 * @return
 	 */
-	public String totalListaOrcamentoLiquido(String tipo, String cidade, String where){
+	public String totalListaOrcamentoLiquido(String[] tipo, String cidade, String where){
 		String valor = null;
 		// Instancia a classe para manipular a tabela no banco de dados
 		ItemOrcamentoSql itemOrcamentoSql = new ItemOrcamentoSql(context);
 		
 		String sql = ("SELECT SUM(AEAORCAM.FC_VL_TOTAL) AS FC_VL_TOTAL "
 				    + "FROM AEAORCAM "
-					+ "LEFT OUTER JOIN CFACIDAD CFACIDAD ON(AEAORCAM.ID_CFACIDAD = CFACIDAD.ID_CFACIDAD) "
-					+ "WHERE (AEAORCAM.STATUS IN (" + tipo + ")) ");
-		
-		/*// Checa se eh para listar todos os pedidos
-		if(tipo.equalsIgnoreCase("TP")){
-			sql += "WHERE (AEAORCAM.STATUS = 'P') OR (AEAORCAM.STATUS = 'N')";
-		} else {
-			sql += "WHERE (AEAORCAM.STATUS = '" + tipo + "') ";
-		}*/
-		
+					+ "LEFT OUTER JOIN CFACIDAD CFACIDAD ON(AEAORCAM.ID_CFACIDAD = CFACIDAD.ID_CFACIDAD) ");
+
+        String tipoStatus = "";
+
+        if (tipo != null){
+            int total = 0;
+            for(String s:tipo) {
+                tipoStatus += (total > 0 ? ", " : "");
+                tipoStatus += "'" + s + "'";
+            }
+            sql += "WHERE (AEAORCAM.STATUS IN (" + tipoStatus + ")) ";
+        }
+
 		if(cidade != null){
 			sql = sql + " AND (CFACIDAD.DESCRICAO = '" + cidade +"' )";
 		}
@@ -1126,23 +1139,26 @@ public class OrcamentoRotinas extends Rotinas {
 	 * @param tipo - O = Orcamento, P = Pedido, E = Excluido
 	 * @return
 	 */
-	public String totalListaOrcamentoBruto(String tipo, String cidade, String where){
+	public String totalListaOrcamentoBruto(String[] tipo, String cidade, String where){
 		String valor = null;
 		// Instancia a classe para manipular a tabela no banco de dados
 		ItemOrcamentoSql itemOrcamentoSql = new ItemOrcamentoSql(context);
 		
 		String sql = ("SELECT SUM(AEAORCAM.VL_MERC_BRUTO) AS VL_MERC_BRUTO "
 				    + "FROM AEAORCAM "
-					+ "LEFT OUTER JOIN CFACIDAD CFACIDAD ON(AEAORCAM.ID_CFACIDAD = CFACIDAD.ID_CFACIDAD) "
-					+ "WHERE (AEAORCAM.STATUS IN (" + tipo + ")) ");
-		
-		/*// Checa se eh para listar todos os pedidos
-		if(tipo.equalsIgnoreCase("TP")){
-			sql += "WHERE (AEAORCAM.STATUS = 'P') OR (AEAORCAM.STATUS = 'N')";
-		} else {
-			sql += "WHERE (AEAORCAM.STATUS = '" + tipo + "') ";
-		}*/
-		
+					+ "LEFT OUTER JOIN CFACIDAD CFACIDAD ON(AEAORCAM.ID_CFACIDAD = CFACIDAD.ID_CFACIDAD) ");
+
+        String tipoStatus = "";
+
+        if (tipo != null){
+            int total = 0;
+            for(String s:tipo) {
+                tipoStatus += (total > 0 ? ", " : "");
+                tipoStatus += "'" + s + "'";
+            }
+            sql += " WHERE (AEAORCAM.STATUS IN (" + tipoStatus + ")) ";
+        }
+
 		if(cidade != null){
 			sql = sql + " AND (CFACIDAD.DESCRICAO = '" + cidade +"' )";
 		}
@@ -1176,15 +1192,15 @@ public class OrcamentoRotinas extends Rotinas {
 	 * @param tipo - O = Orcamento, P = Pedido, E = Excluido, N = Pedidos Enviados
 	 * @return
 	 */
-	public String quantidadeListaOrcamento(String tipo, String cidade, String where){
+	public String quantidadeListaOrcamento(String[] tipo, String cidade, String where){
 		String valor = null;
 		// Instancia a classe para manipular a tabela no banco de dados
 		ItemOrcamentoSql itemOrcamentoSql = new ItemOrcamentoSql(context);
 		// Monta o sql
 		String sql = ("SELECT COUNT(*) AS QUANTIDADE_ORCAMENTO "
 			        + "FROM AEAORCAM "
-			        + "LEFT OUTER JOIN CFACIDAD CFACIDAD ON(AEAORCAM.ID_CFACIDAD = CFACIDAD.ID_CFACIDAD) "
-			        + "WHERE (AEAORCAM.STATUS IN (" + tipo + ")) ");
+			        + "LEFT OUTER JOIN CFACIDAD CFACIDAD ON(AEAORCAM.ID_CFACIDAD = CFACIDAD.ID_CFACIDAD) ");
+			        //+ "WHERE (AEAORCAM.STATUS IN (" + tipo + ")) ");
 		
 		/*// Checa se eh para listar todos os pedidos
 		if(tipo.equalsIgnoreCase("TP")){
@@ -1192,6 +1208,16 @@ public class OrcamentoRotinas extends Rotinas {
 		} else {
 			sql += "WHERE (AEAORCAM.STATUS = '" + tipo + "') ";
 		}*/
+		String tipoStatus = "";
+
+		if (tipo != null){
+			int total = 0;
+			for(String s:tipo) {
+				tipoStatus += (total > 0 ? ", " : "");
+				tipoStatus += "'" + s + "'";
+			}
+			sql += "WHERE (AEAORCAM.STATUS IN (" + tipoStatus + ")) ";
+		}
 		
 		if(cidade != null){
 			sql = sql + " AND (CFACIDAD.DESCRICAO = '" + cidade + "' )";
@@ -1401,7 +1427,7 @@ public class OrcamentoRotinas extends Rotinas {
 		
 		String sql = ("SELECT DT_CAD "
 				    + "FROM AEAORCAM "
-					+ "WHERE (AEAORCAM.DT_CAD = " + idOrcamento + ") ");
+					+ "WHERE (AEAORCAM.ID_AEAORCAM = " + idOrcamento + ") ");
 		
 		Cursor cursor = orcamentoSql.sqlSelect(sql);
 		

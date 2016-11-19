@@ -105,6 +105,7 @@ public class ListaOrcamentoPedidoMDActivity extends AppCompatActivity{
     public static final String TELA_LISTA_PRODUTOS = "LISTA_PRODUTOS";
     public static final int RETORNA_CLIENTE = 100;
     public static final int SOLICITA_CLIENTE = 1;
+    String[] tipoPedido = null;
 
 
     @Override
@@ -122,6 +123,12 @@ public class ListaOrcamentoPedidoMDActivity extends AppCompatActivity{
 
             this.tipoOrcamentoPedido = intentParametro.getString(KEY_ORCAMENTO_PEDIDO);
             this.retornaValor = intentParametro.getString(KEY_RETORNA_VALOR);
+
+            if (tipoOrcamentoPedido.equalsIgnoreCase(TIPO_PEDIDO_ENVIADO)){
+                tipoPedido = new String[]{"N", "RB", "RL", "RE", "F", "C"};
+            } else {
+                tipoPedido = new String[]{tipoOrcamentoPedido};
+            }
 
             if(this.retornaValor == null){
                 this.retornaValor = "F";
@@ -157,6 +164,8 @@ public class ListaOrcamentoPedidoMDActivity extends AppCompatActivity{
 
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                // Fecha o menu floating
+                menuFloatingButton.close(true);
 
                 // Checa se quem chamou essa tela eh para retornar
                 if ((retornaValor != null) && (retornaValor.equals(TELA_LISTA_PRODUTOS))) {
@@ -426,7 +435,7 @@ public class ListaOrcamentoPedidoMDActivity extends AppCompatActivity{
                             onResume();
 
                         } else {
-                            mensagemLixeira.put("mensagem", "NÃO FOI POSSÍVEL RECUPERAR O(S) OR�AMENTO(S) DELETADO(S). \n");
+                            mensagemLixeira.put("mensagem", "NÃO FOI POSSÍVEL RECUPERAR O(S) ORÇAMENTO(S) DELETADO(S). \n");
                         }
 
                         // Instancia a classe  de funcoes para mostra a mensagem
@@ -439,9 +448,12 @@ public class ListaOrcamentoPedidoMDActivity extends AppCompatActivity{
 
                     case R.id.menu_lista_orcamento_context_md_enviar_email:
 
-                        enviarEmail();
+                        EnviarEmailListaOrcamentoPedido enviarEmailListaOrcamentoPedido = new EnviarEmailListaOrcamentoPedido();
+                        enviarEmailListaOrcamentoPedido.execute();
+
+                        //enviarEmail();
                         // Fecha o menu context
-                        mode.finish();
+                        //mode.finish();
                         break;
 
 
@@ -449,7 +461,7 @@ public class ListaOrcamentoPedidoMDActivity extends AppCompatActivity{
 
                         enviarEmail();
                         // Fecha o menu context
-                        mode.finish();
+                        //mode.finish();
                         break;
 
                     case R.id.menu_lista_pedido_context_md_enviar_pedido_nuvem:
@@ -992,12 +1004,12 @@ public class ListaOrcamentoPedidoMDActivity extends AppCompatActivity{
         // Instancia a classe para manipular dados do orcamento
         OrcamentoRotinas orcamentoRotinas = new OrcamentoRotinas(ListaOrcamentoPedidoMDActivity.this);
 
-        String tipoPedido = "";
+        /*String tipoPedido = "";
         if (tipoOrcamentoPedido.equalsIgnoreCase("N")){
             tipoPedido = "'N', 'RB', 'RL', 'RE', 'F'";
         } else {
             tipoPedido = "'"+tipoOrcamentoPedido+"'";
-        }
+        }*/
         listaCidade = orcamentoRotinas.listaCidadeOrcamentoPedido(tipoPedido, null);
 
         if ((listaCidade != null) && (listaCidade.size() > 0)) {
@@ -1122,12 +1134,12 @@ public class ListaOrcamentoPedidoMDActivity extends AppCompatActivity{
             // Cria uma variavel para armazenar a lista de orcamento
             List<OrcamentoBeans> listaOrcamentoPedido = new ArrayList<OrcamentoBeans>();
 
-            String[] tipoPedido = null;
+            /*String[] tipoPedido = null;
             if (tipoOrcamentoPedido.equalsIgnoreCase("N")){
                 tipoPedido = new String[]{"N", "RB", "RL", "RE", "F", "C"};
             } else {
                 tipoPedido = new String[]{tipoOrcamentoPedido};
-            }
+            }*/
 
             // Checa se esta selecionado todos os orcamento/pedido
             if((adapterCidade.getListaCidade().get(itemPosition).getDescricao() != null) &&
@@ -1187,12 +1199,12 @@ public class ListaOrcamentoPedidoMDActivity extends AppCompatActivity{
             // Pega o periodo selecionado no menu
             String periodo = wherePeriodoData();
 
-            String tipoPedido = "";
+            /*String tipoPedido = "";
             if (tipoOrcamentoPedido.equalsIgnoreCase(TIPO_PEDIDO_ENVIADO)){
                 tipoPedido = "'N', 'RB', 'RL', 'RE', 'F'";
             } else {
                 tipoPedido = "'"+tipoOrcamentoPedido+"'";
-            }
+            }*/
 
             // Checa se faz parte da lista de pedido
             if ((tipoOrcamentoPedido.equals(TIPO_PEDIDO_NAO_ENVIADO)) || (tipoOrcamentoPedido.equals(TIPO_PEDIDO_ENVIADO))){
@@ -1298,6 +1310,98 @@ public class ListaOrcamentoPedidoMDActivity extends AppCompatActivity{
                 }
             }
             return where;
+        }
+    }
+
+
+    public class EnviarEmailListaOrcamentoPedido extends AsyncTask<Void, Void, Void> {
+
+        private ArrayList<Uri> listaCaminho;
+        private ProgressDialog progress;
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+            progress = new ProgressDialog(ListaOrcamentoPedidoMDActivity.this);
+            progress.setIndeterminate(true);
+            progress.setTitle("Enviar e-mail");
+            progress.setMessage("Aguarde, todos os PDF estão sendo gerados.\n"
+                    + "Vai levar um pouquinho mais de tempo.");
+            progress.setCancelable(true);
+
+            progress.show();
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            listaCaminho = new ArrayList<Uri>();;
+
+            OrcamentoRotinas orcamentoRotinas = new OrcamentoRotinas(ListaOrcamentoPedidoMDActivity.this);
+
+            List<Integer> listaIdOrcamento = new ArrayList<Integer>();
+
+            for (int i = 0; i < listaItemOrcamentoSelecionado.size(); i++) {
+                listaIdOrcamento.add(adapterListaOrcamentoPedido.getListaOrcamentoPediso().get(listaItemOrcamentoSelecionado.get(i)).getIdOrcamento());
+            }
+            String where = "(";
+
+            int total = 0;
+            for (int idOrcamento : listaIdOrcamento) {
+                where += ( (total > 0) ? ", ": "" );
+                where += idOrcamento;
+                total ++;
+            }
+            where +=")";
+
+            List<OrcamentoBeans> listaOrcamento = orcamentoRotinas.listaOrcamentoPedido(tipoPedido, "ID_AEAORCAM IN " + where, null);
+
+            for(OrcamentoBeans orcamento : listaOrcamento){
+
+                // Instancia a classe responsavel por criar o pdf
+                GerarPdfRotinas gerarPdfRotinas = new GerarPdfRotinas(ListaOrcamentoPedidoMDActivity.this);
+                // Envia os dados do orcamento
+                gerarPdfRotinas.setOrcamento(orcamento);
+                // Envia a lista de produtos que pertence ao orcamento
+                gerarPdfRotinas.setListaItensOrcamento(orcamentoRotinas.listaItemOrcamentoResumida(null, ""+orcamento.getIdOrcamento(), null, null));
+
+                // Cria o pdf e pega o caminho do arquivo
+                String retornoCaminho = gerarPdfRotinas.criaArquivoPdf();
+
+                // Checa se existe algum caminho
+                if(retornoCaminho.length() > 0){
+                    // Adiciona o caminha a uma lista
+                    listaCaminho.add(Uri.fromFile(new File(retornoCaminho)));
+                }
+
+            } // Fim for
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+
+            if(listaCaminho.size() > 0){
+
+                PessoaRotinas pessoaRotinas = new PessoaRotinas(ListaOrcamentoPedidoMDActivity.this);
+
+                Intent dadosEmail = new Intent(Intent.ACTION_SEND_MULTIPLE);
+                //dadosEmail.setType("text/plai");
+                dadosEmail.setType("message/rfc822");
+                dadosEmail.putExtra(Intent.EXTRA_EMAIL  , new String[]{""});
+                dadosEmail.putExtra(Intent.EXTRA_SUBJECT, getResources().getString(R.string.orcamento_pedido));
+                dadosEmail.putExtra(Intent.EXTRA_STREAM, listaCaminho);
+                dadosEmail.putExtra(Intent.EXTRA_TEXT   , "Enviado pelo App SAVARE.");
+
+                try {
+                    startActivity(Intent.createChooser(dadosEmail, "Enviar e-mail..."));
+
+                } catch (android.content.ActivityNotFoundException ex) {
+                    SuperToast.create(ListaOrcamentoPedidoMDActivity.this, getResources().getString(R.string.nao_possivel_compartilhar_arquivo), SuperToast.Duration.LONG, Style.getStyle(Style.RED, SuperToast.Animations.FLYIN)).show();
+                }
+            }
+            progress.dismiss();
         }
     }
 }

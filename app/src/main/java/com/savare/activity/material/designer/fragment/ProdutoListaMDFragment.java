@@ -107,10 +107,12 @@ public class ProdutoListaMDFragment extends Fragment {
                 textCodigoOrcamento.setText(idOrcamento);
                 textNomeRazao.setText(nomeRazao);
                 textCodigoPessoa.setText(idCliente);
-                textAtacadoVarejo.setText(atacadoVarejo);
-
+                if (atacadoVarejo.equalsIgnoreCase("0")) {
+                    textAtacadoVarejo.setText(R.string.atacado);
+                } else {
+                    textAtacadoVarejo.setText(R.string.varejo);
+                }
             } else {
-
                 layoutFragmentRodape.setVisibility(View.GONE);
             }
         }

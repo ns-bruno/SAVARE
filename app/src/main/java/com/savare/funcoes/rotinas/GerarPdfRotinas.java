@@ -7,6 +7,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
+import android.app.Activity;
+import android.content.ContentValues;
 import android.content.Context;
 import android.os.Environment;
 
@@ -21,17 +23,20 @@ import com.itextpdf.text.Phrase;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
+import com.savare.R;
 import com.savare.beans.EmpresaBeans;
 import com.savare.beans.ItemOrcamentoBeans;
 import com.savare.beans.OrcamentoBeans;
 import com.savare.beans.PessoaBeans;
+import com.savare.beans.PlanoPagamentoBeans;
+import com.savare.beans.TipoDocumentoBeans;
 import com.savare.funcoes.FuncoesPersonalizadas;
 
 public class GerarPdfRotinas {
 
 	//private static Font catFont = new Font(Font.FontFamily.TIMES_ROMAN, 18, Font.BOLD);
-	//private static Font redFont = new Font(Font.FontFamily.TIMES_ROMAN, 12, Font.NORMAL, BaseColor.RED);
-	//private static Font subFont = new Font(Font.FontFamily.TIMES_ROMAN, 16, Font.BOLD);
+	private static Font empresaFont = new Font(Font.FontFamily.HELVETICA, 16, Font.BOLDITALIC);
+	private static Font contextoFont = new Font(Font.FontFamily.TIMES_ROMAN, 9, Font.NORMAL);
 	private static Font smallBold = new Font(Font.FontFamily.TIMES_ROMAN, 12, Font.BOLD);
 	private Context context;
 	private OrcamentoBeans orcamento;
@@ -70,12 +75,6 @@ public class GerarPdfRotinas {
 		Document documento = new Document();
 		// Cria o documento tamanho A4
 		documento = new Document(PageSize.A4);
-		
-		//document.addTitle("Orcamento/Pedido PDF");
-		//document.addSubject("Documento feito pela app SAVARE");
-		//document.addKeywords("Java, PDF, iText");
-		//document.addAuthor(funcoes.getValorXml("CodigoUsuario") + " - " + funcoes.getValorXml("Usuario"));
-		//document.addCreator("Lars Vogel");
 		
 		// Cria um formato de data
 		DateFormat dataFormatada = new SimpleDateFormat("MM_yyyy");
@@ -128,8 +127,19 @@ public class GerarPdfRotinas {
 	        	  localDocumento = camihnoDocumento.toString();
 	          }
 	      }catch (Exception e){
-	    	  String s = e.getMessage();
-	    	  s.length();
+            final FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
+
+            // Armazena as informacoes para para serem exibidas e enviadas
+            final ContentValues contentValues = new ContentValues();
+            contentValues.put("comando", 0);
+            contentValues.put("tela", "OrcamentoProdutoMDFragment");
+            contentValues.put("mensagem", e.getMessage());
+
+            ((Activity) context).runOnUiThread(new Runnable() {
+                public void run() {
+                    funcoes.menssagem(contentValues);
+                }
+            });
 	      }
 	      
 	    return localDocumento;
@@ -151,7 +161,8 @@ public class GerarPdfRotinas {
 		
 		//Dados do produtos
 		 if(tipoTabela == 1){
-			tabela = new PdfPTable(new float[] { 0.08f, 0.42f, 0.15f, 0.1f, 0.2f });
+             // Adiciona o tamanho de cada coluna
+			tabela = new PdfPTable(new float[] { 0.11f, 0.42f, 0.15f, 0.1f, 0.1f, 0.15f, 0.2f });
 			// Percentagem da largura da pagina
 			tabela.setWidthPercentage(100);
 			// Muda a cor do fundo do cabecalho
@@ -166,6 +177,16 @@ public class GerarPdfRotinas {
 		    c1.setHorizontalAlignment(Element.ALIGN_CENTER);
 	 	    c1.setBackgroundColor(BaseColor.LIGHT_GRAY);
 		    tabela.addCell(c1);
+
+            c1 = new PdfPCell(new Phrase("Marca", smallBold));
+            c1.setHorizontalAlignment(Element.ALIGN_CENTER);
+            c1.setBackgroundColor(BaseColor.LIGHT_GRAY);
+            tabela.addCell(c1);
+
+            c1 = new PdfPCell(new Phrase("Emb.", smallBold));
+            c1.setHorizontalAlignment(Element.ALIGN_CENTER);
+            c1.setBackgroundColor(BaseColor.LIGHT_GRAY);
+            tabela.addCell(c1);
 	
 	 	    c1 = new PdfPCell(new Phrase("Qtde.", smallBold));
 	 	    c1.setHorizontalAlignment(Element.ALIGN_RIGHT);
@@ -182,15 +203,17 @@ public class GerarPdfRotinas {
 	 	    c1.setBackgroundColor(BaseColor.LIGHT_GRAY);
 		    tabela.addCell(c1);
 		    tabela.setHeaderRows(1);
-	
+
 	 	    for (int i = 0; i < listaItensOrcamento.size(); i++) {
 	 	    	tabela.getDefaultCell().setHorizontalAlignment(Element.ALIGN_LEFT);
-	 	    	tabela.addCell(listaItensOrcamento.get(i).getProduto().getCodigoEstrutural());
-	 	    	tabela.addCell(listaItensOrcamento.get(i).getProduto().getDescricaoProduto() + "\n" + listaItensOrcamento.get(i).getComplemento());
+	 	    	tabela.addCell(new Phrase(listaItensOrcamento.get(i).getProduto().getCodigoEstrutural(), contextoFont));
+	 	    	tabela.addCell(new Phrase(listaItensOrcamento.get(i).getProduto().getDescricaoProduto() + "\n" + listaItensOrcamento.get(i).getComplemento(), contextoFont));
+	 	    	tabela.addCell(new Phrase(listaItensOrcamento.get(i).getProduto().getDescricaoMarca(), contextoFont));
+	 	    	tabela.addCell(new Phrase(listaItensOrcamento.get(i).getUnidadeVenda().getSiglaUnidadeVenda(), contextoFont));
 	 	    	tabela.getDefaultCell().setHorizontalAlignment(Element.ALIGN_RIGHT);
-	 	    	tabela.addCell(funcoes.arredondarValor(listaItensOrcamento.get(i).getQuantidade()));
-	 	    	tabela.addCell(funcoes.arredondarValor(listaItensOrcamento.get(i).getValorLiquidoUnitario()));
-	 	    	tabela.addCell(funcoes.arredondarValor(listaItensOrcamento.get(i).getValorLiquido()));
+	 	    	tabela.addCell(new Phrase(funcoes.arredondarValor(listaItensOrcamento.get(i).getQuantidade()), contextoFont));
+	 	    	tabela.addCell(new Phrase(funcoes.arredondarValor(listaItensOrcamento.get(i).getValorLiquidoUnitario()), contextoFont));
+	 	    	tabela.addCell(new Phrase(funcoes.arredondarValor(listaItensOrcamento.get(i).getValorLiquido()), contextoFont));
 			}
 	 	    
 	 	    // Dados da empresa e vendedor
@@ -206,13 +229,14 @@ public class GerarPdfRotinas {
 			
 			// Pega os dados da emrpesa
 			EmpresaBeans empresa = empresaRotinas.empresa(funcoes.getValorXml("CodigoEmpresa"));
-			
-			// Nome da empresa
-			PdfPCell c1 = new PdfPCell(new Phrase(empresa.getNomeFantasia()));
-		 	c1.setHorizontalAlignment(Element.ALIGN_CENTER);
-		 	tabela.addCell(c1);
-		 	tabela.setHeaderRows(1);
-		 	
+
+             if (empresa != null) {
+                 // Nome da empresa
+                 PdfPCell c1 = new PdfPCell(new Phrase(empresa.getNomeFantasia(), empresaFont));
+                 c1.setHorizontalAlignment(Element.ALIGN_CENTER);
+                 tabela.addCell(c1);
+                 tabela.setHeaderRows(1);
+             }
 		 	//tabela.addCell(empresa.getNomeFantasia());
 		 	tabela.addCell("Vendedor: " + funcoes.getValorXml("Usuario"));
 			
@@ -224,9 +248,26 @@ public class GerarPdfRotinas {
 			tabela.setWidthPercentage(100);
 			PessoaRotinas pessoaRotinas = new PessoaRotinas(context);
 			PessoaBeans pessoa = pessoaRotinas.listaPessoaResumido("CFACLIFO.ID_CFACLIFO = " + orcamento.getIdPessoa(), PessoaRotinas.KEY_TIPO_CLIENTE, null).get(0);
-			
+
+            TipoDocumentoBeans documentoVenda = null;
+            PlanoPagamentoBeans planoPagamento = null;
+
+            if (orcamento.getIdTipoDocumento() > 0) {
+                TipoDocumentoRotinas tipoDocumentoRotinas = new TipoDocumentoRotinas(context);
+                documentoVenda = tipoDocumentoRotinas.listaTipoDocumento("CFATPDOC.ID_CFATPDOC = " + orcamento.getIdTipoDocumento()).get(1);
+            }
+
+            OrcamentoRotinas orcamentoRotinas = new OrcamentoRotinas(context);
+            PlanoPagamentoRotinas planoPagamentoRotinas = new PlanoPagamentoRotinas(context);
+
+            int idPlanoPgto = orcamentoRotinas.idPlanoPagamentoOrcamento(""+orcamento.getIdOrcamento());
+
+            if (idPlanoPgto > 0) {
+                planoPagamento = planoPagamentoRotinas.listaPlanoPagamento("AEAPLPGT.ID_AEAPLPGT = " + idPlanoPgto, null, null).get(1);
+            }
+
 			// Preenche as celulas em asequencia
-			tabela.addCell("Orçamento/Pedido N�: " + orcamento.getIdOrcamento());
+			tabela.addCell("Orçamento/Pedido N.: " + orcamento.getIdOrcamento());
 			tabela.addCell("Data Cadastro: " + orcamento.getDataCadastro());
 			tabela.addCell("Razão Social: " + pessoa.getNomeRazao());
 			tabela.addCell("Fantasia: " + pessoa.getNomeFantasia());
@@ -236,7 +277,9 @@ public class GerarPdfRotinas {
 			tabela.addCell("Bairro: " + pessoa.getEnderecoPessoa().getBairro());
 			tabela.addCell("Cidade: " + pessoa.getCidadePessoa().getDescricao());
 			tabela.addCell("Estado: " + pessoa.getEstadoPessoa().getSiglaEstado());
-			
+			tabela.addCell("Documento: " + (documentoVenda != null ? documentoVenda.getDescricaoTipoDocumento() : context.getResources().getString(R.string.selecione_tipo_documento)));
+			tabela.addCell("Plano Pagamento: " + (planoPagamento != null ? planoPagamento.getDescricaoPlanoPagamento() : context.getResources().getString(R.string.plano_pagamento)));
+
 			// Numero do Orcamento
 			PdfPCell c1 = new PdfPCell();
 		 	c1.setPhrase(new Phrase("Nº " + orcamento.getIdOrcamento()));
@@ -250,6 +293,7 @@ public class GerarPdfRotinas {
 			// Percentagem da largura da pagina
 			tabela.setWidthPercentage(100);
 			tabela.getDefaultCell().setHorizontalAlignment(Element.ALIGN_RIGHT);
+            tabela.getDefaultCell().setBackgroundColor(BaseColor.GRAY);
 			tabela.addCell("Total Geral: " + funcoes.arredondarValor(orcamento.getTotalOrcamento()));
 		 
 			// Observacao

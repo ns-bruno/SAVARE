@@ -42,7 +42,7 @@ public class ReceptorAlarmeEnviarOrcamentoBroadcastRotinas extends BroadcastRece
 		}
 
 		// Checa se esta enviando dados
-		if (!funcoes.getValorXml("EnviandoDados").equalsIgnoreCase("S")) {
+		if ((!funcoes.getValorXml("EnviandoDados").equalsIgnoreCase("S")) && (funcoes.getValorXml("EnviarAutomatico").equalsIgnoreCase("S"))) {
 
 			OrcamentoRotinas orcamentoRotinas = new OrcamentoRotinas(context);
 
@@ -50,7 +50,7 @@ public class ReceptorAlarmeEnviarOrcamentoBroadcastRotinas extends BroadcastRece
 			funcoes.setValorXml("EnviandoDados", "S");
 
 			// Pega a quantidade de pedidos que precisam ser enviados
-			double quatidadeOrcamentoEnviar = funcoes.desformatarValor(orcamentoRotinas.quantidadeListaOrcamento("'P'", null, null));
+			double quatidadeOrcamentoEnviar = funcoes.desformatarValor(orcamentoRotinas.quantidadeListaOrcamento(new String[]{"P"}, null, null));
 
 			//final PessoaRotinas pessoaRotinas = new PessoaRotinas(context);
 			//double quantidadeCadastroNovo = pessoaRotinas.quantidadeCadastroPessoaNovo();

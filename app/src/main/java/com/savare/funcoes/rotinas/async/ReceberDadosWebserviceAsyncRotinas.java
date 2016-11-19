@@ -635,8 +635,8 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
         } catch (final Exception e) {
 
             // Atualiza a notificacao
-            mLoad.bigTextStyle(context.getResources().getString(R.string.msg_error) + e.getMessage());
-            mLoad.progress().value(0, 0, true).build();
+            mLoad.bigTextStyle(context.getResources().getString(R.string.msg_error) + ": " + e.getMessage());
+            mLoad.simple().build();
 
             // Checo se o texto de status foi passado pro parametro
             if (textStatus != null) {
@@ -726,7 +726,8 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 .load()
                 .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR)
                 .title(R.string.importar_dados_recebidos)
-                .bigTextStyle(context.getResources().getString(R.string.terminamos_receber_dados))
+                .message(context.getResources().getString(R.string.atualizado_sucesso))
+                //.bigTextStyle(context.getResources().getString(R.string.atualizado_sucesso))
                 .smallIcon(R.mipmap.ic_launcher)
                 .largeIcon(R.mipmap.ic_launcher)
                 .flags(Notification.DEFAULT_LIGHTS)
@@ -737,7 +738,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             if (textStatus != null){
                 ((Activity) context).runOnUiThread(new Runnable() {
                     public void run() {
-                        textStatus.setText(context.getResources().getString(R.string.terminamos_receber_dados));
+                        textStatus.setText(context.getResources().getString(R.string.terminamos));
                     }
                 });
             }
@@ -757,8 +758,8 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
         funcoes.setValorXml("CodigoUsuario", usuario.getAsString("ID_USUA"));
         funcoes.setValorXml("CodigoEmpresa", usuario.getAsString("ID_SMAEMPRE"));
         funcoes.setValorXml("Email", usuario.getAsString("EMAIL_USUA"));
-        funcoes.setValorXml("EnviarAutomatico", "S");
-        funcoes.setValorXml("ReceberAutomatico", "S");
+        funcoes.setValorXml("EnviarAutomatico", "N");
+        funcoes.setValorXml("ReceberAutomatico", "N");
         funcoes.setValorXml("ImagemProduto", "N");
         funcoes.setValorXml("AbriuAppPriveiraVez", "S");
         funcoes.setValorXml("ModoConexao", usuario.getAsString("MODO_CONEXAO"));
@@ -909,13 +910,29 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                     });*/
                 } // Fim do for
 
+                // Checa se todos foram inseridos/atualizados com sucesso
+                if (todosSucesso){
+                    inserirUltimaAtualizacao("SMAEMPRE");
+                }
+
                 // Atualiza a notificacao
                 mLoad.bigTextStyle(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
                 mLoad.progress().value(0, 0, true).build();
 
-                // Checa se todos foram inseridos/atualizados com sucesso
-                if (todosSucesso){
-                    inserirUltimaAtualizacao("SMAEMPRE");
+                // Checo se o texto de status foi passado pro parametro
+                if (textStatus != null){
+                    ((Activity) context).runOnUiThread(new Runnable() {
+                        public void run() {
+                            textStatus.setText(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
+                        }
+                    });
+                }
+                if (progressBarStatus != null){
+                    ((Activity) context).runOnUiThread(new Runnable() {
+                        public void run() {
+                            progressBarStatus.setIndeterminate(true);
+                        }
+                    });
                 }
             }
         }catch (Exception e){

@@ -7,14 +7,14 @@
         android:orderInCategory="1"
         android:icon="@mipmap/ic_cloud_upload_dark"
         android:title="@string/enviar_pedido_nuvem"
-        app:showAsAction="always" />
+        app:showAsAction="never" />
 
     <item
         android:id="@+id/menu_lista_pedido_context_md_enviar_email"
         android:orderInCategory="100"
         android:icon="@mipmap/ic_email_dark"
         android:title="@string/enviar_email"
-        app:showAsAction="always" />
+        app:showAsAction="never" />
 
 
 </menu>

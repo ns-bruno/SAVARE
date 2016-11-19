@@ -1,6 +1,7 @@
 package com.savare.funcoes.rotinas.receptor;
 
 import com.savare.funcoes.FuncoesPersonalizadas;
+import com.savare.funcoes.Rotinas;
 import com.savare.funcoes.rotinas.UsuarioRotinas;
 import com.savare.funcoes.rotinas.async.ReceberDadosFtpAsyncRotinas;
 import com.savare.funcoes.rotinas.async.ReceberDadosWebserviceAsyncRotinas;
@@ -24,7 +25,7 @@ public class ReceptorAlarmeReceberDadosBroadcastRotinas extends BroadcastReceive
 			funcoes.setValorXml("RecebendoDados", "N");
 		}
 
-		if (!funcoes.getValorXml("RecebendoDados").equalsIgnoreCase("S")) {
+		if ((!funcoes.getValorXml("RecebendoDados").equalsIgnoreCase("S")) && (usuarioRotinas.existeUsuario() == true) && (!funcoes.getValorXml("CodigoUsuario").equalsIgnoreCase(funcoes.NAO_ENCONTRADO)) ) {
 
 			// Checa se o tipo de conexao eh por webservice
 			if (funcoes.getValorXml("ModoConexao").equalsIgnoreCase("W")){

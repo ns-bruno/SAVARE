@@ -781,7 +781,7 @@ public class OrcamentoProdutoDetalhesMDFragment extends Fragment {
 
         adapterEstoque = new ItemUniversalAdapter(getContext(), ItemUniversalAdapter.ESTOQUE);
         // Inseri uma lista dentro do adapter
-        adapterEstoque.setListaEstoque(estoqueRotinas.listaEstoqueProduto(idProduto, "AEALOCES.TIPO_VENDA = '" + atacadoVarejo + "'"));
+        adapterEstoque.setListaEstoque(estoqueRotinas.listaEstoqueProduto(idProduto, "(AEALOCES.TIPO_VENDA = '" + atacadoVarejo + "') OR (AEALOCES.TIPO_VENDA = '2')"));
         // Inseri o adapter dentro do spinner
         spinnerEstoque.setAdapter(adapterEstoque);
     }

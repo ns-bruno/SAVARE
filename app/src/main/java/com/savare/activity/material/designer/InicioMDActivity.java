@@ -376,7 +376,7 @@ public class InicioMDActivity extends AppCompatActivity {
         if (dadosEmpresa != null && dadosUsuario != null) {
 
             // Checa se esta liberado para vender no atacado
-            if (dadosUsuario.getVendeAtacadoUsuario() == '1'){
+            if ((dadosUsuario.getVendeAtacadoUsuario() == '1') && (dadosEmpresa.getTitpoAcumuloCreditoAtacado().length() > 0) && (dadosEmpresa.getPeriodocrceditoAtacado().length() > 0)){
                 // Vareavel para salvar a descricao do card
                 String descricaoCard = "";
 
@@ -432,7 +432,7 @@ public class InicioMDActivity extends AppCompatActivity {
                 // Checa se esta liberado para vender no varejo
             }
 
-            if (dadosUsuario.getVendeVarejoUsuario() == '1'){
+            if ((dadosUsuario.getVendeVarejoUsuario() == '1') && (dadosEmpresa.getTitpoAcumuloCreditoVarejo().length() > 0) && (dadosEmpresa.getPeriodocrceditoVarejo().length() > 0)){
                 String descricaoCard = "";
                 // Checa se o tipo eh por valor para vendas no varejo
                 if (dadosEmpresa.getTitpoAcumuloCreditoVarejo().equalsIgnoreCase("V")) {

@@ -13,6 +13,8 @@ import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.github.johnpersano.supertoasts.SuperToast;
+import com.github.johnpersano.supertoasts.util.Style;
 import com.savare.R;
 import com.savare.activity.material.designer.OrcamentoTabFragmentMDActivity;
 import com.savare.adapter.ItemUniversalAdapter;
@@ -113,7 +115,7 @@ public class OrcamentoPrazoMDFragment extends Fragment{
             }
         });
 
-        CarregarPrazoOrcamento carregarPrazoOrcamento = new CarregarPrazoOrcamento(textCodigoOrcamento.getText().toString(), textAtacadoVarejo.getText().toString());
+        CarregarPrazoOrcamento carregarPrazoOrcamento = new CarregarPrazoOrcamento(textCodigoOrcamento.getText().toString(), atacadoVarejo);
         carregarPrazoOrcamento.execute();
 
         return viewOrcamentoPrazo;
@@ -290,7 +292,10 @@ public class OrcamentoPrazoMDFragment extends Fragment{
             ContentValues valoresItemOrcamento = new ContentValues();
             valoresItemOrcamento.put("ID_AEAPLPGT", adapterPlanoPagamento.getListaPlanoPagamento().get(spinnerPlanoPagamento.getSelectedItemPosition()).getIdPlanoPagamento());
             // Salva o plano de pagamento nos itens do orcamento
-            orcamentoRotinas.updatePlanoPagamentoItemOrcamento(valoresItemOrcamento, textCodigoOrcamento.getText().toString());
+            if (orcamentoRotinas.updatePlanoPagamentoItemOrcamento(valoresItemOrcamento, textCodigoOrcamento.getText().toString()) > 0){
+
+                SuperToast.create(getContext(), getResources().getString(R.string.atualizado_sucesso), SuperToast.Duration.SHORT, Style.getStyle(Style.GREEN, SuperToast.Animations.POPUP)).show();
+            }
 
             progressBarStatus.setVisibility(View.GONE);
         }

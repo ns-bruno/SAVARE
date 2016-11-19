@@ -11,6 +11,7 @@ import com.heinrichreimersoftware.materialintro.slide.FragmentSlide;
 import com.heinrichreimersoftware.materialintro.slide.SimpleSlide;
 import com.heinrichreimersoftware.materialintro.slide.Slide;
 import com.savare.R;
+import com.savare.activity.material.designer.fragment.ChaveUsuarioFragment;
 import com.savare.activity.material.designer.fragment.LoginFragment;
 import com.savare.activity.material.designer.fragment.RecebeDadosWebserviceFragment;
 import com.savare.configuracao.ConfiguracoesInternas;
@@ -61,7 +62,7 @@ public class RegistroChaveUsuarioMDActivity extends IntroActivity {
                 .scrollable(scrollable)
                 .build());
 
-        addSlide(new SimpleSlide.Builder()
+        /*addSlide(new SimpleSlide.Builder()
                 .title(R.string.registrar_voce_como_usuario)
                 .description(R.string.orientacao_registrar_usuario)
                 //.image(R.drawable.ic_account_key)
@@ -82,7 +83,15 @@ public class RegistroChaveUsuarioMDActivity extends IntroActivity {
                         //nextSlide();
                     }
                 })
-                .build());
+                .build());*/
+
+        Slide chaveSlide = new FragmentSlide.Builder()
+                .background(R.color.md_red_A700)
+                .backgroundDark(R.color.md_red_A400)
+                .fragment(ChaveUsuarioFragment.newInstance())
+                .build();
+        addSlide(chaveSlide);
+
 
         Slide loginSlide = new FragmentSlide.Builder()
                 .background(R.color.md_indigo_900)
@@ -136,6 +145,8 @@ public class RegistroChaveUsuarioMDActivity extends IntroActivity {
                 if (chaveUsuario.length() >= 36) {
                     FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(RegistroChaveUsuarioMDActivity.this);
                     funcoes.setValorXml("ChaveUsuario", chaveUsuario);
+
+                    SuperToast.create(RegistroChaveUsuarioMDActivity.this, getResources().getString(R.string.chave_salva_sucesso), SuperToast.Duration.LONG, Style.getStyle(Style.GREEN, SuperToast.Animations.POPUP)).show();
                 } else {
                     SuperToast.create(RegistroChaveUsuarioMDActivity.this, getResources().getString(R.string.tamanho_chave_nao_permitido), SuperToast.Duration.LONG, Style.getStyle(Style.RED, SuperToast.Animations.POPUP)).show();
                 }

@@ -172,6 +172,7 @@
     <string name="pegamos_produto">Pegamos o produto</string>
     <string name="clientes">Clientes</string>
     <string name="orcamentos">Orçamentos</string>
+    <string name="orcamento_pedido">Orçamento(s)/Pedido(s)</string>
     <string name="produtos">Produtos</string>
     <string name="titulos">Títulos</string>
     <string name="pedidos_a_enviar">Pedidos à Enviar</string>
@@ -227,6 +228,7 @@
     <string name="erro_validar_versao">Erro ao validar a versao do SAVARE, entre em contato com o suporte técnico do SAVARE</string>
     <string name="senha_login">Senha do Login</string>
     <string name="proximo">Próximo</string>
+    <string name="digitar_chave">Digitar Chave de Licença</string>
     <string name="nao_tenho_chave">Não tenho nenhuma chave de licença</string>
     <string name="primeiro_passo">Antes de iniciar a aplicação precisamos configurar algumas coisas.</string>
     <string name="tenho_chave_licenca">Eu tenho uma chave de licença</string>
@@ -237,6 +239,7 @@
 <string name="orientacao_registrar_usuario">Se você adquiriu uma chave/licença para usar o SAVARE clique no botão \"EU TENHO UMA CHAVE DE LICENÇA\", ou se você quer fazer
     um teste primeiro basta ir para o próximo passo.</string>
     <string name="terminamos_primeiros_passos">Terminamos os primeiros passos</string>
+    <string name="terminamos">Terminamos</string>
     <string name="pronto_para_iniciar_savare">Pronto, terminamos os primeiros passos, agora vamos iniciar o SAVARE e receber uma gama de dados.</string>
     <string name="escanear_codigo_barras">Escanear código de barras</string>
     <string name="cancelado">Cancelado</string>
@@ -244,6 +247,7 @@
     <string name="servidor_nuvem_retornou_alguma_coisa">O servidor em nuvem retornou alguns dados, vamos checar agora, aguarde por favor...</string>
     <string name="achamos_usuario_servidor_nuvem">Achamos um usuário no servidor em nuvem. </string>
     <string name="usuario_atualizado_sucesso">Usuário atualizado com sucesso.</string>
+    <string name="atualizado_sucesso">Atualizado com Sucesso.</string>
     <string name="nao_conseguimos_atualizar_usuario">Não conseguimos atualizar o usuário, tente novamente, se persistir entre em contato com o suporte SAVARE.</string>
     <string name="nome_login_invalido">Nome de login inválido, tente outro sem espaço e sem caracteres especiais.</string>
     <string name="tamanho_chave_nao_permitido">Tamanho da chave não é permitida</string>
@@ -291,6 +295,10 @@
     <string name="estamos_checando_pedido_numero">Estamos checando o pedido Nº </string>
     <string name="selecione_tipo_documento">Selecione o tipo de documento</string>
     <string name="sincroniza_webservice">Sincronizar com Servidor Web</string>
+    <string name="chave_salva_sucesso">Chave salva com sucesso.</string>
+    <string name="digite_chave">Digite a sua chave de licença</string>
+    <string name="atacado">Atacado</string>
+    <string name="varejo">Varejo</string>
 
     <string-array name="tab_produto_md">
         <item>Produtos</item>

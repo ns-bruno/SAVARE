@@ -263,8 +263,8 @@ public class CadastroUsuarioActivity extends Activity {
 		funcoes.setValorXml("ChaveUsuario", editChaveUsuario.getText().toString());
 		funcoes.setValorXml("CodigoEmpresa", editCodigoEmpresa.getText().toString());
 		funcoes.setValorXml("Email", editEmail.getText().toString());
-		funcoes.setValorXml("EnviarAutomatico", "S");
-		funcoes.setValorXml("ReceberAutomatico", "S");
+		funcoes.setValorXml("EnviarAutomatico", "N");
+		funcoes.setValorXml("ReceberAutomatico", "N");
 		funcoes.setValorXml("ImagemProduto", "N");
 		funcoes.setValorXml("AbriuAppPriveiraVez", "S");
 		funcoes.setValorXml("IPServidorWebservice", editIpServidorWebservice.getText().toString());

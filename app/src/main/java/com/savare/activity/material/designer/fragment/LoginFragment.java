@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.github.johnpersano.supertoasts.SuperToast;
@@ -33,6 +34,7 @@ public class LoginFragment extends SlideFragment {
     private EditText password;
     private Button login;
     private ProgressBar progressBarStatus;
+    private TextView textStatus;
     private Bundle parametros;
 
     public LoginFragment() {
@@ -52,6 +54,7 @@ public class LoginFragment extends SlideFragment {
         password = (EditText) root.findViewById(R.id.fragment_login_password);
         login = (Button) root.findViewById(R.id.fragment_login_login);
         progressBarStatus = (ProgressBar) root.findViewById(R.id.fragment_login_progressBar_status);
+        textStatus = (TextView) root.findViewById(R.id.fragment_login_text_status);
 
         login.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -61,7 +64,10 @@ public class LoginFragment extends SlideFragment {
                     username.setEnabled(false);
                     password.setEnabled(false);
                     login.setEnabled(false);
-                    login.setText(R.string.aguarde_buscando_primeiros_dados);
+                    //login.setText(R.string.aguarde_buscando_primeiros_dados);
+
+                    textStatus.setVisibility(View.VISIBLE);
+                    textStatus.setText(R.string.aguarde_buscando_primeiros_dados);
 
                     final FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(getContext());
                     funcoes.setValorXml("Usuario", username.getText().toString());
@@ -81,7 +87,10 @@ public class LoginFragment extends SlideFragment {
                                             // Verfifica se existe algum usuario cadastrado, ou
                                             if ((rotinas.existeUsuario() == true) && (!funcoes.getValorXml("CodigoUsuario").equalsIgnoreCase(funcoes.NAO_ENCONTRADO))) {
 
-                                                login.setText(R.string.logado_sucesso);
+                                                SuperToast.create(getContext(), getResources().getString(R.string.usuario_atualizado_sucesso), SuperToast.Duration.LONG, Style.getStyle(Style.GREEN, SuperToast.Animations.POPUP)).show();
+
+                                                //login.setText(R.string.logado_sucesso);
+                                                textStatus.setText(R.string.logado_sucesso);
 
                                                 // Deixa a barra de progresso invisivel
                                                 progressBarStatus.setVisibility(View.INVISIBLE);
@@ -92,6 +101,13 @@ public class LoginFragment extends SlideFragment {
                                                         .content("Não conseguimos receber os dados do usuário, por favor, tente novamente.")
                                                         .positiveText(R.string.button_ok)
                                                         .show();
+
+                                                ((Activity) getContext()).runOnUiThread(new Runnable() {
+                                                    public void run() {
+                                                        textStatus.setText(R.string.nao_conseguimos_atualizar_usuario);
+                                                    }
+                                                });
+
 
                                                 // Abilita novamente os campos e o botao
                                                 username.setEnabled(true);
@@ -107,7 +123,7 @@ public class LoginFragment extends SlideFragment {
                                     new String[]{WSSisinfoWebservice.FUNCTION_SELECT_USUARIO_USUA});
 
                             // Insiro um textView para mostra o status
-                            receberDadosWebservice.setTextStatus(login);
+                            receberDadosWebservice.setTextStatus(textStatus);
 
                             // Executa o asynctask
                             receberDadosWebservice.execute();

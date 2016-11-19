@@ -11,6 +11,8 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.github.johnpersano.supertoasts.SuperToast;
+import com.github.johnpersano.supertoasts.util.Style;
 import com.savare.R;
 import com.savare.activity.material.designer.OrcamentoTabFragmentMDActivity;
 import com.savare.funcoes.FuncoesPersonalizadas;
@@ -85,8 +87,9 @@ public class OrcamentoObservacaoMDFragment extends Fragment {
 
                             OrcamentoRotinas orcamentoRotinas = new OrcamentoRotinas(getActivity());
                             // Inseri a obs no banco de dados
-                            orcamentoRotinas.updateOrcamento(dadosObservacao, textCodigoOrcamento.getText().toString());
-
+                            if (orcamentoRotinas.updateOrcamento(dadosObservacao, textCodigoOrcamento.getText().toString()) > 0){
+                                SuperToast.create(getContext(), getResources().getString(R.string.atualizado_sucesso), SuperToast.Duration.SHORT, Style.getStyle(Style.GREEN, SuperToast.Animations.POPUP)).show();
+                            }
                         } else {
                             FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(getActivity());
                             // Cria uma variavem para inserir as propriedades da mensagem
