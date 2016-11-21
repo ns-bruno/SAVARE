@@ -138,7 +138,6 @@ public class FuncoesSql {
 		try {
 			// Inseri os valores no banco de dados
 			id = bancoDados.insertWithOnConflict(tabela, null, values, SQLiteDatabase.CONFLICT_REPLACE);
-	        
 			/*if (id > 0){
 				ContentValues mensagem = new ContentValues();
 				mensagem.put("mensagem", "Cadastrado com Sucesso!");

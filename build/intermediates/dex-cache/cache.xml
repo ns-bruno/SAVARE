@@ -88,7 +88,7 @@
         jumboMode="true"
         optimize="true"
         revision="24.0.0"
-        sha1="626cbcf54f4b1efef66eb6941b140b91bbf0dca8">
+        sha1="bcabb26f2f5d0d458738f8d1657ac4804c29f9a3">
         <dex dex="E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\transforms\dex\debug\folders\1000\10\instant-run_f220a86ac17998e0905b58d345ff95e80b3a0448\classes.dex" />
     </item>
     <item
@@ -376,7 +376,7 @@
         jumboMode="true"
         optimize="true"
         revision="24.0.0"
-        sha1="b7512a5ba1f96e3fc43ccb777df95674bb58f323">
+        sha1="d4cbc7fad42891051290110dec28767cc0f8290f">
         <dex dex="E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\transforms\dex\debug\folders\1000\10\instant-run-bootstrap_eab7dc508a7a330ac9c40f72451d72461e8a2173\classes.dex" />
     </item>
     <item

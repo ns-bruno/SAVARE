@@ -8,12 +8,23 @@ import android.content.Intent;
 
 public class ReceptorCriarAlarmeRebootRotinas extends BroadcastReceiver {
 
+	boolean enviarAutomatico = false;
+	boolean receberAutomatico = false;
+
 	@Override
 	public void onReceive(Context context, Intent intent) {
-		
+
 		FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
-		
-		funcoes.criarAlarmeEnviarReceberDadosAutomatico(true, true);
+
+		if (funcoes.getValorXml("EnviarAutomatico").equalsIgnoreCase("S")){
+			enviarAutomatico = true;
+		}
+
+		if (funcoes.getValorXml("ReceberAutomatico").equalsIgnoreCase("S")){
+			receberAutomatico = true;
+		}
+
+		funcoes.criarAlarmeEnviarReceberDadosAutomatico(enviarAutomatico, receberAutomatico);
 
 	}
 
