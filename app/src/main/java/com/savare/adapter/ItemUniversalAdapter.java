@@ -870,14 +870,16 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 			if(produto.isProdutoNovo()){
 				// Muda o fundo do view
 				view.setBackgroundColor(context.getResources().getColor(R.color.azul_medio_200));
-				
-				// muda a cor dos texto do produto
-				textDescricao.setTextColor(this.context.getResources().getColor(R.color.branco));
-				textAbaixoDescricaoDireita.setTextColor(this.context.getResources().getColor(R.color.branco));
-				textAbaixoDescricaoEsqueda.setTextColor(this.context.getResources().getColor(R.color.branco));
-				textBottonDireito.setTextColor(this.context.getResources().getColor(R.color.branco));
-				textBottonEsquerdo.setTextColor(this.context.getResources().getColor(R.color.branco));
-				textBottonEsquerdoDois.setTextColor(this.context.getResources().getColor(R.color.branco));
+
+				if (produto.getEstaNoOrcamento() != '1') {
+					// muda a cor dos texto do produto
+					textDescricao.setTextColor(this.context.getResources().getColor(R.color.branco));
+					textAbaixoDescricaoDireita.setTextColor(this.context.getResources().getColor(R.color.branco));
+					textAbaixoDescricaoEsqueda.setTextColor(this.context.getResources().getColor(R.color.branco));
+					textBottonDireito.setTextColor(this.context.getResources().getColor(R.color.branco));
+					textBottonEsquerdo.setTextColor(this.context.getResources().getColor(R.color.branco));
+					textBottonEsquerdoDois.setTextColor(this.context.getResources().getColor(R.color.branco));
+				}
 				
 				// Deixa o texto em negrito
 				textDescricao.setTypeface(null, Typeface.BOLD);

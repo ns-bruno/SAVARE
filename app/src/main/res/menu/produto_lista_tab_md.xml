@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto" >
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
         android:id="@+id/menu_produto_lista_tab_md_search_pesquisar"
@@ -18,6 +18,10 @@
         android:title="@string/limpar_historico"
         app:showAsAction="never" />
 
-
-
+    <item
+        android:id="@+id/menu_produto_lista_tab_md_produtos_novos"
+        android:orderInCategory="103"
+        android:icon="@mipmap/ic_new_box"
+        android:title="@string/apenas_produtos_novos"
+        app:showAsAction="never" />
 </menu>

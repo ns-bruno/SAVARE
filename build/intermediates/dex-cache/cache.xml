@@ -30,6 +30,33 @@
     </item>
     <item
         is-multidex="true"
+        jar="E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\com.android.support\recyclerview-v7\24.2.0\jars\classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="24.0.0"
+        sha1="c755536e5a100d9c76c8ea0b72f76c018f7a9de2">
+        <dex dex="E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\transforms\dex\debug\folders\1000\10\com.android.support-recyclerview-v7-24.2.0_0922dee5241e91f7497ee119ca73668e90f76311\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\com.android.support\cardview-v7\23.2.1\jars\classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="24.0.0"
+        sha1="cb86970df0f0f25f766d320b279c7858c1ca0003">
+        <dex dex="E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\transforms\dex\debug\folders\1000\10\com.android.support-cardview-v7-23.2.1_af80655360e7ebd87be465e6ff27576918175a46\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\com.android.support\appcompat-v7\24.2.0\jars\classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="24.0.0"
+        sha1="c3c638be6e650b165ab9ae144857b64e82787fad">
+        <dex dex="E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\transforms\dex\debug\folders\1000\10\com.android.support-appcompat-v7-24.2.0_53e9a03c7acca763bad36c16558e2430ecc86555\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
         jar="E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\libs\libGoogleAnalyticsServices.jar"
         jumboMode="true"
         optimize="true"
@@ -57,12 +84,66 @@
     </item>
     <item
         is-multidex="true"
+        jar="E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\libs\jdom-2.0.5.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="24.0.0"
+        sha1="2001db51c131e555bafdb77fc52af6a9408c505e">
+        <dex dex="E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\transforms\dex\debug\folders\1000\2\jdom-2.0.5_7293ad8764bd430bdeaa0798642a03cdaa092b93\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\com.ogaclejapan.smarttablayout\library\1.6.0\jars\classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="24.0.0"
+        sha1="773103b47908c3026873309dd5d968b7fc6556eb">
+        <dex dex="E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\transforms\dex\debug\folders\1000\10\com.ogaclejapan.smarttablayout-library-1.6.0_2ffb4b9ebc83e84ea0d79de391cee10baf96106b\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
         jar="E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\com.android.support\support-core-ui\24.2.0\jars\libs\internal_impl-24.2.0.jar"
         jumboMode="true"
         optimize="true"
         revision="24.0.0"
         sha1="6e02e34594ebe9c0501ffda8dd48497f81b82977">
         <dex dex="E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\transforms\dex\debug\folders\1000\10\internal_impl-24.2.0_27591f842e630cbc31aef332e12bbeaa8711a3d0\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\me.sudar\zxing-orient\2.1.1\jars\classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="24.0.0"
+        sha1="70bcfb0b03448cd1bc52eb47df703909ca8d05c0">
+        <dex dex="E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\transforms\dex\debug\folders\1000\10\me.sudar-zxing-orient-2.1.1_cbfec619d38dfde03a395fb0bb9f9d5f38b78a2d\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\com.mikepenz\materialize\1.0.0\jars\classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="24.0.0"
+        sha1="84c98924eff3106f306c3e233cc2e6d84744f518">
+        <dex dex="E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\transforms\dex\debug\folders\1000\10\com.mikepenz-materialize-1.0.0_91c88c0182dc4ec715bf5bab2cb2b5a56616b996\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\Bruno\.gradle\caches\modules-2\files-2.1\org.apache.httpcomponents\httpclient-android\4.3.5.1\eecbb0b998e77629862a13d957d552b3be58fc4e\httpclient-android-4.3.5.1.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="24.0.0"
+        sha1="eecbb0b998e77629862a13d957d552b3be58fc4e">
+        <dex dex="E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\transforms\dex\debug\folders\1000\10\httpclient-android-4.3.5.1_64e5532739640820167eab2fc717009ebb60f2cd\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\com.android.support\animated-vector-drawable\24.2.0\jars\classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="24.0.0"
+        sha1="f3ee23ef25c9a8fe3d40246d0b7097267963a612">
+        <dex dex="E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\transforms\dex\debug\folders\1000\10\com.android.support-animated-vector-drawable-24.2.0_813d5fcd9fabaf5adf0428f31482567ef297b61b\classes.dex" />
     </item>
     <item
         is-multidex="true"
@@ -88,7 +169,7 @@
         jumboMode="true"
         optimize="true"
         revision="24.0.0"
-        sha1="bcabb26f2f5d0d458738f8d1657ac4804c29f9a3">
+        sha1="a0c36539e4ad9d7e27a902a0748a0117fc80def5">
         <dex dex="E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\transforms\dex\debug\folders\1000\10\instant-run_f220a86ac17998e0905b58d345ff95e80b3a0448\classes.dex" />
     </item>
     <item
@@ -129,12 +210,30 @@
     </item>
     <item
         is-multidex="true"
+        jar="E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\com.android.support\support-fragment\24.2.0\jars\classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="24.0.0"
+        sha1="d8bd2268fdcbfd52c76ade65d9900cd8def93a44">
+        <dex dex="E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\transforms\dex\debug\folders\1000\10\com.android.support-support-fragment-24.2.0_205d6dc920b922987dbfedf19a6e2f3161804f6e\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
         jar="C:\Users\Bruno\.gradle\caches\modules-2\files-2.1\com.nineoldandroids\library\2.4.0\e9b63380f3a242dbdbf103a2355ad7e43bad17cb\library-2.4.0.jar"
         jumboMode="true"
         optimize="true"
         revision="24.0.0"
         sha1="e9b63380f3a242dbdbf103a2355ad7e43bad17cb">
         <dex dex="E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\transforms\dex\debug\folders\1000\10\library-2.4.0_38d8f4cf16ebfcad497db98e476793accc4c2a04\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="F:\AndroidSDK\extras\android\m2repository\com\android\support\support-annotations\24.2.0\support-annotations-24.2.0.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="24.0.0"
+        sha1="6be858a75633b1f0a2d24cad740db57775cb6871">
+        <dex dex="E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\transforms\dex\debug\folders\1000\10\support-annotations-24.2.0_bf36b9f23deeab0922045d5a9bc5f0b19b0e3377\classes.dex" />
     </item>
     <item
         is-multidex="true"
@@ -156,6 +255,24 @@
     </item>
     <item
         is-multidex="true"
+        jar="E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\com.mikepenz\iconics-core\2.8.0\jars\classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="24.0.0"
+        sha1="dcac7435781db56e25ab17c3f662227c517fc327">
+        <dex dex="E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\transforms\dex\debug\folders\1000\10\com.mikepenz-iconics-core-2.8.0_b1fad8c1c0349ea3e16a22efdb37054be5c39836\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\com.android.support\support-core-ui\24.2.0\jars\classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="24.0.0"
+        sha1="c84e216d9bf618464d6b9564d71d9a656433e7c4">
+        <dex dex="E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\transforms\dex\debug\folders\1000\10\com.android.support-support-core-ui-24.2.0_843bf07f9375d9dd7e59d0f137f388fea3694608\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
         jar="E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\com.android.support\support-media-compat\24.2.0\jars\classes.jar"
         jumboMode="true"
         optimize="true"
@@ -174,12 +291,39 @@
     </item>
     <item
         is-multidex="true"
+        jar="E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\incremental-classes\debug\instant-run-bootstrap.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="24.0.0"
+        sha1="882baa630a9ae69d19063f689aa7367ec1653d6b">
+        <dex dex="E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\transforms\dex\debug\folders\1000\10\instant-run-bootstrap_eab7dc508a7a330ac9c40f72451d72461e8a2173\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\com.mikepenz\fastadapter\1.8.0\jars\classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="24.0.0"
+        sha1="21752cbe99942598e0b554b84e79b7c8d6f172f2">
+        <dex dex="E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\transforms\dex\debug\folders\1000\10\com.mikepenz-fastadapter-1.8.0_cac87f1aa2170f15a19e8cad4219813c76cbe0ab\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
         jar="E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\com.afollestad.material-dialogs\core\0.8.6.2\jars\classes.jar"
         jumboMode="true"
         optimize="true"
         revision="24.0.0"
         sha1="cbdf1602ce622f3445dc7513237f30930c6e4a5a">
         <dex dex="E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\transforms\dex\debug\folders\1000\10\com.afollestad.material-dialogs-core-0.8.6.2_6e68c04c7bda1fbb8dd7c93dfd90b0693e9b256f\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\libs\itextpdf-5.5.4.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="24.0.0"
+        sha1="81b48c75481eee3f322b3ce0a57edac5868d47e4">
+        <dex dex="E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\transforms\dex\debug\folders\1000\2\itextpdf-5.5.4_1935d8b4e3b834531c203caf20a67292d02e3cbc\classes.dex" />
     </item>
     <item
         is-multidex="true"
@@ -219,186 +363,6 @@
     </item>
     <item
         is-multidex="true"
-        jar="E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\libs\mpandroidchartlibrary-2-0-9.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="24.0.0"
-        sha1="db5a003a317b20269d6fbedcf9ee8917d6a66fff">
-        <dex dex="E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\transforms\dex\debug\folders\1000\2\mpandroidchartlibrary-2-0-9_2d1e9f677879b89bd422a6e7fe888143bb4c7b4d\classes.dex" />
-    </item>
-    <item
-        is-multidex="true"
-        jar="E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\com.android.support\support-core-utils\24.2.0\jars\classes.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="24.0.0"
-        sha1="fcc945a86ebcbf527429acb8216ec7dae2c06417">
-        <dex dex="E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\transforms\dex\debug\folders\1000\10\com.android.support-support-core-utils-24.2.0_2081b0318cb673503a32a2eb9bb68dc9b3f7a9fd\classes.dex" />
-    </item>
-    <item
-        is-multidex="true"
-        jar="E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\libs\ksoap2-android-assembly-3.6.0-jar-with-dependencies.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="24.0.0"
-        sha1="f14b0683eee5ccd32199d4b49b88e4772297918b">
-        <dex dex="E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\transforms\dex\debug\folders\1000\2\ksoap2-android-assembly-3.6.0-jar-with-dependencies_f661f6859a68ab08b57309d9965bd52a5ed6649d\classes.dex" />
-    </item>
-    <item
-        is-multidex="true"
-        jar="E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\de.hdodenhof\circleimageview\2.0.0\jars\classes.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="24.0.0"
-        sha1="031e8b3ab2df4ab43b1017f84417d7e10dfbb8d2">
-        <dex dex="E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\transforms\dex\debug\folders\1000\10\de.hdodenhof-circleimageview-2.0.0_dad4ceb34ae09f7be503b1959904e1de0eb48696\classes.dex" />
-    </item>
-    <item
-        is-multidex="true"
-        jar="E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\com.android.support\recyclerview-v7\24.2.0\jars\classes.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="24.0.0"
-        sha1="c755536e5a100d9c76c8ea0b72f76c018f7a9de2">
-        <dex dex="E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\transforms\dex\debug\folders\1000\10\com.android.support-recyclerview-v7-24.2.0_0922dee5241e91f7497ee119ca73668e90f76311\classes.dex" />
-    </item>
-    <item
-        is-multidex="true"
-        jar="E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\com.android.support\cardview-v7\23.2.1\jars\classes.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="24.0.0"
-        sha1="cb86970df0f0f25f766d320b279c7858c1ca0003">
-        <dex dex="E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\transforms\dex\debug\folders\1000\10\com.android.support-cardview-v7-23.2.1_af80655360e7ebd87be465e6ff27576918175a46\classes.dex" />
-    </item>
-    <item
-        is-multidex="true"
-        jar="E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\com.android.support\appcompat-v7\24.2.0\jars\classes.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="24.0.0"
-        sha1="c3c638be6e650b165ab9ae144857b64e82787fad">
-        <dex dex="E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\transforms\dex\debug\folders\1000\10\com.android.support-appcompat-v7-24.2.0_53e9a03c7acca763bad36c16558e2430ecc86555\classes.dex" />
-    </item>
-    <item
-        is-multidex="true"
-        jar="E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\libs\jdom-2.0.5.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="24.0.0"
-        sha1="2001db51c131e555bafdb77fc52af6a9408c505e">
-        <dex dex="E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\transforms\dex\debug\folders\1000\2\jdom-2.0.5_7293ad8764bd430bdeaa0798642a03cdaa092b93\classes.dex" />
-    </item>
-    <item
-        is-multidex="true"
-        jar="E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\com.ogaclejapan.smarttablayout\library\1.6.0\jars\classes.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="24.0.0"
-        sha1="773103b47908c3026873309dd5d968b7fc6556eb">
-        <dex dex="E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\transforms\dex\debug\folders\1000\10\com.ogaclejapan.smarttablayout-library-1.6.0_2ffb4b9ebc83e84ea0d79de391cee10baf96106b\classes.dex" />
-    </item>
-    <item
-        is-multidex="true"
-        jar="E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\me.sudar\zxing-orient\2.1.1\jars\classes.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="24.0.0"
-        sha1="70bcfb0b03448cd1bc52eb47df703909ca8d05c0">
-        <dex dex="E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\transforms\dex\debug\folders\1000\10\me.sudar-zxing-orient-2.1.1_cbfec619d38dfde03a395fb0bb9f9d5f38b78a2d\classes.dex" />
-    </item>
-    <item
-        is-multidex="true"
-        jar="E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\com.mikepenz\materialize\1.0.0\jars\classes.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="24.0.0"
-        sha1="84c98924eff3106f306c3e233cc2e6d84744f518">
-        <dex dex="E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\transforms\dex\debug\folders\1000\10\com.mikepenz-materialize-1.0.0_91c88c0182dc4ec715bf5bab2cb2b5a56616b996\classes.dex" />
-    </item>
-    <item
-        is-multidex="true"
-        jar="C:\Users\Bruno\.gradle\caches\modules-2\files-2.1\org.apache.httpcomponents\httpclient-android\4.3.5.1\eecbb0b998e77629862a13d957d552b3be58fc4e\httpclient-android-4.3.5.1.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="24.0.0"
-        sha1="eecbb0b998e77629862a13d957d552b3be58fc4e">
-        <dex dex="E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\transforms\dex\debug\folders\1000\10\httpclient-android-4.3.5.1_64e5532739640820167eab2fc717009ebb60f2cd\classes.dex" />
-    </item>
-    <item
-        is-multidex="true"
-        jar="E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\com.android.support\animated-vector-drawable\24.2.0\jars\classes.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="24.0.0"
-        sha1="f3ee23ef25c9a8fe3d40246d0b7097267963a612">
-        <dex dex="E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\transforms\dex\debug\folders\1000\10\com.android.support-animated-vector-drawable-24.2.0_813d5fcd9fabaf5adf0428f31482567ef297b61b\classes.dex" />
-    </item>
-    <item
-        is-multidex="true"
-        jar="E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\com.android.support\support-fragment\24.2.0\jars\classes.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="24.0.0"
-        sha1="d8bd2268fdcbfd52c76ade65d9900cd8def93a44">
-        <dex dex="E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\transforms\dex\debug\folders\1000\10\com.android.support-support-fragment-24.2.0_205d6dc920b922987dbfedf19a6e2f3161804f6e\classes.dex" />
-    </item>
-    <item
-        is-multidex="true"
-        jar="F:\AndroidSDK\extras\android\m2repository\com\android\support\support-annotations\24.2.0\support-annotations-24.2.0.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="24.0.0"
-        sha1="6be858a75633b1f0a2d24cad740db57775cb6871">
-        <dex dex="E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\transforms\dex\debug\folders\1000\10\support-annotations-24.2.0_bf36b9f23deeab0922045d5a9bc5f0b19b0e3377\classes.dex" />
-    </item>
-    <item
-        is-multidex="true"
-        jar="E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\com.mikepenz\iconics-core\2.8.0\jars\classes.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="24.0.0"
-        sha1="dcac7435781db56e25ab17c3f662227c517fc327">
-        <dex dex="E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\transforms\dex\debug\folders\1000\10\com.mikepenz-iconics-core-2.8.0_b1fad8c1c0349ea3e16a22efdb37054be5c39836\classes.dex" />
-    </item>
-    <item
-        is-multidex="true"
-        jar="E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\com.android.support\support-core-ui\24.2.0\jars\classes.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="24.0.0"
-        sha1="c84e216d9bf618464d6b9564d71d9a656433e7c4">
-        <dex dex="E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\transforms\dex\debug\folders\1000\10\com.android.support-support-core-ui-24.2.0_843bf07f9375d9dd7e59d0f137f388fea3694608\classes.dex" />
-    </item>
-    <item
-        is-multidex="true"
-        jar="E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\incremental-classes\debug\instant-run-bootstrap.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="24.0.0"
-        sha1="d4cbc7fad42891051290110dec28767cc0f8290f">
-        <dex dex="E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\transforms\dex\debug\folders\1000\10\instant-run-bootstrap_eab7dc508a7a330ac9c40f72451d72461e8a2173\classes.dex" />
-    </item>
-    <item
-        is-multidex="true"
-        jar="E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\com.mikepenz\fastadapter\1.8.0\jars\classes.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="24.0.0"
-        sha1="21752cbe99942598e0b554b84e79b7c8d6f172f2">
-        <dex dex="E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\transforms\dex\debug\folders\1000\10\com.mikepenz-fastadapter-1.8.0_cac87f1aa2170f15a19e8cad4219813c76cbe0ab\classes.dex" />
-    </item>
-    <item
-        is-multidex="true"
-        jar="E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\libs\itextpdf-5.5.4.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="24.0.0"
-        sha1="81b48c75481eee3f322b3ce0a57edac5868d47e4">
-        <dex dex="E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\transforms\dex\debug\folders\1000\2\itextpdf-5.5.4_1935d8b4e3b834531c203caf20a67292d02e3cbc\classes.dex" />
-    </item>
-    <item
-        is-multidex="true"
         jar="E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\me.zhanghai.android.materialprogressbar\library\1.1.7\jars\classes.jar"
         jumboMode="true"
         optimize="true"
@@ -426,12 +390,48 @@
     </item>
     <item
         is-multidex="true"
+        jar="E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\libs\mpandroidchartlibrary-2-0-9.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="24.0.0"
+        sha1="db5a003a317b20269d6fbedcf9ee8917d6a66fff">
+        <dex dex="E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\transforms\dex\debug\folders\1000\2\mpandroidchartlibrary-2-0-9_2d1e9f677879b89bd422a6e7fe888143bb4c7b4d\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
         jar="E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\com.android.support\support-fragment\24.2.0\jars\libs\internal_impl-24.2.0.jar"
         jumboMode="true"
         optimize="true"
         revision="24.0.0"
         sha1="032a4b53def5e2ceedfc2e793b126c0163cfa1dd">
         <dex dex="E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\transforms\dex\debug\folders\1000\10\internal_impl-24.2.0_500cc23e4e224926683b1058c3e5b50690c28951\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\com.android.support\support-core-utils\24.2.0\jars\classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="24.0.0"
+        sha1="fcc945a86ebcbf527429acb8216ec7dae2c06417">
+        <dex dex="E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\transforms\dex\debug\folders\1000\10\com.android.support-support-core-utils-24.2.0_2081b0318cb673503a32a2eb9bb68dc9b3f7a9fd\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\libs\ksoap2-android-assembly-3.6.0-jar-with-dependencies.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="24.0.0"
+        sha1="f14b0683eee5ccd32199d4b49b88e4772297918b">
+        <dex dex="E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\transforms\dex\debug\folders\1000\2\ksoap2-android-assembly-3.6.0-jar-with-dependencies_f661f6859a68ab08b57309d9965bd52a5ed6649d\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\de.hdodenhof\circleimageview\2.0.0\jars\classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="24.0.0"
+        sha1="031e8b3ab2df4ab43b1017f84417d7e10dfbb8d2">
+        <dex dex="E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\transforms\dex\debug\folders\1000\10\de.hdodenhof-circleimageview-2.0.0_dad4ceb34ae09f7be503b1959904e1de0eb48696\classes.dex" />
     </item>
     <item
         is-multidex="true"

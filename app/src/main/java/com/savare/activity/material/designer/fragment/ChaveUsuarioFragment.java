@@ -60,10 +60,10 @@ public class ChaveUsuarioFragment extends SlideFragment {
 
                         desativarCampos();
 
-                        SuperToast.create(getContext(), getResources().getString(R.string.chave_salva_sucesso), SuperToast.Duration.LONG, Style.getStyle(Style.GREEN, SuperToast.Animations.POPUP)).show();
+                        SuperToast.create(getContext(), getResources().getString(R.string.chave_salva_sucesso), SuperToast.Duration.SHORT, Style.getStyle(Style.GREEN, SuperToast.Animations.POPUP)).show();
 
                     } else {
-                        SuperToast.create(getContext(), getResources().getString(R.string.tamanho_chave_nao_permitido), SuperToast.Duration.LONG, Style.getStyle(Style.RED, SuperToast.Animations.POPUP)).show();
+                        SuperToast.create(getContext(), getResources().getString(R.string.tamanho_chave_nao_permitido), SuperToast.Duration.SHORT, Style.getStyle(Style.RED, SuperToast.Animations.POPUP)).show();
                     }
                 }
             }

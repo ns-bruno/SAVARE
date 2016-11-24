@@ -29,6 +29,8 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.github.johnpersano.supertoasts.SuperToast;
+import com.github.johnpersano.supertoasts.util.Style;
 import com.savare.R;
 import com.savare.activity.material.designer.ListaOrcamentoPedidoMDActivity;
 import com.savare.activity.material.designer.OrcamentoProdutoDetalhesTabFragmentMDActivity;
@@ -245,7 +247,7 @@ public class ProdutoListaMDFragment extends Fragment {
                                 + "(AEAPRODU.CODIGO_ESTRUTURAL LIKE '%" + query + "%') OR "
                                 + "(AEAPRODU.DESCRICAO_AUXILIAR LIKE '%" + query + "%') OR "
                                 + "(AEAPRODU.REFERENCIA LIKE '%" + query + "%') OR "
-                                + "(AEAMARCA.DESCRICAO LIKE '%" + query + "%') )";
+                                + "(AEAMARCA.DESCRICAO LIKE '%" + query + "%') ) OR (AEAMARCA.DESCRICAO LIKE '%"+ query +"%')";
 
                         if ((tipoTela == TELA_MAIS_VENDIDOS_AREA) || (tipoTela == TELA_MAIS_VENDIDOS_CIDADE)) {
                             // Limpa o listView
@@ -289,6 +291,42 @@ public class ProdutoListaMDFragment extends Fragment {
             }
         });
         searchView.setQueryHint(getResources().getString(R.string.pesquisar));
+
+
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        if (item.getItemId() == R.id.menu_produto_lista_tab_md_produtos_novos){
+            //SuperToast.create(getContext(), "Todos os Produtos", SuperToast.Duration.LONG, Style.getStyle(Style.BLUE, SuperToast.Animations.POPUP)).show();
+
+            // Monta a clausula where para buscar no banco de dados
+            String where = "( (JULIANDAY(DATE('NOW', 'LOCALTIME')) - JULIANDAY(AEAPRODU.DT_CAD)) <= SMAEMPRE.QTD_DIAS_DESTACA_PRODUTO )";
+
+            if ((tipoTela == TELA_MAIS_VENDIDOS_AREA) || (tipoTela == TELA_MAIS_VENDIDOS_CIDADE)) {
+                // Limpa o listView
+                listViewProdutos.setAdapter(null);
+                // Executa
+                LoaderProdutos loaderProdutosAsync = new LoaderProdutos(where, spinnerFiltro);
+                if ((loaderProdutosAsync.getStatus() == AsyncTask.Status.RUNNING)){
+                    loaderProdutosAsync.cancel(true);
+                }
+                loaderProdutosAsync.execute();
+
+            } else {
+                // Limpa o listView
+                listViewProdutos.setAdapter(null);
+                // Executa
+                LoaderProdutos loaderProdutosAsync = new LoaderProdutos(where, null);
+                if ((loaderProdutosAsync.getStatus() == AsyncTask.Status.RUNNING)){
+                    loaderProdutosAsync.cancel(true);
+                }
+                loaderProdutosAsync.execute();
+            }
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
