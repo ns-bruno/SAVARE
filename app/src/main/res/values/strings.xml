@@ -299,6 +299,7 @@
     <string name="digite_chave">Digite a sua chave de licença</string>
     <string name="atacado">Atacado</string>
     <string name="varejo">Varejo</string>
+    <string name="apenas_produtos_novos">Apenas Produtos Novos</string>
 
     <string-array name="tab_produto_md">
         <item>Produtos</item>

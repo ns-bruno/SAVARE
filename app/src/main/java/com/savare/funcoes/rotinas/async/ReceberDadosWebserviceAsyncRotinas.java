@@ -939,9 +939,9 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             // Cria uma notificacao
             PugNotification.with(context)
                     .load()
-                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR)
+                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + e.hashCode())
                     .title(R.string.importar_dados_recebidos)
-                    .bigTextStyle(e.getMessage())
+                    .bigTextStyle("ImportaDadosEmpresa- " + e.getMessage())
                     .smallIcon(R.mipmap.ic_launcher)
                     .largeIcon(R.mipmap.ic_launcher)
                     .flags(Notification.DEFAULT_ALL)
@@ -997,7 +997,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                     });
                 }
                 int controle = 0;
-
+                List<ContentValues> listaAreas = new ArrayList<ContentValues>();
                 // Passa por toda a lista
                 for (SoapObject objetoIndividual : listaAreasObject) {
                     final int finalControle = controle;
@@ -1037,13 +1037,17 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                     if ((objetoIndividual.hasProperty("descontoPromocao"))) {
                         dadosAreas.put("DESC_PROMOCAO", objetoIndividual.getProperty("descontoPromocao").toString());
                     }
-
-                    AreasSql areasSql = new AreasSql(context);
+                    listaAreas.add(dadosAreas);
+                    /*AreasSql areasSql = new AreasSql(context);
 
                     if (areasSql.insertOrReplace(dadosAreas) <= 0) {
                         todosSucesso = false;
-                    }
+                    }*/
                 } // Fim do for
+                AreasSql areasSql = new AreasSql(context);
+
+                areasSql.insertList(listaAreas);
+
                 // Checa se todos foram inseridos/atualizados com sucesso
                 if (todosSucesso) {
                     inserirUltimaAtualizacao("CFAAREAS");
@@ -1072,9 +1076,9 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             // Cria uma notificacao para ser manipulado
             PugNotification.with(context)
                     .load()
-                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR)
+                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + e.hashCode())
                     .title(R.string.importar_dados_recebidos)
-                    .bigTextStyle(e.getMessage())
+                    .bigTextStyle("ImportaDadosArea - " + e.getMessage())
                     .smallIcon(R.mipmap.ic_launcher)
                     .largeIcon(R.mipmap.ic_launcher)
                     .flags(Notification.DEFAULT_ALL)
@@ -1129,7 +1133,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                     });
                 }
                 int controle = 0;
-
+                List<ContentValues> listaAtividade = new ArrayList<ContentValues>();
                 // Passa por toda a lista
                 for (SoapObject objetoIndividual : listaAtividadeObject) {
                     final int finalControle = controle;
@@ -1163,30 +1167,33 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                         objeto = objetoIndividual;
                     }
 
-                    ContentValues dadosAreas = new ContentValues();
-                    dadosAreas.put("ID_CFAATIVI", Integer.parseInt(objeto.getProperty("idRamoAtividade").toString()));
-                    dadosAreas.put("DT_ALT", objeto.getProperty("dataAlteracao").toString());
-                    dadosAreas.put("CODIGO", Integer.parseInt(objeto.getProperty("codigo").toString()));
-                    dadosAreas.put("DESCRICAO", objeto.getProperty("descricaoRamoAtividade").toString());
-                    dadosAreas.put("DESC_ATAC_VISTA", Double.parseDouble(objeto.getProperty("descontoAtacadoVista").toString()));
-                    dadosAreas.put("DESC_ATAC_PRAZO", Double.parseDouble(objeto.getProperty("descontoAtacadoPrazo").toString()));
-                    dadosAreas.put("DESC_VARE_VISTA", Double.parseDouble(objeto.getProperty("descontoVarejoVista").toString()));
-                    dadosAreas.put("DESC_VARE_PRAZO", Double.parseDouble(objeto.getProperty("descontoVarejoPrazo").toString()));
+                    ContentValues dadosAtividade = new ContentValues();
+                    dadosAtividade.put("ID_CFAATIVI", Integer.parseInt(objeto.getProperty("idRamoAtividade").toString()));
+                    dadosAtividade.put("DT_ALT", objeto.getProperty("dataAlteracao").toString());
+                    dadosAtividade.put("CODIGO", Integer.parseInt(objeto.getProperty("codigo").toString()));
+                    dadosAtividade.put("DESCRICAO", objeto.getProperty("descricaoRamoAtividade").toString());
+                    dadosAtividade.put("DESC_ATAC_VISTA", Double.parseDouble(objeto.getProperty("descontoAtacadoVista").toString()));
+                    dadosAtividade.put("DESC_ATAC_PRAZO", Double.parseDouble(objeto.getProperty("descontoAtacadoPrazo").toString()));
+                    dadosAtividade.put("DESC_VARE_VISTA", Double.parseDouble(objeto.getProperty("descontoVarejoVista").toString()));
+                    dadosAtividade.put("DESC_VARE_PRAZO", Double.parseDouble(objeto.getProperty("descontoVarejoPrazo").toString()));
                     if ((objeto.hasProperty("descontoPromocao"))) {
-                        dadosAreas.put("DESC_PROMOCAO", objeto.getProperty("descontoPromocao").toString());
+                        dadosAtividade.put("DESC_PROMOCAO", objeto.getProperty("descontoPromocao").toString());
                     }
-
-                    RamoAtividadeSql atividadeSql = new RamoAtividadeSql(context);
+                    listaAtividade.add(dadosAtividade);
+                    //RamoAtividadeSql atividadeSql = new RamoAtividadeSql(context);
 
                     // Pega o sql para passar para o statement
-                    //final String sql = atividadeSql.construirSqlStatement(dadosAreas);
+                    //final String sql = atividadeSql.construirSqlStatement(dadosAtividade);
                     // Pega o argumento para o statement
-                    //final String[] argumentoSql = atividadeSql.argumentoStatement(dadosAreas);
+                    //final String[] argumentoSql = atividadeSql.argumentoStatement(dadosAtividade);
 
-                    if (atividadeSql.insertOrReplace(dadosAreas) <= 0) {
+                    /*if (atividadeSql.insertOrReplace(dadosAtividade) <= 0) {
                         todosSucesso = false;
-                    }
+                    }*/
                 } // Fim do for
+                RamoAtividadeSql atividadeSql = new RamoAtividadeSql(context);
+                atividadeSql.insertList(listaAtividade);
+
                 // Checa se todos foram inseridos/atualizados com sucesso
                 if (todosSucesso) {
                     inserirUltimaAtualizacao("CFAATIVI");
@@ -1215,9 +1222,9 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             // Cria uma notificacao para ser manipulado
             PugNotification.with(context)
                     .load()
-                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR)
+                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + e.hashCode())
                     .title(R.string.importar_dados_recebidos)
-                    .bigTextStyle(e.getMessage())
+                    .bigTextStyle("ImportaDadosAtividade - " + e.getMessage())
                     .smallIcon(R.mipmap.ic_launcher)
                     .largeIcon(R.mipmap.ic_launcher)
                     .flags(Notification.DEFAULT_ALL)
@@ -1370,9 +1377,9 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             // Cria uma notificacao para ser manipulado
             PugNotification.with(context)
                     .load()
-                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR)
+                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + e.hashCode())
                     .title(R.string.importar_dados_recebidos)
-                    .bigTextStyle(e.getMessage())
+                    .bigTextStyle("ImportaDadosStatus - " + e.getMessage())
                     .smallIcon(R.mipmap.ic_launcher)
                     .largeIcon(R.mipmap.ic_launcher)
                     .flags(Notification.DEFAULT_ALL)
@@ -1519,9 +1526,9 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             // Cria uma notificacao para ser manipulado
             PugNotification.with(context)
                     .load()
-                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR)
+                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + e.hashCode())
                     .title(R.string.importar_dados_recebidos)
-                    .bigTextStyle(e.getMessage())
+                    .bigTextStyle("ImportaDadosTipoDocumento - " + e.getMessage())
                     .smallIcon(R.mipmap.ic_launcher)
                     .largeIcon(R.mipmap.ic_launcher)
                     .flags(Notification.DEFAULT_ALL)
@@ -1660,9 +1667,9 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             // Cria uma notificacao para ser manipulado
             PugNotification.with(context)
                     .load()
-                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR)
+                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + hashCode())
                     .title(R.string.importar_dados_recebidos)
-                    .bigTextStyle(e.getMessage())
+                    .bigTextStyle("ImportaDadosCartaoCredito - " + e.getMessage())
                     .smallIcon(R.mipmap.ic_launcher)
                     .largeIcon(R.mipmap.ic_launcher)
                     .flags(Notification.DEFAULT_ALL)
@@ -1812,9 +1819,9 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             // Cria uma notificacao para ser manipulado
             PugNotification.with(context)
                     .load()
-                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR)
+                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + e.hashCode())
                     .title(R.string.importar_dados_recebidos)
-                    .bigTextStyle(e.getMessage())
+                    .bigTextStyle("ImportaDadosPortador - " + e.getMessage())
                     .smallIcon(R.mipmap.ic_launcher)
                     .largeIcon(R.mipmap.ic_launcher)
                     .flags(Notification.DEFAULT_ALL)
@@ -1962,9 +1969,9 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             // Cria uma notificacao para ser manipulado
             PugNotification.with(context)
                     .load()
-                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR)
+                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + e.hashCode())
                     .title(R.string.importar_dados_recebidos)
-                    .bigTextStyle(e.getMessage())
+                    .bigTextStyle("ImportaDadosProfissao - " + e.getMessage())
                     .smallIcon(R.mipmap.ic_launcher)
                     .largeIcon(R.mipmap.ic_launcher)
                     .flags(Notification.DEFAULT_ALL)
@@ -2114,9 +2121,9 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             // Cria uma notificacao para ser manipulado
             PugNotification.with(context)
                     .load()
-                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR)
+                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + e.hashCode())
                     .title(R.string.importar_dados_recebidos)
-                    .bigTextStyle(e.getMessage())
+                    .bigTextStyle("ImportaDadosTipoCliente - " + e.getMessage())
                     .smallIcon(R.mipmap.ic_launcher)
                     .largeIcon(R.mipmap.ic_launcher)
                     .flags(Notification.DEFAULT_ALL)
@@ -2256,9 +2263,9 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             // Cria uma notificacao para ser manipulado
             PugNotification.with(context)
                     .load()
-                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR)
+                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + e.hashCode())
                     .title(R.string.importar_dados_recebidos)
-                    .bigTextStyle(e.getMessage())
+                    .bigTextStyle("ImportaDadosTipoCobranca - " + e.getMessage())
                     .smallIcon(R.mipmap.ic_launcher)
                     .largeIcon(R.mipmap.ic_launcher)
                     .flags(Notification.DEFAULT_ALL)
@@ -2406,9 +2413,9 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             // Cria uma notificacao para ser manipulado
             PugNotification.with(context)
                     .load()
-                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR)
+                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + e.hashCode())
                     .title(R.string.importar_dados_recebidos)
-                    .bigTextStyle(e.getMessage())
+                    .bigTextStyle("ImportaDadosEstado - " + e.getMessage())
                     .smallIcon(R.mipmap.ic_launcher)
                     .largeIcon(R.mipmap.ic_launcher)
                     .flags(Notification.DEFAULT_ALL)
@@ -2548,9 +2555,9 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             // Cria uma notificacao para ser manipulado
             PugNotification.with(context)
                     .load()
-                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR)
+                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + e.hashCode())
                     .title(R.string.importar_dados_recebidos)
-                    .bigTextStyle(e.getMessage())
+                    .bigTextStyle("ImportaDadosCidade - " + e.getMessage())
                     .smallIcon(R.mipmap.ic_launcher)
                     .largeIcon(R.mipmap.ic_launcher)
                     .flags(Notification.DEFAULT_ALL)
@@ -2852,9 +2859,9 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             // Cria uma notificacao para ser manipulado
             PugNotification.with(context)
                     .load()
-                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR)
+                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + e.hashCode())
                     .title(R.string.importar_dados_recebidos)
-                    .bigTextStyle(e.getMessage())
+                    .bigTextStyle("ImportaDadosClifo - " + e.getMessage())
                     .smallIcon(R.mipmap.ic_launcher)
                     .largeIcon(R.mipmap.ic_launcher)
                     .flags(Notification.DEFAULT_ALL)
@@ -3025,9 +3032,9 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             // Cria uma notificacao para ser manipulado
             PugNotification.with(context)
                     .load()
-                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR)
+                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + e.hashCode())
                     .title(R.string.importar_dados_recebidos)
-                    .bigTextStyle(e.getMessage())
+                    .bigTextStyle("ImportaDadosEndereco - " + e.getMessage())
                     .smallIcon(R.mipmap.ic_launcher)
                     .largeIcon(R.mipmap.ic_launcher)
                     .flags(Notification.DEFAULT_ALL)
@@ -3246,9 +3253,9 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             // Cria uma notificacao para ser manipulado
             PugNotification.with(context)
                     .load()
-                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR)
+                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + e.hashCode())
                     .title(R.string.importar_dados_recebidos)
-                    .bigTextStyle(e.getMessage())
+                    .bigTextStyle("ImportaDadosParametros - " + e.getMessage())
                     .smallIcon(R.mipmap.ic_launcher)
                     .largeIcon(R.mipmap.ic_launcher)
                     .flags(Notification.DEFAULT_ALL)
@@ -3404,9 +3411,9 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             // Cria uma notificacao para ser manipulado
             PugNotification.with(context)
                     .load()
-                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR)
+                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + e.hashCode())
                     .title(R.string.importar_dados_recebidos)
-                    .bigTextStyle(e.getMessage())
+                    .bigTextStyle("ImportaDadosFotos - " + e.getMessage())
                     .smallIcon(R.mipmap.ic_launcher)
                     .largeIcon(R.mipmap.ic_launcher)
                     .flags(Notification.DEFAULT_ALL)
@@ -3557,9 +3564,9 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             // Cria uma notificacao para ser manipulado
             PugNotification.with(context)
                     .load()
-                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR)
+                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + e.hashCode())
                     .title(R.string.importar_dados_recebidos)
-                    .bigTextStyle(e.getMessage())
+                    .bigTextStyle("ImportaDadosPlanoPagamento - " + e.getMessage())
                     .smallIcon(R.mipmap.ic_launcher)
                     .largeIcon(R.mipmap.ic_launcher)
                     .flags(Notification.DEFAULT_ALL)
@@ -3698,9 +3705,9 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             // Cria uma notificacao para ser manipulado
             PugNotification.with(context)
                     .load()
-                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR)
+                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + e.hashCode())
                     .title(R.string.importar_dados_recebidos)
-                    .bigTextStyle(e.getMessage())
+                    .bigTextStyle("ImportaDadosClasseProdutos - " + e.getMessage())
                     .smallIcon(R.mipmap.ic_launcher)
                     .largeIcon(R.mipmap.ic_launcher)
                     .flags(Notification.DEFAULT_ALL)
@@ -3840,9 +3847,9 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             // Cria uma notificacao para ser manipulado
             PugNotification.with(context)
                     .load()
-                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR)
+                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + e.hashCode())
                     .title(R.string.importar_dados_recebidos)
-                    .bigTextStyle(e.getMessage())
+                    .bigTextStyle("ImportaDadosUnidadeVenda - " + e.getMessage())
                     .smallIcon(R.mipmap.ic_launcher)
                     .largeIcon(R.mipmap.ic_launcher)
                     .flags(Notification.DEFAULT_ALL)
@@ -3980,9 +3987,9 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             // Cria uma notificacao para ser manipulado
             PugNotification.with(context)
                     .load()
-                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR)
+                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + e.hashCode())
                     .title(R.string.importar_dados_recebidos)
-                    .bigTextStyle(e.getMessage())
+                    .bigTextStyle("ImportaDadosGrade - " + e.getMessage())
                     .smallIcon(R.mipmap.ic_launcher)
                     .largeIcon(R.mipmap.ic_launcher)
                     .flags(Notification.DEFAULT_ALL)
@@ -4119,9 +4126,9 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             // Cria uma notificacao para ser manipulado
             PugNotification.with(context)
                     .load()
-                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR)
+                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + e.hashCode())
                     .title(R.string.importar_dados_recebidos)
-                    .bigTextStyle(e.getMessage())
+                    .bigTextStyle("ImportaDadosMarca - " + e.getMessage())
                     .smallIcon(R.mipmap.ic_launcher)
                     .largeIcon(R.mipmap.ic_launcher)
                     .flags(Notification.DEFAULT_ALL)
@@ -4261,9 +4268,9 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             // Cria uma notificacao para ser manipulado
             PugNotification.with(context)
                     .load()
-                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR)
+                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + e.hashCode())
                     .title(R.string.importar_dados_recebidos)
-                    .bigTextStyle(e.getMessage())
+                    .bigTextStyle("ImportaDadosSituacaoTributaria - " + e.getMessage())
                     .smallIcon(R.mipmap.ic_launcher)
                     .largeIcon(R.mipmap.ic_launcher)
                     .flags(Notification.DEFAULT_ALL)
@@ -4431,9 +4438,9 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             // Cria uma notificacao para ser manipulado
             PugNotification.with(context)
                     .load()
-                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR)
+                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + e.hashCode())
                     .title(R.string.importar_dados_recebidos)
-                    .bigTextStyle(e.getMessage())
+                    .bigTextStyle("ImportaDadosProduto - " + e.getMessage())
                     .smallIcon(R.mipmap.ic_launcher)
                     .largeIcon(R.mipmap.ic_launcher)
                     .flags(Notification.DEFAULT_ALL)
@@ -4597,9 +4604,9 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             // Cria uma notificacao para ser manipulado
             PugNotification.with(context)
                     .load()
-                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR)
+                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + e.hashCode())
                     .title(R.string.importar_dados_recebidos)
-                    .bigTextStyle(e.getMessage())
+                    .bigTextStyle("ImportaDadosEmbalagem - " + e.getMessage())
                     .smallIcon(R.mipmap.ic_launcher)
                     .largeIcon(R.mipmap.ic_launcher)
                     .flags(Notification.DEFAULT_ALL)
@@ -4781,9 +4788,9 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             // Cria uma notificacao para ser manipulado
             PugNotification.with(context)
                     .load()
-                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR)
+                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + e.hashCode())
                     .title(R.string.importar_dados_recebidos)
-                    .bigTextStyle(e.getMessage())
+                    .bigTextStyle("ImportaDadosProdutoPorLoja - " + e.getMessage())
                     .smallIcon(R.mipmap.ic_launcher)
                     .largeIcon(R.mipmap.ic_launcher)
                     .flags(Notification.DEFAULT_ALL)
@@ -4926,9 +4933,9 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             // Cria uma notificacao para ser manipulado
             PugNotification.with(context)
                     .load()
-                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR)
+                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + e.hashCode())
                     .title(R.string.importar_dados_recebidos)
-                    .bigTextStyle(e.getMessage())
+                    .bigTextStyle("ImportaDadosLocalEstoque - " + e.getMessage())
                     .smallIcon(R.mipmap.ic_launcher)
                     .largeIcon(R.mipmap.ic_launcher)
                     .flags(Notification.DEFAULT_ALL)
@@ -5073,9 +5080,9 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             // Cria uma notificacao para ser manipulado
             PugNotification.with(context)
                     .load()
-                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR)
+                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + e.hashCode())
                     .title(R.string.importar_dados_recebidos)
-                    .bigTextStyle(e.getMessage())
+                    .bigTextStyle("ImportaDadosEstoque - " + e.getMessage())
                     .smallIcon(R.mipmap.ic_launcher)
                     .largeIcon(R.mipmap.ic_launcher)
                     .flags(Notification.DEFAULT_ALL)
@@ -5325,9 +5332,9 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             // Cria uma notificacao para ser manipulado
             PugNotification.with(context)
                     .load()
-                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR)
+                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + e.hashCode())
                     .title(R.string.importar_dados_recebidos)
-                    .bigTextStyle(e.getMessage())
+                    .bigTextStyle("ImportarDadosOrcamento - " + e.getMessage())
                     .smallIcon(R.mipmap.ic_launcher)
                     .largeIcon(R.mipmap.ic_launcher)
                     .flags(Notification.DEFAULT_ALL)
@@ -5573,9 +5580,9 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             // Cria uma notificacao para ser manipulado
             PugNotification.with(context)
                     .load()
-                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR)
+                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + e.hashCode())
                     .title(R.string.importar_dados_recebidos)
-                    .bigTextStyle(e.getMessage())
+                    .bigTextStyle("ImportaDadosItemOrcamento" + e.getMessage())
                     .smallIcon(R.mipmap.ic_launcher)
                     .largeIcon(R.mipmap.ic_launcher)
                     .flags(Notification.DEFAULT_ALL)
@@ -5777,9 +5784,9 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             // Cria uma notificacao para ser manipulado
             PugNotification.with(context)
                     .load()
-                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR)
+                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + e.hashCode())
                     .title(R.string.importar_dados_recebidos)
-                    .bigTextStyle(e.getMessage())
+                    .bigTextStyle("ImportaDadosPercentual" + e.getMessage())
                     .smallIcon(R.mipmap.ic_launcher)
                     .largeIcon(R.mipmap.ic_launcher)
                     .flags(Notification.DEFAULT_ALL)
@@ -5935,9 +5942,9 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             // Cria uma notificacao para ser manipulado
             PugNotification.with(context)
                     .load()
-                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR)
+                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + e.hashCode())
                     .title(R.string.importar_dados_recebidos)
-                    .bigTextStyle(e.getMessage())
+                    .bigTextStyle("ImportaDadosFator" + e.getMessage())
                     .smallIcon(R.mipmap.ic_launcher)
                     .largeIcon(R.mipmap.ic_launcher)
                     .flags(Notification.DEFAULT_ALL)
@@ -6095,9 +6102,9 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             // Cria uma notificacao para ser manipulado
             PugNotification.with(context)
                     .load()
-                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR)
+                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + e.hashCode())
                     .title(R.string.importar_dados_recebidos)
-                    .bigTextStyle(e.getMessage())
+                    .bigTextStyle("ImportaDadosProdutoRecomendado" + e.getMessage())
                     .smallIcon(R.mipmap.ic_launcher)
                     .largeIcon(R.mipmap.ic_launcher)
                     .flags(Notification.DEFAULT_ALL)
@@ -6300,9 +6307,9 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             // Cria uma notificacao para ser manipulado
             PugNotification.with(context)
                     .load()
-                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR)
+                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + e.hashCode())
                     .title(R.string.importar_dados_recebidos)
-                    .bigTextStyle(e.getMessage())
+                    .bigTextStyle("ImportaDadosParcela - " + e.getMessage())
                     .smallIcon(R.mipmap.ic_launcher)
                     .largeIcon(R.mipmap.ic_launcher)
                     .flags(Notification.DEFAULT_ALL)

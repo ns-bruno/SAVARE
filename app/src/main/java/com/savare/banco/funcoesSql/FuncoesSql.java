@@ -15,6 +15,9 @@ import com.savare.banco.local.ConexaoBancoDeDados;
 import com.savare.funcoes.VersionUtils;
 import com.savare.funcoes.FuncoesPersonalizadas;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class FuncoesSql {
 	
 	private ConexaoBancoDeDados conexaoBanco;
@@ -207,10 +210,10 @@ public class FuncoesSql {
 	
 	
 	/**
-	 * Executa um insert no banco mais r�pido devido passar no paramento
+	 * Executa um insert no banco mais rapido devido passar no paramento
 	 * o sql puro e os dados do argumento que contem no sql.
-	 * Para gerar o sql e os argumento para usar a fun��o(metodo) construirSqlStatement,
-	 * e para gerar os argumentos basta usar a fun��o argumentoStatement.
+	 * Para gerar o sql e os argumento para usar a funcao(metodo) construirSqlStatement,
+	 * e para gerar os argumentos basta usar a funcao argumentoStatement.
 	 * 
 	 * @param sql
 	 * @param bindArgs
@@ -287,7 +290,65 @@ public class FuncoesSql {
 		
 		return id;
 	} // Fim do insert
-	
+
+
+	public void insertList(List<ContentValues> listaValores){
+		bancoDados = conexaoBanco.abrirBanco();
+		try {
+            bancoDados.beginTransaction();
+
+            for(ContentValues valores : listaValores) {
+                bancoDados.execSQL(construirInsert(valores, bancoDados.CONFLICT_REPLACE));
+            }
+		} catch (final SQLException e) {
+
+			Log.e("SAVARE", e.getMessage());
+
+			final ContentValues contentValues = new ContentValues();
+			contentValues.put("comando", 0);
+			contentValues.put("tela", "FuncoesSql");
+			contentValues.put("mensagem", e.toString());
+			contentValues.put("dados", e.toString());
+			// Pega os dados do usuario
+			//contentValues.put("usuario", funcoes.getValorXml("Usuario"));
+			//contentValues.put("empresa", funcoes.getValorXml("ChaveEmpresa"));
+			//contentValues.put("email", funcoes.getValorXml("Email"));
+
+			((Activity) context).runOnUiThread(new Runnable() {
+				public void run() {
+					funcoes.menssagem(contentValues);
+				}
+			});
+
+		} catch (final Exception e) {
+
+			Log.e("SAVARE", e.getMessage());
+
+			final ContentValues contentValues = new ContentValues();
+			contentValues.put("comando", 0);
+			contentValues.put("tela", "FuncoesSql");
+			contentValues.put("mensagem", e.toString());
+			contentValues.put("dados", e.toString());
+			// Pega os dados do usuario
+			//contentValues.put("usuario", funcoes.getValorXml("Usuario"));
+			//contentValues.put("empresa", funcoes.getValorXml("ChaveEmpresa"));
+			//contentValues.put("email", funcoes.getValorXml("Email"));
+
+			((Activity) context).runOnUiThread(new Runnable() {
+				public void run() {
+					funcoes.menssagem(contentValues);
+				}
+			});
+
+		} finally {
+
+			bancoDados.setTransactionSuccessful();
+			bancoDados.endTransaction();
+
+			conexaoBanco.fechar();
+			bancoDados.close();
+		}
+	} // Fim do insert
 	
 	public long insertIgnoreConflict(ContentValues values){
 		bancoDados = conexaoBanco.abrirBanco();
