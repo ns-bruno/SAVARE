@@ -826,6 +826,8 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 }
                 int controle = 0;
 
+                List<ContentValues> listaEmpresa = new ArrayList<ContentValues>();
+
                 // Passa por toda a lista
                 for (SoapObject objetoIndividual : listaEmpresaObject) {
                     final int finalControle = controle;
@@ -890,18 +892,19 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                     dadosEmpresa.put("PERIODO_CREDITO_ATACADO", objeto.hasProperty("periodocrceditoAtacado") ? objeto.getProperty("periodocrceditoAtacado").toString() : "");
                     dadosEmpresa.put("PERIODO_CREDITO_VAREJO", objeto.hasProperty("periodocrceditoVarejo") ? objeto.getProperty("periodocrceditoVarejo").toString() : "");
 
-                    final EmpresaSql empresaSql = new EmpresaSql(context);
+                    listaEmpresa.add(dadosEmpresa);
+                    //EmpresaSql empresaSql = new EmpresaSql(context);
 
                     // Pega o sql para passar para o statement
                     //final String sql = empresaSql.construirSqlStatement(dadosEmpresa);
                     // Pega o argumento para o statement
                     //final String[] argumentoSql = empresaSql.argumentoStatement(dadosEmpresa);
 
-                    Log.i("SAVARE", "ReceberDadosWebserviceAsyncRotinas");
+                    //Log.i("SAVARE", "ReceberDadosWebserviceAsyncRotinas");
 
-                    if (empresaSql.insertOrReplace(dadosEmpresa) <= 0){
+                    /*if (empresaSql.insertOrReplace(dadosEmpresa) <= 0){
                         todosSucesso = false;
-                    }
+                    }*/
                     /*((Activity) context).runOnUiThread(new Runnable() {
                         public void run() {
                             //areasSql.insertOrReplace(dadosAreas);
@@ -909,6 +912,9 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                         }
                     });*/
                 } // Fim do for
+                EmpresaSql empresaSql = new EmpresaSql(context);
+
+                todosSucesso = empresaSql.insertList(listaEmpresa);
 
                 // Checa se todos foram inseridos/atualizados com sucesso
                 if (todosSucesso){
@@ -998,6 +1004,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 }
                 int controle = 0;
                 List<ContentValues> listaAreas = new ArrayList<ContentValues>();
+
                 // Passa por toda a lista
                 for (SoapObject objetoIndividual : listaAreasObject) {
                     final int finalControle = controle;
@@ -1038,11 +1045,6 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                         dadosAreas.put("DESC_PROMOCAO", objetoIndividual.getProperty("descontoPromocao").toString());
                     }
                     listaAreas.add(dadosAreas);
-                    /*AreasSql areasSql = new AreasSql(context);
-
-                    if (areasSql.insertOrReplace(dadosAreas) <= 0) {
-                        todosSucesso = false;
-                    }*/
                 } // Fim do for
                 AreasSql areasSql = new AreasSql(context);
 
@@ -1133,7 +1135,9 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                     });
                 }
                 int controle = 0;
+
                 List<ContentValues> listaAtividade = new ArrayList<ContentValues>();
+
                 // Passa por toda a lista
                 for (SoapObject objetoIndividual : listaAtividadeObject) {
                     final int finalControle = controle;
@@ -1166,7 +1170,6 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                     } else {
                         objeto = objetoIndividual;
                     }
-
                     ContentValues dadosAtividade = new ContentValues();
                     dadosAtividade.put("ID_CFAATIVI", Integer.parseInt(objeto.getProperty("idRamoAtividade").toString()));
                     dadosAtividade.put("DT_ALT", objeto.getProperty("dataAlteracao").toString());
@@ -1280,6 +1283,8 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 }
                 int controle = 0;
 
+                List<ContentValues> listaStatus = new ArrayList<ContentValues>();
+
                 // Passa por toda a lista
                 for (SoapObject objetoIndividual : listaStatusObject) {
                     final int finalControle = controle;
@@ -1338,18 +1343,23 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                         dadosStatus.put("DESC_PROMOCAO", objeto.getProperty("descontoPromocao").toString());
                     }
 
-                    StatusSql statusSql = new StatusSql(context);
+                    listaStatus.add(dadosStatus);
+                    //StatusSql statusSql = new StatusSql(context);
 
                     // Pega o sql para passar para o statement
                     //final String sql = statusSql.construirSqlStatement(dadosStatus);
                     // Pega o argumento para o statement
                     //final String[] argumentoSql = statusSql.argumentoStatement(dadosStatus);
 
-                    if (statusSql.insertOrReplace(dadosStatus) <= 0) {
+                    /*if (statusSql.insertOrReplace(dadosStatus) <= 0) {
                         todosSucesso = false;
-                    }
+                    }*/
 
                 } // Fim do for
+                StatusSql statusSql = new StatusSql(context);
+
+                todosSucesso = statusSql.insertList(listaStatus);
+
                 // Atualiza a notificacao
                 mLoad.bigTextStyle(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
                 mLoad.progress().value(0, 0, true).build();
@@ -1434,6 +1444,8 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 }
                 int controle = 0;
 
+                List<ContentValues> listaTipoDocumento = new ArrayList<ContentValues>();
+
                 // Passa por toda a lista
                 for (SoapObject objetoIndividual : listaDocumentoObject) {
                     final int finalControle = controle;
@@ -1481,24 +1493,11 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                     if (objeto.hasProperty("tipoVenda")) {
                         dadosDocumento.put("TIPO", objeto.getProperty("tipoVenda").toString());
                     }
-
-                    TipoDocumentoSql tipoDocumentoSql = new TipoDocumentoSql(context);
-
-                    // Pega o sql para passar para o statement
-                    //final String sql = tipoDocumentoSql.construirSqlStatement(dadosDocumento);
-                    // Pega o argumento para o statement
-                    //final String[] argumentoSql = tipoDocumentoSql.argumentoStatement(dadosDocumento);
-
-                    if (tipoDocumentoSql.insertOrReplace(dadosDocumento) <= 0) {
-                        todosSucesso = false;
-                    }
-                    /*((Activity) context).runOnUiThread(new Runnable() {
-                        public void run() {
-                            //tipoDocumentoSql.insertOrReplace(dadosDocumento);
-                            tipoDocumentoSql.insertOrReplaceFast(sql, argumentoSql);
-                        }
-                    });*/
                 } // Fim do for
+                TipoDocumentoSql tipoDocumentoSql = new TipoDocumentoSql(context);
+
+                todosSucesso = tipoDocumentoSql.insertList(listaTipoDocumento);
+
                 // Checa se todos foram inseridos/atualizados com sucesso
                 if (todosSucesso) {
                     inserirUltimaAtualizacao("CFATPDOC");
@@ -1584,6 +1583,8 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 }
                 int controle = 0;
 
+                List<ContentValues> listaCartao = new ArrayList<ContentValues>();
+
                 // Passa por toda a lista
                 for (SoapObject objetoIndividual : listaCartaoCreditoObject) {
                     final int finalControle = controle;
@@ -1623,16 +1624,18 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                     dadosCartao.put("CODIGO", Integer.parseInt(objeto.getProperty("codigoCartao").toString()));
                     dadosCartao.put("DESCRICAO", objeto.getProperty("descricaoCartao").toString());
 
-                    CartaoSql cartaoSql = new CartaoSql(context);
+                    listaCartao.add(dadosCartao);
+
+                    //CartaoSql cartaoSql = new CartaoSql(context);
 
                     // Pega o sql para passar para o statement
                     //final String sql = cartaoSql.construirSqlStatement(dadosCartao);
                     // Pega o argumento para o statement
                     //final String[] argumentoSql = cartaoSql.argumentoStatement(dadosCartao);
 
-                    if (cartaoSql.insertOrReplace(dadosCartao) <= 0) {
+                    /*if (cartaoSql.insertOrReplace(dadosCartao) <= 0) {
                         todosSucesso = false;
-                    }
+                    }*/
                     /*((Activity) context).runOnUiThread(new Runnable() {
                         public void run() {
                             //cartaoSql.insertOrReplace(dadosCartao);
@@ -1640,6 +1643,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                         }
                     });*/
                 } // Fim do for
+                CartaoSql cartaoSql = new CartaoSql(context);
+
+                todosSucesso = cartaoSql.insertList(listaCartao);
+
                 // Checa se todos foram inseridos/atualizados com sucesso
                 if (todosSucesso) {
                     inserirUltimaAtualizacao("CFACCRED");
@@ -1724,6 +1731,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 }
                 int controle = 0;
 
+                List<ContentValues> listaPortador = new ArrayList<ContentValues>();
 
                 // Passa por toda a lista
                 for (SoapObject objetoIndividual : listaPortadorObject) {
@@ -1774,17 +1782,16 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                     if (objeto.hasProperty("tipo")) {
                         dadosPortador.put("TIPO", objeto.getProperty("tipo").toString());
                     }
-
-                    PortadorBancoSql portadorBancoSql = new PortadorBancoSql(context);
+                    listaPortador.add(dadosPortador);
 
                     // Pega o sql para passar para o statement
                     //final String sql = portadorBancoSql.construirSqlStatement(dadosPortador);
                     // Pega o argumento para o statement
                     //final String[] argumentoSql = portadorBancoSql.argumentoStatement(dadosPortador);
 
-                    if (portadorBancoSql.insertOrReplace(dadosPortador) <= 0) {
+                    /*if (portadorBancoSql.insertOrReplace(dadosPortador) <= 0) {
                         todosSucesso = false;
-                    }
+                    }*/
                     /*((Activity) context).runOnUiThread(new Runnable() {
                         public void run() {
                             //portadorBancoSql.insertOrReplace(dadosPortador);
@@ -1792,6 +1799,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                         }
                     });*/
                 } // Fim do for
+                PortadorBancoSql portadorBancoSql = new PortadorBancoSql(context);
+
+                todosSucesso = portadorBancoSql.insertList(listaPortador);
+
                 // Checa se todos foram inseridos/atualizados com sucesso
                 if (todosSucesso) {
                     inserirUltimaAtualizacao("CFAPORTA");
@@ -2034,6 +2045,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 }
                 int controle = 0;
 
+                List<ContentValues> listaTipoCliente = new ArrayList<ContentValues>();
                 // Passa por toda a lista
                 for (SoapObject objetoIndividual : listaTipoClienteObject) {
                     final int finalControle = controle;
@@ -2082,17 +2094,18 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                     if (objeto.hasProperty("vendeAtacadoVarejo")){
                         dadosTipoCliente.put("VENDE_ATAC_VAREJO", objeto.getProperty("vendeAtacadoVarejo").toString());
                     }
+                    listaTipoCliente.add(dadosTipoCliente);
 
-                    TipoClienteSql tipoClienteSql = new TipoClienteSql(context);
+                    //TipoClienteSql tipoClienteSql = new TipoClienteSql(context);
 
                     // Pega o sql para passar para o statement
                     //final String sql = tipoClienteSql.construirSqlStatement(dadosTipoCliente);
                     // Pega o argumento para o statement
                     //final String[] argumentoSql = tipoClienteSql.argumentoStatement(dadosTipoCliente);
 
-                    if (tipoClienteSql.insertOrReplace(dadosTipoCliente) <= 0) {
+                    /*if (tipoClienteSql.insertOrReplace(dadosTipoCliente) <= 0) {
                         todosSucesso = false;
-                    }
+                    }*/
                     /*((Activity) context).runOnUiThread(new Runnable() {
                         public void run() {
                             //tipoClienteSql.insertOrReplace(dadosTipoCliente);
@@ -2100,6 +2113,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                         }
                     });*/
                 } // Fim do for
+                TipoClienteSql tipoClienteSql = new TipoClienteSql(context);
+
+                todosSucesso = tipoClienteSql.insertList(listaTipoCliente);
+
                 // Checa se todos foram inseridos/atualizados com sucesso
                 if (todosSucesso) {
                     inserirUltimaAtualizacao("CFATPCLI");
@@ -2185,6 +2202,8 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 }
                 int controle = 0;
 
+                List<ContentValues> listaTipoCobranca = new ArrayList<ContentValues>();
+
                 // Passa por toda a lista
                 for (SoapObject objetoIndividual : listaTipoCobrancaObject) {
                     final int finalControle = controle;
@@ -2225,16 +2244,18 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                     dadosTipoCobranca.put("DESCRICAO", objeto.getProperty("descricaoTipoCobranca").toString());
                     dadosTipoCobranca.put("SIGLA", objeto.getProperty("siglaTipoCobranca").toString());
 
-                    CobrancaSql cobrancaSql = new CobrancaSql(context);
+                    listaTipoCobranca.add(dadosTipoCobranca);
+
+                    //CobrancaSql cobrancaSql = new CobrancaSql(context);
 
                     // Pega o sql para passar para o statement
                     //final String sql = cobrancaSql.construirSqlStatement(dadosTipoCobranca);
                     // Pega o argumento para o statement
                     //final String[] argumentoSql = cobrancaSql.argumentoStatement(dadosTipoCobranca);
 
-                    if (cobrancaSql.insertOrReplace(dadosTipoCobranca) <= 0) {
+                    /*if (cobrancaSql.insertOrReplace(dadosTipoCobranca) <= 0) {
                         todosSucesso = false;
-                    }
+                    }*/
                     /*((Activity) context).runOnUiThread(new Runnable() {
                         public void run() {
                             //cobrancaSql.insertOrReplace(dadosTipoCobranca);
@@ -2242,6 +2263,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                         }
                     });*/
                 } // Fim do for
+                CobrancaSql cobrancaSql = new CobrancaSql(context);
+
+                todosSucesso = cobrancaSql.insertList(listaTipoCobranca);
+
                 // Checa se todos foram inseridos/atualizados com sucesso
                 if (todosSucesso) {
                     inserirUltimaAtualizacao("CFATPCOB");
@@ -2327,6 +2352,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 }
                 int controle = 0;
 
+                List<ContentValues> listaEstado = new ArrayList<ContentValues>();
                 // Passa por toda a lista
                 for (SoapObject objetoIndividual : listaEstadoObject) {
                     final int finalControle = controle;
@@ -2374,17 +2400,16 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                     if (objeto.hasProperty("tipoIpiSaida")) {
                         dadosEstado.put("TIPO_IPI_SAI", objeto.getProperty("tipoIpiSaida").toString());
                     }
-
-                    EstadoSql estadoSql = new EstadoSql(context);
+                    listaEstado.add(dadosEstado);
 
                     // Pega o sql para passar para o statement
                     //final String sql = estadoSql.construirSqlStatement(dadosEstado);
                     // Pega o argumento para o statement
                     //final String[] argumentoSql = estadoSql.argumentoStatement(dadosEstado);
 
-                    if (estadoSql.insertOrReplace(dadosEstado) <= 0) {
+                    /*if (estadoSql.insertOrReplace(dadosEstado) <= 0) {
                         todosSucesso = false;
-                    }
+                    }*/
                     /*((Activity) context).runOnUiThread(new Runnable() {
                         public void run() {
                             //estadoSql.insertOrReplace(dadosEstado);
@@ -2392,6 +2417,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                         }
                     });*/
                 } // Fim do for
+                EstadoSql estadoSql = new EstadoSql(context);
+
+                todosSucesso = estadoSql.insertList(listaEstado);
+
                 // Checa se todos foram inseridos/atualizados com sucesso
                 if (todosSucesso) {
                     inserirUltimaAtualizacao("CFAESTAD");
@@ -2477,6 +2506,8 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 }
                 int controle = 0;
 
+                List<ContentValues> listaCidade = new ArrayList<ContentValues>();
+
                 // Passa por toda a lista
                 for (SoapObject objetoIndividual : listaCidadeObject) {
                     final int finalControle = controle;
@@ -2517,16 +2548,17 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                     dadosCidade.put("COD_IBGE", Integer.parseInt(objeto.getProperty("codigoIbge").toString()));
                     dadosCidade.put("DESCRICAO", objeto.getProperty("descricao").toString());
 
-                    CidadeSql cidadeSql = new CidadeSql(context);
+                    listaCidade.add(dadosCidade);
+                    //CidadeSql cidadeSql = new CidadeSql(context);
 
                     // Pega o sql para passar para o statement
                     //final String sql = cidadeSql.construirSqlStatement(dadosCidade);
                     // Pega o argumento para o statement
                     //final String[] argumentoSql = cidadeSql.argumentoStatement(dadosCidade);
 
-                    if (cidadeSql.insertOrReplace(dadosCidade) <= 0) {
+                    /*if (cidadeSql.insertOrReplace(dadosCidade) <= 0) {
                         todosSucesso = false;
-                    }
+                    }*/
                     /*((Activity) context).runOnUiThread(new Runnable() {
                         public void run() {
                             //cidadeSql.insertOrReplace(dadosCidade);
@@ -2534,6 +2566,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                         }
                     });*/
                 } // Fim do for
+                CidadeSql cidadeSql = new CidadeSql(context);
+
+                todosSucesso = cidadeSql.insertList(listaCidade);
+
                 // Checa se todos foram inseridos/atualizados com sucesso
                 if (todosSucesso) {
                     inserirUltimaAtualizacao("CFACIDAD");
@@ -2618,6 +2654,8 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                     });
                 }
                 int controle = 0;
+
+                List<ContentValues> listaCliente = new ArrayList<ContentValues>();
 
                 // Passa por toda a lista
                 for (SoapObject objetoIndividual : listaClifoObject) {
@@ -2819,17 +2857,18 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                             dadosClifo.put("ID_CFAAREAS", Integer.parseInt(areaPessoa.getProperty("idAreas").toString()));
                         }
                     }
+                    listaCliente.add(dadosClifo);
 
-                    PessoaSql pessoaSql = new PessoaSql(context);
+                    //PessoaSql pessoaSql = new PessoaSql(context);
 
                     // Pega o sql para passar para o statement
                     //final String sql = pessoaSql.construirSqlStatement(dadosClifo);
                     // Pega o argumento para o statement
                     //final String[] argumentoSql = pessoaSql.argumentoStatement(dadosClifo);
 
-                    if (pessoaSql.insertOrReplace(dadosClifo) <= 0) {
+                    /*if (pessoaSql.insertOrReplace(dadosClifo) <= 0) {
                         todosSucesso = false;
-                    }
+                    }*/
                     /*((Activity) context).runOnUiThread(new Runnable() {
                         public void run() {
                             //pessoaSql.insertOrReplace(dadosClifo);
@@ -2837,6 +2876,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                         }
                     });*/
                 } // Fim do for
+                PessoaSql pessoaSql = new PessoaSql(context);
+
+                todosSucesso = pessoaSql.insertList(listaCliente);
+
                 // Checa se todos foram inseridos/atualizados com sucesso
                 if (todosSucesso) {
                     inserirUltimaAtualizacao("CFACLIFO");
@@ -2923,6 +2966,8 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 }
                 int controle = 0;
 
+                List<ContentValues> listaEndereco = new ArrayList<ContentValues>();
+
                 // Passa por toda a lista
                 for (SoapObject objetoIndividual : listaEnderecoObject) {
                     final int finalControle = controle;
@@ -2992,18 +3037,18 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                     if (objeto.hasProperty("email")){
                         dadosEndereco.put("EMAIL", objeto.getProperty("email").toString());
                     }
+                    listaEndereco.add(dadosEndereco);
 
-
-                    EnderecoSql enderecoSql = new EnderecoSql(context);
+                    //EnderecoSql enderecoSql = new EnderecoSql(context);
 
                     // Pega o sql para passar para o statement
                     //final String sql = enderecoSql.construirSqlStatement(dadosEndereco);
                     // Pega o argumento para o statement
                     //final String[] argumentoSql = enderecoSql.argumentoStatement(dadosEndereco);
 
-                    if (enderecoSql.insertOrReplace(dadosEndereco) <= 0) {
+                    /*if (enderecoSql.insertOrReplace(dadosEndereco) <= 0) {
                         todosSucesso = false;
-                    }
+                    }*/
                     /*((Activity) context).runOnUiThread(new Runnable() {
                         public void run() {
                             //enderecoSql.insertOrReplace(dadosEndereco);
@@ -3011,6 +3056,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                         }
                     });*/
                 } // Fim do for
+                EnderecoSql enderecoSql = new EnderecoSql(context);
+
+                todosSucesso = enderecoSql.insertList(listaEndereco);
+
                 // Checa se todos foram inseridos/atualizados com sucesso
                 if (todosSucesso) {
                     inserirUltimaAtualizacao("CFAENDER");
@@ -3097,6 +3146,8 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 }
                 int controle = 0;
 
+                List<ContentValues> listaParametros = new ArrayList<ContentValues>();
+
                 // Passa por toda a lista
                 for (SoapObject objetoIndividual : listaParametroObject) {
                     final int finalControle = controle;
@@ -3130,108 +3181,113 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                         objeto = objetoIndividual;
                     }
 
-                    ContentValues dadosEndereco = new ContentValues();
-                    dadosEndereco.put("ID_CFAPARAM", Integer.parseInt(objeto.getProperty("idParametro").toString()));
-                    dadosEndereco.put("DT_ALT", objeto.getProperty("dataAlteracao").toString());
+                    ContentValues dadosParametros = new ContentValues();
+                    dadosParametros.put("ID_CFAPARAM", Integer.parseInt(objeto.getProperty("idParametro").toString()));
+                    dadosParametros.put("DT_ALT", objeto.getProperty("dataAlteracao").toString());
                     if (objeto.hasProperty("idClifo")){
-                        dadosEndereco.put("ID_CFACLIFO", Integer.parseInt(objeto.getProperty("idClifo").toString()));
+                        dadosParametros.put("ID_CFACLIFO", Integer.parseInt(objeto.getProperty("idClifo").toString()));
                     }
                     if (objeto.hasProperty("idEmpresa")){
-                        dadosEndereco.put("ID_SMAEMPRE", Integer.parseInt(objeto.getProperty("idEmpresa").toString()));
+                        dadosParametros.put("ID_SMAEMPRE", Integer.parseInt(objeto.getProperty("idEmpresa").toString()));
                     }
                     if (objeto.hasProperty("idVendedor")){
-                        dadosEndereco.put("ID_CFACLIFO_VENDE", Integer.parseInt(objeto.getProperty("idVendedor").toString()));
+                        dadosParametros.put("ID_CFACLIFO_VENDE", Integer.parseInt(objeto.getProperty("idVendedor").toString()));
                     }
                     if (objeto.hasProperty("idTipoCobranca")){
-                        dadosEndereco.put("ID_CFATPCOB", Integer.parseInt(objeto.getProperty("idTipoCobranca").toString()));
+                        dadosParametros.put("ID_CFATPCOB", Integer.parseInt(objeto.getProperty("idTipoCobranca").toString()));
                     }
                     if (objeto.hasProperty("idPortadorBanco")){
-                        dadosEndereco.put("ID_CFAPORTA", Integer.parseInt(objeto.getProperty("idPortadorBanco").toString()));
+                        dadosParametros.put("ID_CFAPORTA", Integer.parseInt(objeto.getProperty("idPortadorBanco").toString()));
                     }
                     if (objeto.hasProperty("idTipoDocumento")){
-                        dadosEndereco.put("ID_CFATPDOC", Integer.parseInt(objeto.getProperty("idTipoDocumento").toString()));
+                        dadosParametros.put("ID_CFATPDOC", Integer.parseInt(objeto.getProperty("idTipoDocumento").toString()));
                     }
                     if (objeto.hasProperty("idPlanoPagamento")){
-                        dadosEndereco.put("ID_AEAPLPGT", Integer.parseInt(objeto.getProperty("idPlanoPagamento").toString()));
+                        dadosParametros.put("ID_AEAPLPGT", Integer.parseInt(objeto.getProperty("idPlanoPagamento").toString()));
                     }
                     if (objeto.hasProperty("roteiro")){
-                        dadosEndereco.put("ROTEIRO", Integer.parseInt(objeto.getProperty("roteiro").toString()));
+                        dadosParametros.put("ROTEIRO", Integer.parseInt(objeto.getProperty("roteiro").toString()));
                     }
                     if (objeto.hasProperty("frequencia")){
-                        dadosEndereco.put("FREQUENCIA", Integer.parseInt(objeto.getProperty("frequencia").toString()));
+                        dadosParametros.put("FREQUENCIA", Integer.parseInt(objeto.getProperty("frequencia").toString()));
                     }
                     if (objeto.hasProperty("diasAtrazo")){
-                        dadosEndereco.put("DIAS_ATRAZO", Integer.parseInt(objeto.getProperty("diasAtrazo").toString()));
+                        dadosParametros.put("DIAS_ATRAZO", Integer.parseInt(objeto.getProperty("diasAtrazo").toString()));
                     }
                     if (objeto.hasProperty("diasCarencia")){
-                        dadosEndereco.put("DIAS_CARENCIA", Integer.parseInt(objeto.getProperty("diasCarencia").toString()));
+                        dadosParametros.put("DIAS_CARENCIA", Integer.parseInt(objeto.getProperty("diasCarencia").toString()));
                     }
                     if (objeto.hasProperty("vendeAtrazado")){
-                        dadosEndereco.put("VENDE_ATRAZADO", objeto.getProperty("vendeAtrazado").toString());
+                        dadosParametros.put("VENDE_ATRAZADO", objeto.getProperty("vendeAtrazado").toString());
                     }
                     if (objeto.hasProperty("descontoPromocao")){
-                        dadosEndereco.put("DESC_PROMOCAO", objeto.getProperty("descontoPromocao").toString());
+                        dadosParametros.put("DESC_PROMOCAO", objeto.getProperty("descontoPromocao").toString());
                     }
                     if (objeto.hasProperty("dataUltimaVisita")){
-                        dadosEndereco.put("DT_ULT_VISITA", objeto.getProperty("dataUltimaVisita").toString());
+                        dadosParametros.put("DT_ULT_VISITA", objeto.getProperty("dataUltimaVisita").toString());
                     }
                     if (objeto.hasProperty("dataUltimoEnvio")){
-                        dadosEndereco.put("DT_ULT_ENVIO", objeto.getProperty("dataUltimoEnvio").toString());
+                        dadosParametros.put("DT_ULT_ENVIO", objeto.getProperty("dataUltimoEnvio").toString());
                     }
                     if (objeto.hasProperty("dataUltimoRecebimento")){
-                        dadosEndereco.put("DT_ULT_RECEBTO", objeto.getProperty("dataUltimoRecebimento").toString());
+                        dadosParametros.put("DT_ULT_RECEBTO", objeto.getProperty("dataUltimoRecebimento").toString());
                     }
                     if (objeto.hasProperty("dataProximoContato")){
-                        dadosEndereco.put("DT_PROXIMO_CONTATO", objeto.getProperty("dataProximoContato").toString());
+                        dadosParametros.put("DT_PROXIMO_CONTATO", objeto.getProperty("dataProximoContato").toString());
                     }
                     if (objeto.hasProperty("atacadoVarejo")){
-                        dadosEndereco.put("ATACADO_VEREJO", objeto.getProperty("atacadoVarejo").toString());
+                        dadosParametros.put("ATACADO_VEREJO", objeto.getProperty("atacadoVarejo").toString());
                     }
                     if (objeto.hasProperty("vistaPrazo")){
-                        dadosEndereco.put("VISTA_PRAZO", objeto.getProperty("vistaPrazo").toString());
+                        dadosParametros.put("VISTA_PRAZO", objeto.getProperty("vistaPrazo").toString());
                     }
                     if (objeto.hasProperty("faturaValorMinimo")){
-                        dadosEndereco.put("FATURA_VL_MIN", objeto.getProperty("faturaValorMinimo").toString());
+                        dadosParametros.put("FATURA_VL_MIN", objeto.getProperty("faturaValorMinimo").toString());
                     }
                     if (objeto.hasProperty("parcelaEmAberto")){
-                        dadosEndereco.put("PARCELA_EM_ABERTO", objeto.getProperty("parcelaEmAberto").toString());
+                        dadosParametros.put("PARCELA_EM_ABERTO", objeto.getProperty("parcelaEmAberto").toString());
                     }
                     if (objeto.hasProperty("limite")){
-                        dadosEndereco.put("LIMITE", Double.parseDouble(objeto.getProperty("limite").toString()));
+                        dadosParametros.put("LIMITE", Double.parseDouble(objeto.getProperty("limite").toString()));
                     }
                     if (objeto.hasProperty("descontoAtacadoVista")){
-                        dadosEndereco.put("DESC_ATAC_VISTA", Double.parseDouble(objeto.getProperty("descontoAtacadoVista").toString()));
+                        dadosParametros.put("DESC_ATAC_VISTA", Double.parseDouble(objeto.getProperty("descontoAtacadoVista").toString()));
                     }
                     if (objeto.hasProperty("descontoAtacadoPrazo")){
-                        dadosEndereco.put("DESC_ATAC_PRAZO", Double.parseDouble(objeto.getProperty("descontoAtacadoPrazo").toString()));
+                        dadosParametros.put("DESC_ATAC_PRAZO", Double.parseDouble(objeto.getProperty("descontoAtacadoPrazo").toString()));
                     }
                     if (objeto.hasProperty("descontoVarejoVista")){
-                        dadosEndereco.put("DESC_VARE_VISTA", Double.parseDouble(objeto.getProperty("descontoVarejoVista").toString()));
+                        dadosParametros.put("DESC_VARE_VISTA", Double.parseDouble(objeto.getProperty("descontoVarejoVista").toString()));
                     }
                     if (objeto.hasProperty("descontoVarejoPrazo")){
-                        dadosEndereco.put("DESC_VARE_PRAZO", Double.parseDouble(objeto.getProperty("descontoVarejoPrazo").toString()));
+                        dadosParametros.put("DESC_VARE_PRAZO", Double.parseDouble(objeto.getProperty("descontoVarejoPrazo").toString()));
                     }
                     if (objeto.hasProperty("jurosDiario")){
-                        dadosEndereco.put("JUROS_DIARIO", Double.parseDouble(objeto.getProperty("jurosDiario").toString()));
+                        dadosParametros.put("JUROS_DIARIO", Double.parseDouble(objeto.getProperty("jurosDiario").toString()));
                     }
+                    listaParametros.add(dadosParametros);
 
-                    ParametrosSql parametrosSql = new ParametrosSql(context);
+                    //ParametrosSql parametrosSql = new ParametrosSql(context);
 
                     // Pega o sql para passar para o statement
-                    //final String sql = parametrosSql.construirSqlStatement(dadosEndereco);
+                    //final String sql = parametrosSql.construirSqlStatement(dadosParametros);
                     // Pega o argumento para o statement
-                    //final String[] argumentoSql = parametrosSql.argumentoStatement(dadosEndereco);
+                    //final String[] argumentoSql = parametrosSql.argumentoStatement(dadosParametros);
 
-                    if (parametrosSql.insertOrReplace(dadosEndereco) <= 0) {
+                    /*if (parametrosSql.insertOrReplace(dadosParametros) <= 0) {
                         todosSucesso = false;
-                    }
+                    }*/
                     /*((Activity) context).runOnUiThread(new Runnable() {
                         public void run() {
-                            //parametrosSql.insertOrReplace(dadosEndereco);
+                            //parametrosSql.insertOrReplace(dadosParametros);
                             parametrosSql.insertOrReplaceFast(sql, argumentoSql);
                         }
                     });*/
                 } // Fim do for
+                ParametrosSql parametrosSql = new ParametrosSql(context);
+
+                todosSucesso = parametrosSql.insertList(listaParametros);
+
                 // Checa se todos foram inseridos/atualizados com sucesso
                 if (todosSucesso) {
                     inserirUltimaAtualizacao("CFAPARAM");
@@ -3320,6 +3376,8 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                     }
                     int controle = 0;
 
+                    List<ContentValues> listaImagem = new ArrayList<ContentValues>();
+
                     // Passa por toda a lista
                     for (SoapObject objetoIndividual : listaFotosObject) {
                         final int finalControle = controle;
@@ -3367,17 +3425,18 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                             if (objeto.hasProperty("fotos")) {
                                 dadosFotos.put("FOTO", Base64.decode(objeto.getProperty("fotos").toString(), Base64.DEFAULT));
                             }
+                            listaImagem.add(dadosFotos);
 
-                            FotosSql fotosSql = new FotosSql(context);
+                            //FotosSql fotosSql = new FotosSql(context);
 
                             // Pega o sql para passar para o statement
                             //final String sql = fotosSql.construirSqlStatement(dadosFotos);
                             // Pega o argumento para o statement
                             //final String[] argumentoSql = fotosSql.argumentoStatement(dadosFotos);
 
-                            if (fotosSql.insertOrReplace(dadosFotos) <= 0) {
+                            /*if (fotosSql.insertOrReplace(dadosFotos) <= 0) {
                                 todosSucesso = false;
-                            }
+                            }*/
                         }
                         /*((Activity) context).runOnUiThread(new Runnable() {
                         public void run() {
@@ -3389,6 +3448,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                     if ((listaFotosObject != null) && (listaFotosObject.size() > 0)){
                         listaFotosObject.clear();
                     }
+                    FotosSql fotosSql = new FotosSql(context);
+
+                    todosSucesso = fotosSql.insertList(listaImagem);
+
                     // Checa se todos foram inseridos/atualizados com sucesso
                     if (todosSucesso) {
                         inserirUltimaAtualizacao("CFAFOTOS");
@@ -3474,6 +3537,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                     });
                 }
                 int controle = 0;
+                List<ContentValues> listaPlanoPagamento = new ArrayList<ContentValues>();
 
                 // Passa por toda a lista
                 for (SoapObject objetoIndividual : listaPlanoObject) {
@@ -3525,17 +3589,18 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                     dadosPagamento.put("JURO_MEDIO_ATAC", Double.parseDouble(objeto.getProperty("jurosAtacado").toString()));
                     dadosPagamento.put("JURO_MEDIO_VARE", Double.parseDouble(objeto.getProperty("jurosVarejo").toString()));
                     dadosPagamento.put("DIAS_MEDIOS", Integer.parseInt(objeto.getProperty("diasMedios").toString()));
+                    listaPlanoPagamento.add(dadosPagamento);
 
-                    PlanoPagamentoSql planoPagamentoSql = new PlanoPagamentoSql(context);
+                    //PlanoPagamentoSql planoPagamentoSql = new PlanoPagamentoSql(context);
 
                     // Pega o sql para passar para o statement
                     //final String sql = planoPagamentoSql.construirSqlStatement(dadosPagamento);
                     // Pega o argumento para o statement
                     //final String[] argumentoSql = planoPagamentoSql.argumentoStatement(dadosPagamento);
 
-                    if (planoPagamentoSql.insertOrReplace(dadosPagamento) <= 0) {
+                    /*if (planoPagamentoSql.insertOrReplace(dadosPagamento) <= 0) {
                         todosSucesso = false;
-                    }
+                    }*/
                     /*((Activity) context).runOnUiThread(new Runnable() {
                         public void run() {
                             //planoPagamentoSql.insertOrReplace(dadosPagamento);
@@ -3543,6 +3608,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                         }
                     });*/
                 } // Fim do for
+                PlanoPagamentoSql planoPagamentoSql = new PlanoPagamentoSql(context);
+
+                todosSucesso = planoPagamentoSql.insertList(listaPlanoPagamento);
+
                 // Checa se todos foram inseridos/atualizados com sucesso
                 if (todosSucesso) {
                     inserirUltimaAtualizacao("AEAPLPGT");
@@ -3627,6 +3696,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                     });
                 }
                 int controle = 0;
+                List<ContentValues> listaClasseProduto = new ArrayList<ContentValues>();
 
                 // Passa por toda a lista
                 for (SoapObject objetoIndividual : listaClasseObject) {
@@ -3666,17 +3736,18 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                     dadosClasse.put("CODIGO", Integer.parseInt(objeto.getProperty("codigoClasse").toString()));
                     dadosClasse.put("DT_ALT", objeto.getProperty("dataAlteracao").toString());
                     dadosClasse.put("DESCRICAO", objeto.getProperty("descricaoClasse").toString());
+                    listaClasseProduto.add(dadosClasse);
 
-                    ClasseSql classeSql = new ClasseSql(context);
+                    //ClasseSql classeSql = new ClasseSql(context);
 
                     // Pega o sql para passar para o statement
                     //final String sql = classeSql.construirSqlStatement(dadosClasse);
                     // Pega o argumento para o statement
                     //final String[] argumentoSql = classeSql.argumentoStatement(dadosClasse);
 
-                    if (classeSql.insertOrReplace(dadosClasse) <= 0) {
+                    /*if (classeSql.insertOrReplace(dadosClasse) <= 0) {
                         todosSucesso = false;
-                    }
+                    }*/
                     /*((Activity) context).runOnUiThread(new Runnable() {
                         public void run() {
                             //classeSql.insertOrReplace(dadosClasse);
@@ -3684,6 +3755,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                         }
                     });*/
                 } // Fim do for
+                ClasseSql classeSql = new ClasseSql(context);
+
+                todosSucesso = classeSql.insertList(listaClasseProduto);
+
                 // Checa se todos foram inseridos/atualizados com sucesso
                 if (todosSucesso) {
                     inserirUltimaAtualizacao("AEACLASE");
@@ -3769,6 +3844,8 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 }
                 int controle = 0;
 
+                List<ContentValues> listaUnidadeVenda = new ArrayList<ContentValues>();
+
                 // Passa por toda a lista
                 for (SoapObject objetoIndividual : listaUnidadeVendaObject) {
                     final int finalControle = controle;
@@ -3808,17 +3885,18 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                     dadosUnidade.put("DESCRICAO_SINGULAR", objeto.getProperty("descricaoUnidadeVenda").toString());
                     dadosUnidade.put("SIGLA", objeto.getProperty("siglaUnidadeVenda").toString());
                     dadosUnidade.put("DECIMAIS", Integer.parseInt(objeto.getProperty("casasDecimais").toString()));
+                    listaUnidadeVenda.add(dadosUnidade);
 
-                    UnidadeVendaSql unidadeVendaSql = new UnidadeVendaSql(context);
+                    //UnidadeVendaSql unidadeVendaSql = new UnidadeVendaSql(context);
 
                     // Pega o sql para passar para o statement
                     //final String sql = unidadeVendaSql.construirSqlStatement(dadosUnidade);
                     // Pega o argumento para o statement
                     //final String[] argumentoSql = unidadeVendaSql.argumentoStatement(dadosUnidade);
 
-                    if (unidadeVendaSql.insertOrReplace(dadosUnidade) <= 0) {
+                    /*if (unidadeVendaSql.insertOrReplace(dadosUnidade) <= 0) {
                         todosSucesso = false;
-                    }
+                    }*/
                     /*((Activity) context).runOnUiThread(new Runnable() {
                         public void run() {
                             //unidadeVendaSql.insertOrReplace(dadosUnidade);
@@ -3826,6 +3904,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                         }
                     });*/
                 } // Fim do for
+                UnidadeVendaSql unidadeVendaSql = new UnidadeVendaSql(context);
+
+                todosSucesso = unidadeVendaSql.insertList(listaUnidadeVenda);
+
                 // Checa se todos foram inseridos/atualizados com sucesso
                 if (todosSucesso) {
                     inserirUltimaAtualizacao("AEAUNVEN");
@@ -3910,6 +3992,8 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 }
                 int controle = 0;
 
+                List<ContentValues> listaGrade = new ArrayList<ContentValues>();
+
                 // Passa por toda a lista
                 for (SoapObject objetoIndividual : listaGradeObject) {
                     final int finalControle = controle;
@@ -3948,17 +4032,18 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                     dadosGrade.put("ID_AEATPGRD", Integer.parseInt(objeto.getProperty("idTipoGrade").toString()));
                     dadosGrade.put("DT_ALT", objeto.getProperty("dataAlteracao").toString());
                     dadosGrade.put("DESCRICAO", objeto.getProperty("descricaoGrade").toString());
+                    listaGrade.add(dadosGrade);
 
-                    GradeSql gradeSql = new GradeSql(context);
+                    //GradeSql gradeSql = new GradeSql(context);
 
                     // Pega o sql para passar para o statement
                     //final String sql = gradeSql.construirSqlStatement(dadosGrade);
                     // Pega o argumento para o statement
                     //final String[] argumentoSql = gradeSql.argumentoStatement(dadosGrade);
 
-                    if (gradeSql.insertOrReplace(dadosGrade) <= 0) {
+                    /*if (gradeSql.insertOrReplace(dadosGrade) <= 0) {
                         todosSucesso = false;
-                    }
+                    }*/
                     /*((Activity) context).runOnUiThread(new Runnable() {
                         public void run() {
                             //gradeSql.insertOrReplace(dadosGrade);
@@ -3966,6 +4051,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                         }
                     });*/
                 } // Fim do for
+                GradeSql gradeSql = new GradeSql(context);
+
+                todosSucesso = gradeSql.insertList(listaGrade);
+
                 // Checa se todos foram inseridos/atualizados com sucesso
                 if (todosSucesso) {
                     inserirUltimaAtualizacao("AEAGRADE");
@@ -4050,6 +4139,8 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 }
                 int controle = 0;
 
+                List<ContentValues> listaMarca = new ArrayList<ContentValues>();
+
                 // Passa por toda a lista
                 for (SoapObject objetoIndividual : listaMarcaObject) {
                     final int finalControle = controle;
@@ -4088,16 +4179,18 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                     dadosMarca.put("DT_ALT", objeto.getProperty("dataAlteracao").toString());
                     dadosMarca.put("DESCRICAO", objeto.getProperty("descricaoMarca").toString());
 
-                    MarcaSql marcaSql = new MarcaSql(context);
+                    listaMarca.add(dadosMarca);
+
+                    //MarcaSql marcaSql = new MarcaSql(context);
 
                     // Pega o sql para passar para o statement
                     //final String sql = marcaSql.construirSqlStatement(dadosMarca);
                     // Pega o argumento para o statement
                     //final String[] argumentoSql = marcaSql.argumentoStatement(dadosMarca);
 
-                    if (marcaSql.insertOrReplace(dadosMarca) <= 0) {
+                    /*if (marcaSql.insertOrReplace(dadosMarca) <= 0) {
                         todosSucesso = false;
-                    }
+                    }*/
                     /*((Activity) context).runOnUiThread(new Runnable() {
                         public void run() {
                             //marcaSql.insertOrReplace(dadosMarca);
@@ -4105,6 +4198,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                         }
                     });*/
                 } // Fim do for
+                MarcaSql marcaSql = new MarcaSql(context);
+
+                todosSucesso = marcaSql.insertList(listaMarca);
+
                 // Checa se todos foram inseridos/atualizados com sucesso
                 if (todosSucesso) {
                     inserirUltimaAtualizacao("AEAMARCA");
@@ -4189,6 +4286,8 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 }
                 int controle = 0;
 
+                List<ContentValues> listaSituacaoTributaria = new ArrayList<ContentValues>();
+
                 // Passa por toda a lista
                 for (SoapObject objetoIndividual : listaSituacaoTributariaObject) {
                     final int finalControle = controle;
@@ -4230,16 +4329,18 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                     dadosSituacao.put("TIPO", objeto.getProperty("tipo").toString());
                     dadosSituacao.put("ORIGEM", objeto.getProperty("origem").toString());
 
-                    SituacaoTributariaSql situacaoTributariaSql = new SituacaoTributariaSql(context);
+                    listaSituacaoTributaria.add(dadosSituacao);
+
+                    //SituacaoTributariaSql situacaoTributariaSql = new SituacaoTributariaSql(context);
 
                     // Pega o sql para passar para o statement
                     //final String sql = situacaoTributariaSql.construirSqlStatement(dadosSituacao);
                     // Pega o argumento para o statement
                     //final String[] argumentoSql = situacaoTributariaSql.argumentoStatement(dadosSituacao);
 
-                    if (situacaoTributariaSql.insertOrReplace(dadosSituacao) <= 0) {
+                    /*if (situacaoTributariaSql.insertOrReplace(dadosSituacao) <= 0) {
                         todosSucesso = false;
-                    }
+                    }*/
                     /*((Activity) context).runOnUiThread(new Runnable() {
                         public void run() {
                             //situacaoTributariaSql.insertOrReplace(dadosSituacao);
@@ -4247,6 +4348,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                         }
                     });*/
                 } // Fim do for
+                SituacaoTributariaSql situacaoTributariaSql = new SituacaoTributariaSql(context);
+
+                todosSucesso = situacaoTributariaSql.insertList(listaSituacaoTributaria);
+
                 // Checa se todos foram inseridos/atualizados com sucesso
                 if (todosSucesso) {
                     inserirUltimaAtualizacao("AEACODST");
@@ -4332,6 +4437,8 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 }
                 int controle = 0;
 
+                List<ContentValues> listaProduto = new ArrayList<ContentValues>();
+
                 // Passa por toda a lista
                 for (SoapObject objetoIndividual : listaProdutoObject) {
                     final int finalControle = controle;
@@ -4400,16 +4507,18 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                     dadosProduto.put("ATIVO", objeto.getProperty("ativo").toString());
                     dadosProduto.put("TIPO", objeto.getProperty("tipoProduto").toString());
 
-                    ProdutoSql produtoSql = new ProdutoSql(context);
+                    listaProduto.add(dadosProduto);
+
+                    //ProdutoSql produtoSql = new ProdutoSql(context);
 
                     // Pega o sql para passar para o statement
                     //final String sql = produtoSql.construirSqlStatement(dadosProduto);
                     // Pega o argumento para o statement
                     //final String[] argumentoSql = produtoSql.argumentoStatement(dadosProduto);
 
-                    if (produtoSql.insertOrReplace(dadosProduto) <= 0) {
+                    /*if (produtoSql.insertOrReplace(dadosProduto) <= 0) {
                         todosSucesso = false;
-                    }
+                    }*/
                     /*((Activity) context).runOnUiThread(new Runnable() {
                         public void run() {
                             //produtoSql.insertOrReplace(dadosProduto);
@@ -4417,6 +4526,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                         }
                     });*/
                 } // Fim do for
+                ProdutoSql produtoSql = new ProdutoSql(context);
+
+                todosSucesso = produtoSql.insertList(listaProduto);
+
                 // Checa se todos foram inseridos/atualizados com sucesso
                 if (todosSucesso) {
                     inserirUltimaAtualizacao("AEAPRODU");
@@ -4501,6 +4614,8 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 }
                 int controle = 0;
 
+                List<ContentValues> listaEmbalagem = new ArrayList<ContentValues>();
+
                 // Passa por toda a lista
                 for (SoapObject objetoIndividual : listaEmbalagemObject) {
                     final int finalControle = controle;
@@ -4565,17 +4680,18 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                     if (objeto.hasProperty("ativo")) {
                         dadosEmbalagem.put("ATIVO", objeto.getProperty("ativo").toString());
                     }
+                    listaEmbalagem.add(dadosEmbalagem);
 
-                    EmbalagemSql embalagemSql = new EmbalagemSql(context);
+                    //EmbalagemSql embalagemSql = new EmbalagemSql(context);
 
                     // Pega o sql para passar para o statement
                     //final String sql = embalagemSql.construirSqlStatement(dadosEmbalagem);
                     // Pega o argumento para o statement
                     //final String[] argumentoSql = embalagemSql.argumentoStatement(dadosEmbalagem);
 
-                    if (embalagemSql.insertOrReplace(dadosEmbalagem) <= 0) {
+                    /*if (embalagemSql.insertOrReplace(dadosEmbalagem) <= 0) {
                         todosSucesso = false;
-                    }
+                    }*/
                     /*((Activity) context).runOnUiThread(new Runnable() {
                         public void run() {
                             //embalagemSql.insertOrReplace(dadosEmbalagem);
@@ -4583,6 +4699,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                         }
                     });*/
                 } // Fim do for
+                EmbalagemSql embalagemSql = new EmbalagemSql(context);
+
+                todosSucesso = embalagemSql.insertList(listaEmbalagem);
+
                 // Checa se todos foram inseridos/atualizados com sucesso
                 if (todosSucesso) {
                     inserirUltimaAtualizacao("AEAEMBAL");
@@ -4668,6 +4788,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 }
                 int controle = 0;
                 List<ContentValues> listaProdutoLoja = new ArrayList<ContentValues>();
+
                 // Passa por toda a lista
                 for (SoapObject objetoIndividual : listaProdutoLojaObject) {
                     final int finalControle = controle;
@@ -4856,6 +4977,8 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 }
                 int controle = 0;
 
+                List<ContentValues> listaLocalEstoque = new ArrayList<ContentValues>();
+
                 // Passa por toda a lista
                 for (SoapObject objetoIndividual : listaLocalEstoqueObject) {
                     final int finalControle = controle;
@@ -4898,17 +5021,18 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                     dadosLocalEstoque.put("DESCRICAO", objeto.getProperty("descricaoLocalEstoque").toString());
                     dadosLocalEstoque.put("ATIVO", objeto.getProperty("ativo").toString());
                     dadosLocalEstoque.put("TIPO_VENDA", objeto.getProperty("tipoVenda").toString());
+                    listaLocalEstoque.add(dadosLocalEstoque);
 
-                    LocacaoSql locacaoSql = new LocacaoSql(context);
+                    //LocacaoSql locacaoSql = new LocacaoSql(context);
 
                     // Pega o sql para passar para o statement
                     //final String sql = locacaoSql.construirSqlStatement(dadosLocalEstoque);
                     // Pega o argumento para o statement
                     //final String[] argumentoSql = locacaoSql.argumentoStatement(dadosLocalEstoque);
 
-                    if (locacaoSql.insertOrReplace(dadosLocalEstoque) <= 0) {
+                    /*if (locacaoSql.insertOrReplace(dadosLocalEstoque) <= 0) {
                         todosSucesso = false;
-                    }
+                    }*/
                     /*((Activity) context).runOnUiThread(new Runnable() {
                         public void run() {
                             //locacaoSql.insertOrReplace(dadosLocalEstoque);
@@ -4916,6 +5040,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                         }
                     });*/
                 } // Fim do for
+                LocacaoSql locacaoSql = new LocacaoSql(context);
+
+                todosSucesso = locacaoSql.insertList(listaLocalEstoque);
+
                 // Checa se todos foram inseridos/atualizados com sucesso
                 if (todosSucesso) {
                     inserirUltimaAtualizacao("AEALOCES");
@@ -5154,7 +5282,6 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                     });
                 }
                 int controle = 0;
-
                 // Passa por toda a lista
                 for (SoapObject objetoIndividual : listaOrcamentoObject) {
                     final int finalControle = controle;
@@ -5655,6 +5782,8 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 }
                 int controle = 0;
 
+                List<ContentValues> listaPercentual = new ArrayList<ContentValues>();
+
                 // Passa por toda a lista
                 for (SoapObject objetoIndividual : listaPercentualObject) {
                     final int finalControle = controle;
@@ -5756,17 +5885,18 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                     if (objeto.hasProperty("aliquotaCofins")) {
                         dadosPercentual.put("ALIQUOTA_COFINS", Double.parseDouble(objeto.getProperty("aliquotaCofins").toString()));
                     }
+                    listaPercentual.add(dadosPercentual);
 
-                    PercentualSql percentualSql = new PercentualSql(context);
+                    //PercentualSql percentualSql = new PercentualSql(context);
 
                     // Pega o sql para passar para o statement
                     //final String sql = percentualSql.construirSqlStatement(dadosPercentual);
                     // Pega o argumento para o statement
                     //final String[] argumentoSql = percentualSql.argumentoStatement(dadosPercentual);
 
-                    if (percentualSql.insertOrReplace(dadosPercentual) <= 0) {
+                    /*if (percentualSql.insertOrReplace(dadosPercentual) <= 0) {
                         todosSucesso = false;
-                    }
+                    }*/
                     /*((Activity) context).runOnUiThread(new Runnable() {
                         public void run() {
                             //percentualSql.insertOrReplace(dadosPercentual);
@@ -5774,6 +5904,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                         }
                     });*/
                 } // Fim do for
+                PercentualSql percentualSql = new PercentualSql(context);
+
+                todosSucesso = percentualSql.insertList(listaPercentual);
+
                 // Checa se todos foram inseridos/atualizados com sucesso
                 if (todosSucesso) {
                     inserirUltimaAtualizacao("AEAPERCE");
@@ -5859,6 +5993,8 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 }
                 int controle = 0;
 
+                List<ContentValues> listaFator = new ArrayList<ContentValues>();
+
                 // Passa por toda a lista
                 for (SoapObject objetoIndividual : listaFatorObject) {
                     final int finalControle = controle;
@@ -5915,16 +6051,18 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                     }
                     dadosFator.put("DIAS_BONUS", Integer.parseInt(objeto.getProperty("diasBonus").toString()));
 
-                    FatorSql fatorSql = new FatorSql(context);
+                    listaFator.add(dadosFator);
+
+                    //FatorSql fatorSql = new FatorSql(context);
 
                     // Pega o sql para passar para o statement
                     //final String sql = fatorSql.construirSqlStatement(dadosFator);
                     // Pega o argumento para o statement
                     //final String[] argumentoSql = fatorSql.argumentoStatement(dadosFator);
 
-                    if (fatorSql.insertOrReplace(dadosFator) <= 0) {
+                    /*if (fatorSql.insertOrReplace(dadosFator) <= 0) {
                         todosSucesso = false;
-                    }
+                    }*/
                     /*((Activity) context).runOnUiThread(new Runnable() {
                         public void run() {
                             //fatorSql.insertOrReplace(dadosFator);
@@ -5932,6 +6070,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                         }
                     });*/
                 } // Fim do for
+                FatorSql fatorSql = new FatorSql(context);
+
+                todosSucesso = fatorSql.insertList(listaFator);
+
                 // Checa se todos foram inseridos/atualizados com sucesso
                 if (todosSucesso) {
                     inserirUltimaAtualizacao("AEAFATOR");
@@ -6017,6 +6159,8 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 }
                 int controle = 0;
 
+                List<ContentValues> listaProdutoRecomend = new ArrayList<ContentValues>();
+
                 // Passa por toda a lista
                 for (SoapObject objetoIndividual : listaProdutoRecomendadoObject) {
                     final int finalControle = controle;
@@ -6074,17 +6218,18 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                     if (objeto.hasProperty("posicao")) {
                         dadosRecomendado.put("POSICAO", Integer.parseInt(objeto.getProperty("posicao").toString()));
                     }
+                    listaProdutoRecomend.add(dadosRecomendado);
 
-                    ProdutoRecomendadoSql produtoRecomendadoSql = new ProdutoRecomendadoSql(context);
+                    //ProdutoRecomendadoSql produtoRecomendadoSql = new ProdutoRecomendadoSql(context);
 
                     // Pega o sql para passar para o statement
                     //final String sql = produtoRecomendadoSql.construirSqlStatement(dadosRecomendado);
                     // Pega o argumento para o statement
                     //final String[] argumentoSql = produtoRecomendadoSql.argumentoStatement(dadosRecomendado);
 
-                    if (produtoRecomendadoSql.insertOrReplace(dadosRecomendado) <= 0) {
+                    /*if (produtoRecomendadoSql.insertOrReplace(dadosRecomendado) <= 0) {
                         todosSucesso = false;
-                    }
+                    }*/
                     /*((Activity) context).runOnUiThread(new Runnable() {
                         public void run() {
                             //produtoRecomendadoSql.insertOrReplace(dadosRecomendado);
@@ -6092,6 +6237,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                         }
                     });*/
                 } // Fim do for
+                ProdutoRecomendadoSql produtoRecomendadoSql = new ProdutoRecomendadoSql(context);
+
+                todosSucesso = produtoRecomendadoSql.insertList(listaProdutoRecomend);
+
                 // Checa se todos foram inseridos/atualizados com sucesso
                 if (todosSucesso) {
                     inserirUltimaAtualizacao("AEAPRREC");
@@ -6195,6 +6344,8 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 }
                 int controle = 0;
 
+                List<ContentValues> listaParcela = new ArrayList<ContentValues>();
+
                 // Passa por toda a lista
                 for (SoapObject objetoIndividual : listaParcelaObject) {
                     final int finalControle = controle;
@@ -6229,74 +6380,79 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                         objeto = objetoIndividual;
                     }
 
-                    ContentValues dadosMarca = new ContentValues();
-                    dadosMarca.put("ID_RPAPARCE", Integer.parseInt(objeto.getProperty("idParcela").toString()));
+                    ContentValues dadosParcela = new ContentValues();
+                    dadosParcela.put("ID_RPAPARCE", Integer.parseInt(objeto.getProperty("idParcela").toString()));
                     if (objeto.hasProperty("idEmpresa")) {
-                        dadosMarca.put("ID_SMAEMPRE", Integer.parseInt(objeto.getProperty("idEmpresa").toString()));
+                        dadosParcela.put("ID_SMAEMPRE", Integer.parseInt(objeto.getProperty("idEmpresa").toString()));
                     }
                     if (objeto.hasProperty("idFatura")) {
-                        dadosMarca.put("ID_RPAFATUR", Integer.parseInt(objeto.getProperty("idFatura").toString()));
+                        dadosParcela.put("ID_RPAFATUR", Integer.parseInt(objeto.getProperty("idFatura").toString()));
                     }
                     if (objeto.hasProperty("idPessoa")) {
-                        dadosMarca.put("ID_CFACLIFO", Integer.parseInt(objeto.getProperty("idPessoa").toString()));
+                        dadosParcela.put("ID_CFACLIFO", Integer.parseInt(objeto.getProperty("idPessoa").toString()));
                     }
                     if (objeto.hasProperty("idTipoDocumento")) {
-                        dadosMarca.put("ID_CFATPDOC", Integer.parseInt(objeto.getProperty("idTipoDocumento").toString()));
+                        dadosParcela.put("ID_CFATPDOC", Integer.parseInt(objeto.getProperty("idTipoDocumento").toString()));
                     }
                     if (objeto.hasProperty("idTipoCobranca")) {
-                        dadosMarca.put("ID_CFATPCOB", Integer.parseInt(objeto.getProperty("idTipoCobranca").toString()));
+                        dadosParcela.put("ID_CFATPCOB", Integer.parseInt(objeto.getProperty("idTipoCobranca").toString()));
                     }
                     if (objeto.hasProperty("idPortadorBanco")) {
-                        dadosMarca.put("ID_CFAPORTA", Integer.parseInt(objeto.getProperty("idPortadorBanco").toString()));
+                        dadosParcela.put("ID_CFAPORTA", Integer.parseInt(objeto.getProperty("idPortadorBanco").toString()));
                     }
-                    dadosMarca.put("DT_ALT", objeto.getProperty("dataAlteracao").toString());
-                    dadosMarca.put("TIPO", objeto.getProperty("tipo").toString());
-                    dadosMarca.put("DT_EMISSAO", objeto.getProperty("dataEmissao").toString());
-                    dadosMarca.put("DT_VENCIMENTO", objeto.getProperty("dataVencimento").toString());
+                    dadosParcela.put("DT_ALT", objeto.getProperty("dataAlteracao").toString());
+                    dadosParcela.put("TIPO", objeto.getProperty("tipo").toString());
+                    dadosParcela.put("DT_EMISSAO", objeto.getProperty("dataEmissao").toString());
+                    dadosParcela.put("DT_VENCIMENTO", objeto.getProperty("dataVencimento").toString());
                     if (objeto.hasProperty("dataBaixa")) {
-                        dadosMarca.put("DT_BAIXA", objeto.getProperty("dataBaixa").toString());
+                        dadosParcela.put("DT_BAIXA", objeto.getProperty("dataBaixa").toString());
                     }
                     if (objeto.hasProperty("parcela")) {
-                        dadosMarca.put("PARCELA", Integer.parseInt(objeto.getProperty("parcela").toString()));
+                        dadosParcela.put("PARCELA", Integer.parseInt(objeto.getProperty("parcela").toString()));
                     }
-                    dadosMarca.put("VL_PARCELA", Double.parseDouble(objeto.getProperty("valorParcela").toString()));
+                    dadosParcela.put("VL_PARCELA", Double.parseDouble(objeto.getProperty("valorParcela").toString()));
                     if (objeto.hasProperty("totalPago")) {
-                        dadosMarca.put("FC_VL_TOTAL_PAGO", Double.parseDouble(objeto.getProperty("totalPago").toString()));
+                        dadosParcela.put("FC_VL_TOTAL_PAGO", Double.parseDouble(objeto.getProperty("totalPago").toString()));
                     }
                     if (objeto.hasProperty("totalRestante")) {
-                        dadosMarca.put("FC_VL_RESTANTE", Double.parseDouble(objeto.getProperty("totalRestante").toString()));
+                        dadosParcela.put("FC_VL_RESTANTE", Double.parseDouble(objeto.getProperty("totalRestante").toString()));
                     }
                     if (objeto.hasProperty("jurosDiario")) {
-                        dadosMarca.put("VL_JUROS_DIARIO", Double.parseDouble(objeto.getProperty("jurosDiario").toString()));
+                        dadosParcela.put("VL_JUROS_DIARIO", Double.parseDouble(objeto.getProperty("jurosDiario").toString()));
                     }
                     if (objeto.hasProperty("percentualDesconto")) {
-                        dadosMarca.put("PERC_DESCONTO", Double.parseDouble(objeto.getProperty("percentualDesconto").toString()));
+                        dadosParcela.put("PERC_DESCONTO", Double.parseDouble(objeto.getProperty("percentualDesconto").toString()));
                     }
-                    dadosMarca.put("SEQUENCIAL", objeto.getProperty("sequencial").toString());
+                    dadosParcela.put("SEQUENCIAL", objeto.getProperty("sequencial").toString());
                     if (objeto.hasProperty("numero")) {
-                        dadosMarca.put("NUMERO", objeto.getProperty("numero").toString());
+                        dadosParcela.put("NUMERO", objeto.getProperty("numero").toString());
                     }
                     if (objeto.hasProperty("observasao")) {
-                        dadosMarca.put("OBS", objeto.getProperty("observasao").toString());
+                        dadosParcela.put("OBS", objeto.getProperty("observasao").toString());
                     }
+                    listaParcela.add(dadosParcela);
 
-                    ParcelaSql parcelaSql = new ParcelaSql(context);
+                    //ParcelaSql parcelaSql = new ParcelaSql(context);
 
                     // Pega o sql para passar para o statement
-                    //final String sql = parcelaSql.construirSqlStatement(dadosMarca);
+                    //final String sql = parcelaSql.construirSqlStatement(dadosParcela);
                     // Pega o argumento para o statement
-                    //final String[] argumentoSql = parcelaSql.argumentoStatement(dadosMarca);
+                    //final String[] argumentoSql = parcelaSql.argumentoStatement(dadosParcela);
 
-                    if (parcelaSql.insertOrReplace(dadosMarca) <= 0) {
+                    /*if (parcelaSql.insertOrReplace(dadosParcela) <= 0) {
                         todosSucesso = false;
-                    }
+                    }*/
                     /*((Activity) context).runOnUiThread(new Runnable() {
                         public void run() {
-                            //parcelaSql.insertOrReplace(dadosMarca);
+                            //parcelaSql.insertOrReplace(dadosParcela);
                             parcelaSql.insertOrReplaceFast(sql, argumentoSql);
                         }
                     });*/
                 } // Fim do for
+                ParcelaSql parcelaSql = new ParcelaSql(context);
+
+                todosSucesso = parcelaSql.insertList(listaParcela);
+
                 // Checa se todos foram inseridos/atualizados com sucesso
                 if (todosSucesso) {
                     inserirUltimaAtualizacao("RPAPARCE");
