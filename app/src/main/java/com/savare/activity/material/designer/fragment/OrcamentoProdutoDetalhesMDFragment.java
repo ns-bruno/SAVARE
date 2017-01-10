@@ -10,6 +10,7 @@ import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -23,6 +24,8 @@ import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.github.johnpersano.supertoasts.SuperToast;
+import com.github.johnpersano.supertoasts.util.Style;
 import com.savare.R;
 import com.savare.activity.material.designer.OrcamentoProdutoDetalhesTabFragmentMDActivity;
 import com.savare.adapter.ItemUniversalAdapter;
@@ -257,6 +260,17 @@ public class OrcamentoProdutoDetalhesMDFragment extends Fragment {
             }
         });
 
+        editDesconto.setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+
+                if (keyCode == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN) {
+
+                    editTotal.setSelection(editTotal.getText().length());
+                }
+                return false;
+            }
+        });
 
         editValorDesconto.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -913,7 +927,7 @@ public class OrcamentoProdutoDetalhesMDFragment extends Fragment {
         int casasDecimais = produtoRotinas.casasDecimaisProduto(""+idEmbalagem, ""+produto.getProduto().getIdProduto());
 
         // Checa se existe ponto
-        if(editQuantidade.getText().toString().indexOf(".") > 0){
+        if((!editQuantidade.getText().toString().isEmpty()) && (editQuantidade.getText().toString().indexOf(".") > 0)){
             // Pega as casas decimais da quantidade digitada
             String cdAux = editQuantidade.getText().toString().substring(editQuantidade.getText().toString().indexOf(".") + 1);
             // Converte o valor pego apos a virgula
@@ -985,7 +999,7 @@ public class OrcamentoProdutoDetalhesMDFragment extends Fragment {
     } // Fim validarDados
 
     private void salvarProdutoOrcamento(){
-        if((editQuantidade != null) && (!editQuantidade.getText().equals(""))){
+        if((editQuantidade != null) && (!editQuantidade.getText().equals("")) && (!editQuantidade.getText().toString().isEmpty())){
             FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(getContext());
 
             // Checa os dados informado
@@ -1075,15 +1089,10 @@ public class OrcamentoProdutoDetalhesMDFragment extends Fragment {
                     }
                 }
             } else {
-                // Dados da mensagem
-                ContentValues mensagem = new ContentValues();
-                mensagem.put("comando", 2);
-                mensagem.put("tela", "OrcamentoProdutoDetalhesActivity");
-                mensagem.put("mensagem", "Verifique se os campos obrigatorios estão preenchidos.\n");
-
-                funcoes = new FuncoesPersonalizadas(getContext());
-                funcoes.menssagem(mensagem);
+                SuperToast.create(getContext(), getContext().getResources().getString(R.string.verifique_campos_obrigatorios), SuperToast.Duration.SHORT, Style.getStyle(Style.RED, SuperToast.Animations.POPUP)).show();
             }
+        } else {
+            SuperToast.create(getContext(), getContext().getResources().getString(R.string.quantidade_invalida), SuperToast.Duration.SHORT, Style.getStyle(Style.RED, SuperToast.Animations.POPUP)).show();
         }
     }
 }

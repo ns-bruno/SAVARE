@@ -8,6 +8,7 @@ import org.ksoap2.serialization.KvmSerializable;
 import org.ksoap2.serialization.PropertyInfo;
 
 import java.util.Hashtable;
+import java.util.List;
 
 public class OrcamentoBeans implements Parcelable, KvmSerializable {
 	
@@ -61,6 +62,8 @@ public class OrcamentoBeans implements Parcelable, KvmSerializable {
 	
 	private boolean tagSelectContext,
 					tagEnviado;
+
+	private List<ItemOrcamentoBeans> listaItemOrcamento;
 
 	public OrcamentoBeans(Parcel dados) {
 		this.idOrcamento = dados.readInt();
@@ -526,6 +529,14 @@ public class OrcamentoBeans implements Parcelable, KvmSerializable {
 
 	public void setPesoBruto(double pesoBruto) {
 		this.pesoBruto = pesoBruto;
+	}
+
+	public List<ItemOrcamentoBeans> getListaItemOrcamento() {
+		return listaItemOrcamento;
+	}
+
+	public void setListaItemOrcamento(List<ItemOrcamentoBeans> listaItemOrcamento) {
+		this.listaItemOrcamento = listaItemOrcamento;
 	}
 
 	/**

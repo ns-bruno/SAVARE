@@ -75,6 +75,14 @@
             android:visibility="gone"
             android:indeterminate="true"/>
 
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/status"
+            android:id="@+id/activity_lista_orcamento_pedido_md_text_status"
+            android:layout_weight="1"
+            android:visibility="gone"/>
+
     </LinearLayout>
 
     <FrameLayout

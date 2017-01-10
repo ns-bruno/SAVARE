@@ -162,13 +162,18 @@ public class GerarPdfRotinas {
 		//Dados do produtos
 		 if(tipoTabela == 1){
              // Adiciona o tamanho de cada coluna
-			tabela = new PdfPTable(new float[] { 0.11f, 0.42f, 0.15f, 0.1f, 0.1f, 0.15f, 0.2f });
+			tabela = new PdfPTable(new float[] {0.08f, 0.11f, 0.42f, 0.15f, 0.1f, 0.1f, 0.15f, 0.2f });
 			// Percentagem da largura da pagina
 			tabela.setWidthPercentage(100);
 			// Muda a cor do fundo do cabecalho
 			//tabela.getDefaultCell().setBackgroundColor(BaseColor.LIGHT_GRAY);
-	
-	 	    PdfPCell c1 = new PdfPCell(new Phrase("Código", smallBold));
+
+			PdfPCell c1 = new PdfPCell(new Phrase("Seq.", smallBold));
+			c1.setHorizontalAlignment(Element.ALIGN_CENTER);
+			c1.setBackgroundColor(BaseColor.LIGHT_GRAY);
+			tabela.addCell(c1);
+
+			c1 = new PdfPCell(new Phrase("Código", smallBold));
 	 	    c1.setHorizontalAlignment(Element.ALIGN_CENTER);
 	 	    c1.setBackgroundColor(BaseColor.LIGHT_GRAY);
 	 	    tabela.addCell(c1);
@@ -206,6 +211,7 @@ public class GerarPdfRotinas {
 
 	 	    for (int i = 0; i < listaItensOrcamento.size(); i++) {
 	 	    	tabela.getDefaultCell().setHorizontalAlignment(Element.ALIGN_LEFT);
+	 	    	tabela.addCell(new Phrase(listaItensOrcamento.get(i).getSequencia() + "", contextoFont));
 	 	    	tabela.addCell(new Phrase(listaItensOrcamento.get(i).getProduto().getCodigoEstrutural(), contextoFont));
 	 	    	tabela.addCell(new Phrase(listaItensOrcamento.get(i).getProduto().getDescricaoProduto() + "\n" + listaItensOrcamento.get(i).getComplemento(), contextoFont));
 	 	    	tabela.addCell(new Phrase(listaItensOrcamento.get(i).getProduto().getDescricaoMarca(), contextoFont));

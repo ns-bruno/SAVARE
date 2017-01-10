@@ -101,8 +101,7 @@ public class SincronizacaoMDActivity extends AppCompatActivity {
                 //receberDadosFtpAsync.execute(ImportarDadosTxtRotinas.BLOCO_C);
 
 
-                String[] tabelaRecebeDados = {  WSSisinfoWebservice.FUNCTION_SELECT_SMAEMPRE,
-                                                WSSisinfoWebservice.FUNCTION_SELECT_CFAAREAS,
+                String[] tabelaRecebeDados = {  WSSisinfoWebservice.FUNCTION_SELECT_CFAAREAS,
                                                 WSSisinfoWebservice.FUNCTION_SELECT_SMAEMPRE,
                                                 WSSisinfoWebservice.FUNCTION_SELECT_CFAATIVI,
                                                 WSSisinfoWebservice.FUNCTION_SELECT_CFASTATU,

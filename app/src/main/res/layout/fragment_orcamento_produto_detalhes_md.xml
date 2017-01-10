@@ -95,7 +95,7 @@
                 android:ems="10"
                 android:gravity="right"
                 android:hint="@string/quantidade"
-                android:inputType="numberDecimal" >
+                android:inputType="numberDecimal">
 
                 <requestFocus />
             </EditText>
@@ -201,7 +201,8 @@
                 android:ems="10"
                 android:gravity="right"
                 android:hint="@string/desconto"
-                android:inputType="numberDecimal|numberSigned" >
+                android:inputType="numberDecimal|numberSigned"
+                android:nextFocusDown="@+id/activity_orcamento_produto_detalhes_md_edit_total">
             </EditText>
         </LinearLayout>
 
@@ -256,7 +257,8 @@
                 android:ems="10"
                 android:gravity="right"
                 android:hint="@string/total_liquido"
-                android:inputType="numberDecimal" >
+                android:inputType="numberDecimal"
+                android:nextFocusDown="@+id/activity_orcamento_produto_detalhes_md_edit_observacao">
             </EditText>
         </LinearLayout>
 

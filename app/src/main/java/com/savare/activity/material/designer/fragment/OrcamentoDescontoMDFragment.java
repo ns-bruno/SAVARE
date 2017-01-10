@@ -1,6 +1,7 @@
 package com.savare.activity.material.designer.fragment;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.os.AsyncTask;
@@ -138,9 +139,7 @@ public class OrcamentoDescontoMDFragment extends Fragment {
 
                 if (keyCode == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN) {
 
-                    InputMethodManager imm = (InputMethodManager)getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-                    // Fecha o teclado
-                    imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
+                    editTotalLiquido.setSelection(editTotalLiquido.getText().length());
                 }
 
                 return false;
@@ -201,9 +200,11 @@ public class OrcamentoDescontoMDFragment extends Fragment {
 
                 if (keyCode == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN) {
 
-                    InputMethodManager imm = (InputMethodManager)getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+                    //InputMethodManager imm = (InputMethodManager)getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
                     // Fecha o teclado
-                    imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
+                    //imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
+                    FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(getContext());
+                    funcoes.fecharTecladoVirtual();
                 }
                 return false;
             }
@@ -383,6 +384,7 @@ public class OrcamentoDescontoMDFragment extends Fragment {
 
     public class SalvarDescontoOrcamento extends AsyncTask<Void, Void, Void> {
         private String idOrcamento;
+        private ProgressDialog progress;
 
         public SalvarDescontoOrcamento(String idOrcamento) {
             this.idOrcamento = idOrcamento;
@@ -394,6 +396,12 @@ public class OrcamentoDescontoMDFragment extends Fragment {
 
             progressBarStatus.setVisibility(View.VISIBLE);
             progressBarStatus.setIndeterminate(true);
+
+            //Cria novo um ProgressDialogo e exibe
+            progress = new ProgressDialog(getActivity());
+            progress.setMessage(getContext().getResources().getString(R.string.aguarde_distribuir_desconto_item_orcamento));
+            progress.setCancelable(false);
+            progress.show();
         }
 
         @Override
@@ -439,6 +447,7 @@ public class OrcamentoDescontoMDFragment extends Fragment {
             super.onPostExecute(aVoid);
 
             progressBarStatus.setVisibility(View.GONE);
+            progress.dismiss();
         }
     }
 }

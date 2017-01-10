@@ -34,6 +34,8 @@ import android.widget.EditText;
 
 import com.github.johnpersano.supertoasts.SuperToast;
 import com.github.johnpersano.supertoasts.util.Style;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import com.savare.R;
 import com.savare.banco.ConexaoTask;
 import com.savare.banco.local.ConexaoBancoDeDados;
@@ -49,9 +51,13 @@ import org.jasypt.util.text.BasicTextEncryptor;
 import org.ksoap2.serialization.SoapObject;
 
 import java.io.File;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.NetworkInterface;
+import java.net.Socket;
+import java.net.SocketAddress;
 import java.net.SocketException;
 import java.text.DateFormat;
 import java.text.NumberFormat;
@@ -1143,17 +1149,31 @@ public class FuncoesPersonalizadas {
 
 	public boolean checaVersao(){
 		boolean valido = false;
+        JsonObject statuRetorno = null;
 		try {
 			WSSisinfoWebservice webserviceSisInfo = new WSSisinfoWebservice(context);
-			Vector<SoapObject> listaVersao = webserviceSisInfo.executarSelectWebservice(null, WSSisinfoWebservice.FUNCTION_SELECT_VERSAO_SAVARE, null);
+			//Vector<SoapObject> listaVersao = webserviceSisInfo.executarSelectWebservice(null, WSSisinfoWebservice.FUNCTION_SELECT_VERSAO_SAVARE, null);
 
-			// Checa se retornou alguma coisa
-			if ((listaVersao != null) && (listaVersao.size() > 0)) {
+            //String retornoWebservice = webserviceSisInfo.executarSelectWebserviceJson(null, WSSisinfoWebservice.FUNCTION_JSON_SELECT_VERSAO_SAVARE, WSSisinfoWebservice.METODO_GET, null);
+            JsonObject retornoWebservice = new Gson().fromJson(webserviceSisInfo.executarSelectWebserviceJson(null, WSSisinfoWebservice.FUNCTION_JSON_SELECT_VERSAO_SAVARE, WSSisinfoWebservice.METODO_GET, null), JsonObject.class);
 
-				// Passa por toda a lista
-				for (SoapObject objetoIndividual : listaVersao) {
-					// Cria uma vareavel para receber os dados retornado do webservice
-					//SoapObject objeto;
+            // Checa se retornou todas as informações necessarias
+            if ((retornoWebservice != null) && (retornoWebservice.has(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO)) && (retornoWebservice.has(WSSisinfoWebservice.KEY_OBJECT_OBJECT_RETORNO))) {
+
+                statuRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO);
+
+                if (statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO).getAsInt() == 300) {
+
+                    // Checa se retornou alguma coisa
+                    if ((retornoWebservice.has(WSSisinfoWebservice.KEY_OBJECT_OBJECT_RETORNO))){
+                    //if ((listaVersao != null) && (listaVersao.size() > 0)) {
+
+                        int versaoWebservice = retornoWebservice.get(WSSisinfoWebservice.KEY_OBJECT_OBJECT_RETORNO).getAsInt();
+
+                        // Passa por toda a lista
+                        //for (SoapObject objetoIndividual : listaVersao) {
+                            // Cria uma vareavel para receber os dados retornado do webservice
+                            //SoapObject objeto;
 
                     /*if (objetoIndividual.hasProperty("return")) {
                         objeto = (SoapObject) objetoIndividual.getProperty("return");
@@ -1161,47 +1181,81 @@ public class FuncoesPersonalizadas {
                         objeto = objetoIndividual;
                     }*/
 
-					int versaoLocal = VersionUtils.getVersionCode(context);
-					int versaoWebservice = Integer.parseInt(objetoIndividual.getProperty("return").toString());
+                            int versaoLocal = VersionUtils.getVersionCode(context);
+                            //int versaoWebservice = Integer.parseInt(objetoIndividual.getProperty("return").toString());
 
-					// Checa se o SAVARE esta desatualizado
-					if (versaoLocal < versaoWebservice){
+                            // Checa se o SAVARE esta desatualizado
+                            if (versaoLocal < versaoWebservice) {
 
-						// Cria uma notificacao para ser manipulado
-						Load mLoad = PugNotification.with(context).load()
-								.identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR)
-								.smallIcon(R.mipmap.ic_launcher)
-								.largeIcon(R.mipmap.ic_launcher)
-								.title(R.string.versao_savare_desatualizada)
-								.bigTextStyle(R.string.savare_desatualizado_favor_atualize)
-								.flags(Notification.DEFAULT_LIGHTS);
-						mLoad.simple().build();
+                                // Cria uma notificacao para ser manipulado
+                                Load mLoad = PugNotification.with(context).load()
+                                        .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR)
+                                        .smallIcon(R.mipmap.ic_launcher)
+                                        .largeIcon(R.mipmap.ic_launcher)
+                                        .title(R.string.versao_savare_desatualizada)
+                                        .bigTextStyle(R.string.savare_desatualizado_favor_atualize)
+                                        .flags(Notification.DEFAULT_LIGHTS);
+                                mLoad.simple().build();
 
-						// Checa se o SAVARE esta mais atualizado que o webservice
-					} else if (versaoLocal > versaoWebservice){
+                                // Checa se o SAVARE esta mais atualizado que o webservice
+                            } else if (versaoLocal > versaoWebservice) {
 
-						// Cria uma notificacao para ser manipulado
-						Load mLoad = PugNotification.with(context).load()
-								.identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR)
-								.smallIcon(R.mipmap.ic_launcher)
-								.largeIcon(R.mipmap.ic_launcher)
-								.title(R.string.versao_savare_desatualizada)
-								.bigTextStyle(R.string.savare_mais_atualizado_que_webservice)
-								.flags(Notification.DEFAULT_LIGHTS);
-						mLoad.simple().build();
+                                // Cria uma notificacao para ser manipulado
+                                Load mLoad = PugNotification.with(context).load()
+                                        .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR)
+                                        .smallIcon(R.mipmap.ic_launcher)
+                                        .largeIcon(R.mipmap.ic_launcher)
+                                        .title(R.string.versao_savare_desatualizada)
+                                        .bigTextStyle(R.string.savare_mais_atualizado_que_webservice)
+                                        .flags(Notification.DEFAULT_LIGHTS);
+                                mLoad.simple().build();
 
-						valido = true;
+                                valido = true;
 
-						// Checa se o SAVARE esta na mesma versao que o webservice
-					} else if (versaoLocal == versaoWebservice){
-						valido = true;
-					}
-				}
-			}
+                                // Checa se o SAVARE esta na mesma versao que o webservice
+                            } else if (versaoLocal == versaoWebservice) {
+                                valido = true;
+                            }
+                        //}
+                    } else {
+                        // Cria uma notificacao para ser manipulado
+                        Load mLoad = PugNotification.with(context).load()
+                                .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR)
+                                .smallIcon(R.mipmap.ic_launcher)
+                                .largeIcon(R.mipmap.ic_launcher)
+                                .title(R.string.versao_savare_desatualizada)
+                                .bigTextStyle(context.getResources().getString(R.string.numero_vensao_savare_nao_chegou))
+                                .flags(Notification.DEFAULT_LIGHTS);
+                        mLoad.simple().build();
+                    }
+                } else {
+                    // Cria uma notificacao para ser manipulado
+                    Load mLoad = PugNotification.with(context).load()
+                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR)
+                            .smallIcon(R.mipmap.ic_launcher)
+                            .largeIcon(R.mipmap.ic_launcher)
+                            .title(R.string.versao_savare_desatualizada)
+                            .bigTextStyle("Código Retorno: " + ((statuRetorno != null && statuRetorno.has(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO)) ? statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO) : "Sem código.\n")
+                                        + "Mensagem: " + ((statuRetorno != null && statuRetorno.has(WSSisinfoWebservice.KEY_ELEMENT_MENSAGEM_RETORNO)) ? statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_MENSAGEM_RETORNO) : "Erro ao pegar o status do retorno do Webservice.\n")
+                                        + "Extra: " + ((statuRetorno != null && statuRetorno.has(WSSisinfoWebservice.KEY_ELEMENT_EXTRA_RETORNO)) ? statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_EXTRA_RETORNO) : "\n"))
+                            .flags(Notification.DEFAULT_LIGHTS);
+                    mLoad.simple().build();
+                }
+            } else {
+                // Cria uma notificacao para ser manipulado
+                Load mLoad = PugNotification.with(context).load()
+                        .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_ENVIAR_DADOS)
+                        .smallIcon(R.mipmap.ic_launcher)
+                        .largeIcon(R.mipmap.ic_launcher)
+                        .title(R.string.versao_savare_desatualizada)
+                        .bigTextStyle(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice))
+                        .flags(Notification.DEFAULT_LIGHTS);
+                mLoad.simple().build();
+            }
 		}catch (Exception e){
 			// Cria uma notificacao para ser manipulado
 			Load mLoad = PugNotification.with(context).load()
-					.identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR)
+					.identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_ENVIAR_DADOS)
 					.smallIcon(R.mipmap.ic_launcher)
 					.largeIcon(R.mipmap.ic_launcher)
 					.title(R.string.versao_savare_desatualizada)
@@ -1240,4 +1294,25 @@ public class FuncoesPersonalizadas {
 		imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
 	}
 
+	public static boolean pingHost(String host, int port) {
+        try {
+            SocketAddress sockaddr = new InetSocketAddress(host, port);
+            // Create an unbound socket
+            Socket sock = new Socket();
+
+            // This method will block no more than timeoutMs.
+            // If the timeout occurs, SocketTimeoutException is thrown.
+            sock.connect(sockaddr, 2000);
+
+            return true;
+        } catch (IOException e) {
+            return false; // Either timeout or unreachable or failed DNS lookup.
+        } catch (Exception e) {
+            return false; // Either timeout or unreachable or failed DNS lookup.
+        }
+    }
+
+    public static boolean pingWebserviceSisInfo(){
+        return pingHost(ServicosWeb.IP_SERVIDOR_WEBSERVICE, 8080);
+    }
 } // Fecha classe

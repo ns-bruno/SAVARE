@@ -142,14 +142,16 @@ public class OrcamentoProdutoMDFragment extends Fragment {
                     }
 
                 } else {
-                    FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(getActivity());
+                    /*FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(getActivity());
                     // Cria uma variavem para inserir as propriedades da mensagem
                     ContentValues mensagem = new ContentValues();
                     mensagem.put("comando", 2);
                     mensagem.put("tela", "OrcamentoProdutoMDFragment");
                     mensagem.put("mensagem", getActivity().getResources().getString(R.string.nao_orcamento) + "\n");
                     // Executa a mensagem passando por parametro as propriedades
-                    funcoes.menssagem(mensagem);
+                    funcoes.menssagem(mensagem);*/
+
+                    SuperToast.create(getContext(), getContext().getResources().getString(R.string.nao_orcamento), SuperToast.Duration.SHORT, Style.getStyle(Style.RED, SuperToast.Animations.POPUP)).show();
                 }
             } // Fim setOnItemClickListener
         }); //listViewItemOrcamento.setOnItemClickListener
@@ -340,7 +342,7 @@ public class OrcamentoProdutoMDFragment extends Fragment {
                             startActivity(intentOrcamento);
 
                         } else {
-                            FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(getActivity());
+                            /*FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(getActivity());
                             // Cria uma variavem para inserir as propriedades da mensagem
                             ContentValues mensagem = new ContentValues();
                             mensagem.put("comando", 2);
@@ -348,7 +350,10 @@ public class OrcamentoProdutoMDFragment extends Fragment {
                             mensagem.put("mensagem", getActivity().getResources().getString(R.string.nao_orcamento) + "\n"
                                     + getActivity().getResources().getString(R.string.nao_pode_ser_inserido_novos_produtos));
                             // Executa a mensagem passando por parametro as propriedades
-                            funcoes.menssagem(mensagem);
+                            funcoes.menssagem(mensagem);*/
+
+                            SuperToast.create(getContext(), getContext().getResources().getString(R.string.nao_orcamento) + "\n" +
+                                                            getContext().getResources().getString(R.string.nao_pode_ser_inserido_novos_produtos), SuperToast.Duration.VERY_SHORT, Style.getStyle(Style.RED, SuperToast.Animations.POPUP)).show();
                         }
                         break;
 
@@ -519,7 +524,8 @@ public class OrcamentoProdutoMDFragment extends Fragment {
 
                                                 // Verifica se foi deletado algum registro
                                                 if (totalAtualizado > 0) {
-                                                    mensagem.put("mensagem", totalAtualizado + " Transformado(s) em Pedido(s). \n");
+                                                    SuperToast.create(getContext(), totalAtualizado + " Transformado(s) em Pedido(s)", SuperToast.Duration.SHORT, Style.getStyle(Style.GREEN, SuperToast.Animations.FLYIN)).show();
+                                                    //mensagem.put("mensagem", totalAtualizado + " Transformado(s) em Pedido(s). \n");
 
                                                     tipoOrcamentoPedido = "P";
 
@@ -548,14 +554,15 @@ public class OrcamentoProdutoMDFragment extends Fragment {
                                                     //finish();
 
                                                 } else {
-                                                    mensagem.put("mensagem", getResources().getString(R.string.nao_foi_possivel_transformar_orcamento_pedido));
+                                                    SuperToast.create(getContext(), getResources().getString(R.string.nao_foi_possivel_transformar_orcamento_pedido), SuperToast.Duration.LONG, Style.getStyle(Style.RED, SuperToast.Animations.FLYIN)).show();
+                                                    //mensagem.put("mensagem", getResources().getString(R.string.nao_foi_possivel_transformar_orcamento_pedido));
                                                 }
                                                 // Instancia a classe de funcoes
-                                                FuncoesPersonalizadas funcoes;
+                                                /*FuncoesPersonalizadas funcoes;
 
                                                 // Instancia a classe  de funcoes para mostra a mensagem
                                                 funcoes = new FuncoesPersonalizadas(getActivity());
-                                                funcoes.menssagem(mensagem);
+                                                funcoes.menssagem(mensagem);*/
 
                                             } else {
                                                 SuperToast.create(getContext(), getResources().getString(R.string.opcao_positivacao_nao_valida_para_esta_tela), SuperToast.Duration.LONG, Style.getStyle(Style.RED, SuperToast.Animations.FLYIN)).show();
@@ -867,9 +874,10 @@ public class OrcamentoProdutoMDFragment extends Fragment {
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
 
+            // Fecha a barra de progresso
+            progress.dismiss();
+
             if (retornoCaminho.length() > 0) {
-                // Fecha a barra de progresso
-                progress.dismiss();
 
                 File arquivo = new File(retornoCaminho);
 

@@ -88,8 +88,9 @@
                 android:gravity="right"
                 android:digits="0123456789,-"
                 android:hint="@string/desconto_percentual"
-                android:inputType="numberDecimal|numberSigned" >
-            </EditText>
+                android:inputType="numberDecimal|numberSigned"
+                android:nextFocusDown="@+id/fragment_orcamento_desconto_md_edit_total_liquido" />
+
         </LinearLayout>
 
         <LinearLayout
@@ -140,11 +141,10 @@
                 android:gravity="right"
                 android:digits="0123456789,"
                 android:hint="@string/total_liquido"
-                android:inputType="numberDecimal|numberSigned" />
+                android:inputType="numberDecimal|numberSigned"/>
 
         </LinearLayout>
 
-    </LinearLayout>
 
         <android.support.v7.widget.Toolbar
             android:id="@+id/fragment_orcamento_desconto_md_toolbar_rodape"
@@ -155,8 +155,6 @@
             android:minHeight="?attr/actionBarSize"
             app:popupTheme="@style/MaterialDrawerTheme.Light.DarkToolbar"
             android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
-
         </android.support.v7.widget.Toolbar>
-
-
+    </LinearLayout>
 </LinearLayout>

@@ -10,6 +10,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
 import android.util.Log;
 
+import com.github.johnpersano.supertoasts.SuperToast;
+import com.github.johnpersano.supertoasts.util.Style;
 import com.savare.R;
 import com.savare.banco.local.ConexaoBancoDeDados;
 import com.savare.funcoes.VersionUtils;
@@ -62,18 +64,21 @@ public class FuncoesSql {
 		long id = 0;
 		
 		try {
+            bancoDados.beginTransaction();
 			// Inseri os valores no banco de dados
 			id = bancoDados.insertWithOnConflict(tabela, null, values, SQLiteDatabase.CONFLICT_NONE);
 			//id = bancoDados.insert(tabela, null, values);
 			
 			if (id > 0){
-				ContentValues mensagem = new ContentValues();
+				SuperToast.create(context, context.getResources().getString(R.string.cadastro_sucesso), SuperToast.Duration.VERY_SHORT, Style.getStyle(Style.GREEN, SuperToast.Animations.POPUP)).show();
+
+				/*ContentValues mensagem = new ContentValues();
 				mensagem.put("mensagem", "Cadastrado com Sucesso!");
 				mensagem.put("comando", 2);
 				mensagem.put("tela", tabela);
-				
+
 				funcoes = new FuncoesPersonalizadas(context);
-				funcoes.menssagem(mensagem);
+				funcoes.menssagem(mensagem);*/
 				
 			} else {
 				ContentValues mensagem = new ContentValues();
@@ -89,7 +94,7 @@ public class FuncoesSql {
 			this.funcoes = new FuncoesPersonalizadas(context);
 
 			// Armazena as informacoes para para serem exibidas e enviadas
-			ContentValues contentValues = new ContentValues();
+			final ContentValues contentValues = new ContentValues();
 			contentValues.put("comando", 0);
 			contentValues.put("tela", tabela);
 			contentValues.put("mensagem", funcoes.tratamentoErroBancoDados(e.getMessage()));
@@ -99,14 +104,18 @@ public class FuncoesSql {
 			contentValues.put("usuario", funcoes.getValorXml("Usuario"));
 			contentValues.put("empresa", funcoes.getValorXml("ChaveEmpresa"));
 			contentValues.put("email", funcoes.getValorXml("Email"));
-			
-			this.funcoes.menssagem(contentValues);
+
+			((Activity) context).runOnUiThread(new Runnable() {
+				public void run() {
+					funcoes.menssagem(contentValues);
+				}
+			});
 			
 		} catch (Exception e) {
 			this.funcoes = new FuncoesPersonalizadas(context);
 
 			// Armazena as informacoes para para serem exibidas e enviadas
-			ContentValues contentValues = new ContentValues();
+			final ContentValues contentValues = new ContentValues();
 			contentValues.put("comando", 0);
 			contentValues.put("tela", tabela);
 			contentValues.put("mensagem", funcoes.tratamentoErroBancoDados(e.getMessage()));
@@ -115,12 +124,19 @@ public class FuncoesSql {
 			contentValues.put("usuario", funcoes.getValorXml("Usuario"));
 			contentValues.put("empresa", funcoes.getValorXml("ChaveEmpresa"));
 			contentValues.put("email", funcoes.getValorXml("Email"));
-			
-			this.funcoes.menssagem(contentValues);
+
+			((Activity) context).runOnUiThread(new Runnable() {
+				public void run() {
+					funcoes.menssagem(contentValues);
+				}
+			});
 			
 		} finally{
+			bancoDados.setTransactionSuccessful();
+			bancoDados.endTransaction();
+
 			conexaoBanco.fechar();
-			bancoDados.close();
+			//bancoDados.close();
 		}
 		
 		return id;
@@ -350,7 +366,7 @@ public class FuncoesSql {
 			bancoDados.endTransaction();
 
 			conexaoBanco.fechar();
-			bancoDados.close();
+			//bancoDados.close();
 		}
         return totalSucesso;
 	} // Fim do insert

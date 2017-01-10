@@ -6,14 +6,14 @@
         android:id="@+id/menu_lista_lixeira_context_md_restaurar_orcamento"
         android:orderInCategory="1"
         android:title="@string/restaurar_orcamento"
-        app:showAsAction="never" />
+        android:showAsAction="never" />
 
     <item
         android:id="@+id/menu_lista_lixeira_context_md_enviar_email"
         android:orderInCategory="100"
         android:icon="@mipmap/ic_email_dark"
         android:title="@string/enviar_email"
-        app:showAsAction="always" />
+        android:showAsAction="never" />
 
 
 </menu>

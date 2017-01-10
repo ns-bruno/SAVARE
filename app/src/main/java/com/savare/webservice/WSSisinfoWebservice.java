@@ -6,11 +6,13 @@ import android.content.Context;
 import android.os.Build;
 import android.telephony.TelephonyManager;
 
+import com.google.gson.Gson;
 import com.savare.beans.DispositivoBeans;
 import com.savare.beans.RetornoWebServiceBeans;
 import com.savare.configuracao.ServicosWeb;
 import com.savare.funcoes.FuncoesPersonalizadas;
 
+import org.apache.http.client.HttpClient;
 import org.ksoap2.SoapEnvelope;
 import org.ksoap2.serialization.PropertyInfo;
 import org.ksoap2.serialization.SoapObject;
@@ -18,7 +20,17 @@ import org.ksoap2.serialization.SoapSerializationEnvelope;
 import org.ksoap2.transport.HttpTransportSE;
 import org.xmlpull.v1.XmlPullParserException;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.ProtocolException;
+import java.net.URL;
+import java.net.URLEncoder;
 import java.util.List;
 import java.util.Vector;
 
@@ -31,6 +43,7 @@ public class WSSisinfoWebservice {
     private DispositivoBeans dispositivoBeans;
     public static final String FUNCTION_SELECT_USUARIO_USUA = "selectUsuario";
     public static final String FUNCTION_SELECT_VERSAO_SAVARE = "selectVersaoSavare";
+    public static final String FUNCTION_JSON_SELECT_VERSAO_SAVARE = "/savare/selectVersaoSavare";
     public static final String FUNCTION_SELECT_ULTIMA_ATUALIZACAO = "selectUltimaAtualizacao";
     public static final String FUNCTION_INSERT_ULTIMA_ATUALIZACAO = "insertUltimaAtualizacao";
     public static final String FUNCTION_SELECT_CFAAREAS = "selectAreas";
@@ -61,15 +74,25 @@ public class WSSisinfoWebservice {
     public static final String FUNCTION_SELECT_AEALOCES = "selectLocalEstoque";
     public static final String FUNCTION_SELECT_AEAESTOQ = "selectEstoque";
     public static final String FUNCTION_SELECT_AEAORCAM = "selectOrcamento";
+    public static final String FUNCTION_JSON_SELECT_AEAORCAM = "/orcamento/selectOrcamento";
     public static final String FUNCTION_SELECT_AEAITORC = "selectItemOrcamento";
     public static final String FUNCTION_SELECT_AEAPERCE = "selectPercentual";
     public static final String FUNCTION_SELECT_AEAFATOR = "selectFator";
     public static final String FUNCTION_SELECT_AEAPRREC = "selectProdutoRecomendado";
     public static final String FUNCTION_SELECT_RPAPARCE = "selectParcelas";
     public static final String FUNCTION_INSERT_AEAORCAM = "insertOrcamento";
+    public static final String FUNCTION_JSON_INSERT_AEAORCAM = "/orcamento/insertOrcamento";
     public static final String FUNCTION_INSERT_AEAITORC = "insertItemOrcamento";
     public static final String FUNCTION_UPDATE_STATUS_AEAORCAM = "updateStatusOrcamento";
     public static final String FUNCTION_CHECK_SEND_AEAORCAM = "checkSendOrcamento";
+    public static final String METODO_GET = "GET";
+    public static final String METODO_PUT = "PUT";
+    public static final String METODO_POST = "POST";
+    public static final String KEY_OBJECT_STATUS_RETORNO = "statusRetorno";
+    public static final String KEY_OBJECT_OBJECT_RETORNO = "object";
+    public static final String KEY_ELEMENT_CODIGO_RETORNO = "codigoRetorno";
+    public static final String KEY_ELEMENT_MENSAGEM_RETORNO = "mensagemRetorno";
+    public static final String KEY_ELEMENT_EXTRA_RETORNO = "extra";
 
     public WSSisinfoWebservice(Context context) {
         this.context = context;
@@ -319,4 +342,161 @@ public class WSSisinfoWebservice {
         return null;
     }
 
+    /**
+     *
+     * @param sql
+     * @param funcao
+     * @param metodo
+     * @param dadosJson - Os dados a serem passados ja tem que ser passado no formato Json
+     * @return
+     */
+    public String executarSelectWebserviceJson(String sql, String funcao, String metodo, String dadosJson){
+        String retorno = null;
+        HttpURLConnection conexaoHttp = null;
+        try {
+            String ipServidor = ServicosWeb.IP_SERVIDOR_WEBSERVICE;
+
+            FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
+
+            // Checa se retornou algum endereco de ip do servidor
+            if ((ipServidor == null) || (ipServidor.length() <= 1) || (ipServidor.equalsIgnoreCase(funcoes.NAO_ENCONTRADO))){
+                ipServidor = "localhost";
+            }
+            String enderecoWebService = "http://" + ipServidor + ((!ServicosWeb.PORTA_JSON.isEmpty()) ? (":" + ServicosWeb.PORTA_JSON + "/") : "/" ) + ServicosWeb.WS_ENDERECO_WEBSERVICE_JSON + funcao;
+
+            if ((metodo.equalsIgnoreCase(METODO_GET)) || (metodo.equalsIgnoreCase(METODO_POST))){
+                Gson gson = new Gson();
+                // Adiciona o dipositivo em formado json e codificado
+                enderecoWebService += "/" + URLEncoder.encode(gson.toJson(dispositivoBeans), "UTF-8");
+
+                if ((metodo.equalsIgnoreCase(METODO_GET)) && (dadosJson != null) && (!dadosJson.isEmpty())){
+                    enderecoWebService += "/" + URLEncoder.encode(dadosJson, "UTF-8");
+                }
+            }
+            URL urlWebservice = new URL(enderecoWebService);
+
+            conexaoHttp = (HttpURLConnection) urlWebservice.openConnection();
+            // Indeca o metodo da conexao (GET, PUT, POST, DEL)
+            conexaoHttp.setRequestMethod(metodo);
+            conexaoHttp.setRequestProperty("Accept", "application/json");
+            conexaoHttp.setRequestProperty("Content-Type", "application/json");
+            //conexaoHttp.setRequestProperty("Accept-Language", "pt-BR,pt;q=0.8,en-US;q=0.6,en;q=0.4");
+            conexaoHttp.setConnectTimeout(100000);
+            conexaoHttp.setReadTimeout(100000);
+
+            if ((metodo.equalsIgnoreCase(METODO_POST)) && (dadosJson != null) && (!dadosJson.isEmpty())){
+                // // Define que a conexão pode enviar informacoes e obte-las de volta
+                conexaoHttp.setDoOutput(true);
+                conexaoHttp.setDoInput(true);
+
+                DataOutputStream dadosEnvio = new DataOutputStream(conexaoHttp.getOutputStream());
+                // Salva o Json para envio
+                dadosEnvio.writeBytes(dadosJson);
+                dadosEnvio.flush();
+            }
+            conexaoHttp.connect();
+
+            // Pega o codigo de retorno da comunicacao
+            int codigoResp = conexaoHttp.getResponseCode();
+            // Checa o codigo de retorno, se foi com sucesso
+            if (codigoResp == 200) {
+
+                //InputStream inputStream = new BufferedInputStream(conexaoHttp.getInputStream());
+                BufferedReader buffeLeitura = new BufferedReader(new InputStreamReader(conexaoHttp.getInputStream()));
+                StringBuilder dadosWebservice = new StringBuilder();
+
+                String inputLine;
+                while ((inputLine = buffeLeitura.readLine()) != null) {
+                    dadosWebservice.append(inputLine + "\n");
+                }
+                buffeLeitura.close();
+
+                retorno = dadosWebservice.toString();
+            }
+
+            if (codigoResp == 500){
+                funcoes = new FuncoesPersonalizadas(context);
+
+                // Armazena as informacoes para para serem exibidas e enviadas
+                final ContentValues contentValues = new ContentValues();
+                contentValues.put("comando", 0);
+                contentValues.put("tela", "WSSisInfoWebservice");
+                contentValues.put("mensagem", "Erro: 500. \nAconteceu um erro do servidor em nuvem (Webservice). Tente novamente mais tarde, caso persista o erro entre em contato com suporte SAVARE");
+                contentValues.put("dados", conexaoHttp.toString());
+
+                final FuncoesPersonalizadas finalFuncoes = funcoes;
+                ((Activity) context).runOnUiThread(new Runnable() {
+                    public void run() {
+                        finalFuncoes.menssagem(contentValues);
+                    }
+                });
+            }
+        } catch (MalformedURLException e){
+            final FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
+
+            // Armazena as informacoes para para serem exibidas e enviadas
+            final ContentValues contentValues = new ContentValues();
+            contentValues.put("comando", 0);
+            contentValues.put("tela", "WSSisInfoWebservice");
+            contentValues.put("mensagem", funcoes.tratamentoErroBancoDados(e.toString()));
+            contentValues.put("dados", e.toString());
+
+            ((Activity) context).runOnUiThread(new Runnable() {
+                public void run() {
+                    funcoes.menssagem(contentValues);
+                }
+            });
+        } catch (ProtocolException e){
+            final FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
+
+            // Armazena as informacoes para para serem exibidas e enviadas
+            final ContentValues contentValues = new ContentValues();
+            contentValues.put("comando", 0);
+            contentValues.put("tela", "WSSisInfoWebservice");
+            contentValues.put("mensagem", funcoes.tratamentoErroBancoDados(e.toString()));
+            contentValues.put("dados", e.toString());
+
+            ((Activity) context).runOnUiThread(new Runnable() {
+                public void run() {
+                    funcoes.menssagem(contentValues);
+                }
+            });
+        } catch (IOException e){
+            final FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
+
+            // Armazena as informacoes para para serem exibidas e enviadas
+            final ContentValues contentValues = new ContentValues();
+            contentValues.put("comando", 0);
+            contentValues.put("tela", "WSSisInfoWebservice");
+            contentValues.put("mensagem", funcoes.tratamentoErroBancoDados(e.toString()));
+            contentValues.put("dados", e.toString());
+
+            ((Activity) context).runOnUiThread(new Runnable() {
+                public void run() {
+                    funcoes.menssagem(contentValues);
+                }
+            });
+        } catch (Exception e){
+            final FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
+
+            // Armazena as informacoes para para serem exibidas e enviadas
+            final ContentValues contentValues = new ContentValues();
+            contentValues.put("comando", 0);
+            contentValues.put("tela", "WSSisInfoWebservice");
+            contentValues.put("mensagem", funcoes.tratamentoErroBancoDados(e.toString()));
+            contentValues.put("dados", e.toString());
+
+            ((Activity) context).runOnUiThread(new Runnable() {
+                public void run() {
+                    funcoes.menssagem(contentValues);
+                }
+            });
+        } finally {
+            if (conexaoHttp != null){
+                // Desconecta com o webservice
+                conexaoHttp.disconnect();
+            }
+        }
+        return retorno;
+    }
 }

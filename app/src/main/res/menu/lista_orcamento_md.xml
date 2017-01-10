@@ -45,7 +45,13 @@
     <item
         android:id="@+id/menu_lista_orcamento_md_sincronizar_web_service"
         android:orderInCategory="104"
-        android:title="@string/sincroniza_webservice"
+        android:title="@string/receber_dados_pedido_servidor_web"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/menu_lista_orcamento_md_enviar_todos_pedidos"
+        android:orderInCategory="104"
+        android:title="@string/enviar_todos_pedidos_nuvem"
         app:showAsAction="never" />
 
 </menu>

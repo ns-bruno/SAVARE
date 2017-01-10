@@ -65,7 +65,7 @@ public class ListaOrcamentoPedidoMDActivity extends AppCompatActivity{
     private Spinner spinnerListaCidade;
     private Toolbar toolbarCabecalho;
     private ListView listViewListaOrcamentoPedido;
-    private TextView textTotal, textDataInicial, textDataFinal;
+    private TextView textTotal, textDataInicial, textDataFinal, textStatus;
     private FloatingActionMenu menuFloatingButton;
     private FloatingActionButton itemMenuNovoOrcamento, itemMenuRateioPreco;
     private ProgressBar progressBarStatus;
@@ -288,7 +288,10 @@ public class ListaOrcamentoPedidoMDActivity extends AppCompatActivity{
 
                                             // Verifica se foi deletado algum registro
                                             if (totalAtualizado > 0) {
-                                                mensagem.put("mensagem", totalAtualizado + " Transformado(s) em Pedido(s). \n");
+                                                SuperToast.create(ListaOrcamentoPedidoMDActivity.this, totalAtualizado + " Transformado(s) em Pedido(s).", SuperToast.Duration.VERY_SHORT, Style.getStyle(Style.GREEN, SuperToast.Animations.FLYIN)).show();
+                                                //mensagem.put("mensagem", totalAtualizado + " Transformado(s) em Pedido(s). \n");
+
+                                                SuperToast.create(ListaOrcamentoPedidoMDActivity.this, getResources().getString(R.string.nao_possivel_compartilhar_arquivo), SuperToast.Duration.LONG, Style.getStyle(Style.RED, SuperToast.Animations.FLYIN)).show();
 
                                                 for (int i = 0; i < listaItemOrcamentoSelecionado.size(); i++) {
 
@@ -313,7 +316,8 @@ public class ListaOrcamentoPedidoMDActivity extends AppCompatActivity{
                                                 carregarDadosOrcamentoPedido.execute();
 
                                             } else {
-                                                mensagem.put("mensagem", getResources().getString(R.string.nao_foi_possivel_transformar_orcamento_pedido));
+                                                //mensagem.put("mensagem", getResources().getString(R.string.nao_foi_possivel_transformar_orcamento_pedido));
+                                                SuperToast.create(ListaOrcamentoPedidoMDActivity.this, getResources().getString(R.string.nao_foi_possivel_transformar_orcamento_pedido), SuperToast.Duration.SHORT, Style.getStyle(Style.RED, SuperToast.Animations.FLYIN)).show();
                                             }
                                             // Esvazia a lista de selecionados
                                             //listaItemOrcamentoSelecionado = null;
@@ -472,6 +476,8 @@ public class ListaOrcamentoPedidoMDActivity extends AppCompatActivity{
                         }
                         EnviarDadosWebserviceAsyncRotinas enviarDadosWebservice = new EnviarDadosWebserviceAsyncRotinas(ListaOrcamentoPedidoMDActivity.this);
                         enviarDadosWebservice.setIdOrcamentoSelecionado(idOrcamento);
+                        enviarDadosWebservice.setProgressBarStatus(progressBarStatus);
+                        enviarDadosWebservice.setTextStatus(textTotal);
                         enviarDadosWebservice.execute();
 
                         //EnviarOrcamentoFtpAsyncRotinas enviarOrcamento = new EnviarOrcamentoFtpAsyncRotinas(ListaOrcamentoPedidoMDActivity.this);
@@ -823,7 +829,7 @@ public class ListaOrcamentoPedidoMDActivity extends AppCompatActivity{
                         ContentValues mensagem = new ContentValues();
                         mensagem.put("comando", 1);
                         mensagem.put("tela", "ListaOrcamentoPedidoMDActivity");
-                        mensagem.put("mensagem", "Voc� j� esta na lista de pedidos enviados.\n");
+                        mensagem.put("mensagem", "Você já esta na lista de pedidos enviados.\n");
 
                         FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(ListaOrcamentoPedidoMDActivity.this);
                         funcoes.menssagem(mensagem);
@@ -875,6 +881,16 @@ public class ListaOrcamentoPedidoMDActivity extends AppCompatActivity{
                 break;
 
             case R.id.menu_lista_orcamento_md_sincronizar_web_service:
+                List<String> listaGuidOrcamento = new ArrayList<String>();
+
+                OrcamentoRotinas orcamentoRotinas = new OrcamentoRotinas(getApplicationContext());
+                String [] listaTipo = new String[]{ OrcamentoRotinas.PEDIDO_ENVIADO,
+                                                    OrcamentoRotinas.PEDIDO_RETORNADO_BLOQUEADO,
+                                                    OrcamentoRotinas.PEDIDO_RETORNADO_LIBERADO};
+                // Passa por toda lista de orcamento pegando o guid do mesmo
+                for (OrcamentoBeans orcamento : orcamentoRotinas.listaOrcamentoPedido(listaTipo, null, OrcamentoRotinas.ORDEM_DECRESCENTE)){
+                    listaGuidOrcamento.add(orcamento.getGuid());
+                }
 
                 ReceberDadosWebserviceAsyncRotinas receberDadosWebservice = new ReceberDadosWebserviceAsyncRotinas(new ReceberDadosWebserviceAsyncRotinas.OnTaskCompleted() {
                     @Override
@@ -885,11 +901,22 @@ public class ListaOrcamentoPedidoMDActivity extends AppCompatActivity{
                 ListaOrcamentoPedidoMDActivity.this);
                 receberDadosWebservice.setProgressBarStatus(progressBarStatus);
 
-                String[] tabelaRecebeDados = {  WSSisinfoWebservice.FUNCTION_SELECT_AEAORCAM,
-                                                WSSisinfoWebservice.FUNCTION_SELECT_AEAITORC};
+                String[] tabelaRecebeDados = {  WSSisinfoWebservice.FUNCTION_SELECT_AEAORCAM};
 
                 receberDadosWebservice.setTabelaRecebeDados(tabelaRecebeDados);
+                receberDadosWebservice.setListaGuidOrcamento((listaGuidOrcamento != null && listaGuidOrcamento.size() > 0) ? listaGuidOrcamento : null);
+                receberDadosWebservice.setTextStatus(textTotal);
+                receberDadosWebservice.setProgressBarStatus(progressBarStatus);
                 receberDadosWebservice.execute();
+
+                break;
+
+            case R.id.menu_lista_orcamento_md_enviar_todos_pedidos:
+
+                EnviarDadosWebserviceAsyncRotinas enviarDadosWebservice = new EnviarDadosWebserviceAsyncRotinas(ListaOrcamentoPedidoMDActivity.this);
+                enviarDadosWebservice.setTextStatus(textTotal);
+                enviarDadosWebservice.setProgressBarStatus(progressBarStatus);
+                enviarDadosWebservice.execute();
 
                 break;
 
@@ -981,6 +1008,7 @@ public class ListaOrcamentoPedidoMDActivity extends AppCompatActivity{
         textTotal = (TextView) findViewById(R.id.activity_lista_orcamento_pedido_md_text_total);
         textDataInicial = (TextView) findViewById(R.id.activity_lista_orcamento_pedido_md_text_data_inicial);
         textDataFinal = (TextView) findViewById(R.id.activity_lista_orcamento_pedido_md_text_data_final);
+        textStatus = (TextView) findViewById(R.id.activity_lista_orcamento_pedido_md_text_status);
         spinnerListaCidade = (Spinner) findViewById(R.id.activity_lista_orcamento_pedido_md_spinner_cidades);
         menuFloatingButton = (FloatingActionMenu) findViewById(R.id.activity_lista_orcamento_pedido_md_menu_float);
         itemMenuNovoOrcamento = (FloatingActionButton) findViewById(R.id.activity_lista_orcamento_pedido_md_novo_orcamento);

@@ -77,6 +77,7 @@
     <string name="configuracao">Configuração</string>
     <string name="configuracoes">Configurações</string>
     <string name="cadastro_usuario">Cadastro Usuário</string>
+    <string name="cadastro_sucesso">Cadastro Sucesso</string>
     <string name="login_progress_signing_in">Signing in&#8230;</string>
     <string name="pesquisar">Pesquisar</string>
     <string name="tamanho_texto">Tamanho do Texto</string>
@@ -112,6 +113,7 @@
     <string name="enviar_email">Enviar e-Mail</string>
     <string name="visualizar_logs">Visualizar logs</string>
     <string name="enviar_pedido_nuvem">Enviar Pedido para Nuvem</string>
+    <string name="enviar_todos_pedidos_nuvem">Enviar Todos os Pedidos para Nuvem</string>
     <string name="observacao">Observação</string>
     <string name="total">Total</string>
     <string name="total_bruto">Total Bruto</string>
@@ -126,6 +128,7 @@
     <string name="estoque">Estoque</string>
     <string name="tabela_preco">Tabela de Preço</string>
     <string name="quantidade">Quantidade</string>
+    <string name="quantidade_invalida">Quantidade invalida</string>
     <string name="desconto">Desconto</string>
     <string name="ultima_visita">Última Visita</string>
     <string name="desconto_atacado_vista">Desc. Atacado Vista</string>
@@ -159,7 +162,8 @@
     <string name="achamos_orcamento_numero">Achamos o orçamento de Nº </string>
     <string name="agora_estamos_pegando_produtos_orcamento_numero">Agora estamos pegando os produtos do orçamento de Nº </string>
     <string name="vamos_prepara_dados_para_enviar">Vamos preparar os dados coletados para enviar.</string>
-    <string name="conseguimos_enviar_pedido">Conseguimos enviar o pedido de Nº </string>
+    <string name="conseguimos_enviar_pedido_numero">Conseguimos enviar o pedido de Nº </string>
+    <string name="conseguimos_enviar_pedido">Conseguimos enviar o pedido.</string>
     <string name="conseguimos_enviar_item">Conseguimos enviar o item </string>
     <string name="pegando_item_pedido">Estamos pegando o(s) item(ns) do(s) pedido(s).</string>
     <string name="pedido_numero">Pedido Nº </string>
@@ -176,7 +180,7 @@
     <string name="produtos">Produtos</string>
     <string name="titulos">Títulos</string>
     <string name="pedidos_a_enviar">Pedidos à Enviar</string>
-    <string name="pedidos_enviados">Pedidos Enviados</string>
+    <string name="pedidos_enviados">Todos os Pedidos Enviados</string>
     <string name="lixeira">Lixeira</string>
     <string name="sincronizacao">Sincronização</string>
     <string name="logs">Logs</string>
@@ -200,7 +204,7 @@
     <string name="mes_vendas">Mês de Vendas</string>
     <string name="nao_achamos_nenhum_valor">Não Achamos Nenhum Valor.</string>
     <string name="vendas_realizadas_mensal">Vendas Realizadas Mensal</string>
-    <string name="enviando_pedidos">Enviando o Pedidos</string>
+    <string name="enviando_pedidos">Enviando o(s) Pedido(s)</string>
     <string name="nao">Não</string>
     <string name="sim">Sim</string>
     <string name="tem_certeza_que_deseja_excluir_pedido">Tem certeza que deseja excluir o(s) pedido(s)?</string>
@@ -240,6 +244,7 @@
     um teste primeiro basta ir para o próximo passo.</string>
     <string name="terminamos_primeiros_passos">Terminamos os primeiros passos</string>
     <string name="terminamos">Terminamos</string>
+    <string name="terminamos_enviar_dados">Terminamos de enviar os dados.</string>
     <string name="pronto_para_iniciar_savare">Pronto, terminamos os primeiros passos, agora vamos iniciar o SAVARE e receber uma gama de dados.</string>
     <string name="escanear_codigo_barras">Escanear código de barras</string>
     <string name="cancelado">Cancelado</string>
@@ -286,20 +291,33 @@
     <string name="recebendo_dados_recomendado">Recebendo os dados do(s) Produto(s) Recomendado(s)...</string>
     <string name="recebendo_dados_parcela">Recebendo os dados da(s) Parcela(s)...</string>
     <string name="aguarde_mais_um_pouco_proxima_etapa">Aguarde mais um pouco, vamos para próxima etapa ...</string>
+    <string name="nao_tem_pedido_listar">Não tem pedido para pegar dados no dispositivo.</string>
     <string name="nao_conseguimos_validar_versao">Não conseguimos validar a versão do SAVARE, por favor, entre em contato com o suporte SAVARE.</string>
     <string name="terminamos_receber_dados">Terminamos de receber os primeiros dados, pode ir em frente e usar o SAVARE.</string>
     <string name="listando_pedidos_para_enviar">Estamos listando os pedidos à serem enviados para nuvem.</string>
-    <string name="enviando_item_pedido">Enviando item(ns) do pedido</string>
+    <string name="enviando_item_pedido">Enviando item(ns)</string>
+    <string name="vamos_enviar_item_pedido">Aguarde..., agora vamos enviar o(s) item(ns) do(s) pedido(s).</string>
     <string name="procurando_dados">Estamos procurando se tem dados, </string>
     <string name="vamos_checar_pedido_enviado">Vamos checar se conseguimos enviar todos os pedidos</string>
     <string name="estamos_checando_pedido_numero">Estamos checando o pedido Nº </string>
     <string name="selecione_tipo_documento">Selecione o tipo de documento</string>
     <string name="sincroniza_webservice">Sincronizar com Servidor Web</string>
+    <string name="receber_dados_pedido_servidor_web">Receber Dados Servidor Web</string>
     <string name="chave_salva_sucesso">Chave salva com sucesso.</string>
     <string name="digite_chave">Digite a sua chave de licença</string>
     <string name="atacado">Atacado</string>
     <string name="varejo">Varejo</string>
     <string name="apenas_produtos_novos">Apenas Produtos Novos</string>
+    <string name="aguarde_distribuir_desconto_item_orcamento">Aguarde, vamor distribuir o desconto no(s) item(ns) do oçamento...</string>
+    <string name="aparentemente_servidor_webservice_offline">Aparentemente o Servidor Webservice está offline, pedimos que tente novamente, mas se não der certo entre em contato com o suporte SAVARE.</string>
+    <string name="estamos_checando_webservice_online">Estamos checando se o servidor Webservice está online, Aguarde...</string>
+    <string name="checando_versao_savare">Estamos checando a versão do SAVARE, Aguarde...</string>
+    <string name="verifique_campos_obrigatorios">Verifique se todos os campos obrigatórios estão preenchidos.</string>
+    <string name="marcando_item_enviado_sucesso">Estamos marcando que o item foi enviado com sucesso.</string>
+    <string name="marcando_pedido_enviado_sucesso">Estamos marcando que o pedido foi enviado com sucesso.</string>
+    <string name="numero_vensao_savare_nao_chegou">Não chegou o número da versão do SAVARE, tente novamente. Se persistir entre em contato com o suporte SAVARE.</string>
+    <string name="nao_retornou_dados_suficiente_para_continuar_comunicao_webservice">Não recebemos os dados primários para continuar a se comunicar com servidor em nuvem (Webservice).</string>
+    <string name="nem_todos_pedidos_foram_enviados_tente_novamente">Nem todos os pedidos foram enviados. Atualize a lista e tente enviar novamente.</string>
 
     <string-array name="tab_produto_md">
         <item>Produtos</item>

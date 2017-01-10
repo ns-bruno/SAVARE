@@ -734,7 +734,7 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 			// Instancia a classe de funcoes para serem usadas
 			//funcoes = new FuncoesPersonalizadas(context);
 			
-			textDescricao.setText(item.getProduto().getDescricaoProduto() + " - " + item.getProduto().getDescricaoMarca() +
+			textDescricao.setText(item.getProduto().getDescricaoProduto() + " - " + (((item.getProduto().getDescricaoMarca() != null ) && (item.getProduto().getDescricaoMarca().length() > 0) ) ? item.getProduto().getDescricaoMarca() : "") +
 								( ( (this.tipoItem == HISTORICO_PRECO_ITEM_ORCAMENTO) && (item.getDataCadastro() != null) ) ? " (" + funcoes.formataDataHora(item.getDataCadastro()) + ")" : "" ));
 			textAbaixoDescricaoEsqueda.setText("Código: " + item.getProduto().getCodigoEstrutural());
 			textAbaixoDescricaoDireita.setText("Qtd.: " + (funcoes.arredondarValor(item.getQuantidade())));
@@ -791,7 +791,7 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 			
 			this.funcoes = new FuncoesPersonalizadas(context);
 			
-			textDescricao.setText(produto.getProduto().getDescricaoProduto() + " - " + ((produto.getProduto().getDescricaoMarca() != null ) ? produto.getProduto().getDescricaoMarca() : ""));
+			textDescricao.setText(produto.getProduto().getDescricaoProduto() + " - " + (((produto.getProduto().getDescricaoMarca() != null ) && (produto.getProduto().getDescricaoMarca().length() > 0) ) ? produto.getProduto().getDescricaoMarca() : ""));
 			textAbaixoDescricaoEsqueda.setText("Cód. " + produto.getProduto().getCodigoEstrutural());
 			textAbaixoDescricaoDireita.setText("Ref. " + ((produto.getProduto().getReferencia() != null) ? produto.getProduto().getReferencia() : ""));
 			textBottonEsquerdoDois.setText(produto.getProduto().getUnidadeVendaProduto().getSiglaUnidadeVenda());
@@ -900,7 +900,7 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 			 */
 			ItemOrcamentoBeans item = listaItemOrcamento.get(position);
 			
-			textDescricao.setText(item.getProduto().getDescricaoProduto() + " - " + item.getProduto().getDescricaoMarca());
+			textDescricao.setText(item.getProduto().getDescricaoProduto() + " - " + (((item.getProduto().getDescricaoMarca() != null ) && (item.getProduto().getDescricaoMarca().length() > 0) ) ? item.getProduto().getDescricaoMarca() : ""));
 			textAbaixoDescricaoEsqueda.setText("Código: " + item.getProduto().getCodigoEstrutural());
 			textAbaixoDescricaoDireita.setText("Qtd.: " + String.valueOf(item.getQuantidade()));
 			// Instancia a classe de funcoes

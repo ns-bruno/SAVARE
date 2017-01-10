@@ -109,7 +109,7 @@ public class ParcelaRotinas extends Rotinas {
 					parcela.setParcela(cursor.getInt(cursor.getColumnIndex("PARCELA")));
 					parcela.setSequencial(cursor.getString(cursor.getColumnIndex("SEQUENCIAL")));
 					parcela.setNumero(cursor.getString(cursor.getColumnIndex("NUMERO")));
-					
+
 					List<ParcelaBeans> listaParcela = new ArrayList<ParcelaBeans>();
 					listaParcela.add(parcela);
 					
