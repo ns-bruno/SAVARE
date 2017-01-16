@@ -1150,6 +1150,10 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 				textBottonEsquerdo.setTypeface(null, Typeface.NORMAL);
 				textBottonEsquerdoDois.setTypeface(null, Typeface.NORMAL);
 			}
+			// Checa se tem o numero já faturado no sisinfo
+            if (orcamento.getNumero() > 0){
+                textAbaixoDescricaoEsqueda.setText(textAbaixoDescricaoEsqueda.getText() + "[" + orcamento.getNumero() + "]");
+            }
 			
 		} else if(this.tipoItem == RATEIO_ORCAMENTO){
 			/**

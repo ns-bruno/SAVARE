@@ -291,8 +291,6 @@ public class ListaOrcamentoPedidoMDActivity extends AppCompatActivity{
                                                 SuperToast.create(ListaOrcamentoPedidoMDActivity.this, totalAtualizado + " Transformado(s) em Pedido(s).", SuperToast.Duration.VERY_SHORT, Style.getStyle(Style.GREEN, SuperToast.Animations.FLYIN)).show();
                                                 //mensagem.put("mensagem", totalAtualizado + " Transformado(s) em Pedido(s). \n");
 
-                                                SuperToast.create(ListaOrcamentoPedidoMDActivity.this, getResources().getString(R.string.nao_possivel_compartilhar_arquivo), SuperToast.Duration.LONG, Style.getStyle(Style.RED, SuperToast.Animations.FLYIN)).show();
-
                                                 for (int i = 0; i < listaItemOrcamentoSelecionado.size(); i++) {
 
                                                     int idOrcamento = adapterListaOrcamentoPedido.getListaOrcamentoPediso().get(listaItemOrcamentoSelecionado.get(i)).getIdOrcamento();
@@ -813,73 +811,6 @@ public class ListaOrcamentoPedidoMDActivity extends AppCompatActivity{
 
                 break;
 
-            case R.id.menu_lista_orcamento_md_somente_enviados:
-
-                if(!tipoOrcamentoPedido.equalsIgnoreCase("O")){
-                    // Checa se nao esta na lista de pedidos enviados
-                    if(!tipoOrcamentoPedido.equalsIgnoreCase("N")){
-                        tipoOrcamentoPedido = "N";
-                        // Recarrega a lista de cidades
-                        carregarListaCidade();
-                        // Recarrega a lista
-                        carregarDadosOrcamentoPedido.execute();
-
-                    } else {
-                        // Dados da mensagem
-                        ContentValues mensagem = new ContentValues();
-                        mensagem.put("comando", 1);
-                        mensagem.put("tela", "ListaOrcamentoPedidoMDActivity");
-                        mensagem.put("mensagem", "Você já esta na lista de pedidos enviados.\n");
-
-                        FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(ListaOrcamentoPedidoMDActivity.this);
-                        funcoes.menssagem(mensagem);
-                    }
-
-                } else {
-                    // Dados da mensagem
-                    ContentValues mensagem = new ContentValues();
-                    mensagem.put("comando", 1);
-                    mensagem.put("tela", "ListaOrcamentoPedidoMDActivity");
-                    mensagem.put("mensagem", "Filtro permitido apenas para a lista de pedidos.\n");
-
-                    FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(ListaOrcamentoPedidoMDActivity.this);
-                    funcoes.menssagem(mensagem);
-                }
-                break;
-
-            case R.id.menu_lista_orcamento_md_nao_enviados:
-
-                if(!tipoOrcamentoPedido.equalsIgnoreCase("O")){
-                    // Checa se nao esta na lista de pedidos nao enviados
-                    if(!tipoOrcamentoPedido.equalsIgnoreCase("P")){
-                        tipoOrcamentoPedido = "P";
-                        // Recarrega a lista de cidades
-                        carregarListaCidade();
-                        // Recarrega a lista
-                        carregarDadosOrcamentoPedido.execute();
-
-                    } else {
-                        // Dados da mensagem
-                        ContentValues mensagem = new ContentValues();
-                        mensagem.put("comando", 1);
-                        mensagem.put("tela", "ListaOrcamentoPedidoMDActivity");
-                        mensagem.put("mensagem", "Você já esta na lista de pedidos NÃO enviados.\n");
-
-                        FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(ListaOrcamentoPedidoMDActivity.this);
-                        funcoes.menssagem(mensagem);
-                    }
-                } else {
-                    // Dados da mensagem
-                    ContentValues mensagem = new ContentValues();
-                    mensagem.put("comando", 1);
-                    mensagem.put("tela", "ListaOrcamentoPedidoMDActivity");
-                    mensagem.put("mensagem", "Filtro permitido apenas para a lista de pedidos.\n");
-
-                    FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(ListaOrcamentoPedidoMDActivity.this);
-                    funcoes.menssagem(mensagem);
-                }
-                break;
-
             case R.id.menu_lista_orcamento_md_sincronizar_web_service:
                 List<String> listaGuidOrcamento = new ArrayList<String>();
 
@@ -899,9 +830,8 @@ public class ListaOrcamentoPedidoMDActivity extends AppCompatActivity{
                     }
                 },
                 ListaOrcamentoPedidoMDActivity.this);
-                receberDadosWebservice.setProgressBarStatus(progressBarStatus);
 
-                String[] tabelaRecebeDados = {  WSSisinfoWebservice.FUNCTION_SELECT_AEAORCAM};
+                String[] tabelaRecebeDados = {WSSisinfoWebservice.FUNCTION_SELECT_AEAORCAM};
 
                 receberDadosWebservice.setTabelaRecebeDados(tabelaRecebeDados);
                 receberDadosWebservice.setListaGuidOrcamento((listaGuidOrcamento != null && listaGuidOrcamento.size() > 0) ? listaGuidOrcamento : null);
@@ -1236,9 +1166,11 @@ public class ListaOrcamentoPedidoMDActivity extends AppCompatActivity{
 
             // Checa se faz parte da lista de pedido
             if ((tipoOrcamentoPedido.equals(TIPO_PEDIDO_NAO_ENVIADO)) || (tipoOrcamentoPedido.equals(TIPO_PEDIDO_ENVIADO))){
-                // Muda a cor do actionBar
-                toolbarCabecalho.setBackgroundColor(getResources().getColor(R.color.laranja_escuro));
 
+                if(tipoOrcamentoPedido.equals(TIPO_PEDIDO_NAO_ENVIADO)){
+                    // Muda a cor do actionBar
+                    toolbarCabecalho.setBackgroundColor(getResources().getColor(R.color.md_deep_orange_500));
+                }
                 // Checa se esta visualizando rateio de preco
                 if( (adapterListaOrcamentoPedido != null ) && (adapterListaOrcamentoPedido.getTipoItem() == adapterListaOrcamentoPedido.RATEIO_ORCAMENTO) ){
 

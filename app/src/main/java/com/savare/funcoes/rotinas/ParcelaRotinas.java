@@ -9,6 +9,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.widget.ProgressBar;
 
+import com.savare.R;
 import com.savare.banco.funcoesSql.ParcelaSql;
 import com.savare.beans.ParcelaBeans;
 import com.savare.beans.TitulosListaBeans;
@@ -81,11 +82,13 @@ public class ParcelaRotinas extends Rotinas {
 			 	while(cursor.moveToNext()) {
 
 					final int finalControle = controle;
-					((Activity) context).runOnUiThread(new Runnable() {
-						public void run() {
-							progressBarStatus.setProgress(finalControle);
-						}
-					});
+					if (progressBarStatus != null) {
+						((Activity) context).runOnUiThread(new Runnable() {
+							public void run() {
+								progressBarStatus.setProgress(finalControle);
+							}
+						});
+					}
 			 		
 			 		TitulosListaBeans titulos = new TitulosListaBeans();
 			 		
@@ -127,7 +130,7 @@ public class ParcelaRotinas extends Rotinas {
 			ContentValues mensagem = new ContentValues();
 			mensagem.put("comando", 2);
 			mensagem.put("tela", "PessoaRotinas");
-			mensagem.put("mensagem", "Os dados da pessoa esta incompleto.");
+			mensagem.put("mensagem", context.getResources().getString(R.string.nao_conseguimos_verificar_titulos) + "\n" + e.getMessage());
 			
 			// Executa a mensagem passando por parametro as propriedades
 			funcoes.menssagem(mensagem);

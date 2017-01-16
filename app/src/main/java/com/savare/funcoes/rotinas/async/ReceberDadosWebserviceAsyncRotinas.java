@@ -133,7 +133,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 .title(R.string.importar_dados_recebidos)
                 .flags(Notification.DEFAULT_LIGHTS);
 
-        mLoad.bigTextStyle("Aguarde, vamor receber os dados. Primeiro vamos ver se tem internet...");
+        mLoad.bigTextStyle(context.getResources().getString(R.string.aguarde_estamos_checando_se_existe_internet));
         mLoad.progress().value(0, 0, true).build();
 
         // Checo se o texto de status foi passado pro parametro
@@ -141,7 +141,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             ((Activity) context).runOnUiThread(new Runnable() {
                 public void run() {
                     textStatus.setVisibility(View.VISIBLE);
-                    textStatus.setText(context.getResources().getText(R.string.aguarde_estamos_checando_se_existe_internet));
+                    textStatus.setText(context.getResources().getString(R.string.aguarde_estamos_checando_se_existe_internet));
                 }
             });
         }
@@ -1098,21 +1098,29 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                             }
                         });
                     }
+                    final SoapObject objeto;
+
+                    if (objetoIndividual.hasProperty("return")) {
+                        objeto = (SoapObject) objetoIndividual.getProperty("return");
+
+                    } else {
+                        objeto = objetoIndividual;
+                    }
                     controle ++;
 
                     ContentValues dadosAreas = new ContentValues();
-                    dadosAreas.put("ID_CFAAREAS", Integer.parseInt(objetoIndividual.getProperty("idAreas").toString()));
-                    dadosAreas.put("DT_ALT", objetoIndividual.getProperty("dataAlt").toString());
-                    dadosAreas.put("CODIGO", Integer.parseInt(objetoIndividual.getProperty("codigoAreas").toString()));
-                    dadosAreas.put("DESCRICAO", objetoIndividual.getProperty("descricaoAreas").toString());
-                    dadosAreas.put("DESC_ATAC_VISTA", Double.parseDouble(objetoIndividual.getProperty("descontoAtacadoVista").toString()));
-                    dadosAreas.put("DESC_ATAC_PRAZO", Double.parseDouble(objetoIndividual.getProperty("descontoAtacadoPrazo").toString()));
-                    dadosAreas.put("DESC_VARE_VISTA", Double.parseDouble(objetoIndividual.getProperty("descontoVarejoVista").toString()));
-                    dadosAreas.put("DESC_VARE_PRAZO", Double.parseDouble(objetoIndividual.getProperty("descontoVarejoPrazo").toString()));
-                    dadosAreas.put("DESC_SERV_VISTA", Double.parseDouble(objetoIndividual.getProperty("descontoServicoVista").toString()));
-                    dadosAreas.put("DESC_SERV_PRAZO", Double.parseDouble(objetoIndividual.getProperty("descontoServicoPrazo").toString()));
-                    if ((objetoIndividual.hasProperty("descontoPromocao"))) {
-                        dadosAreas.put("DESC_PROMOCAO", objetoIndividual.getProperty("descontoPromocao").toString());
+                    dadosAreas.put("ID_CFAAREAS", Integer.parseInt(objeto.getProperty("idAreas").toString()));
+                    dadosAreas.put("DT_ALT", objeto.getProperty("dataAlt").toString());
+                    dadosAreas.put("CODIGO", Integer.parseInt(objeto.getProperty("codigoAreas").toString()));
+                    dadosAreas.put("DESCRICAO", objeto.getProperty("descricaoAreas").toString());
+                    dadosAreas.put("DESC_ATAC_VISTA", Double.parseDouble(objeto.getProperty("descontoAtacadoVista").toString()));
+                    dadosAreas.put("DESC_ATAC_PRAZO", Double.parseDouble(objeto.getProperty("descontoAtacadoPrazo").toString()));
+                    dadosAreas.put("DESC_VARE_VISTA", Double.parseDouble(objeto.getProperty("descontoVarejoVista").toString()));
+                    dadosAreas.put("DESC_VARE_PRAZO", Double.parseDouble(objeto.getProperty("descontoVarejoPrazo").toString()));
+                    dadosAreas.put("DESC_SERV_VISTA", Double.parseDouble(objeto.getProperty("descontoServicoVista").toString()));
+                    dadosAreas.put("DESC_SERV_PRAZO", Double.parseDouble(objeto.getProperty("descontoServicoPrazo").toString()));
+                    if ((objeto.hasProperty("descontoPromocao"))) {
+                        dadosAreas.put("DESC_PROMOCAO", objeto.getProperty("descontoPromocao").toString());
                     }
                     listaAreas.add(dadosAreas);
                 } // Fim do for
@@ -1563,6 +1571,8 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                     if (objeto.hasProperty("tipoVenda")) {
                         dadosDocumento.put("TIPO", objeto.getProperty("tipoVenda").toString());
                     }
+
+                    listaTipoDocumento.add(dadosDocumento);
                 } // Fim do for
                 TipoDocumentoSql tipoDocumentoSql = new TipoDocumentoSql(context);
 
@@ -5323,6 +5333,13 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 }
             });
         }
+        if (progressBarStatus != null) {
+            ((Activity) context).runOnUiThread(new Runnable() {
+                public void run() {
+                    progressBarStatus.setIndeterminate(true);
+                }
+            });
+        }
         try {
             // Pega quando foi a ultima data que recebeu dados
             String ultimaData = pegaUltimaDataAtualizacao("AEAORCAM");
@@ -5346,13 +5363,196 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             WSSisinfoWebservice webserviceSisInfo = new WSSisinfoWebservice(context);
             JsonObject retornoWebservice = gson.fromJson(webserviceSisInfo.executarSelectWebserviceJson(null, WSSisinfoWebservice.FUNCTION_JSON_SELECT_AEAORCAM, WSSisinfoWebservice.METODO_GET, objectparametros.toString()), JsonObject.class);
 
-            if ((retornoWebservice != null) && (retornoWebservice.has(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO)) && (retornoWebservice.has(WSSisinfoWebservice.KEY_OBJECT_OBJECT_RETORNO))) {
+            if ((retornoWebservice != null) && (retornoWebservice.has(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO))) {
                 statuRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO);
 
                 if (statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO).getAsInt() == 300) {
+                    //JsonObject objectRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_OBJECT_RETORNO);
+
+                    final JsonArray listaPedidoRetorno = retornoWebservice.getAsJsonArray(WSSisinfoWebservice.KEY_OBJECT_OBJECT_RETORNO);
+                    boolean todosSucesso = true;
+
+                    // Atualiza a notificacao
+                    mLoad.bigTextStyle(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
+                    mLoad.progress().value(0, listaPedidoRetorno.size(), false).build();
+
+                    // Checo se o texto de status foi passado pro parametro
+                    if (textStatus != null) {
+                        ((Activity) context).runOnUiThread(new Runnable() {
+                            public void run() {
+                                textStatus.setText(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
+                            }
+                        });
+                    }
                     // Checa se retornou alguma coisa
                     if ((retornoWebservice.has(WSSisinfoWebservice.KEY_OBJECT_OBJECT_RETORNO))){
+                        // Atualiza a notificacao
+                        mLoad.bigTextStyle(context.getResources().getString(R.string.recebendo_dados_orcamento));
+                        mLoad.progress().value(0, 0, true).build();
 
+                        // Checo se o texto de status foi passado pro parametro
+                        if (textStatus != null) {
+                            ((Activity) context).runOnUiThread(new Runnable() {
+                                public void run() {
+                                    textStatus.setText(context.getResources().getString(R.string.recebendo_dados_orcamento));
+                                }
+                            });
+                        }
+                        if (progressBarStatus != null) {
+                            ((Activity) context).runOnUiThread(new Runnable() {
+                                public void run() {
+                                    progressBarStatus.setIndeterminate(false);
+                                    progressBarStatus.setMax(listaPedidoRetorno.size());
+                                }
+                            });
+                        }
+
+                        for(int i = 0; i < listaPedidoRetorno.size(); i++){
+                            // Atualiza a notificacao
+                            mLoad.bigTextStyle(context.getResources().getString(R.string.recebendo_dados_orcamento) + " - " + i + "/" + listaPedidoRetorno.size());
+                            mLoad.progress().update(0, i, listaPedidoRetorno.size(), false).build();
+
+                            // Checo se o texto de status foi passado pro parametro
+                            if (textStatus != null) {
+                                final int finalI1 = i;
+                                ((Activity) context).runOnUiThread(new Runnable() {
+                                    public void run() {
+                                        textStatus.setText(context.getResources().getString(R.string.recebendo_dados_orcamento) + " - " + finalI1 + "/" + listaPedidoRetorno.size());
+                                    }
+                                });
+                            }
+                            if (progressBarStatus != null) {
+                                final int finalI = i;
+                                ((Activity) context).runOnUiThread(new Runnable() {
+                                    public void run() {
+                                        progressBarStatus.setProgress(finalI);
+                                    }
+                                });
+                            }
+                            JsonObject pedidoRetorno = listaPedidoRetorno.get(i).getAsJsonObject();
+                            ContentValues dadosOrcamento = new ContentValues();
+                            dadosOrcamento.put("ID_SMAEMPRE", pedidoRetorno.get("idEmpresa").getAsInt());
+                            if (pedidoRetorno.has("idPessoa")) {
+                                dadosOrcamento.put("ID_CFACLIFO", pedidoRetorno.get("idPessoa").getAsInt());
+                            }
+                            if (pedidoRetorno.has("idEstado")) {
+                                dadosOrcamento.put("ID_CFAESTAD", pedidoRetorno.get("idEstado").getAsInt());
+                            }
+                            if (pedidoRetorno.has("idCidade")) {
+                                dadosOrcamento.put("ID_CFACIDAD", pedidoRetorno.get("idCidade").getAsInt());
+                            }
+                            if (pedidoRetorno.has("idRomaneio")) {
+                                dadosOrcamento.put("ID_AEAROMAN", pedidoRetorno.get("idRomaneio").getAsInt());
+                            }
+                            if (pedidoRetorno.has("idTipoDocumento")) {
+                                dadosOrcamento.put("ID_CFATPDOC", pedidoRetorno.get("idTipoDocumento").getAsInt());
+                            }
+                            dadosOrcamento.put("GUID", pedidoRetorno.get("guid").getAsString());
+                            dadosOrcamento.put("NUMERO", pedidoRetorno.get("numero").getAsInt());
+                            if (pedidoRetorno.has("totalFrete")) {
+                                dadosOrcamento.put("VL_FRETE", pedidoRetorno.get("totalFrete").getAsDouble());
+                            }
+                            if (pedidoRetorno.has("totalSeguro")) {
+                                dadosOrcamento.put("VL_SEGURO", pedidoRetorno.get("totalSeguro").getAsDouble());
+                            }
+                            if (pedidoRetorno.has("totalOutros")) {
+                                dadosOrcamento.put("VL_OUTROS", pedidoRetorno.get("totalOutros").getAsDouble());
+                            }
+                            if (pedidoRetorno.has("totalEncargoFinanceiros")) {
+                                dadosOrcamento.put("VL_ENCARGOS_FINANCEIROS", pedidoRetorno.get("totalEncargosFinanceiros").getAsDouble());
+                            }
+                            if (pedidoRetorno.has("totalTabelaFaturado")) {
+                                dadosOrcamento.put("VL_TABELA_FATURADO", pedidoRetorno.get("totalTabelaFaturado").getAsDouble());
+                            }
+                            if (pedidoRetorno.has("totalOrcamentoFaturado")) {
+                                dadosOrcamento.put("FC_VL_TOTAL_FATURADO", pedidoRetorno.get("totalOrcamentoFaturado").getAsDouble());
+                            }
+                            dadosOrcamento.put("ATAC_VAREJO", pedidoRetorno.get("tipoVenda").getAsString());
+                            if (pedidoRetorno.has("pessoaCliente")) {
+                                dadosOrcamento.put("PESSOA_CLIENTE", pedidoRetorno.get("pessoaCliente").getAsString());
+                            }
+                            if (pedidoRetorno.has("nomeRazao")) {
+                                dadosOrcamento.put("NOME_CLIENTE", pedidoRetorno.get("nomeRazao").getAsString());
+                            }
+                            if (pedidoRetorno.has("rgIe")) {
+                                dadosOrcamento.put("IE_RG_CLIENTE", pedidoRetorno.get("rgIe").getAsString());
+                            }
+                            if (pedidoRetorno.has("cpfCnpj")) {
+                                dadosOrcamento.put("CPF_CGC_CLIENTE", pedidoRetorno.get("cpfCnpj").getAsString());
+                            }
+                            if (pedidoRetorno.has("enderecoCliente")) {
+                                dadosOrcamento.put("ENDERECO_CLIENTE", pedidoRetorno.get("enderecoCliente").getAsString());
+                            }
+                            if (pedidoRetorno.has("bairroCliente")) {
+                                dadosOrcamento.put("BAIRRO_CLIENTE", pedidoRetorno.get("bairroCliente").getAsString());
+                            }
+                            if (pedidoRetorno.has("cepCliente")) {
+                                dadosOrcamento.put("CEP_CLIENTE", pedidoRetorno.get("cepCliente").getAsString());
+                            }
+                            if (pedidoRetorno.has("observacao")) {
+                                dadosOrcamento.put("OBS", pedidoRetorno.get("observacao").getAsString());
+                            }
+                            if (pedidoRetorno.has("status")) {
+                                String situacao = pedidoRetorno.get("status").getAsString();
+
+                                if (situacao.equalsIgnoreCase("0") || situacao.equalsIgnoreCase("3")) {
+                                    // Marca o status como retorno liberado
+                                    dadosOrcamento.put("STATUS", "RL");
+
+                                } else if (situacao.equalsIgnoreCase("1")) {
+                                    // Marca o peiddo como enviado
+                                    dadosOrcamento.put("STATUS", "N");
+
+                                } else if (situacao.equalsIgnoreCase("-1") || situacao.equalsIgnoreCase("2")) {
+                                    // Marca o status como retorno como excluido ou bloqueado
+                                    dadosOrcamento.put("STATUS", "RB");
+
+                                } else if (situacao.equalsIgnoreCase("7")) {
+                                    // Marca o status como retorno como conferido
+                                    dadosOrcamento.put("STATUS", "C");
+
+                                } else if (situacao.equalsIgnoreCase("8") || situacao.equalsIgnoreCase("9") ||
+                                        situacao.equalsIgnoreCase("10") || situacao.equalsIgnoreCase("11")) {
+                                    // Marca o status como retorno como faturado
+                                    dadosOrcamento.put("STATUS", "F");
+
+                                } else if (situacao.equalsIgnoreCase("99")) {
+                                    // Marca o status como retorno como excluido
+                                    dadosOrcamento.put("STATUS", "RE");
+
+                                } else {
+                                    dadosOrcamento.put("STATUS", "N");
+                                }
+                            }
+                            if (pedidoRetorno.has("tipoEntrega")) {
+                                dadosOrcamento.put("TIPO_ENTREGA", pedidoRetorno.get("tipoEntrega").getAsString());
+                            }
+                            OrcamentoSql orcamentoSql = new OrcamentoSql(context);
+
+                            //if (orcamentoSql.updateFast(dadosOrcamento, "AEAORCAM.GUID = '" + dadosOrcamento.getAsString("GUID") + "'") == 0) {
+                            if (orcamentoSql.update(dadosOrcamento, "AEAORCAM.GUID = '" + dadosOrcamento.getAsString("GUID") + "'") == 0) {
+
+                                if (pedidoRetorno.has("totalTabela")) {
+                                    dadosOrcamento.put("VL_TABELA", pedidoRetorno.get("totalTabela").getAsDouble());
+                                    dadosOrcamento.put("VL_MERC_BRUTO", pedidoRetorno.get("totalTabela").getAsDouble());
+                                }
+                                if (pedidoRetorno.has("totalOrcamentoCusto")) {
+                                    dadosOrcamento.put("VL_MERC_CUSTO", pedidoRetorno.get("totalOrcamentoCusto").getAsDouble());
+                                }
+                                if (pedidoRetorno.has("totalOrcamento")) {
+                                    dadosOrcamento.put("FC_VL_TOTAL", pedidoRetorno.get("totalOrcamento").getAsDouble());
+                                }
+                                dadosOrcamento.put("DT_CAD", pedidoRetorno.get("dataCadastro").getAsString());
+                                dadosOrcamento.put("DT_ALT", pedidoRetorno.get("dataAlteracao").getAsString());
+
+                                if (orcamentoSql.insertOrReplace(dadosOrcamento) <= 0) {
+                                    todosSucesso = false;
+                                }
+                            }
+                        } // Fim do for
+                        if (todosSucesso) {
+                            inserirUltimaAtualizacao("AEAORCAM");
+                        }
                     } else {
                         // Cria uma notificacao para ser manipulado
                         Load mLoad = PugNotification.with(context).load()

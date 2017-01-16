@@ -122,8 +122,11 @@ public class LoginMDActivity extends AppCompatActivity {
                     textUsuario.setText(dadosUsuario.getString(dadosUsuario.getColumnIndex("LOGIN_USUA")));
                 }
             }
+            boolean enviaAutomatico = (funcoes.getValorXml("EnviarAutomatico").equalsIgnoreCase("S") ? true : false);
+            boolean receberAutomatico = (funcoes.getValorXml("ReceberAutomatico").equalsIgnoreCase("S") ? true : false);
+
             // Cria o alarme se nao existir para enviar e receber dados
-            funcoes.criarAlarmeEnviarReceberDadosAutomatico(true, true);
+            funcoes.criarAlarmeEnviarReceberDadosAutomatico(enviaAutomatico, receberAutomatico);
 
         }catch (Exception e){
             FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(LoginMDActivity.this);

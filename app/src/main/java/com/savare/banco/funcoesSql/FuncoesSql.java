@@ -446,11 +446,11 @@ public class FuncoesSql {
 		bancoDados = conexaoBanco.abrirBanco();
 		
 		try {
-			qtdAtualizado = bancoDados.updateWithOnConflict(tabela, dados, where, null, 0);
-			//qtdAtualizado = bancoDados.update(tabela, dados, where, null);
+			//qtdAtualizado = bancoDados.updateWithOnConflict(tabela, dados, where, null, 0);
+			qtdAtualizado = bancoDados.update(tabela, dados, where, null);
 			
-			if(qtdAtualizado > 0){
-				/*final ContentValues mensagem = new ContentValues();
+			/*if(qtdAtualizado > 0){
+				final ContentValues mensagem = new ContentValues();
 				mensagem.put("comando", 2);
 				mensagem.put("mensagem", "Atualizado com sucesso! \n");
 				mensagem.put("tela", tabela);
@@ -460,16 +460,22 @@ public class FuncoesSql {
                     public void run() {
                         funcoes.menssagem(mensagem);
                     }
-                });*/
+                });
 				
-			} else {
-				ContentValues mensagem = new ContentValues();
+			}*/
+			if (qtdAtualizado <= 0){
+				final ContentValues mensagem = new ContentValues();
 				mensagem.put("comando", 2);
 				mensagem.put("mensagem", context.getResources().getString(R.string.nao_foi_possivel_atualizar) + " \n");
 				mensagem.put("tela", tabela);
 				
 				this.funcoes = new FuncoesPersonalizadas(context);
-				this.funcoes.menssagem(mensagem);
+				//this.funcoes.menssagem(mensagem);
+				((Activity) context).runOnUiThread(new Runnable() {
+					public void run() {
+						funcoes.menssagem(mensagem);
+					}
+				});
 			}
 			
 		} catch (SQLException e) {

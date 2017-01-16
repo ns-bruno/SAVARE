@@ -95,8 +95,9 @@
                 android:ems="10"
                 android:gravity="right"
                 android:hint="@string/quantidade"
-                android:inputType="numberDecimal">
-
+                android:inputType="numberDecimal"
+                android:imeOptions="actionNext"
+                android:nextFocusForward="@+id/activity_orcamento_produto_detalhes_md_edit_desconto">
                 <requestFocus />
             </EditText>
         </LinearLayout>
@@ -181,7 +182,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:background="@color/cinza_platina" >
+            android:background="@color/cinza_platina">
 
             <Spinner
                 android:id="@+id/activity_orcamento_produto_detalhes_md_spinner_estoque"
@@ -202,7 +203,9 @@
                 android:gravity="right"
                 android:hint="@string/desconto"
                 android:inputType="numberDecimal|numberSigned"
-                android:nextFocusDown="@+id/activity_orcamento_produto_detalhes_md_edit_total">
+                android:imeOptions="actionNext"
+                android:nextFocusDown="@+id/activity_orcamento_produto_detalhes_md_edit_total"
+                android:selectAllOnFocus="true">
             </EditText>
         </LinearLayout>
 
@@ -245,7 +248,10 @@
                 android:ems="10"
                 android:gravity="right"
                 android:hint="@string/valor_desconto"
-                android:inputType="numberDecimal|numberSigned" >
+                android:inputType="numberDecimal|numberSigned"
+                android:imeOptions="actionNext"
+                android:nextFocusDown="@+id/activity_orcamento_produto_detalhes_md_edit_total"
+                android:selectAllOnFocus="true">
             </EditText>
 
             <EditText
@@ -258,7 +264,9 @@
                 android:gravity="right"
                 android:hint="@string/total_liquido"
                 android:inputType="numberDecimal"
-                android:nextFocusDown="@+id/activity_orcamento_produto_detalhes_md_edit_observacao">
+                android:imeOptions="actionNext"
+                android:nextFocusDown="@+id/activity_orcamento_produto_detalhes_md_edit_observacao"
+                android:selectAllOnFocus="true">
             </EditText>
         </LinearLayout>
 

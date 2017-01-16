@@ -205,6 +205,7 @@
     <string name="nao_achamos_nenhum_valor">Não Achamos Nenhum Valor.</string>
     <string name="vendas_realizadas_mensal">Vendas Realizadas Mensal</string>
     <string name="enviando_pedidos">Enviando o(s) Pedido(s)</string>
+    <string name="enviando_pedidos_confirmando">Enviando e confirmando o(s) Pedido(s)</string>
     <string name="nao">Não</string>
     <string name="sim">Sim</string>
     <string name="tem_certeza_que_deseja_excluir_pedido">Tem certeza que deseja excluir o(s) pedido(s)?</string>
@@ -244,7 +245,7 @@
     um teste primeiro basta ir para o próximo passo.</string>
     <string name="terminamos_primeiros_passos">Terminamos os primeiros passos</string>
     <string name="terminamos">Terminamos</string>
-    <string name="terminamos_enviar_dados">Terminamos de enviar os dados.</string>
+    <string name="terminamos_enviar_dados">Terminamos de enviar os dados. Pode atualizar a tela, por favor.</string>
     <string name="pronto_para_iniciar_savare">Pronto, terminamos os primeiros passos, agora vamos iniciar o SAVARE e receber uma gama de dados.</string>
     <string name="escanear_codigo_barras">Escanear código de barras</string>
     <string name="cancelado">Cancelado</string>
@@ -318,6 +319,7 @@
     <string name="numero_vensao_savare_nao_chegou">Não chegou o número da versão do SAVARE, tente novamente. Se persistir entre em contato com o suporte SAVARE.</string>
     <string name="nao_retornou_dados_suficiente_para_continuar_comunicao_webservice">Não recebemos os dados primários para continuar a se comunicar com servidor em nuvem (Webservice).</string>
     <string name="nem_todos_pedidos_foram_enviados_tente_novamente">Nem todos os pedidos foram enviados. Atualize a lista e tente enviar novamente.</string>
+    <string name="nao_conseguimos_verificar_titulos">Não conseguimos verificar os títulos a receber.</string>
 
     <string-array name="tab_produto_md">
         <item>Produtos</item>

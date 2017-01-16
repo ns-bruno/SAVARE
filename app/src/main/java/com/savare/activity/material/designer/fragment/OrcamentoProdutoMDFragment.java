@@ -327,304 +327,304 @@ public class OrcamentoProdutoMDFragment extends Fragment {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
 
-                switch (item.getItemId()) {
+            switch (item.getItemId()) {
 
-                    case R.id.menu_orcamento_tab_md_adicionar:
+                case R.id.menu_orcamento_tab_md_adicionar:
 
-                        // Checa se eh um orcamento
-                        if (tipoOrcamentoPedido.equals("O")) {
-                            // Abre a tela que lista todos os produtos
-                            Intent intentOrcamento = new Intent(getContext(), ProdutoListaMDActivity.class);
-                            intentOrcamento.putExtra(ProdutoListaMDActivity.KEY_ID_ORCAMENTO, textCodigoOrcamento.getText().toString());
-                            intentOrcamento.putExtra(ProdutoListaMDActivity.KEY_ID_CLIENTE, idPessoa);
-                            intentOrcamento.putExtra(ProdutoListaMDActivity.KEY_ATACADO_VAREJO, textAtacadoVarejo.getText().toString());
-                            intentOrcamento.putExtra(ProdutoListaMDActivity.KEY_NOME_RAZAO, razaoSocial.replaceFirst("- ", ""));
-                            startActivity(intentOrcamento);
+                    // Checa se eh um orcamento
+                    if (tipoOrcamentoPedido.equals("O")) {
+                        // Abre a tela que lista todos os produtos
+                        Intent intentOrcamento = new Intent(getContext(), ProdutoListaMDActivity.class);
+                        intentOrcamento.putExtra(ProdutoListaMDActivity.KEY_ID_ORCAMENTO, textCodigoOrcamento.getText().toString());
+                        intentOrcamento.putExtra(ProdutoListaMDActivity.KEY_ID_CLIENTE, idPessoa);
+                        intentOrcamento.putExtra(ProdutoListaMDActivity.KEY_ATACADO_VAREJO, textAtacadoVarejo.getText().toString());
+                        intentOrcamento.putExtra(ProdutoListaMDActivity.KEY_NOME_RAZAO, razaoSocial.replaceFirst("- ", ""));
+                        startActivity(intentOrcamento);
 
-                        } else {
-                            /*FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(getActivity());
-                            // Cria uma variavem para inserir as propriedades da mensagem
-                            ContentValues mensagem = new ContentValues();
-                            mensagem.put("comando", 2);
-                            mensagem.put("tela", "OrcamentoActivity");
-                            mensagem.put("mensagem", getActivity().getResources().getString(R.string.nao_orcamento) + "\n"
-                                    + getActivity().getResources().getString(R.string.nao_pode_ser_inserido_novos_produtos));
-                            // Executa a mensagem passando por parametro as propriedades
-                            funcoes.menssagem(mensagem);*/
+                    } else {
+                        /*FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(getActivity());
+                        // Cria uma variavem para inserir as propriedades da mensagem
+                        ContentValues mensagem = new ContentValues();
+                        mensagem.put("comando", 2);
+                        mensagem.put("tela", "OrcamentoActivity");
+                        mensagem.put("mensagem", getActivity().getResources().getString(R.string.nao_orcamento) + "\n"
+                                + getActivity().getResources().getString(R.string.nao_pode_ser_inserido_novos_produtos));
+                        // Executa a mensagem passando por parametro as propriedades
+                        funcoes.menssagem(mensagem);*/
 
-                            SuperToast.create(getContext(), getContext().getResources().getString(R.string.nao_orcamento) + "\n" +
-                                                            getContext().getResources().getString(R.string.nao_pode_ser_inserido_novos_produtos), SuperToast.Duration.VERY_SHORT, Style.getStyle(Style.RED, SuperToast.Animations.POPUP)).show();
-                        }
-                        break;
+                        SuperToast.create(getContext(), getContext().getResources().getString(R.string.nao_orcamento) + "\n" +
+                                                        getContext().getResources().getString(R.string.nao_pode_ser_inserido_novos_produtos), SuperToast.Duration.VERY_SHORT, Style.getStyle(Style.RED, SuperToast.Animations.POPUP)).show();
+                    }
+                    break;
 
-                    case R.id.menu_orcamento_tab_md_enviar_email:
-                        EnviarEmailOrcamentoPedido enviarEmailOrcamentoPedido = new EnviarEmailOrcamentoPedido();
-                        enviarEmailOrcamentoPedido.execute();
+                case R.id.menu_orcamento_tab_md_enviar_email:
+                    EnviarEmailOrcamentoPedido enviarEmailOrcamentoPedido = new EnviarEmailOrcamentoPedido();
+                    enviarEmailOrcamentoPedido.execute();
 
-                        /*
-                        try {
-                            //Cria novo um ProgressDialogo e exibe
-                            ProgressDialog progress = new ProgressDialog(getActivity());
-                            progress.setMessage("Aguarde, o PDF está sendo Gerado...");
-                            progress.setCancelable(false);
-                            progress.show();
+                    /*
+                    try {
+                        //Cria novo um ProgressDialogo e exibe
+                        ProgressDialog progress = new ProgressDialog(getActivity());
+                        progress.setMessage("Aguarde, o PDF está sendo Gerado...");
+                        progress.setCancelable(false);
+                        progress.show();
 
-                            GerarPdfRotinas gerarPdfRotinas = new GerarPdfRotinas(getActivity());
-                            // Envia a lista de produtos que pertence ao orcamento
-                            gerarPdfRotinas.setListaItensOrcamento(adapterItemOrcamento.getListaItemOrcamento());
-                            // Envia os dados do orcamento
-                            gerarPdfRotinas.setOrcamento(preencheDadosOrcamento());
+                        GerarPdfRotinas gerarPdfRotinas = new GerarPdfRotinas(getActivity());
+                        // Envia a lista de produtos que pertence ao orcamento
+                        gerarPdfRotinas.setListaItensOrcamento(adapterItemOrcamento.getListaItemOrcamento());
+                        // Envia os dados do orcamento
+                        gerarPdfRotinas.setOrcamento(preencheDadosOrcamento());
 
-                            String retornoCaminho = gerarPdfRotinas.criaArquivoPdf();
+                        String retornoCaminho = gerarPdfRotinas.criaArquivoPdf();
 
-                            if (retornoCaminho.length() > 0) {
-                                // Fecha a barra de progresso
-                                progress.dismiss();
+                        if (retornoCaminho.length() > 0) {
+                            // Fecha a barra de progresso
+                            progress.dismiss();
 
-                                File arquivo = new File(retornoCaminho);
+                            File arquivo = new File(retornoCaminho);
 
-                                PessoaRotinas pessoaRotinas = new PessoaRotinas(getActivity());
+                            PessoaRotinas pessoaRotinas = new PessoaRotinas(getActivity());
 
-                                Intent dadosEmail = new Intent(Intent.ACTION_SEND);
-                                //dadosEmail.setType("message/rfc822");
-                                dadosEmail.setType("text/plain");
-                                dadosEmail.putExtra(Intent.EXTRA_EMAIL, new String[]{pessoaRotinas.emailPessoa(idPessoa)});
-                                dadosEmail.putExtra(Intent.EXTRA_SUBJECT, "Orçamento/Pedido # " + textCodigoOrcamento.getText());
-                                dadosEmail.putExtra(Intent.EXTRA_STREAM, Uri.parse("file://" + arquivo));
-                                dadosEmail.putExtra(Intent.EXTRA_TEXT, "E-Mail enviado pelo App SAVARE.");
+                            Intent dadosEmail = new Intent(Intent.ACTION_SEND);
+                            //dadosEmail.setType("message/rfc822");
+                            dadosEmail.setType("text/plain");
+                            dadosEmail.putExtra(Intent.EXTRA_EMAIL, new String[]{pessoaRotinas.emailPessoa(idPessoa)});
+                            dadosEmail.putExtra(Intent.EXTRA_SUBJECT, "Orçamento/Pedido # " + textCodigoOrcamento.getText());
+                            dadosEmail.putExtra(Intent.EXTRA_STREAM, Uri.parse("file://" + arquivo));
+                            dadosEmail.putExtra(Intent.EXTRA_TEXT, "E-Mail enviado pelo App SAVARE.");
 
-                                try {
-                                    startActivity(Intent.createChooser(dadosEmail, "Enviar e-mail..."));
+                            try {
+                                startActivity(Intent.createChooser(dadosEmail, "Enviar e-mail..."));
 
-                                } catch (android.content.ActivityNotFoundException ex) {
-                                    SuperToast.create(getContext(), getResources().getString(R.string.nao_possivel_compartilhar_arquivo), SuperToast.Duration.LONG, Style.getStyle(Style.RED, SuperToast.Animations.FLYIN)).show();
-                                }
-                            } else {
-                                progress.dismiss();
-                            }
-
-                        } catch (Exception e) {
-
-                        }*/
-
-                        break;
-
-                    case R.id.menu_orcamento_tab_md_pesquisa:
-
-                        break;
-
-                    case R.id.menu_orcamento_tab_md_atualizar:
-                        onResume();
-                        break;
-
-                    case R.id.menu_orcamento_tab_md_salvar:
-
-                        try {
-                            //ContentValues dadosOrcamento = new ContentValues();
-                            //dadosOrcamento.put("TIPO_ORCAMENTO", "ORCAMENTO");
-
-                            GerarPdfAsyncRotinas gerarPdfSalvar = new GerarPdfAsyncRotinas(getActivity());
-                            // Seta(envia) os dados do orcamento
-                            gerarPdfSalvar.setOrcamento(preencheDadosOrcamento());
-                            // Seta(envia) a lista de produtos do orcamento
-                            gerarPdfSalvar.setListaItensOrcamento(adapterItemOrcamento.getListaItemOrcamento());
-
-                            gerarPdfSalvar.execute("");
-
-                            // Fecha a view
-                            //finish();
-
-                        } catch (Exception e) {
-                            //Log.i("thread", e.getMessage());
-
-                            FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(getActivity());
-                            // Cria uma variavem para inserir as propriedades da mensagem
-                            ContentValues mensagem = new ContentValues();
-                            mensagem.put("comando", 0);
-                            mensagem.put("tela", "OrcamentoActivity");
-                            mensagem.put("mensagem", getActivity().getResources().getString(R.string.nao_foi_possivel_salvar_orcamento_pdf));
-                            mensagem.put("dados", e.toString());
-                            mensagem.put("usuario", funcoes.getValorXml("Usuario"));
-                            mensagem.put("empresa", funcoes.getValorXml("ChaveEmpresa"));
-                            mensagem.put("email", funcoes.getValorXml("Email"));
-
-                            // Executa a mensagem passando por parametro as propriedades
-                            funcoes.menssagem(mensagem);
-                        }
-                        break;
-
-                    case R.id.menu_orcamento_tab_md_rateio_preco:
-                        // Checa se existe produtos no orcamento
-                        if ( (adapterItemOrcamento != null) && (adapterItemOrcamento.getListaItemOrcamento().size() > 0) ) {
-
-                            if (adapterItemOrcamento.getTipoItem() == adapterItemOrcamento.RATEIO_ITEM_ORCAMENTO) {
-                                adapterItemOrcamento.setTipoItem(adapterItemOrcamento.ITEM_ORCAMENTO);
-                                ((BaseAdapter) listViewListaProdutoOrcamento.getAdapter()).notifyDataSetChanged();
-
-                                OrcamentoRotinas orcamentoRotinas = new OrcamentoRotinas(getActivity());
-
-                                textTotal.setText("Total: " + orcamentoRotinas.totalOrcamentoLiquido(textCodigoOrcamento.getText().toString()));
-
-                            } else {
-                                adapterItemOrcamento.setTipoItem(adapterItemOrcamento.RATEIO_ITEM_ORCAMENTO);
-                                ((BaseAdapter) listViewListaProdutoOrcamento.getAdapter()).notifyDataSetChanged();
-
-                                // Variavel para armezenar o total da diferenca entro o preco vendido e o preco de tabela
-                                double totalDiferenca = 0;
-                                // Passa por toda a lista de itens
-                                for (int i = 0; i < adapterItemOrcamento.getListaItemOrcamento().size(); i++) {
-                                    totalDiferenca = totalDiferenca + (adapterItemOrcamento.getListaItemOrcamento().get(i).getValorTabela() - adapterItemOrcamento.getListaItemOrcamento().get(i).getValorLiquido());
-                                }
-                                // Instancia a classe de funcoes
-                                FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(getActivity());
-                                // Seta o campo com o total da diferenca
-                                textTotal.setText("Diferença: " + funcoes.arredondarValor(String.valueOf(totalDiferenca * (-1))));
+                            } catch (android.content.ActivityNotFoundException ex) {
+                                SuperToast.create(getContext(), getResources().getString(R.string.nao_possivel_compartilhar_arquivo), SuperToast.Duration.LONG, Style.getStyle(Style.RED, SuperToast.Animations.FLYIN)).show();
                             }
                         } else {
-                            FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(getActivity());
-                            // Cria uma variavem para inserir as propriedades da mensagem
-                            ContentValues mensagem = new ContentValues();
-                            mensagem.put("comando", 2);
-                            mensagem.put("tela", "OrcamentoFragment");
-                            mensagem.put("mensagem", getActivity().getResources().getString(R.string.nao_existe_produto_lista_orcamento) + "\n");
-                            // Executa a mensagem passando por parametro as propriedades
-                            funcoes.menssagem(mensagem);
+                            progress.dismiss();
                         }
-                        break;
 
-                    case R.id.menu_orcamento_tab_md_transformar_pedido:
+                    } catch (Exception e) {
+
+                    }*/
+
+                    break;
+
+                case R.id.menu_orcamento_tab_md_pesquisa:
+
+                    break;
+
+                case R.id.menu_orcamento_tab_md_atualizar:
+                    onResume();
+                    break;
+
+                case R.id.menu_orcamento_tab_md_salvar:
+
+                    try {
+                        //ContentValues dadosOrcamento = new ContentValues();
+                        //dadosOrcamento.put("TIPO_ORCAMENTO", "ORCAMENTO");
+
+                        GerarPdfAsyncRotinas gerarPdfSalvar = new GerarPdfAsyncRotinas(getActivity());
+                        // Seta(envia) os dados do orcamento
+                        gerarPdfSalvar.setOrcamento(preencheDadosOrcamento());
+                        // Seta(envia) a lista de produtos do orcamento
+                        gerarPdfSalvar.setListaItensOrcamento(adapterItemOrcamento.getListaItemOrcamento());
+
+                        gerarPdfSalvar.execute("");
+
+                        // Fecha a view
+                        //finish();
+
+                    } catch (Exception e) {
+                        //Log.i("thread", e.getMessage());
+
+                        FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(getActivity());
+                        // Cria uma variavem para inserir as propriedades da mensagem
+                        ContentValues mensagem = new ContentValues();
+                        mensagem.put("comando", 0);
+                        mensagem.put("tela", "OrcamentoActivity");
+                        mensagem.put("mensagem", getActivity().getResources().getString(R.string.nao_foi_possivel_salvar_orcamento_pdf));
+                        mensagem.put("dados", e.toString());
+                        mensagem.put("usuario", funcoes.getValorXml("Usuario"));
+                        mensagem.put("empresa", funcoes.getValorXml("ChaveEmpresa"));
+                        mensagem.put("email", funcoes.getValorXml("Email"));
+
+                        // Executa a mensagem passando por parametro as propriedades
+                        funcoes.menssagem(mensagem);
+                    }
+                    break;
+
+                case R.id.menu_orcamento_tab_md_rateio_preco:
+                    // Checa se existe produtos no orcamento
+                    if ( (adapterItemOrcamento != null) && (adapterItemOrcamento.getListaItemOrcamento().size() > 0) ) {
+
+                        if (adapterItemOrcamento.getTipoItem() == adapterItemOrcamento.RATEIO_ITEM_ORCAMENTO) {
+                            adapterItemOrcamento.setTipoItem(adapterItemOrcamento.ITEM_ORCAMENTO);
+                            ((BaseAdapter) listViewListaProdutoOrcamento.getAdapter()).notifyDataSetChanged();
+
+                            OrcamentoRotinas orcamentoRotinas = new OrcamentoRotinas(getActivity());
+
+                            textTotal.setText("Total: " + orcamentoRotinas.totalOrcamentoLiquido(textCodigoOrcamento.getText().toString()));
+
+                        } else {
+                            adapterItemOrcamento.setTipoItem(adapterItemOrcamento.RATEIO_ITEM_ORCAMENTO);
+                            ((BaseAdapter) listViewListaProdutoOrcamento.getAdapter()).notifyDataSetChanged();
+
+                            // Variavel para armezenar o total da diferenca entro o preco vendido e o preco de tabela
+                            double totalDiferenca = 0;
+                            // Passa por toda a lista de itens
+                            for (int i = 0; i < adapterItemOrcamento.getListaItemOrcamento().size(); i++) {
+                                totalDiferenca = totalDiferenca + (adapterItemOrcamento.getListaItemOrcamento().get(i).getValorTabela() - adapterItemOrcamento.getListaItemOrcamento().get(i).getValorLiquido());
+                            }
+                            // Instancia a classe de funcoes
+                            FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(getActivity());
+                            // Seta o campo com o total da diferenca
+                            textTotal.setText("Diferença: " + funcoes.arredondarValor(String.valueOf(totalDiferenca * (-1))));
+                        }
+                    } else {
+                        FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(getActivity());
+                        // Cria uma variavem para inserir as propriedades da mensagem
+                        ContentValues mensagem = new ContentValues();
+                        mensagem.put("comando", 2);
+                        mensagem.put("tela", "OrcamentoFragment");
+                        mensagem.put("mensagem", getActivity().getResources().getString(R.string.nao_existe_produto_lista_orcamento) + "\n");
+                        // Executa a mensagem passando por parametro as propriedades
+                        funcoes.menssagem(mensagem);
+                    }
+                    break;
+
+                case R.id.menu_orcamento_tab_md_transformar_pedido:
 
 
-                        // Checa se eh um orcamento
-                        if (tipoOrcamentoPedido.equals("O")) {
+                    // Checa se eh um orcamento
+                    if (tipoOrcamentoPedido.equals("O")) {
 
-                            new MaterialDialog.Builder(getActivity())
-                                    .title(R.string.formar_venda)
-                                    .items(R.array.forma_venda_positivacao)
-                                    .itemsCallback(new MaterialDialog.ListCallback() {
-                                        @Override
-                                        public void onSelection(MaterialDialog dialog, View view, int which, CharSequence text) {
+                        new MaterialDialog.Builder(getActivity())
+                                .title(R.string.formar_venda)
+                                .items(R.array.forma_venda_positivacao)
+                                .itemsCallback(new MaterialDialog.ListCallback() {
+                                    @Override
+                                    public void onSelection(MaterialDialog dialog, View view, int which, CharSequence text) {
 
-                                            // Valida a opcao selecionada 1 = Visitou, mas, não comprou e 2 = Não estava
-                                            if ((which != 1) && (which != 2)) {
+                                        // Valida a opcao selecionada 1 = Visitou, mas, não comprou e 2 = Não estava
+                                        if ((which != 1) && (which != 2)) {
 
-                                                // Instancia a classe para manipular os orcamento no banco de dados
-                                                OrcamentoSql orcamentoSql = new OrcamentoSql(getActivity());
-                                                int totalAtualizado = 0;
+                                            // Instancia a classe para manipular os orcamento no banco de dados
+                                            OrcamentoSql orcamentoSql = new OrcamentoSql(getActivity());
+                                            int totalAtualizado = 0;
 
-                                                ContentValues dadosPedido = new ContentValues();
-                                                dadosPedido.put("STATUS", "P");
+                                            ContentValues dadosPedido = new ContentValues();
+                                            dadosPedido.put("STATUS", "P");
 
-                                                totalAtualizado = totalAtualizado + orcamentoSql.update(dadosPedido, "AEAORCAM.ID_AEAORCAM = " + textCodigoOrcamento.getText());
+                                            totalAtualizado = totalAtualizado + orcamentoSql.update(dadosPedido, "AEAORCAM.ID_AEAORCAM = " + textCodigoOrcamento.getText());
 
-                                                // Dados da mensagem
-                                                ContentValues mensagem = new ContentValues();
-                                                mensagem.put("comando", 2);
-                                                mensagem.put("tela", "OrcamentoFragment");
+                                            // Dados da mensagem
+                                            ContentValues mensagem = new ContentValues();
+                                            mensagem.put("comando", 2);
+                                            mensagem.put("tela", "OrcamentoFragment");
 
-                                                // Verifica se foi deletado algum registro
-                                                if (totalAtualizado > 0) {
-                                                    SuperToast.create(getContext(), totalAtualizado + " Transformado(s) em Pedido(s)", SuperToast.Duration.SHORT, Style.getStyle(Style.GREEN, SuperToast.Animations.FLYIN)).show();
-                                                    //mensagem.put("mensagem", totalAtualizado + " Transformado(s) em Pedido(s). \n");
+                                            // Verifica se foi deletado algum registro
+                                            if (totalAtualizado > 0) {
+                                                SuperToast.create(getContext(), totalAtualizado + " Transformado(s) em Pedido(s)", SuperToast.Duration.SHORT, Style.getStyle(Style.GREEN, SuperToast.Animations.FLYIN)).show();
+                                                //mensagem.put("mensagem", totalAtualizado + " Transformado(s) em Pedido(s). \n");
 
-                                                    tipoOrcamentoPedido = "P";
+                                                tipoOrcamentoPedido = "P";
 
-                                                    // Pega os dados da positivacao
-                                                    String sqlInsert = "INSERT OR REPLACE INTO CFAPOSIT(STATUS, VALOR_VENDA, DATA_VISITA, ID_CFACLIFO, ID_AEAORCAM) VALUES " +
-                                                            "(" + which + ", " +
-                                                            "(SELECT AEAORCAM.FC_VL_TOTAL FROM AEAORCAM WHERE AEAORCAM.ID_AEAORCAM = " + idOrcamento + "), " +
-                                                            "(SELECT (DATE('NOW', 'localtime'))), " +
-                                                            "(SELECT AEAORCAM.ID_CFACLIFO FROM AEAORCAM WHERE AEAORCAM.ID_AEAORCAM = " + idOrcamento + "), " +
-                                                            idOrcamento + ")";
+                                                // Pega os dados da positivacao
+                                                String sqlInsert = "INSERT OR REPLACE INTO CFAPOSIT(STATUS, VALOR_VENDA, DATA_VISITA, ID_CFACLIFO, ID_AEAORCAM) VALUES " +
+                                                        "(" + which + ", " +
+                                                        "(SELECT AEAORCAM.FC_VL_TOTAL FROM AEAORCAM WHERE AEAORCAM.ID_AEAORCAM = " + idOrcamento + "), " +
+                                                        "(SELECT (DATE('NOW', 'localtime'))), " +
+                                                        "(SELECT AEAORCAM.ID_CFACLIFO FROM AEAORCAM WHERE AEAORCAM.ID_AEAORCAM = " + idOrcamento + "), " +
+                                                        idOrcamento + ")";
 
-                                                    PositivacaoSql positivacaoSql = new PositivacaoSql(getContext());
+                                                PositivacaoSql positivacaoSql = new PositivacaoSql(getContext());
 
-                                                    // Inseri a positivacao e checa se inseriu com sucesso
-                                                    positivacaoSql.execSQL(sqlInsert);
+                                                // Inseri a positivacao e checa se inseriu com sucesso
+                                                positivacaoSql.execSQL(sqlInsert);
 
-                                                    GerarPdfAsyncRotinas gerarPdfSalvar = new GerarPdfAsyncRotinas(getActivity());
-                                                    // Seta(envia) os dados do orcamento
-                                                    gerarPdfSalvar.setOrcamento(preencheDadosOrcamento());
-                                                    // Seta(envia) a lista de produtos do orcamento
-                                                    gerarPdfSalvar.setListaItensOrcamento(adapterItemOrcamento.getListaItemOrcamento());
+                                                GerarPdfAsyncRotinas gerarPdfSalvar = new GerarPdfAsyncRotinas(getActivity());
+                                                // Seta(envia) os dados do orcamento
+                                                gerarPdfSalvar.setOrcamento(preencheDadosOrcamento());
+                                                // Seta(envia) a lista de produtos do orcamento
+                                                gerarPdfSalvar.setListaItensOrcamento(adapterItemOrcamento.getListaItemOrcamento());
 
-                                                    gerarPdfSalvar.execute("");
+                                                gerarPdfSalvar.execute("");
 
-                                                    // Fecha a view
-                                                    //finish();
-
-                                                } else {
-                                                    SuperToast.create(getContext(), getResources().getString(R.string.nao_foi_possivel_transformar_orcamento_pedido), SuperToast.Duration.LONG, Style.getStyle(Style.RED, SuperToast.Animations.FLYIN)).show();
-                                                    //mensagem.put("mensagem", getResources().getString(R.string.nao_foi_possivel_transformar_orcamento_pedido));
-                                                }
-                                                // Instancia a classe de funcoes
-                                                /*FuncoesPersonalizadas funcoes;
-
-                                                // Instancia a classe  de funcoes para mostra a mensagem
-                                                funcoes = new FuncoesPersonalizadas(getActivity());
-                                                funcoes.menssagem(mensagem);*/
+                                                // Fecha a view
+                                                //finish();
 
                                             } else {
-                                                SuperToast.create(getContext(), getResources().getString(R.string.opcao_positivacao_nao_valida_para_esta_tela), SuperToast.Duration.LONG, Style.getStyle(Style.RED, SuperToast.Animations.FLYIN)).show();
+                                                SuperToast.create(getContext(), getResources().getString(R.string.nao_foi_possivel_transformar_orcamento_pedido), SuperToast.Duration.LONG, Style.getStyle(Style.RED, SuperToast.Animations.FLYIN)).show();
+                                                //mensagem.put("mensagem", getResources().getString(R.string.nao_foi_possivel_transformar_orcamento_pedido));
                                             }
+                                            // Instancia a classe de funcoes
+                                            /*FuncoesPersonalizadas funcoes;
+
+                                            // Instancia a classe  de funcoes para mostra a mensagem
+                                            funcoes = new FuncoesPersonalizadas(getActivity());
+                                            funcoes.menssagem(mensagem);*/
+
+                                        } else {
+                                            SuperToast.create(getContext(), getResources().getString(R.string.opcao_positivacao_nao_valida_para_esta_tela), SuperToast.Duration.LONG, Style.getStyle(Style.RED, SuperToast.Animations.FLYIN)).show();
                                         }
-                                    })
-                                    .show();
+                                    }
+                                })
+                                .show();
 
 
-                        } else {
-                            ContentValues mensagem = new ContentValues();
-                            mensagem.put("comando", 2);
-                            mensagem.put("tela", "OrcamentoActivity");
-                            mensagem.put("mensagem", getActivity().getResources().getString(R.string.nao_orcamento) + "\n");
+                    } else {
+                        ContentValues mensagem = new ContentValues();
+                        mensagem.put("comando", 2);
+                        mensagem.put("tela", "OrcamentoActivity");
+                        mensagem.put("mensagem", getActivity().getResources().getString(R.string.nao_orcamento) + "\n");
 
-                            // Instancia a classe de funcoes
-                            FuncoesPersonalizadas funcoes;
+                        // Instancia a classe de funcoes
+                        FuncoesPersonalizadas funcoes;
 
-                            funcoes = new FuncoesPersonalizadas(getActivity());
-                            funcoes.menssagem(mensagem);
-                        }
-                        break;
+                        funcoes = new FuncoesPersonalizadas(getActivity());
+                        funcoes.menssagem(mensagem);
+                    }
+                    break;
 
-                    case R.id.menu_orcamento_tab_md_trocar_cliente:
-                        // Checa se eh um orcamento
-                        if (tipoOrcamentoPedido.equals("O")) {
-                            // Abre a tela de detalhes do produto
-                            Intent intent = new Intent(getActivity(), ClienteListaMDActivity.class);
-                            intent.putExtra(KEY_TELA_CHAMADA, KEY_TELA_ORCAMENTO_FRAGMENTO);
-                            intent.putExtra(KEY_ID_ORCAMENTO, textCodigoOrcamento.getText().toString());
-                            // Abre a activity aquardando uma resposta
-                            startActivityForResult(intent, SOLICITA_CLIENTE);
+                case R.id.menu_orcamento_tab_md_trocar_cliente:
+                    // Checa se eh um orcamento
+                    if (tipoOrcamentoPedido.equals("O")) {
+                        // Abre a tela de detalhes do produto
+                        Intent intent = new Intent(getActivity(), ClienteListaMDActivity.class);
+                        intent.putExtra(KEY_TELA_CHAMADA, KEY_TELA_ORCAMENTO_FRAGMENTO);
+                        intent.putExtra(KEY_ID_ORCAMENTO, textCodigoOrcamento.getText().toString());
+                        // Abre a activity aquardando uma resposta
+                        startActivityForResult(intent, SOLICITA_CLIENTE);
 
-                        } else {
-                            ContentValues mensagem = new ContentValues();
-                            mensagem.put("comando", 2);
-                            mensagem.put("tela", "OrcamentoFragment");
-                            mensagem.put("mensagem", getActivity().getResources().getString(R.string.nao_orcamento) + "\n");
+                    } else {
+                        ContentValues mensagem = new ContentValues();
+                        mensagem.put("comando", 2);
+                        mensagem.put("tela", "OrcamentoFragment");
+                        mensagem.put("mensagem", getActivity().getResources().getString(R.string.nao_orcamento) + "\n");
 
-                            // Instancia a classe de funcoes
-                            FuncoesPersonalizadas funcoes;
+                        // Instancia a classe de funcoes
+                        FuncoesPersonalizadas funcoes;
 
-                            funcoes = new FuncoesPersonalizadas(getActivity());
-                            funcoes.menssagem(mensagem);
-                        }
-                        break;
+                        funcoes = new FuncoesPersonalizadas(getActivity());
+                        funcoes.menssagem(mensagem);
+                    }
+                    break;
 
-                    case R.id.menu_orcamento_tab_md_visualizar_logs:
+                case R.id.menu_orcamento_tab_md_visualizar_logs:
 
-                        // Abre a tela inicial do sistema
-                        Intent intent = new Intent(getActivity(), LogActivity.class);
-                        intent.putExtra("ID_AEAORCAM", textCodigoOrcamento.getText().toString());
-                        intent.putExtra("TABELA", new String[]{"AEAORCAM", "AEAITORC"});
-                        startActivity(intent);
+                    // Abre a tela inicial do sistema
+                    Intent intent = new Intent(getActivity(), LogActivity.class);
+                    intent.putExtra("ID_AEAORCAM", textCodigoOrcamento.getText().toString());
+                    intent.putExtra("TABELA", new String[]{"AEAORCAM", "AEAITORC"});
+                    startActivity(intent);
 
-                        break;
+                    break;
 
-                    default:
-                        break;
-                }
+                default:
+                    break;
+            }
 
-                return true;
+            return true;
             }
         });
 

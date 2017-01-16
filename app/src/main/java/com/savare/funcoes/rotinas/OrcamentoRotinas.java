@@ -398,7 +398,7 @@ public class OrcamentoRotinas extends Rotinas {
 		
 		try {
 			// Constroi um sql
-			String sql = "SELECT AEAORCAM.ID_AEAORCAM, AEAORCAM.GUID, AEAORCAM.ID_SMAEMPRE, AEAORCAM.ID_CFAESTAD, " +
+			String sql = "SELECT AEAORCAM.ID_AEAORCAM, AEAORCAM.NUMERO, AEAORCAM.GUID, AEAORCAM.ID_SMAEMPRE, AEAORCAM.ID_CFAESTAD, " +
 						 "AEAORCAM.ID_CFACIDAD, AEAORCAM.ID_CFATPDOC, AEAORCAM.DT_CAD, AEAORCAM.ID_CFACLIFO, " +
 						 "AEAORCAM.NOME_CLIENTE, AEAORCAM.ATAC_VAREJO, AEAORCAM.PESSOA_CLIENTE, AEAORCAM.IE_RG_CLIENTE, " +
 						 "AEAORCAM.CPF_CGC_CLIENTE, AEAORCAM.ENDERECO_CLIENTE, AEAORCAM.BAIRRO_CLIENTE, " +
@@ -466,6 +466,7 @@ public class OrcamentoRotinas extends Rotinas {
 					OrcamentoBeans orcamento = new OrcamentoBeans();
 					// Pega os dados do orcamento
 					orcamento.setIdOrcamento(cursor.getInt(cursor.getColumnIndex("ID_AEAORCAM")));
+					orcamento.setNumero(cursor.getInt(cursor.getColumnIndex("NUMERO")));
 					orcamento.setIdEmpresa(cursor.getInt(cursor.getColumnIndex("ID_SMAEMPRE")));
                     orcamento.setIdPessoa(cursor.getInt(cursor.getColumnIndex("ID_CFACLIFO")));
                     orcamento.setIdEstado(cursor.getInt(cursor.getColumnIndex("ID_CFAESTAD")));
@@ -747,6 +748,7 @@ public class OrcamentoRotinas extends Rotinas {
             for(String s:tipo) {
                 tipoStatus += (total > 0 ? ", " : "");
                 tipoStatus += "'" + s + "'";
+				total++;
             }
             sql += " WHERE (AEAORCAM.STATUS IN (" + tipoStatus + ")) ";
         }
@@ -1101,6 +1103,7 @@ public class OrcamentoRotinas extends Rotinas {
             for(String s:tipo) {
                 tipoStatus += (total > 0 ? ", " : "");
                 tipoStatus += "'" + s + "'";
+				total ++;
             }
             sql += "WHERE (AEAORCAM.STATUS IN (" + tipoStatus + ")) ";
         }
@@ -1155,6 +1158,7 @@ public class OrcamentoRotinas extends Rotinas {
             for(String s:tipo) {
                 tipoStatus += (total > 0 ? ", " : "");
                 tipoStatus += "'" + s + "'";
+				total++;
             }
             sql += " WHERE (AEAORCAM.STATUS IN (" + tipoStatus + ")) ";
         }
@@ -1215,6 +1219,7 @@ public class OrcamentoRotinas extends Rotinas {
 			for(String s:tipo) {
 				tipoStatus += (total > 0 ? ", " : "");
 				tipoStatus += "'" + s + "'";
+				total ++;
 			}
 			sql += "WHERE (AEAORCAM.STATUS IN (" + tipoStatus + ")) ";
 		}

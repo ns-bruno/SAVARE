@@ -31,18 +31,6 @@
         app:showAsAction="never" />
 
     <item
-        android:id="@+id/menu_lista_orcamento_md_somente_enviados"
-        android:orderInCategory="102"
-        android:title="@string/somente_enviados"
-        app:showAsAction="never" />
-
-    <item
-        android:id="@+id/menu_lista_orcamento_md_nao_enviados"
-        android:orderInCategory="103"
-        android:title="@string/nao_enviados"
-        app:showAsAction="never" />
-
-    <item
         android:id="@+id/menu_lista_orcamento_md_sincronizar_web_service"
         android:orderInCategory="104"
         android:title="@string/receber_dados_pedido_servidor_web"

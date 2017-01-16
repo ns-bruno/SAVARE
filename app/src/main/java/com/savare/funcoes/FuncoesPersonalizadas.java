@@ -1247,7 +1247,7 @@ public class FuncoesPersonalizadas {
                         .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_ENVIAR_DADOS)
                         .smallIcon(R.mipmap.ic_launcher)
                         .largeIcon(R.mipmap.ic_launcher)
-                        .title(R.string.versao_savare_desatualizada)
+                        .title(R.string.recebendo_dados)
                         .bigTextStyle(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice))
                         .flags(Notification.DEFAULT_LIGHTS);
                 mLoad.simple().build();

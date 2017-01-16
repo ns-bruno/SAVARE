@@ -117,8 +117,8 @@ public class OrcamentoProdutoDetalhesMDFragment extends Fragment {
                 mensagem.put("comando", 0);
                 mensagem.put("tela", "OrcamentoProdutoDetalhesMDFragmento");
                 mensagem.put("mensagem", "Erro ao pegar os dados do produto da outra tela (activity). \n"
-                        + "Erro: " + e.getMessage() + "\n"
-                        + "Favor, voltar e selecione novamente um produto");
+                           + "Erro: " + e.getMessage() + "\n"
+                           + "Favor, voltar e selecione novamente um produto");
                 //mensagem.put("dados", getIntent().getParcelableExtra("AEAPLOJA").toString());
                 mensagem.put("usuario", funcoes.getValorXml("Usuario"));
                 mensagem.put("usuario", funcoes.getValorXml("ChaveEmpresa"));
@@ -260,17 +260,6 @@ public class OrcamentoProdutoDetalhesMDFragment extends Fragment {
             }
         });
 
-        editDesconto.setOnKeyListener(new View.OnKeyListener() {
-            @Override
-            public boolean onKey(View v, int keyCode, KeyEvent event) {
-
-                if (keyCode == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN) {
-
-                    editTotal.setSelection(editTotal.getText().length());
-                }
-                return false;
-            }
-        });
 
         editValorDesconto.setOnTouchListener(new View.OnTouchListener() {
             @Override

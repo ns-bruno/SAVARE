@@ -276,14 +276,14 @@ public class EnviarDadosWebserviceAsyncRotinas  extends AsyncTask<Void, Void, Vo
                     orcamento.setListaItemOrcamento(listaItemOrcamento);
 
                     // Indica que essa notificacao eh do tipo progress
-                    mLoad.bigTextStyle(context.getResources().getString(R.string.enviando_pedidos) + " Nº " + orcamento.getIdOrcamento());
+                    mLoad.bigTextStyle(context.getResources().getString(R.string.enviando_pedidos_confirmando) + " Nº " + orcamento.getIdOrcamento());
                     mLoad.progress().value(0, 0, true).build();
 
                     // Checo se o texto de status foi passado pro parametro
                     if (textStatus != null){
                         ((Activity) context).runOnUiThread(new Runnable() {
                             public void run() {
-                                textStatus.setText(context.getResources().getString(R.string.enviando_pedidos) + " Nº " + orcamento.getIdOrcamento());
+                                textStatus.setText(context.getResources().getString(R.string.enviando_pedidos_confirmando) + " Nº " + orcamento.getIdOrcamento());
                             }
                         });
                     }
@@ -301,6 +301,25 @@ public class EnviarDadosWebserviceAsyncRotinas  extends AsyncTask<Void, Void, Vo
                     JsonObject retornoWebservice = gson.fromJson(tempJsonRetorno, JsonObject.class);
 
                     if ((retornoWebservice != null) && (retornoWebservice.has(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO))){
+                        // Indica que essa notificacao eh do tipo progress
+                        mLoad.bigTextStyle(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
+                        mLoad.progress().value(0, 0, true).build();
+
+                        // Checo se o texto de status foi passado pro parametro
+                        if (textStatus != null){
+                            ((Activity) context).runOnUiThread(new Runnable() {
+                                public void run() {
+                                    textStatus.setText(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
+                                }
+                            });
+                        }
+                        if (progressBarStatus != null){
+                            ((Activity) context).runOnUiThread(new Runnable() {
+                                public void run() {
+                                    progressBarStatus.setIndeterminate(true);
+                                }
+                            });
+                        }
                         // Pega o objeto de status retornado do webservice
                         statuRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO);
 
@@ -342,7 +361,7 @@ public class EnviarDadosWebserviceAsyncRotinas  extends AsyncTask<Void, Void, Vo
                                     .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_ENVIAR_DADOS + context.hashCode())
                                     .smallIcon(R.mipmap.ic_launcher)
                                     .largeIcon(R.mipmap.ic_launcher)
-                                    .title(R.string.versao_savare_desatualizada)
+                                    .title(R.string.enviar_pedido_nuvem)
                                     .bigTextStyle("Código Retorno: " + ((statuRetorno != null && statuRetorno.has(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO)) ? statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO).getAsInt() + "\n" : "Sem código.\n")
                                             + "Mensagem: " + ((statuRetorno != null && statuRetorno.has(WSSisinfoWebservice.KEY_ELEMENT_MENSAGEM_RETORNO)) ? statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_MENSAGEM_RETORNO).getAsString() + "\n" : "Não conseguimos enviar o pedido Nº " + orcamento.getIdOrcamento() + "\n")
                                             + "Extra: " + ((statuRetorno != null && statuRetorno.has(WSSisinfoWebservice.KEY_ELEMENT_EXTRA_RETORNO)) ? statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_EXTRA_RETORNO).getAsString() : "\n"))
@@ -355,7 +374,7 @@ public class EnviarDadosWebserviceAsyncRotinas  extends AsyncTask<Void, Void, Vo
                                 .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_ENVIAR_DADOS)
                                 .smallIcon(R.mipmap.ic_launcher)
                                 .largeIcon(R.mipmap.ic_launcher)
-                                .title(R.string.versao_savare_desatualizada)
+                                .title(R.string.enviar_pedido_nuvem)
                                 .bigTextStyle(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice))
                                 .flags(Notification.DEFAULT_LIGHTS);
                         mLoad.simple().build();
