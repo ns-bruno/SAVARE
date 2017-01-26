@@ -28,7 +28,6 @@ import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.github.johnpersano.supertoasts.SuperToast;
@@ -48,7 +47,6 @@ import com.savare.beans.OrcamentoBeans;
 import com.savare.funcoes.FuncoesPersonalizadas;
 import com.savare.funcoes.rotinas.GerarPdfRotinas;
 import com.savare.funcoes.rotinas.OrcamentoRotinas;
-import com.savare.funcoes.rotinas.ParcelaRotinas;
 import com.savare.funcoes.rotinas.PessoaRotinas;
 import com.savare.funcoes.rotinas.async.GerarPdfAsyncRotinas;
 
@@ -112,7 +110,7 @@ public class OrcamentoProdutoMDFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 // Checa se eh orcamento
-                if (tipoOrcamentoPedido.equals("O")) {
+                if ((tipoOrcamentoPedido.equalsIgnoreCase("O")) || (tipoOrcamentoPedido.equalsIgnoreCase("P"))) {
 
                     ItemOrcamentoBeans itemOrcamento = (ItemOrcamentoBeans) parent.getItemAtPosition(position);
 
@@ -256,7 +254,7 @@ public class OrcamentoProdutoMDFragment extends Fragment {
 
                         } else {
 
-                            FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(getActivity());
+                            /*FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(getActivity());
                             // Cria uma variavem para inserir as propriedades da mensagem
                             ContentValues mensagem = new ContentValues();
                             mensagem.put("comando", 2);
@@ -264,9 +262,11 @@ public class OrcamentoProdutoMDFragment extends Fragment {
                             mensagem.put("mensagem", viewOrcamento.getResources().getString(R.string.nao_orcamento) + "\n"
                                     + viewOrcamento.getResources().getString(R.string.nao_pode_deletado));
                             // Executa a mensagem passando por parametro as propriedades
-                            funcoes.menssagem(mensagem);
-                        }
+                            funcoes.menssagem(mensagem);*/
 
+                            SuperToast.create(getContext(), getResources().getString(R.string.nao_orcamento) + "\n"
+                                              + viewOrcamento.getResources().getString(R.string.nao_pode_deletado), SuperToast.Duration.VERY_SHORT, Style.getStyle(Style.RED, SuperToast.Animations.FLYIN)).show();
+                        }
 
                         break;
 
@@ -332,7 +332,7 @@ public class OrcamentoProdutoMDFragment extends Fragment {
                 case R.id.menu_orcamento_tab_md_adicionar:
 
                     // Checa se eh um orcamento
-                    if (tipoOrcamentoPedido.equals("O")) {
+                    if ((tipoOrcamentoPedido.equalsIgnoreCase("O")) || (tipoOrcamentoPedido.equalsIgnoreCase("P"))) {
                         // Abre a tela que lista todos os produtos
                         Intent intentOrcamento = new Intent(getContext(), ProdutoListaMDActivity.class);
                         intentOrcamento.putExtra(ProdutoListaMDActivity.KEY_ID_ORCAMENTO, textCodigoOrcamento.getText().toString());
@@ -417,7 +417,7 @@ public class OrcamentoProdutoMDFragment extends Fragment {
                     onResume();
                     break;
 
-                case R.id.menu_orcamento_tab_md_salvar:
+                case R.id.menu_orcamento_tab_md_abrir_pdf:
 
                     try {
                         //ContentValues dadosOrcamento = new ContentValues();
@@ -429,10 +429,15 @@ public class OrcamentoProdutoMDFragment extends Fragment {
                         // Seta(envia) a lista de produtos do orcamento
                         gerarPdfSalvar.setListaItensOrcamento(adapterItemOrcamento.getListaItemOrcamento());
 
-                        gerarPdfSalvar.execute("");
+                        String caminhoPdf = gerarPdfSalvar.execute("").get();
 
-                        // Fecha a view
-                        //finish();
+                        File file = new File(caminhoPdf);
+                        Intent target = new Intent(Intent.ACTION_VIEW);
+                        target.setDataAndType(Uri.fromFile(file),"application/pdf");
+                        target.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+
+                        Intent intent = Intent.createChooser(target, "Abrir PDF do Orçamento/Pedido");
+                        startActivity(intent);
 
                     } catch (Exception e) {
                         //Log.i("thread", e.getMessage());
@@ -442,7 +447,7 @@ public class OrcamentoProdutoMDFragment extends Fragment {
                         ContentValues mensagem = new ContentValues();
                         mensagem.put("comando", 0);
                         mensagem.put("tela", "OrcamentoActivity");
-                        mensagem.put("mensagem", getActivity().getResources().getString(R.string.nao_foi_possivel_salvar_orcamento_pdf));
+                        mensagem.put("mensagem", getActivity().getResources().getString(R.string.nao_foi_possivel_salvar_orcamento_pdf) + "\n" + e.getMessage());
                         mensagem.put("dados", e.toString());
                         mensagem.put("usuario", funcoes.getValorXml("Usuario"));
                         mensagem.put("empresa", funcoes.getValorXml("ChaveEmpresa"));
@@ -573,7 +578,7 @@ public class OrcamentoProdutoMDFragment extends Fragment {
 
 
                     } else {
-                        ContentValues mensagem = new ContentValues();
+                        /*ContentValues mensagem = new ContentValues();
                         mensagem.put("comando", 2);
                         mensagem.put("tela", "OrcamentoActivity");
                         mensagem.put("mensagem", getActivity().getResources().getString(R.string.nao_orcamento) + "\n");
@@ -582,7 +587,9 @@ public class OrcamentoProdutoMDFragment extends Fragment {
                         FuncoesPersonalizadas funcoes;
 
                         funcoes = new FuncoesPersonalizadas(getActivity());
-                        funcoes.menssagem(mensagem);
+                        funcoes.menssagem(mensagem);*/
+
+                        SuperToast.create(getContext(), getResources().getString(R.string.nao_orcamento), SuperToast.Duration.VERY_SHORT, Style.getStyle(Style.RED, SuperToast.Animations.FLYIN)).show();
                     }
                     break;
 
@@ -597,7 +604,7 @@ public class OrcamentoProdutoMDFragment extends Fragment {
                         startActivityForResult(intent, SOLICITA_CLIENTE);
 
                     } else {
-                        ContentValues mensagem = new ContentValues();
+                        /*ContentValues mensagem = new ContentValues();
                         mensagem.put("comando", 2);
                         mensagem.put("tela", "OrcamentoFragment");
                         mensagem.put("mensagem", getActivity().getResources().getString(R.string.nao_orcamento) + "\n");
@@ -606,7 +613,9 @@ public class OrcamentoProdutoMDFragment extends Fragment {
                         FuncoesPersonalizadas funcoes;
 
                         funcoes = new FuncoesPersonalizadas(getActivity());
-                        funcoes.menssagem(mensagem);
+                        funcoes.menssagem(mensagem);*/
+
+                        SuperToast.create(getContext(), getResources().getString(R.string.nao_orcamento), SuperToast.Duration.VERY_SHORT, Style.getStyle(Style.RED, SuperToast.Animations.FLYIN)).show();
                     }
                     break;
 

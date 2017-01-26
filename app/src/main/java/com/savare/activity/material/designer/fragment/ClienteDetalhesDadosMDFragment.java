@@ -358,10 +358,10 @@ public class ClienteDetalhesDadosMDFragment extends Fragment {
 
         // Pega uma lista dos totais de venda por mes
         List<TotalMensal> listaTotalVendasCliente = orcamentoRotinas.listaTotalVendaMensalCliente(new String[]{OrcamentoRotinas.PEDIDO_ENVIADO,
-                        OrcamentoRotinas.PEDIDO_NAO_ENVIADO,
-                        OrcamentoRotinas.PEDIDO_FATURADO,
-                        OrcamentoRotinas.PEDIDO_RETORNADO_BLOQUEADO,
-                        OrcamentoRotinas.PEDIDO_RETORNADO_LIBERADO},
+                                                                                                    OrcamentoRotinas.PEDIDO_NAO_ENVIADO,
+                                                                                                    OrcamentoRotinas.PEDIDO_FATURADO,
+                                                                                                    OrcamentoRotinas.PEDIDO_RETORNADO_BLOQUEADO,
+                                                                                                    OrcamentoRotinas.PEDIDO_RETORNADO_LIBERADO},
 
                 "AEAORCAM.ID_CFACLIFO = " + idCliente,
 

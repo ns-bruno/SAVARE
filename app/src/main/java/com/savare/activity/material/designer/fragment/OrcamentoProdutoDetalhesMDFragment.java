@@ -1,7 +1,9 @@
 package com.savare.activity.material.designer.fragment;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.ContentValues;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -29,6 +31,7 @@ import com.github.johnpersano.supertoasts.util.Style;
 import com.savare.R;
 import com.savare.activity.material.designer.OrcamentoProdutoDetalhesTabFragmentMDActivity;
 import com.savare.adapter.ItemUniversalAdapter;
+import com.savare.banco.funcoesSql.ItemOrcamentoSql;
 import com.savare.beans.ItemOrcamentoBeans;
 import com.savare.beans.OrcamentoBeans;
 import com.savare.beans.PlanoPagamentoBeans;
@@ -451,6 +454,56 @@ public class OrcamentoProdutoDetalhesMDFragment extends Fragment {
 
                 SalvarDadosOrcamentoProduto salvarDadosORcamentoProduto = new SalvarDadosOrcamentoProduto();
                 salvarDadosORcamentoProduto.execute();
+                break;
+
+            case R.id.menu_orcamento_produto_detalhes_md_fragment_deletar:
+
+                if(this.produto.getEstaNoOrcamento() == '1'){
+
+                    AlertDialog.Builder builderConfirmacao = new AlertDialog.Builder(getActivity());
+                    builderConfirmacao.setMessage("Tem certeza que deseja excluir o(s) item(ns)?")
+                    .setPositiveButton(getContext().getResources().getString(R.string.sim), new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+
+                            // Instancia a classe para manipular os produto no banco de dados
+                            ItemOrcamentoSql itemOrcamentoSql = new ItemOrcamentoSql(getActivity());
+                            // Deleta o item
+                            if ((itemOrcamentoSql.delete("AEAITORC.ID_AEAITORC = " + idItemOrcamento)) > 0) {
+                                SuperToast.create(getContext(), getContext().getResources().getString(R.string.excluido_sucesso), SuperToast.Duration.SHORT, Style.getStyle(Style.GREEN, SuperToast.Animations.POPUP)).show();
+
+                                // Cria uma intent para returnar um valor para activity ProdutoLista
+                                Intent returnIntent = new Intent();
+                                returnIntent.putExtra("RESULTADO", '0');
+                                // Pega a posicao do deste produto na lista de produtos
+                                returnIntent.putExtra("POSICAO", posicao);
+                                returnIntent.putExtra("ID_AEAITORC", idItemOrcamento);
+
+                                // Checa se se quem chemou foi a tela de lista de de orçamento sem associacao de orcamento
+                                if ( (telaChamada != null) && (telaChamada.equalsIgnoreCase("ProdutoListaActivity")) ){
+                                    getActivity().setResult(101, returnIntent);
+                                } else {
+                                    getActivity().setResult(getActivity().RESULT_OK, returnIntent);
+                                }
+
+                                FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(getContext());
+                                funcoes.desbloqueiaOrientacaoTela();
+                                // Fecha a tela de detalhes de produto
+                                getActivity().finish();
+                            }
+                        }
+                    })
+                    .setNegativeButton(getContext().getResources().getString(R.string.nao), new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+
+                        }
+                    });
+                    // Create the AlertDialog object and return it
+                    builderConfirmacao.create();
+                    builderConfirmacao.show();
+                    // Envia os dados do produto para inserir no banco de dados
+                } else {
+                    SuperToast.create(getContext(), getContext().getResources().getString(R.string.produto_nao_esta_orcamento), SuperToast.Duration.SHORT, Style.getStyle(Style.RED, SuperToast.Animations.POPUP)).show();
+                }
                 break;
 
             default:

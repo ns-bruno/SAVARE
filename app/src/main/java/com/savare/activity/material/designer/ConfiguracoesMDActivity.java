@@ -253,7 +253,6 @@ public class ConfiguracoesMDActivity extends AppCompatActivity {
                                             + "LEFT OUTER JOIN CFACLIFO ON (CFAPARAM.ID_CFACLIFO = CFACLIFO.ID_CFACLIFO) \n"
                                             + "WHERE (CFACLIFO.CODIGO_FUN = " + codigoUsuario + ") AND (CFACLIFO.FUNCIONARIO = '1') AND (CFACLIFO.ID_SMAEMPRE = " + codigoEmpresa + "))";
                                     percentualSql.execSQL(sql);
-
                                 }
                             }
                         }
@@ -271,7 +270,7 @@ public class ConfiguracoesMDActivity extends AppCompatActivity {
                     }
                 }
 
-                // Checa s efoi preenchido alguma coisa
+                // Checa se foi preenchido alguma coisa
                 if(editMarkUpAtacado.getText().length() > 0){
 
                     if (markUpAtacado >= 0) {

@@ -111,6 +111,7 @@
     <string name="trocar_cliente">Trocar Cliente</string>
     <string name="plano_pagamento">Plano de Pagamento</string>
     <string name="enviar_email">Enviar e-Mail</string>
+    <string name="abrir_pdf">Abrir PDF</string>
     <string name="visualizar_logs">Visualizar logs</string>
     <string name="enviar_pedido_nuvem">Enviar Pedido para Nuvem</string>
     <string name="enviar_todos_pedidos_nuvem">Enviar Todos os Pedidos para Nuvem</string>
@@ -178,7 +179,7 @@
     <string name="orcamentos">Orçamentos</string>
     <string name="orcamento_pedido">Orçamento(s)/Pedido(s)</string>
     <string name="produtos">Produtos</string>
-    <string name="titulos">Títulos</string>
+    <string name="titulos">Títulos à Receber/Pagar</string>
     <string name="pedidos_a_enviar">Pedidos à Enviar</string>
     <string name="pedidos_enviados">Todos os Pedidos Enviados</string>
     <string name="lixeira">Lixeira</string>
@@ -258,6 +259,7 @@
     <string name="nome_login_invalido">Nome de login inválido, tente outro sem espaço e sem caracteres especiais.</string>
     <string name="tamanho_chave_nao_permitido">Tamanho da chave não é permitida</string>
     <string name="recebendo_dados">Aguarde, Recebendo os dados ...</string>
+    <string name="recebendo_dados_usuario">Aguarde, Recebendo os dados do Usuário ...</string>
     <string name="recebendo_dados_areas">Aguarde, Recebendo os dados da(s) Área(s) ...</string>
     <string name="recebendo_dados_empresa">Aguarde, Recebendo os dados da(s) Empresa(s) ...</string>
     <string name="recebendo_dados_atividade">Recebendo os dados da(s) Atividade(s)...</string>
@@ -320,6 +322,9 @@
     <string name="nao_retornou_dados_suficiente_para_continuar_comunicao_webservice">Não recebemos os dados primários para continuar a se comunicar com servidor em nuvem (Webservice).</string>
     <string name="nem_todos_pedidos_foram_enviados_tente_novamente">Nem todos os pedidos foram enviados. Atualize a lista e tente enviar novamente.</string>
     <string name="nao_conseguimos_verificar_titulos">Não conseguimos verificar os títulos a receber.</string>
+    <string name="produto_nao_esta_orcamento">Não achamos este produto no orçamento</string>
+    <string name="excluido_sucesso">Excluido com sucesso.</string>
+    <string name="nao_chegou_dados_servidor_empresa">Não chegou os dados do servidor da emrpesa</string>
 
     <string-array name="tab_produto_md">
         <item>Produtos</item>
@@ -331,7 +336,7 @@
     </string-array>
     <string-array name="tab_cliente_detalhes_md">
         <item>Dados Cliente</item>
-        <item>Grafico Vendas Mensal</item>
+        <item>Grafico Vendas Pedido/Dias</item>
     </string-array>
     <string-array name="tab_orcamento_md">
         <item>Orçamento</item>

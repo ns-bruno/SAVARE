@@ -47,11 +47,21 @@ public class EnviarDadosWebserviceAsyncRotinas  extends AsyncTask<Void, Void, Vo
     private TextView textStatus = null;
     private Calendar calendario;
     private String[] idOrcamentoSelecionado = null;
+    private OnTaskCompleted listenerTaskCompleted;
     // Cria uma notificacao para ser manipulado
     Load mLoad;
 
     public EnviarDadosWebserviceAsyncRotinas(Context context) {
         this.context = context;
+    }
+
+    public EnviarDadosWebserviceAsyncRotinas(OnTaskCompleted listenerTaskCompleted, Context context) {
+        this.listenerTaskCompleted = listenerTaskCompleted;
+        this.context = context;
+    }
+
+    public interface OnTaskCompleted{
+        void onTaskCompleted();
     }
 
     public void setTabelaEnviarDados(String[] tabelaEnviarDados) {this.tabelaEnviarDados = tabelaEnviarDados; }
@@ -163,13 +173,18 @@ public class EnviarDadosWebserviceAsyncRotinas  extends AsyncTask<Void, Void, Vo
         // Marca que a aplicacao esta recebendo dados
         funcoes.setValorXml("EnviandoDados", "N");
 
+        // Checa se a interface de retorno do asynctask eh diferente de nula
+        if (listenerTaskCompleted != null) {
+            listenerTaskCompleted.onTaskCompleted();
+        }
+
         // Cria uma notificacao para ser manipulado
         PugNotification.with(context)
                 .load()
                 .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_ENVIAR_DADOS)
                 .title(R.string.enviar_pedido_nuvem)
-                .message(context.getResources().getString(R.string.terminamos_enviar_dados))
-                //.bigTextStyle(context.getResources().getString(R.string.atualizado_sucesso))
+                //.message(context.getResources().getString(R.string.terminamos_enviar_dados))
+                .bigTextStyle(context.getResources().getString(R.string.terminamos_enviar_dados))
                 .smallIcon(R.mipmap.ic_launcher)
                 .largeIcon(R.mipmap.ic_launcher)
                 .flags(Notification.DEFAULT_LIGHTS)

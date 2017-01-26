@@ -188,7 +188,7 @@ public class GerarPdfRotinas {
             c1.setBackgroundColor(BaseColor.LIGHT_GRAY);
             tabela.addCell(c1);
 
-            c1 = new PdfPCell(new Phrase("Emb.", smallBold));
+            c1 = new PdfPCell(new Phrase("Unid.", smallBold));
             c1.setHorizontalAlignment(Element.ALIGN_CENTER);
             c1.setBackgroundColor(BaseColor.LIGHT_GRAY);
             tabela.addCell(c1);
@@ -198,7 +198,7 @@ public class GerarPdfRotinas {
 	 	    c1.setBackgroundColor(BaseColor.LIGHT_GRAY);
 	 	    tabela.addCell(c1);
 	
-	 	    c1 = new PdfPCell(new Phrase("Pr. de Venda", smallBold));
+	 	    c1 = new PdfPCell(new Phrase("Pr. Unid.", smallBold));
 	 	    c1.setHorizontalAlignment(Element.ALIGN_RIGHT);
 	 	    c1.setBackgroundColor(BaseColor.LIGHT_GRAY);
 	 	    tabela.addCell(c1);

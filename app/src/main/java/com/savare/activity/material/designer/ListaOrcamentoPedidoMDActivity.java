@@ -843,7 +843,12 @@ public class ListaOrcamentoPedidoMDActivity extends AppCompatActivity{
 
             case R.id.menu_lista_orcamento_md_enviar_todos_pedidos:
 
-                EnviarDadosWebserviceAsyncRotinas enviarDadosWebservice = new EnviarDadosWebserviceAsyncRotinas(ListaOrcamentoPedidoMDActivity.this);
+                EnviarDadosWebserviceAsyncRotinas enviarDadosWebservice = new EnviarDadosWebserviceAsyncRotinas(new EnviarDadosWebserviceAsyncRotinas.OnTaskCompleted() {
+                    @Override
+                    public void onTaskCompleted() {
+                        carregarListaCidade();
+                    }
+                }, ListaOrcamentoPedidoMDActivity.this);
                 enviarDadosWebservice.setTextStatus(textTotal);
                 enviarDadosWebservice.setProgressBarStatus(progressBarStatus);
                 enviarDadosWebservice.execute();

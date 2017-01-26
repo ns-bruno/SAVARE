@@ -525,7 +525,7 @@ public class OrcamentoRotinas extends Rotinas {
 		try {
 			String sql = "SELECT AEAORCAM.ID_CFACLIFO, STRFTIME('%d', AEAORCAM.DT_CAD) AS DIA, AEAORCAM.DT_CAD, AEAORCAM.FC_VL_TOTAL, AEAORCAM.FC_VL_TOTAL_FATURADO " +
 						 "FROM AEAORCAM " +
-						 "WHERE (AEAORCAM.STATUS = 'P' OR AEAORCAM.STATUS = 'N') " +
+						 "WHERE ( (AEAORCAM.STATUS = 'N')  OR (AEAORCAM.STATUS = 'P')  OR (AEAORCAM.STATUS = 'F')  OR (AEAORCAM.STATUS = 'RB')  OR (AEAORCAM.STATUS = 'RL') ) " +
 						 " AND (AEAORCAM.ID_CFACLIFO = " + idClifo + ") ";
 
 			if (mes != null){
@@ -657,7 +657,7 @@ public class OrcamentoRotinas extends Rotinas {
 			ContentValues mensagem = new ContentValues();
 			mensagem.put("comando", 1);
 			mensagem.put("tela", "OrcamentoRotinas");
-			mensagem.put("mensagem", "N�o foi poss�vel pegar o total mensal dos pedidos. \n" + e.getMessage());
+			mensagem.put("mensagem", "Não foi possível pegar o total mensal dos pedidos. \n" + e.getMessage());
 			
 			// Executa a mensagem passando por parametro as propriedades
 			funcoes.menssagem(mensagem);

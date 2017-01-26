@@ -42,44 +42,76 @@ public class WSSisinfoWebservice {
     private Context context;
     private DispositivoBeans dispositivoBeans;
     public static final String FUNCTION_SELECT_USUARIO_USUA = "selectUsuario";
+    public static final String FUNCTION_JSON_SELECT_USUARIO_USUA = "/savare/selectUsuario";
     public static final String FUNCTION_SELECT_VERSAO_SAVARE = "selectVersaoSavare";
     public static final String FUNCTION_JSON_SELECT_VERSAO_SAVARE = "/savare/selectVersaoSavare";
     public static final String FUNCTION_SELECT_ULTIMA_ATUALIZACAO = "selectUltimaAtualizacao";
     public static final String FUNCTION_INSERT_ULTIMA_ATUALIZACAO = "insertUltimaAtualizacao";
     public static final String FUNCTION_SELECT_CFAAREAS = "selectAreas";
+    public static final String FUNCTION_JSON_SELECT_CFAAREAS = "/clienteFornecedor/selectAreas";
     public static final String FUNCTION_SELECT_SMAEMPRE = "selectEmpresa";
+    public static final String FUNCTION_JSON_SELECT_SMAEMPRE = "/sistema/selectEmpresa";
     public static final String FUNCTION_SELECT_CFAATIVI = "selectRamoAtividade";
+    public static final String FUNCTION_JSON_SELECT_CFAATIVI = "/clienteFornecedor/selectRamoAtividade";
     public static final String FUNCTION_SELECT_CFASTATU = "selectStatusClifo";
+    public static final String FUNCTION_JSON_SELECT_CFASTATU = "/clienteFornecedor/selectStatusClifo";
     public static final String FUNCTION_SELECT_CFATPDOC = "selectTipoDocumento";
+    public static final String FUNCTION_JSON_SELECT_CFATPDOC = "/clienteFornecedor/selectTipoDocumento";
     public static final String FUNCTION_SELECT_CFACCRED = "selectCartaoCredito";
+    public static final String FUNCTION_JSON_SELECT_CFACCRED = "/clienteFornecedor/selectCartaoCredito";
     public static final String FUNCTION_SELECT_CFAPORTA = "selectPortador";
+    public static final String FUNCTION_JSON_SELECT_CFAPORTA = "/clienteFornecedor/selectPortador";
     public static final String FUNCTION_SELECT_CFAPROFI = "selectProfissao";
+    public static final String FUNCTION_JSON_SELECT_CFAPROFI = "/clienteFornecedor/selectProfissao";
     public static final String FUNCTION_SELECT_CFATPCLI = "selectTipoCliente";
+    public static final String FUNCTION_JSON_SELECT_CFATPCLI = "/clienteFornecedor/selectTipoCliente";
     public static final String FUNCTION_SELECT_CFATPCOB = "selectTipoCobranca";
+    public static final String FUNCTION_JSON_SELECT_CFATPCOB = "/clienteFornecedor/selectTipoCobranca";
     public static final String FUNCTION_SELECT_CFAESTAD = "selectEstado";
+    public static final String FUNCTION_JSON_SELECT_CFAESTAD = "/clienteFornecedor/selectEstado";
     public static final String FUNCTION_SELECT_CFACIDAD = "selectCidade";
+    public static final String FUNCTION_JSON_SELECT_CFACIDAD = "/clienteFornecedor/selectCidade";
     public static final String FUNCTION_SELECT_CFACLIFO = "selectClienteFornecedor";
+    public static final String FUNCTION_JSON_SELECT_CFACLIFO = "/clienteFornecedor/selectClienteFornecedor";
     public static final String FUNCTION_SELECT_CFAENDER = "selectEndereco";
+    public static final String FUNCTION_JSON_SELECT_CFAENDER = "/clienteFornecedor/selectEndereco";
     public static final String FUNCTION_SELECT_CFAPARAM = "selectParametro";
+    public static final String FUNCTION_JSON_SELECT_CFAPARAM = "/clienteFornecedor/selectParametro";
     public static final String FUNCTION_SELECT_CFAFOTOS = "selectFotos";
+    public static final String FUNCTION_JSON_SELECT_CFAFOTOS = "clienteFornecedor/selectFotos";
     public static final String FUNCTION_SELECT_AEAPLPGT = "selectPlanoPagamento";
+    public static final String FUNCTION_JSON_SELECT_AEAPLPGT = "/estoque/selectPlanoPagamento";
     public static final String FUNCTION_SELECT_AEACLASE = "selectClasseProdutos";
+    public static final String FUNCTION_JSON_SELECT_AEACLASE = "/estoque/selectClasseProdutos";
     public static final String FUNCTION_SELECT_AEAUNVEN = "selectUnidadeVenda";
+    public static final String FUNCTION_JSON_SELECT_AEAUNVEN = "/estoque/selectUnidadeVenda";
     public static final String FUNCTION_SELECT_AEAGRADE = "selectGrade";
+    public static final String FUNCTION_JSON_SELECT_AEAGRADE = "/estoque/selectGrade";
     public static final String FUNCTION_SELECT_AEAMARCA = "selectMarca";
+    public static final String FUNCTION_JSON_SELECT_AEAMARCA = "/estoque/selectMarca";
     public static final String FUNCTION_SELECT_AEACODST = "selectCodigoSituacaoTributaria";
+    public static final String FUNCTION_JSON_SELECT_AEACODST = "/estoque/selectCodigoSituacaoTributaria";
     public static final String FUNCTION_SELECT_AEAPRODU = "selectProduto";
+    public static final String FUNCTION_JSON_SELECT_AEAPRODU = "/estoque/selectProduto";
     public static final String FUNCTION_SELECT_AEAEMBAL = "selectEmbalagemProduto";
+    public static final String FUNCTION_JSON_SELECT_AEAEMBAL = "/estoque/selectEmbalagemProduto";
     public static final String FUNCTION_SELECT_AEAPLOJA = "selectProdutoPorLoja";
+    public static final String FUNCTION_JSON_SELECT_AEAPLOJA = "/estoque/selectProdutoPorLoja";
     public static final String FUNCTION_SELECT_AEALOCES = "selectLocalEstoque";
+    public static final String FUNCTION_JSON_SELECT_AEALOCES = "/estoque/selectLocalEstoque";
     public static final String FUNCTION_SELECT_AEAESTOQ = "selectEstoque";
+    public static final String FUNCTION_JSON_SELECT_AEAESTOQ = "/estoque/selectEstoque";
     public static final String FUNCTION_SELECT_AEAORCAM = "selectOrcamento";
     public static final String FUNCTION_JSON_SELECT_AEAORCAM = "/orcamento/selectOrcamento";
     public static final String FUNCTION_SELECT_AEAITORC = "selectItemOrcamento";
     public static final String FUNCTION_SELECT_AEAPERCE = "selectPercentual";
+    public static final String FUNCTION_JSON_SELECT_AEAPERCE = "/estoque/selectPercentual";
     public static final String FUNCTION_SELECT_AEAFATOR = "selectFator";
+    public static final String FUNCTION_JSON_SELECT_AEAFATOR = "/estoque/selectFator";
     public static final String FUNCTION_SELECT_AEAPRREC = "selectProdutoRecomendado";
+    public static final String FUNCTION_JSON_SELECT_AEAPRREC = "/estoque/selectProdutoRecomendado";
     public static final String FUNCTION_SELECT_RPAPARCE = "selectParcelas";
+    public static final String FUNCTION_JSON_SELECT_RPAPARCE = "/receberPagar/selectParcelas";
     public static final String FUNCTION_INSERT_AEAORCAM = "insertOrcamento";
     public static final String FUNCTION_JSON_INSERT_AEAORCAM = "/orcamento/insertOrcamento";
     public static final String FUNCTION_INSERT_AEAITORC = "insertItemOrcamento";
@@ -412,6 +444,22 @@ public class WSSisinfoWebservice {
                 buffeLeitura.close();
 
                 retorno = dadosWebservice.toString();
+            }
+
+            if (codigoResp == 404){
+                // Armazena as informacoes para para serem exibidas e enviadas
+                final ContentValues contentValues = new ContentValues();
+                contentValues.put("comando", 0);
+                contentValues.put("tela", "WSSisInfoWebservice");
+                contentValues.put("mensagem", "Erro: 404. \nEndereço dos dados está errado. Tente novamente mais tarde, caso persista o erro entre em contato com suporte SAVARE");
+                contentValues.put("dados", conexaoHttp.toString());
+
+                final FuncoesPersonalizadas finalFuncoes = funcoes;
+                ((Activity) context).runOnUiThread(new Runnable() {
+                    public void run() {
+                        finalFuncoes.menssagem(contentValues);
+                    }
+                });
             }
 
             if (codigoResp == 500){

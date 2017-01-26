@@ -118,7 +118,8 @@
                         android:gravity="center_vertical|right"
                         android:inputType="numberDecimal"
                         android:digits="0123456789."
-                        android:maxLines="1" >
+                        android:maxLines="1"
+                        android:enabled="false">
                     </EditText>
                 </LinearLayout>
 
@@ -143,7 +144,8 @@
                         android:gravity="right"
                         android:inputType="numberDecimal"
                         android:digits="0123456789."
-                        android:maxLines="1" >
+                        android:maxLines="1"
+                        android:enabled="false">
                     </EditText>
                 </LinearLayout>
 

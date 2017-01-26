@@ -9,4 +9,11 @@
         android:title="@string/salvar"
         app:showAsAction="always" />
 
+    <item
+        android:id="@+id/menu_orcamento_produto_detalhes_md_fragment_deletar"
+        android:orderInCategory="0"
+        android:icon="@mipmap/ic_content_save_dark"
+        android:title="@string/deletar"
+        app:showAsAction="never" />
+
 </menu>
