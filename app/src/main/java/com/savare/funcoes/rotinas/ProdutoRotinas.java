@@ -76,16 +76,19 @@ public class ProdutoRotinas extends Rotinas {
 		return lista;
 	} // Fim listaClasse
 
-	public List<CidadeBeans> listaCidadesMaisVendidos(){
+	public List<CidadeBeans> listaCidadesMaisVendidos(String where){
 		// Cria uma lista para retornar as cidades
 		List<CidadeBeans> listaCidade = new ArrayList<CidadeBeans>();
 
-		String sql = "SELECT CFACIDAD.ID_CFACIDAD, CFACIDAD.ID_CFAESTAD, CFACIDAD.DESCRICAO AS DESCRICAO_CIDADE " +
+		String sql = "SELECT CFACIDAD.ID_CFACIDAD, CFACIDAD.ID_CFAESTAD, CFACIDAD.DESCRICAO AS DESCRICAO_CIDADE \n" +
 					 "FROM AEAPRREC \n" +
 					 "LEFT OUTER JOIN CFACIDAD CFACIDAD \n" +
 					 "ON(AEAPRREC.ID_CFACIDAD = CFACIDAD.ID_CFACIDAD) \n" +
-					 "WHERE (AEAPRREC.ID_CFACIDAD IS NOT NULL)";
+					 "WHERE (AEAPRREC.ID_CFACIDAD IS NOT NULL) AND (AEAPRREC.ID_CFACIDAD <> '') ";
 
+		if ((where != null) && (!where.isEmpty()) ){
+			sql += "AND " + where;
+		}
 		// Instancia a classe para manipular o banco de dados
 		ProdutoRecomendadoSql produtoRecomendadoSql = new ProdutoRecomendadoSql(context);
 		// Executa a funcao para retornar os registro do banco de dados
@@ -214,7 +217,8 @@ public class ProdutoRotinas extends Rotinas {
 					+ "(SELECT SMAEMPRE.QTD_CASAS_DECIMAIS FROM SMAEMPRE WHERE SMAEMPRE.ID_SMAEMPRE = " + idEmpresa + ")) AS VENDA_VARE_FINAL, "
 
                     + "SMAEMPRE.QTD_DIAS_DESTACA_PRODUTO, "
-					+ "AEAPLOJA.PROMOCAO_ATAC, AEAPLOJA.PROMOCAO_VARE,"
+					+ "AEAPLOJA.PROMOCAO_ATAC_VISTA, AEAPLOJA.PROMOCAO_VARE_VISTA,"
+					+ "AEAPLOJA.PROMOCAO_ATAC_PRAZO, AEAPLOJA.PROMOCAO_VARE_PRAZO,"
 					+ "AEAPLOJA.CT_REPOSICAO_N, AEAPLOJA.CT_COMPLETO_N, "
 					+ "AEAPLOJA.ESTOQUE_F ESTOQUE_FISICO, AEAPLOJA.ESTOQUE_C ESTOQUE_CONTABIL, "
 					+ "AEACLASE.CODIGO AS CODIGO_CLASE, AEACLASE.DESCRICAO AS DESCRICAO_CLASE, AEAPRODU.PESO_BRUTO, AEAPRODU.PESO_LIQUIDO \n"
@@ -234,7 +238,8 @@ public class ProdutoRotinas extends Rotinas {
 
 		if (tipoTela == ProdutoListaMDFragment.TELA_MAIS_VENDIDOS_CIDADE){
 
-			if ((filtro != null) && (filtro.getAsString(String.valueOf(ProdutoListaMDFragment.TELA_MAIS_VENDIDOS_CIDADE)) != null) &&
+			if ((filtro != null) &&
+					(filtro.getAsString(String.valueOf(ProdutoListaMDFragment.TELA_MAIS_VENDIDOS_CIDADE)) != null) &&
 					(filtro.getAsString(String.valueOf(ProdutoListaMDFragment.TELA_MAIS_VENDIDOS_CIDADE)).length() > 0)) {
 
 				sql += " AND ( AEAPRREC.ID_CFACIDAD = " + filtro.getAsString(String.valueOf(ProdutoListaMDFragment.TELA_MAIS_VENDIDOS_CIDADE)) + " ) ";
@@ -363,8 +368,10 @@ public class ProdutoRotinas extends Rotinas {
 					produtoLista.setValorTabelaVarejo(cursor.getDouble(cursor.getColumnIndex("VENDA_VARE_TABELA")));
 					produtoLista.setValorUnitarioAtacado(cursor.getDouble(cursor.getColumnIndex("VENDA_ATAC_FINAL")));
 					produtoLista.setValorUnitarioVarejo(cursor.getDouble(cursor.getColumnIndex("VENDA_VARE_FINAL")));
-					produtoLista.setValorPromocaoAtacado(cursor.getDouble(cursor.getColumnIndex("PROMOCAO_ATAC")));
-					produtoLista.setValorPromocaoVarejo(cursor.getDouble(cursor.getColumnIndex("PROMOCAO_VARE")));
+					produtoLista.setValorPromocaoAtacadoVista(cursor.getDouble(cursor.getColumnIndex("PROMOCAO_ATAC_VISTA")));
+					produtoLista.setValorPromocaoAtacadoPrazo(cursor.getDouble(cursor.getColumnIndex("PROMOCAO_ATAC_PRAZO")));
+					produtoLista.setValorPromocaoVarejoVista(cursor.getDouble(cursor.getColumnIndex("PROMOCAO_VARE_VISTA")));
+					produtoLista.setValorPromocaoVarejoPrazo(cursor.getDouble(cursor.getColumnIndex("PROMOCAO_VARE_PRAZO")));
 					produtoLista.setCustoReposicaoN(cursor.getDouble(cursor.getColumnIndex("CT_REPOSICAO_N")));
 					produtoLista.setCustoCompleto(cursor.getDouble(cursor.getColumnIndex("CT_COMPLETO_N")));
 					produtoLista.setEstoqueFisico(cursor.getDouble(cursor.getColumnIndex("ESTOQUE_FISICO")));
@@ -480,7 +487,8 @@ public class ProdutoRotinas extends Rotinas {
 				   + "(IFNULL((SELECT AEAPERCE.MARKUP_VARE FROM AEAPERCE LEFT OUTER JOIN CFAPARAM ON(AEAPERCE.ID_CFAPARAM_VENDEDOR = CFAPARAM.ID_CFAPARAM) "
 				   + "LEFT OUTER JOIN CFACLIFO ON(CFAPARAM.ID_CFACLIFO = CFACLIFO.ID_CFACLIFO) WHERE CFACLIFO.CODIGO_FUN = " + codigoVendedor + "), 0)/100)), 3) AS VENDA_VARE_FINAL, "
                    + "SMAEMPRE.QTD_DIAS_DESTACA_PRODUTO, "
-				   + "AEAPLOJA.PROMOCAO_ATAC, AEAPLOJA.PROMOCAO_VARE,"
+				   + "AEAPLOJA.PROMOCAO_ATAC_VISTA, AEAPLOJA.PROMOCAO_VARE_VISTA, "
+				   + "AEAPLOJA.PROMOCAO_ATAC_PRAZO, AEAPLOJA.PROMOCAO_VARE_PRAZO, "
 				   + "AEAPLOJA.CT_REPOSICAO_N, AEAPLOJA.CT_COMPLETO_N, "
 				   + "AEAPLOJA.ESTOQUE_F ESTOQUE_FISICO, AEAPLOJA.ESTOQUE_C ESTOQUE_CONTABIL, "
 				   + "AEACLASE.CODIGO AS CODIGO_CLASE, AEACLASE.DESCRICAO AS DESCRICAO_CLASE, AEAPRODU.PESO_BRUTO, AEAPRODU.PESO_LIQUIDO ";
@@ -598,8 +606,11 @@ public class ProdutoRotinas extends Rotinas {
 					produtoLista.setValorTabelaVarejo(cursor.getDouble(cursor.getColumnIndex("VENDA_VARE_TABELA")));
 					produtoLista.setValorUnitarioAtacado(cursor.getDouble(cursor.getColumnIndex("VENDA_ATAC_FINAL")));
 					produtoLista.setValorUnitarioVarejo(cursor.getDouble(cursor.getColumnIndex("VENDA_VARE_FINAL")));
-					produtoLista.setValorPromocaoAtacado(cursor.getDouble(cursor.getColumnIndex("PROMOCAO_ATAC")));
-					produtoLista.setValorPromocaoVarejo(cursor.getDouble(cursor.getColumnIndex("PROMOCAO_VARE")));
+					produtoLista.setValorPromocaoAtacadoVista(cursor.getDouble(cursor.getColumnIndex("PROMOCAO_ATAC_VISTA")));
+					produtoLista.setValorPromocaoAtacadoPrazo(cursor.getDouble(cursor.getColumnIndex("PROMOCAO_ATAC_PRAZO")));
+					produtoLista.setValorPromocaoVarejoVista(cursor.getDouble(cursor.getColumnIndex("PROMOCAO_VARE_VISTA")));
+					produtoLista.setValorPromocaoVarejoPrazo(cursor.getDouble(cursor.getColumnIndex("PROMOCAO_VARE_PRAZO")));
+
 					produtoLista.setCustoReposicaoN(cursor.getDouble(cursor.getColumnIndex("CT_REPOSICAO_N")));
 					produtoLista.setCustoCompleto(cursor.getDouble(cursor.getColumnIndex("CT_COMPLETO_N")));
 					produtoLista.setEstoqueFisico(cursor.getDouble(cursor.getColumnIndex("ESTOQUE_FISICO")));
@@ -668,7 +679,7 @@ public class ProdutoRotinas extends Rotinas {
                                         "AEAUNVEN.SIGLA AS SIGLA_UNVEN, AEAUNVEN.DESCRICAO_SINGULAR AS DESCRICAO_SINGULAR_UNVEN, AEAUNVEN.DECIMAIS AS DECIMAIS_UNVEN \n" +
                                         "FROM AEAEMBAL \n" +
                                         "LEFT OUTER JOIN AEAUNVEN ON(AEAEMBAL.ID_AEAUNVEN = AEAUNVEN.ID_AEAUNVEN) \n" +
-                                        "WHERE (AEAEMBAL.ID_AEAPRODU = " + produto.getIdProduto() + ")");
+                                        "WHERE (AEAEMBAL.ATIVO = '1') AND (AEAEMBAL.ID_AEAPRODU = " + produto.getIdProduto() + ")");
 
                         // Verifica se retornou algum registro
                         if ((cursorEmbalagem != null) && (cursorEmbalagem.getCount() > 0)) {

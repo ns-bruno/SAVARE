@@ -66,7 +66,7 @@ public class OrcamentoProdutoDetalhesMDFragment extends Fragment {
             editTotal,
             editObservacao;
     private ProgressBar progressStatus;
-    private String telaChamada = "", razaoSocial, atacadoVarejo = "0";
+    private String telaChamada = "", razaoSocial, atacadoVarejo = "0", vistaPrazo = "0";
     private int idProduto = -1,
             idOrcamento = -1,
             idPessoa = -1,
@@ -390,14 +390,18 @@ public class OrcamentoProdutoDetalhesMDFragment extends Fragment {
                 // Verifica se a venda eh do atacado
                 if(atacadoVarejo.equalsIgnoreCase("0")){
 
-                    // Armazena o valor final do produto de acordo com o plano de pagamento selecionado
-                    valorUnitarioVendaAux = carregarDadosPlanoPagamento(produto.getValorUnitarioAtacado(), produto.getValorPromocaoAtacado(), '0');
+                    if (vistaPrazo.equalsIgnoreCase("0")) {
+                        // Armazena o valor final do produto de acordo com o plano de pagamento selecionado
+                        valorUnitarioVendaAux = carregarDadosPlanoPagamento(produto.getValorUnitarioAtacado(), produto.getValorPromocaoAtacadoVista(), '0');
+                    } else {
+                        valorUnitarioVendaAux = carregarDadosPlanoPagamento(produto.getValorUnitarioAtacado(), produto.getValorPromocaoAtacadoPrazo(), '0');
+                    }
 
                     // Preence o campo com o valor do produto
                     editUnitarioLiquidoVenda.setText(funcoes.arredondarValor(valorUnitarioVendaAux));
 
                     // Verifica se tem preco de promocao
-                    if(produto.getValorPromocaoAtacado() > 0){
+                    if((vistaPrazo.equalsIgnoreCase("0") && produto.getValorPromocaoAtacadoVista() > 0) || (vistaPrazo.equalsIgnoreCase("1") && produto.getValorPromocaoAtacadoPrazo() > 0)){
                         // Muda a cor do fundo para destacar que eh promocao
                         spinnerPlanoPagamentoPreco.setBackgroundColor(getResources().getColor(R.color.amarelo));
                     }
@@ -405,14 +409,18 @@ public class OrcamentoProdutoDetalhesMDFragment extends Fragment {
                     // Verifica se a venda eh do varejo
                 }else if(atacadoVarejo.equalsIgnoreCase("1")){
 
-                    // Armazena o valor final do produto de acordo com o plano de pagamento selecionado
-                    valorUnitarioVendaAux = carregarDadosPlanoPagamento(produto.getValorUnitarioVarejo(), produto.getValorPromocaoVarejo(), '1');
+                    if (vistaPrazo.equalsIgnoreCase("0")) {
+                        // Armazena o valor final do produto de acordo com o plano de pagamento selecionado
+                        valorUnitarioVendaAux = carregarDadosPlanoPagamento(produto.getValorUnitarioVarejo(), produto.getValorPromocaoVarejoVista(), '1');
+                    } else {
+                        valorUnitarioVendaAux = carregarDadosPlanoPagamento(produto.getValorUnitarioVarejo(), produto.getValorPromocaoVarejoPrazo(), '1');
+                    }
 
                     // Preence o campo com o valor do produto
                     editUnitarioLiquidoVenda.setText(funcoes.arredondarValor(valorUnitarioVendaAux));
 
                     // Verifica se tem preco de promocao
-                    if(produto.getValorPromocaoVarejo() > 0){
+                    if( (vistaPrazo.equalsIgnoreCase("0") && produto.getValorPromocaoVarejoVista() > 0) || (vistaPrazo.equalsIgnoreCase("1") && produto.getValorPromocaoVarejoPrazo() > 0)){
                         // Muda a cor do fundo para destacar que eh promocao
                         spinnerPlanoPagamentoPreco.setBackgroundColor(getResources().getColor(R.color.amarelo));
                     }
@@ -677,15 +685,18 @@ public class OrcamentoProdutoDetalhesMDFragment extends Fragment {
         // Verifica se a venda eh do atacado
         if(String.valueOf(produtoVenda.getAtacadoVarejo()).equals("0")){
 
-            // Armazena o valor final do produto de acordo com o plano de pagamento selecionado
-            valorUnitarioVendaAux = carregarDadosPlanoPagamento(produtoVenda.getValorUnitarioAtacado(), produtoVenda.getValorPromocaoAtacado(), '0');
-
+            if (vistaPrazo.equalsIgnoreCase("0")) {
+                // Armazena o valor final do produto de acordo com o plano de pagamento selecionado
+                valorUnitarioVendaAux = carregarDadosPlanoPagamento(produtoVenda.getValorUnitarioAtacado(), produtoVenda.getValorPromocaoAtacadoVista(), '0');
+            } else {
+                valorUnitarioVendaAux = carregarDadosPlanoPagamento(produtoVenda.getValorUnitarioAtacado(), produtoVenda.getValorPromocaoAtacadoPrazo(), '0');
+            }
 
             // Preence o campo com o valor do produto
             editUnitarioLiquidoVenda.setText(funcoes.arredondarValor(valorUnitarioVendaAux));
 
             // Verifica se tem preco de promocao
-            if(produtoVenda.getValorPromocaoAtacado() > 0){
+            if ( (vistaPrazo.equalsIgnoreCase("0") && produto.getValorPromocaoAtacadoVista() > 0) || (vistaPrazo.equalsIgnoreCase("1") && produto.getValorPromocaoAtacadoPrazo() > 0) ){
                 // Muda a cor do fundo para destacar que eh promocao
                 spinnerPlanoPagamentoPreco.setBackgroundColor(getResources().getColor(R.color.amarelo));
             }
@@ -693,14 +704,18 @@ public class OrcamentoProdutoDetalhesMDFragment extends Fragment {
             // Verifica se a venda eh do varejo
         }else if(String.valueOf(produtoVenda.getAtacadoVarejo()).equals("1")){
 
-            // Armazena o valor final do produto de acordo com o plano de pagamento selecionado
-            valorUnitarioVendaAux = carregarDadosPlanoPagamento(produtoVenda.getValorUnitarioVarejo(), produtoVenda.getValorPromocaoVarejo(), '1');
+            if (vistaPrazo.equalsIgnoreCase("0")) {
+                // Armazena o valor final do produto de acordo com o plano de pagamento selecionado
+                valorUnitarioVendaAux = carregarDadosPlanoPagamento(produtoVenda.getValorUnitarioVarejo(), produtoVenda.getValorPromocaoVarejoVista(), '1');
+            }else {
+                valorUnitarioVendaAux = carregarDadosPlanoPagamento(produtoVenda.getValorUnitarioVarejo(), produtoVenda.getValorPromocaoVarejoPrazo(), '1');
+            }
 
             // Preence o campo com o valor do produto
             editUnitarioLiquidoVenda.setText(funcoes.arredondarValor(valorUnitarioVendaAux));
 
             // Verifica se tem preco de promocao
-            if(produtoVenda.getValorPromocaoVarejo() > 0){
+            if ( (vistaPrazo.equalsIgnoreCase("0") && produto.getValorPromocaoVarejoVista() > 0) || (vistaPrazo.equalsIgnoreCase("1") && produto.getValorPromocaoVarejoPrazo() > 0) ){
                 // Muda a cor do fundo para destacar que eh promocao
                 spinnerPlanoPagamentoPreco.setBackgroundColor(getResources().getColor(R.color.amarelo));
             }

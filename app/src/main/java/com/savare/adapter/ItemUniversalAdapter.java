@@ -3,6 +3,7 @@ package com.savare.adapter;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.view.LayoutInflater;
@@ -24,6 +25,7 @@ import com.savare.activity.material.designer.ListaOrcamentoPedidoMDActivity;
 import com.savare.activity.material.designer.ProdutoDetalhesMDActivity;
 import com.savare.beans.AreaBeans;
 import com.savare.beans.CidadeBeans;
+import com.savare.beans.CriticaOrcamentoBeans;
 import com.savare.beans.DescricaoDublaBeans;
 import com.savare.beans.EmbalagemBeans;
 import com.savare.beans.EstadoBeans;
@@ -74,11 +76,12 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 							AREA = 20,
 							CIDADE_DARK = 21,
 							CLIENTE = 22,
-							HISTORICO_PRECO_ITEM_ORCAMENTO = 23;
+							HISTORICO_PRECO_ITEM_ORCAMENTO = 23,
+							CRITICA_ORCAMENTO = 24;
 	private Context context;
 	private int tipoItem, diasProdutoNovo;
 	private int campoAtualProduto = -1;
-	private String atacadoVarejo, idOrcamento, ATACADO = "0";
+	private String atacadoVarejo, idOrcamento, ATACADO = "0", vistaPrazo = "0";
 	private List<ItemOrcamentoBeans> listaItemOrcamento; // Lista de produtos dentro do orcamento
 	private List<ProdutoListaBeans> listaProduto; // Lista de produtos para venda
 	private List<TipoDocumentoBeans> listaTipoDocumento;
@@ -98,6 +101,7 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 	private List<StatusBeans> listaStatus;
 	private List<AreaBeans> listaArea;
 	private List<PessoaBeans> listaPessoa;
+	private List<CriticaOrcamentoBeans> listaCriticaOrcamento;
 	private FuncoesPersonalizadas funcoes;
 	
 	/**
@@ -239,7 +243,10 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 	public void setAtacadoVarejo(String atacadoVarejo) {
 		this.atacadoVarejo = atacadoVarejo;
 	}
-	
+
+	public String getVistaPrazo() {return vistaPrazo;}
+
+	public void setVistaPrazo(String vistaPrazo) {this.vistaPrazo = vistaPrazo;}
 
 	/**
 	 * @return the idOrcamento
@@ -430,6 +437,10 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 		this.listaPessoa = listaPessoa;
 	}
 
+	public List<CriticaOrcamentoBeans> getListaCriticaOrcamento() {return listaCriticaOrcamento; }
+
+	public void setListaCriticaOrcamento(List<CriticaOrcamentoBeans> listaCriticaOrcamento) {this.listaCriticaOrcamento = listaCriticaOrcamento;}
+
 	@Override
 	public int getCount() {
 		// Verifica o tipo de item
@@ -506,6 +517,9 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 		} else if (this.tipoItem == CLIENTE){
 
 			return this.listaPessoa.size();
+		} else if (this.tipoItem == CRITICA_ORCAMENTO){
+
+			return this.listaCriticaOrcamento.size();
 		} else{
 			return 0;
 		}
@@ -590,6 +604,10 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 
 			return this.listaPessoa.get(position);
 
+		} else if (this.tipoItem == CRITICA_ORCAMENTO){
+
+			return this.listaCriticaOrcamento.get(position);
+
 		} else {
 			return null;
 		}
@@ -664,6 +682,9 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 		} else if (this.tipoItem == CLIENTE){
 
 			return this.listaPessoa.get(position).getIdPessoa();
+		} else if (this.tipoItem == CRITICA_ORCAMENTO){
+
+			return this.listaCriticaOrcamento.get(position).getIdCritica();
 		} else {
 			return position;
 		}
@@ -812,9 +833,14 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 			// Verifica se o tipo da venda eh atacado ou varejo
 			if(atacadoVarejo.equalsIgnoreCase(ATACADO)){
 				// Verifica se o produto esta na promocao
-				if(produto.getValorPromocaoAtacado() > 0){
-					// Seta o preco da promocao atacado
-					textBottonEsquerdo.setText("R$ " + this.funcoes.arredondarValor(produto.getValorPromocaoAtacado()));
+				if(produto.getValorPromocaoAtacadoVista() + produto.getValorPromocaoAtacadoPrazo() > 0){
+
+					if (vistaPrazo.equalsIgnoreCase("0")) {
+						// Seta o preco da promocao atacado
+						textBottonEsquerdo.setText("R$ " + this.funcoes.arredondarValor(produto.getValorPromocaoAtacadoVista()));
+					} else {
+						textBottonEsquerdo.setText("R$ " + this.funcoes.arredondarValor(produto.getValorPromocaoAtacadoPrazo()));
+					}
 					// Muda a cor da view para amarelo
 					viewTopo.setBackgroundColor(context.getResources().getColor(R.color.amarelo));
 				}else{
@@ -827,9 +853,14 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 			
 			}else{
 				// Verifica se o produto esta na promocao
-				if(produto.getValorPromocaoVarejo() > 0){
-					// Seta o preco de promocao varejo
-					textBottonEsquerdo.setText("R$ " + this.funcoes.arredondarValor(String.valueOf(produto.getValorPromocaoVarejo())));
+				if(produto.getValorPromocaoVarejoVista() + produto.getValorPromocaoVarejoPrazo() > 0){
+
+					if (vistaPrazo.equalsIgnoreCase("0")) {
+						// Seta o preco de promocao varejo
+						textBottonEsquerdo.setText("R$ " + this.funcoes.arredondarValor(String.valueOf(produto.getValorPromocaoVarejoVista())));
+					} else {
+						textBottonEsquerdo.setText("R$ " + this.funcoes.arredondarValor(String.valueOf(produto.getValorPromocaoVarejoPrazo())));
+					}
 					// Muda a cor da view para amarelo (promocao)
 					viewTopo.setBackgroundColor(context.getResources().getColor(R.color.amarelo));
 				}else{
@@ -1575,6 +1606,35 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 			textBottonDireito.setVisibility(View.GONE);
 			viewRodape.setVisibility(View.GONE);
 			viewTopo.setVisibility(View.GONE);
+
+		} else if (this.tipoItem == CRITICA_ORCAMENTO){
+			CriticaOrcamentoBeans critica = listaCriticaOrcamento.get(position);
+			FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
+
+			textDescricao.setText(critica.getRetornoWebservice());
+			textAbaixoDescricaoEsqueda.setText("Cod. Ret.: " + critica.getCodigoRetornoWebservice());
+
+			if (critica.getStatus().equalsIgnoreCase(OrcamentoRotinas.PEDIDO_ENVIADO)){
+				textAbaixoDescricaoDireita.setText("Enviado Sucesso");
+				textAbaixoDescricaoDireita.setTextColor(context.getResources().getColor(R.color.verde_escuro));
+				viewRodape.setBackgroundColor(context.getResources().getColor(R.color.verde_escuro));
+
+			} else if (critica.getStatus().equalsIgnoreCase(OrcamentoRotinas.PEDIDO_ERRO_ENVIAR)){
+				textAbaixoDescricaoDireita.setText("Erro ao enviar");
+				textAbaixoDescricaoDireita.setTextColor(context.getResources().getColor(R.color.vermelho_escuro));
+				viewRodape.setBackgroundColor(context.getResources().getColor(R.color.vermelho_escuro));
+
+			} else {
+				textAbaixoDescricaoDireita.setText("Status Desconhecido");
+				textAbaixoDescricaoDireita.setTextColor(context.getResources().getColor(R.color.laranja_escuro));
+				viewRodape.setBackgroundColor(context.getResources().getColor(R.color.laranja_escuro));
+			}
+
+			textBottonEsquerdo.setText("Cod. Crítica: ");
+			textBottonEsquerdoDois.setText("" + critica.getIdCritica());
+			textBottonDireito.setText("" + funcoes.formataDataHora(critica.getDataCadastro()));
+
+			viewTopo.setVisibility(View.INVISIBLE);
 		}
 		// Pega a posicao atual
 		final int posicao = position;

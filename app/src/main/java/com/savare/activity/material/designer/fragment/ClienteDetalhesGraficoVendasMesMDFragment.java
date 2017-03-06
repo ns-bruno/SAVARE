@@ -183,7 +183,7 @@ public class ClienteDetalhesGraficoVendasMesMDFragment extends Fragment {
         // Muda a cor do fundo
         barChartVendasMes.setBackgroundColor(getResources().getColor(R.color.branco));
         // Definir um texto de descrição que aparece no canto inferior direito do gráfico.
-        //barChartVendasMes.setDescription(getResources().getString(R.string.vendas_realizadas_mensal));
+        barChartVendasMes.setDescription("");
         // Define o texto que deve aparecer se o gráfico se encontra vazio.
         barChartVendasMes.setNoDataTextDescription(getResources().getString(R.string.nao_achamos_nenhum_valor));
 

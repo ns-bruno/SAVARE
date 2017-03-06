@@ -71,7 +71,7 @@ public class ProdutoListaMDFragment extends Fragment {
     private Spinner spinnerFiltro;
     private View viewOrcamento;
     private TextView textMensagem;
-    private String idOrcamento, idCliente, atacadoVarejo = "0", atacadoVarejoAuxiliar = "0", nomeRazao;
+    private String idOrcamento, idCliente, atacadoVarejo = "0", atacadoVarejoAuxiliar = "0", nomeRazao, vistaPrazo = "0";
     private ProgressBar progressBarListaProdutos;
     private Boolean pesquisando = false;
     private ProdutoListaBeans produtoVendaClicado;
@@ -413,8 +413,16 @@ public class ProdutoListaMDFragment extends Fragment {
         if (tipoTela == TELA_MAIS_VENDIDOS_CIDADE){
 
             adapterFiltroCidade = new ItemUniversalAdapter(getContext(), ItemUniversalAdapter.CIDADE);
-            // Pega a lista de cidades
-            adapterFiltroCidade.setListaCidade(produtoRotinas.listaCidadesMaisVendidos());
+
+            // Checa se tem o codigo do cliente
+            if (idCliente != null && !idCliente.isEmpty()){
+                String selectCidadeCliente = "(AEAPRREC.ID_CFACIDAD = (SELECT CFAENDER.ID_CFAENDER FROM CFAENDER WHERE (CFAENDER.ID_CFACLIFO = " + idCliente + ") LIMIT 1)) ";
+                // Pega a lista de cidades
+                adapterFiltroCidade.setListaCidade(produtoRotinas.listaCidadesMaisVendidos(selectCidadeCliente));
+            } else {
+                // Pega a lista de cidades
+                adapterFiltroCidade.setListaCidade(produtoRotinas.listaCidadesMaisVendidos(null));
+            }
 
             // Checa se retornou apenas um resultado(padrao de nenhum valor)
             if (adapterFiltroCidade.getCount() == 1){

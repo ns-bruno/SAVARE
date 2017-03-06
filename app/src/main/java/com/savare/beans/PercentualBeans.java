@@ -5,7 +5,7 @@ package com.savare.beans;
  */
 public class PercentualBeans {
 
-    private int idPercentual, idEmpresa, idClasse, idMarca, idProduto, idProdutoLoja, idParametroVendedor;
+    private int idPercentual, idEmpresa, idTabelaPercentualTabela, idTabelaPercentual, idClasse, idMarca, idProduto, idProdutoLoja, idAgrupamentoProduto, idParametroVendedor;
     private String dataAlteracao, tipoIss;
     private double percentualIss, custoFixo, impostosFederais, markupVarejo, markupAtacado, lucroVarejo,
                     lucroAtacado, descontoMercadoriaVistaVarejo, descontoMercadoriaVistaAtacado,
@@ -22,6 +22,22 @@ public class PercentualBeans {
 
     public int getIdEmpresa() {
         return idEmpresa;
+    }
+
+    public int getIdTabelaPercentualTabela() {
+        return idTabelaPercentualTabela;
+    }
+
+    public void setIdTabelaPercentualTabela(int idTabelaPercentualTabela) {
+        this.idTabelaPercentualTabela = idTabelaPercentualTabela;
+    }
+
+    public int getIdTabelaPercentual() {
+        return idTabelaPercentual;
+    }
+
+    public void setIdTabelaPercentual(int idTabelaPercentual) {
+        this.idTabelaPercentual = idTabelaPercentual;
     }
 
     public void setIdEmpresa(int idEmpresa) {
@@ -58,6 +74,14 @@ public class PercentualBeans {
 
     public void setIdProdutoLoja(int idProdutoLoja) {
         this.idProdutoLoja = idProdutoLoja;
+    }
+
+    public int getIdAgrupamentoProduto() {
+        return idAgrupamentoProduto;
+    }
+
+    public void setIdAgrupamentoProduto(int idAgrupamentoProduto) {
+        this.idAgrupamentoProduto = idAgrupamentoProduto;
     }
 
     public int getIdParametroVendedor() {

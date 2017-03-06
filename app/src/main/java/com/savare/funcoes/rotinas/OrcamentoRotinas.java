@@ -33,8 +33,9 @@ public class OrcamentoRotinas extends Rotinas {
 			  				   PEDIDO_NAO_ENVIADO = "P", 
 			  				   EXCLUIDO = "E", 
 			  				   PEDIDO_ENVIADO = "N", 
-			  				   PEDIDO_RETORNADO_BLOQUEADO ="RB", 
-			  				   PEDIDO_RETORNADO_LIBERADO ="RL", 
+			  				   PEDIDO_ERRO_ENVIAR = "EN",
+			  				   PEDIDO_RETORNADO_BLOQUEADO ="RB",
+			  				   PEDIDO_RETORNADO_LIBERADO ="RL",
 			  				   PEDIDO_RETORNADO_EXCLUIDO ="RE",
 			  				   PEDIDO_FATURADO = "F";
 	public static final String ORDEM_DECRESCENTE = "D";
@@ -773,6 +774,9 @@ public class OrcamentoRotinas extends Rotinas {
 				cidade.setIdCidade(cursor.getInt(cursor.getColumnIndex("ID_CFACIDAD")));
 				cidade.setDescricao(cursor.getString(cursor.getColumnIndex("DESCRICAO_CIDAD")));
 
+				if (cidade.getDescricao() == null || cidade.getDescricao().isEmpty()){
+					cidade.setDescricao(context.getResources().getString(R.string.sem_cidade));
+				}
 				EstadoBeans estado = new EstadoBeans();
 				estado.setSiglaEstado(cursor.getString(cursor.getColumnIndex("UF")));
 				cidade.setEstado(estado);
@@ -1109,7 +1113,11 @@ public class OrcamentoRotinas extends Rotinas {
         }
 
 		if(cidade != null){
-			sql = sql + " AND (CFACIDAD.DESCRICAO = '" + cidade +"' )";
+			if (cidade.equalsIgnoreCase(context.getResources().getString(R.string.sem_cidade))){
+				sql += " AND ( (CFACIDAD.DESCRICAO IS NULL ) OR (CFACIDAD.DESCRICAO = '') )";
+			} else {
+				sql = sql + " AND (CFACIDAD.DESCRICAO = '" + cidade + "' )";
+			}
 		}
 		
 		if(where != null){
@@ -1164,7 +1172,11 @@ public class OrcamentoRotinas extends Rotinas {
         }
 
 		if(cidade != null){
-			sql = sql + " AND (CFACIDAD.DESCRICAO = '" + cidade +"' )";
+			if (cidade.equalsIgnoreCase(context.getResources().getString(R.string.sem_cidade))){
+				sql += " AND ( (CFACIDAD.DESCRICAO IS NULL ) OR (CFACIDAD.DESCRICAO = '') )";
+			}else {
+				sql += " AND (CFACIDAD.DESCRICAO = '" + cidade + "' )";
+			}
 		}
 		
 		if(where != null){
@@ -1225,7 +1237,11 @@ public class OrcamentoRotinas extends Rotinas {
 		}
 		
 		if(cidade != null){
-			sql = sql + " AND (CFACIDAD.DESCRICAO = '" + cidade + "' )";
+			if (cidade.equalsIgnoreCase(context.getResources().getString(R.string.sem_cidade))){
+				sql = sql + " AND ( (CFACIDAD.DESCRICAO IS NULL ) OR (CFACIDAD.DESCRICAO = '') )";
+			} else {
+				sql = sql + " AND (CFACIDAD.DESCRICAO = '" + cidade + "' )";
+			}
 		}
 		
 		if(where != null){

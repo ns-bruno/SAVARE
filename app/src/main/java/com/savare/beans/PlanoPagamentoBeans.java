@@ -10,6 +10,7 @@ public class PlanoPagamentoBeans implements Parcelable{
 				codigoPlanoPagamento, diasMedios;
 	private String descricaoPlanoPagamento, dataAlteracao;
 	private String ativo,
+				 origemValor,
 				 atacadoVarejo,
 				 vistaPrazo,
 				 descontoPromocao;
@@ -112,6 +113,14 @@ public class PlanoPagamentoBeans implements Parcelable{
 	 */
 	public String getAtivo() {
 		return ativo;
+	}
+
+	public String getOrigemValor() {
+		return origemValor;
+	}
+
+	public void setOrigemValor(String origemValor) {
+		this.origemValor = origemValor;
 	}
 
 	/**

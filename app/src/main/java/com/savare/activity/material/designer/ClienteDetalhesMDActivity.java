@@ -39,7 +39,8 @@ import java.util.UUID;
 public class ClienteDetalhesMDActivity extends AppCompatActivity{
 
     private Toolbar toolbarCabecalho;
-    private FloatingActionButton itemMenuNovoOrcamento, itemMenuTitulosCliente, itemMenuEnviarDados, itemMenuPositivarCliente;
+    private FloatingActionButton itemMenuNovoOrcamento, itemMenuTitulosCliente, itemMenuEnviarDados, itemMenuPositivarCliente,
+                                 itemMenuHistoricoPedidos;
     private FloatingActionMenu floatingMenu;
 
     private String codigoCli,
@@ -251,6 +252,21 @@ public class ClienteDetalhesMDActivity extends AppCompatActivity{
             }
         });
 
+        itemMenuHistoricoPedidos.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Fecha o menuFloating
+                floatingMenu.close(true);
+
+                // Cria uma intent para abrir uma nova activity
+                Intent intentTitulos = new Intent(getApplicationContext(), ListaOrcamentoPedidoMDActivity.class);
+                intentTitulos.putExtra("ID_CFACLIFO", idCliente);
+                intentTitulos.putExtra(ListaOrcamentoPedidoMDActivity.KEY_ORCAMENTO_PEDIDO, ListaOrcamentoPedidoMDActivity.TIPO_TODOS_PEDIDO);
+
+                startActivity(intentTitulos);
+            }
+        });
+
     } // Fim onCreate
 
     @Override
@@ -278,6 +294,7 @@ public class ClienteDetalhesMDActivity extends AppCompatActivity{
         itemMenuTitulosCliente = (FloatingActionButton) findViewById(R.id.fragment_cliente_detalhes_tab_md_menu_item_titulos_cliente);
         itemMenuEnviarDados = (FloatingActionButton) findViewById(R.id.fragment_cliente_detalhes_tab_md_menu_item_enviar_dados_cliente);
         itemMenuPositivarCliente = (FloatingActionButton) findViewById(R.id.fragment_cliente_detalhes_tab_md_menu_item_positivar_cliente);
+        itemMenuHistoricoPedidos = (FloatingActionButton) findViewById(R.id.fragment_cliente_detalhes_tab_md_menu_item_historico_pedido);
         floatingMenu = (FloatingActionMenu) findViewById(R.id.afragment_cliente_detalhes_tab_md_menu_float);
     }
 }

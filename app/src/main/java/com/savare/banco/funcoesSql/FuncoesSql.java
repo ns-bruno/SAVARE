@@ -449,20 +449,6 @@ public class FuncoesSql {
 			//qtdAtualizado = bancoDados.updateWithOnConflict(tabela, dados, where, null, 0);
 			qtdAtualizado = bancoDados.update(tabela, dados, where, null);
 			
-			/*if(qtdAtualizado > 0){
-				final ContentValues mensagem = new ContentValues();
-				mensagem.put("comando", 2);
-				mensagem.put("mensagem", "Atualizado com sucesso! \n");
-				mensagem.put("tela", tabela);
-				
-				this.funcoes = new FuncoesPersonalizadas(context);
-                ((Activity) context).runOnUiThread(new Runnable() {
-                    public void run() {
-                        funcoes.menssagem(mensagem);
-                    }
-                });
-				
-			}*/
 			if (qtdAtualizado <= 0){
 				final ContentValues mensagem = new ContentValues();
 				mensagem.put("comando", 2);
@@ -530,7 +516,7 @@ public class FuncoesSql {
 		bancoDados = conexaoBanco.abrirBanco();
 
 		try {
-			qtdAtualizado = bancoDados.updateWithOnConflict(tabela, dados, where, null, 0);
+			qtdAtualizado = bancoDados.updateWithOnConflict(tabela, dados, where, null, SQLiteDatabase.CONFLICT_NONE);
 
 		} catch (SQLException e) {
 			this.funcoes = new FuncoesPersonalizadas(context);

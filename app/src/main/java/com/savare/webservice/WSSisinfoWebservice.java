@@ -93,6 +93,8 @@ public class WSSisinfoWebservice {
     public static final String FUNCTION_JSON_SELECT_AEACODST = "/estoque/selectCodigoSituacaoTributaria";
     public static final String FUNCTION_SELECT_AEAPRODU = "selectProduto";
     public static final String FUNCTION_JSON_SELECT_AEAPRODU = "/estoque/selectProduto";
+    public static final String FUNCTION_SELECT_AEAPRECO = "selectPreco";
+    public static final String FUNCTION_JSON_SELECT_AEAPRECO = "/estoque/selectPreco";
     public static final String FUNCTION_SELECT_AEAEMBAL = "selectEmbalagemProduto";
     public static final String FUNCTION_JSON_SELECT_AEAEMBAL = "/estoque/selectEmbalagemProduto";
     public static final String FUNCTION_SELECT_AEAPLOJA = "selectProdutoPorLoja";

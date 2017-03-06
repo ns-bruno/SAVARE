@@ -17,8 +17,10 @@ public class ProdutoListaBeans implements Parcelable {
 	private int idPLoja;
 	private double valorUnitarioAtacado,
 				   valorUnitarioVarejo,
-				   valorPromocaoAtacado,
-				   valorPromocaoVarejo,
+			       valorPromocaoAtacadoVista,
+			       valorPromocaoAtacadoPrazo,
+				   valorPromocaoVarejoVista,
+				   valorPromocaoVarejoPrazo,
 				   valorTabelaAtacado,
 				   valorTabelaVarejo,
 				   custoReposicaoN,
@@ -33,8 +35,8 @@ public class ProdutoListaBeans implements Parcelable {
 		this.estaNoOrcamento = dados.readString().charAt(0);
 		this.valorUnitarioAtacado = dados.readDouble();
 		this.valorUnitarioVarejo = dados.readDouble();
-		this.valorPromocaoAtacado = dados.readDouble();
-		this.valorPromocaoVarejo = dados.readDouble();
+		this.valorPromocaoAtacadoVista = dados.readDouble();
+		this.valorPromocaoVarejoVista = dados.readDouble();
 		this.custoReposicaoN = dados.readDouble();
 		this.custoCompleto = dados.readDouble();
 		this.estoqueFisico = dados.readDouble();
@@ -159,32 +161,36 @@ public class ProdutoListaBeans implements Parcelable {
 		this.custoCompleto = custoCompleto;
 	}
 
-	/**
-	 * @return the valorPromocaoAtacado
-	 */
-	public double getValorPromocaoAtacado() {
-		return valorPromocaoAtacado;
+	public double getValorPromocaoAtacadoVista() {
+		return valorPromocaoAtacadoVista;
 	}
 
-	/**
-	 * @param valorPromocaoAtacado the valorPromocaoAtacado to set
-	 */
-	public void setValorPromocaoAtacado(double valorPromocaoAtacado) {
-		this.valorPromocaoAtacado = valorPromocaoAtacado;
+	public void setValorPromocaoAtacadoVista(double valorPromocaoAtacadoVista) {
+		this.valorPromocaoAtacadoVista = valorPromocaoAtacadoVista;
 	}
 
-	/**
-	 * @return the valorPromocaoVarejo
-	 */
-	public double getValorPromocaoVarejo() {
-		return valorPromocaoVarejo;
+	public double getValorPromocaoAtacadoPrazo() {
+		return valorPromocaoAtacadoPrazo;
 	}
 
-	/**
-	 * @param valorPromocaoVarejo the valorPromocaoVarejo to set
-	 */
-	public void setValorPromocaoVarejo(double valorPromocaoVarejo) {
-		this.valorPromocaoVarejo = valorPromocaoVarejo;
+	public void setValorPromocaoAtacadoPrazo(double valorPromocaoAtacadoPrazo) {
+		this.valorPromocaoAtacadoPrazo = valorPromocaoAtacadoPrazo;
+	}
+
+	public double getValorPromocaoVarejoVista() {
+		return valorPromocaoVarejoVista;
+	}
+
+	public void setValorPromocaoVarejoVista(double valorPromocaoVarejoVista) {
+		this.valorPromocaoVarejoVista = valorPromocaoVarejoVista;
+	}
+
+	public double getValorPromocaoVarejoPrazo() {
+		return valorPromocaoVarejoPrazo;
+	}
+
+	public void setValorPromocaoVarejoPrazo(double valorPromocaoVarejoPrazo) {
+		this.valorPromocaoVarejoPrazo = valorPromocaoVarejoPrazo;
 	}
 
 	/**
@@ -287,8 +293,8 @@ public class ProdutoListaBeans implements Parcelable {
 		dest.writeString(String.valueOf(estaNoOrcamento));
 		dest.writeDouble(valorUnitarioAtacado);
 		dest.writeDouble(valorUnitarioVarejo);
-		dest.writeDouble(valorPromocaoAtacado);
-		dest.writeDouble(valorPromocaoVarejo);
+		dest.writeDouble(valorPromocaoAtacadoVista);
+		dest.writeDouble(valorPromocaoVarejoVista);
 		dest.writeDouble(custoReposicaoN);
 		dest.writeDouble(custoCompleto);
 		dest.writeDouble(estoqueFisico);
@@ -315,8 +321,8 @@ public class ProdutoListaBeans implements Parcelable {
 			produtoVenda.setEstaNoOrcamento(source.readString().charAt(0));
 			produtoVenda.setValorUnitarioAtacado(source.readDouble());
 			produtoVenda.setValorUnitarioVarejo(source.readDouble());
-			produtoVenda.setValorPromocaoAtacado(source.readDouble());
-			produtoVenda.setValorPromocaoVarejo(source.readDouble());
+			produtoVenda.setValorPromocaoAtacadoVista(source.readDouble());
+			produtoVenda.setValorPromocaoVarejoVista(source.readDouble());
 			produtoVenda.setCustoReposicaoN(source.readDouble());
 			produtoVenda.setCustoCompleto(source.readDouble());
 			produtoVenda.setEstoqueFisico(source.readDouble());

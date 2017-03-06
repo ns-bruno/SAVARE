@@ -7,6 +7,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 
 import com.savare.R;
+import com.savare.activity.material.designer.fragment.OrcamentoCriticaMDFragment;
 import com.savare.activity.material.designer.fragment.OrcamentoDescontoMDFragment;
 import com.savare.activity.material.designer.fragment.OrcamentoObservacaoMDFragment;
 import com.savare.activity.material.designer.fragment.OrcamentoPrazoMDFragment;
@@ -46,6 +47,10 @@ public class OrcamentoTabFragmentMDAdapter extends FragmentStatePagerAdapter {
 
             case 3:
                 fragment = new OrcamentoObservacaoMDFragment();
+                break;
+
+            case 4:
+                fragment = new OrcamentoCriticaMDFragment();
                 break;
         }
         // Checa se o fragment nao eh nulo

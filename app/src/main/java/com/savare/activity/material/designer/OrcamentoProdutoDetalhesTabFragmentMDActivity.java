@@ -25,6 +25,7 @@ public class OrcamentoProdutoDetalhesTabFragmentMDActivity extends AppCompatActi
                                 KEY_RAZAO_SOCIAL = "RAZAO_SOCIAL",
                                 KEY_TELA_CHAMADA = "TELA_CHAMADA",
                                 KEY_ATACADO_VAREJO = "ATAC_VERE",
+                                KEY_VISTA_PRAZO = "VISTA_PRAZO",
                                 KEY_POSICAO = "POSICAO";
 
     @Override

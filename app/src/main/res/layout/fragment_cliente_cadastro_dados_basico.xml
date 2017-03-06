@@ -4,19 +4,19 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/cinza_platina"
-    android:padding="10dp" >
+    android:padding="10dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="fill_parent"
         android:gravity="center_horizontal"
-        android:orientation="vertical" >
+        android:orientation="vertical">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:gravity="center_horizontal"
-            android:orientation="horizontal" >
+            android:orientation="horizontal">
 
             <TextView
                 android:id="@+id/fragment_cliente_cadastro_dados_basico_text_codigo_pessoa"
@@ -41,7 +41,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:gravity="center_horizontal"
-            android:orientation="horizontal" >
+            android:orientation="horizontal">
 
             <RadioGroup
                 android:id="@+id/fragment_cliente_cadastro_dados_basico_radioGroup_fisica_juridica"
@@ -49,7 +49,7 @@
                 android:layout_height="wrap_content"
                 android:background="@color/branco"
                 android:gravity="center_horizontal"
-                android:orientation="horizontal" >
+                android:orientation="horizontal">
 
                 <RadioButton
                     android:id="@+id/fragment_cliente_cadastro_dados_basico_radioButton_fisica"
@@ -74,7 +74,7 @@
             android:layout_marginTop="5dp"
             android:background="@color/branco"
             android:gravity="center_horizontal"
-            android:orientation="vertical" >
+            android:orientation="vertical">
 
             <EditText
                 android:id="@+id/fragment_cliente_cadastro_dados_basico_text_razao"
@@ -84,8 +84,8 @@
                 android:hint="@string/razao_social"
                 android:inputType="text|textCapCharacters"
                 android:maxLines="3"
-                android:textColor="@color/azul_escuro"
-                android:textAppearance="?android:attr/textAppearanceLarge" />
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textColor="@color/azul_escuro" />
 
 
         </LinearLayout>
@@ -96,7 +96,7 @@
             android:layout_marginTop="5dp"
             android:background="@color/branco"
             android:gravity="center_horizontal"
-            android:orientation="vertical" >
+            android:orientation="vertical">
 
             <EditText
                 android:id="@+id/fragment_cliente_cadastro_dados_basico_text_fantasia"
@@ -137,7 +137,7 @@
             android:layout_marginTop="5dp"
             android:background="@color/branco"
             android:gravity="center_horizontal"
-            android:orientation="vertical" >
+            android:orientation="vertical">
 
             <Spinner
                 android:id="@+id/fragment_cliente_cadastro_dados_basico_spinner_estado"
@@ -158,7 +158,7 @@
             android:layout_marginTop="5dp"
             android:background="@color/branco"
             android:gravity="center_horizontal"
-            android:orientation="vertical" >
+            android:orientation="vertical">
 
             <EditText
                 android:id="@+id/fragment_cliente_cadastro_dados_basico_text_cep"
@@ -175,7 +175,7 @@
             android:layout_marginTop="5dp"
             android:background="@color/branco"
             android:gravity="center_horizontal"
-            android:orientation="vertical" >
+            android:orientation="vertical">
 
             <EditText
                 android:id="@+id/fragment_cliente_cadastro_dados_basico_text_bairro"
@@ -190,7 +190,7 @@
             android:layout_height="match_parent"
             android:layout_marginTop="5dp"
             android:background="@color/branco"
-            android:orientation="horizontal" >
+            android:orientation="horizontal">
 
             <EditText
                 android:id="@+id/fragment_cliente_cadastro_dados_basico_text_endereco"
@@ -213,7 +213,7 @@
             android:layout_height="match_parent"
             android:layout_marginTop="5dp"
             android:background="@color/branco"
-            android:orientation="vertical" >
+            android:orientation="vertical">
 
             <EditText
                 android:id="@+id/fragment_cliente_cadastro_dados_basico_text_complemento"
@@ -229,7 +229,7 @@
             android:layout_height="match_parent"
             android:layout_marginTop="5dp"
             android:background="@color/branco"
-            android:orientation="vertical" >
+            android:orientation="vertical">
 
             <EditText
                 android:id="@+id/fragment_cliente_cadastro_dados_basico_text_email"
@@ -243,15 +243,37 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginTop="5dp"
+            android:layout_marginTop="10dp"
             android:background="@color/branco"
-            android:orientation="vertical" >
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/fragment_cliente_cadastro_dados_basico_text_status_cliente"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/status" />
 
             <Spinner
                 android:id="@+id/fragment_cliente_cadastro_dados_basico_spinner_status"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="10dp"
+            android:background="@color/branco"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/fragment_cliente_cadastro_dados_basico_text_ramo_atividade"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/ramo_atividade" />
 
             <Spinner
                 android:id="@+id/fragment_cliente_cadastro_dados_basico_spinner_ramo_atividade"
@@ -259,23 +281,84 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1" />
 
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="10dp"
+            android:background="@color/branco"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/fragment_cliente_cadastro_dados_basico_text_tipo_cliente"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/tipo_cliente" />
+
             <Spinner
                 android:id="@+id/fragment_cliente_cadastro_dados_basico_spinner_tipo_cliente"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="10dp"
+            android:background="@color/branco"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/fragment_cliente_cadastro_dados_basico_text_tipo_documento"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/tipo_documento" />
 
             <Spinner
                 android:id="@+id/fragment_cliente_cadastro_dados_basico_spinner_tipo_documento"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="10dp"
+            android:background="@color/branco"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/fragment_cliente_cadastro_dados_basico_text_portador"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/portador" />
 
             <Spinner
                 android:id="@+id/fragment_cliente_cadastro_dados_basico_spinner_portador_banco"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="10dp"
+            android:background="@color/branco"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/fragment_cliente_cadastro_dados_basico_text_plano_pagamento"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/plano_pagamento" />
 
             <Spinner
                 android:id="@+id/fragment_cliente_cadastro_dados_basico_spinner_plano_pagamento"
@@ -288,15 +371,14 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@color/branco"
-            android:orientation="horizontal" >
-        </LinearLayout>
+            android:orientation="horizontal"></LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginTop="5dp"
+            android:layout_marginTop="10dp"
             android:background="@color/branco"
-            android:orientation="horizontal" >
+            android:orientation="horizontal">
 
             <TextView
                 android:id="@+id/text_capital_social"
@@ -319,7 +401,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@color/branco"
-            android:orientation="horizontal" >
+            android:orientation="horizontal">
 
             <EditText
                 android:id="@+id/fragment_cliente_cadastro_dados_basico_editText_capital_social"
@@ -328,8 +410,7 @@
                 android:layout_weight="1"
                 android:ems="10"
                 android:gravity="center_horizontal"
-                android:inputType="numberDecimal" >
-            </EditText>
+                android:inputType="numberDecimal"></EditText>
 
             <EditText
                 android:id="@+id/fragment_cliente_cadastro_dados_basico_editText_limite_compras"
@@ -344,9 +425,9 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginTop="5dp"
+            android:layout_marginTop="10dp"
             android:background="@color/branco"
-            android:orientation="horizontal" >
+            android:orientation="horizontal">
 
             <TextView
                 android:id="@+id/text_desconto_atacado_vista"
@@ -369,7 +450,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@color/branco"
-            android:orientation="horizontal" >
+            android:orientation="horizontal">
 
             <EditText
                 android:id="@+id/fragment_cliente_cadastro_dados_basico_editText_desconto_atacado_vista"
@@ -378,8 +459,7 @@
                 android:layout_weight="1"
                 android:ems="10"
                 android:gravity="center_horizontal"
-                android:inputType="numberDecimal" >
-            </EditText>
+                android:inputType="numberDecimal"></EditText>
 
             <EditText
                 android:id="@+id/fragment_cliente_cadastro_dados_basico_editText_desconto_atacado_prazo"
@@ -394,9 +474,9 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginTop="5dp"
+            android:layout_marginTop="10dp"
             android:background="@color/branco"
-            android:orientation="horizontal" >
+            android:orientation="horizontal">
 
             <TextView
                 android:id="@+id/text_desconto_varejo_vista"
@@ -419,7 +499,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@color/branco"
-            android:orientation="horizontal" >
+            android:orientation="horizontal">
 
             <EditText
                 android:id="@+id/fragment_cliente_cadastro_dados_basico_editText_desconto_varejo_vista"
@@ -428,8 +508,7 @@
                 android:layout_weight="1"
                 android:ems="10"
                 android:gravity="center_horizontal"
-                android:inputType="numberDecimal" >
-            </EditText>
+                android:inputType="numberDecimal"></EditText>
 
             <EditText
                 android:id="@+id/fragment_cliente_cadastro_dados_basico_editText_desconto_varejo_prazo"

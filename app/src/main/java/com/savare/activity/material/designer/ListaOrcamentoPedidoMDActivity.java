@@ -78,6 +78,7 @@ public class ListaOrcamentoPedidoMDActivity extends AppCompatActivity{
     private String tipoOrcamentoPedido; // O = Orcamento, P = Pedido nao enviados, E = Excluido, N = Pedidos Enviados
     private String retornaValor = "F";
     private String cidade;
+    private String idPessoa = null;
     private int totalItemSelecionado = 0;
     private String tipoOrdem = null;
     double totalDiferenca;
@@ -96,6 +97,7 @@ public class ListaOrcamentoPedidoMDActivity extends AppCompatActivity{
             TIPO_PEDIDO_RETORNADO_LIBERADO = "RL",
             TIPO_PEDIDO_RETORNADO_EXCLUIDO = "RE",
             TIPO_PEDIDO_FATURADO = "F",
+            TIPO_TODOS_PEDIDO = "TODOS_PEDIDOS",
             ITEM_NAO_CONFERIDO = "NC",
             ITEM_CONFERIDO = "C";
     public static final String KEY_TELA_LISTA_ORCAMENTO_PEDIDO = "ListaOrcamentoPedidosActivity",
@@ -123,9 +125,22 @@ public class ListaOrcamentoPedidoMDActivity extends AppCompatActivity{
 
             this.tipoOrcamentoPedido = intentParametro.getString(KEY_ORCAMENTO_PEDIDO);
             this.retornaValor = intentParametro.getString(KEY_RETORNA_VALOR);
+            this.idPessoa = intentParametro.getString("ID_CFACLIFO");
 
             if (tipoOrcamentoPedido.equalsIgnoreCase(TIPO_PEDIDO_ENVIADO)){
                 tipoPedido = new String[]{"N", "RB", "RL", "RE", "F", "C"};
+
+            } else if (tipoOrcamentoPedido.equalsIgnoreCase(TIPO_TODOS_PEDIDO)){
+                tipoPedido = new String[]{
+                                        TIPO_PEDIDO_NAO_ENVIADO,
+                                        TIPO_PEDIDO_ENVIADO,
+                                        TIPO_ORCAMENTO_EXCLUIDO,
+                                        TIPO_PEDIDO_RETORNADO_BLOQUEADO,
+                                        TIPO_PEDIDO_RETORNADO_LIBERADO,
+                                        TIPO_PEDIDO_RETORNADO_EXCLUIDO,
+                                        TIPO_PEDIDO_FATURADO,
+                                        ITEM_CONFERIDO,
+                                        ITEM_NAO_CONFERIDO};
             } else {
                 tipoPedido = new String[]{tipoOrcamentoPedido};
             }
@@ -472,7 +487,13 @@ public class ListaOrcamentoPedidoMDActivity extends AppCompatActivity{
                         for (int i = 0; i < listaItemOrcamentoSelecionado.size(); i++) {
                             idOrcamento[i] = String.valueOf(adapterListaOrcamentoPedido.getListaOrcamentoPediso().get(listaItemOrcamentoSelecionado.get(i)).getIdOrcamento());
                         }
-                        EnviarDadosWebserviceAsyncRotinas enviarDadosWebservice = new EnviarDadosWebserviceAsyncRotinas(ListaOrcamentoPedidoMDActivity.this);
+                        EnviarDadosWebserviceAsyncRotinas enviarDadosWebservice = new EnviarDadosWebserviceAsyncRotinas(new EnviarDadosWebserviceAsyncRotinas.OnTaskCompleted() {
+                            @Override
+                            public void onTaskCompleted() {
+                                //onDestroyActionMode(mode);
+                                mode.finish();
+                            }
+                        }, ListaOrcamentoPedidoMDActivity.this);
                         enviarDadosWebservice.setIdOrcamentoSelecionado(idOrcamento);
                         enviarDadosWebservice.setProgressBarStatus(progressBarStatus);
                         enviarDadosWebservice.setTextStatus(textTotal);
@@ -928,10 +949,6 @@ public class ListaOrcamentoPedidoMDActivity extends AppCompatActivity{
 
                 // Faz a mensagem (dialog) aparecer
                 mensagemAtacadoVarejo.show();
-
-
-
-
             }
         }
     }
@@ -973,7 +990,11 @@ public class ListaOrcamentoPedidoMDActivity extends AppCompatActivity{
         } else {
             tipoPedido = "'"+tipoOrcamentoPedido+"'";
         }*/
-        listaCidade = orcamentoRotinas.listaCidadeOrcamentoPedido(tipoPedido, null);
+        String where = null;
+        if ((idPessoa != null) && (!idPessoa.isEmpty())){
+            where = "AEAORCAM.ID_CFACLIFO = " + idPessoa;
+        }
+        listaCidade = orcamentoRotinas.listaCidadeOrcamentoPedido(tipoPedido, where);
 
         if ((listaCidade != null) && (listaCidade.size() > 0)) {
 
@@ -1104,13 +1125,38 @@ public class ListaOrcamentoPedidoMDActivity extends AppCompatActivity{
                 tipoPedido = new String[]{tipoOrcamentoPedido};
             }*/
 
+            String periodo = wherePeriodoData();
+
             // Checa se esta selecionado todos os orcamento/pedido
             if((adapterCidade.getListaCidade().get(itemPosition).getDescricao() != null) &&
                (adapterCidade.getListaCidade().get(itemPosition).getDescricao().equalsIgnoreCase("Todas as Cidades"))) {
 
-                // Preenche a lista de pessoas
-                listaOrcamentoPedido = orcamentoRotinas.listaOrcamentoPedido(tipoPedido, wherePeriodoData(), tipoOrdem);
+                String where = null;
 
+                if((periodo != null) && (periodo.length() > 0)){
+                    where =  periodo;
+                }
+
+                if ((idPessoa != null) && (!idPessoa.isEmpty())){
+                    where += " AND (AEAORCAM.ID_CFACLIFO = " + idPessoa + ")";
+                }
+                // Preenche a lista de pedidos
+                listaOrcamentoPedido = orcamentoRotinas.listaOrcamentoPedido(tipoPedido, where, tipoOrdem);
+
+            } else if ((adapterCidade.getListaCidade().get(itemPosition).getDescricao().equalsIgnoreCase(getResources().getString(R.string.sem_cidade)))){
+                String where = "((CFACIDAD.DESCRICAO IS NULL) OR (CFACIDAD.DESCRICAO = ''))";
+
+                if((periodo != null) && (periodo.length() > 0)){
+                    where += " AND " + periodo;
+                }
+
+                if ((idPessoa != null) && (!idPessoa.isEmpty())){
+                    where += " AND (AEAORCAM.ID_CFACLIFO = " + idPessoa + ")";
+                }
+                // Instancia a classe
+                listaOrcamentoPedido = new ArrayList<OrcamentoBeans>();
+                // Preenche a lista de pedidos
+                listaOrcamentoPedido = orcamentoRotinas.listaOrcamentoPedido(tipoPedido, where, tipoOrdem);
             } else if ((adapterCidade.getListaCidade().get(itemPosition).getDescricao() != null)){
                 // Pega a palavra que eh para ser removida
                 //String remover = adapterCidade.getListaCidade().get(itemPosition).getDescricao().substring(0, 5);
@@ -1118,15 +1164,17 @@ public class ListaOrcamentoPedidoMDActivity extends AppCompatActivity{
                 // Monta a clausula where do sql
                 String where = "(CFACIDAD.DESCRICAO LIKE '%" + adapterCidade.getListaCidade().get(itemPosition).getDescricao() + "%')";
 
-                String periodo = wherePeriodoData();
-
                 if((periodo != null) && (periodo.length() > 0)){
                     where += " AND " + periodo;
                 }
 
+                if ((idPessoa != null) && (!idPessoa.isEmpty())){
+                    where += " AND (AEAORCAM.ID_CFACLIFO = " + idPessoa + ")";
+                }
+
                 // Instancia a classe
                 listaOrcamentoPedido = new ArrayList<OrcamentoBeans>();
-                // Preenche a lista de pessoas
+                // Preenche a lista de pedidos
                 listaOrcamentoPedido = orcamentoRotinas.listaOrcamentoPedido(tipoPedido, where, tipoOrdem);
             }
 

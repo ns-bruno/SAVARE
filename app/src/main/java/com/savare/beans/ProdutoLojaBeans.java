@@ -7,7 +7,7 @@ public class ProdutoLojaBeans {
 
     private int idProdutoLoja, idEmpresa, idProduto, idSituacaoTributaria;
     private String dataAlteracao, ativo, dataEntradaDireta, dataEntradaNota;
-    private double estoqueFisico, estoqueContabil, retido, pedido, cutoReposicaoNota, custoCompletoNota,
+    private double estoqueFisico, estoqueContabil, retido, pedido, cutoReposicaoNota, custoCompletoNota, custoRealNota, custoMedioNota,
                     vendaAtacado, vendaVarejo, promocaoAtacado, promocaoVarejo, precoMinimoAtacado,
                     precoMinimoVarejo, precoMaximoAtacado, precoMaximoVarejo;
 
@@ -121,6 +121,22 @@ public class ProdutoLojaBeans {
 
     public void setCustoCompletoNota(double custoCompletoNota) {
         this.custoCompletoNota = custoCompletoNota;
+    }
+
+    public double getCustoRealNota() {
+        return custoRealNota;
+    }
+
+    public void setCustoRealNota(double custoRealNota) {
+        this.custoRealNota = custoRealNota;
+    }
+
+    public double getCustoMedioNota() {
+        return custoMedioNota;
+    }
+
+    public void setCustoMedioNota(double custoMedioNota) {
+        this.custoMedioNota = custoMedioNota;
     }
 
     public double getVendaAtacado() {

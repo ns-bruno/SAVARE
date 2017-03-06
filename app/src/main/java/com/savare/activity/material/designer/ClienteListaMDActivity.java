@@ -342,7 +342,8 @@ public class ClienteListaMDActivity extends AppCompatActivity {
                 PessoaRotinas pessoaRotinas = new PessoaRotinas(context);
 
                 if ((!cidade.getDescricao().equalsIgnoreCase("Nenhum valor encontrado")) &&
-                        (!cidade.getDescricao().equalsIgnoreCase("Todas as Cidades"))) {
+                        (!cidade.getDescricao().equalsIgnoreCase("Todas as Cidades")) &&
+                        (!cidade.getDescricao().equalsIgnoreCase(getResources().getString(R.string.sem_cidade)))) {
 
                     // Monta a clausula where do sql
                     whereAux = "( CFACIDAD.DESCRICAO LIKE '%" + cidade.getDescricao().replace("'", "%") + "%' )";
@@ -354,6 +355,15 @@ public class ClienteListaMDActivity extends AppCompatActivity {
                     // Cria a lista com as pessoas de acordo com a cidade selecionada
                     listaPessoas = pessoaRotinas.listaPessoaResumido(whereAux, PessoaRotinas.KEY_TIPO_CLIENTE, progressBarStatus);
 
+                } else if (cidade.getDescricao().equalsIgnoreCase(getResources().getString(R.string.sem_cidade))){
+                    whereAux = "( (CFACIDAD.DESCRICAO IS NULL) OR (CFACIDAD.DESCRICAO = '') )";
+
+                    if ((where != null) && (where.length() > 1)){
+                        whereAux = where;
+                    }
+
+                    // Cria a lista com as pessoas de acordo com a cidade selecionada
+                    listaPessoas = pessoaRotinas.listaPessoaResumido(whereAux, PessoaRotinas.KEY_TIPO_CLIENTE, progressBarStatus);
                 } else if (cidade.getDescricao().equalsIgnoreCase("Todas as Cidades")) {
 
                     if ((where != null) && (where.length() > 1)){

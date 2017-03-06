@@ -6,6 +6,7 @@ package com.savare.beans;
 public class ProdutoRecomendadoBeans {
 
     private int idPrecoRecomendado, idProduto, idAreas, idCidade, idClifoVendedor, idClifo, idEmpresa, posicao;
+    private double quantidadeVendida, valorTotalVenda, valorTotalCusto;
 
     public int getIdPrecoRecomendado() {
         return idPrecoRecomendado;
@@ -69,5 +70,29 @@ public class ProdutoRecomendadoBeans {
 
     public void setPosicao(int posicao) {
         this.posicao = posicao;
+    }
+
+    public double getQuantidadeVendida() {
+        return quantidadeVendida;
+    }
+
+    public void setQuantidadeVendida(double quantidadeVendida) {
+        this.quantidadeVendida = quantidadeVendida;
+    }
+
+    public double getValorTotalVenda() {
+        return valorTotalVenda;
+    }
+
+    public void setValorTotalVenda(double valorTotalVenda) {
+        this.valorTotalVenda = valorTotalVenda;
+    }
+
+    public double getValorTotalCusto() {
+        return valorTotalCusto;
+    }
+
+    public void setValorTotalCusto(double valorTotalCusto) {
+        this.valorTotalCusto = valorTotalCusto;
     }
 }

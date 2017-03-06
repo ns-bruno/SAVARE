@@ -252,6 +252,7 @@
     <string name="cancelado">Cancelado</string>
     <string name="registrar">Registrar</string>
     <string name="servidor_nuvem_retornou_alguma_coisa">O servidor em nuvem retornou alguns dados, vamos checar agora, aguarde por favor...</string>
+    <string name="salvando_critica_retorno">Salvando a crítica do retorno.</string>
     <string name="achamos_usuario_servidor_nuvem">Achamos um usuário no servidor em nuvem. </string>
     <string name="usuario_atualizado_sucesso">Usuário atualizado com sucesso.</string>
     <string name="atualizado_sucesso">Atualizado com Sucesso.</string>
@@ -283,6 +284,7 @@
     <string name="recebendo_dados_marca">Recebendo os dados da(s) Marca(s)...</string>
     <string name="recebendo_dados_situacao_tributaria">Recebendo os dados da(s) Situação(ões) Tributária(s)...</string>
     <string name="recebendo_dados_produto">Recebendo os dados do(s) Produto(s)...</string>
+    <string name="recebendo_dados_preco">Recebendo os dados do(s) Preço(s)...</string>
     <string name="recebendo_dados_embalagem">Recebendo os dados da(s) Embalagem(ens)...</string>
     <string name="recebendo_dados_produto_loja">Recebendo os dados do(s) Produto(s) por Loja(s)...</string>
     <string name="recebendo_dados_local_estoque">Recebendo os dados do(s) Local(is) do(s) Estoque(s)...</string>
@@ -325,6 +327,10 @@
     <string name="produto_nao_esta_orcamento">Não achamos este produto no orçamento</string>
     <string name="excluido_sucesso">Excluido com sucesso.</string>
     <string name="nao_chegou_dados_servidor_empresa">Não chegou os dados do servidor da emrpesa</string>
+    <string name="sem_cidade">Sem Cidade</string>
+    <string name="portador">Portador/Banco</string>
+    <string name="calculando_preco_venda">Calculando Preço de Venda</string>
+
 
     <string-array name="tab_produto_md">
         <item>Produtos</item>
@@ -343,6 +349,7 @@
         <item>Desconto</item>
         <item>Prazo</item>
         <item>Observação</item>
+        <item>Crítica</item>
     </string-array>
 
     <string-array name="tab_orcamento_produto_detalhes_md">

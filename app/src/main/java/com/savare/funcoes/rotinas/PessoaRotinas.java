@@ -6,6 +6,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.widget.ProgressBar;
 
+import com.savare.R;
 import com.savare.banco.funcoesSql.PessoaSql;
 import com.savare.beans.CidadeBeans;
 import com.savare.beans.DescricaoSimplesBeans;
@@ -86,19 +87,20 @@ public class PessoaRotinas extends Rotinas {
 		// Cria uma lista para retornar as cidades
 		List<CidadeBeans> lista = new ArrayList<CidadeBeans>();
 
-		String sql = "SELECT CFACIDAD.ID_CFACIDAD, CFACIDAD.DESCRICAO AS DESCRICAO_CIDAD, CFAESTAD.UF FROM CFAENDER "
-				+ "LEFT OUTER JOIN CFACIDAD ON CFAENDER.ID_CFACIDAD = CFACIDAD.ID_CFACIDAD "
-				+ "LEFT OUTER JOIN CFAESTAD ON CFACIDAD.ID_CFAESTAD = CFAESTAD.ID_CFAESTAD "
-				+ "LEFT OUTER JOIN CFACLIFO ON CFAENDER.ID_CFACLIFO = CFACLIFO.ID_CFACLIFO "
-				+ "WHERE (CFACIDAD.DESCRICAO IS NOT NULL) ";
+		String sql = 	"SELECT CFACIDAD.ID_CFACIDAD, CFACIDAD.DESCRICAO AS DESCRICAO_CIDAD, CFAESTAD.UF FROM CFACLIFO\n " +
+						"LEFT OUTER JOIN CFAENDER ON CFAENDER.ID_CFACLIFO = CFACLIFO.ID_CFACLIFO\n " +
+						"LEFT OUTER JOIN CFACIDAD ON CFAENDER.ID_CFACIDAD = CFACIDAD.ID_CFACIDAD\n " +
+						"LEFT OUTER JOIN CFAESTAD ON CFACIDAD.ID_CFAESTAD = CFAESTAD.ID_CFAESTAD\n ";
+						//+ "WHERE (CFACIDAD.DESCRICAO IS NOT NULL) ";
 
 		// Verifica qual opcao foi passado por parametro
 		if(tipoPessoa.equalsIgnoreCase(KEY_TIPO_CLIENTE)){
-			sql = sql + "AND (CFACLIFO.CLIENTE = 1) GROUP BY CFACIDAD.DESCRICAO ";
+			sql = sql + "WHERE (CFACLIFO.CLIENTE = 1) GROUP BY CFACIDAD.DESCRICAO ";
 
 		}else {
 			sql = sql + "GROUP BY CFACIDAD.DESCRICAO ";
 		}
+		sql += "ORDER BY CFACIDAD.DESCRICAO ";
 		// Instancia a classe para manipular o banco de dados
 		PessoaSql clienteSql = new PessoaSql(context);
 		// Executa a funcao para retornar os registro do banco de dados
@@ -112,6 +114,9 @@ public class PessoaRotinas extends Rotinas {
 				cidade.setIdCidade(cursor.getInt(cursor.getColumnIndex("ID_CFACIDAD")));
 				cidade.setDescricao(cursor.getString(cursor.getColumnIndex("DESCRICAO_CIDAD")));
 
+				if ( (cidade.getDescricao() == null) || (cidade.getDescricao().isEmpty()) ){
+					cidade.setDescricao(context.getResources().getString(R.string.sem_cidade));
+				}
 				EstadoBeans estado = new EstadoBeans();
 				estado.setSiglaEstado(cursor.getString(cursor.getColumnIndex("UF")));
 				cidade.setEstado(estado);

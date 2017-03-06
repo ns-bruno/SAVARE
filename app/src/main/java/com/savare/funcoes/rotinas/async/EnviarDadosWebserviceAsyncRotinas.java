@@ -20,6 +20,7 @@ import com.savare.beans.ItemOrcamentoBeans;
 import com.savare.beans.OrcamentoBeans;
 import com.savare.configuracao.ConfiguracoesInternas;
 import com.savare.funcoes.FuncoesPersonalizadas;
+import com.savare.funcoes.rotinas.CriticaOrcamentoRotina;
 import com.savare.funcoes.rotinas.OrcamentoRotinas;
 import com.savare.webservice.WSSisinfoWebservice;
 
@@ -338,50 +339,89 @@ public class EnviarDadosWebserviceAsyncRotinas  extends AsyncTask<Void, Void, Vo
                         // Pega o objeto de status retornado do webservice
                         statuRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO);
 
-                        if (statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO).getAsInt() == 100) {
+                        if (statuRetorno != null) {
+                            // Indica que essa notificacao eh do tipo progress
+                            mLoad.bigTextStyle(context.getResources().getString(R.string.salvando_critica_retorno));
+                            mLoad.progress().value(0, 0, true).build();
 
-                            totalPedidoEnviado ++;
-
-                            inserirUltimaAtualizacao("AEAITORC_ENVIAR");
-                            inserirUltimaAtualizacao("AEAORCAM_ENVIAR");
-
-                            // Cria uma vareavel para salvar o status do pedido
-                            ContentValues dadosPedido = new ContentValues();
-                            dadosPedido.put("STATUS", "RB");
-
-                            ItemOrcamentoSql itemOrcamentoSql = new ItemOrcamentoSql(context);
-
-                            if (itemOrcamentoSql.update(dadosPedido, "AEAITORC.ID_AEAORCAM = " + orcamento.getIdOrcamento()) > 0){
-                                OrcamentoSql orcamentoSql = new OrcamentoSql(context);
-
-                                orcamentoSql.update(dadosPedido, "AEAORCAM.ID_AEAORCAM = " + orcamento.getIdOrcamento());
-
-                                mLoad.bigTextStyle(context.getResources().getString(R.string.marcando_pedido_enviado_sucesso));
-                                mLoad.progress().value(0, 0, true).build();
-
-                                // Checo se o texto de status foi passado pro parametro
-                                if (textStatus != null){
-                                    ((Activity) context).runOnUiThread(new Runnable() {
-                                        public void run() {
-                                            textStatus.setText(context.getResources().getString(R.string.marcando_pedido_enviado_sucesso));
-                                        }
-                                    });
-                                }
+                            // Checo se o texto de status foi passado pro parametro
+                            if (textStatus != null){
+                                ((Activity) context).runOnUiThread(new Runnable() {
+                                    public void run() {
+                                        textStatus.setText(context.getResources().getString(R.string.salvando_critica_retorno));
+                                    }
+                                });
                             }
-                        } else {
-                            listaOrcamento.remove(listaOrcamento.indexOf(orcamento));
+                            if (progressBarStatus != null){
+                                ((Activity) context).runOnUiThread(new Runnable() {
+                                    public void run() {
+                                        progressBarStatus.setIndeterminate(true);
+                                    }
+                                });
+                            }
 
-                            // Cria uma notificacao para ser manipulado
-                            Load mLoad = PugNotification.with(context).load()
-                                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_ENVIAR_DADOS + context.hashCode())
-                                    .smallIcon(R.mipmap.ic_launcher)
-                                    .largeIcon(R.mipmap.ic_launcher)
-                                    .title(R.string.enviar_pedido_nuvem)
-                                    .bigTextStyle("Código Retorno: " + ((statuRetorno != null && statuRetorno.has(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO)) ? statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO).getAsInt() + "\n" : "Sem código.\n")
-                                            + "Mensagem: " + ((statuRetorno != null && statuRetorno.has(WSSisinfoWebservice.KEY_ELEMENT_MENSAGEM_RETORNO)) ? statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_MENSAGEM_RETORNO).getAsString() + "\n" : "Não conseguimos enviar o pedido Nº " + orcamento.getIdOrcamento() + "\n")
-                                            + "Extra: " + ((statuRetorno != null && statuRetorno.has(WSSisinfoWebservice.KEY_ELEMENT_EXTRA_RETORNO)) ? statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_EXTRA_RETORNO).getAsString() : "\n"))
-                                    .flags(Notification.DEFAULT_LIGHTS);
-                            mLoad.simple().build();
+                            final ContentValues dadosCritica = new ContentValues();
+                            dadosCritica.put("ID_AEAORCAM", orcamento.getIdOrcamento());
+                            dadosCritica.put("CODIGO_RETORNO_WEBSERVICE", ((statuRetorno.has(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO)) ? statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO).getAsInt() : -1));
+                            dadosCritica.put("RETORNO_WEBSERVICE", ((statuRetorno.has(WSSisinfoWebservice.KEY_ELEMENT_MENSAGEM_RETORNO) ? statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_MENSAGEM_RETORNO).getAsString() : "") + " \n " +
+                                                                    (statuRetorno.has(WSSisinfoWebservice.KEY_ELEMENT_EXTRA_RETORNO) ? statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_EXTRA_RETORNO).getAsString() : "")));
+
+                            if (statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO).getAsInt() == 100) {
+
+                                dadosCritica.put("STATUS", OrcamentoRotinas.PEDIDO_ENVIADO);
+
+                                totalPedidoEnviado++;
+
+                                inserirUltimaAtualizacao("AEAITORC_ENVIAR");
+                                inserirUltimaAtualizacao("AEAORCAM_ENVIAR");
+
+                                // Cria uma vareavel para salvar o status do pedido
+                                ContentValues dadosPedido = new ContentValues();
+                                dadosPedido.put("STATUS", "RB");
+
+                                ItemOrcamentoSql itemOrcamentoSql = new ItemOrcamentoSql(context);
+
+                                if (itemOrcamentoSql.update(dadosPedido, "AEAITORC.ID_AEAORCAM = " + orcamento.getIdOrcamento()) > 0) {
+                                    OrcamentoSql orcamentoSql = new OrcamentoSql(context);
+
+                                    orcamentoSql.update(dadosPedido, "AEAORCAM.ID_AEAORCAM = " + orcamento.getIdOrcamento());
+
+                                    mLoad.bigTextStyle(context.getResources().getString(R.string.marcando_pedido_enviado_sucesso));
+                                    mLoad.progress().value(0, 0, true).build();
+
+                                    // Checo se o texto de status foi passado pro parametro
+                                    if (textStatus != null) {
+                                        ((Activity) context).runOnUiThread(new Runnable() {
+                                            public void run() {
+                                                textStatus.setText(context.getResources().getString(R.string.marcando_pedido_enviado_sucesso));
+                                            }
+                                        });
+                                    }
+                                }
+                            } else {
+                                dadosCritica.put("STATUS", OrcamentoRotinas.PEDIDO_ERRO_ENVIAR);
+
+                                listaOrcamento.remove(listaOrcamento.indexOf(orcamento));
+
+                                // Cria uma notificacao para ser manipulado
+                                Load mLoad = PugNotification.with(context).load()
+                                        .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_ENVIAR_DADOS + context.hashCode())
+                                        .smallIcon(R.mipmap.ic_launcher)
+                                        .largeIcon(R.mipmap.ic_launcher)
+                                        .title(R.string.enviar_pedido_nuvem)
+                                        .bigTextStyle("Código Retorno: " + ((statuRetorno != null && statuRetorno.has(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO)) ? statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO).getAsInt() + "\n" : "Sem código.\n")
+                                                + "Mensagem: " + ((statuRetorno != null && statuRetorno.has(WSSisinfoWebservice.KEY_ELEMENT_MENSAGEM_RETORNO)) ? statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_MENSAGEM_RETORNO).getAsString() + "\n" : "Não conseguimos enviar o pedido Nº " + orcamento.getIdOrcamento() + "\n")
+                                                + "Extra: " + ((statuRetorno != null && statuRetorno.has(WSSisinfoWebservice.KEY_ELEMENT_EXTRA_RETORNO)) ? statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_EXTRA_RETORNO).getAsString() : "\n"))
+                                        .flags(Notification.DEFAULT_LIGHTS);
+                                mLoad.simple().build();
+                            }
+                            final CriticaOrcamentoRotina criticaOrcamentoRotina = new CriticaOrcamentoRotina(context);
+
+                            ((Activity) context).runOnUiThread(new Runnable() {
+                                public void run() {
+                                    criticaOrcamentoRotina.insertCriticaOrcamento(dadosCritica);
+                                }
+                            });
                         }
                     } else {
                         // Cria uma notificacao para ser manipulado
@@ -610,7 +650,7 @@ public class EnviarDadosWebserviceAsyncRotinas  extends AsyncTask<Void, Void, Vo
                     .smallIcon(R.mipmap.ic_launcher)
                     .largeIcon(R.mipmap.ic_launcher)
                     .title(R.string.importar_dados_recebidos)
-                    .message(e.getMessage())
+                    .bigTextStyle(e.getMessage())
                     .flags(Notification.DEFAULT_SOUND);
             mLoad.simple().build();
         }

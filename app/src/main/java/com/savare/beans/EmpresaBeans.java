@@ -2,7 +2,7 @@ package com.savare.beans;
 
 public class EmpresaBeans {
 
-	private int idEmpresa, diasAtrazo, semMovimento, validadeFichaCliente, quantidadeDiasDestacaProduto, quantidadeCasasDecimais;
+	private int idEmpresa, idPlanoPagamentoVarejo, idPlanoPagamentoAtacado, diasAtrazo, semMovimento, validadeFichaCliente, quantidadeDiasDestacaProduto, quantidadeCasasDecimais;
 	private String nomeRazao,
 				   nomeFantasia,
 				   CpfCnpj,
@@ -25,6 +25,23 @@ public class EmpresaBeans {
 	public int getIdEmpresa() {
 		return idEmpresa;
 	}
+
+	public int getIdPlanoPagamentoVarejo() {
+		return idPlanoPagamentoVarejo;
+	}
+
+	public void setIdPlanoPagamentoVarejo(int idPlanoPagamentoVarejo) {
+		this.idPlanoPagamentoVarejo = idPlanoPagamentoVarejo;
+	}
+
+	public int getIdPlanoPagamentoAtacado() {
+		return idPlanoPagamentoAtacado;
+	}
+
+	public void setIdPlanoPagamentoAtacado(int idPlanoPagamentoAtacado) {
+		this.idPlanoPagamentoAtacado = idPlanoPagamentoAtacado;
+	}
+
 	/**
 	 * @param idEmpresa the idEmpresa to set
 	 */

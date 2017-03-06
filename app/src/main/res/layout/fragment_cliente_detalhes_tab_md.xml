@@ -92,10 +92,20 @@
         fab:menu_labels_singleLine="true" >
 
         <com.github.clans.fab.FloatingActionButton
+            android:id="@+id/fragment_cliente_detalhes_tab_md_menu_item_historico_pedido"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@mipmap/ic_history"
+            fab:fab_size="mini"
+            fab:fab_label="Histórico de Pedidos"
+            fab:fab_colorNormal="#FFFFFF"
+            fab:fab_colorPressed="@color/colorPrimary"/>
+
+        <com.github.clans.fab.FloatingActionButton
             android:id="@+id/fragment_cliente_detalhes_tab_md_menu_item_titulos_cliente"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_action_view_as_list"
+            android:src="@drawable/ic_action_coins_pay"
             fab:fab_size="mini"
             fab:fab_label="Títulos do Cliente"
             fab:fab_colorNormal="#FFFFFF"
@@ -105,7 +115,7 @@
             android:id="@+id/fragment_cliente_detalhes_tab_md_menu_item_novo_orcamento"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_action_person"
+            android:src="@drawable/ic_action_view_as_list"
             fab:fab_size="mini"
             fab:fab_label="Novo Orçamento"
             fab:fab_colorNormal="#FFFFFF"
@@ -115,7 +125,7 @@
             android:id="@+id/fragment_cliente_detalhes_tab_md_menu_item_enviar_dados_cliente"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_action_person"
+            android:src="@mipmap/ic_cloud_upload"
             fab:fab_size="mini"
             fab:fab_label="Enviar Dados do Novo Cliente"
             fab:fab_colorNormal="#FFFFFF"
