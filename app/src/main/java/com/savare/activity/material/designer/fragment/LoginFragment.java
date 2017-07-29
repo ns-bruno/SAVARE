@@ -85,7 +85,7 @@ public class LoginFragment extends SlideFragment {
                                             Rotinas rotinas = new Rotinas(getContext());
 
                                             // Verfifica se existe algum usuario cadastrado, ou
-                                            if ((rotinas.existeUsuario() == true) && (!funcoes.getValorXml("CodigoUsuario").equalsIgnoreCase(funcoes.NAO_ENCONTRADO))) {
+                                            if ((rotinas.existeUsuario() == true) && (!funcoes.getValorXml("ChaveFuncionario").equalsIgnoreCase(funcoes.NAO_ENCONTRADO))) {
 
                                                 SuperToast.create(getContext(), getResources().getString(R.string.usuario_atualizado_sucesso), SuperToast.Duration.LONG, Style.getStyle(Style.GREEN, SuperToast.Animations.POPUP)).show();
 

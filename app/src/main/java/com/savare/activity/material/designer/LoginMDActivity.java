@@ -18,6 +18,7 @@ import android.widget.TextView;
 
 import com.savare.R;
 import com.savare.activity.CadastroUsuarioActivity;
+import com.savare.banco.funcoesSql.PessoaSql;
 import com.savare.banco.funcoesSql.UsuarioSQL;
 import com.savare.banco.local.ConexaoBancoDeDados;
 import com.savare.funcoes.FuncoesPersonalizadas;
@@ -111,15 +112,15 @@ public class LoginMDActivity extends AppCompatActivity {
 
             } else {
                 textCodigoUsuario.setText(codigoUsuario);
-                UsuarioSQL usuarioSQL = new UsuarioSQL(LoginMDActivity.this);
+                PessoaSql pessoaSql = new PessoaSql(LoginMDActivity.this);
                 // Pega os dados do usuario(vendedor)
-                Cursor dadosUsuario = usuarioSQL.query("id_usua = " + codigoUsuario);
+                Cursor dadosUsuario = pessoaSql.query("CODIGO_FUN = " + codigoUsuario);
 
                 if ((dadosUsuario != null) && (dadosUsuario.getCount() > 0)) {
                     // Move para o primeiro registro
                     dadosUsuario.moveToFirst();
                     // Preenche os campos com os dados do usuario(vendedor)
-                    textUsuario.setText(dadosUsuario.getString(dadosUsuario.getColumnIndex("LOGIN_USUA")));
+                    textUsuario.setText(dadosUsuario.getString(dadosUsuario.getColumnIndex("NOME_RAZAO")));
                 }
             }
             boolean enviaAutomatico = (funcoes.getValorXml("EnviarAutomatico").equalsIgnoreCase("S") ? true : false);
@@ -151,7 +152,7 @@ public class LoginMDActivity extends AppCompatActivity {
             public boolean onKey(View v, int keyCode, KeyEvent event) {
 
                 if (keyCode == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN) {
-                    Log.d("SAVARE", "enter_key_called");
+                    Log.d("SAVARE", "Prescionou a tecla enter apos digitar senha - enter_key_called");
 
                     entrarAplicacao();
                 }
@@ -209,7 +210,7 @@ public class LoginMDActivity extends AppCompatActivity {
         if ((funcoes.getValorXml("Usuario").equalsIgnoreCase(funcoes.NAO_ENCONTRADO)) ||
                 (funcoes.getValorXml("CodigoUsuario").equalsIgnoreCase(funcoes.NAO_ENCONTRADO)) ||
                 (funcoes.getValorXml("CodigoEmpresa").equalsIgnoreCase(funcoes.NAO_ENCONTRADO)) ||
-                (funcoes.getValorXml("ChaveUsuario").equalsIgnoreCase(funcoes.NAO_ENCONTRADO)) ||
+                (funcoes.getValorXml("ChaveFuncionario").equalsIgnoreCase(funcoes.NAO_ENCONTRADO)) ||
                 (funcoes.getValorXml("ModoConexao").equalsIgnoreCase(funcoes.NAO_ENCONTRADO))){
             retorno = false;
 

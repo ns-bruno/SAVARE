@@ -12,7 +12,6 @@ import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -1146,10 +1145,18 @@ public class OrcamentoProdutoDetalhesMDFragment extends Fragment {
                     }
                 }
             } else {
-                SuperToast.create(getContext(), getContext().getResources().getString(R.string.verifique_campos_obrigatorios), SuperToast.Duration.SHORT, Style.getStyle(Style.RED, SuperToast.Animations.POPUP)).show();
+                ((Activity) getContext()).runOnUiThread(new Runnable() {
+                    public void run() {
+                        SuperToast.create(getContext(), getContext().getResources().getString(R.string.verifique_campos_obrigatorios), SuperToast.Duration.SHORT, Style.getStyle(Style.RED, SuperToast.Animations.POPUP)).show();
+                    }
+                });
             }
         } else {
-            SuperToast.create(getContext(), getContext().getResources().getString(R.string.quantidade_invalida), SuperToast.Duration.SHORT, Style.getStyle(Style.RED, SuperToast.Animations.POPUP)).show();
+            ((Activity) getContext()).runOnUiThread(new Runnable() {
+                public void run() {
+                    SuperToast.create(getContext(), getContext().getResources().getString(R.string.quantidade_invalida), SuperToast.Duration.SHORT, Style.getStyle(Style.RED, SuperToast.Animations.POPUP)).show();
+                }
+            });
         }
     }
 }

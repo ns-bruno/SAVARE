@@ -9,6 +9,7 @@ import android.telephony.TelephonyManager;
 import com.google.gson.Gson;
 import com.savare.beans.DispositivoBeans;
 import com.savare.beans.RetornoWebServiceBeans;
+import com.savare.beans.SmadispoBeans;
 import com.savare.configuracao.ServicosWeb;
 import com.savare.funcoes.FuncoesPersonalizadas;
 
@@ -41,81 +42,88 @@ public class WSSisinfoWebservice {
 
     private Context context;
     private DispositivoBeans dispositivoBeans;
+    private SmadispoBeans smadispoBeans;
     public static final String FUNCTION_SELECT_USUARIO_USUA = "selectUsuario";
     public static final String FUNCTION_JSON_SELECT_USUARIO_USUA = "/savare/selectUsuario";
+    public static final String FUNCTION_SISINFOWEB_JSON_SELECT_USUARIO_USUA = "/savare/selectUsuario";
     public static final String FUNCTION_SELECT_VERSAO_SAVARE = "selectVersaoSavare";
     public static final String FUNCTION_JSON_SELECT_VERSAO_SAVARE = "/savare/selectVersaoSavare";
+    public static final String FUNCTION_SISINFOWEB_JSON_SELECT_VERSAO_SAVARE = "/savare/selectVersaoSavare";
     public static final String FUNCTION_SELECT_ULTIMA_ATUALIZACAO = "selectUltimaAtualizacao";
     public static final String FUNCTION_INSERT_ULTIMA_ATUALIZACAO = "insertUltimaAtualizacao";
     public static final String FUNCTION_SELECT_CFAAREAS = "selectAreas";
-    public static final String FUNCTION_JSON_SELECT_CFAAREAS = "/clienteFornecedor/selectAreas";
+    public static final String FUNCTION_SISINFOWEB_JSON_SELECT_CFAAREAS = "/Cfaareas";
     public static final String FUNCTION_SELECT_SMAEMPRE = "selectEmpresa";
     public static final String FUNCTION_JSON_SELECT_SMAEMPRE = "/sistema/selectEmpresa";
+    public static final String FUNCTION_SISINFOWEB_JSON_SELECT_SMAEMPRE = "/Smaempre";
     public static final String FUNCTION_SELECT_CFAATIVI = "selectRamoAtividade";
-    public static final String FUNCTION_JSON_SELECT_CFAATIVI = "/clienteFornecedor/selectRamoAtividade";
+    public static final String FUNCTION_SISINFOWEB_JSON_SELECT_CFAATIVI = "/Cfaativi";
     public static final String FUNCTION_SELECT_CFASTATU = "selectStatusClifo";
-    public static final String FUNCTION_JSON_SELECT_CFASTATU = "/clienteFornecedor/selectStatusClifo";
+    public static final String FUNCTION_SISINFOWEB_JSON_SELECT_CFASTATU = "/Cfastatu";
     public static final String FUNCTION_SELECT_CFATPDOC = "selectTipoDocumento";
-    public static final String FUNCTION_JSON_SELECT_CFATPDOC = "/clienteFornecedor/selectTipoDocumento";
+    public static final String FUNCTION_SISINFOWEB_JSON_SELECT_CFATPDOC = "/Cfatpdoc";
     public static final String FUNCTION_SELECT_CFACCRED = "selectCartaoCredito";
-    public static final String FUNCTION_JSON_SELECT_CFACCRED = "/clienteFornecedor/selectCartaoCredito";
+    public static final String FUNCTION_SISINFOWEB_JSON_SELECT_CFACCRED = "/Cfaccred";
     public static final String FUNCTION_SELECT_CFAPORTA = "selectPortador";
-    public static final String FUNCTION_JSON_SELECT_CFAPORTA = "/clienteFornecedor/selectPortador";
+    public static final String FUNCTION_SISINFOWEB_JSON_SELECT_CFAPORTA = "/Cfaporta";
     public static final String FUNCTION_SELECT_CFAPROFI = "selectProfissao";
-    public static final String FUNCTION_JSON_SELECT_CFAPROFI = "/clienteFornecedor/selectProfissao";
+    public static final String FUNCTION_SISINFOWEB_JSON_SELECT_CFAPROFI = "/Cfaprofi";
     public static final String FUNCTION_SELECT_CFATPCLI = "selectTipoCliente";
-    public static final String FUNCTION_JSON_SELECT_CFATPCLI = "/clienteFornecedor/selectTipoCliente";
+    public static final String FUNCTION_SISINFOWEB_JSON_SELECT_CFATPCLI = "/Cfatpcli";
     public static final String FUNCTION_SELECT_CFATPCOB = "selectTipoCobranca";
-    public static final String FUNCTION_JSON_SELECT_CFATPCOB = "/clienteFornecedor/selectTipoCobranca";
+    public static final String FUNCTION_JSON_SELECT_CFATPCOB = "/Cfatpcob";
     public static final String FUNCTION_SELECT_CFAESTAD = "selectEstado";
-    public static final String FUNCTION_JSON_SELECT_CFAESTAD = "/clienteFornecedor/selectEstado";
+    public static final String FUNCTION_JSON_SELECT_CFAESTAD = "/Cfaestad";
     public static final String FUNCTION_SELECT_CFACIDAD = "selectCidade";
-    public static final String FUNCTION_JSON_SELECT_CFACIDAD = "/clienteFornecedor/selectCidade";
+    public static final String FUNCTION_JSON_SELECT_CFACIDAD = "/Cfacidad";
     public static final String FUNCTION_SELECT_CFACLIFO = "selectClienteFornecedor";
-    public static final String FUNCTION_JSON_SELECT_CFACLIFO = "/clienteFornecedor/selectClienteFornecedor";
+    public static final String FUNCTION_JSON_SELECT_CFACLIFO = "/Cfaclifo";
+    public static final String FUNCTION_SISINFOWEB_JSON_SELECT_CFACLIFO = "/Cfaclifo";
     public static final String FUNCTION_SELECT_CFAENDER = "selectEndereco";
-    public static final String FUNCTION_JSON_SELECT_CFAENDER = "/clienteFornecedor/selectEndereco";
+    public static final String FUNCTION_SISINFOWEB_JSON_SELECT_CFABAIRO = "/Cfabairo";
+    public static final String FUNCTION_SISINFOWEB_JSON_SELECT_CFAENDER = "/Cfaender";
+    public static final String FUNCTION_SISINFOWEB_JSON_SELECT_CFAENDER_CUSTOM = "/CfaenderCustom";
     public static final String FUNCTION_SELECT_CFAPARAM = "selectParametro";
-    public static final String FUNCTION_JSON_SELECT_CFAPARAM = "/clienteFornecedor/selectParametro";
+    public static final String FUNCTION_SISINFOWEB_JSON_SELECT_CFAPARAM = "/Cfaparam";
     public static final String FUNCTION_SELECT_CFAFOTOS = "selectFotos";
-    public static final String FUNCTION_JSON_SELECT_CFAFOTOS = "clienteFornecedor/selectFotos";
+    public static final String FUNCTION_SISINFOWEB_JSON_SELECT_CFAFOTOS = "/Cfafotos";
     public static final String FUNCTION_SELECT_AEAPLPGT = "selectPlanoPagamento";
-    public static final String FUNCTION_JSON_SELECT_AEAPLPGT = "/estoque/selectPlanoPagamento";
+    public static final String FUNCTION_SISINFOWEB_JSON_SELECT_AEAPLPGT = "/Aeaplpgt";
     public static final String FUNCTION_SELECT_AEACLASE = "selectClasseProdutos";
-    public static final String FUNCTION_JSON_SELECT_AEACLASE = "/estoque/selectClasseProdutos";
+    public static final String FUNCTION_SISINFOWEB_JSON_SELECT_AEACLASE = "/Aeaclase";
     public static final String FUNCTION_SELECT_AEAUNVEN = "selectUnidadeVenda";
-    public static final String FUNCTION_JSON_SELECT_AEAUNVEN = "/estoque/selectUnidadeVenda";
+    public static final String FUNCTION_SISINFOWEB_JSON_SELECT_AEAUNVEN = "/Aeaunven";
     public static final String FUNCTION_SELECT_AEAGRADE = "selectGrade";
-    public static final String FUNCTION_JSON_SELECT_AEAGRADE = "/estoque/selectGrade";
+    public static final String FUNCTION_SISINFOWEB_JSON_SELECT_AEAGRADE = "/Aeagrade";
     public static final String FUNCTION_SELECT_AEAMARCA = "selectMarca";
-    public static final String FUNCTION_JSON_SELECT_AEAMARCA = "/estoque/selectMarca";
+    public static final String FUNCTION_SISINFOWEB_JSON_SELECT_AEAMARCA = "/Aeamarca";
     public static final String FUNCTION_SELECT_AEACODST = "selectCodigoSituacaoTributaria";
-    public static final String FUNCTION_JSON_SELECT_AEACODST = "/estoque/selectCodigoSituacaoTributaria";
+    public static final String FUNCTION_SISINFOWEB_JSON_SELECT_AEACODST = "/Aeacodst";
     public static final String FUNCTION_SELECT_AEAPRODU = "selectProduto";
-    public static final String FUNCTION_JSON_SELECT_AEAPRODU = "/estoque/selectProduto";
+    public static final String FUNCTION_SISINFOWEB_JSON_SELECT_AEAPRODU = "/Aeaprodu";
     public static final String FUNCTION_SELECT_AEAPRECO = "selectPreco";
-    public static final String FUNCTION_JSON_SELECT_AEAPRECO = "/estoque/selectPreco";
+    public static final String FUNCTION_SISINFOWEB_JSON_SELECT_AEAPRECO = "/Aeapreco";
     public static final String FUNCTION_SELECT_AEAEMBAL = "selectEmbalagemProduto";
-    public static final String FUNCTION_JSON_SELECT_AEAEMBAL = "/estoque/selectEmbalagemProduto";
+    public static final String FUNCTION_SISINFOWEB_JSON_SELECT_AEAEMBAL = "/Aeaembal";
     public static final String FUNCTION_SELECT_AEAPLOJA = "selectProdutoPorLoja";
-    public static final String FUNCTION_JSON_SELECT_AEAPLOJA = "/estoque/selectProdutoPorLoja";
+    public static final String FUNCTION_SISINFOWEB_JSON_SELECT_AEAPLOJA = "/Aeaploja";
     public static final String FUNCTION_SELECT_AEALOCES = "selectLocalEstoque";
-    public static final String FUNCTION_JSON_SELECT_AEALOCES = "/estoque/selectLocalEstoque";
+    public static final String FUNCTION_SISINFOWEB_JSON_SELECT_AEALOCES = "/Aealoces";
     public static final String FUNCTION_SELECT_AEAESTOQ = "selectEstoque";
-    public static final String FUNCTION_JSON_SELECT_AEAESTOQ = "/estoque/selectEstoque";
+    public static final String FUNCTION_SISINFOWEB_JSON_SELECT_AEAESTOQ = "/Aeaestoq";
     public static final String FUNCTION_SELECT_AEAORCAM = "selectOrcamento";
-    public static final String FUNCTION_JSON_SELECT_AEAORCAM = "/orcamento/selectOrcamento";
+    public static final String FUNCTION_SISINFOWEB_JSON_SELECT_AEAORCAM = "/Aeaorcam";
     public static final String FUNCTION_SELECT_AEAITORC = "selectItemOrcamento";
     public static final String FUNCTION_SELECT_AEAPERCE = "selectPercentual";
-    public static final String FUNCTION_JSON_SELECT_AEAPERCE = "/estoque/selectPercentual";
+    public static final String FUNCTION_SISINFOWEB_JSON_SELECT_AEAPERCE = "/Aeaperce";
     public static final String FUNCTION_SELECT_AEAFATOR = "selectFator";
-    public static final String FUNCTION_JSON_SELECT_AEAFATOR = "/estoque/selectFator";
+    public static final String FUNCTION_SISINFOWEB_JSON_SELECT_AEAFATOR = "/Aeafator";
     public static final String FUNCTION_SELECT_AEAPRREC = "selectProdutoRecomendado";
-    public static final String FUNCTION_JSON_SELECT_AEAPRREC = "/estoque/selectProdutoRecomendado";
+    public static final String FUNCTION_SISINFOWEB_JSON_SELECT_AEAPRREC = "/Aeaprrec";
     public static final String FUNCTION_SELECT_RPAPARCE = "selectParcelas";
-    public static final String FUNCTION_JSON_SELECT_RPAPARCE = "/receberPagar/selectParcelas";
+    public static final String FUNCTION_SISINFOWEB_JSON_SELECT_RPAPARCE = "/Rpaparce";
     public static final String FUNCTION_INSERT_AEAORCAM = "insertOrcamento";
-    public static final String FUNCTION_JSON_INSERT_AEAORCAM = "/orcamento/insertOrcamento";
+    public static final String FUNCTION_SISINFOWEB_JSON_INSERT_AEAORCAM = "/Aeaorcam";
     public static final String FUNCTION_INSERT_AEAITORC = "insertItemOrcamento";
     public static final String FUNCTION_UPDATE_STATUS_AEAORCAM = "updateStatusOrcamento";
     public static final String FUNCTION_CHECK_SEND_AEAORCAM = "checkSendOrcamento";
@@ -133,11 +141,11 @@ public class WSSisinfoWebservice {
 
         FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
 
-        if ((!funcoes.getValorXml("ChaveUsuario").equalsIgnoreCase(funcoes.NAO_ENCONTRADO)) && (funcoes.getValorXml("ChaveUsuario").length() >= 36)) {
+        if ((!funcoes.getValorXml("ChaveFuncionario").equalsIgnoreCase(funcoes.NAO_ENCONTRADO)) && (funcoes.getValorXml("ChaveFuncionario").length() >= 16)) {
 
             // Instancia uma classe para pegar os dados do dispositivo
-            dispositivoBeans = new DispositivoBeans();
-            dispositivoBeans.setChaveUsuario(funcoes.getValorXml("ChaveUsuario"));
+            /*dispositivoBeans = new DispositivoBeans();
+            dispositivoBeans.setChaveUsuario(funcoes.getValorXml("ChaveFuncionario"));
             dispositivoBeans.setNomeDispositivo(android.os.Build.MODEL + " - "+ android.os.Build.PRODUCT);
             dispositivoBeans.setSistemaOperacionalDispositivo(""+android.os.Build.VERSION.SDK_INT);
             dispositivoBeans.setNumeroSerialDispositivo(Build.SERIAL.replace("unknown", ""));
@@ -146,7 +154,14 @@ public class WSSisinfoWebservice {
 
             TelephonyManager telephonyManager = (TelephonyManager) context.getSystemService(context.TELEPHONY_SERVICE);
             dispositivoBeans.setIdDispositivo(telephonyManager.getDeviceId());
-            dispositivoBeans.setOperadoraDispositivo(telephonyManager.getSimOperatorName());
+            dispositivoBeans.setOperadoraDispositivo(telephonyManager.getSimOperatorName());*/
+
+            smadispoBeans = new SmadispoBeans();
+            //smadispoBeans.setGuidClifo(funcoes.getValorXml("ChaveFuncionario"));
+            smadispoBeans.setGuidClifo(funcoes.getValorXml("ChaveFuncionario"));
+            smadispoBeans.setDescricao(android.os.Build.MODEL + " - "+ android.os.Build.PRODUCT);
+            smadispoBeans.setIdentificacao(Build.SERIAL.replace("unknown", "") + " - " + android.os.Build.MANUFACTURER);
+            smadispoBeans.setPlataforma("Android "+android.os.Build.VERSION.SDK_INT);
         }
 
     }
@@ -381,10 +396,10 @@ public class WSSisinfoWebservice {
      * @param sql
      * @param funcao
      * @param metodo
-     * @param dadosJson - Os dados a serem passados ja tem que ser passado no formato Json
+     * @param parametros - Os dados a serem passados ja tem que ser passado no formato Json
      * @return
      */
-    public String executarSelectWebserviceJson(String sql, String funcao, String metodo, String dadosJson){
+    public String executarSelectWebserviceJson(String sql, String funcao, String metodo, String parametros){
         String retorno = null;
         HttpURLConnection conexaoHttp = null;
         try {
@@ -396,15 +411,22 @@ public class WSSisinfoWebservice {
             if ((ipServidor == null) || (ipServidor.length() <= 1) || (ipServidor.equalsIgnoreCase(funcoes.NAO_ENCONTRADO))){
                 ipServidor = "localhost";
             }
-            String enderecoWebService = "http://" + ipServidor + ((!ServicosWeb.PORTA_JSON.isEmpty()) ? (":" + ServicosWeb.PORTA_JSON + "/") : "/" ) + ServicosWeb.WS_ENDERECO_WEBSERVICE_JSON + funcao;
+            //String enderecoWebService = "http://" + ipServidor + ((!ServicosWeb.PORTA_JSON.isEmpty()) ? (":" + ServicosWeb.PORTA_JSON + "/") : "/" ) + ServicosWeb.WS_ENDERECO_WEBSERVICE_JSON + funcao;
+            String enderecoWebService = "http://" + "10.0.2.2" + ((!ServicosWeb.PORTA_JSON.isEmpty()) ? (":" + ServicosWeb.PORTA_JSON + "/") : "/" ) + ServicosWeb.WS_ENDERECO_SISINFOWEB + funcao;
 
             if ((metodo.equalsIgnoreCase(METODO_GET)) || (metodo.equalsIgnoreCase(METODO_POST))){
                 Gson gson = new Gson();
                 // Adiciona o dipositivo em formado json e codificado
-                enderecoWebService += "/" + URLEncoder.encode(gson.toJson(dispositivoBeans), "UTF-8");
+                //enderecoWebService += "/" + URLEncoder.encode(gson.toJson(dispositivoBeans), "UTF-8");
+                enderecoWebService += "?dispositivo=" + URLEncoder.encode(gson.toJson(smadispoBeans), "UTF-8");
 
-                if ((metodo.equalsIgnoreCase(METODO_GET)) && (dadosJson != null) && (!dadosJson.isEmpty())){
-                    enderecoWebService += "/" + URLEncoder.encode(dadosJson, "UTF-8");
+                if ((metodo.equalsIgnoreCase(METODO_GET)) && (parametros != null) && (!parametros.isEmpty()) && (parametros.contains("&"))){
+                    //enderecoWebService += "/" + URLEncoder.encode(parametros, "UTF-8");
+                    enderecoWebService += URLEncoder.encode(parametros, "UTF-8").replace("%26", "&").replace("%3D", "=");
+                }
+                if ((metodo.equalsIgnoreCase(METODO_GET)) && (sql != null) && (!sql.isEmpty())){
+                    //enderecoWebService += "/" + URLEncoder.encode(parametros, "UTF-8");
+                    enderecoWebService += "&sqlQuery= " + URLEncoder.encode(sql, "UTF-8");
                 }
             }
             URL urlWebservice = new URL(enderecoWebService);
@@ -418,14 +440,14 @@ public class WSSisinfoWebservice {
             conexaoHttp.setConnectTimeout(100000);
             conexaoHttp.setReadTimeout(100000);
 
-            if ((metodo.equalsIgnoreCase(METODO_POST)) && (dadosJson != null) && (!dadosJson.isEmpty())){
+            if ((metodo.equalsIgnoreCase(METODO_POST)) && (parametros != null) && (!parametros.isEmpty())){
                 // // Define que a conexão pode enviar informacoes e obte-las de volta
                 conexaoHttp.setDoOutput(true);
                 conexaoHttp.setDoInput(true);
 
                 DataOutputStream dadosEnvio = new DataOutputStream(conexaoHttp.getOutputStream());
                 // Salva o Json para envio
-                dadosEnvio.writeBytes(dadosJson);
+                dadosEnvio.writeBytes(parametros);
                 dadosEnvio.flush();
             }
             conexaoHttp.connect();
@@ -433,7 +455,7 @@ public class WSSisinfoWebservice {
             // Pega o codigo de retorno da comunicacao
             int codigoResp = conexaoHttp.getResponseCode();
             // Checa o codigo de retorno, se foi com sucesso
-            if (codigoResp == 200) {
+            if (codigoResp == HttpURLConnection.HTTP_OK) {
 
                 //InputStream inputStream = new BufferedInputStream(conexaoHttp.getInputStream());
                 BufferedReader buffeLeitura = new BufferedReader(new InputStreamReader(conexaoHttp.getInputStream()));
@@ -445,7 +467,7 @@ public class WSSisinfoWebservice {
                 }
                 buffeLeitura.close();
 
-                retorno = dadosWebservice.toString();
+                return dadosWebservice.toString();
             }
 
             if (codigoResp == 404){
@@ -453,7 +475,8 @@ public class WSSisinfoWebservice {
                 final ContentValues contentValues = new ContentValues();
                 contentValues.put("comando", 0);
                 contentValues.put("tela", "WSSisInfoWebservice");
-                contentValues.put("mensagem", "Erro: 404. \nEndereço dos dados está errado. Tente novamente mais tarde, caso persista o erro entre em contato com suporte SAVARE");
+                contentValues.put("mensagem", "Erro: 404. \nEndereço dos dados está errado. Tente novamente mais tarde, caso persista o erro entre em contato com suporte SAVARE. \n" +
+                                              "Função: " + funcao + " \n Metodo: " + metodo);
                 contentValues.put("dados", conexaoHttp.toString());
 
                 final FuncoesPersonalizadas finalFuncoes = funcoes;

@@ -3,7 +3,6 @@ package com.savare.adapter;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.view.LayoutInflater;
@@ -450,26 +449,26 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 			
 		} else if(this.tipoItem == PRODUTO){
 			// Retorna a quantidade de produto da lista
-			return listaProduto.size();
+			return (listaProduto != null) ? listaProduto.size() : 0;
 			
 		} else if(this.tipoItem == TIPO_DOCUMENTO){
 			// Retorna a quantidade de documentos da lista
-			return listaTipoDocumento.size();
+			return (listaTipoDocumento != null) ? listaTipoDocumento.size() : 0;
 			
 		} else if( (this.tipoItem == PLANO_PAGAMENTO) || (this.tipoItem == PLANO_PAGAMENTO_ORCAMENTO) ){
 			
-			return this.listaPlanoPagamento.size();
+			return (listaPlanoPagamento != null) ? this.listaPlanoPagamento.size() : 0;
 			
 		} else if((this.tipoItem == LISTA_ORCAMENTO_PEDIDO) || (this.tipoItem == RATEIO_ORCAMENTO)){
 			// Retorna a quantidade de orscamento da lista
-			return this.listaOrcamentoPedido.size();
+			return (listaOrcamentoPedido != null) ? this.listaOrcamentoPedido.size() : 0;
 		} else if(this.tipoItem == RAMO_ATIVIDADE){
 			
-			return this.listaRamoAtividade.size();
+			return (listaRamoAtividade != null) ? this.listaRamoAtividade.size() : 0;
 			
 		} else if(this.tipoItem == TIPO_CLIENTE){
 			
-			return this.listaTipoCliente.size();
+			return (listaTipoCliente != null) ? this.listaTipoCliente.size() : 0;
 			
 		} else if(this.tipoItem == PORTADOR_BANCO){
 			
@@ -623,14 +622,14 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 			return this.listaTipoDocumento.get(position).getIdTipoDocumento();
 			
 		} else if( (this.tipoItem == PLANO_PAGAMENTO) || (this.tipoItem == PLANO_PAGAMENTO_ORCAMENTO) ){
-			return this.listaPlanoPagamento.get(position).getIdPlanoPagamento();
+			return (listaPlanoPagamento != null) ? this.listaPlanoPagamento.get(position).getIdPlanoPagamento() : 0;
 			
 		} else if((this.tipoItem == LISTA_ORCAMENTO_PEDIDO) || (this.tipoItem == RATEIO_ORCAMENTO)){
-			return this.listaOrcamentoPedido.get(position).getIdOrcamento();
+			return (listaOrcamentoPedido != null) ? this.listaOrcamentoPedido.get(position).getIdOrcamento() : 0;
 			
 		} else if(this.tipoItem == RAMO_ATIVIDADE){
 			
-			return this.listaRamoAtividade.get(position).getIdRamoAtividade();
+			return (listaRamoAtividade != null) ? this.listaRamoAtividade.get(position).getIdRamoAtividade() : 0;
 			
 		} else if(this.tipoItem == TIPO_CLIENTE){
 			
@@ -1195,7 +1194,7 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 			
 			textDescricao.setText(orcamento.getNomeRazao());
 			textAbaixoDescricaoEsqueda.setText("Nº " +  orcamento.getIdOrcamento());
-			textAbaixoDescricaoDireita.setText(orcamento.getSiglaEstado() + " - " + orcamento.getCidade());
+			textAbaixoDescricaoDireita.setText((orcamento.getSiglaEstado() != null ? orcamento.getSiglaEstado() : "UF") + " - " + (orcamento.getCidade() != null ? orcamento.getCidade() : "Cidade"));
 
 			// Instancia a classe de funcoes universal
 			funcoes = new FuncoesPersonalizadas(context);
@@ -1311,15 +1310,19 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 			
 			//textAbaixoDescricaoEsqueda.setText("D.A.V.: " + tipoCLiente.getDescontoAtacadoVista() + " - D.A.P.: " + tipoCLiente.getDescontoAtacadoPrazo());
 			//textAbaixoDescricaoDireita.setText("D.V.V.: " + tipoCLiente.getDescontoVarejoVista() + " - D.V.P.: " + tipoCLiente.getDescontoVarejoPrazo());
-			
-			if(tipoCLiente.getVendeAtacadoVarejo().equalsIgnoreCase("0")){
-				textBottonEsquerdo.setText("Atacado");
-				
-			}else if(tipoCLiente.getVendeAtacadoVarejo().equalsIgnoreCase("1")){
-				textBottonEsquerdo.setText("Varejo");
-			
-			} else if(tipoCLiente.getVendeAtacadoVarejo().equalsIgnoreCase("2")){
-				textBottonEsquerdo.setText("Atacado e Varejo");
+
+			if (tipoCLiente.getVendeAtacadoVarejo() != null) {
+				if (tipoCLiente.getVendeAtacadoVarejo().equalsIgnoreCase("0")) {
+					textBottonEsquerdo.setText("Atacado");
+
+				} else if (tipoCLiente.getVendeAtacadoVarejo().equalsIgnoreCase("1")) {
+					textBottonEsquerdo.setText("Varejo");
+
+				} else if (tipoCLiente.getVendeAtacadoVarejo().equalsIgnoreCase("2")) {
+					textBottonEsquerdo.setText("Atacado e Varejo");
+				}
+			} else {
+				textBottonEsquerdo.setVisibility(View.INVISIBLE);
 			}
 
 			textAbaixoDescricaoEsqueda.setVisibility(View.INVISIBLE);

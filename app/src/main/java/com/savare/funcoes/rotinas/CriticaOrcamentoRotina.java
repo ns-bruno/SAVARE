@@ -83,7 +83,7 @@ public class CriticaOrcamentoRotina extends Rotinas {
             final ContentValues mensagem = new ContentValues();
             mensagem.put("comando", 1);
             mensagem.put("tela", "CriticaOrcamentoRotina");
-            mensagem.put("mensagem", "Não conseguimos buscar as críticas do orçamento " + idOrcamento + "\n" + e.getMessage());
+            mensagem.put("mensagem", "Não conseguimos buscar as críticas do orçamento " + idOrcamento + ". \n" + e.getMessage());
 
             ((Activity) context).runOnUiThread(new Runnable() {
                 public void run() {
@@ -93,5 +93,50 @@ public class CriticaOrcamentoRotina extends Rotinas {
         }
 
         return listaCriticaOrcamento;
+    }
+
+
+    public CriticaOrcamentoBeans criticaOrcamento(String idCritica, String whereParamero){
+        CriticaOrcamentoBeans dadosCriticaOrcamento = null;
+
+        try{
+            CriticaOrcamentoSql criticaOrcamentoSql = new CriticaOrcamentoSql(context);
+
+            String whereQuery = "(ID_AEACRORC = " + idCritica + ") ";
+
+            if ((whereParamero != null) && (!whereParamero.isEmpty())){
+                whereQuery += " AND (" + whereParamero + ")";
+            }
+
+            final Cursor dados = criticaOrcamentoSql.query(whereQuery, "DT_CAD");
+
+            if (dados != null && dados.getCount() > 0){
+
+                dadosCriticaOrcamento = new CriticaOrcamentoBeans();
+
+                dados.moveToFirst();
+                dadosCriticaOrcamento.setIdCritica(dados.getInt(dados.getColumnIndex("ID_AEACRORC")));
+                dadosCriticaOrcamento.setIdOrcamento(dados.getInt(dados.getColumnIndex("ID_AEAORCAM")));
+                dadosCriticaOrcamento.setDataCadastro(dados.getString(dados.getColumnIndex("DT_CAD")));
+                dadosCriticaOrcamento.setStatus(dados.getString(dados.getColumnIndex("STATUS")));
+                dadosCriticaOrcamento.setCodigoRetornoWebservice(dados.getInt(dados.getColumnIndex("CODIGO_RETORNO_WEBSERVICE")));
+                dadosCriticaOrcamento.setRetornoWebservice(dados.getString(dados.getColumnIndex("RETORNO_WEBSERVICE")));
+            }
+        } catch (Exception e){
+            final FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
+            // Cria uma variavem para inserir as propriedades da mensagem
+            final ContentValues mensagem = new ContentValues();
+            mensagem.put("comando", 1);
+            mensagem.put("tela", "CriticaOrcamentoRotina");
+            mensagem.put("mensagem", "Não conseguimos buscar a crítica " + idCritica + ". \n" + e.getMessage());
+
+            ((Activity) context).runOnUiThread(new Runnable() {
+                public void run() {
+                    funcoes.menssagem(mensagem);
+                }
+            });
+        }
+
+        return dadosCriticaOrcamento;
     }
 }

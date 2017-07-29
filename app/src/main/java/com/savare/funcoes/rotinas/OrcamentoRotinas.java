@@ -414,7 +414,7 @@ public class OrcamentoRotinas extends Rotinas {
 					   + "LEFT OUTER JOIN CFACIDAD CFACIDAD ON(AEAORCAM.ID_CFACIDAD = CFACIDAD.ID_CFACIDAD) ";
 					   //+ "WHERE (AEAORCAM.STATUS = '" + tipo + "') ";
 			
-			if(listaTipo.length > 0){
+			if(listaTipo != null && listaTipo.length > 0){
 				// adiciona a plavra where no select
 				 sql += " WHERE (AEAORCAM.STATUS = '";
 				 
@@ -442,8 +442,11 @@ public class OrcamentoRotinas extends Rotinas {
 			}*/
 			
 			// Adiciona a clausula where
-			if(where != null){
+			if((listaTipo != null) && (where != null)){
 				sql = sql + " AND " + where + " ";
+
+			} else if (where != null){
+				sql += " WHERE " + where + " ";
 			}
 			// Adiciona um ordem no sql
 			sql = sql + " ORDER BY AEAORCAM.DT_CAD ";

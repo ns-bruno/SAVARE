@@ -46,7 +46,7 @@ public class ConexaoBancoDeDados extends SQLiteOpenHelper {
 
 	@Override
 	public void onCreate(SQLiteDatabase bd) {
-		Log.i("SAVARE", "create database");
+		Log.i("SAVARE", "Criando o Banco de Dados");
 		try {
 			//bd.execSQL(SQL_TABELAS[i]);
 			execSqlFile(CREATEFILE, bd);
@@ -147,8 +147,7 @@ public class ConexaoBancoDeDados extends SQLiteOpenHelper {
 																		SQLiteDatabase.OPEN_READWRITE);*/
 			
 			bancoSavare = getWritableDatabase();
-			//bancoSavare = SQLiteDatabase.openDatabase(bancoDados, null, 0);
-			// bancoSavare = getWritableDatabase();
+			//bancoSavare = SQLiteDatabase.openDatabase(bancoDados, null, SQLiteDatabase.OPEN_READWRITE);
 		}
 
 		return bancoSavare;

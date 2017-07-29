@@ -123,7 +123,7 @@ public class RegistroChaveUsuarioMDActivity extends IntroActivity {
         addSlide(receberDadosSlide);
 
 
-        funcoes.setValorXml("ChaveUsuario", ConfiguracoesInternas.CHAVE_USUARIO_PUBLICO_WEBSERVICE);
+        funcoes.setValorXml("ChaveFuncionario", ConfiguracoesInternas.CHAVE_USUARIO_PUBLICO_WEBSERVICE);
     }
 
     @Override
@@ -144,7 +144,7 @@ public class RegistroChaveUsuarioMDActivity extends IntroActivity {
 
                 if (chaveUsuario.length() >= 36) {
                     FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(RegistroChaveUsuarioMDActivity.this);
-                    funcoes.setValorXml("ChaveUsuario", chaveUsuario);
+                    funcoes.setValorXml("ChaveFuncionario", chaveUsuario);
 
                     SuperToast.create(RegistroChaveUsuarioMDActivity.this, getResources().getString(R.string.chave_salva_sucesso), SuperToast.Duration.LONG, Style.getStyle(Style.GREEN, SuperToast.Animations.POPUP)).show();
                 } else {

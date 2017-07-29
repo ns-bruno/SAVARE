@@ -16,7 +16,8 @@
             android:layout_weight="1"
             android:maxLines="1"
             android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="@string/numero" />
+            android:text="@string/numero"
+            android:layout_marginLeft="5dp"/>
 
         <TextView
             android:id="@+id/fragment_orcamento_critica_md_text_total"

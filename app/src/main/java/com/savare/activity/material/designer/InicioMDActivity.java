@@ -44,15 +44,20 @@ import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 import com.savare.R;
 import com.savare.activity.LogActivity;
 import com.savare.activity.fragment.ClienteCadastroFragment;
+import com.savare.banco.funcoesSql.EnderecoSql;
+import com.savare.banco.funcoesSql.PessoaSql;
 import com.savare.banco.funcoesSql.UsuarioSQL;
 import com.savare.beans.EmpresaBeans;
+import com.savare.beans.PessoaBeans;
 import com.savare.beans.UsuarioBeans;
 import com.savare.funcoes.FuncoesPersonalizadas;
 import com.savare.funcoes.rotinas.EmpresaRotinas;
 import com.savare.funcoes.rotinas.OrcamentoRotinas;
+import com.savare.funcoes.rotinas.PessoaRotinas;
 import com.savare.funcoes.rotinas.UsuarioRotinas;
 import com.savare.funcoes.rotinas.async.ReceberDadosFtpAsyncRotinas;
 
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -96,12 +101,17 @@ public class InicioMDActivity extends AppCompatActivity {
 
         FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(InicioMDActivity.this);
 
-        UsuarioSQL usuarioSQL = new UsuarioSQL(InicioMDActivity.this);
+        //PessoaSql pessoaSql = new PessoaSql(InicioMDActivity.this);
         // Pega os dadosUsuario do usuario no banco de dadosUsuario
-        Cursor dadosUsuario = usuarioSQL.query("ID_USUA = " + funcoes.getValorXml("CodigoUsuario"));
+        //Cursor dadosUsuario = pessoaSql.query("CODIGO_FUN = " + funcoes.getValorXml("CodigoUsuario"));
+
+        PessoaRotinas pessoaRotinas = new PessoaRotinas(getApplicationContext());
+        // Pega os dados do usuario
+        List<PessoaBeans> dadosUsuario = pessoaRotinas.listaPessoaResumido("CODIGO_FUN = " + funcoes.getValorXml("CodigoUsuario"), PessoaRotinas.KEY_TIPO_FUNCIONARIO, null);
 
         // Pega o nome de login do usuario
         String nomeCompletoUsua = funcoes.getValorXml("Usuario");
+        String email = "nao encontrado";
 
         if (funcoes.getValorXml("EnviarAutomatico").equalsIgnoreCase("S")){
             enviaAutomatico = true;
@@ -116,11 +126,14 @@ public class InicioMDActivity extends AppCompatActivity {
         }
 
         // Checa se retornou algum dados do usuario
-        if (dadosUsuario != null && dadosUsuario.getCount() > 0){
-            // move para o primeiro registro
-            dadosUsuario.moveToFirst();
+        if (dadosUsuario != null && dadosUsuario.size() > 0){
             // Pega o nome completo do usuario
-            nomeCompletoUsua = dadosUsuario.getString(dadosUsuario.getColumnIndex("NOME_USUA"));
+            nomeCompletoUsua = dadosUsuario.get(0).getNomeRazao();
+
+            if ((dadosUsuario.get(0).getEnderecoPessoa() != null) && (dadosUsuario.get(0).getEnderecoPessoa().getEmail() != null)){
+                email = dadosUsuario.get(0).getEnderecoPessoa().getEmail();
+                funcoes.setValorXml("Email", email);
+            }
         }
 
         // Instancia o cabecalho(conta) do drawer
@@ -128,7 +141,7 @@ public class InicioMDActivity extends AppCompatActivity {
                 .withActivity(this)
                 .withHeaderBackground(R.color.colorAccent)
                 .addProfiles(
-                        new ProfileDrawerItem().withName(nomeCompletoUsua).withEmail(funcoes.getValorXml("Email")).withIcon(getResources().getDrawable(R.mipmap.ic_account_circle)))
+                        new ProfileDrawerItem().withName(nomeCompletoUsua).withEmail(email).withIcon(getResources().getDrawable(R.mipmap.ic_account_circle)))
                 .withOnAccountHeaderListener(new AccountHeader.OnAccountHeaderListener() {
                     @Override
                     public boolean onProfileChanged(View view, IProfile profile, boolean current) {
@@ -365,10 +378,15 @@ public class InicioMDActivity extends AppCompatActivity {
 
         geraCardView();
 
-        EmpresaRotinas empresaRotinas = new EmpresaRotinas(InicioMDActivity.this);
+        /*EmpresaRotinas empresaRotinas = new EmpresaRotinas(InicioMDActivity.this);
         // Pega os dados da empresa
         EmpresaBeans dadosEmpresa = empresaRotinas.empresa(funcoes.getValorXml("CodigoEmpresa"));
 
+        PessoaRotinas pessoaRotinas = new PessoaRotinas(InicioMDActivity.this);
+
+        pessoaRotinas.pessoaCompleta(funcoes.getValorXml());
+
+        //PessoaBeans dadosusuario = pessoaSql.
         UsuarioRotinas usuarioRotinas = new UsuarioRotinas(InicioMDActivity.this);
         // Pega os dados do usuario(vendedor)
         UsuarioBeans dadosUsuario = usuarioRotinas.usuarioCompleto("ID_USUA = " + funcoes.getValorXml("CodigoUsuario"));
@@ -488,7 +506,7 @@ public class InicioMDActivity extends AppCompatActivity {
             } else {
                 funcoes.cancelarSincronizacaoSegundoPlano();
             }
-        }
+        }*/
     } // Fim onResume
 
 

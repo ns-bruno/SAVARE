@@ -17,6 +17,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.savare.R;
+import com.savare.activity.material.designer.OrcamentoCriticaMDActivity;
 import com.savare.activity.material.designer.OrcamentoProdutoDetalhesTabFragmentMDActivity;
 import com.savare.activity.material.designer.OrcamentoTabFragmentMDActivity;
 import com.savare.adapter.ItemUniversalAdapter;
@@ -39,7 +40,7 @@ public class OrcamentoCriticaMDFragment extends Fragment {
     private TextView textAtacadoVarejo;
     private ProgressBar progressBarStatus;
     private Toolbar toolbarRodape;
-    private String idOrcamento = null;
+    private String idOrcamento = null, razaoSocial;
     private ItemUniversalAdapter adapterCriticaOrcamento;
 
     @Nullable
@@ -63,19 +64,22 @@ public class OrcamentoCriticaMDFragment extends Fragment {
             if ((idOrcamento != null) && (!idOrcamento.isEmpty())){
                 textCodigoOrcamento.setText(idOrcamento);
             }
+            razaoSocial = parametro.getString(""+OrcamentoTabFragmentMDActivity.KEY_NOME_RAZAO);
         }
 
         listViewListaCritica.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
                 CriticaOrcamentoBeans criticaOrcamentoBeans = (CriticaOrcamentoBeans) parent.getItemAtPosition(position);
 
                 // Abre a tela de detalhes do produto
-                //Intent intent = new Intent(getActivity(), OrcamentoProdutoDetalhesTabFragmentMDActivity.class);
+                Intent intent = new Intent(getActivity(), OrcamentoCriticaMDActivity.class);
 
-                //intent.putExtra(OrcamentoProdutoDetalhesTabFragmentMDActivity.KEY_ID_AEAPRODU, itemOrcamento.getProduto().getIdProduto());
+                intent.putExtra(OrcamentoCriticaMDActivity.KEY_ID_AEACRORC, "" + criticaOrcamentoBeans.getIdCritica());
+                intent.putExtra(OrcamentoCriticaMDActivity.KEY_RAZAO_SOCIAL, razaoSocial);
 
-                //startActivity(intent);
+                startActivity(intent);
             }
         });
 

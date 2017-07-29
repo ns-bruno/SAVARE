@@ -178,6 +178,10 @@
             android:name="com.savare.activity.material.designer.RegistroChaveUsuarioMDActivity"
             android:theme="@style/AppBaseTheme" >
         </activity>
+        <activity
+            android:name="com.savare.activity.material.designer.OrcamentoCriticaMDActivity"
+            android:theme="@style/AppBaseTheme" >
+        </activity>
 
         <provider
             android:name="com.savare.sincronizacao.EnviarProvider"

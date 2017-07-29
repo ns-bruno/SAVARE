@@ -260,7 +260,7 @@ public class CadastroUsuarioActivity extends Activity {
 		funcoes = new FuncoesPersonalizadas(CadastroUsuarioActivity.this);
 		funcoes.setValorXml("CodigoUsuario", editCodigoVendedor.getText().toString());
 		funcoes.setValorXml("Usuario", editNomeLogin.getText().toString());
-		funcoes.setValorXml("ChaveUsuario", editChaveUsuario.getText().toString());
+		funcoes.setValorXml("ChaveFuncionario", editChaveUsuario.getText().toString());
 		funcoes.setValorXml("CodigoEmpresa", editCodigoEmpresa.getText().toString());
 		funcoes.setValorXml("Email", editEmail.getText().toString());
 		funcoes.setValorXml("EnviarAutomatico", "N");

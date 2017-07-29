@@ -30,7 +30,8 @@ public class PessoaRotinas extends Rotinas {
 
 	public static final String KEY_TIPO_CLIENTE = "cliente",
 							   KEY_TIPO_FONECEDOR = "fornecedor",
-							   KEY_TIPO_USUARIO = "usuario";
+							   KEY_TIPO_USUARIO = "usuario",
+							   KEY_TIPO_FUNCIONARIO = "funcionario";
 
 	public PessoaRotinas(Context context) {
 		super(context);
@@ -163,15 +164,18 @@ public class PessoaRotinas extends Rotinas {
 		
 		// Verifica se eh para retornar apenas os clientes
 		if(tipoPessoa.equalsIgnoreCase(KEY_TIPO_CLIENTE)){
-			sql = sql + "WHERE (CFACLIFO.CLIENTE = 1) ";
+			sql = sql + "WHERE (CFACLIFO.CLIENTE = '1') ";
 		
 		// Verifica se eh para retornar apenas os fornecedores
 		} else if(tipoPessoa.equalsIgnoreCase(KEY_TIPO_FONECEDOR)){
-			sql = sql + "WHERE (CFACLIFO.FORNECEDOR = 1) ";
+			sql = sql + "WHERE (CFACLIFO.FORNECEDOR = '1') ";
 		
 		// Retorna todos os registro, nao importando se eh cliente ou nao
 		} else if (tipoPessoa.equalsIgnoreCase(KEY_TIPO_USUARIO)){
-			sql = sql + "WHERE (CFACLIFO.USUARIO = 1) ";
+			sql = sql + "WHERE (CFACLIFO.USUARIO = '1') ";
+
+		} else if (tipoPessoa.equalsIgnoreCase(KEY_TIPO_FUNCIONARIO)){
+			sql = sql + "WHERE (CFACLIFO.FUNCIONARIO = '1') ";
 		}
 		// Adiciona a clausula where passada por parametro no sql
 		if(where != null){
@@ -231,7 +235,9 @@ public class PessoaRotinas extends Rotinas {
 					pessoa.setCodigoTransportadora(dadosPessoa.getInt(dadosPessoa.getColumnIndex("CODIGO_TRA")));
 					pessoa.setNomeRazao(dadosPessoa.getString(dadosPessoa.getColumnIndex("NOME_RAZAO")));
 					pessoa.setNomeFantasia(dadosPessoa.getString(dadosPessoa.getColumnIndex("NOME_FANTASIA")));
-					pessoa.setDataUltimaCompra(funcoes.formataData(dadosPessoa.getString(dadosPessoa.getColumnIndex("DT_ULT_COMPRA"))));
+					if ((dadosPessoa.getString(dadosPessoa.getColumnIndex("DT_ULT_COMPRA")) != null) && (dadosPessoa.getString(dadosPessoa.getColumnIndex("CLIENTE")).length() > 0)) {
+						pessoa.setDataUltimaCompra(funcoes.formataData(dadosPessoa.getString(dadosPessoa.getColumnIndex("DT_ULT_COMPRA"))));
+					}
 					pessoa.setCpfCnpj(dadosPessoa.getString(dadosPessoa.getColumnIndex("CPF_CNPJ")));
 					pessoa.setIeRg(dadosPessoa.getString(dadosPessoa.getColumnIndex("IE_RG")));
 					// Checa se a pessoa eh um cadastro novo
@@ -373,6 +379,9 @@ public class PessoaRotinas extends Rotinas {
 			// Verifica se eh para retornar apenas os dados do usuario
 			} else if (tipoPessoa.equalsIgnoreCase(KEY_TIPO_USUARIO)){
 				sql = sql + " AND (CFACLIFO.USUARIO = 1) ";
+
+			} else if (tipoPessoa.equalsIgnoreCase(KEY_TIPO_FUNCIONARIO)){
+				sql = sql + " AND (CFACLIFO.FUNCIONARIO = 1) ";
 			}
 			
 			sql = sql + "ORDER BY CFAATIVI.ID_CFAATIVI, CFATPCLI.ID_CFATPCLI";

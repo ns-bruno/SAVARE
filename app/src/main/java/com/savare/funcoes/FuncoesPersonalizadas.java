@@ -38,10 +38,13 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.savare.R;
 import com.savare.banco.ConexaoTask;
+import com.savare.banco.funcoesSql.EmpresaSql;
 import com.savare.banco.local.ConexaoBancoDeDados;
 import com.savare.beans.DispositivoBeans;
+import com.savare.beans.EmpresaBeans;
 import com.savare.configuracao.ConfiguracoesInternas;
 import com.savare.configuracao.ServicosWeb;
+import com.savare.funcoes.rotinas.EmpresaRotinas;
 import com.savare.sincronizacao.SavareAutenticadorService;
 import com.savare.webservice.WSSisinfoWebservice;
 
@@ -688,7 +691,7 @@ public class FuncoesPersonalizadas {
 	public String formataData(String data){
 		String dataFormatada = "";
 		
-		if(data != null){
+		if((data != null) && (data.contains("-"))){
 			Scanner scannerParametro = new Scanner(data).useDelimiter("\\-");
 			int ano = scannerParametro.nextInt();
 			int mes = scannerParametro.nextInt();
@@ -1149,9 +1152,61 @@ public class FuncoesPersonalizadas {
 
 	public boolean checaVersao(){
 		boolean valido = false;
-        JsonObject statuRetorno = null;
 		try {
-			WSSisinfoWebservice webserviceSisInfo = new WSSisinfoWebservice(context);
+			EmpresaRotinas empresaRotinas = new EmpresaRotinas(context);
+
+			EmpresaBeans empresaBeans = empresaRotinas.empresa(getValorXml("CodigoEmpresa"));
+
+			if (empresaBeans != null){
+				int versaoLocal = VersionUtils.getVersionCode(context);
+				//int versaoWebservice = Integer.parseInt(objetoIndividual.getProperty("return").toString());
+
+				// Checa se o SAVARE esta desatualizado
+				if (versaoLocal < empresaBeans.getVersaoSavare()) {
+
+					// Cria uma notificacao para ser manipulado
+					Load mLoad = PugNotification.with(context).load()
+							.identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR)
+							.smallIcon(R.mipmap.ic_launcher)
+							.largeIcon(R.mipmap.ic_launcher)
+							.title(R.string.versao_savare_desatualizada)
+							.bigTextStyle(R.string.savare_desatualizado_favor_atualize)
+							.flags(Notification.DEFAULT_LIGHTS);
+					mLoad.simple().build();
+
+					// Checa se o SAVARE esta mais atualizado que o webservice
+				} else if (versaoLocal > empresaBeans.getVersaoSavare()) {
+
+					// Cria uma notificacao para ser manipulado
+					Load mLoad = PugNotification.with(context).load()
+							.identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR)
+							.smallIcon(R.mipmap.ic_launcher)
+							.largeIcon(R.mipmap.ic_launcher)
+							.title(R.string.versao_savare_desatualizada)
+							.bigTextStyle(R.string.savare_mais_atualizado_que_webservice)
+							.flags(Notification.DEFAULT_LIGHTS);
+					mLoad.simple().build();
+
+					valido = true;
+
+					// Checa se o SAVARE esta na mesma versao que o webservice
+				} else if (versaoLocal == empresaBeans.getVersaoSavare()) {
+					valido = true;
+				}
+			} else {
+				// Cria uma notificacao para ser manipulado
+				Load mLoad = PugNotification.with(context).load()
+						.identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_ENVIAR_DADOS)
+						.smallIcon(R.mipmap.ic_launcher)
+						.largeIcon(R.mipmap.ic_launcher)
+						.title(R.string.recebendo_dados)
+						.bigTextStyle(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice))
+						.flags(Notification.DEFAULT_LIGHTS);
+				mLoad.simple().build();
+			}
+
+			/*WSSisinfoWebservice webserviceSisInfo = new WSSisinfoWebservice(context);
+
 			//Vector<SoapObject> listaVersao = webserviceSisInfo.executarSelectWebservice(null, WSSisinfoWebservice.FUNCTION_SELECT_VERSAO_SAVARE, null);
 
             //String retornoWebservice = webserviceSisInfo.executarSelectWebserviceJson(null, WSSisinfoWebservice.FUNCTION_JSON_SELECT_VERSAO_SAVARE, WSSisinfoWebservice.METODO_GET, null);
@@ -1175,11 +1230,11 @@ public class FuncoesPersonalizadas {
                             // Cria uma vareavel para receber os dados retornado do webservice
                             //SoapObject objeto;
 
-                    /*if (objetoIndividual.hasProperty("return")) {
+                    *//*if (objetoIndividual.hasProperty("return")) {
                         objeto = (SoapObject) objetoIndividual.getProperty("return");
                     } else {
                         objeto = objetoIndividual;
-                    }*/
+                    }*//*
 
                             int versaoLocal = VersionUtils.getVersionCode(context);
                             //int versaoWebservice = Integer.parseInt(objetoIndividual.getProperty("return").toString());
@@ -1251,7 +1306,7 @@ public class FuncoesPersonalizadas {
                         .bigTextStyle(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice))
                         .flags(Notification.DEFAULT_LIGHTS);
                 mLoad.simple().build();
-            }
+            }*/
 		}catch (Exception e){
 			// Cria uma notificacao para ser manipulado
 			Load mLoad = PugNotification.with(context).load()
@@ -1269,11 +1324,11 @@ public class FuncoesPersonalizadas {
 
 	public DispositivoBeans dispositivo(){
 		DispositivoBeans dispositivoBeans = null;
-		if ((!getValorXml("ChaveUsuario").equalsIgnoreCase(NAO_ENCONTRADO)) && (getValorXml("ChaveUsuario").length() >= 36)) {
+		if ((!getValorXml("ChaveFuncionario").equalsIgnoreCase(NAO_ENCONTRADO)) && (getValorXml("ChaveFuncionario").length() >= 16)) {
 
 			// Instancia uma classe para pegar os dados do dispositivo
 			dispositivoBeans = new DispositivoBeans();
-			dispositivoBeans.setChaveUsuario(getValorXml("ChaveUsuario"));
+			dispositivoBeans.setChaveUsuario(getValorXml("ChaveFuncionario"));
 			dispositivoBeans.setNomeDispositivo(android.os.Build.MODEL + " - "+ android.os.Build.PRODUCT);
 			dispositivoBeans.setSistemaOperacionalDispositivo(""+android.os.Build.VERSION.SDK_INT);
 			dispositivoBeans.setNumeroSerialDispositivo(Build.SERIAL.replace("unknown", ""));

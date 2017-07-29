@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.savare.R;
-import com.savare.activity.ClienteListaActivity;
 import com.savare.activity.LogActivity;
 import com.savare.activity.OrcamentoProdutoDetalhesActivity;
 import com.savare.activity.material.designer.ClienteListaMDActivity;

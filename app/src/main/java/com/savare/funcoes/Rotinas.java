@@ -6,6 +6,8 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.database.Cursor;
 import android.telephony.TelephonyManager;
+
+import com.savare.banco.funcoesSql.PessoaSql;
 import com.savare.banco.funcoesSql.UsuarioSQL;
 
 public class Rotinas {
@@ -22,8 +24,8 @@ public class Rotinas {
 	public boolean existeUsuario(){
 		boolean resultado = false;
 		
-		UsuarioSQL usuarioSQL = new UsuarioSQL(context);
-		Cursor cursor = usuarioSQL.query(null);
+		PessoaSql pessoaSql = new PessoaSql(context);
+		Cursor cursor = pessoaSql.query("(CODIGO_FUN > 0) OR (FUNCIONARIO = '1')");
 		
 		if((cursor != null) && (cursor.getCount() > 0)){
 			resultado = true;
@@ -36,8 +38,8 @@ public class Rotinas {
 	public boolean checaUsuario(String codigoUsuario, String usuario){
 		boolean resultado = false;
 		
-		UsuarioSQL usuarioSQL = new UsuarioSQL(context);
-		Cursor cursor = usuarioSQL.query("id_usua = " + codigoUsuario + " and login_usua = '" + usuario +"' ");
+		PessoaSql pessoaSql = new PessoaSql(context);
+		Cursor cursor = pessoaSql.query("CODIGO_FUN = " + codigoUsuario + " AND NOME_RAZAO = '" + usuario +"' ");
 		
 		if(cursor.getCount() > 0){
 			resultado = true;
@@ -59,16 +61,13 @@ public class Rotinas {
 		if(checaUsuario(codigoUsuario, usuario)){
 			// Instancia a classe de funcoes para chamar alguma funcao especifica
 			FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
-			
-			// Instancia a classe de UsuarioSQL para manipular os dados no banco de dados
-			UsuarioSQL usuarioSQL = new UsuarioSQL(context);
-			Cursor cursor = usuarioSQL.query("ID_USUA = " + codigoUsuario);
-			cursor.moveToFirst();
-			
-			String senhaDescrip = funcoes.descriptografaSenha(cursor.getString(cursor.getColumnIndex("SENHA_USUA")));
-			
-			if(senhaDescrip.equals(senha)){
-				resultado = true;
+
+			if (!funcoes.getValorXml("SenhaUsuario").equalsIgnoreCase(FuncoesPersonalizadas.NAO_ENCONTRADO)) {
+				String senhaDescrip = funcoes.descriptografaSenha(funcoes.getValorXml("SenhaUsuario"));
+
+				if (senhaDescrip.equals(senha)) {
+					resultado = true;
+				}
 			}
 		}
 		

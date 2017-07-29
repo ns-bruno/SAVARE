@@ -2,7 +2,7 @@ package com.savare.beans;
 
 public class EmpresaBeans {
 
-	private int idEmpresa, idPlanoPagamentoVarejo, idPlanoPagamentoAtacado, diasAtrazo, semMovimento, validadeFichaCliente, quantidadeDiasDestacaProduto, quantidadeCasasDecimais;
+	private int idEmpresa, idPlanoPagamentoVarejo, idPlanoPagamentoAtacado, diasAtrazo, semMovimento, validadeFichaCliente, quantidadeDiasDestacaProduto, quantidadeCasasDecimais, versaoSavare;
 	private String nomeRazao,
 				   nomeFantasia,
 				   CpfCnpj,
@@ -252,5 +252,13 @@ public class EmpresaBeans {
 
 	public void setValorMinimoVistaAtacado(double valorMinimoVistaAtacado) {
 		this.valorMinimoVistaAtacado = valorMinimoVistaAtacado;
+	}
+
+	public int getVersaoSavare() {
+		return versaoSavare;
+	}
+
+	public void setVersaoSavare(int versaoSavare) {
+		this.versaoSavare = versaoSavare;
 	}
 }

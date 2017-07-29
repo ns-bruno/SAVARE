@@ -187,7 +187,7 @@ public class FuncoesSql {
 			// Pega os dados do usuario
 			this.funcoes = new FuncoesPersonalizadas(context);
 			contentValues.put("usuario", funcoes.getValorXml("Usuario"));
-			contentValues.put("empresa", funcoes.getValorXml("ChaveUsuario"));
+			contentValues.put("empresa", funcoes.getValorXml("ChaveFuncionario"));
 			contentValues.put("email", funcoes.getValorXml("Email"));
 
 			((Activity) context).runOnUiThread(new Runnable() {
@@ -366,7 +366,7 @@ public class FuncoesSql {
 			bancoDados.endTransaction();
 
 			conexaoBanco.fechar();
-			//bancoDados.close();
+			bancoDados.close();
 		}
         return totalSucesso;
 	} // Fim do insert

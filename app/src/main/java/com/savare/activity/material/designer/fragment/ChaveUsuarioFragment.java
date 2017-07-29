@@ -54,9 +54,9 @@ public class ChaveUsuarioFragment extends SlideFragment {
                             .initiateScan();
                 } else {
                     // Checa se a quantidade que foi digitada eh o tamanho certo
-                    if (editTextDigitarChave.getText().length() >= 36) {
+                    if (editTextDigitarChave.getText().length() >= 16) {
                         FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(getContext());
-                        funcoes.setValorXml("ChaveUsuario", editTextDigitarChave.getText().toString());
+                        funcoes.setValorXml("ChaveFuncionario", editTextDigitarChave.getText().toString());
 
                         desativarCampos();
 
@@ -107,9 +107,9 @@ public class ChaveUsuarioFragment extends SlideFragment {
                 // Pega a chave retornado pelo leitor de codigo de barras
                 String chaveUsuario = retornoEscanerCodigoBarra.getContents();
 
-                if (chaveUsuario.length() >= 36) {
+                if (chaveUsuario.length() >= 16) {
                     FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(getContext());
-                    funcoes.setValorXml("ChaveUsuario", chaveUsuario);
+                    funcoes.setValorXml("ChaveFuncionario", chaveUsuario);
 
                     desativarCampos();
                 } else {

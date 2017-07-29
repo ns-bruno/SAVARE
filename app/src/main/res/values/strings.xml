@@ -40,6 +40,7 @@
     <string name="action_websearch">Web search</string>
     <string name="app_not_available">Sorry, there\'s no web browser available</string>
     <string name="status">Status</string>
+    <string name="data">Data</string>
     <string name="fisica">Física</string>
     <string name="juridica">Juridica</string>
     <string name="razao_social">Razão Social</string>
@@ -256,6 +257,7 @@
     <string name="achamos_usuario_servidor_nuvem">Achamos um usuário no servidor em nuvem. </string>
     <string name="usuario_atualizado_sucesso">Usuário atualizado com sucesso.</string>
     <string name="atualizado_sucesso">Atualizado com Sucesso.</string>
+    <string name="terminamos_atualizacao">Terminamos a atualização.</string>
     <string name="nao_conseguimos_atualizar_usuario">Não conseguimos atualizar o usuário, tente novamente, se persistir entre em contato com o suporte SAVARE.</string>
     <string name="nome_login_invalido">Nome de login inválido, tente outro sem espaço e sem caracteres especiais.</string>
     <string name="tamanho_chave_nao_permitido">Tamanho da chave não é permitida</string>
@@ -321,7 +323,7 @@
     <string name="marcando_item_enviado_sucesso">Estamos marcando que o item foi enviado com sucesso.</string>
     <string name="marcando_pedido_enviado_sucesso">Estamos marcando que o pedido foi enviado com sucesso.</string>
     <string name="numero_vensao_savare_nao_chegou">Não chegou o número da versão do SAVARE, tente novamente. Se persistir entre em contato com o suporte SAVARE.</string>
-    <string name="nao_retornou_dados_suficiente_para_continuar_comunicao_webservice">Não recebemos os dados primários para continuar a se comunicar com servidor em nuvem (Webservice).</string>
+    <string name="nao_retornou_dados_suficiente_para_continuar_comunicao_webservice">Não recebemos os dados primários pra checar a versão e continuar a se comunicar com servidor em nuvem (Webservice).</string>
     <string name="nem_todos_pedidos_foram_enviados_tente_novamente">Nem todos os pedidos foram enviados. Atualize a lista e tente enviar novamente.</string>
     <string name="nao_conseguimos_verificar_titulos">Não conseguimos verificar os títulos a receber.</string>
     <string name="produto_nao_esta_orcamento">Não achamos este produto no orçamento</string>
@@ -330,6 +332,8 @@
     <string name="sem_cidade">Sem Cidade</string>
     <string name="portador">Portador/Banco</string>
     <string name="calculando_preco_venda">Calculando Preço de Venda</string>
+    <string name="critica_orcamento">Crítica de Orçamento</string>
+    <string name="sem_razao_social">Sem razão social.</string>
 
 
     <string-array name="tab_produto_md">
