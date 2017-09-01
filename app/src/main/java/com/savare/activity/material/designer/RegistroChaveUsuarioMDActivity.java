@@ -2,7 +2,6 @@ package com.savare.activity.material.designer;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
 
 import com.github.johnpersano.supertoasts.SuperToast;
 import com.github.johnpersano.supertoasts.util.Style;
@@ -32,7 +31,9 @@ public class RegistroChaveUsuarioMDActivity extends IntroActivity {
             showNext = true,
             getStartedEnabled = false;
     private String chaveUsuario = "";
+    private String cnpjEmpresa = "";
     public static final String KEY_CHAVE_USUARIO = "keyChaveusuario";
+    public static final String KEY_CNPJ_EMPRESA = "keyCnpjEmpresa";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -115,15 +116,15 @@ public class RegistroChaveUsuarioMDActivity extends IntroActivity {
                 .scrollable(scrollable)
                 .build());
 
-        Slide receberDadosSlide = new FragmentSlide.Builder()
+        /*Slide receberDadosSlide = new FragmentSlide.Builder()
                 .background(R.color.md_deep_orange_900)
                 .backgroundDark(R.color.md_deep_orange_500)
                 .fragment(RecebeDadosWebserviceFragment.newInstance())
                 .build();
-        addSlide(receberDadosSlide);
+        addSlide(receberDadosSlide);*/
 
 
-        funcoes.setValorXml("ChaveFuncionario", ConfiguracoesInternas.CHAVE_USUARIO_PUBLICO_WEBSERVICE);
+        //funcoes.setValorXml("ChaveFuncionario", ConfiguracoesInternas.CHAVE_USUARIO_PUBLICO_WEBSERVICE);
     }
 
     @Override
@@ -146,9 +147,9 @@ public class RegistroChaveUsuarioMDActivity extends IntroActivity {
                     FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(RegistroChaveUsuarioMDActivity.this);
                     funcoes.setValorXml("ChaveFuncionario", chaveUsuario);
 
-                    SuperToast.create(RegistroChaveUsuarioMDActivity.this, getResources().getString(R.string.chave_salva_sucesso), SuperToast.Duration.LONG, Style.getStyle(Style.GREEN, SuperToast.Animations.POPUP)).show();
+                    SuperToast.create(RegistroChaveUsuarioMDActivity.this, getResources().getString(R.string.cnpj_salva_sucesso), SuperToast.Duration.LONG, Style.getStyle(Style.GREEN, SuperToast.Animations.POPUP)).show();
                 } else {
-                    SuperToast.create(RegistroChaveUsuarioMDActivity.this, getResources().getString(R.string.tamanho_chave_nao_permitido), SuperToast.Duration.LONG, Style.getStyle(Style.RED, SuperToast.Animations.POPUP)).show();
+                    SuperToast.create(RegistroChaveUsuarioMDActivity.this, getResources().getString(R.string.tamanho_cnpj_cpf_nao_permitido), SuperToast.Duration.LONG, Style.getStyle(Style.RED, SuperToast.Animations.POPUP)).show();
                 }
 
                 // Vai para o proximo slide

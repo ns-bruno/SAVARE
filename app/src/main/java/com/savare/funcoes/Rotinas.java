@@ -24,8 +24,11 @@ public class Rotinas {
 	public boolean existeUsuario(){
 		boolean resultado = false;
 		
-		PessoaSql pessoaSql = new PessoaSql(context);
-		Cursor cursor = pessoaSql.query("(CODIGO_FUN > 0) OR (FUNCIONARIO = '1')");
+		//PessoaSql pessoaSql = new PessoaSql(context);
+		//Cursor cursor = pessoaSql.query("(CODIGO_FUN > 0) OR (FUNCIONARIO = '1')");
+
+		UsuarioSQL usuarioSQL = new UsuarioSQL(context);
+		Cursor cursor = usuarioSQL.query(null);
 		
 		if((cursor != null) && (cursor.getCount() > 0)){
 			resultado = true;
@@ -38,10 +41,13 @@ public class Rotinas {
 	public boolean checaUsuario(String codigoUsuario, String usuario){
 		boolean resultado = false;
 		
-		PessoaSql pessoaSql = new PessoaSql(context);
-		Cursor cursor = pessoaSql.query("CODIGO_FUN = " + codigoUsuario + " AND NOME_RAZAO = '" + usuario +"' ");
+		//PessoaSql pessoaSql = new PessoaSql(context);
+		//Cursor cursor = pessoaSql.query("CODIGO_FUN = " + codigoUsuario + " AND NOME_RAZAO = '" + usuario +"' ");
+
+		UsuarioSQL usuarioSQL = new UsuarioSQL(context);
+		Cursor cursor = usuarioSQL.query("LOGIN_USUA = '" + usuario + "'");
 		
-		if(cursor.getCount() > 0){
+		if((cursor != null) && (cursor.getCount() > 0)){
 			resultado = true;
 		}
 		

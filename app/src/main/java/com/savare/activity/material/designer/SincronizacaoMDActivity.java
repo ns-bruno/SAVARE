@@ -1,5 +1,7 @@
 package com.savare.activity.material.designer;
 
+import android.content.ContentValues;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -11,9 +13,12 @@ import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.github.johnpersano.supertoasts.SuperToast;
+import com.github.johnpersano.supertoasts.util.Style;
 import com.savare.R;
 import com.savare.funcoes.FuncoesPersonalizadas;
 import com.savare.funcoes.rotinas.ImportarDadosTxtRotinas;
+import com.savare.funcoes.rotinas.UltimaAtualizacaoRotinas;
 import com.savare.funcoes.rotinas.UsuarioRotinas;
 import com.savare.funcoes.rotinas.async.ReceberDadosFtpAsyncRotinas;
 import com.savare.funcoes.rotinas.async.ReceberDadosWebserviceAsyncRotinas;
@@ -57,14 +62,18 @@ public class SincronizacaoMDActivity extends AppCompatActivity {
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-        // Instancia a classe de rotinas da tabela usuario
-        UsuarioRotinas usuarioRotinas = new UsuarioRotinas(SincronizacaoMDActivity.this);
+        if(!funcoes.getValorXml("CodigoUsuario").equalsIgnoreCase(funcoes.NAO_ENCONTRADO)) {
+            // Instancia a classe de rotinas da tabela usuario
+            UsuarioRotinas usuarioRotinas = new UsuarioRotinas(SincronizacaoMDActivity.this);
 
-        // Pega a data do ultimo envio de pedido
-        textDataUltimoEnvio.setText(usuarioRotinas.dataUltimoEnvio(funcoes.getValorXml("CodigoUsuario")));
-        // Pega a data do ultimo recebimento de dados
-        textDataUltimoRecebimento.setText(usuarioRotinas.dataUltimoRecebimento(funcoes.getValorXml("CodigoUsuario")));
-
+            // Pega a data do ultimo envio de pedido
+            textDataUltimoEnvio.setText(usuarioRotinas.dataUltimoEnvio(funcoes.getValorXml("CodigoUsuario")));
+            // Pega a data do ultimo recebimento de dados
+            textDataUltimoRecebimento.setText(usuarioRotinas.dataUltimoRecebimento(funcoes.getValorXml("CodigoUsuario")));
+        } else {
+            textDataUltimoEnvio.setText("");
+            textDataUltimoRecebimento.setText("");
+        }
         buttonReceberDados.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -203,6 +212,37 @@ public class SincronizacaoMDActivity extends AppCompatActivity {
         } else {
 
         }
+        if (usuarioRotinas.usuarioAtivo() == false){
+
+            final ContentValues contentValues = new ContentValues();
+            contentValues.put("comando", 0);
+            contentValues.put("tela", "InicioMDActivity");
+            contentValues.put("mensagem", "O usuário está inativo, não vai ser possível usar o aplicativo. Entre em contato com a sua empresa ou com o suporte SAVARE.");
+
+            final FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(SincronizacaoMDActivity.this);
+
+            (SincronizacaoMDActivity.this).runOnUiThread(new Runnable() {
+                public void run() {
+                    funcoes.menssagem(contentValues);
+                }
+            });
+        }
+
+        UltimaAtualizacaoRotinas ultimaAtualizacaoRotinas = new UltimaAtualizacaoRotinas(getApplicationContext());
+
+        if(ultimaAtualizacaoRotinas.muitoTempoSemSincronizacao()){
+            final ContentValues contentValues = new ContentValues();
+            contentValues.put("comando", 0);
+            contentValues.put("tela", "InicioMDActivity");
+            contentValues.put("mensagem", "Tem mais de 10 dias sem fazer sincronização. Por favor realize uma sincronização para continuar usando o aplicativo.");
+
+            final FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(SincronizacaoMDActivity.this);
+            (SincronizacaoMDActivity.this).runOnUiThread(new Runnable() {
+                public void run() {
+                    funcoes.menssagem(contentValues);
+                }
+            });
+        }
     }
 
     @Override
@@ -253,6 +293,12 @@ public class SincronizacaoMDActivity extends AppCompatActivity {
                 funcoesExtra.setValorXml("EnviandoDados", "N");
                 funcoesExtra.cancelarSincronizacaoSegundoPlano();
                 break;
+
+            case R.id.menu_sincronizacao_md_zerar_datas_sincronizacao:
+                UltimaAtualizacaoRotinas atualizacaoRotinas = new UltimaAtualizacaoRotinas(SincronizacaoMDActivity.this);
+                if (atualizacaoRotinas.apagarDatasSincronizacao() > 0){
+                    SuperToast.create(SincronizacaoMDActivity.this, getApplicationContext().getResources().getString(R.string.zerado_sucesso), SuperToast.Duration.VERY_SHORT, Style.getStyle(Style.GREEN, SuperToast.Animations.POPUP)).show();
+                }
 
             default:
                 break;

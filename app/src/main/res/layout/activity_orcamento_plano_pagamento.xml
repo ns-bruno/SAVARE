@@ -13,7 +13,7 @@
             android:id="@+id/activity_orcamento_plano_pagamento_text_codigo_orcamento"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/codigo"
+            android:text="@string/idClifo"
             android:textAppearance="?android:attr/textAppearanceMedium" />
 
         <TextView

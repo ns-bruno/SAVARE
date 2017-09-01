@@ -57,7 +57,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:maxLines="1"
-            android:text="@string/codigo"
+            android:text="@string/idClifo"
             android:textColor="@color/branco"
             android:textStyle="bold" />
 
@@ -78,7 +78,7 @@
             android:maxLines="1"
             android:layout_weight="1"
             android:gravity="right"
-            android:text="@string/codigo"
+            android:text="@string/idClifo"
             android:textColor="@color/branco"
             android:textStyle="bold" />
 

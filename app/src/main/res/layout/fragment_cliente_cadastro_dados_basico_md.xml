@@ -24,7 +24,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:background="@color/branco"
-                android:text="@string/codigo"
+                android:text="@string/idClifo"
                 android:textAppearance="?android:attr/textAppearanceLarge" />
 
             <TextView

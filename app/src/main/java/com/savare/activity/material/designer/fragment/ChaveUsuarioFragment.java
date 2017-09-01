@@ -24,9 +24,9 @@ import me.sudar.zxingorient.ZxingOrientResult;
 
 public class ChaveUsuarioFragment extends SlideFragment {
 
-    private EditText editTextDigitarChave;
-    private Button buttonTenhoChave, buttonDigitarChave;
-    private boolean escanearChave= true;
+    private EditText editTextDigitarCnpj;
+    private Button buttonTenhoCnpj, buttonDigitarCnpj;
+    private boolean escanearCnpj = true;
 
     public static ChaveUsuarioFragment newInstance() {
         return new ChaveUsuarioFragment();
@@ -38,15 +38,15 @@ public class ChaveUsuarioFragment extends SlideFragment {
         // Inflate the layout for this fragment
         View root = inflater.inflate(R.layout.fragment_chave_usuario, container, false);
 
-        editTextDigitarChave = (EditText) root.findViewById(R.id.fragment_chave_usuario_editText_digitar_chave);
-        buttonDigitarChave = (Button) root.findViewById(R.id.fragment_chave_usuario_buttonDigitarChave);
-        buttonTenhoChave = (Button) root.findViewById(R.id.fragment_chave_usuario_buttonTenhoChave);
+        editTextDigitarCnpj = (EditText) root.findViewById(R.id.fragment_chave_usuario_editText_digitar_cnpj);
+        buttonDigitarCnpj = (Button) root.findViewById(R.id.fragment_chave_usuario_buttonDigitarCnpj);
+        buttonTenhoCnpj = (Button) root.findViewById(R.id.fragment_chave_usuario_buttonTenhoCnpj);
 
-        buttonTenhoChave.setOnClickListener(new View.OnClickListener() {
+        buttonTenhoCnpj.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                if (escanearChave) {
+                if (escanearCnpj) {
                     new ZxingOrient(getActivity())
                             .setInfo(getResources().getString(R.string.escanear_codigo_barras))
                             .setVibration(true)
@@ -54,37 +54,47 @@ public class ChaveUsuarioFragment extends SlideFragment {
                             .initiateScan();
                 } else {
                     // Checa se a quantidade que foi digitada eh o tamanho certo
-                    if (editTextDigitarChave.getText().length() >= 16) {
+                    if ( (editTextDigitarCnpj.getText().length() == 11) || (editTextDigitarCnpj.getText().length() == 14) ) {
                         FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(getContext());
-                        funcoes.setValorXml("ChaveFuncionario", editTextDigitarChave.getText().toString());
+
+                        String bkpEdittextCnpj = editTextDigitarCnpj.getText().toString();
+
+                        if (editTextDigitarCnpj.getText().length() == 11){
+                            editTextDigitarCnpj.addTextChangedListener(funcoes.insertMascara(funcoes.MASCARA_CPF, editTextDigitarCnpj));
+
+                        } else if (editTextDigitarCnpj.getText().length() == 14){
+                            editTextDigitarCnpj.addTextChangedListener(funcoes.insertMascara(funcoes.MASCARA_CNPJ, editTextDigitarCnpj));
+                        }
+                        editTextDigitarCnpj.setText(bkpEdittextCnpj);
+                        funcoes.setValorXml("CnpjEmpresa", editTextDigitarCnpj.getText().toString());
 
                         desativarCampos();
 
-                        SuperToast.create(getContext(), getResources().getString(R.string.chave_salva_sucesso), SuperToast.Duration.SHORT, Style.getStyle(Style.GREEN, SuperToast.Animations.POPUP)).show();
+                        SuperToast.create(getContext(), getResources().getString(R.string.cnpj_salva_sucesso), SuperToast.Duration.SHORT, Style.getStyle(Style.GREEN, SuperToast.Animations.POPUP)).show();
 
                     } else {
-                        SuperToast.create(getContext(), getResources().getString(R.string.tamanho_chave_nao_permitido), SuperToast.Duration.SHORT, Style.getStyle(Style.RED, SuperToast.Animations.POPUP)).show();
+                        SuperToast.create(getContext(), getResources().getString(R.string.tamanho_cnpj_cpf_nao_permitido), SuperToast.Duration.SHORT, Style.getStyle(Style.RED, SuperToast.Animations.POPUP)).show();
                     }
                 }
             }
         });
 
-        buttonDigitarChave.setOnClickListener(new View.OnClickListener() {
+        buttonDigitarCnpj.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                escanearChave = !escanearChave;
+                escanearCnpj = !escanearCnpj;
 
-                if (escanearChave){
-                    editTextDigitarChave.setVisibility(View.GONE);
+                if (escanearCnpj){
+                    editTextDigitarCnpj.setVisibility(View.GONE);
 
-                    buttonDigitarChave.setText(R.string.digitar_chave);
-                    buttonTenhoChave.setText(R.string.tenho_chave_licenca);
+                    buttonDigitarCnpj.setText(R.string.digitar_cpj);
+                    buttonTenhoCnpj.setText(R.string.tenho_cnpj);
                 } else {
                     // Mostra o campo para digitar a chave
-                    editTextDigitarChave.setVisibility(View.VISIBLE);
+                    editTextDigitarCnpj.setVisibility(View.VISIBLE);
 
-                    buttonTenhoChave.setText(R.string.salvar);
-                    buttonDigitarChave.setText(R.string.cancelar);
+                    buttonTenhoCnpj.setText(R.string.salvar);
+                    buttonDigitarCnpj.setText(R.string.cancelar);
                 }
             }
         });
@@ -105,15 +115,15 @@ public class ChaveUsuarioFragment extends SlideFragment {
                 //Log.d("SAGA", "Scanned - CadastroEmbalagemActivity");
 
                 // Pega a chave retornado pelo leitor de codigo de barras
-                String chaveUsuario = retornoEscanerCodigoBarra.getContents();
+                String cnpj = retornoEscanerCodigoBarra.getContents();
 
-                if (chaveUsuario.length() >= 16) {
+                if (cnpj.length() >= 11) {
                     FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(getContext());
-                    funcoes.setValorXml("ChaveFuncionario", chaveUsuario);
+                    funcoes.setValorXml("CnpjEmpresa", cnpj);
 
                     desativarCampos();
                 } else {
-                    SuperToast.create(getContext(), getResources().getString(R.string.tamanho_chave_nao_permitido), SuperToast.Duration.LONG, Style.getStyle(Style.RED, SuperToast.Animations.POPUP)).show();
+                    SuperToast.create(getContext(), getResources().getString(R.string.tamanho_cnpj_cpf_nao_permitido), SuperToast.Duration.LONG, Style.getStyle(Style.RED, SuperToast.Animations.POPUP)).show();
                 }
 
                 // Vai para o proximo slide
@@ -126,8 +136,8 @@ public class ChaveUsuarioFragment extends SlideFragment {
     }
 
     private void desativarCampos(){
-        buttonDigitarChave.setEnabled(false);
-        buttonTenhoChave.setEnabled(false);
-        editTextDigitarChave.setEnabled(false);
+        buttonDigitarCnpj.setEnabled(false);
+        buttonTenhoCnpj.setEnabled(false);
+        editTextDigitarCnpj.setEnabled(false);
     }
 }

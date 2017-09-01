@@ -20,6 +20,7 @@ public class PercentualRotinas extends Rotinas {
 		FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
 
 		int codigoEmpresa = (!funcoes.getValorXml("CodigoEmpresa").equalsIgnoreCase(funcoes.NAO_ENCONTRADO)) ? Integer.parseInt(funcoes.getValorXml("CodigoEmpresa")) : -1;
+		codigoUsuario = (codigoUsuario.equalsIgnoreCase(funcoes.NAO_ENCONTRADO) ? "0" : codigoUsuario);
 
 		String sql =  "SELECT IFNULL(AEAPERCE.MARKUP_ATAC, 0) AS MARKUP_ATAC FROM AEAPERCE \n"
 					+ "LEFT OUTER JOIN CFAPARAM ON (AEAPERCE.ID_CFAPARAM_VENDEDOR = CFAPARAM.ID_CFAPARAM) \n"
@@ -47,6 +48,7 @@ public class PercentualRotinas extends Rotinas {
 		FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
 
 		int codigoEmpresa = (!funcoes.getValorXml("CodigoEmpresa").equalsIgnoreCase(funcoes.NAO_ENCONTRADO)) ? Integer.parseInt(funcoes.getValorXml("CodigoEmpresa")) : -1;
+		codigoUsuario = (codigoUsuario.equalsIgnoreCase(funcoes.NAO_ENCONTRADO) ? "0" : codigoUsuario );
 
 		String sql = "SELECT IFNULL(AEAPERCE.MARKUP_VARE, 0) AS MARKUP_VARE FROM AEAPERCE "
 				+ "LEFT OUTER JOIN CFAPARAM ON (AEAPERCE.ID_CFAPARAM_VENDEDOR = CFAPARAM.ID_CFAPARAM) \n"

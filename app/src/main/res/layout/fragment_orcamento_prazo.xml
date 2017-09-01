@@ -19,7 +19,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="@string/codigo"
+                android:text="@string/idClifo"
                 android:id="@+id/fragment_orcamento_prazo_text_id_orcamento"
                 android:layout_weight="1" />
 

@@ -314,7 +314,7 @@ public class EnviarDadosWebserviceAsyncRotinas  extends AsyncTask<Void, Void, Vo
                     WSSisinfoWebservice webserviceSisInfo = new WSSisinfoWebservice(context);
                     // Instancia gson para gera json
                     Gson gson = new Gson();
-                    String tempJsonRetorno = webserviceSisInfo.executarSelectWebserviceJson(null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_INSERT_AEAORCAM, WSSisinfoWebservice.METODO_POST, gson.toJson(orcamento, orcamento.getClass()));
+                    String tempJsonRetorno = webserviceSisInfo.executarSelectWebserviceJson(null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_INSERT_AEAORCAM, WSSisinfoWebservice.METODO_POST, gson.toJson(orcamento, orcamento.getClass()), null);
                     JsonObject retornoWebservice = gson.fromJson(tempJsonRetorno, JsonObject.class);
 
                     if ((retornoWebservice != null) && (retornoWebservice.has(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO))){

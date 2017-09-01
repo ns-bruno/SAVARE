@@ -91,13 +91,13 @@ public class LoginMDActivity extends AppCompatActivity {
             // Instancia a classe de funcoes personalizadas
             FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(LoginMDActivity.this);
             // Funca o codigo do usuario no xml
-            String codigoUsuario = funcoes.getValorXml("CodigoUsuario");
+            String cnpjEmpresa = funcoes.getValorXml("CnpjEmpresa");
 
             // Instancia a classe de rotinas
             Rotinas rotinas = new Rotinas(LoginMDActivity.this);
 
             // Verfifica se existe algum usuario cadastrado, ou
-            if ((rotinas.existeUsuario() == false) || (codigoUsuario.equalsIgnoreCase(funcoes.NAO_ENCONTRADO))) {
+            if ((rotinas.existeUsuario() == false) || (cnpjEmpresa.equalsIgnoreCase(funcoes.NAO_ENCONTRADO))) {
 
                 ConexaoBancoDeDados conexaoBancoDeDados = new ConexaoBancoDeDados(LoginMDActivity.this, VersionUtils.getVersionCode(LoginMDActivity.this));
                 // Pega o banco de dados do SAVARE
@@ -111,16 +111,19 @@ public class LoginMDActivity extends AppCompatActivity {
                 startActivity(intent);
 
             } else {
-                textCodigoUsuario.setText(codigoUsuario);
+                textCodigoUsuario.setText(cnpjEmpresa);
                 PessoaSql pessoaSql = new PessoaSql(LoginMDActivity.this);
                 // Pega os dados do usuario(vendedor)
-                Cursor dadosUsuario = pessoaSql.query("CODIGO_FUN = " + codigoUsuario);
+                //Cursor dadosUsuario = pessoaSql.query("CODIGO_FUN = " + cnpjEmpresa);
+
+                UsuarioSQL usuarioSQL = new UsuarioSQL(LoginMDActivity.this);
+                Cursor dadosUsuario = usuarioSQL.query("LOGIN_USUA = '" + funcoes.getValorXml("Usuario") + "'");
 
                 if ((dadosUsuario != null) && (dadosUsuario.getCount() > 0)) {
                     // Move para o primeiro registro
                     dadosUsuario.moveToFirst();
                     // Preenche os campos com os dados do usuario(vendedor)
-                    textUsuario.setText(dadosUsuario.getString(dadosUsuario.getColumnIndex("NOME_RAZAO")));
+                    textUsuario.setText(dadosUsuario.getString(dadosUsuario.getColumnIndex("LOGIN_USUA")));
                 }
             }
             boolean enviaAutomatico = (funcoes.getValorXml("EnviarAutomatico").equalsIgnoreCase("S") ? true : false);
@@ -207,11 +210,11 @@ public class LoginMDActivity extends AppCompatActivity {
 
         FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(LoginMDActivity.this);
         // Checa se tem algum campo obrigatorio vazio
-        if ((funcoes.getValorXml("Usuario").equalsIgnoreCase(funcoes.NAO_ENCONTRADO)) ||
-                (funcoes.getValorXml("CodigoUsuario").equalsIgnoreCase(funcoes.NAO_ENCONTRADO)) ||
+        if ( (funcoes.getValorXml("Usuario").equalsIgnoreCase(funcoes.NAO_ENCONTRADO)) ||
+                (funcoes.getValorXml("CnpjEmpresa").equalsIgnoreCase(funcoes.NAO_ENCONTRADO))/* ||
                 (funcoes.getValorXml("CodigoEmpresa").equalsIgnoreCase(funcoes.NAO_ENCONTRADO)) ||
                 (funcoes.getValorXml("ChaveFuncionario").equalsIgnoreCase(funcoes.NAO_ENCONTRADO)) ||
-                (funcoes.getValorXml("ModoConexao").equalsIgnoreCase(funcoes.NAO_ENCONTRADO))){
+                (funcoes.getValorXml("ModoConexao").equalsIgnoreCase(funcoes.NAO_ENCONTRADO))*/ ){
             retorno = false;
 
         } else {

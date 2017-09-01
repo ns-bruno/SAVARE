@@ -2,6 +2,7 @@ package com.savare.activity.material.designer;
 
 import android.accounts.AccountManager;
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ContentValues;
 import android.content.DialogInterface;
@@ -46,6 +47,7 @@ import com.savare.activity.LogActivity;
 import com.savare.activity.fragment.ClienteCadastroFragment;
 import com.savare.banco.funcoesSql.EnderecoSql;
 import com.savare.banco.funcoesSql.PessoaSql;
+import com.savare.banco.funcoesSql.UltimaAtualizacaoSql;
 import com.savare.banco.funcoesSql.UsuarioSQL;
 import com.savare.beans.EmpresaBeans;
 import com.savare.beans.PessoaBeans;
@@ -54,6 +56,7 @@ import com.savare.funcoes.FuncoesPersonalizadas;
 import com.savare.funcoes.rotinas.EmpresaRotinas;
 import com.savare.funcoes.rotinas.OrcamentoRotinas;
 import com.savare.funcoes.rotinas.PessoaRotinas;
+import com.savare.funcoes.rotinas.UltimaAtualizacaoRotinas;
 import com.savare.funcoes.rotinas.UsuarioRotinas;
 import com.savare.funcoes.rotinas.async.ReceberDadosFtpAsyncRotinas;
 
@@ -105,9 +108,6 @@ public class InicioMDActivity extends AppCompatActivity {
         // Pega os dadosUsuario do usuario no banco de dadosUsuario
         //Cursor dadosUsuario = pessoaSql.query("CODIGO_FUN = " + funcoes.getValorXml("CodigoUsuario"));
 
-        PessoaRotinas pessoaRotinas = new PessoaRotinas(getApplicationContext());
-        // Pega os dados do usuario
-        List<PessoaBeans> dadosUsuario = pessoaRotinas.listaPessoaResumido("CODIGO_FUN = " + funcoes.getValorXml("CodigoUsuario"), PessoaRotinas.KEY_TIPO_FUNCIONARIO, null);
 
         // Pega o nome de login do usuario
         String nomeCompletoUsua = funcoes.getValorXml("Usuario");
@@ -124,18 +124,22 @@ public class InicioMDActivity extends AppCompatActivity {
         if (funcoes.getValorXml("ImagemProduto").equalsIgnoreCase("S")){
             imagemProduto = true;
         }
+        if(!funcoes.getValorXml("CodigoUsuario").equalsIgnoreCase(funcoes.NAO_ENCONTRADO)) {
+            PessoaRotinas pessoaRotinas = new PessoaRotinas(getApplicationContext());
+            // Pega os dados do usuario
+            List<PessoaBeans> dadosUsuario = pessoaRotinas.listaPessoaResumido("CODIGO_FUN = " + funcoes.getValorXml("CodigoUsuario"), PessoaRotinas.KEY_TIPO_FUNCIONARIO, null);
 
-        // Checa se retornou algum dados do usuario
-        if (dadosUsuario != null && dadosUsuario.size() > 0){
-            // Pega o nome completo do usuario
-            nomeCompletoUsua = dadosUsuario.get(0).getNomeRazao();
+            // Checa se retornou algum dados do usuario
+            if (dadosUsuario != null && dadosUsuario.size() > 0) {
+                // Pega o nome completo do usuario
+                nomeCompletoUsua = dadosUsuario.get(0).getNomeRazao();
 
-            if ((dadosUsuario.get(0).getEnderecoPessoa() != null) && (dadosUsuario.get(0).getEnderecoPessoa().getEmail() != null)){
-                email = dadosUsuario.get(0).getEnderecoPessoa().getEmail();
-                funcoes.setValorXml("Email", email);
+                if ((dadosUsuario.get(0).getEnderecoPessoa() != null) && (dadosUsuario.get(0).getEnderecoPessoa().getEmail() != null)) {
+                    email = dadosUsuario.get(0).getEnderecoPessoa().getEmail();
+                    funcoes.setValorXml("Email", email);
+                }
             }
         }
-
         // Instancia o cabecalho(conta) do drawer
         cabecalhoDrawer = new AccountHeaderBuilder()
                 .withActivity(this)
@@ -377,6 +381,8 @@ public class InicioMDActivity extends AppCompatActivity {
         }
 
         geraCardView();
+
+        checaLiberacaoDispositivo();
 
         /*EmpresaRotinas empresaRotinas = new EmpresaRotinas(InicioMDActivity.this);
         // Pega os dados da empresa
@@ -732,5 +738,24 @@ public class InicioMDActivity extends AppCompatActivity {
         mListView.getAdapter().add(card);
         mListView.getAdapter().add(card2);
         mListView.getAdapter().add(card3);*/
+    }
+
+    private void checaLiberacaoDispositivo(){
+
+        UsuarioRotinas usuarioRotinas = new UsuarioRotinas(getApplicationContext());
+        if (usuarioRotinas.usuarioAtivo() == false){
+
+            Intent intentListaConfiguracoes = new Intent(InicioMDActivity.this, SincronizacaoMDActivity.class);
+            // Abre outra tela
+            startActivity(intentListaConfiguracoes);
+        }
+
+        UltimaAtualizacaoRotinas ultimaAtualizacaoRotinas = new UltimaAtualizacaoRotinas(getApplicationContext());
+
+        if(ultimaAtualizacaoRotinas.muitoTempoSemSincronizacao()){
+            Intent intentSincronizacao = new Intent(InicioMDActivity.this, SincronizacaoMDActivity.class);
+            // Abre outra tela
+            startActivity(intentSincronizacao);
+        }
     }
 }

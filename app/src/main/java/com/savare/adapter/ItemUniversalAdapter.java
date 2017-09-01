@@ -1285,7 +1285,7 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 			RamoAtividadeBeans ramoAtividade = listaRamoAtividade.get(position);
 			
 			textDescricao.setText(ramoAtividade.getCodigo() + " - " + ramoAtividade.getDescricaoRamoAtividade());
-			//textAbaixoDescricaoEsqueda.setText("" + ramoAtividade.getCodigo());
+			//textAbaixoDescricaoEsqueda.setText("" + ramoAtividade.getIdClifo());
 			
 			//textAbaixoDescricaoEsqueda.setText("D.A.V.: " + ramoAtividade.getDescontoAtacadoVista() + " - D.A.P.: " + ramoAtividade.getDescontoAtacadoPrazo());
 			//textAbaixoDescricaoDireita.setText("D.V.V.: " + ramoAtividade.getDescontoVarejoVista() + " - D.V.P.: " + ramoAtividade.getDescontoVarejoPrazo());
@@ -1306,7 +1306,7 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 			TipoClienteBeans tipoCLiente = listaTipoCliente.get(position);
 						
 			textDescricao.setText(tipoCLiente.getCodigoTipoCliente() + " - " + tipoCLiente.getDescricaoTipoCliente());
-			//textAbaixoDescricaoEsqueda.setText("" + ramoAtividade.getCodigo());
+			//textAbaixoDescricaoEsqueda.setText("" + ramoAtividade.getIdClifo());
 			
 			//textAbaixoDescricaoEsqueda.setText("D.A.V.: " + tipoCLiente.getDescontoAtacadoVista() + " - D.A.P.: " + tipoCLiente.getDescontoAtacadoPrazo());
 			//textAbaixoDescricaoDireita.setText("D.V.V.: " + tipoCLiente.getDescontoVarejoVista() + " - D.V.P.: " + tipoCLiente.getDescontoVarejoPrazo());
@@ -1339,7 +1339,7 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 			PortadorBancoBeans portadorBanco = listaPortadorBanco.get(position);
 						
 			textDescricao.setText(portadorBanco.getCodigoPortadorBanco() + " - " + portadorBanco.getDescricaoPortador());
-			//textAbaixoDescricaoEsqueda.setText("" + ramoAtividade.getCodigo());
+			//textAbaixoDescricaoEsqueda.setText("" + ramoAtividade.getIdClifo());
 			
 			textAbaixoDescricaoEsqueda.setText("Sigla: " + portadorBanco.getSiglaPortador());
 			

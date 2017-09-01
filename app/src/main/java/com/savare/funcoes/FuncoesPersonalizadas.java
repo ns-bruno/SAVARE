@@ -95,6 +95,8 @@ public class FuncoesPersonalizadas {
 							MINUTOS = 2,
 							HORAS = 3,
 							DIAS = 4;
+	public static final String MASCARA_CPF = "###.###.###-##";
+	public static final String MASCARA_CNPJ = "##.###.###/####-##";
 	AlertDialog.Builder menssagem;
 	private Context context;
 	public static final String NAO_ENCONTRADO = "nao encontrado";

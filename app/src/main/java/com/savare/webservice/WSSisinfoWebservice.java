@@ -33,6 +33,7 @@ import java.net.ProtocolException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.List;
+import java.util.UUID;
 import java.util.Vector;
 
 /**
@@ -44,18 +45,13 @@ public class WSSisinfoWebservice {
     private DispositivoBeans dispositivoBeans;
     private SmadispoBeans smadispoBeans;
     public static final String FUNCTION_SELECT_USUARIO_USUA = "selectUsuario";
-    public static final String FUNCTION_JSON_SELECT_USUARIO_USUA = "/savare/selectUsuario";
-    public static final String FUNCTION_SISINFOWEB_JSON_SELECT_USUARIO_USUA = "/savare/selectUsuario";
-    public static final String FUNCTION_SELECT_VERSAO_SAVARE = "selectVersaoSavare";
-    public static final String FUNCTION_JSON_SELECT_VERSAO_SAVARE = "/savare/selectVersaoSavare";
-    public static final String FUNCTION_SISINFOWEB_JSON_SELECT_VERSAO_SAVARE = "/savare/selectVersaoSavare";
-    public static final String FUNCTION_SELECT_ULTIMA_ATUALIZACAO = "selectUltimaAtualizacao";
-    public static final String FUNCTION_INSERT_ULTIMA_ATUALIZACAO = "insertUltimaAtualizacao";
+    public static final String FUNCTION_CADASTRAR_DISPOSITIVO = "cadastrarDispositivo";
     public static final String FUNCTION_SELECT_CFAAREAS = "selectAreas";
     public static final String FUNCTION_SISINFOWEB_JSON_SELECT_CFAAREAS = "/Cfaareas";
     public static final String FUNCTION_SELECT_SMAEMPRE = "selectEmpresa";
     public static final String FUNCTION_JSON_SELECT_SMAEMPRE = "/sistema/selectEmpresa";
     public static final String FUNCTION_SISINFOWEB_JSON_SELECT_SMAEMPRE = "/Smaempre";
+    public static final String FUNCTION_SISINFOWEB_JSON_SELECT_SMADISPO = "/Smadispo";
     public static final String FUNCTION_SELECT_CFAATIVI = "selectRamoAtividade";
     public static final String FUNCTION_SISINFOWEB_JSON_SELECT_CFAATIVI = "/Cfaativi";
     public static final String FUNCTION_SELECT_CFASTATU = "selectStatusClifo";
@@ -79,6 +75,7 @@ public class WSSisinfoWebservice {
     public static final String FUNCTION_SELECT_CFACLIFO = "selectClienteFornecedor";
     public static final String FUNCTION_JSON_SELECT_CFACLIFO = "/Cfaclifo";
     public static final String FUNCTION_SISINFOWEB_JSON_SELECT_CFACLIFO = "/Cfaclifo";
+    public static final String FUNCTION_SISINFOWEB_JSON_SELECT_CFACLIFO_ADMIN = "/Cfaclifo/Admin";
     public static final String FUNCTION_SELECT_CFAENDER = "selectEndereco";
     public static final String FUNCTION_SISINFOWEB_JSON_SELECT_CFABAIRO = "/Cfabairo";
     public static final String FUNCTION_SISINFOWEB_JSON_SELECT_CFAENDER = "/Cfaender";
@@ -113,6 +110,7 @@ public class WSSisinfoWebservice {
     public static final String FUNCTION_SISINFOWEB_JSON_SELECT_AEAESTOQ = "/Aeaestoq";
     public static final String FUNCTION_SELECT_AEAORCAM = "selectOrcamento";
     public static final String FUNCTION_SISINFOWEB_JSON_SELECT_AEAORCAM = "/Aeaorcam";
+    public static final String FUNCTION_SISINFOWEB_JSON_SELECT_AEASAIDA = "/Aeasaida";
     public static final String FUNCTION_SELECT_AEAITORC = "selectItemOrcamento";
     public static final String FUNCTION_SELECT_AEAPERCE = "selectPercentual";
     public static final String FUNCTION_SISINFOWEB_JSON_SELECT_AEAPERCE = "/Aeaperce";
@@ -141,27 +139,20 @@ public class WSSisinfoWebservice {
 
         FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
 
-        if ((!funcoes.getValorXml("ChaveFuncionario").equalsIgnoreCase(funcoes.NAO_ENCONTRADO)) && (funcoes.getValorXml("ChaveFuncionario").length() >= 16)) {
-
-            // Instancia uma classe para pegar os dados do dispositivo
-            /*dispositivoBeans = new DispositivoBeans();
-            dispositivoBeans.setChaveUsuario(funcoes.getValorXml("ChaveFuncionario"));
-            dispositivoBeans.setNomeDispositivo(android.os.Build.MODEL + " - "+ android.os.Build.PRODUCT);
-            dispositivoBeans.setSistemaOperacionalDispositivo(""+android.os.Build.VERSION.SDK_INT);
-            dispositivoBeans.setNumeroSerialDispositivo(Build.SERIAL.replace("unknown", ""));
-            dispositivoBeans.setMarcaDispositivo(android.os.Build.MANUFACTURER);
-            dispositivoBeans.setIpHost(funcoes.getLocalIpAddress());
-
-            TelephonyManager telephonyManager = (TelephonyManager) context.getSystemService(context.TELEPHONY_SERVICE);
-            dispositivoBeans.setIdDispositivo(telephonyManager.getDeviceId());
-            dispositivoBeans.setOperadoraDispositivo(telephonyManager.getSimOperatorName());*/
+        if ((!funcoes.getValorXml("CnpjEmpresa").equalsIgnoreCase(funcoes.NAO_ENCONTRADO)) && (funcoes.getValorXml("CnpjEmpresa").length() >= 11)) {
 
             smadispoBeans = new SmadispoBeans();
-            //smadispoBeans.setGuidClifo(funcoes.getValorXml("ChaveFuncionario"));
-            smadispoBeans.setGuidClifo(funcoes.getValorXml("ChaveFuncionario"));
-            smadispoBeans.setDescricao(android.os.Build.MODEL + " - "+ android.os.Build.PRODUCT);
-            smadispoBeans.setIdentificacao(Build.SERIAL.replace("unknown", "") + " - " + android.os.Build.MANUFACTURER);
-            smadispoBeans.setPlataforma("Android "+android.os.Build.VERSION.SDK_INT);
+            TelephonyManager tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
+            String androidId = "" + android.provider.Settings.Secure.getString(context.getContentResolver(), android.provider.Settings.Secure.ANDROID_ID);
+
+            UUID deviceUuid = new UUID(androidId.hashCode(), ((long) tm.getDeviceId().hashCode() << 32) | tm.getSimSerialNumber().hashCode());
+
+            if (!funcoes.getValorXml("UuidDispositivo").equalsIgnoreCase(deviceUuid.toString())){
+                funcoes.setValorXml("UuidDispositivo", deviceUuid.toString().toUpperCase());
+            }
+            smadispoBeans.setIdentificacao(deviceUuid.toString().toUpperCase());
+            String descricao = (Build.VERSION.RELEASE + " - "+ Build.MODEL).toUpperCase();
+            smadispoBeans.setDescricao((descricao.length() > 40 ? descricao.substring(0, 39) : descricao));
         }
 
     }
@@ -399,7 +390,7 @@ public class WSSisinfoWebservice {
      * @param parametros - Os dados a serem passados ja tem que ser passado no formato Json
      * @return
      */
-    public String executarSelectWebserviceJson(String sql, String funcao, String metodo, String parametros){
+    public String executarSelectWebserviceJson(String sql, String funcao, String metodo, String parametros, String parametrosUrl){
         String retorno = null;
         HttpURLConnection conexaoHttp = null;
         try {
@@ -412,7 +403,7 @@ public class WSSisinfoWebservice {
                 ipServidor = "localhost";
             }
             //String enderecoWebService = "http://" + ipServidor + ((!ServicosWeb.PORTA_JSON.isEmpty()) ? (":" + ServicosWeb.PORTA_JSON + "/") : "/" ) + ServicosWeb.WS_ENDERECO_WEBSERVICE_JSON + funcao;
-            String enderecoWebService = "http://" + "10.0.2.2" + ((!ServicosWeb.PORTA_JSON.isEmpty()) ? (":" + ServicosWeb.PORTA_JSON + "/") : "/" ) + ServicosWeb.WS_ENDERECO_SISINFOWEB + funcao;
+            String enderecoWebService = "http://" + ipServidor + ((!ServicosWeb.PORTA_JSON.isEmpty()) ? (":" + ServicosWeb.PORTA_JSON + "/") : "/" ) + ServicosWeb.WS_ENDERECO_SISINFOWEB + funcao;
 
             if ((metodo.equalsIgnoreCase(METODO_GET)) || (metodo.equalsIgnoreCase(METODO_POST))){
                 Gson gson = new Gson();
@@ -428,6 +419,9 @@ public class WSSisinfoWebservice {
                     //enderecoWebService += "/" + URLEncoder.encode(parametros, "UTF-8");
                     enderecoWebService += "&sqlQuery= " + URLEncoder.encode(sql, "UTF-8");
                 }
+                if((parametrosUrl) != null && (!parametrosUrl.isEmpty()) && (parametrosUrl.contains("&"))){
+                    enderecoWebService += URLEncoder.encode(parametrosUrl, "UTF-8").replace("%26", "&").replace("%3D", "=");
+                }
             }
             URL urlWebservice = new URL(enderecoWebService);
 
@@ -436,7 +430,6 @@ public class WSSisinfoWebservice {
             conexaoHttp.setRequestMethod(metodo);
             conexaoHttp.setRequestProperty("Accept", "application/json");
             conexaoHttp.setRequestProperty("Content-Type", "application/json");
-            //conexaoHttp.setRequestProperty("Accept-Language", "pt-BR,pt;q=0.8,en-US;q=0.6,en;q=0.4");
             conexaoHttp.setConnectTimeout(100000);
             conexaoHttp.setReadTimeout(100000);
 

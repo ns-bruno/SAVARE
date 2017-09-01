@@ -2,6 +2,7 @@ package com.savare.activity.material.designer.fragment;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.ContentValues;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,7 +17,9 @@ import com.github.johnpersano.supertoasts.SuperToast;
 import com.github.johnpersano.supertoasts.util.Style;
 import com.heinrichreimersoftware.materialintro.app.SlideFragment;
 import com.savare.R;
+import com.savare.activity.CadastroUsuarioActivity;
 import com.savare.activity.material.designer.RegistroChaveUsuarioMDActivity;
+import com.savare.banco.funcoesSql.UsuarioSQL;
 import com.savare.configuracao.ConfiguracoesInternas;
 import com.savare.funcoes.FuncoesPersonalizadas;
 import com.savare.funcoes.Rotinas;
@@ -85,7 +88,7 @@ public class LoginFragment extends SlideFragment {
                                             Rotinas rotinas = new Rotinas(getContext());
 
                                             // Verfifica se existe algum usuario cadastrado, ou
-                                            if ((rotinas.existeUsuario() == true) && (!funcoes.getValorXml("ChaveFuncionario").equalsIgnoreCase(funcoes.NAO_ENCONTRADO))) {
+                                            if ((rotinas.existeUsuario() == true) && (!funcoes.getValorXml("CnpjEmpresa").equalsIgnoreCase(funcoes.NAO_ENCONTRADO))) {
 
                                                 SuperToast.create(getContext(), getResources().getString(R.string.usuario_atualizado_sucesso), SuperToast.Duration.LONG, Style.getStyle(Style.GREEN, SuperToast.Animations.POPUP)).show();
 
@@ -120,7 +123,7 @@ public class LoginFragment extends SlideFragment {
                                         }
                                     },
                                     getContext(),
-                                    new String[]{WSSisinfoWebservice.FUNCTION_SELECT_USUARIO_USUA});
+                                    new String[]{WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_SMADISPO});
 
                             // Insiro um textView para mostra o status
                             receberDadosWebservice.setTextStatus(textStatus);

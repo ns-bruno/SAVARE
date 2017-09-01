@@ -120,6 +120,15 @@ public class UsuarioRotinas extends Rotinas {
         return dtUltimoRecebimento;
     } // Fim dataUltimoEnvio
 
+    public Boolean usuarioAtivo(){
+        FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
+
+        if (usuarioCompleto("LOGIN_USUA = '" + funcoes.getValorXml("Usuario") + "'").getAtivoUsuario() == '1' ){
+            return true;
+        } else {
+            return false;
+        }
+    }
 
     public UsuarioBeans usuarioCompleto(String where){
         // Cria uma vareavel para salvar os dados do usuario

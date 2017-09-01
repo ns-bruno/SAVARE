@@ -15,5 +15,11 @@
         android:title="@string/desmarcar_transmissao_dados"
         app:showAsAction="never" />
 
+    <item
+        android:id="@+id/menu_sincronizacao_md_zerar_datas_sincronizacao"
+        android:orderInCategory="101"
+        android:title="@string/zerar_datas_sincronizacao"
+        app:showAsAction="never" />
+
 
 </menu>

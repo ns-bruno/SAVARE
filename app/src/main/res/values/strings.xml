@@ -30,7 +30,7 @@
     <string name="salvar">Salvar</string>
     <string name="cancelar">Cancelar</string>
     <string name="filtrar">Filtrar</string>
-    <string name="codigo">Código</string>
+    <string name="idClifo">Código</string>
     <string name="codigo_empresa">Código da Empresa</string>
     <string name="referencia">Referência</string>
     <string name="usuario_servidor_sisinfo">Usuário do Servidor SisInfo</string>
@@ -174,6 +174,7 @@
     <string name="nao_foi_possivel_cadastrar">Não foi possível cadastrar.</string>
     <string name="nao_foi_possivel_atualizar">Não foi possível atualizar.</string>
     <string name="desmarcar_transmissao_dados">Desmarcar as transmissões de dados</string>
+    <string name="zerar_datas_sincronizacao">Zerar datas de sincronização</string>
     <string name="achamos_alguma_coisa">Achamos alguma coisa</string>
     <string name="pegamos_produto">Pegamos o produto</string>
     <string name="clientes">Clientes</string>
@@ -235,20 +236,19 @@
     <string name="erro_validar_versao">Erro ao validar a versao do SAVARE, entre em contato com o suporte técnico do SAVARE</string>
     <string name="senha_login">Senha do Login</string>
     <string name="proximo">Próximo</string>
-    <string name="digitar_chave">Digitar Chave de Licença</string>
+    <string name="digitar_cpj">Digitar CNPJ</string>
     <string name="nao_tenho_chave">Não tenho nenhuma chave de licença</string>
     <string name="primeiro_passo">Antes de iniciar a aplicação precisamos configurar algumas coisas.</string>
-    <string name="tenho_chave_licenca">Eu tenho uma chave de licença</string>
+    <string name="tenho_cnpj">Tenho CNPJ</string>
     <string name="aguarde_buscando_primeiros_dados">Aguarde por favor, vamos baixar os primeiros dados.</string>
     <string name="finalizar">Finalizar</string>
     <string name="primeiros_passos_iniciar_savare">Primeiros passos para iniciar o SAVARE</string>
     <string name="registrar_voce_como_usuario">Precisamos registrar você como usuário</string>
-<string name="orientacao_registrar_usuario">Se você adquiriu uma chave/licença para usar o SAVARE clique no botão \"EU TENHO UMA CHAVE DE LICENÇA\", ou se você quer fazer
-    um teste primeiro basta ir para o próximo passo.</string>
+<string name="orientacao_registrar_usuario">Se você adquiriu uma licença para usar o SAVARE clique no botão \"DIGITAR CNPJ\".</string>
     <string name="terminamos_primeiros_passos">Terminamos os primeiros passos</string>
     <string name="terminamos">Terminamos</string>
     <string name="terminamos_enviar_dados">Terminamos de enviar os dados. Pode atualizar a tela, por favor.</string>
-    <string name="pronto_para_iniciar_savare">Pronto, terminamos os primeiros passos, agora vamos iniciar o SAVARE e receber uma gama de dados.</string>
+    <string name="pronto_para_iniciar_savare">Pronto, agora vamos iniciar o SAVARE e aguardar a empresa associar o seu dispositivo a um funcionário para que você possa receber os dados. Verifique com o responvável da sua empresa para providênciar essa ligação do seu dispositivo com o funcionário cadastrado.</string>
     <string name="escanear_codigo_barras">Escanear código de barras</string>
     <string name="cancelado">Cancelado</string>
     <string name="registrar">Registrar</string>
@@ -260,8 +260,9 @@
     <string name="terminamos_atualizacao">Terminamos a atualização.</string>
     <string name="nao_conseguimos_atualizar_usuario">Não conseguimos atualizar o usuário, tente novamente, se persistir entre em contato com o suporte SAVARE.</string>
     <string name="nome_login_invalido">Nome de login inválido, tente outro sem espaço e sem caracteres especiais.</string>
-    <string name="tamanho_chave_nao_permitido">Tamanho da chave não é permitida</string>
+    <string name="tamanho_cnpj_cpf_nao_permitido">Tamanho da CNPJ/CPF não é permitida</string>
     <string name="recebendo_dados">Aguarde, Recebendo os dados ...</string>
+    <string name="recebendo_dados_licenca">Aguarde, Recebendo os dados de licença ...</string>
     <string name="recebendo_dados_usuario">Aguarde, Recebendo os dados do Usuário ...</string>
     <string name="recebendo_dados_areas">Aguarde, Recebendo os dados da(s) Área(s) ...</string>
     <string name="recebendo_dados_empresa">Aguarde, Recebendo os dados da(s) Empresa(s) ...</string>
@@ -310,8 +311,8 @@
     <string name="selecione_tipo_documento">Selecione o tipo de documento</string>
     <string name="sincroniza_webservice">Sincronizar com Servidor Web</string>
     <string name="receber_dados_pedido_servidor_web">Receber Dados Servidor Web</string>
-    <string name="chave_salva_sucesso">Chave salva com sucesso.</string>
-    <string name="digite_chave">Digite a sua chave de licença</string>
+    <string name="cnpj_salva_sucesso">CNPJ salvo com sucesso.</string>
+    <string name="digite_cnpj">Digite o seu CNPJ</string>
     <string name="atacado">Atacado</string>
     <string name="varejo">Varejo</string>
     <string name="apenas_produtos_novos">Apenas Produtos Novos</string>
@@ -319,6 +320,7 @@
     <string name="aparentemente_servidor_webservice_offline">Aparentemente o Servidor Webservice está offline, pedimos que tente novamente, mas se não der certo entre em contato com o suporte SAVARE.</string>
     <string name="estamos_checando_webservice_online">Estamos checando se o servidor Webservice está online, Aguarde...</string>
     <string name="checando_versao_savare">Estamos checando a versão do SAVARE, Aguarde...</string>
+    <string name="servidor_online">O servidor respondeu o nosso sinal. Agora vamos para próxima etapa, Aguarde...</string>
     <string name="verifique_campos_obrigatorios">Verifique se todos os campos obrigatórios estão preenchidos.</string>
     <string name="marcando_item_enviado_sucesso">Estamos marcando que o item foi enviado com sucesso.</string>
     <string name="marcando_pedido_enviado_sucesso">Estamos marcando que o pedido foi enviado com sucesso.</string>
@@ -334,6 +336,10 @@
     <string name="calculando_preco_venda">Calculando Preço de Venda</string>
     <string name="critica_orcamento">Crítica de Orçamento</string>
     <string name="sem_razao_social">Sem razão social.</string>
+    <string name="nao_achamos_cnpj">Não achamaos o CNPJ, volter e tente inserir novamente o CNPJ da empresa.</string>
+    <string name="dispositivo_registrado">Dispositivo registrado com sucesso. Entre em contato com a sua empresa para associar o dispositivo ao seu cadastro.</string>
+    <string name="zerado_sucesso">Apagado com sucesso.</string>
+    <string name="nao_autorizado">Não autorizado</string>
 
 
     <string-array name="tab_produto_md">

@@ -6,8 +6,8 @@ package com.savare.beans;
 
 public class SmadispoBeans {
 
-    private Integer idSmadispo, codigo;
-    private String guid, usCad, dtCad, dtAlt, descricao, identificacao, ativo, guidClifo, plataforma;
+    private Integer idSmadispo, idClifo, idClifoFun, codigo;
+    private String guid, usCad, dtCad, dtAlt, descricao, identificacao, ativo;
 
     public Integer getIdSmadispo() {
         return idSmadispo;
@@ -15,6 +15,22 @@ public class SmadispoBeans {
 
     public void setIdSmadispo(Integer idSmadispo) {
         this.idSmadispo = idSmadispo;
+    }
+
+    public Integer getIdClifo() {
+        return idClifo;
+    }
+
+    public void setIdClifo(Integer idClifo) {
+        this.idClifo = idClifo;
+    }
+
+    public Integer getIdClifoFun() {
+        return idClifoFun;
+    }
+
+    public void setIdClifoFun(Integer idClifoFun) {
+        this.idClifoFun = idClifoFun;
     }
 
     public Integer getCodigo() {
@@ -81,19 +97,5 @@ public class SmadispoBeans {
         this.ativo = ativo;
     }
 
-    public String getGuidClifo() {
-        return guidClifo;
-    }
 
-    public void setGuidClifo(String guidClifo) {
-        this.guidClifo = guidClifo;
-    }
-
-    public String getPlataforma() {
-        return plataforma;
-    }
-
-    public void setPlataforma(String plataforma) {
-        this.plataforma = plataforma;
-    }
 }

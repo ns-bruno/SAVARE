@@ -1,8 +1,13 @@
 package com.savare.funcoes.rotinas;
 
+import android.app.Activity;
+import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 
+import com.savare.activity.material.designer.InicioMDActivity;
+import com.savare.activity.material.designer.SincronizacaoMDActivity;
 import com.savare.banco.funcoesSql.UltimaAtualizacaoSql;
 import com.savare.beans.UltimaAtualizacaoBeans;
 import com.savare.funcoes.Rotinas;
@@ -18,6 +23,25 @@ public class UltimaAtualizacaoRotinas extends Rotinas {
         super(context);
     }
 
+    public Boolean muitoTempoSemSincronizacao(){
+        UltimaAtualizacaoSql ultimaAtualizacaoSql = new UltimaAtualizacaoSql(context);
+
+        Cursor dados = ultimaAtualizacaoSql.sqlSelect("SELECT (JULIANDAY(DATE('NOW', 'LOCALTIME')) - JULIANDAY(DATE(ULTIMA_ATUALIZACAO_DISPOSITIVO.DATA_ULTIMA_ATUALIZACAO))) AS QTD_DIAS " +
+                "FROM ULTIMA_ATUALIZACAO_DISPOSITIVO " +
+                "WHERE ULTIMA_ATUALIZACAO_DISPOSITIVO.TABELA = 'CFACLIFO_ADMIN'");
+
+        if(dados != null && dados.getCount() > 0){
+            dados.moveToFirst();
+
+            if(dados.getInt(dados.getColumnIndex("QTD_DIAS")) > 10){
+                return true;
+            } else {
+                return false;
+            }
+
+        }
+        return false;
+    }
 
     public ArrayList<UltimaAtualizacaoBeans> listaUltimaAtualizacaoTabelas(String tabela){
         ArrayList<UltimaAtualizacaoBeans> listaAtualizacao = null;
@@ -51,5 +75,11 @@ public class UltimaAtualizacaoRotinas extends Rotinas {
         }
 
         return listaAtualizacao;
+    }
+
+    public int apagarDatasSincronizacao(){
+        UltimaAtualizacaoSql atualizacaoSql = new UltimaAtualizacaoSql(context);
+
+        return atualizacaoSql.delete(null);
     }
 }

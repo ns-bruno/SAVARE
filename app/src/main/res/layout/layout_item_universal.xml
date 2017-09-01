@@ -35,7 +35,7 @@
         android:layout_alignLeft="@+id/layout_item_universal_text_descricao"
         android:layout_below="@+id/layout_item_universal_text_descricao"
         android:layout_marginTop="5dp"
-        android:text="@string/codigo" />
+        android:text="@string/idClifo" />
 
     <TextView
         android:id="@+id/layout_item_universal_text_botton_esquerdo"

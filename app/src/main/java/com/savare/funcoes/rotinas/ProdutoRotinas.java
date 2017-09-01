@@ -470,7 +470,9 @@ public class ProdutoRotinas extends Rotinas {
 		FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
 
 		String idEmpresa = funcoes.getValorXml("CodigoEmpresa");
+		idEmpresa = (idEmpresa.equalsIgnoreCase(funcoes.NAO_ENCONTRADO) ? "0" : idEmpresa);
 		String codigoVendedor = funcoes.getValorXml("CodigoUsuario");
+		codigoVendedor = (codigoVendedor.equalsIgnoreCase(funcoes.NAO_ENCONTRADO) ? "0" : codigoVendedor);
 
 		String sql = "SELECT AEAPLOJA.ID_AEAPLOJA, AEAPRODU.ID_AEAPRODU, AEAPRODU.CODIGO_ESTRUTURAL, AEAPRODU.REFERENCIA, "
 				   + "AEAPRODU.DESCRICAO AS DESCRICAO_PRODU, AEAPRODU.TIPO, (JULIANDAY(DATE('NOW', 'LOCALTIME')) - JULIANDAY(AEAPRODU.DT_CAD)) AS DIAS_CADASTRO, "
