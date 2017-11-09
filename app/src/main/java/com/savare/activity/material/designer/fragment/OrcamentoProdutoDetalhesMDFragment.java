@@ -1010,28 +1010,36 @@ public class OrcamentoProdutoDetalhesMDFragment extends Fragment {
 
         if ((adapterEstoque.getListaEstoque() == null) || (adapterEstoque.getListaEstoque().size() <= 0)){
             // Dados da mensagem
-            ContentValues mensagem = new ContentValues();
+            final ContentValues mensagem = new ContentValues();
             mensagem.put("comando", 1);
             mensagem.put("tela", "OrcamentoProdutoDetalhesActivity");
             mensagem.put("mensagem", "Não tem estoque selecionado."
                     + "\n Favor, entrar em contato com o administrador de TI da empresa para que possa enviar os dados corretos do produto.");
 
-            FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(getContext());
-            funcoes.menssagem(mensagem);
+            final FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(getContext());
+            ((Activity) getContext()).runOnUiThread(new Runnable() {
+                public void run() {
+                    funcoes.menssagem(mensagem);
+                }
+            });
 
             dadosValidos = false;
         }
 
         if ((listaPlanoPagamentoPreco == null) || (listaPlanoPagamentoPreco.get(spinnerPlanoPagamentoPreco.getSelectedItemPosition()) == null)){
             // Dados da mensagem
-            ContentValues mensagem = new ContentValues();
+            final ContentValues mensagem = new ContentValues();
             mensagem.put("comando", 1);
             mensagem.put("tela", "OrcamentoProdutoDetalhesActivity");
             mensagem.put("mensagem", "Não existe plano de pagamento. \n"
                        + "Favor, entrar em contato com o administrador de TI da empresa para que possa enviar os dados corretos do produto.");
 
-            FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(getContext());
-            funcoes.menssagem(mensagem);
+            final FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(getContext());
+            ((Activity) getContext()).runOnUiThread(new Runnable() {
+                public void run() {
+                    funcoes.menssagem(mensagem);
+                }
+            });
 
             dadosValidos = false;
         } else if((listaPlanoPagamentoPreco != null) && (listaPlanoPagamentoPreco.get(spinnerPlanoPagamentoPreco.getSelectedItemPosition()).getIdPlanoPagamento() == 0)){

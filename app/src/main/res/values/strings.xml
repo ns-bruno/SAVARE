@@ -288,7 +288,7 @@
     <string name="recebendo_dados_situacao_tributaria">Recebendo os dados da(s) Situação(ões) Tributária(s)...</string>
     <string name="recebendo_dados_produto">Recebendo os dados do(s) Produto(s)...</string>
     <string name="recebendo_dados_preco">Recebendo os dados do(s) Preço(s)...</string>
-    <string name="recebendo_dados_embalagem">Recebendo os dados da(s) Embalagem(ens)...</string>
+    <string name="recebendo_dados_embalagem">Recebendo as Embalagens...</string>
     <string name="recebendo_dados_produto_loja">Recebendo os dados do(s) Produto(s) por Loja(s)...</string>
     <string name="recebendo_dados_local_estoque">Recebendo os dados do(s) Local(is) do(s) Estoque(s)...</string>
     <string name="recebendo_dados_estoque">Recebendo os dados do(s) Estoque(s)...</string>
@@ -326,6 +326,7 @@
     <string name="marcando_pedido_enviado_sucesso">Estamos marcando que o pedido foi enviado com sucesso.</string>
     <string name="numero_vensao_savare_nao_chegou">Não chegou o número da versão do SAVARE, tente novamente. Se persistir entre em contato com o suporte SAVARE.</string>
     <string name="nao_retornou_dados_suficiente_para_continuar_comunicao_webservice">Não recebemos os dados primários pra checar a versão e continuar a se comunicar com servidor em nuvem (Webservice).</string>
+    <string name="nao_retornou_dados_fotos">Não recebemos os dados das imagens para continuar a se comunicar com servidor em nuvem (Webservice).</string>
     <string name="nem_todos_pedidos_foram_enviados_tente_novamente">Nem todos os pedidos foram enviados. Atualize a lista e tente enviar novamente.</string>
     <string name="nao_conseguimos_verificar_titulos">Não conseguimos verificar os títulos a receber.</string>
     <string name="produto_nao_esta_orcamento">Não achamos este produto no orçamento</string>

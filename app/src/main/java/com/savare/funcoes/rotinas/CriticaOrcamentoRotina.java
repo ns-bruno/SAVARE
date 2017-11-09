@@ -36,7 +36,7 @@ public class CriticaOrcamentoRotina extends Rotinas {
         try{
             CriticaOrcamentoSql criticaOrcamentoSql = new CriticaOrcamentoSql(context);
 
-            final Cursor dados = criticaOrcamentoSql.query("ID_AEAORCAM = " + idOrcamento, "DT_CAD");
+            final Cursor dados = criticaOrcamentoSql.query("ID_AEAORCAM = " + idOrcamento, "DT_CAD DESC");
 
             if (dados != null && dados.getCount() > 0){
 

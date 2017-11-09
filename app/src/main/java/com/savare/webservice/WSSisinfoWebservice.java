@@ -67,7 +67,7 @@ public class WSSisinfoWebservice {
     public static final String FUNCTION_SELECT_CFATPCLI = "selectTipoCliente";
     public static final String FUNCTION_SISINFOWEB_JSON_SELECT_CFATPCLI = "/Cfatpcli";
     public static final String FUNCTION_SELECT_CFATPCOB = "selectTipoCobranca";
-    public static final String FUNCTION_JSON_SELECT_CFATPCOB = "/Cfatpcob";
+    public static final String FUNCTION_SISINFOWEB_JSON_SELECT_CFATPCOB = "/Cfatpcob";
     public static final String FUNCTION_SELECT_CFAESTAD = "selectEstado";
     public static final String FUNCTION_JSON_SELECT_CFAESTAD = "/Cfaestad";
     public static final String FUNCTION_SELECT_CFACIDAD = "selectCidade";
@@ -130,9 +130,12 @@ public class WSSisinfoWebservice {
     public static final String METODO_POST = "POST";
     public static final String KEY_OBJECT_STATUS_RETORNO = "statusRetorno";
     public static final String KEY_OBJECT_OBJECT_RETORNO = "object";
+    public static final String KEY_OBJECT_PAGE_RETORNO = "page";
     public static final String KEY_ELEMENT_CODIGO_RETORNO = "codigoRetorno";
     public static final String KEY_ELEMENT_MENSAGEM_RETORNO = "mensagemRetorno";
     public static final String KEY_ELEMENT_EXTRA_RETORNO = "extra";
+    public static final String KEY_ELEMENT_TOTAL_PAGES_RETORNO = "totalPages";
+    public static final String KEY_ELEMENT_PAGE_NUMBER_RETORNO = "pageNumber";
 
     public WSSisinfoWebservice(Context context) {
         this.context = context;

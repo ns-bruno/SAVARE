@@ -170,9 +170,9 @@ public class InicioMDActivity extends AppCompatActivity {
                         new PrimaryDrawerItem().withName(R.string.configuracoes).withIcon(R.drawable.ic_action_settings),
                         new SectionDrawerItem().withName(R.string.monitoramento),
                         new PrimaryDrawerItem().withName(R.string.logs).withIcon(R.drawable.ic_sim_alert),
-                        new SwitchDrawerItem().withName(R.string.enviar_automatico).withIcon(R.mipmap.ic_upload).withChecked(enviaAutomatico).withOnCheckedChangeListener(mOnCheckedChangeListener).withTag("enviar"),
-                        new SwitchDrawerItem().withName(R.string.receber_automatico).withIcon(R.mipmap.ic_download).withChecked(recebeAutomatico).withOnCheckedChangeListener(mOnCheckedChangeListener).withTag("receber"),
-                        new SwitchDrawerItem().withName(R.string.imagem_produto).withIcon(R.mipmap.ic_image_dark).withChecked(imagemProduto).withOnCheckedChangeListener(mOnCheckedChangeListener).withTag("imagem_produto")
+                        new SwitchDrawerItem().withName(R.string.enviar_automatico).withIcon(R.mipmap.ic_upload).withChecked(enviaAutomatico).withOnCheckedChangeListener(mOnCheckedChangeListener).withTag("enviar").withSelectable(false).withSwitchEnabled(false),
+                        new SwitchDrawerItem().withName(R.string.receber_automatico).withIcon(R.mipmap.ic_download).withChecked(recebeAutomatico).withOnCheckedChangeListener(mOnCheckedChangeListener).withTag("receber").withSelectable(false).withSwitchEnabled(false),
+                        new SwitchDrawerItem().withName(R.string.imagem_produto).withIcon(R.mipmap.ic_image_dark).withChecked(imagemProduto).withOnCheckedChangeListener(mOnCheckedChangeListener).withTag("imagem_produto").withSelectable(false).withSwitchEnabled(false)
 
                 )
             .withDisplayBelowStatusBar(true)
