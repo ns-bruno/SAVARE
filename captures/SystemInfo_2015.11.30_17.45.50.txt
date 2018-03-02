@@ -1,0 +1,97 @@
+Applications Graphics Acceleration Info:
+Uptime: 25928278 Realtime: 25928278
+
+** Graphics info for pid 9599 [com.savare] **
+
+Recent DisplayList operations
+          DrawRenderNode
+            DrawRenderNode
+              Save
+              ClipRect
+              Translate
+              DrawText
+              DrawText
+              DrawText
+              DrawText
+              DrawText
+              DrawText
+              DrawText
+              RestoreToCount
+          RestoreToCount
+        DrawRenderNode
+RestoreToCount
+DrawPatch
+multiDraw
+  DrawText
+Save
+DrawRenderNode
+  DrawRenderNode
+  DrawRenderNode
+    DrawRenderNode
+      DrawRenderNode
+        DrawRenderNode
+        DrawRenderNode
+          DrawRenderNode
+            DrawPatch
+          Save
+          ClipRect
+          DrawRenderNode
+            DrawRenderNode
+              Save
+              ClipRect
+              Translate
+              DrawText
+              DrawText
+              DrawText
+              DrawText
+              DrawText
+              DrawText
+              DrawText
+              RestoreToCount
+          RestoreToCount
+        DrawRenderNode
+RestoreToCount
+DrawPatch
+multiDraw
+  DrawText
+
+Caches:
+Current memory usage / total memory usage (bytes):
+  TextureCache          3255312 / 25165824
+  LayerCache                  0 / 16777216 (numLayers = 0)
+  Layers total          0 (numLayers = 0)
+  RenderBufferCache           0 /  2097152
+  GradientCache               0 /   524288
+  PathCache              425984 / 10485760
+  TessellationCache           0 /  1048576
+  TextDropShadowCache         0 /  2097152
+  PatchCache              12480 /   131072
+  FontRenderer 0 A8      524288 /   524288
+  FontRenderer 0 RGBA         0 /        0
+  FontRenderer 0 total   524288 /   524288
+Other:
+  FboCache                    0 /        0
+Total memory usage:
+  4218064 bytes, 4.02 MB
+
+Profile data in ms:
+
+	com.savare/com.savare.activity.InicioActivity/android.view.ViewRootImpl@2f9e880b (visibility=8)
+	com.savare/com.savare.activity.SincronizacaoActivity/android.view.ViewRootImpl@177576e8 (visibility=0)
+	com.savare/com.savare.activity.SincronizacaoActivity/android.view.ViewRootImpl@26ae8101 (visibility=0)
+View hierarchy:
+
+  com.savare/com.savare.activity.InicioActivity/android.view.ViewRootImpl@2f9e880b
+  120 views, 96.14 kB of display lists
+
+  com.savare/com.savare.activity.SincronizacaoActivity/android.view.ViewRootImpl@177576e8
+  58 views, 62.39 kB of display lists
+
+  com.savare/com.savare.activity.SincronizacaoActivity/android.view.ViewRootImpl@26ae8101
+  21 views, 23.98 kB of display lists
+
+
+Total ViewRootImpl: 3
+Total Views:        199
+Total DisplayList:  182.51 kB
+

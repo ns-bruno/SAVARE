@@ -150,12 +150,12 @@ public class ClienteDetalhesDadosMDFragment extends Fragment {
 
             ParcelaRotinas parcelaRotinas = new ParcelaRotinas(getContext());
 
-            if ((abertoTitulosPriveiraVez == false) && (parcelaRotinas.listaTitulos(idCliente, ParcelaRotinas.TITULOS_EM_ABERTO, ParcelaRotinas.RECEBER, null, null).size() > 0)) {
+            if ((abertoTitulosPriveiraVez == false) && (parcelaRotinas.listaTitulos(idCliente, ParcelaRotinas.TITULOS_EM_ABERTO_VENCIDOS, ParcelaRotinas.RECEBER, null, null).size() > 0)) {
 
                 abertoTitulosPriveiraVez = true;
                 // Cria uma intent para abrir uma nova activity
                 Intent intentTitulos = new Intent(getContext(), ListaTitulosMDActivity.class);
-                intentTitulos.putExtra("ID_CFACLIFO", textCodigoPessoa.getText().toString());
+                intentTitulos.putExtra("ID_CFACLIFO", idCliente);
                 startActivity(intentTitulos);
             }
         }

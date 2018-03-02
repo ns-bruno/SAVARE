@@ -70,6 +70,7 @@ public class ClienteDetalhesMDActivity extends AppCompatActivity{
             idCliente = intentParametro.getString("ID_CFACLIFO");
             clienteNovo = intentParametro.getString("CADASTRO_NOVO");
 
+            // Verifica se eh um cliente ja cadastrado no sisinfo
             if ((idCliente != null) && (Integer.parseInt(idCliente) > 0)){
                 itemMenuEnviarDados.setVisibility(View.GONE);
             }
@@ -259,11 +260,11 @@ public class ClienteDetalhesMDActivity extends AppCompatActivity{
                 floatingMenu.close(true);
 
                 // Cria uma intent para abrir uma nova activity
-                Intent intentTitulos = new Intent(getApplicationContext(), ListaOrcamentoPedidoMDActivity.class);
-                intentTitulos.putExtra("ID_CFACLIFO", idCliente);
-                intentTitulos.putExtra(ListaOrcamentoPedidoMDActivity.KEY_ORCAMENTO_PEDIDO, ListaOrcamentoPedidoMDActivity.TIPO_TODOS_PEDIDO);
+                Intent intentHistoricoPedidos = new Intent(getApplicationContext(), ListaOrcamentoPedidoMDActivity.class);
+                intentHistoricoPedidos.putExtra("ID_CFACLIFO", idCliente);
+                intentHistoricoPedidos.putExtra(ListaOrcamentoPedidoMDActivity.KEY_ORCAMENTO_PEDIDO, ListaOrcamentoPedidoMDActivity.TIPO_TODOS_PEDIDO);
 
-                startActivity(intentTitulos);
+                startActivity(intentHistoricoPedidos);
             }
         });
 

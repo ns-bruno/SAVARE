@@ -72,10 +72,11 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:src="@drawable/ic_action_person"
-                    fab:fab_size="mini"
-                    fab:fab_label="Novo Cliente"
+                    android:visibility="gone"
                     fab:fab_colorNormal="#FFFFFF"
-                    fab:fab_colorPressed="@color/colorPrimary"/>
+                    fab:fab_colorPressed="@color/colorPrimary"
+                    fab:fab_label="Novo Cliente"
+                    fab:fab_size="mini" />
 
             </com.github.clans.fab.FloatingActionMenu>
 

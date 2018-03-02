@@ -11,6 +11,7 @@ public class ServicosWeb {
 	public static final String WS_NAME_SPACE = "http://ws/";
 	public static final String WS_ENDERECO_WEBSERVICE = "WebserviceSisInfoSavare/WebserviceSavare?wsdl";
 	//public static final String IP_SERVIDOR_WEBSERVICE = "10.0.2.2";
+	//public static final String IP_SERVIDOR_WEBSERVICE = "172.16.0.241";
 	public static final String IP_SERVIDOR_WEBSERVICE = "sisinfowebservice.ddns.net";
 	public static final String WS_ENDERECO_WEBSERVICE_JSON = "WebserviceSisInfo/webresources/ws";
 	public static final String WS_ENDERECO_SISINFOWEB = "SisInfoWeb";

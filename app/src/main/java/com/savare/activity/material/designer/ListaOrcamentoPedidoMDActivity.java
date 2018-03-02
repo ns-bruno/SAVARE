@@ -1,6 +1,5 @@
 package com.savare.activity.material.designer;
 
-import android.app.ActionBar;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
@@ -27,7 +26,6 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.github.clans.fab.FloatingActionButton;
@@ -45,7 +43,6 @@ import com.savare.funcoes.rotinas.GerarPdfRotinas;
 import com.savare.funcoes.rotinas.OrcamentoRotinas;
 import com.savare.funcoes.rotinas.PessoaRotinas;
 import com.savare.funcoes.rotinas.async.EnviarDadosWebserviceAsyncRotinas;
-import com.savare.funcoes.rotinas.async.EnviarOrcamentoFtpAsyncRotinas;
 import com.savare.funcoes.rotinas.async.ReceberDadosWebserviceAsyncRotinas;
 import com.savare.webservice.WSSisinfoWebservice;
 
@@ -89,6 +86,8 @@ public class ListaOrcamentoPedidoMDActivity extends AppCompatActivity{
     int mesFinalSelecionado = -1;
     int diaFinalSelecionado = -1;
     private int mPreviousVisibleItem;
+    private int positionSpinnerListaCidade = 0,
+                positionScrollListViewOrcamentoPedido = 0;
     public static final String TIPO_ORCAMENTO = "O",
             TIPO_PEDIDO_NAO_ENVIADO = "P",
             TIPO_PEDIDO_ENVIADO = "N",
@@ -658,6 +657,14 @@ public class ListaOrcamentoPedidoMDActivity extends AppCompatActivity{
     }
 
     @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        positionSpinnerListaCidade = spinnerListaCidade.getSelectedItemPosition();
+        positionScrollListViewOrcamentoPedido = listViewListaOrcamentoPedido.getFirstVisiblePosition();
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         //super.onCreateOptionsMenu(menu);
         getMenuInflater().inflate(R.menu.lista_orcamento_md, menu);
@@ -1003,6 +1010,7 @@ public class ListaOrcamentoPedidoMDActivity extends AppCompatActivity{
 
             spinnerListaCidade.setAdapter(adapterCidade);
         }
+        spinnerListaCidade.setSelection(positionSpinnerListaCidade);
 
     }
 
@@ -1279,8 +1287,7 @@ public class ListaOrcamentoPedidoMDActivity extends AppCompatActivity{
                 }
             } // Fim if (this.tipoOrcamentoPedido.equals("E"))
 
-
-
+            listViewListaOrcamentoPedido.setSelection(positionScrollListViewOrcamentoPedido);
             progressBarStatus.setVisibility(View.GONE);
         }
 

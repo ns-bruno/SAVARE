@@ -58,12 +58,13 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|right"
-            android:paddingRight="10dp"
             android:paddingBottom="10dp"
             android:paddingLeft="10dp"
-            fab:menu_icon="@mipmap/ic_plus"
+            android:paddingRight="10dp"
+            android:visibility="invisible"
             fab:menu_colorNormal="@color/colorAccent"
             fab:menu_colorPressed="@color/colorPrimary"
+            fab:menu_icon="@mipmap/ic_plus"
             fab:menu_labels_ellipsize="end"
             fab:menu_labels_singleLine="true">
 
@@ -72,10 +73,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/ic_action_person"
-                fab:fab_size="mini"
-                fab:fab_label="Novo Cliente"
                 fab:fab_colorNormal="#FFFFFF"
-                fab:fab_colorPressed="@color/colorPrimary"/>
+                fab:fab_colorPressed="@color/colorPrimary"
+                fab:fab_label="Novo Cliente"
+                fab:fab_size="mini" />
 
         </com.github.clans.fab.FloatingActionMenu>
 

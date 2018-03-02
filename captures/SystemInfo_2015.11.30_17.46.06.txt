@@ -1,0 +1,232 @@
+TASK com.savare id=21
+  ACTIVITY com.savare/.activity.SincronizacaoActivity 2d3d4722 pid=9599
+    Local Activity 283ba176 State:
+      mResumed=true mStopped=false mFinished=false
+      mLoadersStarted=true
+      mChangingConfigurations=false
+      mCurrentConfig={1.0 310mcc260mnc en_US ?layoutDir sw360dp w360dp h567dp 480dpi nrml port finger qwerty/v/v dpad/v s.6}
+    FragmentManager misc state:
+      mActivity=com.savare.activity.SincronizacaoActivity@283ba176
+      mContainer=android.app.Activity$1@241e3b00
+      mCurState=5 mStateSaved=false mDestroyed=false
+    ViewRoot:
+      mAdded=true mRemoved=false
+      mConsumeBatchedInputScheduled=false
+      mConsumeBatchedInputImmediatelyScheduled=false
+      mPendingInputEventCount=0
+      mProcessInputEventsScheduled=false
+      mTraversalScheduled=false
+      android.view.ViewRootImpl$NativePreImeInputStage: mQueueLength=0
+      android.view.ViewRootImpl$ImeInputStage: mQueueLength=0
+      android.view.ViewRootImpl$NativePostImeInputStage: mQueueLength=0
+    Choreographer:
+      mFrameScheduled=false
+      mLastFrameTime=25700865 (243753 ms ago)
+    View Hierarchy:
+      com.android.internal.policy.impl.PhoneWindow$DecorView{3b4f78a9 V.E..... R....... 0,0-1080,1776}
+        com.android.internal.widget.ActionBarOverlayLayout{33500e2e V.ED.... ........ 0,0-1080,1776 #1020378 android:id/decor_content_parent}
+          android.widget.FrameLayout{22fc3dcf V.E..... ........ 0,219-1080,1776 #1020002 android:id/content}
+            android.widget.LinearLayout{1d55935c V.E..... ........ 0,0-1080,1557}
+              android.widget.ScrollView{257df665 VFED.V.. ........ 0,0-1080,1366 #7f0d0077 app:id/scrollView1}
+                android.widget.LinearLayout{ed2df3a V.E..... ........ 0,0-1080,1366}
+                  android.widget.LinearLayout{30a8e7eb V.E..... ........ 30,30-1050,174}
+                    android.widget.LinearLayout{39568948 V.E..... ........ 0,0-1020,144}
+                      android.widget.TextView{3d5c93e1 V.ED.... ........ 0,48-828,105 #7f0d00cf app:id/activity_sincronizacao_textView_receber_dados}
+                      android.widget.Button{167fb506 VFED..C. ........ 828,0-1020,144 #7f0d00d0 app:id/activity_sincronizacao_button_receber_dados}
+                    android.widget.ProgressBar{62c17c7 G.ED.... ......I. 0,0-0,0 #7f0d00d1 app:id/activity_sincronizacao_progressBar_receber_dados}
+                  android.view.View{3aeef1f4 V.ED.... ........ 30,174-1050,180 #7f0d00d2 app:id/view1}
+                  android.widget.LinearLayout{3c2d8d1d V.E..... ........ 30,240-1050,384}
+                    android.widget.LinearLayout{1d21b92 V.E..... ........ 0,0-1020,144}
+                      android.widget.TextView{2fc86963 V.ED.... ........ 0,48-828,105 #7f0d00d3 app:id/activity_sincronizacao_textView_receber_dados_bloco_s}
+                      android.widget.Button{e033960 VFED..C. ........ 828,0-1020,144 #7f0d00d4 app:id/activity_sincronizacao_button_receber_dados_bloco_s}
+                    android.widget.ProgressBar{331ade19 G.ED.... ......I. 0,0-0,0 #7f0d00d5 app:id/activity_sincronizacao_progressBar_receber_dados_bloco_s}
+                  android.view.View{12725ede V.ED.... ........ 30,384-1050,390 #7f0d00d6 app:id/view2}
+                  android.widget.LinearLayout{314e38bf V.E..... ........ 30,450-1050,654}
+                    android.widget.LinearLayout{36528b8c V.E..... ........ 0,0-1020,204}
+                      android.widget.TextView{3b7bac11 V.ED.... ........ 0,48-828,252 #7f0d00d7 app:id/activity_sincronizacao_textView_receber_dados_bloco_c}
+                      android.widget.Button{1f242d5 VFED..C. ........ 828,0-1020,144 #7f0d00d8 app:id/activity_sincronizacao_button_receber_dados_bloco_c}
+                    android.widget.ProgressBar{217f2438 G.ED.... ......ID 0,170-1020,218 #7f0d00d9 app:id/activity_sincronizacao_progressBar_receber_dados_bloco_c}
+                  android.view.View{2a418aea V.ED.... ........ 30,654-1050,660 #7f0d00da app:id/view3}
+                  android.widget.LinearLayout{1137a1db V.E..... ........ 30,720-1050,864}
+                    android.widget.LinearLayout{1262d478 V.E..... ........ 0,0-1020,144}
+                      android.widget.TextView{3da13751 V.ED.... ........ 0,48-828,105 #7f0d00db app:id/activity_sincronizacao_textView_receber_dados_bloco_a}
+                      android.widget.Button{36256bb6 VFED..C. ........ 828,0-1020,144 #7f0d00dc app:id/activity_sincronizacao_button_receber_dados_bloco_a}
+                    android.widget.ProgressBar{398480b7 G.ED.... ......I. 0,0-0,0 #7f0d00dd app:id/activity_sincronizacao_progressBar_receber_dados_bloco_a}
+                  android.view.View{212cc024 V.ED.... ........ 30,864-1050,870 #7f0d00de app:id/view4}
+                  android.widget.LinearLayout{270f78d V.E..... ........ 30,930-1050,1074}
+                    android.widget.LinearLayout{39948d42 V.E..... ........ 0,0-1020,144}
+                      android.widget.TextView{a567153 V.ED.... ........ 0,48-828,105 #7f0d00df app:id/activity_sincronizacao_textView_receber_dados_bloco_r}
+                      android.widget.Button{3687ba90 VFED..C. ........ 828,0-1020,144 #7f0d00e0 app:id/activity_sincronizacao_button_receber_dados_bloco_r}
+                    android.widget.ProgressBar{2e027f89 G.ED.... ......I. 0,0-0,0 #7f0d00e1 app:id/activity_sincronizacao_progressBar_receber_dados_bloco_r}
+                  android.view.View{6e23b8e V.ED.... ........ 30,1074-1050,1080 #7f0d00e2 app:id/view5}
+                  android.widget.LinearLayout{3a4ccfaf V.E..... ........ 30,1140-1050,1197}
+                    android.widget.LinearLayout{a55efbc V.E..... ........ 0,0-1020,57}
+                      android.widget.TextView{3d0a8b45 V.ED.... ........ 0,0-510,57 #7f0d00e3 app:id/activity_sincronizacao_textView_laybal_data_ultimo_envio}
+                      android.widget.TextView{304a829a V.ED.... ........ 510,0-1020,57 #7f0d00e4 app:id/activity_sincronizacao_textView_laybal_data_ultimo_recebimento}
+                  android.widget.LinearLayout{20a0b7cb V.E..... ........ 30,1257-1050,1330}
+                    android.widget.LinearLayout{e704ba8 V.E..... ........ 0,0-1020,73}
+                      android.widget.TextView{8cd96c1 V.ED.... ........ 0,0-510,73 #7f0d00e5 app:id/activity_sincronizacao_text_data_ultimo_envio}
+                      android.widget.TextView{3dbe2e66 V.ED.... ........ 510,0-1020,73 #7f0d00e6 app:id/activity_sincronizacao_text_data_ultimo_recebimento}
+                  android.view.View{50105a7 V.ED.... ........ 30,1330-1050,1336 #7f0d00e7 app:id/view7}
+          com.android.internal.widget.ActionBarContainer{37527a54 V.ED.... ........ 0,75-1080,219 #1020379 android:id/action_bar_container}
+            com.android.internal.widget.ActionBarView{205bddfd V.E..... ........ 0,0-1080,144 #102037a android:id/action_bar}
+              android.widget.LinearLayout{336ecaf2 VFE...C. ........ 0,0-365,144}
+                com.android.internal.widget.ActionBarView$HomeView{112e5543 V.E..... ........ 0,0-145,144}
+                  android.widget.ImageView{2386e7c0 V.ED.... ........ 0,48-48,96 #102003b android:id/up}
+                  android.widget.ImageView{398d5cf9 V.ED.... ........ 37,24-133,120 #102002c android:id/home}
+                android.widget.LinearLayout{351aa43e V.E..... ........ 145,35-365,108}
+                  android.widget.TextView{57029f V.ED.... ........ 0,0-196,73 #10202b6 android:id/action_bar_title}
+                  android.widget.TextView{dd2bfec G.ED.... ......I. 0,0-0,0 #10202b7 android:id/action_bar_subtitle}
+              android.widget.ActionMenuView{35bdcfb5 V.ED.... ........ 912,0-1080,144}
+                android.widget.ActionMenuPresenter$OverflowMenuButton{1218c64a VFED..C. ........ 0,0-168,144}
+            com.android.internal.widget.ActionBarContextView{283329bb G.E..... ......ID 0,0-0,0 #102037b android:id/action_context_bar}
+          com.android.internal.widget.ActionBarContainer{3621eed8 G.ED.... ......ID 0,0-0,0 #102037c android:id/split_action_bar}
+    Looper (main, tid 1) {2d332084}
+      (Total messages: 0, idling=false, quitting=false)
+
+  ACTIVITY com.savare/.activity.InicioActivity 1226c84b pid=9599
+    Local Activity 3e853079 State:
+      mResumed=false mStopped=true mFinished=false
+      mLoadersStarted=false
+      mChangingConfigurations=false
+      mCurrentConfig={1.0 310mcc260mnc en_US ?layoutDir sw360dp w360dp h567dp 480dpi nrml port finger qwerty/v/v dpad/v s.6}
+    FragmentManager misc state:
+      mActivity=com.savare.activity.InicioActivity@3e853079
+      mContainer=android.app.Activity$1@3cc5406d
+      mCurState=3 mStateSaved=true mDestroyed=false
+    ViewRoot:
+      mAdded=true mRemoved=false
+      mConsumeBatchedInputScheduled=false
+      mConsumeBatchedInputImmediatelyScheduled=false
+      mPendingInputEventCount=0
+      mProcessInputEventsScheduled=false
+      mTraversalScheduled=false
+      android.view.ViewRootImpl$NativePreImeInputStage: mQueueLength=0
+      android.view.ViewRootImpl$ImeInputStage: mQueueLength=0
+      android.view.ViewRootImpl$NativePostImeInputStage: mQueueLength=0
+    Choreographer:
+      mFrameScheduled=false
+      mLastFrameTime=25700865 (243761 ms ago)
+    View Hierarchy:
+      com.android.internal.policy.impl.PhoneWindow$DecorView{3aebd4a2 I.E..... R......D 0,0-1080,1776}
+        com.android.internal.widget.ActionBarOverlayLayout{87f1533 V.ED.... .......D 0,0-1080,1776 #1020378 android:id/decor_content_parent}
+          android.widget.FrameLayout{2f03c0f0 V.E..... .......D 0,219-1080,1776 #1020002 android:id/content}
+            android.support.v4.widget.DrawerLayout{13027669 VFE..... .F....ID 0,0-1080,1557 #7f0d0081 app:id/drawer_layout}
+              android.widget.FrameLayout{165698ee V.E..... ........ 0,0-1080,1557 #7f0d0082 app:id/activity_inicio_content_frame}
+                android.widget.LinearLayout{1b8bd18f V.E..... ........ 15,0-1065,462}
+                  android.widget.LinearLayout{37fbfc1c V.E..... ........ 0,30-1050,231}
+                    android.widget.LinearLayout{36c31025 V.E..... ........ 15,15-1035,72}
+                      android.widget.TextView{219755fa V.ED.... ........ 0,0-680,57 #7f0d0083 app:id/textView4}
+                      android.widget.TextView{22fdf7ab V.ED.... ........ 680,0-1020,57 #7f0d0084 app:id/activity_inicio_text_tipo_acumulo}
+                    android.widget.LinearLayout{dabe08 V.E..... ........ 15,72-1035,129}
+                      android.widget.TextView{53989a1 V.ED.... ........ 0,0-680,57 #7f0d0085 app:id/textView5}
+                      android.widget.TextView{14f4d7c6 V.ED.... ........ 680,0-1020,57 #7f0d0086 app:id/activity_inicio_text_valor_acumulado}
+                    android.widget.LinearLayout{2f226387 V.E..... ........ 15,129-1035,186}
+                      android.widget.TextView{d61b2b4 V.ED.... ........ 0,0-680,57 #7f0d0087 app:id/textView6}
+                      android.widget.TextView{22441edd V.ED.... ........ 680,0-1020,57 #7f0d0088 app:id/activity_inicio_text_prazo_acumulado}
+                  android.widget.LinearLayout{1456aa52 V.E..... ........ 0,261-1050,462}
+                    android.widget.LinearLayout{1e37b123 V.E..... ........ 15,15-1035,72}
+                      android.widget.TextView{39c14620 V.ED.... ........ 0,0-680,57 #7f0d0089 app:id/textView7}
+                      android.widget.TextView{1768cbd9 V.ED.... ........ 680,0-1020,57 #7f0d008a app:id/activity_inicio_text_tipo_acumulo_varejo}
+                    android.widget.LinearLayout{2891199e V.E..... ........ 15,72-1035,129}
+                      android.widget.TextView{29ca3c7f V.ED.... ........ 0,0-680,57 #7f0d008b app:id/textView8}
+                      android.widget.TextView{32c4a44c V.ED.... ........ 680,0-1020,57 #7f0d008c app:id/activity_inicio_text_valor_acumulado_varejo}
+                    android.widget.LinearLayout{26914c95 V.E..... ........ 15,129-1035,186}
+                      android.widget.TextView{17131aa V.ED.... ........ 0,0-680,57 #7f0d008d app:id/textView9}
+                      android.widget.TextView{2dd0219b V.ED.... ........ 680,0-1020,57 #7f0d008e app:id/activity_inicio_text_prazo_acumulado_varejo}
+              android.widget.ListView{4bdb938 VFED.VC. ........ -718,0-2,1557 #7f0d008f app:id/activity_inicio_left_drawer}
+                android.widget.RelativeLayout{c871d11 V.E..... ........ 0,-190-720,5}
+                  android.widget.LinearLayout{c88be76 I.E..... ......ID 0,90-720,165 #7f0d00e8 app:id/headerLayout}
+                    android.widget.TextView{5853c77 V.ED.... ......ID 0,0-0,57 #7f0d00e9 app:id/drawerTitle}
+                    android.view.View{2d3130e4 V.ED.... ......ID 0,60-720,72}
+                  android.widget.LinearLayout{2f2f794d V.E..... ........ 0,0-720,174 #7f0d00ea app:id/itemLayout}
+                    android.widget.LinearLayout{2cba4c02 V.E..... ........ 0,0-720,165}
+                      android.widget.ImageView{1a072913 V.ED.... ........ 0,0-96,96 #7f0d00eb app:id/drawer_icon}
+                      android.widget.TextView{1b427750 V.ED.... ........ 96,0-455,88 #7f0d00ec app:id/drawer_itemName}
+                    android.view.View{33875d49 V.ED.... ........ 30,168-690,171}
+                android.widget.RelativeLayout{1e85264e V.E..... ........ 0,4-720,199}
+                  android.widget.LinearLayout{3eb1436f I.E..... ......ID 0,90-720,165 #7f0d00e8 app:id/headerLayout}
+                    android.widget.TextView{adfb87c V.ED.... ......ID 0,0-0,57 #7f0d00e9 app:id/drawerTitle}
+                    android.view.View{375f8505 V.ED.... ......ID 0,60-720,72}
+                  android.widget.LinearLayout{1511595a V.E..... ........ 0,0-720,174 #7f0d00ea app:id/itemLayout}
+                    android.widget.LinearLayout{3738a78b V.E..... ........ 0,0-720,165}
+                      android.widget.ImageView{26ade068 V.ED.... ........ 0,0-96,96 #7f0d00eb app:id/drawer_icon}
+                      android.widget.TextView{2ad86c81 V.ED.... ........ 96,0-363,88 #7f0d00ec app:id/drawer_itemName}
+                    android.view.View{1bfbb126 V.ED.... ........ 30,168-690,171}
+                android.widget.RelativeLayout{3883167 V.E..... ........ 0,198-720,393}
+                  android.widget.LinearLayout{1cb49b14 I.E..... ......ID 0,90-720,165 #7f0d00e8 app:id/headerLayout}
+                    android.widget.TextView{59e4fbd V.ED.... ......ID 0,0-0,57 #7f0d00e9 app:id/drawerTitle}
+                    android.view.View{9e1b9b2 V.ED.... ......ID 0,60-720,72}
+                  android.widget.LinearLayout{d5c7d03 V.E..... ........ 0,0-720,174 #7f0d00ea app:id/itemLayout}
+                    android.widget.LinearLayout{11ca5480 V.E..... ........ 0,0-720,165}
+                      android.widget.ImageView{13e52ab9 V.ED.... ........ 0,0-96,96 #7f0d00eb app:id/drawer_icon}
+                      android.widget.TextView{fadbefe V.ED.... ........ 96,0-297,88 #7f0d00ec app:id/drawer_itemName}
+                    android.view.View{139fe65f V.ED.... ........ 30,168-690,171}
+                android.widget.RelativeLayout{1fc038ac V.E..... ........ 0,392-720,587}
+                  android.widget.LinearLayout{1724b975 I.E..... ......ID 0,90-720,165 #7f0d00e8 app:id/headerLayout}
+                    android.widget.TextView{30a2cd0a V.ED.... ......ID 0,0-0,57 #7f0d00e9 app:id/drawerTitle}
+                    android.view.View{2f86897b V.ED.... ......ID 0,60-720,72}
+                  android.widget.LinearLayout{a4e3398 V.E..... ........ 0,0-720,174 #7f0d00ea app:id/itemLayout}
+                    android.widget.LinearLayout{369477f1 V.E..... ........ 0,0-720,165}
+                      android.widget.ImageView{2f28afd6 V.ED.... ........ 0,0-96,96 #7f0d00eb app:id/drawer_icon}
+                      android.widget.TextView{f6a4257 V.ED.... ........ 96,0-583,88 #7f0d00ec app:id/drawer_itemName}
+                    android.view.View{16bef144 V.ED.... ........ 30,168-690,171}
+                android.widget.RelativeLayout{3b67a22d V.E..... ........ 0,586-720,781}
+                  android.widget.LinearLayout{3a57f362 I.E..... ......ID 0,90-720,165 #7f0d00e8 app:id/headerLayout}
+                    android.widget.TextView{366acf3 V.ED.... ......ID 0,0-0,57 #7f0d00e9 app:id/drawerTitle}
+                    android.view.View{325bddb0 V.ED.... ......ID 0,60-720,72}
+                  android.widget.LinearLayout{14c93429 V.E..... ........ 0,0-720,174 #7f0d00ea app:id/itemLayout}
+                    android.widget.LinearLayout{2845e3ae V.E..... ........ 0,0-720,165}
+                      android.widget.ImageView{37b5254f V.ED.... ........ 0,0-96,96 #7f0d00eb app:id/drawer_icon}
+                      android.widget.TextView{139924dc V.ED.... ........ 96,0-618,88 #7f0d00ec app:id/drawer_itemName}
+                    android.view.View{1f97e9e5 V.ED.... ........ 30,168-690,171}
+                android.widget.RelativeLayout{9108cba V.E..... ........ 0,780-720,975}
+                  android.widget.LinearLayout{38c8c76b I.E..... ......ID 0,90-720,165 #7f0d00e8 app:id/headerLayout}
+                    android.widget.TextView{201b2c8 V.ED.... ......ID 0,0-0,57 #7f0d00e9 app:id/drawerTitle}
+                    android.view.View{2de23f61 V.ED.... ......ID 0,60-720,72}
+                  android.widget.LinearLayout{1eaaba86 V.E..... ........ 0,0-720,174 #7f0d00ea app:id/itemLayout}
+                    android.widget.LinearLayout{1d2a6f47 V.E..... ........ 0,0-720,165}
+                      android.widget.ImageView{30e33374 V.ED.... ........ 0,0-96,96 #7f0d00eb app:id/drawer_icon}
+                      android.widget.TextView{a22709d V.ED.... ........ 96,0-288,88 #7f0d00ec app:id/drawer_itemName}
+                    android.view.View{567f912 V.ED.... ........ 30,168-690,171}
+                android.widget.RelativeLayout{3114b8e3 V.E..... .....A.. 0,974-720,1169}
+                  android.widget.LinearLayout{18ba12e0 I.E..... .....A.D 0,90-720,165 #7f0d00e8 app:id/headerLayout}
+                    android.widget.TextView{323a7999 V.ED.... .....AID 0,0-410,57 #7f0d00e9 app:id/drawerTitle}
+                    android.view.View{1948945e V.ED.... .....AID 0,60-720,72}
+                  android.widget.LinearLayout{3fd0003f V.E..... .....A.. 0,0-720,174 #7f0d00ea app:id/itemLayout}
+                    android.widget.LinearLayout{3b5d7d0c V.E..... .....A.. 0,0-720,165}
+                      android.widget.ImageView{6301655 V.ED.... .....A.. 0,0-96,96 #7f0d00eb app:id/drawer_icon}
+                      android.widget.TextView{2405986a V.ED.... .....A.. 96,0-511,88 #7f0d00ec app:id/drawer_itemName}
+                    android.view.View{16ce615b V.ED.... .....A.. 30,168-690,171}
+                android.widget.RelativeLayout{3eeb5df8 V.E..... ........ 0,1168-720,1363}
+                  android.widget.LinearLayout{26a8c2d1 I.E..... ......ID 0,90-720,165 #7f0d00e8 app:id/headerLayout}
+                    android.widget.TextView{1fdcd136 V.ED.... ......ID 0,0-0,57 #7f0d00e9 app:id/drawerTitle}
+                    android.view.View{1e87b837 V.ED.... ......ID 0,60-720,72}
+                  android.widget.LinearLayout{b7461a4 V.E..... ........ 0,0-720,174 #7f0d00ea app:id/itemLayout}
+                    android.widget.LinearLayout{3f25bb0d V.E..... ........ 0,0-720,165}
+                      android.widget.ImageView{1b1ccac2 V.ED.... ........ 0,0-96,96 #7f0d00eb app:id/drawer_icon}
+                      android.widget.TextView{2515a0d3 V.ED.... ........ 96,0-522,88 #7f0d00ec app:id/drawer_itemName}
+                    android.view.View{1767f410 V.ED.... ........ 30,168-690,171}
+                android.widget.RelativeLayout{37fffb09 V.E..... ........ 0,1362-720,1557}
+                  android.widget.LinearLayout{870d10e I.E..... ......ID 0,90-720,165 #7f0d00e8 app:id/headerLayout}
+                    android.widget.TextView{368f772f V.ED.... ......ID 0,0-0,57 #7f0d00e9 app:id/drawerTitle}
+                    android.view.View{ec0413c V.ED.... ......ID 0,60-720,72}
+                  android.widget.LinearLayout{c243ec5 V.E..... ........ 0,0-720,174 #7f0d00ea app:id/itemLayout}
+                    android.widget.LinearLayout{7ecf01a V.E..... ........ 0,0-720,165}
+                      android.widget.ImageView{1f26574b V.ED.... ........ 0,0-96,96 #7f0d00eb app:id/drawer_icon}
+                      android.widget.TextView{ee3528 V.ED.... ........ 96,0-241,88 #7f0d00ec app:id/drawer_itemName}
+                    android.view.View{3e8f0241 V.ED.... ........ 30,168-690,171}
+          com.android.internal.widget.ActionBarContainer{34d9f3e6 V.ED.... ........ 0,75-1080,219 #1020379 android:id/action_bar_container}
+            com.android.internal.widget.ActionBarView{33011d27 V.E..... ........ 0,0-1080,144 #102037a android:id/action_bar}
+              android.widget.LinearLayout{1857bd4 VFE...C. ........ 0,0-365,144}
+                com.android.internal.widget.ActionBarView$HomeView{2b88817d V.E..... ........ 0,0-145,144}
+                  android.widget.ImageView{4416872 V.ED.... ........ 0,48-48,96 #102003b android:id/up}
+                  android.widget.ImageView{37d864c3 V.ED.... ........ 37,24-133,120 #102002c android:id/home}
+                android.widget.LinearLayout{27a88140 V.E..... ........ 145,35-365,108}
+                  android.widget.TextView{31a0b879 V.ED.... ........ 0,0-196,73 #10202b6 android:id/action_bar_title}
+                  android.widget.TextView{3999be G.ED.... ......I. 0,0-0,0 #10202b7 android:id/action_bar_subtitle}
+              android.widget.ActionMenuView{c528a1f V.ED.... ........ 1080,0-1080,144}
+            com.android.internal.widget.ActionBarContextView{1834716c G.E..... ......ID 0,0-0,0 #102037b android:id/action_context_bar}
+          com.android.internal.widget.ActionBarContainer{2e6b6335 G.ED.... ......ID 0,0-0,0 #102037c android:id/split_action_bar}
+    Looper (main, tid 1) {2d332084}
+      (Total messages: 0, idling=false, quitting=false)

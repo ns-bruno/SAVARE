@@ -1,595 +1,595 @@
 -- Merging decision tree log ---
 manifest
-ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:2:1-267:12
+ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:2:1-267:12
 	package
-		ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:3:5-25
-		INJECTED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml
-		INJECTED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml
+		ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:3:5-25
+		INJECTED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml
+		INJECTED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml
 	android:versionName
-		INJECTED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml
-		INJECTED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml
+		INJECTED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml
+		INJECTED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml
 	xmlns:android
-		ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:2:11-69
+		ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:2:11-69
 	android:versionCode
-		INJECTED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml
-		INJECTED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml
+		INJECTED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml
+		INJECTED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml
 uses-sdk
-ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:5:5-7:41
-MERGED from [com.android.support:multidex:1.0.1] E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\com.android.support\multidex\1.0.1\AndroidManifest.xml:18:5-42
-MERGED from [com.mikepenz:materialdrawer:5.6.0] E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\com.mikepenz\materialdrawer\5.6.0\AndroidManifest.xml:8:5-10:41
-MERGED from [com.android.support:appcompat-v7:24.2.0] E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\com.android.support\appcompat-v7\24.2.0\AndroidManifest.xml:21:5-23:78
-MERGED from [com.android.support:support-vector-drawable:24.2.0] E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\com.android.support\support-vector-drawable\24.2.0\AndroidManifest.xml:21:5-43
-MERGED from [com.android.support:support-compat:24.2.0] E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\com.android.support\support-compat\24.2.0\AndroidManifest.xml:21:5-23:58
-MERGED from [com.android.support:animated-vector-drawable:24.2.0] E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\com.android.support\animated-vector-drawable\24.2.0\AndroidManifest.xml:20:5-44
-MERGED from [com.android.support:support-v4:24.2.0] E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\com.android.support\support-v4\24.2.0\AndroidManifest.xml:21:5-23:54
-MERGED from [com.android.support:support-core-utils:24.2.0] E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\com.android.support\support-core-utils\24.2.0\AndroidManifest.xml:21:5-23:61
-MERGED from [com.android.support:support-media-compat:24.2.0] E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\com.android.support\support-media-compat\24.2.0\AndroidManifest.xml:21:5-23:63
-MERGED from [com.android.support:support-core-ui:24.2.0] E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\com.android.support\support-core-ui\24.2.0\AndroidManifest.xml:21:5-23:58
-MERGED from [com.android.support:support-fragment:24.2.0] E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\com.android.support\support-fragment\24.2.0\AndroidManifest.xml:21:5-23:60
-MERGED from [com.android.support:recyclerview-v7:24.2.0] E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\com.android.support\recyclerview-v7\24.2.0\AndroidManifest.xml:20:5-43
-MERGED from [com.android.support:design:24.2.0] E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\com.android.support\design\24.2.0\AndroidManifest.xml:20:5-43
-MERGED from [com.mikepenz:materialize:1.0.0] E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\com.mikepenz\materialize\1.0.0\AndroidManifest.xml:8:5-10:41
-MERGED from [com.mikepenz:iconics-core:2.8.0] E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\com.mikepenz\iconics-core\2.8.0\AndroidManifest.xml:8:5-10:41
-MERGED from [com.mikepenz:fastadapter:1.8.0] E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\com.mikepenz\fastadapter\1.8.0\AndroidManifest.xml:8:5-10:41
-MERGED from [com.github.dexafree:materiallist:3.2.1] E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\com.github.dexafree\materiallist\3.2.1\AndroidManifest.xml:7:5-9:41
-MERGED from [com.android.support:cardview-v7:23.2.1] E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\com.android.support\cardview-v7\23.2.1\AndroidManifest.xml:20:5-43
-MERGED from [com.github.clans:fab:1.6.2] E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\com.github.clans\fab\1.6.2\AndroidManifest.xml:8:5-10:41
-MERGED from [com.github.halysongoncalves:pugnotification:1.8.1] E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\com.github.halysongoncalves\pugnotification\1.8.1\AndroidManifest.xml:7:5-9:41
-MERGED from [de.hdodenhof:circleimageview:2.0.0] E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\de.hdodenhof\circleimageview\2.0.0\AndroidManifest.xml:5:5-7:41
-MERGED from [com.ogaclejapan.smarttablayout:library:1.6.0] E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\com.ogaclejapan.smarttablayout\library\1.6.0\AndroidManifest.xml:8:5-10:41
-MERGED from [com.github.arimorty:floatingsearchview:1.1.2] E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\com.github.arimorty\floatingsearchview\1.1.2\AndroidManifest.xml:7:5-9:41
-MERGED from [me.grantland:autofittextview:0.2.0] E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\me.grantland\autofittextview\0.2.0\AndroidManifest.xml:7:5-9:41
-MERGED from [com.bartoszlipinski:viewpropertyobjectanimator:1.2.0] E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\com.bartoszlipinski\viewpropertyobjectanimator\1.2.0\AndroidManifest.xml:7:5-9:41
-MERGED from [com.afollestad.material-dialogs:core:0.8.6.2] E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\com.afollestad.material-dialogs\core\0.8.6.2\AndroidManifest.xml:8:5-11:75
-MERGED from [me.zhanghai.android.materialprogressbar:library:1.1.7] E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\me.zhanghai.android.materialprogressbar\library\1.1.7\AndroidManifest.xml:12:5-14:41
-MERGED from [com.github.johnpersano:supertoasts:1.3.4] E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\com.github.johnpersano\supertoasts\1.3.4\AndroidManifest.xml:3:5-72
-MERGED from [com.heinrichreimersoftware:material-intro:1.5.7] E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\com.heinrichreimersoftware\material-intro\1.5.7\AndroidManifest.xml:8:5-10:41
-MERGED from [me.sudar:zxing-orient:2.1.1] E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\me.sudar\zxing-orient\2.1.1\AndroidManifest.xml:23:5-25:41
+ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:5:5-7:41
+MERGED from [com.android.support:multidex:1.0.1] C:\Users\Bruno\.android\build-cache\d69cfada8f9d285a1e16e43217844fd3ff07f7fd\output\AndroidManifest.xml:18:5-42
+MERGED from [com.mikepenz:materialdrawer:5.6.0] C:\Users\Bruno\.android\build-cache\ee1c7af800bc5347f7c6c223d359ba1e4215c56f\output\AndroidManifest.xml:8:5-10:41
+MERGED from [com.mikepenz:materialize:1.0.0] C:\Users\Bruno\.android\build-cache\dcde904c73a3290795ce69490e24cb98f2847e48\output\AndroidManifest.xml:8:5-10:41
+MERGED from [com.mikepenz:iconics-core:2.8.0] C:\Users\Bruno\.android\build-cache\6a18532579548ac88109966fb5b93b9635e26ac0\output\AndroidManifest.xml:8:5-10:41
+MERGED from [com.mikepenz:fastadapter:1.8.0] C:\Users\Bruno\.android\build-cache\b43843150be1520f447b7783f282264316cf7ba2\output\AndroidManifest.xml:8:5-10:41
+MERGED from [com.github.dexafree:materiallist:3.2.1] C:\Users\Bruno\.android\build-cache\3c0ba4f4edbd522feb118883fbf9b0911ec6e176\output\AndroidManifest.xml:7:5-9:41
+MERGED from [com.github.clans:fab:1.6.2] C:\Users\Bruno\.android\build-cache\2d900c00ff9032a319dd6cc7f46b8d097d9140ee\output\AndroidManifest.xml:8:5-10:41
+MERGED from [com.github.halysongoncalves:pugnotification:1.8.1] C:\Users\Bruno\.android\build-cache\3e390e606eee6ea1bb7513f27e54a72a3f75f3dd\output\AndroidManifest.xml:7:5-9:41
+MERGED from [de.hdodenhof:circleimageview:2.0.0] C:\Users\Bruno\.android\build-cache\1a5a4c261bbd3c8b0f245cb1bd8759df26a0a9f6\output\AndroidManifest.xml:5:5-7:41
+MERGED from [com.ogaclejapan.smarttablayout:library:1.6.0] C:\Users\Bruno\.android\build-cache\46956dfd6c136cee8e96b9f57f3afb40277fcbdc\output\AndroidManifest.xml:8:5-10:41
+MERGED from [com.github.arimorty:floatingsearchview:1.1.2] C:\Users\Bruno\.android\build-cache\180aee4ecd56a4c6a1009b21ff3569fd5b1c4576\output\AndroidManifest.xml:7:5-9:41
+MERGED from [me.grantland:autofittextview:0.2.0] C:\Users\Bruno\.android\build-cache\70b8086a9be50f444da18282f5c354610c095ef8\output\AndroidManifest.xml:7:5-9:41
+MERGED from [com.bartoszlipinski:viewpropertyobjectanimator:1.2.0] C:\Users\Bruno\.android\build-cache\fa84a91f79fca4816ece228f7a7f9c505d25376a\output\AndroidManifest.xml:7:5-9:41
+MERGED from [com.android.support:cardview-v7:23.2.1] C:\Users\Bruno\.android\build-cache\1d62c955cc6991f7d0701ca98a4ac3bb098b76d3\output\AndroidManifest.xml:20:5-43
+MERGED from [com.android.support:design:24.2.0] C:\Users\Bruno\.android\build-cache\28881ba6adbe5954e9a3fc2ee9fb567a9e34dc9e\output\AndroidManifest.xml:20:5-43
+MERGED from [com.afollestad.material-dialogs:core:0.8.6.2] C:\Users\Bruno\.android\build-cache\b8989671e9f2d72cc47bd7fb4785a1192eceeb52\output\AndroidManifest.xml:8:5-11:75
+MERGED from [com.android.support:recyclerview-v7:24.2.0] C:\Users\Bruno\.android\build-cache\919edb8e9104cba2c804489c9f0c6d7741db5c44\output\AndroidManifest.xml:20:5-43
+MERGED from [me.zhanghai.android.materialprogressbar:library:1.1.7] C:\Users\Bruno\.android\build-cache\525828ec8b264388c565fafaa16bcb017368a10d\output\AndroidManifest.xml:12:5-14:41
+MERGED from [com.github.johnpersano:supertoasts:1.3.4] C:\Users\Bruno\.android\build-cache\bb6e156856f66b689ef926e8abf95dd96bb6b7b4\output\AndroidManifest.xml:3:5-72
+MERGED from [com.heinrichreimersoftware:material-intro:1.5.7] C:\Users\Bruno\.android\build-cache\a4a8d61ffba72565456ac4d71d6404bf014466de\output\AndroidManifest.xml:8:5-10:41
+MERGED from [com.android.support:appcompat-v7:24.2.0] C:\Users\Bruno\.android\build-cache\a2329247774d4864842f787002d127eed17a7f0c\output\AndroidManifest.xml:21:5-23:78
+MERGED from [com.android.support:animated-vector-drawable:24.2.0] C:\Users\Bruno\.android\build-cache\093ce68a234369feafc6e04af18c823040ad7c49\output\AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:support-vector-drawable:24.2.0] C:\Users\Bruno\.android\build-cache\bd60fcff8c2078cf116ebebcc17ce1bc57765fe0\output\AndroidManifest.xml:21:5-43
+MERGED from [com.android.support:support-v4:24.2.0] C:\Users\Bruno\.android\build-cache\2cc2f8bfe2ff4733707c9d989b93149015e571f3\output\AndroidManifest.xml:21:5-23:54
+MERGED from [com.android.support:support-fragment:24.2.0] C:\Users\Bruno\.android\build-cache\aa8e7d0f5a0bbebd61664abe95647c7b22e77659\output\AndroidManifest.xml:21:5-23:60
+MERGED from [com.android.support:support-core-utils:24.2.0] C:\Users\Bruno\.android\build-cache\1822674dc21996a995f371c08745a666e545981d\output\AndroidManifest.xml:21:5-23:61
+MERGED from [com.android.support:support-media-compat:24.2.0] C:\Users\Bruno\.android\build-cache\2990a7c2744cb8caf602f93181cbad4fc75c7580\output\AndroidManifest.xml:21:5-23:63
+MERGED from [com.android.support:support-core-ui:24.2.0] C:\Users\Bruno\.android\build-cache\27f142b938cae2cd00a47db0120f05f4c39d9f4e\output\AndroidManifest.xml:21:5-23:58
+MERGED from [com.android.support:support-compat:24.2.0] C:\Users\Bruno\.android\build-cache\958caf730968dca9f5ff90bf400cabd3ed3ecc7d\output\AndroidManifest.xml:21:5-23:58
+MERGED from [me.sudar:zxing-orient:2.1.1] C:\Users\Bruno\.android\build-cache\b469047939a0730095e85e9967c731ea35f772a5\output\AndroidManifest.xml:23:5-25:41
 	tools:overrideLibrary
-		ADDED from [com.android.support:appcompat-v7:24.2.0] E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\com.android.support\appcompat-v7\24.2.0\AndroidManifest.xml:23:9-75
+		ADDED from [com.afollestad.material-dialogs:core:0.8.6.2] C:\Users\Bruno\.android\build-cache\b8989671e9f2d72cc47bd7fb4785a1192eceeb52\output\AndroidManifest.xml:11:9-72
 	android:targetSdkVersion
-		ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:7:9-38
+		ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:7:9-38
 	android:minSdkVersion
-		ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:6:9-35
+		ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:6:9-35
 uses-permission#android.permission.READ_SYNC_STATS
-ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:9:5-74
+ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:9:5-74
 	android:name
-		ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:9:22-71
+		ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:9:22-71
 uses-permission#android.permission.WRITE_EXTERNAL_STORAGE
-ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:10:5-81
+ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:10:5-81
 	android:name
-		ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:10:22-78
+		ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:10:22-78
 uses-permission#android.permission.READ_EXTERNAL_STORAGE
-ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:11:5-80
+ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:11:5-80
 	android:name
-		ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:11:22-77
+		ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:11:22-77
 uses-permission#android.permission.INTERNET
-ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:12:5-67
-MERGED from [com.github.halysongoncalves:pugnotification:1.8.1] E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\com.github.halysongoncalves\pugnotification\1.8.1\AndroidManifest.xml:11:5-67
+ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:12:5-67
+MERGED from [com.github.halysongoncalves:pugnotification:1.8.1] C:\Users\Bruno\.android\build-cache\3e390e606eee6ea1bb7513f27e54a72a3f75f3dd\output\AndroidManifest.xml:11:5-67
 	android:name
-		ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:12:22-64
+		ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:12:22-64
 uses-permission#android.permission.ACCESS_NETWORK_STATE
-ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:13:5-79
+ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:13:5-79
 	android:name
-		ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:13:22-76
+		ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:13:22-76
 uses-permission#android.permission.READ_PHONE_STATE
-ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:14:5-75
+ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:14:5-75
 	android:name
-		ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:14:22-72
+		ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:14:22-72
 uses-permission#android.permission.RECEIVE_BOOT_COMPLETED
-ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:15:5-81
+ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:15:5-81
 	android:name
-		ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:15:22-78
+		ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:15:22-78
 uses-permission#android.permission.ACCESS_FINE_LOCATION
-ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:16:5-79
+ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:16:5-79
 	android:name
-		ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:16:22-76
+		ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:16:22-76
 uses-permission#android.permission.ACCESS_COARSE_LOCATION
-ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:17:5-81
+ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:17:5-81
 	android:name
-		ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:17:22-78
+		ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:17:22-78
 uses-permission#android.permission.AUTHENTICATE_ACCOUNTS
-ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:18:5-80
+ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:18:5-80
 	android:name
-		ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:18:22-77
+		ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:18:22-77
 uses-permission#android.permission.MANAGE_ACCOUNTS
-ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:19:5-74
+ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:19:5-74
 	android:name
-		ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:19:22-71
+		ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:19:22-71
 uses-permission#android.permission.USE_CREDENTIALS
-ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:20:5-74
+ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:20:5-74
 	android:name
-		ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:20:22-71
+		ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:20:22-71
 uses-permission#android.permission.READ_SYNC_SETTINGS
-ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:21:5-77
+ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:21:5-77
 	android:name
-		ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:21:22-74
+		ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:21:22-74
 uses-permission#android.permission.WRITE_SYNC_SETTINGS
-ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:22:5-78
+ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:22:5-78
 	android:name
-		ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:22:22-75
+		ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:22:22-75
 uses-permission#android.permission.VIBRATE
-ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:23:5-66
-MERGED from [com.github.halysongoncalves:pugnotification:1.8.1] E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\com.github.halysongoncalves\pugnotification\1.8.1\AndroidManifest.xml:12:5-66
-MERGED from [me.sudar:zxing-orient:2.1.1] E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\me.sudar\zxing-orient\2.1.1\AndroidManifest.xml:28:5-66
+ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:23:5-66
+MERGED from [com.github.halysongoncalves:pugnotification:1.8.1] C:\Users\Bruno\.android\build-cache\3e390e606eee6ea1bb7513f27e54a72a3f75f3dd\output\AndroidManifest.xml:12:5-66
+MERGED from [me.sudar:zxing-orient:2.1.1] C:\Users\Bruno\.android\build-cache\b469047939a0730095e85e9967c731ea35f772a5\output\AndroidManifest.xml:28:5-66
 	android:name
-		ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:23:22-63
+		ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:23:22-63
 application
-ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:25:5-265:19
-MERGED from [com.android.support:appcompat-v7:24.2.0] E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\com.android.support\appcompat-v7\24.2.0\AndroidManifest.xml:25:5-20
-MERGED from [com.android.support:support-vector-drawable:24.2.0] E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\com.android.support\support-vector-drawable\24.2.0\AndroidManifest.xml:23:5-20
-MERGED from [com.android.support:support-compat:24.2.0] E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\com.android.support\support-compat\24.2.0\AndroidManifest.xml:25:5-20
-MERGED from [com.android.support:animated-vector-drawable:24.2.0] E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\com.android.support\animated-vector-drawable\24.2.0\AndroidManifest.xml:22:5-20
-MERGED from [com.android.support:support-v4:24.2.0] E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\com.android.support\support-v4\24.2.0\AndroidManifest.xml:25:5-20
-MERGED from [com.android.support:support-core-utils:24.2.0] E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\com.android.support\support-core-utils\24.2.0\AndroidManifest.xml:25:5-20
-MERGED from [com.android.support:support-media-compat:24.2.0] E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\com.android.support\support-media-compat\24.2.0\AndroidManifest.xml:25:5-20
-MERGED from [com.android.support:support-core-ui:24.2.0] E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\com.android.support\support-core-ui\24.2.0\AndroidManifest.xml:25:5-20
-MERGED from [com.android.support:support-fragment:24.2.0] E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\com.android.support\support-fragment\24.2.0\AndroidManifest.xml:25:5-20
-MERGED from [com.android.support:design:24.2.0] E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\com.android.support\design\24.2.0\AndroidManifest.xml:22:5-20
-MERGED from [com.github.dexafree:materiallist:3.2.1] E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\com.github.dexafree\materiallist\3.2.1\AndroidManifest.xml:11:5-14:19
-MERGED from [com.android.support:cardview-v7:23.2.1] E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\com.android.support\cardview-v7\23.2.1\AndroidManifest.xml:22:5-20
-MERGED from [com.github.clans:fab:1.6.2] E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\com.github.clans\fab\1.6.2\AndroidManifest.xml:12:5-20
-MERGED from [de.hdodenhof:circleimageview:2.0.0] E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\de.hdodenhof\circleimageview\2.0.0\AndroidManifest.xml:9:5-20
-MERGED from [com.github.arimorty:floatingsearchview:1.1.2] E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\com.github.arimorty\floatingsearchview\1.1.2\AndroidManifest.xml:11:5-20
-MERGED from [me.grantland:autofittextview:0.2.0] E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\me.grantland\autofittextview\0.2.0\AndroidManifest.xml:11:5-47
-MERGED from [com.afollestad.material-dialogs:core:0.8.6.2] E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\com.afollestad.material-dialogs\core\0.8.6.2\AndroidManifest.xml:13:5-20
-MERGED from [com.github.johnpersano:supertoasts:1.3.4] E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\com.github.johnpersano\supertoasts\1.3.4\AndroidManifest.xml:5:5-19
-MERGED from [me.sudar:zxing-orient:2.1.1] E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\me.sudar\zxing-orient\2.1.1\AndroidManifest.xml:57:5-168:19
+ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:25:5-265:19
+MERGED from [com.github.dexafree:materiallist:3.2.1] C:\Users\Bruno\.android\build-cache\3c0ba4f4edbd522feb118883fbf9b0911ec6e176\output\AndroidManifest.xml:11:5-14:19
+MERGED from [com.github.clans:fab:1.6.2] C:\Users\Bruno\.android\build-cache\2d900c00ff9032a319dd6cc7f46b8d097d9140ee\output\AndroidManifest.xml:12:5-20
+MERGED from [de.hdodenhof:circleimageview:2.0.0] C:\Users\Bruno\.android\build-cache\1a5a4c261bbd3c8b0f245cb1bd8759df26a0a9f6\output\AndroidManifest.xml:9:5-20
+MERGED from [com.github.arimorty:floatingsearchview:1.1.2] C:\Users\Bruno\.android\build-cache\180aee4ecd56a4c6a1009b21ff3569fd5b1c4576\output\AndroidManifest.xml:11:5-20
+MERGED from [me.grantland:autofittextview:0.2.0] C:\Users\Bruno\.android\build-cache\70b8086a9be50f444da18282f5c354610c095ef8\output\AndroidManifest.xml:11:5-47
+MERGED from [com.android.support:cardview-v7:23.2.1] C:\Users\Bruno\.android\build-cache\1d62c955cc6991f7d0701ca98a4ac3bb098b76d3\output\AndroidManifest.xml:22:5-20
+MERGED from [com.android.support:design:24.2.0] C:\Users\Bruno\.android\build-cache\28881ba6adbe5954e9a3fc2ee9fb567a9e34dc9e\output\AndroidManifest.xml:22:5-20
+MERGED from [com.afollestad.material-dialogs:core:0.8.6.2] C:\Users\Bruno\.android\build-cache\b8989671e9f2d72cc47bd7fb4785a1192eceeb52\output\AndroidManifest.xml:13:5-20
+MERGED from [com.github.johnpersano:supertoasts:1.3.4] C:\Users\Bruno\.android\build-cache\bb6e156856f66b689ef926e8abf95dd96bb6b7b4\output\AndroidManifest.xml:5:5-19
+MERGED from [com.android.support:appcompat-v7:24.2.0] C:\Users\Bruno\.android\build-cache\a2329247774d4864842f787002d127eed17a7f0c\output\AndroidManifest.xml:25:5-20
+MERGED from [com.android.support:animated-vector-drawable:24.2.0] C:\Users\Bruno\.android\build-cache\093ce68a234369feafc6e04af18c823040ad7c49\output\AndroidManifest.xml:22:5-20
+MERGED from [com.android.support:support-vector-drawable:24.2.0] C:\Users\Bruno\.android\build-cache\bd60fcff8c2078cf116ebebcc17ce1bc57765fe0\output\AndroidManifest.xml:23:5-20
+MERGED from [com.android.support:support-v4:24.2.0] C:\Users\Bruno\.android\build-cache\2cc2f8bfe2ff4733707c9d989b93149015e571f3\output\AndroidManifest.xml:25:5-20
+MERGED from [com.android.support:support-fragment:24.2.0] C:\Users\Bruno\.android\build-cache\aa8e7d0f5a0bbebd61664abe95647c7b22e77659\output\AndroidManifest.xml:25:5-20
+MERGED from [com.android.support:support-core-utils:24.2.0] C:\Users\Bruno\.android\build-cache\1822674dc21996a995f371c08745a666e545981d\output\AndroidManifest.xml:25:5-20
+MERGED from [com.android.support:support-media-compat:24.2.0] C:\Users\Bruno\.android\build-cache\2990a7c2744cb8caf602f93181cbad4fc75c7580\output\AndroidManifest.xml:25:5-20
+MERGED from [com.android.support:support-core-ui:24.2.0] C:\Users\Bruno\.android\build-cache\27f142b938cae2cd00a47db0120f05f4c39d9f4e\output\AndroidManifest.xml:25:5-20
+MERGED from [com.android.support:support-compat:24.2.0] C:\Users\Bruno\.android\build-cache\958caf730968dca9f5ff90bf400cabd3ed3ecc7d\output\AndroidManifest.xml:25:5-20
+MERGED from [me.sudar:zxing-orient:2.1.1] C:\Users\Bruno\.android\build-cache\b469047939a0730095e85e9967c731ea35f772a5\output\AndroidManifest.xml:57:5-168:19
 	android:label
-		ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:28:9-41
+		ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:28:9-41
 	android:allowBackup
-		ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:26:9-35
+		ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:26:9-35
 	android:icon
-		ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:27:9-43
+		ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:27:9-43
 	android:largeHeap
-		ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:30:9-33
+		ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:30:9-33
 	android:theme
-		ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:29:9-56
+		ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:29:9-56
 meta-data#com.google.android.gms.analytics.globalConfigResource
-ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:33:9-35:54
+ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:33:9-35:54
 	android:resource
-		ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:35:13-51
+		ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:35:13-51
 	android:name
-		ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:34:13-81
+		ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:34:13-81
 activity#com.savare.activity.material.designer.LoginMDActivity
-ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:37:9-46:20
+ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:37:9-46:20
 	android:label
-		ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:40:13-45
+		ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:40:13-45
 	android:theme
-		ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:39:13-48
+		ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:39:13-48
 	android:name
-		ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:38:13-71
+		ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:38:13-71
 intent-filter#android.intent.action.MAIN+android.intent.category.LAUNCHER
-ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:41:13-45:29
+ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:41:13-45:29
 action#android.intent.action.MAIN
-ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:42:17-69
+ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:42:17-69
 	android:name
-		ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:42:25-66
+		ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:42:25-66
 category#android.intent.category.LAUNCHER
-ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:44:17-77
+ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:44:17-77
 	android:name
-		ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:44:27-74
+		ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:44:27-74
 activity#com.savare.activity.CadastroUsuarioActivity
-ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:47:9-70
+ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:47:9-70
 	android:name
-		ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:47:19-67
+		ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:47:19-67
 activity#com.savare.activity.InicioActivity
-ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:48:9-61
+ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:48:9-61
 	android:name
-		ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:48:19-58
+		ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:48:19-58
 activity#com.savare.activity.ClienteListaActivity
-ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:49:9-57:20
+ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:49:9-57:20
 	android:name
-		ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:49:19-64
+		ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:49:19-64
 intent-filter#android.intent.action.SEARCH
-ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:50:13-52:29
+ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:50:13-52:29
 action#android.intent.action.SEARCH
-ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:51:17-71
+ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:51:17-71
 	android:name
-		ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:51:25-68
+		ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:51:25-68
 meta-data#android.app.searchable
-ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:54:13-56:57
+ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:54:13-56:57
 	android:resource
-		ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:56:17-54
+		ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:56:17-54
 	android:name
-		ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:55:17-54
+		ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:55:17-54
 activity#com.savare.activity.ClienteDetalhesActivity
-ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:58:9-79
+ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:58:9-79
 	android:name
-		ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:58:19-67
+		ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:58:19-67
 activity#com.savare.activity.OrcamentoActivity
-ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:59:9-72:20
+ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:59:9-72:20
 	android:uiOptions
-		ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:61:13-57
+		ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:61:13-57
 	android:name
-		ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:60:13-55
+		ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:60:13-55
 meta-data#android.support.UI_OPTIONS
-ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:69:13-71:60
+ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:69:13-71:60
 	android:value
-		ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:71:17-57
+		ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:71:17-57
 	android:name
-		ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:70:17-58
+		ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:70:17-58
 activity#com.savare.activity.ProdutoListaActivity
-ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:73:9-76
+ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:73:9-76
 	android:name
-		ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:73:19-64
+		ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:73:19-64
 activity#com.savare.activity.OrcamentoProdutoDetalhesActivity
-ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:74:9-79
+ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:74:9-79
 	android:name
-		ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:74:19-76
+		ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:74:19-76
 activity#com.savare.activity.OrcamentoPlanoPagamentoActivity
-ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:75:9-78
+ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:75:9-78
 	android:name
-		ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:75:19-75
+		ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:75:19-75
 activity#com.savare.activity.ListaOrcamentoPedidoActivity
-ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:76:9-75
+ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:76:9-75
 	android:name
-		ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:76:19-72
+		ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:76:19-72
 activity#com.savare.activity.ListaTitulosActivity
-ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:77:9-67
+ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:77:9-67
 	android:name
-		ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:77:19-64
+		ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:77:19-64
 activity#com.savare.activity.SincronizacaoActivity
-ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:78:9-68
+ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:78:9-68
 	android:name
-		ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:78:19-65
+		ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:78:19-65
 activity#com.savare.activity.ConfiguracoesActivity
-ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:79:9-68
+ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:79:9-68
 	android:name
-		ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:79:19-65
+		ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:79:19-65
 activity#com.savare.activity.fragment.OrcamentoTabulacaoFragment
-ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:80:9-82:69
+ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:80:9-82:69
 	android:uiOptions
-		ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:82:13-57
+		ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:82:13-57
 	android:name
-		ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:81:13-73
+		ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:81:13-73
 activity#com.savare.activity.ProdutoDetalhesActivity
-ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:83:9-70
+ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:83:9-70
 	android:name
-		ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:83:19-67
+		ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:83:19-67
 activity#com.savare.activity.LogActivity
-ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:84:9-58
+ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:84:9-58
 	android:name
-		ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:84:19-55
+		ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:84:19-55
 activity#com.savare.activity.fragment.ClienteCadastroFragment
-ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:85:9-79
+ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:85:9-79
 	android:name
-		ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:85:19-76
+		ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:85:19-76
 activity#com.savare.activity.material.designer.InicioMDActivity
-ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:86:9-87:56
+ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:86:9-87:56
 	android:theme
-		ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:87:19-54
+		ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:87:19-54
 	android:name
-		ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:86:19-78
+		ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:86:19-78
 activity#com.savare.activity.material.designer.ProdutoDetalhesMDActivity
-ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:88:9-89:50
+ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:88:9-89:50
 	android:theme
-		ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:89:13-48
+		ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:89:13-48
 	android:name
-		ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:88:19-87
+		ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:88:19-87
 activity#com.savare.activity.material.designer.ListaTitulosMDActivity
-ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:90:9-95:20
+ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:90:9-95:20
 	android:theme
-		ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:91:13-48
+		ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:91:13-48
 	android:name
-		ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:90:19-84
+		ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:90:19-84
 activity#com.savare.activity.LoginActivity
-ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:96:9-60
+ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:96:9-60
 	android:name
-		ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:96:19-57
+		ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:96:19-57
 activity#com.savare.activity.material.designer.ProdutoListaMDActivity
-ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:98:9-104:20
+ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:98:9-104:20
 	android:theme
-		ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:100:13-48
+		ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:100:13-48
 	android:name
-		ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:99:13-78
+		ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:99:13-78
 activity#com.savare.activity.SearchableActivity
-ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:106:9-119:20
+ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:106:9-119:20
 	android:label
-		ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:109:13-45
+		ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:109:13-45
 	android:launchMode
-		ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:110:13-43
+		ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:110:13-43
 	android:windowSoftInputMode
-		ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:107:13-66
+		ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:107:13-66
 	android:theme
-		ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:111:13-48
+		ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:111:13-48
 	android:name
-		ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:108:13-66
+		ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:108:13-66
 activity#com.savare.activity.material.designer.ClienteDetalhesMDActivity
-ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:121:9-123:50
+ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:121:9-123:50
 	android:windowSoftInputMode
-		ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:122:13-54
+		ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:122:13-54
 	android:theme
-		ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:123:13-48
+		ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:123:13-48
 	android:name
-		ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:121:19-87
+		ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:121:19-87
 activity#com.savare.activity.material.designer.ClienteListaMDActivity
-ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:124:9-129:20
+ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:124:9-129:20
 	android:theme
-		ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:125:13-48
+		ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:125:13-48
 	android:name
-		ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:124:19-84
+		ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:124:19-84
 activity#com.savare.activity.material.designer.OrcamentoTabFragmentMDActivity
-ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:131:9-134:20
+ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:131:9-134:20
 	android:theme
-		ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:133:13-48
+		ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:133:13-48
 	android:name
-		ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:132:13-86
+		ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:132:13-86
 activity#com.savare.activity.material.designer.ListaOrcamentoPedidoMDActivity
-ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:136:9-139:20
+ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:136:9-139:20
 	android:theme
-		ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:138:13-48
+		ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:138:13-48
 	android:name
-		ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:137:13-86
+		ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:137:13-86
 activity#com.savare.activity.material.designer.SincronizacaoMDActivity
-ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:141:9-144:20
+ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:141:9-144:20
 	android:theme
-		ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:143:13-48
+		ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:143:13-48
 	android:name
-		ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:142:13-79
+		ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:142:13-79
 activity#com.savare.activity.material.designer.ConfiguracoesMDActivity
-ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:146:9-149:20
+ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:146:9-149:20
 	android:theme
-		ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:148:13-48
+		ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:148:13-48
 	android:name
-		ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:147:13-79
+		ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:147:13-79
 activity#com.savare.activity.material.designer.OrcamentoProdutoDetalhesTabFragmentMDActivity
-ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:151:9-153:20
+ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:151:9-153:20
 	android:theme
-		ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:152:13-48
+		ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:152:13-48
 	android:name
-		ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:151:19-107
+		ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:151:19-107
 activity#com.savare.activity.material.designer.RegistroChaveUsuarioMDActivity
-ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:155:9-158:20
+ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:155:9-158:20
 	android:theme
-		ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:157:13-48
+		ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:157:13-48
 	android:name
-		ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:156:13-86
+		ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:156:13-86
 activity#com.savare.activity.material.designer.OrcamentoCriticaMDActivity
-ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:160:9-163:20
+ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:160:9-163:20
 	android:theme
-		ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:162:13-48
+		ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:162:13-48
 	android:name
-		ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:161:13-82
+		ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:161:13-82
 provider#com.savare.sincronizacao.EnviarProvider
-ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:165:9-169:38
+ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:165:9-169:38
 	android:authorities
-		ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:167:13-60
+		ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:167:13-60
 	android:syncable
-		ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:169:13-36
+		ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:169:13-36
 	android:exported
-		ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:168:13-37
+		ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:168:13-37
 	android:name
-		ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:166:13-57
+		ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:166:13-57
 provider#com.savare.provider.SearchableProvider
-ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:171:9-173:69
+ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:171:9-173:69
 	android:authorities
-		ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:172:13-73
+		ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:172:13-73
 	android:name
-		ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:173:13-66
+		ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:173:13-66
 service#com.savare.sincronizacao.SavareSyncService
-ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:176:9-192:19
+ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:176:9-192:19
 	android:process
-		ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:179:13-36
+		ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:179:13-36
 	android:exported
-		ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:178:13-36
+		ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:178:13-36
 	android:name
-		ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:177:13-60
+		ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:177:13-60
 intent-filter#android.content.SavareSyncAdapter
-ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:185:13-187:29
+ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:185:13-187:29
 action#android.content.SavareSyncAdapter
-ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:186:17-76
+ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:186:17-76
 	android:name
-		ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:186:25-73
+		ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:186:25-73
 meta-data#android.content.SavareSyncAdapter
-ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:189:13-191:55
+ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:189:13-191:55
 	android:resource
-		ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:191:17-52
+		ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:191:17-52
 	android:name
-		ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:190:17-65
+		ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:190:17-65
 service#com.savare.sincronizacao.SavareAutenticadorService
-ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:195:9-205:19
+ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:195:9-205:19
 	android:name
-		ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:195:18-73
+		ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:195:18-73
 intent-filter#android.accounts.AccountAuthenticator
-ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:198:13-200:29
+ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:198:13-200:29
 action#android.accounts.AccountAuthenticator
-ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:199:17-80
+ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:199:17-80
 	android:name
-		ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:199:25-77
+		ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:199:25-77
 meta-data#android.accounts.AccountAuthenticator
-ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:202:13-204:57
+ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:202:13-204:57
 	android:resource
-		ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:204:17-54
+		ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:204:17-54
 	android:name
-		ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:203:17-69
+		ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:203:17-69
 receiver#com.savare.funcoes.rotinas.receptor.ReceptorAlarmeEnviarOrcamentoBroadcastRotinas
-ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:207:9-215:20
+ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:207:9-215:20
 	android:label
-		ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:209:13-74
+		ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:209:13-74
 	android:name
-		ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:208:13-99
+		ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:208:13-99
 intent-filter#ENVIAR_ORCAMENTO_SAVARE+android.intent.category.DEFAULT
-ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:210:13-214:29
+ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:210:13-214:29
 action#ENVIAR_ORCAMENTO_SAVARE
-ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:211:17-66
+ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:211:17-66
 	android:name
-		ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:211:25-63
+		ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:211:25-63
 category#android.intent.category.DEFAULT
-ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:213:17-76
+ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:213:17-76
 	android:name
-		ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:213:27-73
+		ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:213:27-73
 receiver#com.savare.funcoes.rotinas.receptor.ReceptorNotificarAparelhoRotinas
-ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:217:9-225:20
+ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:217:9-225:20
 	android:label
-		ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:219:13-61
+		ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:219:13-61
 	android:name
-		ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:218:13-86
+		ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:218:13-86
 intent-filter#NOTIFICACAO_SAVARE+android.intent.category.DEFAULT
-ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:220:13-224:29
+ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:220:13-224:29
 action#NOTIFICACAO_SAVARE
-ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:223:17-61
+ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:223:17-61
 	android:name
-		ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:223:25-58
+		ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:223:25-58
 receiver#com.savare.funcoes.rotinas.receptor.ReceptorCriarAlarmeRebootRotinas
-ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:227:9-237:20
+ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:227:9-237:20
 	android:label
-		ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:229:13-61
+		ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:229:13-61
 	android:name
-		ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:228:13-86
+		ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:228:13-86
 intent-filter#android.intent.action.BOOT_COMPLETED+android.intent.action.REBOOT+android.intent.category.DEFAULT
-ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:230:13-236:29
+ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:230:13-236:29
 action#android.intent.action.BOOT_COMPLETED
-ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:231:17-79
+ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:231:17-79
 	android:name
-		ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:231:25-76
+		ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:231:25-76
 action#android.intent.action.REBOOT
-ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:235:17-71
+ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:235:17-71
 	android:name
-		ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:235:25-68
+		ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:235:25-68
 receiver#com.savare.funcoes.rotinas.receptor.ReceptorAlarmeReceberDadosBroadcastRotinas
-ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:239:9-247:20
+ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:239:9-247:20
 	android:label
-		ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:241:13-71
+		ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:241:13-71
 	android:name
-		ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:240:13-96
+		ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:240:13-96
 intent-filter#RECEBER_DADOS_SAVARE+android.intent.category.DEFAULT
-ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:242:13-246:29
+ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:242:13-246:29
 action#RECEBER_DADOS_SAVARE
-ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:245:17-63
+ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:245:17-63
 	android:name
-		ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:245:25-60
+		ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:245:25-60
 receiver#com.savare.funcoes.rotinas.receptor.ReceptorAlarmeEnviarCadastroPessoaBroadcastRotinas
-ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:249:9-257:20
+ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:249:9-257:20
 	android:label
-		ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:251:13-79
+		ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:251:13-79
 	android:name
-		ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:250:13-104
+		ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:250:13-104
 intent-filter#ENVIAR_OUTROS_DADOS_SAVARE+android.intent.category.DEFAULT
-ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:252:13-256:29
+ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:252:13-256:29
 action#ENVIAR_OUTROS_DADOS_SAVARE
-ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:253:17-69
+ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:253:17-69
 	android:name
-		ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:253:25-66
+		ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:253:25-66
 meta-data#com.google.android.gms.version
-ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:261:9-263:69
+ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:261:9-263:69
 	android:value
-		ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:263:13-66
+		ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:263:13-66
 	android:name
-		ADDED from E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:262:13-58
+		ADDED from D:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\src\main\AndroidManifest.xml:262:13-58
 uses-permission#android.permission.CAMERA
-ADDED from [me.sudar:zxing-orient:2.1.1] E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\me.sudar\zxing-orient\2.1.1\AndroidManifest.xml:27:5-65
+ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Bruno\.android\build-cache\b469047939a0730095e85e9967c731ea35f772a5\output\AndroidManifest.xml:27:5-65
 	android:name
-		ADDED from [me.sudar:zxing-orient:2.1.1] E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\me.sudar\zxing-orient\2.1.1\AndroidManifest.xml:27:22-62
+		ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Bruno\.android\build-cache\b469047939a0730095e85e9967c731ea35f772a5\output\AndroidManifest.xml:27:22-62
 uses-permission#android.permission.FLASHLIGHT
-ADDED from [me.sudar:zxing-orient:2.1.1] E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\me.sudar\zxing-orient\2.1.1\AndroidManifest.xml:29:5-69
+ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Bruno\.android\build-cache\b469047939a0730095e85e9967c731ea35f772a5\output\AndroidManifest.xml:29:5-69
 	android:name
-		ADDED from [me.sudar:zxing-orient:2.1.1] E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\me.sudar\zxing-orient\2.1.1\AndroidManifest.xml:29:22-66
+		ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Bruno\.android\build-cache\b469047939a0730095e85e9967c731ea35f772a5\output\AndroidManifest.xml:29:22-66
 uses-feature#android.hardware.camera
-ADDED from [me.sudar:zxing-orient:2.1.1] E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\me.sudar\zxing-orient\2.1.1\AndroidManifest.xml:32:5-34:36
+ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Bruno\.android\build-cache\b469047939a0730095e85e9967c731ea35f772a5\output\AndroidManifest.xml:32:5-34:36
 	android:required
-		ADDED from [me.sudar:zxing-orient:2.1.1] E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\me.sudar\zxing-orient\2.1.1\AndroidManifest.xml:34:9-33
+		ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Bruno\.android\build-cache\b469047939a0730095e85e9967c731ea35f772a5\output\AndroidManifest.xml:34:9-33
 	android:name
-		ADDED from [me.sudar:zxing-orient:2.1.1] E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\me.sudar\zxing-orient\2.1.1\AndroidManifest.xml:33:9-47
+		ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Bruno\.android\build-cache\b469047939a0730095e85e9967c731ea35f772a5\output\AndroidManifest.xml:33:9-47
 uses-feature#android.hardware.camera.front
-ADDED from [me.sudar:zxing-orient:2.1.1] E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\me.sudar\zxing-orient\2.1.1\AndroidManifest.xml:35:5-37:36
+ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Bruno\.android\build-cache\b469047939a0730095e85e9967c731ea35f772a5\output\AndroidManifest.xml:35:5-37:36
 	android:required
-		ADDED from [me.sudar:zxing-orient:2.1.1] E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\me.sudar\zxing-orient\2.1.1\AndroidManifest.xml:37:9-33
+		ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Bruno\.android\build-cache\b469047939a0730095e85e9967c731ea35f772a5\output\AndroidManifest.xml:37:9-33
 	android:name
-		ADDED from [me.sudar:zxing-orient:2.1.1] E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\me.sudar\zxing-orient\2.1.1\AndroidManifest.xml:36:9-53
+		ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Bruno\.android\build-cache\b469047939a0730095e85e9967c731ea35f772a5\output\AndroidManifest.xml:36:9-53
 uses-feature#android.hardware.camera.autofocus
-ADDED from [me.sudar:zxing-orient:2.1.1] E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\me.sudar\zxing-orient\2.1.1\AndroidManifest.xml:40:5-42:36
+ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Bruno\.android\build-cache\b469047939a0730095e85e9967c731ea35f772a5\output\AndroidManifest.xml:40:5-42:36
 	android:required
-		ADDED from [me.sudar:zxing-orient:2.1.1] E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\me.sudar\zxing-orient\2.1.1\AndroidManifest.xml:42:9-33
+		ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Bruno\.android\build-cache\b469047939a0730095e85e9967c731ea35f772a5\output\AndroidManifest.xml:42:9-33
 	android:name
-		ADDED from [me.sudar:zxing-orient:2.1.1] E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\me.sudar\zxing-orient\2.1.1\AndroidManifest.xml:41:9-57
+		ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Bruno\.android\build-cache\b469047939a0730095e85e9967c731ea35f772a5\output\AndroidManifest.xml:41:9-57
 uses-feature#android.hardware.camera.flash
-ADDED from [me.sudar:zxing-orient:2.1.1] E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\me.sudar\zxing-orient\2.1.1\AndroidManifest.xml:43:5-45:36
+ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Bruno\.android\build-cache\b469047939a0730095e85e9967c731ea35f772a5\output\AndroidManifest.xml:43:5-45:36
 	android:required
-		ADDED from [me.sudar:zxing-orient:2.1.1] E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\me.sudar\zxing-orient\2.1.1\AndroidManifest.xml:45:9-33
+		ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Bruno\.android\build-cache\b469047939a0730095e85e9967c731ea35f772a5\output\AndroidManifest.xml:45:9-33
 	android:name
-		ADDED from [me.sudar:zxing-orient:2.1.1] E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\me.sudar\zxing-orient\2.1.1\AndroidManifest.xml:44:9-53
+		ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Bruno\.android\build-cache\b469047939a0730095e85e9967c731ea35f772a5\output\AndroidManifest.xml:44:9-53
 uses-feature#android.hardware.touchscreen
-ADDED from [me.sudar:zxing-orient:2.1.1] E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\me.sudar\zxing-orient\2.1.1\AndroidManifest.xml:47:5-65
+ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Bruno\.android\build-cache\b469047939a0730095e85e9967c731ea35f772a5\output\AndroidManifest.xml:47:5-65
 	android:name
-		ADDED from [me.sudar:zxing-orient:2.1.1] E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\me.sudar\zxing-orient\2.1.1\AndroidManifest.xml:47:19-62
+		ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Bruno\.android\build-cache\b469047939a0730095e85e9967c731ea35f772a5\output\AndroidManifest.xml:47:19-62
 supports-screens
-ADDED from [me.sudar:zxing-orient:2.1.1] E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\me.sudar\zxing-orient\2.1.1\AndroidManifest.xml:50:5-55:40
+ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Bruno\.android\build-cache\b469047939a0730095e85e9967c731ea35f772a5\output\AndroidManifest.xml:50:5-55:40
 	android:largeScreens
-		ADDED from [me.sudar:zxing-orient:2.1.1] E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\me.sudar\zxing-orient\2.1.1\AndroidManifest.xml:52:9-36
+		ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Bruno\.android\build-cache\b469047939a0730095e85e9967c731ea35f772a5\output\AndroidManifest.xml:52:9-36
 	android:smallScreens
-		ADDED from [me.sudar:zxing-orient:2.1.1] E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\me.sudar\zxing-orient\2.1.1\AndroidManifest.xml:54:9-36
+		ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Bruno\.android\build-cache\b469047939a0730095e85e9967c731ea35f772a5\output\AndroidManifest.xml:54:9-36
 	android:normalScreens
-		ADDED from [me.sudar:zxing-orient:2.1.1] E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\me.sudar\zxing-orient\2.1.1\AndroidManifest.xml:53:9-37
+		ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Bruno\.android\build-cache\b469047939a0730095e85e9967c731ea35f772a5\output\AndroidManifest.xml:53:9-37
 	android:xlargeScreens
-		ADDED from [me.sudar:zxing-orient:2.1.1] E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\me.sudar\zxing-orient\2.1.1\AndroidManifest.xml:55:9-37
+		ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Bruno\.android\build-cache\b469047939a0730095e85e9967c731ea35f772a5\output\AndroidManifest.xml:55:9-37
 	android:anyDensity
-		ADDED from [me.sudar:zxing-orient:2.1.1] E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\me.sudar\zxing-orient\2.1.1\AndroidManifest.xml:51:9-34
+		ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Bruno\.android\build-cache\b469047939a0730095e85e9967c731ea35f772a5\output\AndroidManifest.xml:51:9-34
 activity#com.google.zxing.client.android.CaptureActivity
-ADDED from [me.sudar:zxing-orient:2.1.1] E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\me.sudar\zxing-orient\2.1.1\AndroidManifest.xml:60:9-137:20
+ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Bruno\.android\build-cache\b469047939a0730095e85e9967c731ea35f772a5\output\AndroidManifest.xml:60:9-137:20
 	android:clearTaskOnLaunch
-		ADDED from [me.sudar:zxing-orient:2.1.1] E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\me.sudar\zxing-orient\2.1.1\AndroidManifest.xml:62:13-45
+		ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Bruno\.android\build-cache\b469047939a0730095e85e9967c731ea35f772a5\output\AndroidManifest.xml:62:13-45
 	android:stateNotNeeded
-		ADDED from [me.sudar:zxing-orient:2.1.1] E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\me.sudar\zxing-orient\2.1.1\AndroidManifest.xml:64:13-42
+		ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Bruno\.android\build-cache\b469047939a0730095e85e9967c731ea35f772a5\output\AndroidManifest.xml:64:13-42
 	android:windowSoftInputMode
-		ADDED from [me.sudar:zxing-orient:2.1.1] E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\me.sudar\zxing-orient\2.1.1\AndroidManifest.xml:66:13-60
+		ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Bruno\.android\build-cache\b469047939a0730095e85e9967c731ea35f772a5\output\AndroidManifest.xml:66:13-60
 	android:configChanges
-		ADDED from [me.sudar:zxing-orient:2.1.1] E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\me.sudar\zxing-orient\2.1.1\AndroidManifest.xml:63:13-51
+		ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Bruno\.android\build-cache\b469047939a0730095e85e9967c731ea35f772a5\output\AndroidManifest.xml:63:13-51
 	android:theme
-		ADDED from [me.sudar:zxing-orient:2.1.1] E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\me.sudar\zxing-orient\2.1.1\AndroidManifest.xml:65:13-48
+		ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Bruno\.android\build-cache\b469047939a0730095e85e9967c731ea35f772a5\output\AndroidManifest.xml:65:13-48
 	android:name
-		ADDED from [me.sudar:zxing-orient:2.1.1] E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\me.sudar\zxing-orient\2.1.1\AndroidManifest.xml:61:13-75
+		ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Bruno\.android\build-cache\b469047939a0730095e85e9967c731ea35f772a5\output\AndroidManifest.xml:61:13-75
 intent-filter#android.intent.category.DEFAULT+me.sudar.zxing.SCAN
-ADDED from [me.sudar:zxing-orient:2.1.1] E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\me.sudar\zxing-orient\2.1.1\AndroidManifest.xml:67:13-71:29
+ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Bruno\.android\build-cache\b469047939a0730095e85e9967c731ea35f772a5\output\AndroidManifest.xml:67:13-71:29
 action#me.sudar.zxing.SCAN
-ADDED from [me.sudar:zxing-orient:2.1.1] E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\me.sudar\zxing-orient\2.1.1\AndroidManifest.xml:68:17-62
+ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Bruno\.android\build-cache\b469047939a0730095e85e9967c731ea35f772a5\output\AndroidManifest.xml:68:17-62
 	android:name
-		ADDED from [me.sudar:zxing-orient:2.1.1] E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\me.sudar\zxing-orient\2.1.1\AndroidManifest.xml:68:25-59
+		ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Bruno\.android\build-cache\b469047939a0730095e85e9967c731ea35f772a5\output\AndroidManifest.xml:68:25-59
 intent-filter#android.intent.category.DEFAULT+com.google.zxing.client.android.SCAN
-ADDED from [me.sudar:zxing-orient:2.1.1] E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\me.sudar\zxing-orient\2.1.1\AndroidManifest.xml:72:13-76:29
+ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Bruno\.android\build-cache\b469047939a0730095e85e9967c731ea35f772a5\output\AndroidManifest.xml:72:13-76:29
 action#com.google.zxing.client.android.SCAN
-ADDED from [me.sudar:zxing-orient:2.1.1] E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\me.sudar\zxing-orient\2.1.1\AndroidManifest.xml:73:17-79
+ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Bruno\.android\build-cache\b469047939a0730095e85e9967c731ea35f772a5\output\AndroidManifest.xml:73:17-79
 	android:name
-		ADDED from [me.sudar:zxing-orient:2.1.1] E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\me.sudar\zxing-orient\2.1.1\AndroidManifest.xml:73:25-76
+		ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Bruno\.android\build-cache\b469047939a0730095e85e9967c731ea35f772a5\output\AndroidManifest.xml:73:25-76
 intent-filter#android.intent.action.VIEW+android.intent.category.BROWSABLE+android.intent.category.DEFAULT
-ADDED from [me.sudar:zxing-orient:2.1.1] E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\me.sudar\zxing-orient\2.1.1\AndroidManifest.xml:78:13-88:29
+ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Bruno\.android\build-cache\b469047939a0730095e85e9967c731ea35f772a5\output\AndroidManifest.xml:78:13-88:29
 action#android.intent.action.VIEW
-ADDED from [me.sudar:zxing-orient:2.1.1] E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\me.sudar\zxing-orient\2.1.1\AndroidManifest.xml:79:17-69
+ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Bruno\.android\build-cache\b469047939a0730095e85e9967c731ea35f772a5\output\AndroidManifest.xml:79:17-69
 	android:name
-		ADDED from [me.sudar:zxing-orient:2.1.1] E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\me.sudar\zxing-orient\2.1.1\AndroidManifest.xml:79:25-66
+		ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Bruno\.android\build-cache\b469047939a0730095e85e9967c731ea35f772a5\output\AndroidManifest.xml:79:25-66
 category#android.intent.category.BROWSABLE
-ADDED from [me.sudar:zxing-orient:2.1.1] E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\me.sudar\zxing-orient\2.1.1\AndroidManifest.xml:82:17-78
+ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Bruno\.android\build-cache\b469047939a0730095e85e9967c731ea35f772a5\output\AndroidManifest.xml:82:17-78
 	android:name
-		ADDED from [me.sudar:zxing-orient:2.1.1] E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\me.sudar\zxing-orient\2.1.1\AndroidManifest.xml:82:27-75
+		ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Bruno\.android\build-cache\b469047939a0730095e85e9967c731ea35f772a5\output\AndroidManifest.xml:82:27-75
 data
-ADDED from [me.sudar:zxing-orient:2.1.1] E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\me.sudar\zxing-orient\2.1.1\AndroidManifest.xml:84:17-87:45
+ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Bruno\.android\build-cache\b469047939a0730095e85e9967c731ea35f772a5\output\AndroidManifest.xml:84:17-87:45
 	android:path
-		ADDED from [me.sudar:zxing-orient:2.1.1] E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\me.sudar\zxing-orient\2.1.1\AndroidManifest.xml:86:21-63
+		ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Bruno\.android\build-cache\b469047939a0730095e85e9967c731ea35f772a5\output\AndroidManifest.xml:86:21-63
 	android:host
-		ADDED from [me.sudar:zxing-orient:2.1.1] E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\me.sudar\zxing-orient\2.1.1\AndroidManifest.xml:85:21-48
+		ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Bruno\.android\build-cache\b469047939a0730095e85e9967c731ea35f772a5\output\AndroidManifest.xml:85:21-48
 	android:scheme
-		ADDED from [me.sudar:zxing-orient:2.1.1] E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\me.sudar\zxing-orient\2.1.1\AndroidManifest.xml:87:21-42
+		ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Bruno\.android\build-cache\b469047939a0730095e85e9967c731ea35f772a5\output\AndroidManifest.xml:87:21-42
 activity#com.google.zxing.client.android.encode.EncodeActivity
-ADDED from [me.sudar:zxing-orient:2.1.1] E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\me.sudar\zxing-orient\2.1.1\AndroidManifest.xml:138:9-167:20
+ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Bruno\.android\build-cache\b469047939a0730095e85e9967c731ea35f772a5\output\AndroidManifest.xml:138:9-167:20
 	android:stateNotNeeded
-		ADDED from [me.sudar:zxing-orient:2.1.1] E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\me.sudar\zxing-orient\2.1.1\AndroidManifest.xml:140:13-42
+		ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Bruno\.android\build-cache\b469047939a0730095e85e9967c731ea35f772a5\output\AndroidManifest.xml:140:13-42
 	android:name
-		ADDED from [me.sudar:zxing-orient:2.1.1] E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\me.sudar\zxing-orient\2.1.1\AndroidManifest.xml:139:13-81
+		ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Bruno\.android\build-cache\b469047939a0730095e85e9967c731ea35f772a5\output\AndroidManifest.xml:139:13-81
 intent-filter#android.intent.category.DEFAULT+com.google.zxing.client.android.ENCODE
-ADDED from [me.sudar:zxing-orient:2.1.1] E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\me.sudar\zxing-orient\2.1.1\AndroidManifest.xml:141:13-145:29
+ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Bruno\.android\build-cache\b469047939a0730095e85e9967c731ea35f772a5\output\AndroidManifest.xml:141:13-145:29
 action#com.google.zxing.client.android.ENCODE
-ADDED from [me.sudar:zxing-orient:2.1.1] E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\me.sudar\zxing-orient\2.1.1\AndroidManifest.xml:142:17-81
+ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Bruno\.android\build-cache\b469047939a0730095e85e9967c731ea35f772a5\output\AndroidManifest.xml:142:17-81
 	android:name
-		ADDED from [me.sudar:zxing-orient:2.1.1] E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\me.sudar\zxing-orient\2.1.1\AndroidManifest.xml:142:25-78
+		ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Bruno\.android\build-cache\b469047939a0730095e85e9967c731ea35f772a5\output\AndroidManifest.xml:142:25-78
 intent-filter#android.intent.category.DEFAULT+me.sudar.zxing.ENCODE
-ADDED from [me.sudar:zxing-orient:2.1.1] E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\me.sudar\zxing-orient\2.1.1\AndroidManifest.xml:146:13-150:29
+ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Bruno\.android\build-cache\b469047939a0730095e85e9967c731ea35f772a5\output\AndroidManifest.xml:146:13-150:29
 action#me.sudar.zxing.ENCODE
-ADDED from [me.sudar:zxing-orient:2.1.1] E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\me.sudar\zxing-orient\2.1.1\AndroidManifest.xml:147:17-64
+ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Bruno\.android\build-cache\b469047939a0730095e85e9967c731ea35f772a5\output\AndroidManifest.xml:147:17-64
 	android:name
-		ADDED from [me.sudar:zxing-orient:2.1.1] E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\me.sudar\zxing-orient\2.1.1\AndroidManifest.xml:147:25-61
+		ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Bruno\.android\build-cache\b469047939a0730095e85e9967c731ea35f772a5\output\AndroidManifest.xml:147:25-61
 intent-filter#android.intent.action.SEND+android.intent.category.DEFAULT
-ADDED from [me.sudar:zxing-orient:2.1.1] E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\me.sudar\zxing-orient\2.1.1\AndroidManifest.xml:152:13-158:29
+ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Bruno\.android\build-cache\b469047939a0730095e85e9967c731ea35f772a5\output\AndroidManifest.xml:152:13-158:29
 action#android.intent.action.SEND
-ADDED from [me.sudar:zxing-orient:2.1.1] E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\me.sudar\zxing-orient\2.1.1\AndroidManifest.xml:153:17-69
+ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Bruno\.android\build-cache\b469047939a0730095e85e9967c731ea35f772a5\output\AndroidManifest.xml:153:17-69
 	android:name
-		ADDED from [me.sudar:zxing-orient:2.1.1] E:\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_Studio\app\build\intermediates\exploded-aar\me.sudar\zxing-orient\2.1.1\AndroidManifest.xml:153:25-66
+		ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Bruno\.android\build-cache\b469047939a0730095e85e9967c731ea35f772a5\output\AndroidManifest.xml:153:25-66

@@ -11,6 +11,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.savare.R;
 import com.savare.banco.funcoesSql.ItemOrcamentoSql;
@@ -369,36 +370,59 @@ public class EnviarDadosWebserviceAsyncRotinas  extends AsyncTask<Void, Void, Vo
 
                             if (statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO).getAsInt() == HttpURLConnection.HTTP_OK) {
 
-                                dadosCritica.put("STATUS", OrcamentoRotinas.PEDIDO_ENVIADO);
-
-                                totalPedidoEnviado++;
-
-                                inserirUltimaAtualizacao("AEAITORC_ENVIAR");
-                                inserirUltimaAtualizacao("AEAORCAM_ENVIAR");
-
-                                // Cria uma vareavel para salvar o status do pedido
-                                ContentValues dadosPedido = new ContentValues();
-                                dadosPedido.put("STATUS", "RB");
-
-                                ItemOrcamentoSql itemOrcamentoSql = new ItemOrcamentoSql(context);
-
-                                if (itemOrcamentoSql.update(dadosPedido, "AEAITORC.ID_AEAORCAM = " + orcamento.getIdOrcamento()) > 0) {
-                                    OrcamentoSql orcamentoSql = new OrcamentoSql(context);
-
-                                    orcamentoSql.update(dadosPedido, "AEAORCAM.ID_AEAORCAM = " + orcamento.getIdOrcamento());
-
-                                    mLoad.bigTextStyle(context.getResources().getString(R.string.marcando_pedido_enviado_sucesso));
-                                    mLoad.progress().value(0, 0, true).build();
+                                // Checa se retornou alguma coisa
+                                if ((retornoWebservice.has(WSSisinfoWebservice.KEY_OBJECT_OBJECT_RETORNO))) {
+                                    final JsonObject pedidoRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_OBJECT_RETORNO);
+                                    // Atualiza a notificacao
+                                    mLoad.bigTextStyle(context.getResources().getString(R.string.recebendo_dados_orcamento));
+                                    mLoad.progress().value(0, pedidoRetorno.size(), true).build();
 
                                     // Checo se o texto de status foi passado pro parametro
                                     if (textStatus != null) {
                                         ((Activity) context).runOnUiThread(new Runnable() {
                                             public void run() {
-                                                textStatus.setText(context.getResources().getString(R.string.marcando_pedido_enviado_sucesso));
+                                                textStatus.setText(context.getResources().getString(R.string.recebendo_dados_orcamento));
                                             }
                                         });
                                     }
+
+                                    dadosCritica.put("STATUS", OrcamentoRotinas.PEDIDO_ENVIADO);
+
+                                    totalPedidoEnviado++;
+
+                                    inserirUltimaAtualizacao("AEAITORC_ENVIAR");
+                                    inserirUltimaAtualizacao("AEAORCAM_ENVIAR");
+
+                                    // Cria uma vareavel para salvar o status do pedido
+                                    ContentValues dadosPedido = new ContentValues();
+                                    dadosPedido.put("STATUS", "RB");
+
+                                    ItemOrcamentoSql itemOrcamentoSql = new ItemOrcamentoSql(context);
+
+                                    // Atualiza o status de todos os itens do orcamento
+                                    if (itemOrcamentoSql.update(dadosPedido, "AEAITORC.ID_AEAORCAM = " + orcamento.getIdOrcamento()) > 0) {
+                                        // Adiciona o numero do orcamento salvo no banco de dados do sisinfo
+                                        dadosPedido.put("NUMERO", pedidoRetorno.get("numero").getAsInt());
+
+                                        OrcamentoSql orcamentoSql = new OrcamentoSql(context);
+
+                                        orcamentoSql.update(dadosPedido, "AEAORCAM.ID_AEAORCAM = " + orcamento.getIdOrcamento());
+
+                                        mLoad.bigTextStyle(context.getResources().getString(R.string.marcando_pedido_enviado_sucesso));
+                                        mLoad.progress().value(0, 0, true).build();
+
+                                        // Checo se o texto de status foi passado pro parametro
+                                        if (textStatus != null) {
+                                            ((Activity) context).runOnUiThread(new Runnable() {
+                                                public void run() {
+                                                    textStatus.setText(context.getResources().getString(R.string.marcando_pedido_enviado_sucesso));
+                                                }
+                                            });
+                                        }
+                                    }
+
                                 }
+
                             } else {
                                 dadosCritica.put("STATUS", OrcamentoRotinas.PEDIDO_ERRO_ENVIAR);
 

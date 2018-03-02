@@ -12,6 +12,7 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.github.johnpersano.supertoasts.SuperToast;
 import com.github.johnpersano.supertoasts.util.Style;
 import com.google.gson.Gson;
@@ -55,9 +56,11 @@ import com.savare.banco.funcoesSql.TipoDocumentoSql;
 import com.savare.banco.funcoesSql.UltimaAtualizacaoSql;
 import com.savare.banco.funcoesSql.UnidadeVendaSql;
 import com.savare.banco.funcoesSql.UsuarioSQL;
+import com.savare.beans.OrcamentoBeans;
 import com.savare.beans.UltimaAtualizacaoBeans;
 import com.savare.configuracao.ConfiguracoesInternas;
 import com.savare.funcoes.FuncoesPersonalizadas;
+import com.savare.funcoes.rotinas.OrcamentoRotinas;
 import com.savare.funcoes.rotinas.UltimaAtualizacaoRotinas;
 import com.savare.webservice.WSSisinfoWebservice;
 
@@ -71,6 +74,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Random;
+import java.util.UUID;
 import java.util.Vector;
 
 import br.com.goncalves.pugnotification.notification.Load;
@@ -955,7 +959,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 } else {
                     // Cria uma notificacao para ser manipulado
                     Load mLoad = PugNotification.with(context).load()
-                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
+                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                             .smallIcon(R.mipmap.ic_launcher)
                             .largeIcon(R.mipmap.ic_launcher)
                             .title(R.string.recebendo_dados_usuario)
@@ -966,7 +970,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             } else {
                 // Cria uma notificacao para ser manipulado
                 Load mLoad = PugNotification.with(context).load()
-                        .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
+                        .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                         .smallIcon(R.mipmap.ic_launcher)
                         .largeIcon(R.mipmap.ic_launcher)
                         .title(R.string.recebendo_dados)
@@ -1057,37 +1061,31 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                         } else {
                             // Cria uma notificacao para ser manipulado
                             Load mLoad = PugNotification.with(context).load()
-                                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
+                                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                                     .smallIcon(R.mipmap.ic_launcher)
                                     .largeIcon(R.mipmap.ic_launcher)
-                                    .title(R.string.recebendo_dados_usuario)
-                                    .bigTextStyle(context.getResources().getString(R.string.nao_chegou_dados_servidor_empresa) + "\n" + retornoWebservice.toString())
+                                    .title(R.string.msg_error)
+                                    .bigTextStyle(context.getResources().getString(R.string.nao_conseguimos_cadastrar_dispositivo) + "\n" + statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_MENSAGEM_RETORNO).getAsString())
                                     .flags(Notification.DEFAULT_LIGHTS);
                             mLoad.simple().build();
 
-                            // Armazena as informacoes para para serem exibidas e enviadas
-                            final ContentValues contentValues = new ContentValues();
-                            contentValues.put("comando", 0);
-                            contentValues.put("tela", "ReceberDadosWebserviceAsyncRotinas");
-                            contentValues.put("mensagem", "Não conseguimos cadastrar o dispositivo, tente novamente. \n" +
-                                    "Se o erro persistir entre em contato com o suporte SAVARE.");
-                            contentValues.put("dados", "");
-                            // Pega os dados do usuario
-
-                            contentValues.put("usuario", funcoes.getValorXml("Usuario"));
-                            contentValues.put("empresa", funcoes.getValorXml("ChaveEmpresa"));
-                            contentValues.put("email", funcoes.getValorXml("Email"));
-
+                            final JsonObject finalStatuRetorno = statuRetorno;
                             ((Activity) context).runOnUiThread(new Runnable() {
                                 public void run() {
-                                    funcoes.menssagem(contentValues);
+                                    textStatus.setText(R.string.nao_conseguimos_cadastrar_dispositivo);
+
+                                    new MaterialDialog.Builder(context)
+                                            .title("ReceberDadosWebserviceAsyncRotinas")
+                                            .content(context.getResources().getString(R.string.nao_conseguimos_cadastrar_dispositivo) + "\n" +  (finalStatuRetorno != null ? finalStatuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_MENSAGEM_RETORNO).getAsString() : ""))
+                                            .positiveText(R.string.button_ok)
+                                            .show();
                                 }
                             });
                         }
                     } else {
                         // Cria uma notificacao para ser manipulado
                         Load mLoad = PugNotification.with(context).load()
-                                .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
+                                .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                                 .smallIcon(R.mipmap.ic_launcher)
                                 .largeIcon(R.mipmap.ic_launcher)
                                 .title(R.string.recebendo_dados)
@@ -1099,7 +1097,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             } else {
                 // Cria uma notificacao para ser manipulado
                 Load mLoad = PugNotification.with(context).load()
-                        .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
+                        .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                         .smallIcon(R.mipmap.ic_launcher)
                         .largeIcon(R.mipmap.ic_launcher)
                         .title(R.string.recebendo_dados_usuario)
@@ -1344,7 +1342,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                             }
                             // Cria uma notificacao para ser manipulado
                             Load mLoad = PugNotification.with(context).load()
-                                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
+                                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                                     .smallIcon(R.mipmap.ic_launcher)
                                     .largeIcon(R.mipmap.ic_launcher)
                                     .title(R.string.recebendo_dados_usuario)
@@ -1356,7 +1354,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                     } else {
                         // Cria uma notificacao para ser manipulado
                         Load mLoad = PugNotification.with(context).load()
-                                .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
+                                .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                                 .smallIcon(R.mipmap.ic_launcher)
                                 .largeIcon(R.mipmap.ic_launcher)
                                 .title(R.string.recebendo_dados_usuario)
@@ -1375,7 +1373,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 } else {
                     // Cria uma notificacao para ser manipulado
                     Load mLoad = PugNotification.with(context).load()
-                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
+                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                             .smallIcon(R.mipmap.ic_launcher)
                             .largeIcon(R.mipmap.ic_launcher)
                             .title(R.string.recebendo_dados)
@@ -1570,7 +1568,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                 } else {
                                     // Cria uma notificacao para ser manipulado
                                     Load mLoad = PugNotification.with(context).load()
-                                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
+                                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                                             .smallIcon(R.mipmap.ic_launcher)
                                             .largeIcon(R.mipmap.ic_launcher)
                                             .title(R.string.recebendo_dados_empresa)
@@ -1588,7 +1586,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                                 // Cria uma notificacao para ser manipulado
                                 Load mLoad = PugNotification.with(context).load()
-                                        .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
+                                        .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                                         .smallIcon(R.mipmap.ic_launcher)
                                         .largeIcon(R.mipmap.ic_launcher)
                                         .title(R.string.recebendo_dados)
@@ -1605,7 +1603,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 } else {
                     // Cria uma notificacao para ser manipulado
                     Load mLoad = PugNotification.with(context).load()
-                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
+                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                             .smallIcon(R.mipmap.ic_launcher)
                             .largeIcon(R.mipmap.ic_launcher)
                             .title(R.string.recebendo_dados)
@@ -1780,7 +1778,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                 } else {
                                     // Cria uma notificacao para ser manipulado
                                     Load mLoad = PugNotification.with(context).load()
-                                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
+                                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                                             .smallIcon(R.mipmap.ic_launcher)
                                             .largeIcon(R.mipmap.ic_launcher)
                                             .title(R.string.recebendo_dados_areas)
@@ -1798,7 +1796,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                                 // Cria uma notificacao para ser manipulado
                                 Load mLoad = PugNotification.with(context).load()
-                                        .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
+                                        .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                                         .smallIcon(R.mipmap.ic_launcher)
                                         .largeIcon(R.mipmap.ic_launcher)
                                         .title(R.string.recebendo_dados)
@@ -1815,7 +1813,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 } else {
                     // Cria uma notificacao para ser manipulado
                     Load mLoad = PugNotification.with(context).load()
-                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
+                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                             .smallIcon(R.mipmap.ic_launcher)
                             .largeIcon(R.mipmap.ic_launcher)
                             .title(R.string.recebendo_dados)
@@ -1991,7 +1989,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                 } else {
                                     // Cria uma notificacao para ser manipulado
                                     Load mLoad = PugNotification.with(context).load()
-                                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
+                                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                                             .smallIcon(R.mipmap.ic_launcher)
                                             .largeIcon(R.mipmap.ic_launcher)
                                             .title(R.string.recebendo_dados_atividade)
@@ -2009,7 +2007,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                                 // Cria uma notificacao para ser manipulado
                                 Load mLoad = PugNotification.with(context).load()
-                                        .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
+                                        .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                                         .smallIcon(R.mipmap.ic_launcher)
                                         .largeIcon(R.mipmap.ic_launcher)
                                         .title(R.string.recebendo_dados)
@@ -2026,7 +2024,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 } else {
                     // Cria uma notificacao para ser manipulado
                     Load mLoad = PugNotification.with(context).load()
-                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
+                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                             .smallIcon(R.mipmap.ic_launcher)
                             .largeIcon(R.mipmap.ic_launcher)
                             .title(R.string.recebendo_dados)
@@ -2214,7 +2212,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                 } else {
                                     // Cria uma notificacao para ser manipulado
                                     Load mLoad = PugNotification.with(context).load()
-                                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
+                                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                                             .smallIcon(R.mipmap.ic_launcher)
                                             .largeIcon(R.mipmap.ic_launcher)
                                             .title(R.string.versao_savare_desatualizada)
@@ -2232,7 +2230,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                                 // Cria uma notificacao para ser manipulado
                                 Load mLoad = PugNotification.with(context).load()
-                                        .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
+                                        .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                                         .smallIcon(R.mipmap.ic_launcher)
                                         .largeIcon(R.mipmap.ic_launcher)
                                         .title(R.string.recebendo_dados)
@@ -2249,7 +2247,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 } else {
                     // Cria uma notificacao para ser manipulado
                     Load mLoad = PugNotification.with(context).load()
-                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
+                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                             .smallIcon(R.mipmap.ic_launcher)
                             .largeIcon(R.mipmap.ic_launcher)
                             .title(R.string.recebendo_dados)
@@ -2426,7 +2424,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                 } else {
                                     // Cria uma notificacao para ser manipulado
                                     Load mLoad = PugNotification.with(context).load()
-                                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
+                                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                                             .smallIcon(R.mipmap.ic_launcher)
                                             .largeIcon(R.mipmap.ic_launcher)
                                             .title(R.string.versao_savare_desatualizada)
@@ -2437,7 +2435,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                             } else {
                                 // Cria uma notificacao para ser manipulado
                                 Load mLoad = PugNotification.with(context).load()
-                                        .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
+                                        .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                                         .smallIcon(R.mipmap.ic_launcher)
                                         .largeIcon(R.mipmap.ic_launcher)
                                         .title(R.string.recebendo_dados_parcela)
@@ -2459,7 +2457,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 } else {
                     // Cria uma notificacao para ser manipulado
                     Load mLoad = PugNotification.with(context).load()
-                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
+                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                             .smallIcon(R.mipmap.ic_launcher)
                             .largeIcon(R.mipmap.ic_launcher)
                             .title(R.string.recebendo_dados)
@@ -2630,7 +2628,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                 } else {
                                     // Cria uma notificacao para ser manipulado
                                     Load mLoad = PugNotification.with(context).load()
-                                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
+                                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                                             .smallIcon(R.mipmap.ic_launcher)
                                             .largeIcon(R.mipmap.ic_launcher)
                                             .title(R.string.versao_savare_desatualizada)
@@ -2648,7 +2646,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                                 // Cria uma notificacao para ser manipulado
                                 Load mLoad = PugNotification.with(context).load()
-                                        .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
+                                        .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                                         .smallIcon(R.mipmap.ic_launcher)
                                         .largeIcon(R.mipmap.ic_launcher)
                                         .title(R.string.recebendo_dados)
@@ -2665,7 +2663,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 } else {
                     // Cria uma notificacao para ser manipulado
                     Load mLoad = PugNotification.with(context).load()
-                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
+                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                             .smallIcon(R.mipmap.ic_launcher)
                             .largeIcon(R.mipmap.ic_launcher)
                             .title(R.string.recebendo_dados)
@@ -2844,7 +2842,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                 } else {
                                     // Cria uma notificacao para ser manipulado
                                     Load mLoad = PugNotification.with(context).load()
-                                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
+                                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                                             .smallIcon(R.mipmap.ic_launcher)
                                             .largeIcon(R.mipmap.ic_launcher)
                                             .title(R.string.versao_savare_desatualizada)
@@ -2862,7 +2860,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                                 // Cria uma notificacao para ser manipulado
                                 Load mLoad = PugNotification.with(context).load()
-                                        .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
+                                        .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                                         .smallIcon(R.mipmap.ic_launcher)
                                         .largeIcon(R.mipmap.ic_launcher)
                                         .title(R.string.recebendo_dados)
@@ -2879,7 +2877,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 } else {
                     // Cria uma notificacao para ser manipulado
                     Load mLoad = PugNotification.with(context).load()
-                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
+                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                             .smallIcon(R.mipmap.ic_launcher)
                             .largeIcon(R.mipmap.ic_launcher)
                             .title(R.string.recebendo_dados)
@@ -3056,7 +3054,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                 } else {
                                     // Cria uma notificacao para ser manipulado
                                     Load mLoad = PugNotification.with(context).load()
-                                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
+                                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                                             .smallIcon(R.mipmap.ic_launcher)
                                             .largeIcon(R.mipmap.ic_launcher)
                                             .title(R.string.versao_savare_desatualizada)
@@ -3074,7 +3072,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                                 // Cria uma notificacao para ser manipulado
                                 Load mLoad = PugNotification.with(context).load()
-                                        .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
+                                        .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                                         .smallIcon(R.mipmap.ic_launcher)
                                         .largeIcon(R.mipmap.ic_launcher)
                                         .title(R.string.recebendo_dados)
@@ -3091,7 +3089,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 } else {
                     // Cria uma notificacao para ser manipulado
                     Load mLoad = PugNotification.with(context).load()
-                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
+                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                             .smallIcon(R.mipmap.ic_launcher)
                             .largeIcon(R.mipmap.ic_launcher)
                             .title(R.string.recebendo_dados)
@@ -3270,7 +3268,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                 } else {
                                     // Cria uma notificacao para ser manipulado
                                     Load mLoad = PugNotification.with(context).load()
-                                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
+                                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                                             .smallIcon(R.mipmap.ic_launcher)
                                             .largeIcon(R.mipmap.ic_launcher)
                                             .title(R.string.versao_savare_desatualizada)
@@ -3288,7 +3286,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                                 // Cria uma notificacao para ser manipulado
                                 Load mLoad = PugNotification.with(context).load()
-                                        .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
+                                        .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                                         .smallIcon(R.mipmap.ic_launcher)
                                         .largeIcon(R.mipmap.ic_launcher)
                                         .title(R.string.recebendo_dados)
@@ -3305,7 +3303,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 } else {
                     // Cria uma notificacao para ser manipulado
                     Load mLoad = PugNotification.with(context).load()
-                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
+                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                             .smallIcon(R.mipmap.ic_launcher)
                             .largeIcon(R.mipmap.ic_launcher)
                             .title(R.string.recebendo_dados)
@@ -3475,7 +3473,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                 } else {
                                     // Cria uma notificacao para ser manipulado
                                     Load mLoad = PugNotification.with(context).load()
-                                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
+                                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                                             .smallIcon(R.mipmap.ic_launcher)
                                             .largeIcon(R.mipmap.ic_launcher)
                                             .title(R.string.versao_savare_desatualizada)
@@ -3493,7 +3491,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                                 // Cria uma notificacao para ser manipulado
                                 Load mLoad = PugNotification.with(context).load()
-                                        .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
+                                        .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                                         .smallIcon(R.mipmap.ic_launcher)
                                         .largeIcon(R.mipmap.ic_launcher)
                                         .title(R.string.recebendo_dados)
@@ -3510,7 +3508,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 } else {
                     // Cria uma notificacao para ser manipulado
                     Load mLoad = PugNotification.with(context).load()
-                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
+                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                             .smallIcon(R.mipmap.ic_launcher)
                             .largeIcon(R.mipmap.ic_launcher)
                             .title(R.string.recebendo_dados)
@@ -3554,6 +3552,8 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
             // Pega quando foi a ultima data que recebeu dados
             String ultimaData = pegaUltimaDataAtualizacao("CFAESTAD");
+            String ultimaDataParam = pegaUltimaDataAtualizacao("CFAPARAM");
+            String ultimaDataEnder = pegaUltimaDataAtualizacao("CFAENDER");
             // Cria uma variavel para salvar todos os paramentros em json
             String parametrosWebservice = "";
             String filtraEstadoPorFuncionario =
@@ -3562,9 +3562,33 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                             "AND (CFAPARAM.ID_CFACLIFO_VENDE = (SELECT CLIFO_VENDE.ID_CFACLIFO FROM CFACLIFO CLIFO_VENDE WHERE CLIFO_VENDE.CODIGO_FUN = " + funcoes.getValorXml("CodigoUsuario") + ")))))";
 
             Gson gson = new Gson();
-            if ((ultimaData != null) && (!ultimaData.isEmpty())) {
+            String whereDatas = "";
 
-                parametrosWebservice += "&where= (DT_ALT >= '" + ultimaData + "') AND " + filtraEstadoPorFuncionario;
+            /*if ((ultimaData != null) && (!ultimaData.isEmpty())) {
+                whereDatas += "(DT_ALT >= '" + ultimaData + "') ";
+            }
+            // CHECA SE TEVE ALGUMA ALTERACAO NA TABELA PARAM
+            if ((ultimaDataParam != null) && (!ultimaDataParam.isEmpty())) {
+                if ((!whereDatas.isEmpty()) && (whereDatas.length() > 5)){
+                    whereDatas += " OR ";
+                }
+                whereDatas += "((SELECT CFAPARAM.DT_ALT FROM CFAPARAM WHERE (CFAPARAM.ID_SMAEMPRE = " + funcoes.getValorXml("CodigoEmpresa") + ") \n" +
+                              " AND (CFAPARAM.ID_CFACLIFO_VENDE = (SELECT CLIFO_VENDE.ID_CFACLIFO FROM CFACLIFO CLIFO_VENDE WHERE \n" +
+                              " CLIFO_VENDE.CODIGO_FUN = " + funcoes.getValorXml("CodigoUsuario") + "))) >= '" + ultimaDataParam + "')";
+            }
+            // CHECA SE TEVE ALGUMA ALTERACAO NA TABELA ENDERECO DA LISTA DE CLIENTES DO VENDEDOR
+            if ((ultimaDataEnder != null) && (!ultimaDataEnder.isEmpty())) {
+                if ((!whereDatas.isEmpty()) && (whereDatas.length() > 5)){
+                    whereDatas += " OR ";
+                }
+                whereDatas += "( (SELECT CFAENDER.DT_ALT FROM CFAENDER WHERE \n" +
+                              " CFAENDER.ID_CFACLIFO IN (SELECT CFAPARAM.ID_CFACLIFO FROM CFAPARAM WHERE (CFAPARAM.ID_SMAEMPRE = " + funcoes.getValorXml("CodigoEmpresa") + ") \n" +
+                              " AND (CFAPARAM.ID_CFACLIFO_VENDE = (SELECT CLIFO_VENDE.ID_CFACLIFO FROM CFACLIFO CLIFO_VENDE WHERE \n" +
+                              " CLIFO_VENDE.CODIGO_FUN = " + funcoes.getValorXml("CodigoUsuario") + ")))) >= '" + ultimaDataEnder + "')";
+            }*/
+
+            if ((whereDatas != null) && (!whereDatas.isEmpty())) {
+                parametrosWebservice += "&where= ( " + whereDatas + " ) AND " + filtraEstadoPorFuncionario;
             } else {
                 parametrosWebservice += "&where= " + filtraEstadoPorFuncionario;
             }
@@ -3694,7 +3718,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                 } else {
                                     // Cria uma notificacao para ser manipulado
                                     Load mLoad = PugNotification.with(context).load()
-                                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
+                                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                                             .smallIcon(R.mipmap.ic_launcher)
                                             .largeIcon(R.mipmap.ic_launcher)
                                             .title(R.string.versao_savare_desatualizada)
@@ -3712,7 +3736,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                                 // Cria uma notificacao para ser manipulado
                                 Load mLoad = PugNotification.with(context).load()
-                                        .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
+                                        .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                                         .smallIcon(R.mipmap.ic_launcher)
                                         .largeIcon(R.mipmap.ic_launcher)
                                         .title(R.string.recebendo_dados)
@@ -3729,7 +3753,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 } else {
                     // Cria uma notificacao para ser manipulado
                     Load mLoad = PugNotification.with(context).load()
-                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
+                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                             .smallIcon(R.mipmap.ic_launcher)
                             .largeIcon(R.mipmap.ic_launcher)
                             .title(R.string.recebendo_dados)
@@ -3773,6 +3797,9 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
             // Pega quando foi a ultima data que recebeu dados
             String ultimaData = pegaUltimaDataAtualizacao("CFACIDAD");
+            String ultimaDataParam = pegaUltimaDataAtualizacao("CFAPARAM");
+            String ultimaDataEnder = pegaUltimaDataAtualizacao("CFAENDER");
+            String ultimaDataEstad = pegaUltimaDataAtualizacao("CFAESTAD");
             // Cria uma variavel para salvar todos os paramentros em json
             String parametrosWebservice = "";
             String filtraCidadePorFuncionario =
@@ -3791,9 +3818,37 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                             "WHERE \n" +
                             "CFAPARAM.ID_CFACLIFO_VENDE = (SELECT CFACLIFO_VEND_CIDADE.ID_CFACLIFO FROM CFACLIFO CFACLIFO_VEND_CIDADE WHERE CFACLIFO_VEND_CIDADE.CODIGO_FUN = " + funcoes.getValorXml("CodigoUsuario") + ")";
             Gson gson = new Gson();
-            if ((ultimaData != null) && (!ultimaData.isEmpty())) {
+            String whereDatas = "";
 
-                parametrosWebservice += "&sqlQuery= " + sqlQuery + " AND (CFACIDAD.DT_ALT >= '" + ultimaData + "') ";
+            if ((ultimaData != null) && (!ultimaData.isEmpty())) {
+                whereDatas += "(CFACIDAD.DT_ALT >= '" + ultimaData + "') ";
+
+                // CHECA SE TEVE ALGUMA ALTERACAO NA TABELA PARAM
+                if ((ultimaDataParam != null) && (!ultimaDataParam.isEmpty())) {
+                    if ((!whereDatas.isEmpty()) && (whereDatas.length() > 5)) {
+                        whereDatas += " OR ";
+                    }
+                    whereDatas += "(CFAPARAM.DT_ALT >= '" + ultimaDataParam + "')";
+                }
+                // CHECA SE TEVE ALGUMA ALTERACAO NA TABELA ENDERECO DA LISTA DE CLIENTES DO VENDEDOR
+                if ((ultimaDataEnder != null) && (!ultimaDataEnder.isEmpty())) {
+                    if ((!whereDatas.isEmpty()) && (whereDatas.length() > 5)) {
+                        whereDatas += " OR ";
+                    }
+                    whereDatas += "( CFAENDER.DT_ALT >= '" + ultimaDataEnder + "')";
+                }
+                // CHECA SE TEVE ALGUMA ALTERACAO NA TABELA ESTADO
+                if ((ultimaDataEstad != null) && (!ultimaDataEstad.isEmpty())) {
+                    if ((!whereDatas.isEmpty()) && (whereDatas.length() > 5)) {
+                        whereDatas += " OR ";
+                    }
+                    whereDatas += "( CFAESTAD.DT_ALT >= '" + ultimaDataEstad + "')";
+                }
+            }
+
+            if ((whereDatas != null) && (!whereDatas.isEmpty())) {
+
+                parametrosWebservice += "&sqlQuery= " + sqlQuery + " AND ( " + whereDatas + " ) ";
             } else {
                 parametrosWebservice += "&sqlQuery= " + sqlQuery;
             }
@@ -3916,7 +3971,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                 } else {
                                     // Cria uma notificacao para ser manipulado
                                     Load mLoad = PugNotification.with(context).load()
-                                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
+                                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                                             .smallIcon(R.mipmap.ic_launcher)
                                             .largeIcon(R.mipmap.ic_launcher)
                                             .title(R.string.versao_savare_desatualizada)
@@ -3934,7 +3989,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                                 // Cria uma notificacao para ser manipulado
                                 Load mLoad = PugNotification.with(context).load()
-                                        .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
+                                        .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                                         .smallIcon(R.mipmap.ic_launcher)
                                         .largeIcon(R.mipmap.ic_launcher)
                                         .title(R.string.recebendo_dados)
@@ -3951,7 +4006,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 } else {
                     // Cria uma notificacao para ser manipulado
                     Load mLoad = PugNotification.with(context).load()
-                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
+                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                             .smallIcon(R.mipmap.ic_launcher)
                             .largeIcon(R.mipmap.ic_launcher)
                             .title(R.string.recebendo_dados)
@@ -3977,7 +4032,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
 
     private void importarDadosClifo() {
-        JsonObject statuRetorno = null;
+        JsonObject statuRetorno;
 
         // Atualiza a notificacao
         mLoad.bigTextStyle(context.getResources().getString(R.string.procurando_dados) + " Cliente e Fornecedor");
@@ -3996,22 +4051,35 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
             // Pega quando foi a ultima data que recebeu dados
             String ultimaData = pegaUltimaDataAtualizacao("CFACLIFO");
+            String ultimaDataParam = pegaUltimaDataAtualizacao("CFAPARAM");
+
             // Cria uma variavel para salvar todos os paramentros em json
             String parametrosWebservice = "";
-            String filraClientePorVendedor =
+
+            String filtraClientePorParametro =
+                            "SELECT CFAPARAM.ID_CFACLIFO FROM CFAPARAM WHERE (CFAPARAM.ID_SMAEMPRE = " + funcoes.getValorXml("CodigoEmpresa") + ") AND \n" +
+                            "(CFAPARAM.ID_CFACLIFO_VENDE = (SELECT CLIFO_VENDE.ID_CFACLIFO FROM CFACLIFO CLIFO_VENDE WHERE CLIFO_VENDE.CODIGO_FUN = " + funcoes.getValorXml("CodigoUsuario") + "))  \n";
+
+            // CHECA SE TEVE ALGUMA ALTERACAO NA TABELA PARAM
+            if ((ultimaDataParam != null) && (!ultimaDataParam.isEmpty())) {
+
+                filtraClientePorParametro += " AND (CFAPARAM.DT_ALT >= '" + ultimaDataParam + "')";
+            }
+
+            String filtraClientePorVendedor =
                     "((CFACLIFO.ID_CFACLIFO IN \n" +
-                            "(SELECT CFAPARAM.ID_CFACLIFO FROM CFAPARAM WHERE CFAPARAM.ID_SMAEMPRE = " + funcoes.getValorXml("CodigoEmpresa") + " AND \n" +
-                            "CFAPARAM.ID_CFACLIFO_VENDE = (SELECT CLIFO_VENDE.ID_CFACLIFO FROM CFACLIFO CLIFO_VENDE WHERE CLIFO_VENDE.CODIGO_FUN = " + funcoes.getValorXml("CodigoUsuario") + "))) \n" +
+                            "(" + filtraClientePorParametro + " ) " +
+                            ") \n" +
                             "OR (CFACLIFO.NOME_RAZAO LIKE '%CONSUMIDOR%FINAL%'))";
 
-            Gson gson = new Gson();
             if ((ultimaData != null) && (!ultimaData.isEmpty())) {
 
-                parametrosWebservice += "&where= (DT_ALT >= '" + ultimaData + "') AND " + filraClientePorVendedor;
+                parametrosWebservice += "&where= (CFACLIFO.DT_ALT >= '" + ultimaData + "') OR " + filtraClientePorVendedor;
             } else {
-                parametrosWebservice += "&where= " + filraClientePorVendedor;
+                parametrosWebservice += "&where= " + filtraClientePorVendedor;
             }
             WSSisinfoWebservice webserviceSisInfo = new WSSisinfoWebservice(context);
+            Gson gson = new Gson();
             JsonObject retornoWebservice = gson.fromJson(webserviceSisInfo.executarSelectWebserviceJson(null, WSSisinfoWebservice.FUNCTION_JSON_SELECT_CFACLIFO, WSSisinfoWebservice.METODO_GET, parametrosWebservice, null), JsonObject.class);
 
             if ((retornoWebservice != null) && (retornoWebservice.has(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO))) {
@@ -4283,7 +4351,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                 } else {
                                     // Cria uma notificacao para ser manipulado
                                     Load mLoad = PugNotification.with(context).load()
-                                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
+                                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                                             .smallIcon(R.mipmap.ic_launcher)
                                             .largeIcon(R.mipmap.ic_launcher)
                                             .title(R.string.versao_savare_desatualizada)
@@ -4301,7 +4369,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                                 // Cria uma notificacao para ser manipulado
                                 Load mLoad = PugNotification.with(context).load()
-                                        .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
+                                        .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                                         .smallIcon(R.mipmap.ic_launcher)
                                         .largeIcon(R.mipmap.ic_launcher)
                                         .title(R.string.recebendo_dados)
@@ -4318,7 +4386,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 } else {
                     // Cria uma notificacao para ser manipulado
                     Load mLoad = PugNotification.with(context).load()
-                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
+                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                             .smallIcon(R.mipmap.ic_launcher)
                             .largeIcon(R.mipmap.ic_launcher)
                             .title(R.string.recebendo_dados)
@@ -4377,22 +4445,29 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
             // Pega quando foi a ultima data que recebeu dados
             String ultimaData = pegaUltimaDataAtualizacao("CFAENDER");
+            String ultimaDataParam = pegaUltimaDataAtualizacao("CFAPARAM");
             // Cria uma variavel para salvar todos os paramentros em json
             String parametrosWebservice = "";
-            String filtraEnder =
-                    "(CFAENDER.ID_CFACLIFO IN " +
-                            "(SELECT CFAPARAM.ID_CFACLIFO FROM CFAPARAM WHERE (CFAPARAM.ID_SMAEMPRE = " + funcoes.getValorXml("CodigoEmpresa") + ")\n" +
-                            "AND (CFAPARAM.ID_CFACLIFO_VENDE = " +
-                            "(SELECT CLIFO_VENDE.ID_CFACLIFO FROM CFACLIFO CLIFO_VENDE WHERE CLIFO_VENDE.CODIGO_FUN = " + funcoes.getValorXml("CodigoUsuario") + "))))";
+            String filtraClientePorParametro =
+                    "SELECT CFAPARAM.ID_CFACLIFO FROM CFAPARAM WHERE (CFAPARAM.ID_SMAEMPRE = " + funcoes.getValorXml("CodigoEmpresa") + ") \n" +
+                            "AND (CFAPARAM.ID_CFACLIFO_VENDE = (SELECT CLIFO_VENDE.ID_CFACLIFO FROM CFACLIFO CLIFO_VENDE WHERE CLIFO_VENDE.CODIGO_FUN = " + funcoes.getValorXml("CodigoUsuario") + ")) \n";
 
-            Gson gson = new Gson();
+            // CHECA SE TEVE ALGUMA ALTERACAO NA TABELA PARAM
+            if ((ultimaDataParam != null) && (!ultimaDataParam.isEmpty())) {
+
+                filtraClientePorParametro += " AND (CFAPARAM.DT_ALT >= '" + ultimaDataParam + "')";
+            }
+            String filtraEnder =
+                    "(CFAENDER.ID_CFACLIFO IN (" + filtraClientePorParametro + " ) )";
+
             if ((ultimaData != null) && (!ultimaData.isEmpty())) {
 
-                parametrosWebservice += "&where= (CFAENDER.DT_ALT >= '" + ultimaData + "') AND " + filtraEnder;
+                parametrosWebservice += "&where= (CFAENDER.DT_ALT >= '" + ultimaData + "') OR " + filtraEnder;
             } else {
                 parametrosWebservice += "&where= " + filtraEnder;
             }
             WSSisinfoWebservice webserviceSisInfo = new WSSisinfoWebservice(context);
+            Gson gson = new Gson();
             JsonObject retornoWebservice = gson.fromJson(webserviceSisInfo.executarSelectWebserviceJson(null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_CFAENDER_CUSTOM, WSSisinfoWebservice.METODO_GET, parametrosWebservice, null), JsonObject.class);
 
             if ((retornoWebservice != null) && (retornoWebservice.has(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO))) {
@@ -4540,7 +4615,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                 } else {
                                     // Cria uma notificacao para ser manipulado
                                     Load mLoad = PugNotification.with(context).load()
-                                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
+                                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                                             .smallIcon(R.mipmap.ic_launcher)
                                             .largeIcon(R.mipmap.ic_launcher)
                                             .title(R.string.versao_savare_desatualizada)
@@ -4558,7 +4633,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                                 // Cria uma notificacao para ser manipulado
                                 Load mLoad = PugNotification.with(context).load()
-                                        .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
+                                        .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                                         .smallIcon(R.mipmap.ic_launcher)
                                         .largeIcon(R.mipmap.ic_launcher)
                                         .title(R.string.recebendo_dados)
@@ -4575,7 +4650,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 } else {
                     // Cria uma notificacao para ser manipulado
                     Load mLoad = PugNotification.with(context).load()
-                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
+                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                             .smallIcon(R.mipmap.ic_launcher)
                             .largeIcon(R.mipmap.ic_launcher)
                             .title(R.string.recebendo_dados)
@@ -4786,7 +4861,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                                 dadosParametros.put("DT_PROXIMO_CONTATO", parametroRetorno.get("dtProximoContato").getAsString());
                                             }
                                             if (parametroRetorno.has("atacadoVarejo")) {
-                                                dadosParametros.put("ATACADO_VEREJO", parametroRetorno.get("atacadoVarejo").getAsString());
+                                                dadosParametros.put("ATACADO_VAREJO", parametroRetorno.get("atacadoVarejo").getAsString());
                                             }
                                             if (parametroRetorno.has("vistaPrazo")) {
                                                 dadosParametros.put("VISTA_PRAZO", parametroRetorno.get("vistaPrazo").getAsString());
@@ -4843,7 +4918,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                 } else {
                                     // Cria uma notificacao para ser manipulado
                                     Load mLoad = PugNotification.with(context).load()
-                                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
+                                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                                             .smallIcon(R.mipmap.ic_launcher)
                                             .largeIcon(R.mipmap.ic_launcher)
                                             .title(R.string.versao_savare_desatualizada)
@@ -4861,7 +4936,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                                 // Cria uma notificacao para ser manipulado
                                 Load mLoad = PugNotification.with(context).load()
-                                        .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
+                                        .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                                         .smallIcon(R.mipmap.ic_launcher)
                                         .largeIcon(R.mipmap.ic_launcher)
                                         .title(R.string.recebendo_dados)
@@ -4878,7 +4953,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 } else {
                     // Cria uma notificacao para ser manipulado
                     Load mLoad = PugNotification.with(context).load()
-                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
+                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                             .smallIcon(R.mipmap.ic_launcher)
                             .largeIcon(R.mipmap.ic_launcher)
                             .title(R.string.recebendo_dados)
@@ -4932,7 +5007,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 Gson gson = new Gson();
                 if ((ultimaData != null) && (!ultimaData.isEmpty())) {
 
-                    parametrosWebservice += "&where= (DT_ALT >= '" + ultimaData + "') AND " + filtraFotos + "&size=50";
+                    parametrosWebservice += "&where= (CFAFOTOS.DT_ALT >= '" + ultimaData + "') AND " + filtraFotos + "&size=50";
                 } else {
                     parametrosWebservice += "&where= " + filtraFotos + "&size=50";
                 }
@@ -5033,11 +5108,13 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                                         dadosFotos.put("ID_AEAPRODU", fotosRetorno.get("idAeaprodu").getAsInt());
                                                     }
                                                     if (fotosRetorno.has("foto")) {
-                                                        dadosFotos.put("FOTO", Base64.decode(fotosRetorno.get("foto").getAsString(), Base64.DEFAULT));
-                                                        //byte[] b1 = fotosRetorno.getAsJsonArray("foto").toString().getBytes();
+                                                        //dadosFotos.put("FOTO", Base64.decode(fotosRetorno.get("foto").getAsString(), Base64.DEFAULT));
 
-                                                        //dadosFotos.put("FOTO", Base64.decode(fotosRetorno.getAsJsonArray("foto").toString().getBytes(), Base64.DEFAULT));
-                                                        //dadosFotos.put("FOTO", Base64.decode(fotosRetorno.getAsJsonArray("foto").toString().getBytes(), Base64.DEFAULT));
+                                                        byte[] tmp = new byte[fotosRetorno.getAsJsonArray("foto").size()];
+                                                        for(int j = 0; j < fotosRetorno.getAsJsonArray("foto").size(); j++){
+                                                            tmp[j]=(byte)(((int)fotosRetorno.getAsJsonArray("foto").get(j).getAsInt()) & 0xFF);
+                                                        }
+                                                        dadosFotos.put("FOTO", tmp);
                                                     }
                                                     listaDadosFotos.add(dadosFotos);
                                                 }
@@ -5068,7 +5145,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                     } else {
                                         // Cria uma notificacao para ser manipulado
                                         Load mLoad = PugNotification.with(context).load()
-                                                .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
+                                                .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                                                 .smallIcon(R.mipmap.ic_launcher)
                                                 .largeIcon(R.mipmap.ic_launcher)
                                                 .title(R.string.versao_savare_desatualizada)
@@ -5086,7 +5163,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                                     // Cria uma notificacao para ser manipulado
                                     Load mLoad = PugNotification.with(context).load()
-                                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
+                                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                                             .smallIcon(R.mipmap.ic_launcher)
                                             .largeIcon(R.mipmap.ic_launcher)
                                             .title(R.string.recebendo_dados)
@@ -5103,7 +5180,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                     } else {
                         // Cria uma notificacao para ser manipulado
                         Load mLoad = PugNotification.with(context).load()
-                                .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
+                                .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                                 .smallIcon(R.mipmap.ic_launcher)
                                 .largeIcon(R.mipmap.ic_launcher)
                                 .title(R.string.recebendo_dados)
@@ -5114,7 +5191,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 } else {
                     // Cria uma notificacao para ser manipulado
                     Load mLoad = PugNotification.with(context).load()
-                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
+                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                             .smallIcon(R.mipmap.ic_launcher)
                             .largeIcon(R.mipmap.ic_launcher)
                             .title(R.string.recebendo_dados)
@@ -5150,7 +5227,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
             // Cria uma notificacao para ser manipulado
             Load mLoad = PugNotification.with(context).load()
-                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
+                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                     .smallIcon(R.mipmap.ic_launcher)
                     .largeIcon(R.mipmap.ic_launcher)
                     .title(R.string.recebendo_dados)
@@ -5327,7 +5404,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                 } else {
                                     // Cria uma notificacao para ser manipulado
                                     Load mLoad = PugNotification.with(context).load()
-                                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
+                                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                                             .smallIcon(R.mipmap.ic_launcher)
                                             .largeIcon(R.mipmap.ic_launcher)
                                             .title(R.string.versao_savare_desatualizada)
@@ -5345,7 +5422,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                                 // Cria uma notificacao para ser manipulado
                                 Load mLoad = PugNotification.with(context).load()
-                                        .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
+                                        .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                                         .smallIcon(R.mipmap.ic_launcher)
                                         .largeIcon(R.mipmap.ic_launcher)
                                         .title(R.string.recebendo_dados)
@@ -5362,7 +5439,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 } else {
                     // Cria uma notificacao para ser manipulado
                     Load mLoad = PugNotification.with(context).load()
-                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
+                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                             .smallIcon(R.mipmap.ic_launcher)
                             .largeIcon(R.mipmap.ic_launcher)
                             .title(R.string.recebendo_dados)
@@ -5532,7 +5609,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                 } else {
                                     // Cria uma notificacao para ser manipulado
                                     Load mLoad = PugNotification.with(context).load()
-                                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
+                                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                                             .smallIcon(R.mipmap.ic_launcher)
                                             .largeIcon(R.mipmap.ic_launcher)
                                             .title(R.string.versao_savare_desatualizada)
@@ -5550,7 +5627,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                                 // Cria uma notificacao para ser manipulado
                                 Load mLoad = PugNotification.with(context).load()
-                                        .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
+                                        .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                                         .smallIcon(R.mipmap.ic_launcher)
                                         .largeIcon(R.mipmap.ic_launcher)
                                         .title(R.string.recebendo_dados)
@@ -5567,7 +5644,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 } else {
                     // Cria uma notificacao para ser manipulado
                     Load mLoad = PugNotification.with(context).load()
-                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
+                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                             .smallIcon(R.mipmap.ic_launcher)
                             .largeIcon(R.mipmap.ic_launcher)
                             .title(R.string.recebendo_dados)
@@ -5736,7 +5813,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                 } else {
                                     // Cria uma notificacao para ser manipulado
                                     Load mLoad = PugNotification.with(context).load()
-                                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
+                                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                                             .smallIcon(R.mipmap.ic_launcher)
                                             .largeIcon(R.mipmap.ic_launcher)
                                             .title(R.string.versao_savare_desatualizada)
@@ -5754,7 +5831,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                                 // Cria uma notificacao para ser manipulado
                                 Load mLoad = PugNotification.with(context).load()
-                                        .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
+                                        .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                                         .smallIcon(R.mipmap.ic_launcher)
                                         .largeIcon(R.mipmap.ic_launcher)
                                         .title(R.string.recebendo_dados)
@@ -5771,7 +5848,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 } else {
                     // Cria uma notificacao para ser manipulado
                     Load mLoad = PugNotification.with(context).load()
-                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
+                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                             .smallIcon(R.mipmap.ic_launcher)
                             .largeIcon(R.mipmap.ic_launcher)
                             .title(R.string.recebendo_dados)
@@ -5938,7 +6015,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                 } else {
                                     // Cria uma notificacao para ser manipulado
                                     Load mLoad = PugNotification.with(context).load()
-                                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
+                                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                                             .smallIcon(R.mipmap.ic_launcher)
                                             .largeIcon(R.mipmap.ic_launcher)
                                             .title(R.string.versao_savare_desatualizada)
@@ -5956,7 +6033,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                                 // Cria uma notificacao para ser manipulado
                                 Load mLoad = PugNotification.with(context).load()
-                                        .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
+                                        .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                                         .smallIcon(R.mipmap.ic_launcher)
                                         .largeIcon(R.mipmap.ic_launcher)
                                         .title(R.string.recebendo_dados)
@@ -5973,7 +6050,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 } else {
                     // Cria uma notificacao para ser manipulado
                     Load mLoad = PugNotification.with(context).load()
-                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
+                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                             .smallIcon(R.mipmap.ic_launcher)
                             .largeIcon(R.mipmap.ic_launcher)
                             .title(R.string.recebendo_dados)
@@ -6143,7 +6220,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                 } else {
                                     // Cria uma notificacao para ser manipulado
                                     Load mLoad = PugNotification.with(context).load()
-                                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
+                                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                                             .smallIcon(R.mipmap.ic_launcher)
                                             .largeIcon(R.mipmap.ic_launcher)
                                             .title(R.string.versao_savare_desatualizada)
@@ -6161,7 +6238,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                                 // Cria uma notificacao para ser manipulado
                                 Load mLoad = PugNotification.with(context).load()
-                                        .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
+                                        .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                                         .smallIcon(R.mipmap.ic_launcher)
                                         .largeIcon(R.mipmap.ic_launcher)
                                         .title(R.string.recebendo_dados)
@@ -6178,7 +6255,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 } else {
                     // Cria uma notificacao para ser manipulado
                     Load mLoad = PugNotification.with(context).load()
-                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
+                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                             .smallIcon(R.mipmap.ic_launcher)
                             .largeIcon(R.mipmap.ic_launcher)
                             .title(R.string.recebendo_dados)
@@ -6349,7 +6426,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                 } else {
                                     // Cria uma notificacao para ser manipulado
                                     Load mLoad = PugNotification.with(context).load()
-                                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
+                                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                                             .smallIcon(R.mipmap.ic_launcher)
                                             .largeIcon(R.mipmap.ic_launcher)
                                             .title(R.string.versao_savare_desatualizada)
@@ -6367,7 +6444,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                                 // Cria uma notificacao para ser manipulado
                                 Load mLoad = PugNotification.with(context).load()
-                                        .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
+                                        .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                                         .smallIcon(R.mipmap.ic_launcher)
                                         .largeIcon(R.mipmap.ic_launcher)
                                         .title(R.string.recebendo_dados)
@@ -6384,7 +6461,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 } else {
                     // Cria uma notificacao para ser manipulado
                     Load mLoad = PugNotification.with(context).load()
-                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
+                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                             .smallIcon(R.mipmap.ic_launcher)
                             .largeIcon(R.mipmap.ic_launcher)
                             .title(R.string.recebendo_dados)
@@ -6586,7 +6663,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                 } else {
                                     // Cria uma notificacao para ser manipulado
                                     Load mLoad = PugNotification.with(context).load()
-                                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
+                                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                                             .smallIcon(R.mipmap.ic_launcher)
                                             .largeIcon(R.mipmap.ic_launcher)
                                             .title(R.string.versao_savare_desatualizada)
@@ -6604,7 +6681,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                                 // Cria uma notificacao para ser manipulado
                                 Load mLoad = PugNotification.with(context).load()
-                                        .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
+                                        .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                                         .smallIcon(R.mipmap.ic_launcher)
                                         .largeIcon(R.mipmap.ic_launcher)
                                         .title(R.string.recebendo_dados)
@@ -6621,7 +6698,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 } else {
                     // Cria uma notificacao para ser manipulado
                     Load mLoad = PugNotification.with(context).load()
-                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
+                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                             .smallIcon(R.mipmap.ic_launcher)
                             .largeIcon(R.mipmap.ic_launcher)
                             .title(R.string.recebendo_dados)
@@ -6803,7 +6880,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                 } else {
                                     // Cria uma notificacao para ser manipulado
                                     Load mLoad = PugNotification.with(context).load()
-                                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode() + new Random().nextInt())
+                                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                                             .smallIcon(R.mipmap.ic_launcher)
                                             .largeIcon(R.mipmap.ic_launcher)
                                             .title(R.string.recebendo_dados_preco)
@@ -6821,7 +6898,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                                 // Cria uma notificacao para ser manipulado
                                 Load mLoad = PugNotification.with(context).load()
-                                        .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
+                                        .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                                         .smallIcon(R.mipmap.ic_launcher)
                                         .largeIcon(R.mipmap.ic_launcher)
                                         .title(R.string.recebendo_dados)
@@ -6838,7 +6915,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 } else {
                     // Cria uma notificacao para ser manipulado
                     Load mLoad = PugNotification.with(context).load()
-                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
+                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                             .smallIcon(R.mipmap.ic_launcher)
                             .largeIcon(R.mipmap.ic_launcher)
                             .title(R.string.recebendo_dados)
@@ -6851,7 +6928,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             // Cria uma notificacao para ser manipulado
             PugNotification.with(context)
                     .load()
-                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + e.hashCode() + new Random().nextInt())
+                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + e.hashCode() + new Random().nextInt(100))
                     .title(R.string.importar_dados_recebidos)
                     .bigTextStyle("ImportaDadosPreco - " + e.getMessage())
                     .smallIcon(R.mipmap.ic_launcher)
@@ -7037,7 +7114,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                 } else {
                                     // Cria uma notificacao para ser manipulado
                                     Load mLoad = PugNotification.with(context).load()
-                                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
+                                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                                             .smallIcon(R.mipmap.ic_launcher)
                                             .largeIcon(R.mipmap.ic_launcher)
                                             .title(R.string.versao_savare_desatualizada)
@@ -7055,7 +7132,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                                 // Cria uma notificacao para ser manipulado
                                 Load mLoad = PugNotification.with(context).load()
-                                        .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
+                                        .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                                         .smallIcon(R.mipmap.ic_launcher)
                                         .largeIcon(R.mipmap.ic_launcher)
                                         .title(R.string.recebendo_dados)
@@ -7072,7 +7149,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 } else {
                     // Cria uma notificacao para ser manipulado
                     Load mLoad = PugNotification.with(context).load()
-                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
+                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                             .smallIcon(R.mipmap.ic_launcher)
                             .largeIcon(R.mipmap.ic_launcher)
                             .title(R.string.recebendo_dados)
@@ -7302,7 +7379,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                 } else {
                                     // Cria uma notificacao para ser manipulado
                                     Load mLoad = PugNotification.with(context).load()
-                                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
+                                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                                             .smallIcon(R.mipmap.ic_launcher)
                                             .largeIcon(R.mipmap.ic_launcher)
                                             .title(R.string.versao_savare_desatualizada)
@@ -7320,7 +7397,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                                 // Cria uma notificacao para ser manipulado
                                 Load mLoad = PugNotification.with(context).load()
-                                        .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
+                                        .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                                         .smallIcon(R.mipmap.ic_launcher)
                                         .largeIcon(R.mipmap.ic_launcher)
                                         .title(R.string.recebendo_dados)
@@ -7337,7 +7414,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 } else {
                     // Cria uma notificacao para ser manipulado
                     Load mLoad = PugNotification.with(context).load()
-                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
+                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                             .smallIcon(R.mipmap.ic_launcher)
                             .largeIcon(R.mipmap.ic_launcher)
                             .title(R.string.recebendo_dados)
@@ -7516,7 +7593,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                 } else {
                                     // Cria uma notificacao para ser manipulado
                                     Load mLoad = PugNotification.with(context).load()
-                                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
+                                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                                             .smallIcon(R.mipmap.ic_launcher)
                                             .largeIcon(R.mipmap.ic_launcher)
                                             .title(R.string.versao_savare_desatualizada)
@@ -7534,7 +7611,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                                 // Cria uma notificacao para ser manipulado
                                 Load mLoad = PugNotification.with(context).load()
-                                        .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
+                                        .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                                         .smallIcon(R.mipmap.ic_launcher)
                                         .largeIcon(R.mipmap.ic_launcher)
                                         .title(R.string.recebendo_dados)
@@ -7551,7 +7628,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 } else {
                     // Cria uma notificacao para ser manipulado
                     Load mLoad = PugNotification.with(context).load()
-                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
+                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                             .smallIcon(R.mipmap.ic_launcher)
                             .largeIcon(R.mipmap.ic_launcher)
                             .title(R.string.recebendo_dados)
@@ -7731,7 +7808,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                 } else {
                                     // Cria uma notificacao para ser manipulado
                                     Load mLoad = PugNotification.with(context).load()
-                                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
+                                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                                             .smallIcon(R.mipmap.ic_launcher)
                                             .largeIcon(R.mipmap.ic_launcher)
                                             .title(R.string.versao_savare_desatualizada)
@@ -7749,7 +7826,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                                 // Cria uma notificacao para ser manipulado
                                 Load mLoad = PugNotification.with(context).load()
-                                        .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
+                                        .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                                         .smallIcon(R.mipmap.ic_launcher)
                                         .largeIcon(R.mipmap.ic_launcher)
                                         .title(R.string.recebendo_dados)
@@ -7766,7 +7843,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 } else {
                     // Cria uma notificacao para ser manipulado
                     Load mLoad = PugNotification.with(context).load()
-                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
+                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                             .smallIcon(R.mipmap.ic_launcher)
                             .largeIcon(R.mipmap.ic_launcher)
                             .title(R.string.recebendo_dados)
@@ -7817,29 +7894,422 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
 
             // Pega quando foi a ultima data que recebeu dados
+            String ultimaData = pegaUltimaDataAtualizacao("AEASAIDA_ORC");
+            // Cria uma variavel para salvar todos os paramentros em json
+            String parametrosWebservice = "";
+
+            List<OrcamentoBeans> listaOrcamento = new ArrayList<OrcamentoBeans>();
+
+            OrcamentoRotinas orcamentoRotinas = new OrcamentoRotinas(context);
+            String [] listaTipo = new String[]{ OrcamentoRotinas.PEDIDO_ENVIADO,
+                                                OrcamentoRotinas.PEDIDO_RETORNADO_BLOQUEADO,
+                                                OrcamentoRotinas.PEDIDO_RETORNADO_LIBERADO};
+
+            listaOrcamento = orcamentoRotinas.listaOrcamentoPedido(listaTipo, null, OrcamentoRotinas.ORDEM_DECRESCENTE);
+
+            if ( (listaOrcamento != null) && (listaOrcamento.size() > 0) ) {
+                String whereGuidOrcamento = "(GUID IN (";
+                int controle = 0;
+                for (OrcamentoBeans orcamento : listaOrcamento) {
+                    controle++;
+                    whereGuidOrcamento += "'" + orcamento.getGuid() + "'";
+                    if (controle < listaOrcamento.size()) {
+                        whereGuidOrcamento += ", ";
+                    }
+                }
+                whereGuidOrcamento += ") )";
+
+                if ((ultimaData != null) && (!ultimaData.isEmpty())) {
+                    parametrosWebservice += "&where= ( (DT_ALT >= '" + ultimaData + "') AND " + whereGuidOrcamento + ")";
+                } else {
+                    parametrosWebservice += "&where= " + whereGuidOrcamento;
+                }
+                if (!parametrosWebservice.isEmpty()) {
+                    Gson gson = new Gson();
+                    WSSisinfoWebservice webserviceSisInfo = new WSSisinfoWebservice(context);
+                    JsonObject retornoWebservice = gson.fromJson(webserviceSisInfo.executarSelectWebserviceJson(null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEAORCAM, WSSisinfoWebservice.METODO_GET, parametrosWebservice, null), JsonObject.class);
+
+                    if ((retornoWebservice != null) && (retornoWebservice.has(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO))) {
+                        statuRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO);
+
+                        if (statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO).getAsInt() == HttpURLConnection.HTTP_OK) {
+                            boolean todosSucesso = true;
+
+                            JsonObject pageRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_PAGE_RETORNO);
+
+                            if (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) {
+                                final int totalPages = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt();
+                                int pageNumber = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_PAGE_NUMBER_RETORNO).getAsInt();
+
+                                for (int ia = pageNumber; ia < totalPages; ia++) {
+
+                                    statuRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO);
+
+                                    // Verifica se retornou com sucesso
+                                    if (statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO).getAsInt() == HttpURLConnection.HTTP_OK) {
+                                        // Atualiza a notificacao
+                                        mLoad.bigTextStyle(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
+                                        mLoad.progress().value(0, 0, true).build();
+
+                                        // Checo se o texto de status foi passado pro parametro
+                                        if (textStatus != null) {
+                                            ((Activity) context).runOnUiThread(new Runnable() {
+                                                public void run() {
+                                                    textStatus.setText(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
+                                                }
+                                            });
+                                        }
+                                        // Checa se retornou alguma coisa
+                                        if ((retornoWebservice.has(WSSisinfoWebservice.KEY_OBJECT_OBJECT_RETORNO))) {
+                                            final JsonArray listaPedidoRetorno = retornoWebservice.getAsJsonArray(WSSisinfoWebservice.KEY_OBJECT_OBJECT_RETORNO);
+                                            // Checa se retornou algum dados na lista
+                                            if (listaPedidoRetorno.size() > 0) {
+                                                // Atualiza a notificacao
+                                                mLoad.bigTextStyle(context.getResources().getString(R.string.recebendo_dados_orcamento));
+                                                mLoad.progress().value(0, listaPedidoRetorno.size(), false).build();
+
+                                                // Checo se o texto de status foi passado pro parametro
+                                                if (textStatus != null) {
+                                                    ((Activity) context).runOnUiThread(new Runnable() {
+                                                        public void run() {
+                                                            textStatus.setText(context.getResources().getString(R.string.recebendo_dados_orcamento));
+                                                        }
+                                                    });
+                                                }
+                                                if (progressBarStatus != null) {
+                                                    ((Activity) context).runOnUiThread(new Runnable() {
+                                                        public void run() {
+                                                            progressBarStatus.setIndeterminate(false);
+                                                            progressBarStatus.setMax(listaPedidoRetorno.size());
+                                                        }
+                                                    });
+                                                }
+
+                                                for (int i = 0; i < listaPedidoRetorno.size(); i++) {
+                                                    // Atualiza a notificacao
+                                                    mLoad.bigTextStyle(context.getResources().getString(R.string.recebendo_dados_orcamento) + " - Parte " + (pageNumber + 1) + "/" + totalPages + " - " + i + "/" + listaPedidoRetorno.size());
+                                                    mLoad.progress().update(0, i, listaPedidoRetorno.size(), false).build();
+
+                                                    // Checo se o texto de status foi passado pro parametro
+                                                    if (textStatus != null) {
+                                                        final int finalI1 = i;
+                                                        final int finalPageNumber = pageNumber + 1;
+                                                        ((Activity) context).runOnUiThread(new Runnable() {
+                                                            public void run() {
+                                                                textStatus.setText(context.getResources().getString(R.string.recebendo_dados_orcamento) + " - Parte " + finalPageNumber + "/" + totalPages + " - " + finalI1 + "/" + listaPedidoRetorno.size());
+                                                            }
+                                                        });
+                                                    }
+                                                    if (progressBarStatus != null) {
+                                                        final int finalI = i;
+                                                        ((Activity) context).runOnUiThread(new Runnable() {
+                                                            public void run() {
+                                                                progressBarStatus.setProgress(finalI);
+                                                            }
+                                                        });
+                                                    }
+                                                    JsonObject pedidoRetorno = listaPedidoRetorno.get(i).getAsJsonObject();
+                                                    ContentValues dadosOrcamento = new ContentValues();
+                                                    dadosOrcamento.put("ID_SMAEMPRE", pedidoRetorno.get("idSmaempre").getAsInt());
+                                                    if (pedidoRetorno.has("idCfaclifo") && pedidoRetorno.get("idCfaclifo").getAsInt() > 0) {
+                                                        dadosOrcamento.put("ID_CFACLIFO", pedidoRetorno.get("idCfaclifo").getAsInt());
+                                                    }
+                                                    if (pedidoRetorno.has("idCfaestad") && pedidoRetorno.get("idCfaestad").getAsInt() > 0) {
+                                                        dadosOrcamento.put("ID_CFAESTAD", pedidoRetorno.get("idCfaestad").getAsInt());
+                                                    }
+                                                    if (pedidoRetorno.has("idCfacidad") && pedidoRetorno.get("idCfacidad").getAsInt() > 0) {
+                                                        dadosOrcamento.put("ID_CFACIDAD", pedidoRetorno.get("idCfacidad").getAsInt());
+                                                    }
+                                                    if (pedidoRetorno.has("idAearoman") && pedidoRetorno.get("idAearoman").getAsInt() > 0) {
+                                                        dadosOrcamento.put("ID_AEAROMAN", pedidoRetorno.get("idAearoman").getAsInt());
+                                                    }
+                                                    if (pedidoRetorno.has("idCfatpdoc") && pedidoRetorno.get("idCfatpdoc").getAsInt() > 0) {
+                                                        dadosOrcamento.put("ID_CFATPDOC", pedidoRetorno.get("idCfatpdoc").getAsInt());
+                                                    }
+                                                    //dadosOrcamento.put("GUID", pedidoRetorno.get("guid").getAsString());
+                                                    //dadosOrcamento.put("NUMERO", pedidoRetorno.get("numero").getAsInt());
+                                                    if (pedidoRetorno.has("vlFrete")) {
+                                                        dadosOrcamento.put("VL_FRETE", pedidoRetorno.get("vlFrete").getAsDouble());
+                                                    }
+                                                    if (pedidoRetorno.has("vlSeguro")) {
+                                                        dadosOrcamento.put("VL_SEGURO", pedidoRetorno.get("vlSeguro").getAsDouble());
+                                                    }
+                                                    if (pedidoRetorno.has("vlOutros")) {
+                                                        dadosOrcamento.put("VL_OUTROS", pedidoRetorno.get("vlOutros").getAsDouble());
+                                                    }
+                                                    if (pedidoRetorno.has("vlEncargosFinanceiros")) {
+                                                        dadosOrcamento.put("VL_ENCARGOS_FINANCEIROS", pedidoRetorno.get("vlEncargosFinanceiros").getAsDouble());
+                                                    }
+                                                    if (pedidoRetorno.has("vlTabelaFaturado")) {
+                                                        dadosOrcamento.put("VL_TABELA_FATURADO", pedidoRetorno.get("vlTabelaFaturado").getAsDouble());
+                                                    }
+                                                    if (pedidoRetorno.has("fcVlTotalFaturado")) {
+                                                        dadosOrcamento.put("FC_VL_TOTAL_FATURADO", pedidoRetorno.get("fcVlTotalFaturado").getAsDouble());
+                                                    }
+                                                    dadosOrcamento.put("ATAC_VAREJO", pedidoRetorno.get("atacVarejo").getAsString());
+                                                    if (pedidoRetorno.has("pessoaCliente")) {
+                                                        dadosOrcamento.put("PESSOA_CLIENTE", pedidoRetorno.get("pessoaCliente").getAsString());
+                                                    }
+                                                    if (pedidoRetorno.has("nomeCliente")) {
+                                                        dadosOrcamento.put("NOME_CLIENTE", pedidoRetorno.get("nomeCliente").getAsString());
+                                                    }
+                                                    if (pedidoRetorno.has("ieRgCliente")) {
+                                                        dadosOrcamento.put("IE_RG_CLIENTE", pedidoRetorno.get("ieRgCliente").getAsString());
+                                                    }
+                                                    if (pedidoRetorno.has("cpfCgcCliente")) {
+                                                        dadosOrcamento.put("CPF_CGC_CLIENTE", pedidoRetorno.get("cpfCgcCliente").getAsString());
+                                                    }
+                                                    if (pedidoRetorno.has("enderecoCliente")) {
+                                                        dadosOrcamento.put("ENDERECO_CLIENTE", pedidoRetorno.get("enderecoCliente").getAsString());
+                                                    }
+                                                    if (pedidoRetorno.has("bairroCliente")) {
+                                                        dadosOrcamento.put("BAIRRO_CLIENTE", pedidoRetorno.get("bairroCliente").getAsString());
+                                                    }
+                                                    if (pedidoRetorno.has("cepCliente")) {
+                                                        dadosOrcamento.put("CEP_CLIENTE", pedidoRetorno.get("cepCliente").getAsString());
+                                                    }
+                                                    if (pedidoRetorno.has("obs")) {
+                                                        dadosOrcamento.put("OBS", pedidoRetorno.get("obs").getAsString());
+                                                    }
+                                                    if (pedidoRetorno.has("andamento")) {
+                                                        String situacao = pedidoRetorno.get("andamento").getAsString();
+
+                                                        if (situacao.equalsIgnoreCase("0") || situacao.equalsIgnoreCase("3")) {
+                                                            // Marca o status como retorno liberado
+                                                            dadosOrcamento.put("STATUS", "RL");
+
+                                                        } else if (situacao.equalsIgnoreCase("1")) {
+                                                            // Marca o peiddo como enviado
+                                                            dadosOrcamento.put("STATUS", "N");
+
+                                                        } else if (situacao.equalsIgnoreCase("X") || situacao.equalsIgnoreCase("2")) {
+                                                            // Marca o status como retorno como excluido ou bloqueado
+                                                            dadosOrcamento.put("STATUS", "RB");
+
+                                                        } else if (situacao.equalsIgnoreCase("7")) {
+                                                            // Marca o status como retorno como conferido
+                                                            dadosOrcamento.put("STATUS", "C");
+
+                                                        } else if (situacao.equalsIgnoreCase("8") || situacao.equalsIgnoreCase("9") ||
+                                                                situacao.equalsIgnoreCase("A") || situacao.equalsIgnoreCase("B")) {
+                                                            // Marca o status como retorno como faturado
+                                                            dadosOrcamento.put("STATUS", "F");
+
+                                                        } else if (situacao.equalsIgnoreCase("99")) {
+                                                            // Marca o status como retorno como excluido
+                                                            dadosOrcamento.put("STATUS", "RE");
+
+                                                        } else {
+                                                            dadosOrcamento.put("STATUS", "N");
+                                                        }
+                                                    }
+                                                    if (pedidoRetorno.has("tipoEntrega")) {
+                                                        dadosOrcamento.put("TIPO_ENTREGA", pedidoRetorno.get("tipoEntrega").getAsString());
+                                                    }
+                                                    OrcamentoSql orcamentoSql = new OrcamentoSql(context);
+
+                                                    //if (orcamentoSql.updateFast(dadosOrcamento, "AEAORCAM.GUID = '" + dadosOrcamento.getAsString("GUID") + "'") == 0) {
+                                                    if (orcamentoSql.updateFast(dadosOrcamento, "AEAORCAM.GUID = '" + pedidoRetorno.get("guid").getAsString() + "'") == 0) {
+
+                                                        dadosOrcamento.put("GUID", pedidoRetorno.get("guid").getAsString());
+                                                        dadosOrcamento.put("NUMERO", pedidoRetorno.get("numero").getAsInt());
+
+                                                        if (pedidoRetorno.has("vlTabela")) {
+                                                            dadosOrcamento.put("VL_TABELA", pedidoRetorno.get("vlTabela").getAsDouble());
+                                                            dadosOrcamento.put("VL_MERC_BRUTO", pedidoRetorno.get("vlMercBruto").getAsDouble());
+                                                        }
+                                                        if (pedidoRetorno.has("vlMercCusto")) {
+                                                            dadosOrcamento.put("VL_MERC_CUSTO", pedidoRetorno.get("vlMercCusto").getAsDouble());
+                                                        }
+                                                        if (pedidoRetorno.has("fcVlTotal")) {
+                                                            dadosOrcamento.put("FC_VL_TOTAL", pedidoRetorno.get("fcVlTotal").getAsDouble());
+                                                        }
+                                                        dadosOrcamento.put("DT_CAD", pedidoRetorno.get("dtCad").getAsString());
+                                                        dadosOrcamento.put("DT_ALT", pedidoRetorno.get("dtAlt").getAsString());
+
+                                                        if (orcamentoSql.insertOrReplace(dadosOrcamento) <= 0) {
+                                                            todosSucesso = false;
+                                                        }
+                                                    }
+                                                    for (int j = 0; j < listaOrcamento.size(); j++) {
+                                                        if (listaOrcamento.get(j).getGuid().equalsIgnoreCase(pedidoRetorno.get("guid").getAsString())){
+                                                            listaOrcamento.remove(j);
+                                                            break;
+                                                        }
+                                                    }
+                                                } // Fim do for
+                                            }
+                                            // Atualiza a notificacao
+                                            mLoad.bigTextStyle(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
+                                            mLoad.progress().value(0, 0, true).build();
+
+                                            // Checo se o texto de status foi passado pro parametro
+                                            if (textStatus != null) {
+                                                ((Activity) context).runOnUiThread(new Runnable() {
+                                                    public void run() {
+                                                        textStatus.setText(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
+                                                    }
+                                                });
+                                            }
+                                            if (progressBarStatus != null) {
+                                                ((Activity) context).runOnUiThread(new Runnable() {
+                                                    public void run() {
+                                                        progressBarStatus.setIndeterminate(true);
+                                                    }
+                                                });
+                                            }
+                                        } else {
+                                            // Cria uma notificacao para ser manipulado
+                                            Load mLoad = PugNotification.with(context).load()
+                                                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
+                                                    .smallIcon(R.mipmap.ic_launcher)
+                                                    .largeIcon(R.mipmap.ic_launcher)
+                                                    .title(R.string.versao_savare_desatualizada)
+                                                    .bigTextStyle(context.getResources().getString(R.string.nao_chegou_dados_servidor_empresa) + "\n" + retornoWebservice.toString())
+                                                    .flags(Notification.DEFAULT_LIGHTS);
+                                            mLoad.simple().build();
+                                        }
+                                        // Incrementa o total de paginas
+                                        pageNumber++;
+                                        if (pageNumber < totalPages) {
+                                            retornoWebservice = gson.fromJson(webserviceSisInfo.executarSelectWebserviceJson(null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEAORCAM, WSSisinfoWebservice.METODO_GET, parametrosWebservice + "&pageNumber=" + pageNumber, null), JsonObject.class);
+                                        }
+                                    } else {
+                                        todosSucesso = false;
+
+                                        // Cria uma notificacao para ser manipulado
+                                        Load mLoad = PugNotification.with(context).load()
+                                                .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
+                                                .smallIcon(R.mipmap.ic_launcher)
+                                                .largeIcon(R.mipmap.ic_launcher)
+                                                .title(R.string.recebendo_dados)
+                                                .bigTextStyle(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString())
+                                                .flags(Notification.DEFAULT_LIGHTS);
+                                        mLoad.simple().build();
+                                    }
+                                } // Fim do for ia (page)
+                                if (todosSucesso) {
+                                    inserirUltimaAtualizacao("AEASAIDA_ORC");
+                                }
+                            }
+                        } else {
+                            // Cria uma notificacao para ser manipulado
+                            Load mLoad = PugNotification.with(context).load()
+                                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
+                                    .smallIcon(R.mipmap.ic_launcher)
+                                    .largeIcon(R.mipmap.ic_launcher)
+                                    .title(R.string.recebendo_dados)
+                                    .bigTextStyle(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.get(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO))
+                                    .flags(Notification.DEFAULT_LIGHTS);
+                            mLoad.simple().build();
+                        }
+                    }
+                }
+                importarDadosPedido(listaOrcamento);
+            }
+        } catch (Exception e) {
+            // Cria uma notificacao para ser manipulado
+            PugNotification.with(context)
+                    .load()
+                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + e.hashCode())
+                    .title(R.string.importar_dados_recebidos)
+                    .bigTextStyle("ImportarDadosOrcamento - " + e.getMessage())
+                    .smallIcon(R.mipmap.ic_launcher)
+                    .largeIcon(R.mipmap.ic_launcher)
+                    .flags(Notification.DEFAULT_ALL)
+                    .simple()
+                    .build();
+        }
+    }
+
+
+    /**
+     * Pega os dados do pedido que foi enviado pelo dispositivo.
+     * Ou seja, pelo numero do orcamento eh pego os dados depois que o orcamento eh transformado
+     * em pedido.
+     */
+    private void importarDadosPedido(List<OrcamentoBeans> listaPedidosDispositivo) {
+        JsonObject statuRetorno = null;
+
+        // Atualiza a notificacao
+        mLoad.bigTextStyle(context.getResources().getString(R.string.procurando_dados) + " Pedido");
+        mLoad.progress().value(0, 0, true).build();
+
+        // Checo se o texto de status foi passado pro parametro
+        if (textStatus != null) {
+            ((Activity) context).runOnUiThread(new Runnable() {
+                public void run() {
+                    textStatus.setText(context.getResources().getString(R.string.procurando_dados) + " Pedido");
+                }
+            });
+        }
+        if (progressBarStatus != null) {
+            ((Activity) context).runOnUiThread(new Runnable() {
+                public void run() {
+                    progressBarStatus.setIndeterminate(true);
+                }
+            });
+        }
+        try {
+            FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
+
+            // Pega quando foi a ultima data que recebeu dados
             String ultimaData = pegaUltimaDataAtualizacao("AEASAIDA");
             // Cria uma variavel para salvar todos os paramentros em json
             String parametrosWebservice = "";
 
-            Gson gson = new Gson();
-            if ((ultimaData != null) && (!ultimaData.isEmpty())) {
+            List<OrcamentoBeans> listaOrcamento = new ArrayList<OrcamentoBeans>();
 
-                parametrosWebservice += "&where= (DT_ALT >= '" + ultimaData + "') AND " +
-                        "(AEASAIDA.ID_CFACLIFO_VENDEDOR_INI = (SELECT CFACLIFO.ID_CFACLIFO FROM CFACLIFO WHERE CFACLIFO.CODIGO_FUN = " + funcoes.getValorXml("CodigoUsuario") + "))";
+            if ((listaPedidosDispositivo != null) && (listaPedidosDispositivo.size() > 0)){
+                listaOrcamento = listaPedidosDispositivo;
+
+            } else if(listaPedidosDispositivo == null) {
+                OrcamentoRotinas orcamentoRotinas = new OrcamentoRotinas(context);
+                String[] listaTipo = new String[]{  OrcamentoRotinas.PEDIDO_ENVIADO,
+                                                    OrcamentoRotinas.PEDIDO_RETORNADO_BLOQUEADO,
+                                                    OrcamentoRotinas.PEDIDO_RETORNADO_LIBERADO};
+
+                listaOrcamento = orcamentoRotinas.listaOrcamentoPedido(listaTipo, null, OrcamentoRotinas.ORDEM_DECRESCENTE);
             }
-            if ((listaGuidOrcamento != null) && (listaGuidOrcamento.size() > 0)) {
-                parametrosWebservice += " AND (GUID IN(";
+
+            String whereGuidOrcamento = "";
+
+            if ( (listaOrcamento != null) && (listaOrcamento.size() > 0) ) {
+                whereGuidOrcamento = "( (SERIE_ORC = (SELECT AEASERIE.CODIGO FROM SMAEMPRE, AEASERIE WHERE (SMAEMPRE.ID_AEASERIE_ORC_PALM = AEASERIE.ID_AEASERIE) " +
+                                     "AND (SMAEMPRE.ID_SMAEMPRE = " + funcoes.getValorXml("CodigoEmpresa") + "))) AND " +
+                                     "(NUMERO_ORC IN (";
                 int controle = 0;
-                for (String guid : listaGuidOrcamento) {
+                for (OrcamentoBeans orcamento : listaOrcamento) {
                     controle++;
-                    parametrosWebservice += "'" + guid + "'";
-                    if (controle < listaGuidOrcamento.size()) {
-                        parametrosWebservice += ", ";
+                    whereGuidOrcamento += orcamento.getNumero();
+                    if (controle < listaOrcamento.size()) {
+                        whereGuidOrcamento += ", ";
                     }
                 }
-                parametrosWebservice += " ))";
+                whereGuidOrcamento += ")) )";
             }
+
+            if ((ultimaData != null) && (!ultimaData.isEmpty()) && (!whereGuidOrcamento.isEmpty())) {
+                /*parametrosWebservice += "&where=  ( (DT_ALT >= '" + ultimaData + "' ) AND " +
+                                        // Pega todas as vendas feito para o vendedor a partir de uma data
+                                        "(AEASAIDA.ID_CFACLIFO_VENDEDOR_INI = (SELECT ID_CFACLIFO FROM CFACLIFO WHERE CFACLIFO.CODIGO_FUN = " + funcoes.getValorXml("CodigoUsuario") + ")) AND " +
+                                        "(AEASAIDA.ID_CFACLIFO IS NOT NULL) AND (AEASAIDA.ID_CFACIDAD IS NOT NULL) ) \n";;
+                if (!whereGuidOrcamento.isEmpty()){
+                    parametrosWebservice += " OR ( (DT_ALT >= '" + ultimaData + "') AND " + whereGuidOrcamento + ")";
+                }*/
+                //Cria where para pegar os pedidos que foi enviado pelo vendedor e que teve alteração a partir de uma data
+                parametrosWebservice += "&where= (DT_ALT >= '" + ultimaData + "') AND " + whereGuidOrcamento;
+
+            } else if (!whereGuidOrcamento.isEmpty()) {
+                //Cria where para pegar os pedidos que foi enviado pelo vendedor
+                parametrosWebservice += "&where= " + whereGuidOrcamento;
+            } else {
+                return;
+            }
+
+            // Verifica se teve algum parametro
             if (!parametrosWebservice.isEmpty()) {
+                Gson gson = new Gson();
                 WSSisinfoWebservice webserviceSisInfo = new WSSisinfoWebservice(context);
                 JsonObject retornoWebservice = gson.fromJson(webserviceSisInfo.executarSelectWebserviceJson(null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEASAIDA, WSSisinfoWebservice.METODO_GET, parametrosWebservice, null), JsonObject.class);
 
@@ -7847,8 +8317,6 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                     statuRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO);
 
                     if (statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO).getAsInt() == HttpURLConnection.HTTP_OK) {
-                        //JsonObject objectRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_OBJECT_RETORNO);
-
                         boolean todosSucesso = true;
 
                         JsonObject pageRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_PAGE_RETORNO);
@@ -7966,8 +8434,8 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                                 if (pedidoRetorno.has("pessoaCliente")) {
                                                     dadosOrcamento.put("PESSOA_CLIENTE", pedidoRetorno.get("pessoaCliente").getAsString());
                                                 }
-                                                if (pedidoRetorno.has("nomeRazao")) {
-                                                    dadosOrcamento.put("NOME_CLIENTE", pedidoRetorno.get("nomeRazao").getAsString());
+                                                if (pedidoRetorno.has("nomeCliente")) {
+                                                    dadosOrcamento.put("NOME_CLIENTE", pedidoRetorno.get("nomeCliente").getAsString());
                                                 }
                                                 if (pedidoRetorno.has("ieRgCliente")) {
                                                     dadosOrcamento.put("IE_RG_CLIENTE", pedidoRetorno.get("ieRgCliente").getAsString());
@@ -8016,19 +8484,23 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                                         dadosOrcamento.put("STATUS", "RE");
 
                                                     } else {
-                                                        dadosOrcamento.put("STATUS", "N");
+                                                        dadosOrcamento.put("STATUS", "F");
                                                     }
+                                                } else {
+                                                    dadosOrcamento.put("STATUS", "F");
                                                 }
                                                 if (pedidoRetorno.has("tipoEntrega")) {
                                                     dadosOrcamento.put("TIPO_ENTREGA", pedidoRetorno.get("tipoEntrega").getAsString());
                                                 }
                                                 OrcamentoSql orcamentoSql = new OrcamentoSql(context);
 
-                                                //if (orcamentoSql.updateFast(dadosOrcamento, "AEAORCAM.GUID = '" + dadosOrcamento.getAsString("GUID") + "'") == 0) {
-                                                if (orcamentoSql.updateFast(dadosOrcamento, "AEAORCAM.GUID = '" + dadosOrcamento.getAsString("GUID") + "'") == 0) {
+                                                if (orcamentoSql.updateFast(dadosOrcamento, "AEAORCAM.NUMERO = " + pedidoRetorno.get("numeroOrc") ) == 0) {
 
-                                                    if (pedidoRetorno.has("vlTabela")) {
-                                                        dadosOrcamento.put("VL_TABELA", pedidoRetorno.get("vlTabela").getAsDouble());
+                                                    if (pedidoRetorno.has("vlMercTabela")) {
+                                                        dadosOrcamento.put("VL_TABELA", pedidoRetorno.get("vlMercTabela").getAsDouble());
+                                                        dadosOrcamento.put("VL_TABELA_FATURADO", pedidoRetorno.get("vlMercTabela").getAsDouble());
+                                                    }
+                                                    if (pedidoRetorno.has("vlMercBruto")) {
                                                         dadosOrcamento.put("VL_MERC_BRUTO", pedidoRetorno.get("vlMercBruto").getAsDouble());
                                                     }
                                                     if (pedidoRetorno.has("vlMercCusto")) {
@@ -8036,6 +8508,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                                     }
                                                     if (pedidoRetorno.has("fcVlTotal")) {
                                                         dadosOrcamento.put("FC_VL_TOTAL", pedidoRetorno.get("fcVlTotal").getAsDouble());
+                                                        dadosOrcamento.put("FC_VL_TOTAL_FATURADO", pedidoRetorno.get("fcVlTotal").getAsDouble());
                                                     }
                                                     dadosOrcamento.put("DT_CAD", pedidoRetorno.get("dtCad").getAsString());
                                                     dadosOrcamento.put("DT_ALT", pedidoRetorno.get("dtAlt").getAsString());
@@ -8068,7 +8541,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                     } else {
                                         // Cria uma notificacao para ser manipulado
                                         Load mLoad = PugNotification.with(context).load()
-                                                .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
+                                                .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                                                 .smallIcon(R.mipmap.ic_launcher)
                                                 .largeIcon(R.mipmap.ic_launcher)
                                                 .title(R.string.versao_savare_desatualizada)
@@ -8086,7 +8559,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                                     // Cria uma notificacao para ser manipulado
                                     Load mLoad = PugNotification.with(context).load()
-                                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
+                                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                                             .smallIcon(R.mipmap.ic_launcher)
                                             .largeIcon(R.mipmap.ic_launcher)
                                             .title(R.string.recebendo_dados)
@@ -8102,7 +8575,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                     } else {
                         // Cria uma notificacao para ser manipulado
                         Load mLoad = PugNotification.with(context).load()
-                                .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
+                                .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                                 .smallIcon(R.mipmap.ic_launcher)
                                 .largeIcon(R.mipmap.ic_launcher)
                                 .title(R.string.recebendo_dados)
@@ -8593,7 +9066,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                 } else {
                                     // Cria uma notificacao para ser manipulado
                                     Load mLoad = PugNotification.with(context).load()
-                                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
+                                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                                             .smallIcon(R.mipmap.ic_launcher)
                                             .largeIcon(R.mipmap.ic_launcher)
                                             .title(R.string.versao_savare_desatualizada)
@@ -8611,7 +9084,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                                 // Cria uma notificacao para ser manipulado
                                 Load mLoad = PugNotification.with(context).load()
-                                        .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
+                                        .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                                         .smallIcon(R.mipmap.ic_launcher)
                                         .largeIcon(R.mipmap.ic_launcher)
                                         .title(R.string.recebendo_dados)
@@ -8628,7 +9101,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 } else {
                     // Cria uma notificacao para ser manipulado
                     Load mLoad = PugNotification.with(context).load()
-                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
+                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                             .smallIcon(R.mipmap.ic_launcher)
                             .largeIcon(R.mipmap.ic_launcher)
                             .title(R.string.recebendo_dados)
@@ -8827,7 +9300,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                 } else {
                                     // Cria uma notificacao para ser manipulado
                                     Load mLoad = PugNotification.with(context).load()
-                                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
+                                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                                             .smallIcon(R.mipmap.ic_launcher)
                                             .largeIcon(R.mipmap.ic_launcher)
                                             .title(R.string.versao_savare_desatualizada)
@@ -8845,7 +9318,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                                 // Cria uma notificacao para ser manipulado
                                 Load mLoad = PugNotification.with(context).load()
-                                        .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
+                                        .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                                         .smallIcon(R.mipmap.ic_launcher)
                                         .largeIcon(R.mipmap.ic_launcher)
                                         .title(R.string.recebendo_dados)
@@ -8862,7 +9335,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 } else {
                     // Cria uma notificacao para ser manipulado
                     Load mLoad = PugNotification.with(context).load()
-                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
+                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                             .smallIcon(R.mipmap.ic_launcher)
                             .largeIcon(R.mipmap.ic_launcher)
                             .title(R.string.recebendo_dados)
@@ -9008,9 +9481,9 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                             if (recomendadoRetorno.has("idCidade") && recomendadoRetorno.get("idCidade").getAsInt() > 0) {
                                                 dadosRecomendado.put("ID_CFACIDAD", recomendadoRetorno.get("idCidade").getAsInt());
                                             }
-                            /*if (recomendadoRetorno.has("idClifoVendedor") && recomendadoRetorno.get("idClifoVendedor").getAsInt() > 0) {
-                                dadosRecomendado.put("ID_CFACLIFO_VENDEDOR", recomendadoRetorno.get("idClifoVendedor").getAsInt());
-                            }*/
+                                            /*if (recomendadoRetorno.has("idClifoVendedor") && recomendadoRetorno.get("idClifoVendedor").getAsInt() > 0) {
+                                                dadosRecomendado.put("ID_CFACLIFO_VENDEDOR", recomendadoRetorno.get("idClifoVendedor").getAsInt());
+                                            }*/
                                             if (recomendadoRetorno.has("idClifo") && recomendadoRetorno.get("idClifo").getAsInt() > 0) {
                                                 dadosRecomendado.put("ID_CFACLIFO", recomendadoRetorno.get("idClifo").getAsInt());
                                             }
@@ -9059,7 +9532,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                 } else {
                                     // Cria uma notificacao para ser manipulado
                                     Load mLoad = PugNotification.with(context).load()
-                                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
+                                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                                             .smallIcon(R.mipmap.ic_launcher)
                                             .largeIcon(R.mipmap.ic_launcher)
                                             .title(R.string.recebendo_dados)
@@ -9077,7 +9550,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                                 // Cria uma notificacao para ser manipulado
                                 Load mLoad = PugNotification.with(context).load()
-                                        .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
+                                        .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                                         .smallIcon(R.mipmap.ic_launcher)
                                         .largeIcon(R.mipmap.ic_launcher)
                                         .title(R.string.recebendo_dados)
@@ -9094,7 +9567,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 } else {
                     // Cria uma notificacao para ser manipulado
                     Load mLoad = PugNotification.with(context).load()
-                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
+                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                             .smallIcon(R.mipmap.ic_launcher)
                             .largeIcon(R.mipmap.ic_launcher)
                             .title(R.string.recebendo_dados)
@@ -9318,7 +9791,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                 } else {
                                     // Cria uma notificacao para ser manipulado
                                     Load mLoad = PugNotification.with(context).load()
-                                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
+                                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                                             .smallIcon(R.mipmap.ic_launcher)
                                             .largeIcon(R.mipmap.ic_launcher)
                                             .title(R.string.recebendo_dados_parcela)
@@ -9336,7 +9809,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                                 // Cria uma notificacao para ser manipulado
                                 Load mLoad = PugNotification.with(context).load()
-                                        .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
+                                        .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                                         .smallIcon(R.mipmap.ic_launcher)
                                         .largeIcon(R.mipmap.ic_launcher)
                                         .title(R.string.recebendo_dados)
@@ -9353,7 +9826,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 } else {
                     // Cria uma notificacao para ser manipulado
                     Load mLoad = PugNotification.with(context).load()
-                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
+                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                             .smallIcon(R.mipmap.ic_launcher)
                             .largeIcon(R.mipmap.ic_launcher)
                             .title(R.string.recebendo_dados)

@@ -653,11 +653,18 @@ public class OrcamentoProdutoMDFragment extends Fragment {
         public boolean onQueryTextSubmit(String query) {
             // Chama a funcao para carregar a lista com todos os produtos
             //criaListaDeProdutos(null, null, 1);
+            if ((query == null) || (query.isEmpty())){
+                SuperToast.create(getContext(), getContext().getResources().getString(R.string.digite_alguma_coisa_pesquisar), SuperToast.Duration.LONG, Style.getStyle(Style.RED, SuperToast.Animations.POPUP)).show();
 
-            adapterItemOrcamento.getFilter().filter(query);
+            } else if ((adapterItemOrcamento == null) || (adapterItemOrcamento.getListaItemOrcamento() == null) || (adapterItemOrcamento.getListaItemOrcamento().size() < 1)){
+                SuperToast.create(getContext(), getContext().getResources().getString(R.string.nao_tem_produtos_orcamento_pedido), SuperToast.Duration.LONG, Style.getStyle(Style.RED, SuperToast.Animations.POPUP)).show();
 
-            // Seta o adapte com a nova lista, com ou sem o filtro
-            adapterItemOrcamento.setListaItemOrcamento(adapterItemOrcamento.getListaItemOrcamento());
+            } else {
+                adapterItemOrcamento.getFilter().filter(query);
+
+                // Seta o adapte com a nova lista, com ou sem o filtro
+                adapterItemOrcamento.setListaItemOrcamento(adapterItemOrcamento.getListaItemOrcamento());
+            }
 
             return false;
         } // Fim do onQueryTextSubmit

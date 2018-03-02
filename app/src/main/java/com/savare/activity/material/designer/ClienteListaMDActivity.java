@@ -46,9 +46,11 @@ public class ClienteListaMDActivity extends AppCompatActivity {
             idOrcamento;
     private Toolbar toolbarCabecalho;
     private boolean pesquisando = false;
+    private int positionSpinnerListaCidade = 0,
+                positionScrollListViewPessoa = 0;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_cliente_lista_md);
 
@@ -205,6 +207,14 @@ public class ClienteListaMDActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        //outState.putInt(KEY_POSITION_SPINNER_LISTA_CIDADE, spinnerListaCidade.getSelectedItemPosition());
+        positionSpinnerListaCidade = spinnerListaCidade.getSelectedItemPosition();
+        positionScrollListViewPessoa = listViewPessoa.getFirstVisiblePosition();
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         //super.onCreateOptionsMenu(menu);
         getMenuInflater().inflate(R.menu.cliente_lista_md, menu);
@@ -295,6 +305,7 @@ public class ClienteListaMDActivity extends AppCompatActivity {
 
             spinnerListaCidade.setAdapter(adapterListaCidade);
         }
+        spinnerListaCidade.setSelection(positionSpinnerListaCidade);
     }
 
     private void recuperaCampo() {
@@ -408,6 +419,7 @@ public class ClienteListaMDActivity extends AppCompatActivity {
                 // Seta o listView com o novo adapter que ja esta com a nova lista
                 listViewPessoa.setAdapter(adapterPessoa);
             }
+            listViewPessoa.setSelection(positionScrollListViewPessoa);
 
         }
     }

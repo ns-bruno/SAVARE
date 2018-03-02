@@ -259,6 +259,7 @@
     <string name="atualizado_sucesso">Atualizado com Sucesso.</string>
     <string name="terminamos_atualizacao">Terminamos a atualização.</string>
     <string name="nao_conseguimos_atualizar_usuario">Não conseguimos atualizar o usuário, tente novamente, se persistir entre em contato com o suporte SAVARE.</string>
+    <string name="nao_conseguimos_cadastrar_dispositivo">Não conseguimos cadastrar o dispositivo, tente novamente, se persistir entre em contato com o suporte SAVARE.</string>
     <string name="nome_login_invalido">Nome de login inválido, tente outro sem espaço e sem caracteres especiais.</string>
     <string name="tamanho_cnpj_cpf_nao_permitido">Tamanho da CNPJ/CPF não é permitida</string>
     <string name="recebendo_dados">Aguarde, Recebendo os dados ...</string>
@@ -341,6 +342,8 @@
     <string name="dispositivo_registrado">Dispositivo registrado com sucesso. Entre em contato com a sua empresa para associar o dispositivo ao seu cadastro.</string>
     <string name="zerado_sucesso">Apagado com sucesso.</string>
     <string name="nao_autorizado">Não autorizado</string>
+    <string name="nao_tem_produtos_orcamento_pedido">Não tem produtos dentro do orçamento/pedido</string>
+    <string name="digite_alguma_coisa_pesquisar">Digite alguma palavra para pesquisar</string>
 
 
     <string-array name="tab_produto_md">

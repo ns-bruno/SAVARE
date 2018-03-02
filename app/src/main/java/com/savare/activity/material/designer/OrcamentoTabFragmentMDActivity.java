@@ -95,7 +95,7 @@ public class OrcamentoTabFragmentMDActivity extends AppCompatActivity {
 
         ParcelaRotinas parcelaRotinas = new ParcelaRotinas(getApplicationContext());
 
-        if ((abertoTitulosPriveiraVez == false) && (parcelaRotinas.listaTitulos(idPessoa, ParcelaRotinas.TITULOS_EM_ABERTO, ParcelaRotinas.RECEBER, null, null).size() > 0)) {
+        if ((abertoTitulosPriveiraVez == false) && (parcelaRotinas.listaTitulos(idPessoa, ParcelaRotinas.TITULOS_EM_ABERTO_VENCIDOS, ParcelaRotinas.RECEBER, null, null).size() > 0)) {
 
             abertoTitulosPriveiraVez = true;
 
