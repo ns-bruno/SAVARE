@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.savare"
-    android:versionCode="1007"
-    android:versionName="1.0.0.7" >
+    android:versionCode="1013"
+    android:versionName="1.0.1.3" >
 
     <uses-sdk
         android:minSdkVersion="15"

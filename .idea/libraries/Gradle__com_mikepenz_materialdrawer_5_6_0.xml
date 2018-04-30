@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="Gradle: com.mikepenz:materialdrawer-5.6.0">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.android/build-cache/6aeccc1b032267f38812d8633986911d88ee207d/output/jars/classes.jar!/" />
+      <root url="file://$USER_HOME$/.android/build-cache/6aeccc1b032267f38812d8633986911d88ee207d/output/res" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

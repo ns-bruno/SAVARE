@@ -330,6 +330,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                                 // Importa os dados
                                 importarDadosClifo();
+                                importarDadosRemoveClifo();
                             }
 
                             // Recebe os dados da tabela CFAENDER
@@ -4053,9 +4054,6 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             String ultimaData = pegaUltimaDataAtualizacao("CFACLIFO");
             String ultimaDataParam = pegaUltimaDataAtualizacao("CFAPARAM");
 
-            // Cria uma variavel para salvar todos os paramentros em json
-            String parametrosWebservice = "";
-
             String filtraClientePorParametro =
                             "SELECT CFAPARAM.ID_CFACLIFO FROM CFAPARAM WHERE (CFAPARAM.ID_SMAEMPRE = " + funcoes.getValorXml("CodigoEmpresa") + ") AND \n" +
                             "(CFAPARAM.ID_CFACLIFO_VENDE = (SELECT CLIFO_VENDE.ID_CFACLIFO FROM CFACLIFO CLIFO_VENDE WHERE CLIFO_VENDE.CODIGO_FUN = " + funcoes.getValorXml("CodigoUsuario") + "))  \n";
@@ -4070,11 +4068,14 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                     "((CFACLIFO.ID_CFACLIFO IN \n" +
                             "(" + filtraClientePorParametro + " ) " +
                             ") \n" +
-                            "OR (CFACLIFO.NOME_RAZAO LIKE '%CONSUMIDOR%FINAL%'))";
+                            "OR ( (CFACLIFO.NOME_RAZAO LIKE '%CONSUMIDOR%FINAL%') " + ((ultimaData != null && !ultimaData.isEmpty()) ? " AND (CFACLIFO.DT_ALT >= '" + ultimaData + "')" : "") + " ))";
+
+            // Cria uma variavel para salvar todos os paramentros em json
+            String parametrosWebservice = "";
 
             if ((ultimaData != null) && (!ultimaData.isEmpty())) {
 
-                parametrosWebservice += "&where= (CFACLIFO.DT_ALT >= '" + ultimaData + "') OR " + filtraClientePorVendedor;
+                parametrosWebservice += "&where= (CFACLIFO.DT_ALT >= '" + ultimaData + "') AND " + filtraClientePorVendedor;
             } else {
                 parametrosWebservice += "&where= " + filtraClientePorVendedor;
             }
@@ -4149,7 +4150,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                                 final int finalPageNumber = pageNumber + 1;
                                                 ((Activity) context).runOnUiThread(new Runnable() {
                                                     public void run() {
-                                                        textStatus.setText(context.getResources().getString(R.string.recebendo_dados_cliente) + " - Parte " + finalPageNumber + "/" + totalPages + " - " + finalI1 + "/" + listaClienteRetorno.size());
+                                                        textStatus.setText(context.getResources().getString(R.string.recebendo_dados_cliente) + " - Parte " + (finalPageNumber + 1) + "/" + totalPages + " - " + finalI1 + "/" + listaClienteRetorno.size());
                                                     }
                                                 });
                                             }
@@ -4381,6 +4382,275 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                         // Checa se todos foram inseridos/atualizados com sucesso
                         if (todosSucesso) {
                             inserirUltimaAtualizacao("CFACLIFO");
+                        }
+                    }
+                } else {
+                    // Cria uma notificacao para ser manipulado
+                    Load mLoad = PugNotification.with(context).load()
+                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
+                            .smallIcon(R.mipmap.ic_launcher)
+                            .largeIcon(R.mipmap.ic_launcher)
+                            .title(R.string.recebendo_dados)
+                            .bigTextStyle(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString())
+                            .flags(Notification.DEFAULT_LIGHTS);
+                    mLoad.simple().build();
+                }
+            }
+        } catch (JsonParseException e) {
+
+            // Cria uma notificacao para ser manipulado
+            PugNotification.with(context)
+                    .load()
+                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + e.hashCode())
+                    .title(R.string.importar_dados_recebidos)
+                    .bigTextStyle("ImportaDadosClifo - " + e.getMessage())
+                    .smallIcon(R.mipmap.ic_launcher)
+                    .largeIcon(R.mipmap.ic_launcher)
+                    .flags(Notification.DEFAULT_ALL)
+                    .simple()
+                    .build();
+        } catch (Exception e) {
+
+            // Cria uma notificacao para ser manipulado
+            PugNotification.with(context)
+                    .load()
+                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + e.hashCode())
+                    .title(R.string.importar_dados_recebidos)
+                    .bigTextStyle("ImportaDadosClifo - " + e.getMessage())
+                    .smallIcon(R.mipmap.ic_launcher)
+                    .largeIcon(R.mipmap.ic_launcher)
+                    .flags(Notification.DEFAULT_ALL)
+                    .simple()
+                    .build();
+        }
+    }
+
+
+    private void importarDadosRemoveClifo() {
+        JsonObject statuRetorno;
+
+        // Atualiza a notificacao
+        mLoad.bigTextStyle(context.getResources().getString(R.string.procurando_dados) + " Remover Cliente e Fornecedor");
+        mLoad.progress().value(0, 0, true).build();
+
+        // Checo se o texto de status foi passado pro parametro
+        if (textStatus != null) {
+            ((Activity) context).runOnUiThread(new Runnable() {
+                public void run() {
+                    textStatus.setText(context.getResources().getString(R.string.procurando_dados) + " Remover Cliente e Fornecedor");
+                }
+            });
+        }
+        try {
+            FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
+
+            // Cria uma variavel para salvar todos os paramentros em json
+            String parametrosWebservice = "";
+
+            String filtraClientePorParametro =
+                    "SELECT CFAPARAM.ID_CFACLIFO FROM CFAPARAM WHERE (CFAPARAM.ID_SMAEMPRE = " + funcoes.getValorXml("CodigoEmpresa") + ") AND \n" +
+                            "(CFAPARAM.ID_CFACLIFO_VENDE = (SELECT CLIFO_VENDE.ID_CFACLIFO FROM CFACLIFO CLIFO_VENDE WHERE CLIFO_VENDE.CODIGO_FUN = " + funcoes.getValorXml("CodigoUsuario") + "))  \n";
+
+            String filtraClientePorVendedor =
+                    "((CFACLIFO.ID_CFACLIFO IN \n" +
+                            "(" + filtraClientePorParametro + " ) " +
+                            ") \n" +
+                            "OR (CFACLIFO.NOME_RAZAO LIKE '%CONSUMIDOR%FINAL%'))";
+
+            parametrosWebservice += "&where= " + filtraClientePorVendedor;
+
+            WSSisinfoWebservice webserviceSisInfo = new WSSisinfoWebservice(context);
+            Gson gson = new Gson();
+            JsonObject retornoWebservice = gson.fromJson(webserviceSisInfo.executarSelectWebserviceJson(null, WSSisinfoWebservice.FUNCTION_JSON_SELECT_CFACLIFO, WSSisinfoWebservice.METODO_GET, parametrosWebservice, null), JsonObject.class);
+
+            if ((retornoWebservice != null) && (retornoWebservice.has(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO))) {
+                statuRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO);
+                // Verifica se retornou com sucesso
+                if (statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO).getAsInt() == HttpURLConnection.HTTP_OK) {
+                    //boolean todosSucesso = true;
+
+                    JsonObject pageRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_PAGE_RETORNO);
+
+                    if (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) {
+                        final int totalPages = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt();
+                        int pageNumber = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_PAGE_NUMBER_RETORNO).getAsInt();
+
+                        List<ContentValues> listaTodosClifo = new ArrayList<ContentValues>();
+
+                        for (int ia = pageNumber; ia < totalPages; ia++) {
+
+                            statuRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO);
+
+                            // Verifica se retornou com sucesso
+                            if (statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO).getAsInt() == HttpURLConnection.HTTP_OK) {
+                                // Atualiza a notificacao
+                                mLoad.bigTextStyle(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
+                                mLoad.progress().value(0, 0, true).build();
+
+                                // Checo se o texto de status foi passado pro parametro
+                                if (textStatus != null) {
+                                    ((Activity) context).runOnUiThread(new Runnable() {
+                                        public void run() {
+                                            textStatus.setText(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
+                                        }
+                                    });
+                                }
+                                // Checa se retornou alguma coisa
+                                if ((retornoWebservice.has(WSSisinfoWebservice.KEY_OBJECT_OBJECT_RETORNO))) {
+                                    final JsonArray listaClienteRetorno = retornoWebservice.getAsJsonArray(WSSisinfoWebservice.KEY_OBJECT_OBJECT_RETORNO);
+                                    // Checa se retornou algum dados na lista
+                                    if (listaClienteRetorno.size() > 0) {
+                                        // Atualiza a notificacao
+                                        mLoad.bigTextStyle(context.getResources().getString(R.string.recebendo_dados_cliente));
+                                        mLoad.progress().value(0, listaClienteRetorno.size(), false).build();
+
+                                        // Checo se o texto de status foi passado pro parametro
+                                        if (textStatus != null) {
+                                            ((Activity) context).runOnUiThread(new Runnable() {
+                                                public void run() {
+                                                    textStatus.setText(context.getResources().getString(R.string.recebendo_dados_cliente));
+                                                }
+                                            });
+                                        }
+                                        if (progressBarStatus != null) {
+                                            ((Activity) context).runOnUiThread(new Runnable() {
+                                                public void run() {
+                                                    progressBarStatus.setIndeterminate(false);
+                                                    progressBarStatus.setMax(listaClienteRetorno.size());
+                                                }
+                                            });
+                                        }
+
+                                        for (int i = 0; i < listaClienteRetorno.size(); i++) {
+                                            // Atualiza a notificacao
+                                            mLoad.bigTextStyle(context.getResources().getString(R.string.recebendo_dados_cliente) + " - Parte " + (pageNumber + 1) + "/" + totalPages + " - " + i + "/" + listaClienteRetorno.size());
+                                            mLoad.progress().update(0, i, listaClienteRetorno.size(), false).build();
+
+                                            // Checo se o texto de status foi passado pro parametro
+                                            if (textStatus != null) {
+                                                final int finalI1 = i;
+                                                final int finalPageNumber = pageNumber + 1;
+                                                ((Activity) context).runOnUiThread(new Runnable() {
+                                                    public void run() {
+                                                        textStatus.setText(context.getResources().getString(R.string.recebendo_dados_cliente) + " - Parte " + finalPageNumber + "/" + totalPages + " - " + finalI1 + "/" + listaClienteRetorno.size());
+                                                    }
+                                                });
+                                            }
+                                            if (progressBarStatus != null) {
+                                                final int finalI = i;
+                                                ((Activity) context).runOnUiThread(new Runnable() {
+                                                    public void run() {
+                                                        progressBarStatus.setProgress(finalI);
+                                                    }
+                                                });
+                                            }
+                                            JsonObject clienteRetorno = listaClienteRetorno.get(i).getAsJsonObject();
+                                            ContentValues dadosClifo = new ContentValues();
+
+                                            dadosClifo.put("ID_CFACLIFO", clienteRetorno.get("idCfaclifo").getAsInt());
+                                            dadosClifo.put("ID_SMAEMPRE", clienteRetorno.get("idSmaempre").getAsInt());
+                                            dadosClifo.put("CPF_CNPJ", clienteRetorno.has("cpfCgc") ? clienteRetorno.get("cpfCgc").getAsString() : "");
+                                            dadosClifo.put("NOME_RAZAO", clienteRetorno.get("nomeRazao").getAsString());
+
+                                            listaTodosClifo.add(dadosClifo);
+                                        }
+                                    }
+                                    // Atualiza a notificacao
+                                    mLoad.bigTextStyle(context.getResources().getString(R.string.vamos_checar_cliente));
+                                    mLoad.progress().value(0, 0, true).build();
+
+                                    // Checo se o texto de status foi passado pro parametro
+                                    if (textStatus != null) {
+                                        ((Activity) context).runOnUiThread(new Runnable() {
+                                            public void run() {
+                                                textStatus.setText(context.getResources().getString(R.string.vamos_checar_cliente));
+                                            }
+                                        });
+                                    }
+                                    if (progressBarStatus != null) {
+                                        ((Activity) context).runOnUiThread(new Runnable() {
+                                            public void run() {
+                                                progressBarStatus.setIndeterminate(true);
+                                            }
+                                        });
+                                    }
+                                } else {
+                                    // Cria uma notificacao para ser manipulado
+                                    Load mLoad = PugNotification.with(context).load()
+                                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
+                                            .smallIcon(R.mipmap.ic_launcher)
+                                            .largeIcon(R.mipmap.ic_launcher)
+                                            .title(R.string.versao_savare_desatualizada)
+                                            .bigTextStyle(context.getResources().getString(R.string.nao_chegou_dados_servidor_empresa) + "\n" + retornoWebservice.toString())
+                                            .flags(Notification.DEFAULT_LIGHTS);
+                                    mLoad.simple().build();
+                                }
+                                // Incrementa o total de paginas
+                                pageNumber++;
+                                if (pageNumber < totalPages) {
+                                    retornoWebservice = gson.fromJson(webserviceSisInfo.executarSelectWebserviceJson(null, WSSisinfoWebservice.FUNCTION_JSON_SELECT_CFACLIFO, WSSisinfoWebservice.METODO_GET, parametrosWebservice + "&pageNumber=" + pageNumber, null), JsonObject.class);
+                                }
+                            } else {
+                                // Cria uma notificacao para ser manipulado
+                                Load mLoad = PugNotification.with(context).load()
+                                        .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
+                                        .smallIcon(R.mipmap.ic_launcher)
+                                        .largeIcon(R.mipmap.ic_launcher)
+                                        .title(R.string.recebendo_dados)
+                                        .bigTextStyle(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString())
+                                        .flags(Notification.DEFAULT_LIGHTS);
+                                mLoad.simple().build();
+                            }
+                        } // Fim do for ia (page)
+                        if ((listaTodosClifo != null) && (listaTodosClifo.size() > 0) ){
+                            PessoaSql pessoaSql = new PessoaSql(context);
+
+                            //Cursor listaClifoApp = pessoaSql.query("CLIENTE = '1' AND CODIGO_CLI IS NOT NULL");
+                            Cursor listaClifoApp = pessoaSql.query(filtraClientePorVendedor);
+
+                            if ((listaClifoApp != null) & (listaClifoApp.getCount() > 0)){
+
+                                if (listaTodosClifo.size() != listaClifoApp.getCount()) {
+
+                                    while (listaClifoApp.moveToNext()) {
+                                        Integer idClifoTab = listaClifoApp.getInt(listaClifoApp.getColumnIndex("ID_CFACLIFO"));
+                                        Boolean naoEstaLista = true;
+
+                                        for (ContentValues v : listaTodosClifo) {
+                                            if (v.getAsInteger("ID_CFACLIFO").equals(idClifoTab)) {
+                                                naoEstaLista = false;
+                                                break;
+                                            } else {
+                                                naoEstaLista = true;
+                                            }
+                                        }
+                                        if (naoEstaLista) {
+                                            pessoaSql.delete("ID_CFACLIFO = " + idClifoTab);
+                                            ParametrosSql parametrosSql = new ParametrosSql(context);
+                                            parametrosSql.delete("ID_CFACLIFO = " + idClifoTab);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        // Atualiza a notificacao
+                        mLoad.bigTextStyle(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
+                        mLoad.progress().value(0, 0, true).build();
+
+                        // Checo se o texto de status foi passado pro parametro
+                        if (textStatus != null) {
+                            ((Activity) context).runOnUiThread(new Runnable() {
+                                public void run() {
+                                    textStatus.setText(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
+                                }
+                            });
+                        }
+                        if (progressBarStatus != null) {
+                            ((Activity) context).runOnUiThread(new Runnable() {
+                                public void run() {
+                                    progressBarStatus.setIndeterminate(true);
+                                }
+                            });
                         }
                     }
                 } else {

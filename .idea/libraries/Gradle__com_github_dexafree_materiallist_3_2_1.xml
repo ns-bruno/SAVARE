@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="Gradle: com.github.dexafree:materiallist-3.2.1">
+    <CLASSES>
+      <root url="file://$USER_HOME$/.android/build-cache/e7a97b62d9bacbb1dda4b6fbdc2c3f230fe87b25/output/res" />
+      <root url="jar://$USER_HOME$/.android/build-cache/e7a97b62d9bacbb1dda4b6fbdc2c3f230fe87b25/output/jars/classes.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.github.dexafree/materiallist/3.2.1/6acd595c779e9caad20843d063da2ea2a125d263/materiallist-3.2.1-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

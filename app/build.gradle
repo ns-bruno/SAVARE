@@ -6,13 +6,13 @@ android {
     compileOptions.encoding = 'UTF-8'
     useLibrary 'org.apache.http.legacy'
 
-    defaultConfig {
+        defaultConfig {
         applicationId "com.savare"
         //vectorDrawables.useSupportLibrary = true
         //minSdkVersion 11
         //targetSdkVersion 21
-        versionCode 1007
-        versionName "1.0.0.7"
+        versionCode 1013
+        versionName "1.0.1.3"
         multiDexEnabled true
     }
 

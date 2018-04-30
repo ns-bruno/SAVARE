@@ -8,6 +8,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -332,7 +333,7 @@ public class OrcamentoProdutoMDFragment extends Fragment {
                 case R.id.menu_orcamento_tab_md_adicionar:
 
                     // Checa se eh um orcamento
-                    if ((tipoOrcamentoPedido.equalsIgnoreCase("O")) || (tipoOrcamentoPedido.equalsIgnoreCase("P"))) {
+                    if ((tipoOrcamentoPedido.equalsIgnoreCase(OrcamentoRotinas.ORCAMENTO))) {
                         // Abre a tela que lista todos os produtos
                         Intent intentOrcamento = new Intent(getContext(), ProdutoListaMDActivity.class);
                         intentOrcamento.putExtra(ProdutoListaMDActivity.KEY_ID_ORCAMENTO, textCodigoOrcamento.getText().toString());
@@ -358,55 +359,13 @@ public class OrcamentoProdutoMDFragment extends Fragment {
                     break;
 
                 case R.id.menu_orcamento_tab_md_enviar_email:
-                    EnviarEmailOrcamentoPedido enviarEmailOrcamentoPedido = new EnviarEmailOrcamentoPedido();
-                    enviarEmailOrcamentoPedido.execute();
-
-                    /*
-                    try {
-                        //Cria novo um ProgressDialogo e exibe
-                        ProgressDialog progress = new ProgressDialog(getActivity());
-                        progress.setMessage("Aguarde, o PDF está sendo Gerado...");
-                        progress.setCancelable(false);
-                        progress.show();
-
-                        GerarPdfRotinas gerarPdfRotinas = new GerarPdfRotinas(getActivity());
-                        // Envia a lista de produtos que pertence ao orcamento
-                        gerarPdfRotinas.setListaItensOrcamento(adapterItemOrcamento.getListaItemOrcamento());
-                        // Envia os dados do orcamento
-                        gerarPdfRotinas.setOrcamento(preencheDadosOrcamento());
-
-                        String retornoCaminho = gerarPdfRotinas.criaArquivoPdf();
-
-                        if (retornoCaminho.length() > 0) {
-                            // Fecha a barra de progresso
-                            progress.dismiss();
-
-                            File arquivo = new File(retornoCaminho);
-
-                            PessoaRotinas pessoaRotinas = new PessoaRotinas(getActivity());
-
-                            Intent dadosEmail = new Intent(Intent.ACTION_SEND);
-                            //dadosEmail.setType("message/rfc822");
-                            dadosEmail.setType("text/plain");
-                            dadosEmail.putExtra(Intent.EXTRA_EMAIL, new String[]{pessoaRotinas.emailPessoa(idPessoa)});
-                            dadosEmail.putExtra(Intent.EXTRA_SUBJECT, "Orçamento/Pedido # " + textCodigoOrcamento.getText());
-                            dadosEmail.putExtra(Intent.EXTRA_STREAM, Uri.parse("file://" + arquivo));
-                            dadosEmail.putExtra(Intent.EXTRA_TEXT, "E-Mail enviado pelo App SAVARE.");
-
-                            try {
-                                startActivity(Intent.createChooser(dadosEmail, "Enviar e-mail..."));
-
-                            } catch (android.content.ActivityNotFoundException ex) {
-                                SuperToast.create(getContext(), getResources().getString(R.string.nao_possivel_compartilhar_arquivo), SuperToast.Duration.LONG, Style.getStyle(Style.RED, SuperToast.Animations.FLYIN)).show();
-                            }
-                        } else {
-                            progress.dismiss();
-                        }
-
-                    } catch (Exception e) {
-
-                    }*/
-
+                    // Checa se tem algum item no pedido/orcamento
+                    if ((adapterItemOrcamento == null) || (adapterItemOrcamento.getListaItemOrcamento() == null) || (adapterItemOrcamento.getListaItemOrcamento().size() < 1)){
+                        SuperToast.create(getContext(), getContext().getResources().getString(R.string.nao_tem_produtos_orcamento_pedido), SuperToast.Duration.LONG, Style.getStyle(Style.RED, SuperToast.Animations.POPUP)).show();
+                    } else {
+                        EnviarEmailOrcamentoPedido enviarEmailOrcamentoPedido = new EnviarEmailOrcamentoPedido();
+                        enviarEmailOrcamentoPedido.execute();
+                    }
                     break;
 
                 case R.id.menu_orcamento_tab_md_pesquisa:
@@ -420,25 +379,25 @@ public class OrcamentoProdutoMDFragment extends Fragment {
                 case R.id.menu_orcamento_tab_md_abrir_pdf:
 
                     try {
-                        //ContentValues dadosOrcamento = new ContentValues();
-                        //dadosOrcamento.put("TIPO_ORCAMENTO", "ORCAMENTO");
+                        if ((adapterItemOrcamento == null) || (adapterItemOrcamento.getListaItemOrcamento() == null) || (adapterItemOrcamento.getListaItemOrcamento().size() < 1)){
+                            SuperToast.create(getContext(), getContext().getResources().getString(R.string.nao_tem_produtos_orcamento_pedido), SuperToast.Duration.LONG, Style.getStyle(Style.RED, SuperToast.Animations.POPUP)).show();
+                        } else {
+                            GerarPdfAsyncRotinas gerarPdfSalvar = new GerarPdfAsyncRotinas(getActivity());
+                            // Seta(envia) os dados do orcamento
+                            gerarPdfSalvar.setOrcamento(preencheDadosOrcamento());
+                            // Seta(envia) a lista de produtos do orcamento
+                            gerarPdfSalvar.setListaItensOrcamento(adapterItemOrcamento.getListaItemOrcamento());
 
-                        GerarPdfAsyncRotinas gerarPdfSalvar = new GerarPdfAsyncRotinas(getActivity());
-                        // Seta(envia) os dados do orcamento
-                        gerarPdfSalvar.setOrcamento(preencheDadosOrcamento());
-                        // Seta(envia) a lista de produtos do orcamento
-                        gerarPdfSalvar.setListaItensOrcamento(adapterItemOrcamento.getListaItemOrcamento());
+                            String caminhoPdf = gerarPdfSalvar.execute("").get();
 
-                        String caminhoPdf = gerarPdfSalvar.execute("").get();
+                            File file = new File(caminhoPdf);
+                            Intent target = new Intent(Intent.ACTION_VIEW);
+                            target.setDataAndType(Uri.fromFile(file), "application/pdf");
+                            target.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
 
-                        File file = new File(caminhoPdf);
-                        Intent target = new Intent(Intent.ACTION_VIEW);
-                        target.setDataAndType(Uri.fromFile(file),"application/pdf");
-                        target.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-
-                        Intent intent = Intent.createChooser(target, "Abrir PDF do Orçamento/Pedido");
-                        startActivity(intent);
-
+                            Intent intent = Intent.createChooser(target, "Abrir PDF do Orçamento/Pedido");
+                            startActivity(intent);
+                        }
                     } catch (Exception e) {
                         //Log.i("thread", e.getMessage());
 

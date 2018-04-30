@@ -127,7 +127,13 @@ public class ListaOrcamentoPedidoMDActivity extends AppCompatActivity{
             this.idPessoa = intentParametro.getString("ID_CFACLIFO");
 
             if (tipoOrcamentoPedido.equalsIgnoreCase(TIPO_PEDIDO_ENVIADO)){
-                tipoPedido = new String[]{"N", "RB", "RL", "RE", "F", "C"};
+                tipoPedido = new String[]{
+                                        TIPO_PEDIDO_ENVIADO,
+                                        TIPO_PEDIDO_RETORNADO_BLOQUEADO,
+                                        TIPO_PEDIDO_RETORNADO_LIBERADO,
+                                        TIPO_PEDIDO_RETORNADO_EXCLUIDO,
+                                        TIPO_PEDIDO_FATURADO,
+                                        ITEM_CONFERIDO};
 
             } else if (tipoOrcamentoPedido.equalsIgnoreCase(TIPO_TODOS_PEDIDO)){
                 tipoPedido = new String[]{
@@ -668,6 +674,16 @@ public class ListaOrcamentoPedidoMDActivity extends AppCompatActivity{
     public boolean onCreateOptionsMenu(Menu menu) {
         //super.onCreateOptionsMenu(menu);
         getMenuInflater().inflate(R.menu.lista_orcamento_md, menu);
+
+        // Checa se eh orcamento
+        if (tipoOrcamentoPedido.equals("O")) {
+
+            menu.findItem(R.id.menu_lista_orcamento_md_enviar_todos_pedidos).setVisible(false);
+            // Checa se eh pedido
+        } else if (tipoOrcamentoPedido.equals("E")) {
+            menu.findItem(R.id.menu_lista_orcamento_md_enviar_todos_pedidos).setVisible(false);
+        }
+
         return super.onCreateOptionsMenu(menu);
     }
 

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
@@ -91,13 +92,15 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom"
                 android:layout_weight="1"
-                android:digits="0123456789,"
+                android:digits="0123456789,-"
                 android:ems="10"
                 android:gravity="right"
                 android:hint="@string/quantidade"
-                android:inputType="numberDecimal"
                 android:imeOptions="actionNext"
-                android:nextFocusForward="@+id/activity_orcamento_produto_detalhes_md_edit_desconto">
+                android:inputType="number|numberDecimal|numberSigned"
+                android:nextFocusForward="@+id/activity_orcamento_produto_detalhes_md_edit_desconto"
+                android:selectAllOnFocus="true">
+
                 <requestFocus />
             </EditText>
         </LinearLayout>
@@ -150,8 +153,10 @@
                 android:ems="10"
                 android:gravity="right"
                 android:hint="@string/unitario_liquido"
-                android:inputType="numberDecimal|numberSigned" >
-            </EditText>
+                android:imeOptions="actionNext"
+                android:inputType="number|numberDecimal|numberSigned"
+                android:nextFocusForward="@+id/activity_orcamento_produto_detalhes_md_edit_total"
+                android:selectAllOnFocus="true"></EditText>
         </LinearLayout>
 
         <LinearLayout
@@ -202,9 +207,9 @@
                 android:ems="10"
                 android:gravity="right"
                 android:hint="@string/desconto"
-                android:inputType="numberDecimal|numberSigned"
+                android:inputType="number|numberDecimal|numberSigned"
                 android:imeOptions="actionNext"
-                android:nextFocusDown="@+id/activity_orcamento_produto_detalhes_md_edit_total"
+                android:nextFocusForward="@+id/activity_orcamento_produto_detalhes_md_edit_valor_desconto"
                 android:selectAllOnFocus="true">
             </EditText>
         </LinearLayout>
@@ -216,7 +221,7 @@
 
             <TextView
                 android:id="@+id/activity_orcamento_produto_detalhes_md_text_valor_desconto_label"
-                android:layout_width="wrap_content"
+                android:layout_width="112dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:gravity="right"
@@ -227,7 +232,7 @@
                 android:id="@+id/activity_orcamento_produto_detalhes_md_text_total_label"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1.5"
+                android:layout_weight="2"
                 android:gravity="right"
                 android:text="@string/total_liquido"
                 android:textColor="@color/cinza_escuro" />
@@ -248,24 +253,23 @@
                 android:ems="10"
                 android:gravity="right"
                 android:hint="@string/valor_desconto"
-                android:inputType="numberDecimal|numberSigned"
                 android:imeOptions="actionNext"
-                android:nextFocusDown="@+id/activity_orcamento_produto_detalhes_md_edit_total"
-                android:selectAllOnFocus="true">
-            </EditText>
+                android:inputType="number|numberDecimal|numberSigned"
+                android:nextFocusForward="@+id/activity_orcamento_produto_detalhes_md_edit_total"
+                android:selectAllOnFocus="true"></EditText>
 
             <EditText
                 android:id="@+id/activity_orcamento_produto_detalhes_md_edit_total"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:digits="0123456789,"
+                android:digits="0123456789,-"
                 android:ems="10"
                 android:gravity="right"
                 android:hint="@string/total_liquido"
-                android:inputType="numberDecimal"
+                android:inputType="number|numberDecimal|numberSigned"
                 android:imeOptions="actionNext"
-                android:nextFocusDown="@+id/activity_orcamento_produto_detalhes_md_edit_observacao"
+                android:nextFocusForward="@+id/activity_orcamento_produto_detalhes_md_edit_observacao"
                 android:selectAllOnFocus="true">
             </EditText>
         </LinearLayout>
