@@ -4,7 +4,6 @@ import java.io.File;
 import java.util.ArrayList;
 
 import android.app.Activity;
-import android.app.Notification;
 import android.content.ContentValues;
 import android.content.Context;
 import android.os.AsyncTask;
@@ -14,14 +13,10 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.savare.R;
-import com.savare.configuracao.ConfiguracoesInternas;
 import com.savare.funcoes.FuncoesPersonalizadas;
 import com.savare.funcoes.rotinas.ImportarDadosTxtRotinas;
 import com.savare.funcoes.rotinas.ReceberArquivoTxtServidorFtpRotinas;
 import com.savare.funcoes.rotinas.UsuarioRotinas;
-
-import br.com.goncalves.pugnotification.notification.PugNotification;
 
 public class ReceberDadosFtpAsyncRotinas extends AsyncTask<String, String, Integer> {
 	
@@ -163,7 +158,7 @@ public class ReceberDadosFtpAsyncRotinas extends AsyncTask<String, String, Integ
 				} else if (telaChamou != TELA_INICIO){
 					mensagem += "Não localizamos o arquivo para receber os dados de atualização.";
 
-					PugNotification.with(context)
+					/*PugNotification.with(context)
 							.load()
 							.identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
 							.title(R.string.receber_todos_dados)
@@ -172,7 +167,7 @@ public class ReceberDadosFtpAsyncRotinas extends AsyncTask<String, String, Integ
 							.largeIcon(R.mipmap.ic_launcher)
 							.flags(Notification.DEFAULT_SOUND)
 							.simple()
-							.build();
+							.build();*/
 				}
 			}
 		
@@ -183,7 +178,7 @@ public class ReceberDadosFtpAsyncRotinas extends AsyncTask<String, String, Integ
 			// Marca que a aplicacao nao esta mais recebendo dados
 			funcoes.setValorXml("RecebendoDados", "N");
 
-			funcoes.criarAlarmeEnviarReceberDadosAutomatico(true, true);
+			//funcoes.criarAlarmeEnviarReceberDadosAutomatico(true, true);
 
 			// Checa se que esta chamando esta classe eh o alarme
 			if(telaChamou != TELA_RECEPTOR_ALARME){
@@ -223,7 +218,7 @@ public class ReceberDadosFtpAsyncRotinas extends AsyncTask<String, String, Integ
 		funcoes.setValorXml("RecebendoDados", "N");
 
 		// Cria navamente o alarme
-		funcoes.criarAlarmeEnviarReceberDadosAutomatico(true, true);
+		//funcoes.criarAlarmeEnviarReceberDadosAutomatico(true, true);
 
 		// Checa se que esta chamando esta classe eh o alarme
 		if( (mensagem != null) && (mensagem.length() > 1) && (telaChamou != TELA_RECEPTOR_ALARME) && (telaChamou != TELA_INICIO)){
@@ -248,7 +243,7 @@ public class ReceberDadosFtpAsyncRotinas extends AsyncTask<String, String, Integ
 			
 			context.sendBroadcast(intent);*/
 		} else if ((mensagem != null) && (mensagem.length() > 1)){
-			PugNotification.with(context)
+			/*PugNotification.with(context)
 					.load()
 					.identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
 					.title(R.string.receber_todos_dados)
@@ -258,7 +253,7 @@ public class ReceberDadosFtpAsyncRotinas extends AsyncTask<String, String, Integ
 					.largeIcon(R.mipmap.ic_launcher)
 					.flags(Notification.DEFAULT_SOUND)
 					.simple()
-					.build();
+					.build();*/
 		}
 	}
 

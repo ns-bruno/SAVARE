@@ -1,6 +1,7 @@
 package com.savare.activity.material.designer.fragment;
 
 import android.content.ContentValues;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.Toolbar;
@@ -11,8 +12,8 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.github.johnpersano.supertoasts.SuperToast;
-import com.github.johnpersano.supertoasts.util.Style;
+import com.github.johnpersano.supertoasts.library.Style;
+import com.github.johnpersano.supertoasts.library.SuperActivityToast;
 import com.savare.R;
 import com.savare.activity.material.designer.OrcamentoTabFragmentMDActivity;
 import com.savare.funcoes.FuncoesPersonalizadas;
@@ -88,7 +89,13 @@ public class OrcamentoObservacaoMDFragment extends Fragment {
                             OrcamentoRotinas orcamentoRotinas = new OrcamentoRotinas(getActivity());
                             // Inseri a obs no banco de dados
                             if (orcamentoRotinas.updateOrcamento(dadosObservacao, textCodigoOrcamento.getText().toString()) > 0){
-                                SuperToast.create(getContext(), getResources().getString(R.string.atualizado_sucesso), SuperToast.Duration.SHORT, Style.getStyle(Style.GREEN, SuperToast.Animations.POPUP)).show();
+                                //SuperActivityToast.create(getActivity(), getResources().getString(R.string.atualizado_sucesso), SuperToast.Duration.SHORT, Style.getStyle(Style.GREEN, SuperToast.Animations.POPUP)).show();
+
+                                SuperActivityToast.create(getActivity(), getResources().getString(R.string.atualizado_sucesso), Style.DURATION_SHORT)
+                                        .setTextColor(Color.WHITE)
+                                        .setColor(Color.GREEN)
+                                        .setAnimations(Style.ANIMATIONS_POP)
+                                        .show();
                             }
                         } else {
                             FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(getActivity());

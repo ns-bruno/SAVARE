@@ -20,7 +20,6 @@ import android.widget.Spinner;
 import com.github.clans.fab.FloatingActionButton;
 import com.savare.R;
 import com.savare.activity.fragment.ClienteCadastroFragment;
-import com.savare.activity.fragment.OrcamentoFragment;
 import com.savare.adapter.ItemUniversalAdapter;
 import com.savare.adapter.PessoaAdapter;
 import com.savare.beans.CidadeBeans;
@@ -61,8 +60,8 @@ public class ClienteListaMDActivity extends AppCompatActivity {
 
             this.telaChamou = intentParametro.getString(ListaOrcamentoPedidoMDActivity.KEY_TELA_CHAMADA);
 
-            if (telaChamou.equals(OrcamentoFragment.KEY_TELA_ORCAMENTO_FRAGMENTO)) {
-                idOrcamento = intentParametro.getString(OrcamentoFragment.KEY_ID_ORCAMENTO);
+            if (telaChamou.equals(OrcamentoTabFragmentMDActivity.KEY_TELA_ORCAMENTO_FRAGMENTO)) {
+                idOrcamento = intentParametro.getString(OrcamentoTabFragmentMDActivity.KEY_ID_ORCAMENTO);
             }
         }
 
@@ -129,7 +128,7 @@ public class ClienteListaMDActivity extends AppCompatActivity {
                     // Fecha a tela de detalhes de produto
                     finish();
 
-                } else if((telaChamou != null) && (telaChamou.equals(OrcamentoFragment.KEY_TELA_ORCAMENTO_FRAGMENTO))){
+                } else if((telaChamou != null) && (telaChamou.equals(OrcamentoTabFragmentMDActivity.KEY_TELA_ORCAMENTO_FRAGMENTO))){
 
                     PessoaBeans pessoa = new PessoaBeans();
                     pessoa = (PessoaBeans) listViewPessoa.getAdapter().getItem(position);
@@ -166,12 +165,12 @@ public class ClienteListaMDActivity extends AppCompatActivity {
                         returnIntent.putExtra("CODIGO_TRA", String.valueOf(pessoa.getCodigoTransportadora()));
                         returnIntent.putExtra("CODIGO_FUN", String.valueOf(pessoa.getCodigoFuncionario()));
 
-                        setResult(OrcamentoFragment.RETORNA_CLIENTE, returnIntent);
+                        setResult(OrcamentoTabFragmentMDActivity.RETORNA_CLIENTE, returnIntent);
                         // Fecha a tela de detalhes de produto
                         finish();
 
                     } else {
-                        setResult(OrcamentoFragment.ERRO_RETORNA_CLIENTE);
+                        setResult(OrcamentoTabFragmentMDActivity.ERRO_RETORNA_CLIENTE);
                         // Fecha a tela de detalhes de produto
                         finish();
                     }

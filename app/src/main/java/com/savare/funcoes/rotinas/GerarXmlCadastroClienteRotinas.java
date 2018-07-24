@@ -5,10 +5,6 @@ import android.content.Context;
 import android.os.Environment;
 import com.savare.beans.PessoaBeans;
 import com.savare.funcoes.FuncoesPersonalizadas;
-import org.jdom2.Document;
-import org.jdom2.Element;
-import org.jdom2.output.Format;
-import org.jdom2.output.XMLOutputter;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
@@ -66,11 +62,11 @@ public class GerarXmlCadastroClienteRotinas {
 
                     Writer saida = new OutputStreamWriter(new FileOutputStream(arquivoXml));
 
-                    XMLOutputter saidaXml = new XMLOutputter();
+                    //XMLOutputter saidaXml = new XMLOutputter();
 
-                    saidaXml.setFormat(Format.getCompactFormat().setEncoding("ISO-8859-1"));
+                    //saidaXml.setFormat(Format.getCompactFormat().setEncoding("ISO-8859-1"));
 
-                    saidaXml.output(gerarXml(listaPessoasCadastro.get(i)), saida);
+                    //saidaXml.output(gerarXml(listaPessoasCadastro.get(i)), saida);
 
                     if(arquivoXml.exists()){
                         listaLocalArquivoXml.add(new File(arquivoXml.getPath()));
@@ -97,7 +93,7 @@ public class GerarXmlCadastroClienteRotinas {
     } // Fim criarArquivoXml
 
 
-    private Document gerarXml(PessoaBeans pessoa){
+    /*private Document gerarXml(PessoaBeans pessoa){
 
         // Cria o elemento(tag) raiz
         Element tagCadastroProc = new Element("cadastroProc");
@@ -324,5 +320,5 @@ public class GerarXmlCadastroClienteRotinas {
         doc.setRootElement(tagCadastroProc);
 
         return doc;
-    } // Fim gerarXml
+    } // Fim gerarXml*/
 }

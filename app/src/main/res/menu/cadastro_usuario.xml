@@ -5,13 +5,13 @@
     <item
         android:id="@+id/menu_cadastro_usuario_salvar"
         android:icon="@drawable/ic_action_save"
-        android:orderInCategory="1"
-        app:showAsAction="always"
-        android:title="@string/salvar"/>
+        android:orderInCategory="100"
+        android:title="@string/salvar"
+        app:showAsAction="always" />
     <item
     android:id="@+id/menu_cadastro_usuario_cancelar"
     android:icon="@drawable/ic_action_cancel"
-    android:orderInCategory="100"
+    android:orderInCategory="101"
     app:showAsAction="always"
     android:title="@string/cancelar"/>
 

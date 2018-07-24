@@ -33,6 +33,11 @@ public class OrcamentoTabFragmentMDActivity extends AppCompatActivity {
                                 KEY_ATACADO_VAREJO = "AEACADO_VAREJO",
                                 KEY_NOME_RAZAO = "NOME_RAZAO",
                                 KEY_ID_PESSOA = "ID_PESSOA";
+    public static final int SOLICITA_CLIENTE = 2,
+                            RETORNA_CLIENTE = 100,
+                            ERRO_RETORNA_CLIENTE = 101;
+    public static final String  KEY_TELA_ORCAMENTO_FRAGMENTO = "ORCAMENTO_FRAGMENT",
+                                KEY_TELA_CHAMADA = "TELA_CHAMADA";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,7 +100,7 @@ public class OrcamentoTabFragmentMDActivity extends AppCompatActivity {
 
         ParcelaRotinas parcelaRotinas = new ParcelaRotinas(getApplicationContext());
 
-        if ((abertoTitulosPriveiraVez == false) && (parcelaRotinas.listaTitulos(idPessoa, ParcelaRotinas.TITULOS_EM_ABERTO, ParcelaRotinas.RECEBER, null, null).size() > 0)) {
+        if ((abertoTitulosPriveiraVez == false) && (parcelaRotinas.listaTitulos(idPessoa, ParcelaRotinas.TITULOS_EM_ABERTO_VENCIDOS, ParcelaRotinas.RECEBER, null, null).size() > 0)) {
 
             abertoTitulosPriveiraVez = true;
 

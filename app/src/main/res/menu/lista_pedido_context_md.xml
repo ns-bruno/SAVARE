@@ -16,5 +16,12 @@
         android:title="@string/enviar_email"
         android:showAsAction="never" />
 
+    <item
+        android:id="@+id/menu_lista_pedido_context_md_deletar"
+        android:orderInCategory="101"
+        android:icon="@mipmap/ic_delete_dark"
+        android:title="@string/deletar"
+        android:showAsAction="never"/>
+
 
 </menu>

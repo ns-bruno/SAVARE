@@ -2,9 +2,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.savare">
 
-    <uses-sdk
-        android:minSdkVersion="15"
-        android:targetSdkVersion="22" />
+    <!--<uses-sdk-->
+        <!--android:minSdkVersion="15"-->
+        <!--android:targetSdkVersion="22" />-->
 
     <uses-permission android:name="android.permission.READ_SYNC_STATS" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -24,6 +24,7 @@
 
     <application
         android:allowBackup="true"
+        android:hardwareAccelerated="false"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:theme="@android:style/Theme.Holo.Light"
@@ -45,42 +46,6 @@
             </intent-filter>
         </activity>
         <activity android:name=".activity.CadastroUsuarioActivity" />
-        <activity android:name=".activity.InicioActivity" />
-        <activity android:name=".activity.ClienteListaActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.SEARCH" />
-            </intent-filter>
-
-            <meta-data
-                android:name="android.app.searchable"
-                android:resource="@layout/searchable" />
-        </activity>
-        <activity android:name=".activity.ClienteDetalhesActivity"></activity>
-        <activity
-            android:name=".activity.OrcamentoActivity"
-            android:uiOptions="splitActionBarWhenNarrow">
-            <intent-filter>
-                <action android:name="android.intent.action.SEARCH" />
-            </intent-filter>
-
-            <meta-data
-                android:name="android.app.searchable"
-                android:resource="@layout/searchable" />
-            <meta-data
-                android:name="android.support.UI_OPTIONS"
-                android:value="splitActionBarWhenNarrow" />
-        </activity>
-        <activity android:name=".activity.ProdutoListaActivity"></activity>
-        <activity android:name=".activity.OrcamentoProdutoDetalhesActivity" />
-        <activity android:name=".activity.OrcamentoPlanoPagamentoActivity" />
-        <activity android:name=".activity.ListaOrcamentoPedidoActivity" />
-        <activity android:name=".activity.ListaTitulosActivity" />
-        <activity android:name=".activity.SincronizacaoActivity" />
-        <activity android:name=".activity.ConfiguracoesActivity" />
-        <activity
-            android:name=".activity.fragment.OrcamentoTabulacaoFragment"
-            android:uiOptions="splitActionBarWhenNarrow"></activity>
-        <activity android:name=".activity.ProdutoDetalhesActivity" />
         <activity android:name=".activity.LogActivity" />
         <activity android:name=".activity.fragment.ClienteCadastroFragment" />
         <activity android:name=".activity.material.designer.InicioMDActivity"
@@ -93,7 +58,6 @@
                 android:name="android.app.searchable"
                 android:resource="@xml/searchable" />
         </activity>
-        <activity android:name=".activity.LoginActivity" />
 
         <activity
             android:name=".activity.material.designer.ProdutoListaMDActivity"
@@ -162,6 +126,17 @@
             android:theme="@style/AppBaseTheme" >
         </activity>
 
+        <activity
+            android:name=".activity.material.designer.CadastroServidorMDActivity"
+            android:theme="@style/AppBaseTheme">
+        </activity>
+
+        <activity
+            android:name=".activity.material.designer.ListaServidoresWebserviceMDActivity"
+            android:theme="@style/AppBaseTheme">
+        </activity>
+
+
         <provider
             android:name=".sincronizacao.EnviarProvider"
             android:authorities="@string/content_authority"
@@ -209,7 +184,6 @@
             android:label="ReceptorAlarmeEnviarOrcamentoBroadcastRotinas">
             <intent-filter>
                 <action android:name="ENVIAR_ORCAMENTO_SAVARE" />
-
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </receiver>

@@ -1,6 +1,7 @@
 package com.savare.activity.material.designer;
 
 import android.content.ContentValues;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.provider.SearchRecentSuggestions;
 import android.support.v4.view.ViewPager;
@@ -9,8 +10,8 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-import com.github.johnpersano.supertoasts.SuperToast;
-import com.github.johnpersano.supertoasts.util.Style;
+import com.github.johnpersano.supertoasts.library.Style;
+import com.github.johnpersano.supertoasts.library.SuperActivityToast;
 import com.ogaclejapan.smarttablayout.SmartTabLayout;
 import com.savare.R;
 import com.savare.adapter.ProdutoTabMDAdapter;
@@ -122,7 +123,12 @@ public class ProdutoListaMDActivity extends AppCompatActivity {
                 // Limpa o historico de palavras pesquisadas
                 searchRecentSuggestions.clearHistory();
 
-                SuperToast.create(ProdutoListaMDActivity.this, "Cookies removidos", SuperToast.Duration.LONG, Style.getStyle(Style.GREEN, SuperToast.Animations.POPUP)).show();
+                //SuperToast.create(ProdutoListaMDActivity.this, "Cookies removidos", SuperToast.Duration.LONG, Style.getStyle(Style.GREEN, SuperToast.Animations.POPUP)).show();
+                SuperActivityToast.create(ProdutoListaMDActivity.this, "Cookies removidos", Style.DURATION_LONG)
+                        .setTextColor(Color.WHITE)
+                        .setColor(Color.RED)
+                        .setAnimations(Style.ANIMATIONS_POP)
+                        .show();
                 break;
 
             default:

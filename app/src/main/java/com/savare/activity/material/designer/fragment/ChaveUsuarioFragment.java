@@ -1,16 +1,19 @@
 package com.savare.activity.material.designer.fragment;
 
+import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 
-import com.github.johnpersano.supertoasts.SuperToast;
-import com.github.johnpersano.supertoasts.util.Style;
+import com.github.johnpersano.supertoasts.library.Style;
+import com.github.johnpersano.supertoasts.library.SuperActivityToast;
 import com.heinrichreimersoftware.materialintro.app.SlideFragment;
 import com.savare.R;
 import com.savare.funcoes.FuncoesPersonalizadas;
@@ -53,28 +56,7 @@ public class ChaveUsuarioFragment extends SlideFragment {
                             .setIcon(R.mipmap.ic_launcher)
                             .initiateScan();
                 } else {
-                    // Checa se a quantidade que foi digitada eh o tamanho certo
-                    if ( (editTextDigitarCnpj.getText().length() == 11) || (editTextDigitarCnpj.getText().length() == 14) ) {
-                        FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(getContext());
-
-                        String bkpEdittextCnpj = editTextDigitarCnpj.getText().toString();
-
-                        if (editTextDigitarCnpj.getText().length() == 11){
-                            editTextDigitarCnpj.addTextChangedListener(funcoes.insertMascara(funcoes.MASCARA_CPF, editTextDigitarCnpj));
-
-                        } else if (editTextDigitarCnpj.getText().length() == 14){
-                            editTextDigitarCnpj.addTextChangedListener(funcoes.insertMascara(funcoes.MASCARA_CNPJ, editTextDigitarCnpj));
-                        }
-                        editTextDigitarCnpj.setText(bkpEdittextCnpj);
-                        funcoes.setValorXml("CnpjEmpresa", editTextDigitarCnpj.getText().toString());
-
-                        desativarCampos();
-
-                        SuperToast.create(getContext(), getResources().getString(R.string.cnpj_salva_sucesso), SuperToast.Duration.SHORT, Style.getStyle(Style.GREEN, SuperToast.Animations.POPUP)).show();
-
-                    } else {
-                        SuperToast.create(getContext(), getResources().getString(R.string.tamanho_cnpj_cpf_nao_permitido), SuperToast.Duration.SHORT, Style.getStyle(Style.RED, SuperToast.Animations.POPUP)).show();
-                    }
+                    salvarCnpjEmpresa();
                 }
             }
         });
@@ -98,6 +80,18 @@ public class ChaveUsuarioFragment extends SlideFragment {
                 }
             }
         });
+
+        editTextDigitarCnpj.setOnKeyListener(new View.OnKeyListener() {
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                // If the event is a key-down event on the "enter" button
+                if ((event.getAction() == KeyEvent.ACTION_DOWN) && (keyCode == KeyEvent.KEYCODE_ENTER)) {
+                    salvarCnpjEmpresa();
+                    return true;
+                }
+                return false;
+            }
+        });
+
         return root;
     }
 
@@ -109,7 +103,12 @@ public class ChaveUsuarioFragment extends SlideFragment {
             // Checha se retornou algum dado
             if(retornoEscanerCodigoBarra.getContents() == null) {
                 //Log.d("SAGA", "Cancelled scan - CadastroEmbalagemActivity");
-                SuperToast.create(getContext(), getResources().getString(R.string.cancelado), SuperToast.Duration.LONG, Style.getStyle(Style.RED, SuperToast.Animations.POPUP)).show();
+                //SuperActivityToast.create(getActivity(), getResources().getString(R.string.cancelado), SuperToast.Duration.LONG, Style.getStyle(Style.RED, SuperToast.Animations.POPUP)).show();
+                SuperActivityToast.create(getActivity(), getResources().getString(R.string.cancelado), Style.DURATION_LONG)
+                        .setTextColor(Color.WHITE)
+                        .setColor(Color.RED)
+                        .setAnimations(Style.ANIMATIONS_POP)
+                        .show();
 
             } else {
                 //Log.d("SAGA", "Scanned - CadastroEmbalagemActivity");
@@ -119,11 +118,16 @@ public class ChaveUsuarioFragment extends SlideFragment {
 
                 if (cnpj.length() >= 11) {
                     FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(getContext());
-                    funcoes.setValorXml("CnpjEmpresa", cnpj);
+                    funcoes.setValorXml(funcoes.TAG_CNPJ_EMPRESA, cnpj);
 
                     desativarCampos();
                 } else {
-                    SuperToast.create(getContext(), getResources().getString(R.string.tamanho_cnpj_cpf_nao_permitido), SuperToast.Duration.LONG, Style.getStyle(Style.RED, SuperToast.Animations.POPUP)).show();
+                    //SuperActivityToast.create(getActivity(), getResources().getString(R.string.tamanho_cnpj_cpf_nao_permitido), SuperToast.Duration.LONG, Style.getStyle(Style.RED, SuperToast.Animations.POPUP)).show();
+                    SuperActivityToast.create(getActivity(), getResources().getString(R.string.tamanho_cnpj_cpf_nao_permitido), Style.DURATION_LONG)
+                            .setTextColor(Color.WHITE)
+                            .setColor(Color.RED)
+                            .setAnimations(Style.ANIMATIONS_POP)
+                            .show();
                 }
 
                 // Vai para o proximo slide
@@ -139,5 +143,43 @@ public class ChaveUsuarioFragment extends SlideFragment {
         buttonDigitarCnpj.setEnabled(false);
         buttonTenhoCnpj.setEnabled(false);
         editTextDigitarCnpj.setEnabled(false);
+    }
+
+    private void salvarCnpjEmpresa(){
+        // Checa se a quantidade que foi digitada eh o tamanho certo
+        if ( (editTextDigitarCnpj.getText().length() == 11) || (editTextDigitarCnpj.getText().length() == 14) ) {
+            FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(getContext());
+
+            String bkpEdittextCnpj = editTextDigitarCnpj.getText().toString();
+
+            if (editTextDigitarCnpj.getText().length() == 11){
+                editTextDigitarCnpj.addTextChangedListener(funcoes.insertMascara(funcoes.MASCARA_CPF, editTextDigitarCnpj));
+
+            } else if (editTextDigitarCnpj.getText().length() == 14){
+                editTextDigitarCnpj.addTextChangedListener(funcoes.insertMascara(funcoes.MASCARA_CNPJ, editTextDigitarCnpj));
+            }
+            editTextDigitarCnpj.setText(bkpEdittextCnpj);
+            funcoes.setValorXml(funcoes.TAG_CNPJ_EMPRESA, editTextDigitarCnpj.getText().toString());
+
+            desativarCampos();
+
+            //SuperActivityToast.create(getActivity(), getResources().getString(R.string.cnpj_salva_sucesso), SuperToast.Duration.SHORT, Style.getStyle(Style.GREEN, SuperToast.Animations.FLYIN)).show();
+
+            SuperActivityToast.create(getActivity(), getResources().getString(R.string.cnpj_salva_sucesso), Style.DURATION_SHORT)
+                    .setTextColor(Color.WHITE)
+                    .setColor(Color.GREEN)
+                    .setAnimations(Style.ANIMATIONS_POP)
+                    .show();
+
+            //SuperActivityToast.create(getActivity(), getResources().getString(R.string.cnpj_salva_sucesso), SuperToast.Duration.SHORT, Style.getStyle(Style.GREEN, SuperToast.Animations.POPUP)).show();
+
+        } else {
+            //SuperActivityToast.create(getActivity(), getResources().getString(R.string.tamanho_cnpj_cpf_nao_permitido), SuperToast.Duration.SHORT, Style.getStyle(Style.RED, SuperToast.Animations.POPUP)).show();
+            SuperActivityToast.create(getActivity(), getResources().getString(R.string.tamanho_cnpj_cpf_nao_permitido), Style.DURATION_SHORT)
+                    .setTextColor(Color.WHITE)
+                    .setColor(Color.RED)
+                    .setAnimations(Style.ANIMATIONS_POP)
+                    .show();
+        }
     }
 }

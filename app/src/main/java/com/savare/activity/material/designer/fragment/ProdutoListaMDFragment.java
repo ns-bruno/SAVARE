@@ -297,7 +297,7 @@ public class ProdutoListaMDFragment extends Fragment {
     public boolean onOptionsItemSelected(MenuItem item) {
 
         if (item.getItemId() == R.id.menu_produto_lista_tab_md_produtos_novos){
-            //SuperToast.create(getContext(), "Todos os Produtos", SuperToast.Duration.LONG, Style.getStyle(Style.BLUE, SuperToast.Animations.POPUP)).show();
+            //SuperActivityToast.create(getActivity(), "Todos os Produtos", SuperToast.Duration.LONG, Style.getStyle(Style.BLUE, SuperToast.Animations.POPUP)).show();
 
             // Monta a clausula where para buscar no banco de dados
             String where = "( (JULIANDAY(DATE('NOW', 'LOCALTIME')) - JULIANDAY(AEAPRODU.DT_CAD)) <= SMAEMPRE.QTD_DIAS_DESTACA_PRODUTO )";
@@ -555,11 +555,11 @@ public class ProdutoListaMDFragment extends Fragment {
                     if ((idOrcamento != null) && (idOrcamento.length() > 0)) {
 
                         // Cria a lista de produto e verifica se os produto existe no orcamento
-                        listaProdutos = produtoRotinas.listaProduto(where, null, idOrcamento, progressBarListaProdutos, null, produtoRotinas.NAO);
+                        listaProdutos = produtoRotinas.listaProduto(where, null, idOrcamento, progressBarListaProdutos, null, produtoRotinas.NAO, 0);
 
                     } else {
                         // Cria a lista de produto sem verificar se o produto existe no orcamento
-                        listaProdutos = produtoRotinas.listaProduto(where, null, null, progressBarListaProdutos, null, produtoRotinas.NAO);
+                        listaProdutos = produtoRotinas.listaProduto(where, null, null, progressBarListaProdutos, null, produtoRotinas.NAO, 0);
                     }
                 // Checa a tela que esta chamando esta funcao (Mais Vendidos por area)
                 } else if (tipoTela == TELA_MAIS_VENDIDOS_AREA) {

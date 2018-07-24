@@ -1,16 +1,13 @@
 package com.savare.activity.fragment;
 
 import com.savare.R;
-import com.savare.activity.InicioActivity;
 import com.savare.adapter.ClienteCadastroFragmentAdapter;
-import com.savare.banco.funcoesSql.PessoaSql;
 import com.savare.funcoes.FuncoesPersonalizadas;
 import com.savare.funcoes.rotinas.AuxiliarRotinas;
 
 import android.app.ActionBar;
 import android.app.FragmentTransaction;
 import android.app.ActionBar.Tab;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;

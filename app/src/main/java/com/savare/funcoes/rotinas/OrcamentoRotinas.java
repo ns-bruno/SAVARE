@@ -825,6 +825,23 @@ public class OrcamentoRotinas extends Rotinas {
 		}
 		return retorno;
 	}
+
+	public String atacadoVarejoOrcamento(String idOrcamento){
+		String retorno = "";
+
+		// Instancia a classe para manipular a tabela no banco de dados
+		OrcamentoSql orcamentoSql = new OrcamentoSql(context);
+
+		Cursor cursor = orcamentoSql.query(" ID_AEAORCAM = " + idOrcamento);
+
+		if( (cursor != null) && (cursor.getCount() > 0) ){
+			// Move o cursor para o primeiro registro
+			cursor.moveToFirst();
+
+			retorno = cursor.getString(cursor.getColumnIndex("ATAC_VAREJO"));
+		}
+		return retorno;
+	}
 	
 	/**
 	 * Busca o codigo do cliente atraves do numero do orcamento.
@@ -838,6 +855,7 @@ public class OrcamentoRotinas extends Rotinas {
 		
 		// Verifica se retornou algum registro
 		if(cursor != null && cursor.getCount() > 0){
+			cursor.moveToFirst();
 			return cursor.getString(cursor.getColumnIndex("ID_CFACLIFO"));
 		}else {
 			return "0";

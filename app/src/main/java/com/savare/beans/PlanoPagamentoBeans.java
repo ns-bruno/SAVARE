@@ -7,13 +7,18 @@ public class PlanoPagamentoBeans implements Parcelable{
 	
 	private int idPlanoPagamento,
 				idEmpresa,
+				idMoeda,
+				idTipoDocumento,
+				idPlanoPagamentoEquivalente,
+				idFormaPagamento,
 				codigoPlanoPagamento, diasMedios;
 	private String descricaoPlanoPagamento, dataAlteracao;
-	private String ativo,
-				 origemValor,
-				 atacadoVarejo,
-				 vistaPrazo,
-				 descontoPromocao;
+	private String 	ativo,
+					origemValor,
+					atacadoVarejo,
+					vistaPrazo,
+					descontoPromocao,
+					comissao;
 	private double descontoAtacado,
 				   descontoVarejo,
 				   jurosAtacado,
@@ -36,7 +41,47 @@ public class PlanoPagamentoBeans implements Parcelable{
 	public PlanoPagamentoBeans() {
 		
 	}
-	
+
+
+	public int getIdMoeda() {
+		return idMoeda;
+	}
+
+	public void setIdMoeda(int idMoeda) {
+		this.idMoeda = idMoeda;
+	}
+
+	public int getIdTipoDocumento() {
+		return idTipoDocumento;
+	}
+
+	public void setIdTipoDocumento(int idTipoDocumento) {
+		this.idTipoDocumento = idTipoDocumento;
+	}
+
+	public int getIdPlanoPagamentoEquivalente() {
+		return idPlanoPagamentoEquivalente;
+	}
+
+	public void setIdPlanoPagamentoEquivalente(int idPlanoPagamentoEquivalente) {
+		this.idPlanoPagamentoEquivalente = idPlanoPagamentoEquivalente;
+	}
+
+	public int getIdFormaPagamento() {
+		return idFormaPagamento;
+	}
+
+	public void setIdFormaPagamento(int idFormaPagamento) {
+		this.idFormaPagamento = idFormaPagamento;
+	}
+
+	public String getComissao() {
+		return comissao;
+	}
+
+	public void setComissao(String comissao) {
+		this.comissao = comissao;
+	}
 
 	/**
 	 * @return the precoProduto

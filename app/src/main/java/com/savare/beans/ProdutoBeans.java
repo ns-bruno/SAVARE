@@ -45,8 +45,7 @@ public class ProdutoBeans implements Parcelable {
 	public ProdutoBeans() {
 		
 	}
-	
-	
+
 	/**
 	 * @return the diasCadastro
 	 */

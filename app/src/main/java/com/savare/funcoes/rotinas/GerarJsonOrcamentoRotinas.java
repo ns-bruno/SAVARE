@@ -7,8 +7,6 @@ import com.savare.banco.funcoesSql.ItemOrcamentoSql;
 import com.savare.banco.funcoesSql.OrcamentoSql;
 import com.savare.funcoes.FuncoesPersonalizadas;
 
-import org.jdom2.Element;
-import org.json.JSONException;
 import org.json.JSONStringer;
 
 /**

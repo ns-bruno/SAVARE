@@ -30,6 +30,9 @@ public class ProdutoListaBeans implements Parcelable {
 	private char atacadoVarejo,
 				 estaNoOrcamento;
 	private boolean produtoNovo = false;
+	private String 	produtoPromocaoAtacado,
+					produtoPromocaoVarejo,
+					produtoPromocaoServico;
 	
 	public ProdutoListaBeans(Parcel dados) {
 		this.estaNoOrcamento = dados.readString().charAt(0);
@@ -281,6 +284,30 @@ public class ProdutoListaBeans implements Parcelable {
 
 	public void setProdutoNovo(boolean produtoNovo) {
 		this.produtoNovo = produtoNovo;
+	}
+
+	public String getProdutoPromocaoAtacado() {
+		return produtoPromocaoAtacado;
+	}
+
+	public void setProdutoPromocaoAtacado(String produtoPromocaoAtacado) {
+		this.produtoPromocaoAtacado = produtoPromocaoAtacado;
+	}
+
+	public String getProdutoPromocaoVarejo() {
+		return produtoPromocaoVarejo;
+	}
+
+	public void setProdutoPromocaoVarejo(String produtoPromocaoVarejo) {
+		this.produtoPromocaoVarejo = produtoPromocaoVarejo;
+	}
+
+	public String getProdutoPromocaoServico() {
+		return produtoPromocaoServico;
+	}
+
+	public void setProdutoPromocaoServico(String produtoPromocaoServico) {
+		this.produtoPromocaoServico = produtoPromocaoServico;
 	}
 
 	/**

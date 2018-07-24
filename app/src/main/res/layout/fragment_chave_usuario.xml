@@ -14,7 +14,7 @@
         android:gravity="center_horizontal"
         android:textAppearance="@style/TextAppearance.AppCompat.Display1"
         android:paddingBottom="30dp"
-        android:textColor="@color/white"/>
+        android:textColor="@color/md_white_1000"/>
 
     <TextView
         android:text="@string/orientacao_registrar_usuario"
@@ -26,7 +26,7 @@
         android:paddingBottom="30dp"
         android:gravity="center_horizontal"
         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-        android:textColor="@color/white"
+        android:textColor="@color/md_white_1000"
         />
 
     <EditText
@@ -34,6 +34,7 @@
         android:layout_height="wrap_content"
         android:ems="10"
         android:digits="0123456789"
+        android:inputType="numberDecimal"
         android:hint="@string/digite_cnpj"
         android:textColor="@color/branco"
         android:id="@+id/fragment_chave_usuario_editText_digitar_cnpj"

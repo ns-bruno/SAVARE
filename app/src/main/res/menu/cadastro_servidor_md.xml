@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/menu_cadastro_servidor_md_salvar"
+        android:icon="@mipmap/ic_content_save_dark"
+        android:orderInCategory="1"
+        android:title="@string/salvar"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/menu_cadastro_servidor_md_deletar"
+        android:icon="@mipmap/ic_delete_dark"
+        android:title="@string/deletar" />
+</menu>

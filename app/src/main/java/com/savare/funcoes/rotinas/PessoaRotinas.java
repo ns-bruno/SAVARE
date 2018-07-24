@@ -6,6 +6,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.widget.ProgressBar;
 
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.savare.R;
 import com.savare.banco.funcoesSql.PessoaSql;
 import com.savare.beans.CidadeBeans;
@@ -145,7 +146,7 @@ public class PessoaRotinas extends Rotinas {
 	/**
 	 * 
 	 * @param where
-	 * @param tipoPessoa - KEY_TIPO_CLIENTE, KEY_TIPO_FONECEDOR, KEY_TIPO_USUARIO
+	 * @param tipoPessoa - KEY_TIPO_CLIENTE, KEY_TIPO_FONECEDOR, KEY_TIPO_USUARIO, KEY_TIPO_FUNCIONARIO
 	 * @return
 	 */
 	public List<PessoaBeans> listaPessoaResumido(String where, String tipoPessoa, final ProgressBar progresso) {
@@ -322,17 +323,13 @@ public class PessoaRotinas extends Rotinas {
 
 			}
 		}catch (Exception e){
-			final FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
-			// Cria uma variavem para inserir as propriedades da mensagem
-			final ContentValues mensagem = new ContentValues();
-			mensagem.put("comando", 2);
-			mensagem.put("tela", "PessoaRotinas");
-			mensagem.put("mensagem", "Não existe registros cadastrados");
-
-			// Executa a mensagem passando por parametro as propriedades
 			((Activity) context).runOnUiThread(new Runnable() {
 				public void run() {
-					funcoes.menssagem(mensagem);
+					new MaterialDialog.Builder(context)
+							.title("PessoaRotinas")
+							.content(context.getResources().getString(R.string.msg_error) + "\n Não existe registros cadastrados")
+							.positiveText(R.string.button_ok)
+							.show();
 				}
 			});
 		}

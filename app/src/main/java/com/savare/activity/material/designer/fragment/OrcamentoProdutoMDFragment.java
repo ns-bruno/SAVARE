@@ -8,6 +8,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -30,11 +31,12 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.github.johnpersano.supertoasts.SuperToast;
-import com.github.johnpersano.supertoasts.util.Style;
+import com.github.johnpersano.supertoasts.library.Style;
+import com.github.johnpersano.supertoasts.library.SuperActivityToast;
 import com.savare.R;
 import com.savare.activity.LogActivity;
 import com.savare.activity.material.designer.ClienteListaMDActivity;
+import com.savare.activity.material.designer.ListaOrcamentoPedidoMDActivity;
 import com.savare.activity.material.designer.OrcamentoProdutoDetalhesTabFragmentMDActivity;
 import com.savare.activity.material.designer.OrcamentoTabFragmentMDActivity;
 import com.savare.activity.material.designer.ProdutoListaMDActivity;
@@ -48,11 +50,13 @@ import com.savare.funcoes.FuncoesPersonalizadas;
 import com.savare.funcoes.rotinas.GerarPdfRotinas;
 import com.savare.funcoes.rotinas.OrcamentoRotinas;
 import com.savare.funcoes.rotinas.PessoaRotinas;
+import com.savare.funcoes.rotinas.async.EnviarDadosWebserviceAsyncRotinas;
 import com.savare.funcoes.rotinas.async.GerarPdfAsyncRotinas;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 /**
  * Created by Bruno Nogueira Silva on 12/04/2016.
@@ -140,16 +144,11 @@ public class OrcamentoProdutoMDFragment extends Fragment {
                     }
 
                 } else {
-                    /*FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(getActivity());
-                    // Cria uma variavem para inserir as propriedades da mensagem
-                    ContentValues mensagem = new ContentValues();
-                    mensagem.put("comando", 2);
-                    mensagem.put("tela", "OrcamentoProdutoMDFragment");
-                    mensagem.put("mensagem", getActivity().getResources().getString(R.string.nao_orcamento) + "\n");
-                    // Executa a mensagem passando por parametro as propriedades
-                    funcoes.menssagem(mensagem);*/
-
-                    SuperToast.create(getContext(), getContext().getResources().getString(R.string.nao_orcamento), SuperToast.Duration.SHORT, Style.getStyle(Style.RED, SuperToast.Animations.POPUP)).show();
+                    SuperActivityToast.create(getActivity(), getResources().getString(R.string.nao_orcamento), Style.DURATION_SHORT)
+                            .setTextColor(Color.WHITE)
+                            .setColor(Color.RED)
+                            .setAnimations(Style.ANIMATIONS_POP)
+                            .show();
                 }
             } // Fim setOnItemClickListener
         }); //listViewItemOrcamento.setOnItemClickListener
@@ -223,19 +222,21 @@ public class OrcamentoProdutoMDFragment extends Fragment {
 
                                             // Verifica se foi deletado algum registro
                                             if (totalDeletado > 0) {
-                                                mensagem.put("mensagem", totalDeletado + " Deletado(s). \n");
-
+                                                SuperActivityToast.create(getActivity(), totalDeletado + " " + (viewOrcamento.getResources().getString(R.string.deletados)), Style.DURATION_SHORT)
+                                                        .setTextColor(Color.WHITE)
+                                                        .setColor(Color.RED)
+                                                        .setAnimations(Style.ANIMATIONS_POP)
+                                                        .show();
                                                 // Atualiza a lista de produtos
                                                 onResume();
 
                                             } else {
-                                                mensagem.put("mensagem", getActivity().getResources().getString(R.string.nao_conseguimos_deletar_itens) + "\n");
+                                                SuperActivityToast.create(getActivity(), viewOrcamento.getResources().getString(R.string.nao_conseguimos_deletar_itens), Style.DURATION_SHORT)
+                                                        .setTextColor(Color.WHITE)
+                                                        .setColor(Color.RED)
+                                                        .setAnimations(Style.ANIMATIONS_POP)
+                                                        .show();
                                             }
-
-                                            // Instancia a classe  de funcoes para mostra a mensagem
-                                            FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(getActivity());
-                                            funcoes.menssagem(mensagem);
-
                                             mode.finish();
 
                                         }
@@ -250,22 +251,12 @@ public class OrcamentoProdutoMDFragment extends Fragment {
                             builderConfirmacao.create();
                             builderConfirmacao.show();
 
-                            //return true;
-
                         } else {
-
-                            /*FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(getActivity());
-                            // Cria uma variavem para inserir as propriedades da mensagem
-                            ContentValues mensagem = new ContentValues();
-                            mensagem.put("comando", 2);
-                            mensagem.put("tela", "OrcamentoProdutoMDFragment");
-                            mensagem.put("mensagem", viewOrcamento.getResources().getString(R.string.nao_orcamento) + "\n"
-                                    + viewOrcamento.getResources().getString(R.string.nao_pode_deletado));
-                            // Executa a mensagem passando por parametro as propriedades
-                            funcoes.menssagem(mensagem);*/
-
-                            SuperToast.create(getContext(), getResources().getString(R.string.nao_orcamento) + "\n"
-                                              + viewOrcamento.getResources().getString(R.string.nao_pode_deletado), SuperToast.Duration.VERY_SHORT, Style.getStyle(Style.RED, SuperToast.Animations.FLYIN)).show();
+                            SuperActivityToast.create(getActivity(), (viewOrcamento.getResources().getString(R.string.nao_orcamento)) + "\n" + (viewOrcamento.getResources().getString(R.string.nao_pode_deletado)), Style.DURATION_SHORT)
+                                    .setTextColor(Color.WHITE)
+                                    .setColor(Color.RED)
+                                    .setAnimations(Style.ANIMATIONS_POP)
+                                    .show();
                         }
 
                         break;
@@ -332,7 +323,7 @@ public class OrcamentoProdutoMDFragment extends Fragment {
                 case R.id.menu_orcamento_tab_md_adicionar:
 
                     // Checa se eh um orcamento
-                    if ((tipoOrcamentoPedido.equalsIgnoreCase("O")) || (tipoOrcamentoPedido.equalsIgnoreCase("P"))) {
+                    if ((tipoOrcamentoPedido.equalsIgnoreCase(OrcamentoRotinas.ORCAMENTO))) {
                         // Abre a tela que lista todos os produtos
                         Intent intentOrcamento = new Intent(getContext(), ProdutoListaMDActivity.class);
                         intentOrcamento.putExtra(ProdutoListaMDActivity.KEY_ID_ORCAMENTO, textCodigoOrcamento.getText().toString());
@@ -342,71 +333,27 @@ public class OrcamentoProdutoMDFragment extends Fragment {
                         startActivity(intentOrcamento);
 
                     } else {
-                        /*FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(getActivity());
-                        // Cria uma variavem para inserir as propriedades da mensagem
-                        ContentValues mensagem = new ContentValues();
-                        mensagem.put("comando", 2);
-                        mensagem.put("tela", "OrcamentoActivity");
-                        mensagem.put("mensagem", getActivity().getResources().getString(R.string.nao_orcamento) + "\n"
-                                + getActivity().getResources().getString(R.string.nao_pode_ser_inserido_novos_produtos));
-                        // Executa a mensagem passando por parametro as propriedades
-                        funcoes.menssagem(mensagem);*/
-
-                        SuperToast.create(getContext(), getContext().getResources().getString(R.string.nao_orcamento) + "\n" +
-                                                        getContext().getResources().getString(R.string.nao_pode_ser_inserido_novos_produtos), SuperToast.Duration.VERY_SHORT, Style.getStyle(Style.RED, SuperToast.Animations.POPUP)).show();
+                        SuperActivityToast.create(getActivity(), getResources().getString(R.string.nao_orcamento) + "\n" + getResources().getString(R.string.nao_pode_ser_inserido_novos_produtos), Style.DURATION_VERY_SHORT)
+                                .setTextColor(Color.WHITE)
+                                .setColor(Color.RED)
+                                .setAnimations(Style.ANIMATIONS_POP)
+                                .show();
                     }
                     break;
 
                 case R.id.menu_orcamento_tab_md_enviar_email:
-                    EnviarEmailOrcamentoPedido enviarEmailOrcamentoPedido = new EnviarEmailOrcamentoPedido();
-                    enviarEmailOrcamentoPedido.execute();
+                    // Checa se tem algum item no pedido/orcamento
+                    if ((adapterItemOrcamento == null) || (adapterItemOrcamento.getListaItemOrcamento() == null) || (adapterItemOrcamento.getListaItemOrcamento().size() < 1)){
+                        SuperActivityToast.create(getActivity(), getResources().getString(R.string.nao_tem_produtos_orcamento_pedido), Style.DURATION_LONG)
+                                .setTextColor(Color.WHITE)
+                                .setColor(Color.RED)
+                                .setAnimations(Style.ANIMATIONS_POP)
+                                .show();
 
-                    /*
-                    try {
-                        //Cria novo um ProgressDialogo e exibe
-                        ProgressDialog progress = new ProgressDialog(getActivity());
-                        progress.setMessage("Aguarde, o PDF está sendo Gerado...");
-                        progress.setCancelable(false);
-                        progress.show();
-
-                        GerarPdfRotinas gerarPdfRotinas = new GerarPdfRotinas(getActivity());
-                        // Envia a lista de produtos que pertence ao orcamento
-                        gerarPdfRotinas.setListaItensOrcamento(adapterItemOrcamento.getListaItemOrcamento());
-                        // Envia os dados do orcamento
-                        gerarPdfRotinas.setOrcamento(preencheDadosOrcamento());
-
-                        String retornoCaminho = gerarPdfRotinas.criaArquivoPdf();
-
-                        if (retornoCaminho.length() > 0) {
-                            // Fecha a barra de progresso
-                            progress.dismiss();
-
-                            File arquivo = new File(retornoCaminho);
-
-                            PessoaRotinas pessoaRotinas = new PessoaRotinas(getActivity());
-
-                            Intent dadosEmail = new Intent(Intent.ACTION_SEND);
-                            //dadosEmail.setType("message/rfc822");
-                            dadosEmail.setType("text/plain");
-                            dadosEmail.putExtra(Intent.EXTRA_EMAIL, new String[]{pessoaRotinas.emailPessoa(idPessoa)});
-                            dadosEmail.putExtra(Intent.EXTRA_SUBJECT, "Orçamento/Pedido # " + textCodigoOrcamento.getText());
-                            dadosEmail.putExtra(Intent.EXTRA_STREAM, Uri.parse("file://" + arquivo));
-                            dadosEmail.putExtra(Intent.EXTRA_TEXT, "E-Mail enviado pelo App SAVARE.");
-
-                            try {
-                                startActivity(Intent.createChooser(dadosEmail, "Enviar e-mail..."));
-
-                            } catch (android.content.ActivityNotFoundException ex) {
-                                SuperToast.create(getContext(), getResources().getString(R.string.nao_possivel_compartilhar_arquivo), SuperToast.Duration.LONG, Style.getStyle(Style.RED, SuperToast.Animations.FLYIN)).show();
-                            }
-                        } else {
-                            progress.dismiss();
-                        }
-
-                    } catch (Exception e) {
-
-                    }*/
-
+                    } else {
+                        EnviarEmailOrcamentoPedido enviarEmailOrcamentoPedido = new EnviarEmailOrcamentoPedido();
+                        enviarEmailOrcamentoPedido.execute();
+                    }
                     break;
 
                 case R.id.menu_orcamento_tab_md_pesquisa:
@@ -418,31 +365,47 @@ public class OrcamentoProdutoMDFragment extends Fragment {
                     break;
 
                 case R.id.menu_orcamento_tab_md_abrir_pdf:
-
                     try {
-                        //ContentValues dadosOrcamento = new ContentValues();
-                        //dadosOrcamento.put("TIPO_ORCAMENTO", "ORCAMENTO");
+                        // Checa se tem algum item no pedido/orcamento
+                        if ((adapterItemOrcamento == null) || (adapterItemOrcamento.getListaItemOrcamento() == null) || (adapterItemOrcamento.getListaItemOrcamento().size() < 1)){
+                            SuperActivityToast.create(getActivity(), getResources().getString(R.string.nao_tem_produtos_orcamento_pedido), Style.DURATION_LONG)
+                                    .setTextColor(Color.WHITE)
+                                    .setColor(Color.RED)
+                                    .setAnimations(Style.ANIMATIONS_POP)
+                                    .show();
 
-                        GerarPdfAsyncRotinas gerarPdfSalvar = new GerarPdfAsyncRotinas(getActivity());
-                        // Seta(envia) os dados do orcamento
-                        gerarPdfSalvar.setOrcamento(preencheDadosOrcamento());
-                        // Seta(envia) a lista de produtos do orcamento
-                        gerarPdfSalvar.setListaItensOrcamento(adapterItemOrcamento.getListaItemOrcamento());
+                        } else {
 
-                        String caminhoPdf = gerarPdfSalvar.execute("").get();
+                            GerarPdfAsyncRotinas gerarPdfSalvar = new GerarPdfAsyncRotinas(getActivity());
+                            // Seta(envia) os dados do orcamento
+                            gerarPdfSalvar.setOrcamento(preencheDadosOrcamento());
+                            // Seta(envia) a lista de produtos do orcamento
+                            gerarPdfSalvar.setListaItensOrcamento(adapterItemOrcamento.getListaItemOrcamento());
 
-                        File file = new File(caminhoPdf);
-                        Intent target = new Intent(Intent.ACTION_VIEW);
-                        target.setDataAndType(Uri.fromFile(file),"application/pdf");
-                        target.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+                            String caminhoPdf = gerarPdfSalvar.execute("").get();
 
-                        Intent intent = Intent.createChooser(target, "Abrir PDF do Orçamento/Pedido");
-                        startActivity(intent);
+                            File file = new File(caminhoPdf);
+                            Intent target = new Intent(Intent.ACTION_VIEW);
+                            target.setDataAndType(Uri.fromFile(file), "application/pdf");
+                            target.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+
+                            Intent intent = Intent.createChooser(target, "Abrir PDF do Orçamento/Pedido");
+                            startActivity(intent);
+                        }
 
                     } catch (Exception e) {
                         //Log.i("thread", e.getMessage());
-
-                        FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(getActivity());
+                        final String error = e.getMessage();
+                        ((Activity) getContext()).runOnUiThread(new Runnable() {
+                            public void run() {
+                                new MaterialDialog.Builder(getContext())
+                                        .title("OrcamentoProdutoMDFFragment")
+                                        .content(getActivity().getResources().getString(R.string.nao_foi_possivel_salvar_orcamento_pdf) + "\n" + error)
+                                        .positiveText(R.string.button_ok)
+                                        .show();
+                            }
+                        });
+                        /*FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(getActivity());
                         // Cria uma variavem para inserir as propriedades da mensagem
                         ContentValues mensagem = new ContentValues();
                         mensagem.put("comando", 0);
@@ -454,7 +417,7 @@ public class OrcamentoProdutoMDFragment extends Fragment {
                         mensagem.put("email", funcoes.getValorXml("Email"));
 
                         // Executa a mensagem passando por parametro as propriedades
-                        funcoes.menssagem(mensagem);
+                        funcoes.menssagem(mensagem);*/
                     }
                     break;
 
@@ -498,10 +461,8 @@ public class OrcamentoProdutoMDFragment extends Fragment {
                     break;
 
                 case R.id.menu_orcamento_tab_md_transformar_pedido:
-
-
                     // Checa se eh um orcamento
-                    if (tipoOrcamentoPedido.equals("O")) {
+                    if (tipoOrcamentoPedido.equals(OrcamentoRotinas.ORCAMENTO)) {
 
                         new MaterialDialog.Builder(getActivity())
                                 .title(R.string.formar_venda)
@@ -512,65 +473,112 @@ public class OrcamentoProdutoMDFragment extends Fragment {
 
                                         // Valida a opcao selecionada 1 = Visitou, mas, não comprou e 2 = Não estava
                                         if ((which != 1) && (which != 2)) {
+                                            try {
+                                                // Instancia a classe para manipular os orcamento no banco de dados
+                                                OrcamentoSql orcamentoSql = new OrcamentoSql(getActivity());
+                                                int totalAtualizado = 0;
 
-                                            // Instancia a classe para manipular os orcamento no banco de dados
-                                            OrcamentoSql orcamentoSql = new OrcamentoSql(getActivity());
-                                            int totalAtualizado = 0;
+                                                ContentValues dadosPedido = new ContentValues();
+                                                dadosPedido.put("STATUS", OrcamentoRotinas.PEDIDO_NAO_ENVIADO);
 
-                                            ContentValues dadosPedido = new ContentValues();
-                                            dadosPedido.put("STATUS", "P");
+                                                totalAtualizado = totalAtualizado + orcamentoSql.update(dadosPedido, "AEAORCAM.ID_AEAORCAM = " + textCodigoOrcamento.getText());
 
-                                            totalAtualizado = totalAtualizado + orcamentoSql.update(dadosPedido, "AEAORCAM.ID_AEAORCAM = " + textCodigoOrcamento.getText());
+                                                // Dados da mensagem
+                                                ContentValues mensagem = new ContentValues();
+                                                mensagem.put("comando", 2);
+                                                mensagem.put("tela", "OrcamentoFragment");
 
-                                            // Dados da mensagem
-                                            ContentValues mensagem = new ContentValues();
-                                            mensagem.put("comando", 2);
-                                            mensagem.put("tela", "OrcamentoFragment");
+                                                // Verifica se foi deletado algum registro
+                                                if (totalAtualizado > 0) {
 
-                                            // Verifica se foi deletado algum registro
-                                            if (totalAtualizado > 0) {
-                                                SuperToast.create(getContext(), totalAtualizado + " Transformado(s) em Pedido(s)", SuperToast.Duration.SHORT, Style.getStyle(Style.GREEN, SuperToast.Animations.FLYIN)).show();
-                                                //mensagem.put("mensagem", totalAtualizado + " Transformado(s) em Pedido(s). \n");
+                                                    SuperActivityToast.create(getActivity(), totalAtualizado + " Orçamento(s) Transformado(s) em Pedido(s)", Style.DURATION_LONG)
+                                                            .setTextColor(Color.WHITE)
+                                                            .setColor(Color.GREEN)
+                                                            .setAnimations(Style.ANIMATIONS_FLY)
+                                                            .show();
 
-                                                tipoOrcamentoPedido = "P";
+                                                    tipoOrcamentoPedido = "P";
 
-                                                // Pega os dados da positivacao
-                                                String sqlInsert = "INSERT OR REPLACE INTO CFAPOSIT(STATUS, VALOR_VENDA, DATA_VISITA, ID_CFACLIFO, ID_AEAORCAM) VALUES " +
-                                                        "(" + which + ", " +
-                                                        "(SELECT AEAORCAM.FC_VL_TOTAL FROM AEAORCAM WHERE AEAORCAM.ID_AEAORCAM = " + idOrcamento + "), " +
-                                                        "(SELECT (DATE('NOW', 'localtime'))), " +
-                                                        "(SELECT AEAORCAM.ID_CFACLIFO FROM AEAORCAM WHERE AEAORCAM.ID_AEAORCAM = " + idOrcamento + "), " +
-                                                        idOrcamento + ")";
+                                                    // Pega os dados da positivacao
+                                                    String sqlInsert = "INSERT OR REPLACE INTO CFAPOSIT(STATUS, VALOR_VENDA, DATA_VISITA, ID_CFACLIFO, ID_AEAORCAM) VALUES " +
+                                                            "(" + which + ", " +
+                                                            "(SELECT AEAORCAM.FC_VL_TOTAL FROM AEAORCAM WHERE AEAORCAM.ID_AEAORCAM = " + idOrcamento + "), " +
+                                                            "(SELECT (DATE('NOW', 'localtime'))), " +
+                                                            "(SELECT AEAORCAM.ID_CFACLIFO FROM AEAORCAM WHERE AEAORCAM.ID_AEAORCAM = " + idOrcamento + "), " +
+                                                            idOrcamento + ")";
 
-                                                PositivacaoSql positivacaoSql = new PositivacaoSql(getContext());
+                                                    PositivacaoSql positivacaoSql = new PositivacaoSql(getContext());
 
-                                                // Inseri a positivacao e checa se inseriu com sucesso
-                                                positivacaoSql.execSQL(sqlInsert);
+                                                    // Inseri a positivacao e checa se inseriu com sucesso
+                                                    positivacaoSql.execSQL(sqlInsert);
 
-                                                GerarPdfAsyncRotinas gerarPdfSalvar = new GerarPdfAsyncRotinas(getActivity());
-                                                // Seta(envia) os dados do orcamento
-                                                gerarPdfSalvar.setOrcamento(preencheDadosOrcamento());
-                                                // Seta(envia) a lista de produtos do orcamento
-                                                gerarPdfSalvar.setListaItensOrcamento(adapterItemOrcamento.getListaItemOrcamento());
+                                                    FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(getContext());
+                                                    // Verifica se eh pra enviar o pedido instantaneamente, assim que transformar em pedido
+                                                    if ((funcoes.getValorXml(funcoes.TAG_ENVIAR_INSTANTANEAMENTE).equalsIgnoreCase(funcoes.SIM)) && (idOrcamento != null) && (!idOrcamento.isEmpty())) {
 
-                                                gerarPdfSalvar.execute("");
+                                                        progressBarStatus.setVisibility(View.VISIBLE);
+                                                        progressBarStatus.setIndeterminate(true);
+                                                        final String valorTotalPedido = textTotal.getText().toString();
 
-                                                // Fecha a view
-                                                //finish();
+                                                        String[] listaIdOrcamento = new String[1];
+                                                        listaIdOrcamento[0] = idOrcamento;
 
-                                            } else {
-                                                SuperToast.create(getContext(), getResources().getString(R.string.nao_foi_possivel_transformar_orcamento_pedido), SuperToast.Duration.LONG, Style.getStyle(Style.RED, SuperToast.Animations.FLYIN)).show();
-                                                //mensagem.put("mensagem", getResources().getString(R.string.nao_foi_possivel_transformar_orcamento_pedido));
+                                                        EnviarDadosWebserviceAsyncRotinas enviarDadosWebservice = new EnviarDadosWebserviceAsyncRotinas(new EnviarDadosWebserviceAsyncRotinas.OnTaskCompleted() {
+                                                            @Override
+                                                            public void onTaskCompleted() {
+                                                                progressBarStatus.setVisibility(View.GONE);
+                                                                textTotal.setText("Total: " + valorTotalPedido);
+                                                            }
+                                                        }, getContext());
+                                                        enviarDadosWebservice.setIdOrcamentoSelecionado(listaIdOrcamento);
+                                                        enviarDadosWebservice.setProgressBarStatus(progressBarStatus);
+                                                        enviarDadosWebservice.setTextStatus(textTotal);
+                                                        enviarDadosWebservice.execute();
+                                                    }
+                                                    // Verifica se eh pra salvar o PDF do pedido automatico
+                                                    if ((funcoes.getValorXml(funcoes.TAG_SALVA_PEDIDO_PDF).equalsIgnoreCase(funcoes.SIM)) && (idOrcamento != null) && (!idOrcamento.isEmpty())) {
+
+                                                        GerarPdfAsyncRotinas gerarPdfSalvar = new GerarPdfAsyncRotinas(getActivity());
+                                                        // Seta(envia) os dados do orcamento
+                                                        gerarPdfSalvar.setOrcamento(preencheDadosOrcamento());
+                                                        // Seta(envia) a lista de produtos do orcamento
+                                                        gerarPdfSalvar.setListaItensOrcamento(adapterItemOrcamento.getListaItemOrcamento());
+                                                        gerarPdfSalvar.setTipoGerarPdf(gerarPdfSalvar.SIM);
+
+                                                        String caminhoPdf = gerarPdfSalvar.execute("").get();
+
+                                                        SuperActivityToast.create(getContext(), (getContext().getResources().getString(R.string.pdf_salvo_sucesso)) + "\n" + caminhoPdf, Style.DURATION_SHORT)
+                                                                .setTextColor(Color.WHITE)
+                                                                .setColor(Color.GRAY)
+                                                                .setAnimations(Style.ANIMATIONS_POP)
+                                                                .show();
+                                                    }
+                                                } else {
+                                                    SuperActivityToast.create(getActivity(), getResources().getString(R.string.nao_foi_possivel_transformar_orcamento_pedido), Style.DURATION_LONG)
+                                                            .setTextColor(Color.WHITE)
+                                                            .setColor(Color.RED)
+                                                            .setAnimations(Style.ANIMATIONS_POP)
+                                                            .show();
+                                                }
+                                            } catch (InterruptedException e) {
+                                                SuperActivityToast.create(getActivity(), (getResources().getString(R.string.nao_foi_possivel_transformar_orcamento_pedido) + " - " + e.getMessage()), Style.DURATION_LONG)
+                                                        .setTextColor(Color.WHITE)
+                                                        .setColor(Color.RED)
+                                                        .setAnimations(Style.ANIMATIONS_POP)
+                                                        .show();
+                                            } catch (ExecutionException e) {
+                                                SuperActivityToast.create(getActivity(), (getResources().getString(R.string.nao_foi_possivel_transformar_orcamento_pedido) + " - " + e.getMessage()), Style.DURATION_LONG)
+                                                        .setTextColor(Color.WHITE)
+                                                        .setColor(Color.RED)
+                                                        .setAnimations(Style.ANIMATIONS_POP)
+                                                        .show();
                                             }
-                                            // Instancia a classe de funcoes
-                                            /*FuncoesPersonalizadas funcoes;
-
-                                            // Instancia a classe  de funcoes para mostra a mensagem
-                                            funcoes = new FuncoesPersonalizadas(getActivity());
-                                            funcoes.menssagem(mensagem);*/
-
                                         } else {
-                                            SuperToast.create(getContext(), getResources().getString(R.string.opcao_positivacao_nao_valida_para_esta_tela), SuperToast.Duration.LONG, Style.getStyle(Style.RED, SuperToast.Animations.FLYIN)).show();
+                                            SuperActivityToast.create(getActivity(), getResources().getString(R.string.opcao_positivacao_nao_valida_para_esta_tela), Style.DURATION_LONG)
+                                                    .setTextColor(Color.WHITE)
+                                                    .setColor(Color.RED)
+                                                    .setAnimations(Style.ANIMATIONS_POP)
+                                                    .show();
                                         }
                                     }
                                 })
@@ -578,24 +586,17 @@ public class OrcamentoProdutoMDFragment extends Fragment {
 
 
                     } else {
-                        /*ContentValues mensagem = new ContentValues();
-                        mensagem.put("comando", 2);
-                        mensagem.put("tela", "OrcamentoActivity");
-                        mensagem.put("mensagem", getActivity().getResources().getString(R.string.nao_orcamento) + "\n");
-
-                        // Instancia a classe de funcoes
-                        FuncoesPersonalizadas funcoes;
-
-                        funcoes = new FuncoesPersonalizadas(getActivity());
-                        funcoes.menssagem(mensagem);*/
-
-                        SuperToast.create(getContext(), getResources().getString(R.string.nao_orcamento), SuperToast.Duration.VERY_SHORT, Style.getStyle(Style.RED, SuperToast.Animations.FLYIN)).show();
+                        SuperActivityToast.create(getActivity(), (getResources().getString(R.string.nao_orcamento) + " - " + tipoOrcamentoPedido), Style.DURATION_VERY_SHORT)
+                                .setTextColor(Color.WHITE)
+                                .setColor(Color.RED)
+                                .setAnimations(Style.ANIMATIONS_POP)
+                                .show();
                     }
                     break;
 
                 case R.id.menu_orcamento_tab_md_trocar_cliente:
                     // Checa se eh um orcamento
-                    if (tipoOrcamentoPedido.equals("O")) {
+                    if (tipoOrcamentoPedido.equals(OrcamentoRotinas.ORCAMENTO)) {
                         // Abre a tela de detalhes do produto
                         Intent intent = new Intent(getActivity(), ClienteListaMDActivity.class);
                         intent.putExtra(KEY_TELA_CHAMADA, KEY_TELA_ORCAMENTO_FRAGMENTO);
@@ -604,18 +605,11 @@ public class OrcamentoProdutoMDFragment extends Fragment {
                         startActivityForResult(intent, SOLICITA_CLIENTE);
 
                     } else {
-                        /*ContentValues mensagem = new ContentValues();
-                        mensagem.put("comando", 2);
-                        mensagem.put("tela", "OrcamentoFragment");
-                        mensagem.put("mensagem", getActivity().getResources().getString(R.string.nao_orcamento) + "\n");
-
-                        // Instancia a classe de funcoes
-                        FuncoesPersonalizadas funcoes;
-
-                        funcoes = new FuncoesPersonalizadas(getActivity());
-                        funcoes.menssagem(mensagem);*/
-
-                        SuperToast.create(getContext(), getResources().getString(R.string.nao_orcamento), SuperToast.Duration.VERY_SHORT, Style.getStyle(Style.RED, SuperToast.Animations.FLYIN)).show();
+                        SuperActivityToast.create(getActivity(), getResources().getString(R.string.nao_orcamento), Style.DURATION_VERY_SHORT)
+                                .setTextColor(Color.WHITE)
+                                .setColor(Color.RED)
+                                .setAnimations(Style.ANIMATIONS_POP)
+                                .show();
                     }
                     break;
 
@@ -653,6 +647,27 @@ public class OrcamentoProdutoMDFragment extends Fragment {
         public boolean onQueryTextSubmit(String query) {
             // Chama a funcao para carregar a lista com todos os produtos
             //criaListaDeProdutos(null, null, 1);
+
+            if ((query == null) || (query.isEmpty())){
+                SuperActivityToast.create(getActivity(), getResources().getString(R.string.digite_alguma_coisa_pesquisar), Style.DURATION_LONG)
+                        .setTextColor(Color.WHITE)
+                        .setColor(Color.RED)
+                        .setAnimations(Style.ANIMATIONS_POP)
+                        .show();
+
+            } else if ((adapterItemOrcamento == null) || (adapterItemOrcamento.getListaItemOrcamento() == null) || (adapterItemOrcamento.getListaItemOrcamento().size() < 1)){
+                SuperActivityToast.create(getActivity(), getResources().getString(R.string.nao_tem_produtos_orcamento_pedido), Style.DURATION_LONG)
+                        .setTextColor(Color.WHITE)
+                        .setColor(Color.RED)
+                        .setAnimations(Style.ANIMATIONS_POP)
+                        .show();
+
+            } else {
+                adapterItemOrcamento.getFilter().filter(query);
+
+                // Seta o adapte com a nova lista, com ou sem o filtro
+                adapterItemOrcamento.setListaItemOrcamento(adapterItemOrcamento.getListaItemOrcamento());
+            }
 
             adapterItemOrcamento.getFilter().filter(query);
 
@@ -904,7 +919,13 @@ public class OrcamentoProdutoMDFragment extends Fragment {
                     startActivity(Intent.createChooser(dadosEmail, "Enviar e-mail..."));
 
                 } catch (android.content.ActivityNotFoundException ex) {
-                    SuperToast.create(getContext(), getResources().getString(R.string.nao_possivel_compartilhar_arquivo), SuperToast.Duration.LONG, Style.getStyle(Style.RED, SuperToast.Animations.FLYIN)).show();
+                    //SuperActivityToast.create(getActivity(), getResources().getString(R.string.nao_possivel_compartilhar_arquivo), SuperToast.Duration.LONG, Style.getStyle(Style.RED, SuperToast.Animations.FLYIN)).show();
+
+                    SuperActivityToast.create(getActivity(), getResources().getString(R.string.nao_possivel_compartilhar_arquivo), Style.DURATION_LONG)
+                            .setTextColor(Color.WHITE)
+                            .setColor(Color.RED)
+                            .setAnimations(Style.ANIMATIONS_POP)
+                            .show();
                 }
             }
 

@@ -135,7 +135,7 @@ public class ConexaoBancoDeDados extends SQLiteOpenHelper {
 	 * @return
 	 */
 	public SQLiteDatabase abrirBanco() {
-		Log.i("SAVARE", "ConexaoBancoDeDados - abrirBanco");
+		//Log.i("SAVARE", "ConexaoBancoDeDados - abrirBanco");
 
 		String bancoDados = PATH_BANCO + NOME_BANCO;
 		//File s = context.getExternalFilesDir(null);

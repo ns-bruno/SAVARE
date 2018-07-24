@@ -1,30 +1,18 @@
 package com.savare.funcoes.rotinas;
 
+import android.content.ContentValues;
+import android.content.Context;
+import android.os.Environment;
+
+import com.savare.funcoes.FuncoesPersonalizadas;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
-
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
-
-import org.jdom2.Document;
-import org.jdom2.Element;
-import org.jdom2.output.Format;
-import org.jdom2.output.XMLOutputter;
-
-import android.content.ContentValues;
-import android.content.Context;
-import android.database.Cursor;
-import android.os.Environment;
-
-import com.savare.banco.funcoesSql.ItemOrcamentoSql;
-import com.savare.banco.funcoesSql.OrcamentoSql;
-import com.savare.funcoes.FuncoesPersonalizadas;
 
 public class GerarXmlOrcamentoRotinas {
 	
@@ -70,11 +58,11 @@ public class GerarXmlOrcamentoRotinas {
 	    	
 	    	Writer saida = new OutputStreamWriter(new FileOutputStream(arquivoXml));
 	    	
-	    	XMLOutputter saidaXml = new XMLOutputter();
+	    	//XMLOutputter saidaXml = new XMLOutputter();
 	    	
-	    	saidaXml.setFormat(Format.getCompactFormat().setEncoding("ISO-8859-1"));
+	    	//saidaXml.setFormat(Format.getCompactFormat().setEncoding("ISO-8859-1"));
 	    	
-	    	saidaXml.output(gerarXml(), saida);
+	    	//saidaXml.output(gerarXml(), saida);
 	    	
 	    	if(arquivoXml.exists()){
 	    		localArquivoXml = arquivoXml.getPath();
@@ -105,7 +93,7 @@ public class GerarXmlOrcamentoRotinas {
 	}
 	
 	
-	private Document gerarXml(){
+	/*private Document gerarXml(){
 		OrcamentoSql orcamentoSql = new OrcamentoSql(context);
 		
 		Cursor dadosOrcamento = orcamentoSql.query("AEAORCAM.ID_AEAORCAM = " + idOrcamento);
@@ -397,5 +385,5 @@ public class GerarXmlOrcamentoRotinas {
 	    doc.setRootElement(tagOrcamentoProc);
 	    
 	    return doc;
-	}
+	}*/
 }

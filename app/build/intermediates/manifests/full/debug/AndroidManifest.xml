@@ -1,12 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.savare"
-    android:versionCode="1005"
-    android:versionName="1.0.0.5" >
+    android:versionCode="2000"
+    android:versionName="2.0.0.0" >
 
     <uses-sdk
-        android:minSdkVersion="15"
-        android:targetSdkVersion="22" />
+        android:minSdkVersion="16"
+        android:targetSdkVersion="27" />
+
+    <!-- <uses-sdk -->
+    <!-- android:minSdkVersion="15" -->
+    <!-- android:targetSdkVersion="22" /> -->
 
     <uses-permission android:name="android.permission.READ_SYNC_STATS" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -47,10 +51,15 @@
         android:xlargeScreens="true" />
 
     <application
+        android:name="android.support.multidex.MultiDexApplication"
         android:allowBackup="true"
+        android:debuggable="true"
+        android:hardwareAccelerated="false"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:largeHeap="true"
+        android:supportsRtl="true"
+        android:testOnly="true"
         android:theme="@android:style/Theme.Holo.Light" >
 
         <!-- Google Analytics Version v4 needs this value for easy tracking -->
@@ -69,42 +78,6 @@
             </intent-filter>
         </activity>
         <activity android:name="com.savare.activity.CadastroUsuarioActivity" />
-        <activity android:name="com.savare.activity.InicioActivity" />
-        <activity android:name="com.savare.activity.ClienteListaActivity" >
-            <intent-filter>
-                <action android:name="android.intent.action.SEARCH" />
-            </intent-filter>
-
-            <meta-data
-                android:name="android.app.searchable"
-                android:resource="@layout/searchable" />
-        </activity>
-        <activity android:name="com.savare.activity.ClienteDetalhesActivity" />
-        <activity
-            android:name="com.savare.activity.OrcamentoActivity"
-            android:uiOptions="splitActionBarWhenNarrow" >
-            <intent-filter>
-                <action android:name="android.intent.action.SEARCH" />
-            </intent-filter>
-
-            <meta-data
-                android:name="android.app.searchable"
-                android:resource="@layout/searchable" />
-            <meta-data
-                android:name="android.support.UI_OPTIONS"
-                android:value="splitActionBarWhenNarrow" />
-        </activity>
-        <activity android:name="com.savare.activity.ProdutoListaActivity" />
-        <activity android:name="com.savare.activity.OrcamentoProdutoDetalhesActivity" />
-        <activity android:name="com.savare.activity.OrcamentoPlanoPagamentoActivity" />
-        <activity android:name="com.savare.activity.ListaOrcamentoPedidoActivity" />
-        <activity android:name="com.savare.activity.ListaTitulosActivity" />
-        <activity android:name="com.savare.activity.SincronizacaoActivity" />
-        <activity android:name="com.savare.activity.ConfiguracoesActivity" />
-        <activity
-            android:name="com.savare.activity.fragment.OrcamentoTabulacaoFragment"
-            android:uiOptions="splitActionBarWhenNarrow" />
-        <activity android:name="com.savare.activity.ProdutoDetalhesActivity" />
         <activity android:name="com.savare.activity.LogActivity" />
         <activity android:name="com.savare.activity.fragment.ClienteCadastroFragment" />
         <activity
@@ -120,7 +93,6 @@
                 android:name="android.app.searchable"
                 android:resource="@xml/searchable" />
         </activity>
-        <activity android:name="com.savare.activity.LoginActivity" />
         <activity
             android:name="com.savare.activity.material.designer.ProdutoListaMDActivity"
             android:theme="@style/AppBaseTheme" >
@@ -180,6 +152,14 @@
         </activity>
         <activity
             android:name="com.savare.activity.material.designer.OrcamentoCriticaMDActivity"
+            android:theme="@style/AppBaseTheme" >
+        </activity>
+        <activity
+            android:name="com.savare.activity.material.designer.CadastroServidorMDActivity"
+            android:theme="@style/AppBaseTheme" >
+        </activity>
+        <activity
+            android:name="com.savare.activity.material.designer.ListaServidoresWebserviceMDActivity"
             android:theme="@style/AppBaseTheme" >
         </activity>
 

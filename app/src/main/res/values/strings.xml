@@ -14,6 +14,7 @@
     <string name="enviar">Enviar</string>
     <string name="enviar_dados_cliente">Enviar Dados Cliente</string>
     <string name="adicionar_produto">Adicionar Produtos</string>
+    <string name="adicionar_servidor">Adicionar Servidor</string>
     <string name="atualizar">Atualizar</string>
     <string name="voltar">Voltar</string>
     <string name="chave_empresa">Chave da Empresa</string>
@@ -27,6 +28,7 @@
     <string name="embalagem">Embalagem</string>
     <string name="ip_servidor_sisinfo">IP Servidor SisInfo</string>
     <string name="senha_servidor_sisinfo">Senha do Servidor SisInfo</string>
+    <string name="nome_servidor">Nome do Servidor</string>
     <string name="salvar">Salvar</string>
     <string name="cancelar">Cancelar</string>
     <string name="filtrar">Filtrar</string>
@@ -83,6 +85,7 @@
     <string name="pesquisar">Pesquisar</string>
     <string name="tamanho_texto">Tamanho do Texto</string>
     <string name="enviar_automatico">Enviar Automático</string>
+    <string name="enviar_instantaneamente">Enviar Instantâneamente</string>
     <string name="receber_automatico">Receber Automático</string>
     <string name="quantidade_casas_decimais">Quantidade de Casas Decimais</string>
     <string name="percentual_mark_up_atacado">% Mark Up Atacado</string>
@@ -112,6 +115,7 @@
     <string name="trocar_cliente">Trocar Cliente</string>
     <string name="plano_pagamento">Plano de Pagamento</string>
     <string name="enviar_email">Enviar e-Mail</string>
+    <string name="compartilhar">Compartilhar</string>
     <string name="abrir_pdf">Abrir PDF</string>
     <string name="visualizar_logs">Visualizar logs</string>
     <string name="enviar_pedido_nuvem">Enviar Pedido para Nuvem</string>
@@ -125,6 +129,7 @@
     <string name="unitario">Unitário</string>
     <string name="unidade">Unidade</string>
     <string name="ultimo_preco">Ultimo Preço</string>
+    <string name="valor_unitario">Valor Unitário</string>
     <string name="sequencial">Sequêncial</string>
     <string name="codigo_unico">Código Único</string>
     <string name="estoque">Estoque</string>
@@ -161,6 +166,7 @@
     <string name="desconhecido">Desconhecido</string>
     <string name="parece_que_tem_internet_vamos_pegar_dados_agora">Parece que tem internet, agora vamos pegar os dados à serem enviados.</string>
     <string name="aguarde_estamos_checando_se_existe_internet">Aguarde, estamos checando se existe internet...</string>
+    <string name="aguarde_estamos_pegando_lista_servidores">Aguarde, estamos pegando a lista de servidores...</string>
     <string name="achamos_orcamento_numero">Achamos o orçamento de Nº </string>
     <string name="agora_estamos_pegando_produtos_orcamento_numero">Agora estamos pegando os produtos do orçamento de Nº </string>
     <string name="vamos_prepara_dados_para_enviar">Vamos preparar os dados coletados para enviar.</string>
@@ -192,6 +198,7 @@
     <string name="clique_sair_novamente_para_sair">Clieque em voltar novamente para sair.</string>
     <string name="estamos_providenciado_recebimento_dados">Estamos providenciando o recebimento dos dados.</string>
     <string name="estamos_conectanto_servidor_nuvem">Estamos Conectando no Servidor em Nuvem...</string>
+    <string name="estamos_conectanto_servidor_webservice">Estamos Conectando no Servidor Webservice...</string>
     <string name="erro_conectar_servidor_nuvem">Erro ao conectar no Servidor em Nuvem, nem conseguimos logar.</string>
     <string name="logado_sucesso">Logado com sucesso.</string>
     <string name="nao_achamos_nenhum_arquivo_downloads">Não achamos nenhum arquivo para fazer downloads.</string>
@@ -203,6 +210,8 @@
     <string name="selecione_uma_opcao">Selecione Uma Opção</string>
     <string name="todos">Todos</string>
     <string name="imagem_produto">Imagem do Produto</string>
+    <string name="salva_pedido_pdf">Salva Pedido em PDF</string>
+    <string name="pdf_salvo_sucesso">PDF salvo com sucesso.</string>
     <string name="historico_valores_vendas_mensais">Histórico de Valores de Vendas Mensais.</string>
     <string name="mes_vendas">Mês de Vendas</string>
     <string name="nao_achamos_nenhum_valor">Não Achamos Nenhum Valor.</string>
@@ -226,10 +235,12 @@
     <string name="nao_possivel_compartilhar_arquivo">Não é possível compartilhar o arquivo</string>
     <string name="webservice">WebService</string>
     <string name="ip_servidor_webservice">IP Servidor WebService</string>
+    <string name="ip_servidor_webservice_nao_cadastrado">Servidor não esta cadastrado no banco de dados.</string>
     <string name="caminho_banco_dados">Caminho do Banco de Dados</string>
     <string name="porta_banco_dados">Porta do Banco de Dados</string>
     <string name="limpar_campos">Limpar Campos</string>
     <string name="versao_savare_desatualizada">Versão do SAVARE desatualizado</string>
+    <string name="versao_savare_valida">Versão do SAVARE valida</string>
     <string name="savare_desatualizado_favor_atualize">O SAVARE esta desatualizado, por favor, atualize o SAVARE para receber os dados normalmente.</string>
     <string name="savare_mais_atualizado_que_webservice">O SAVARE esta mais atualizado que o Servidor, vamos receber os dados do mesmo jeito, mas
         se acontecer algum erro ao receber os dados entre em contato com o suporte técnico do SAVARE.</string>
@@ -256,6 +267,9 @@
     <string name="salvando_critica_retorno">Salvando a crítica do retorno.</string>
     <string name="achamos_usuario_servidor_nuvem">Achamos um usuário no servidor em nuvem. </string>
     <string name="usuario_atualizado_sucesso">Usuário atualizado com sucesso.</string>
+    <string name="usuario_cadastrado_sucesso">Usuário cadastrado com sucesso.</string>
+    <string name="usuario_inativo">Usuário inativo.</string>
+    <string name="empresa_usuario_inativo">Empresa ou/e Usuário inativo.</string>
     <string name="atualizado_sucesso">Atualizado com Sucesso.</string>
     <string name="terminamos_atualizacao">Terminamos a atualização.</string>
     <string name="nao_conseguimos_atualizar_usuario">Não conseguimos atualizar o usuário, tente novamente, se persistir entre em contato com o suporte SAVARE.</string>
@@ -267,6 +281,7 @@
     <string name="recebendo_dados_areas">Aguarde, Recebendo os dados da(s) Área(s) ...</string>
     <string name="recebendo_dados_empresa">Aguarde, Recebendo os dados da(s) Empresa(s) ...</string>
     <string name="recebendo_dados_atividade">Recebendo os dados da(s) Atividade(s)...</string>
+    <string name="recebendo_dados_cotacao">Recebendo os dados de(s) Cotação...</string>
     <string name="recebendo_dados_status">Recebendo os dados do(s) Statu(s) de Cliente(s)...</string>
     <string name="recebendo_dados_tipo_documento">Recebendo os dados do(s) Tipo(s) de Documento(s)...</string>
     <string name="recebendo_dados_cartao">Recebendo os dados do(s) Cartao(ões) de Crédito(s)...</string>
@@ -297,8 +312,15 @@
     <string name="recebendo_dados_percentual">Recebendo os dados do(s) Percentual(is)...</string>
     <string name="recebendo_dados_fator">Recebendo os dados do(s) Fator(es)...</string>
     <string name="recebendo_dados_recomendado">Recebendo os dados do(s) Produto(s) Recomendado(s)...</string>
+    <string name="recebendo_dados_tabela_promocao">Recebendo os dados do(s) Tabela(s) de Promoção(ões)...</string>
+    <string name="recebendo_dados_item_promocao">Recebendo os dados do(s) Item(ns) de Promoção(ões)...</string>
+    <string name="recebendo_dados_excao_promocao">Recebendo os dados do(s) Exceção da Promoção...</string>
+    <string name="recebendo_dados_relacao_promocao">Recebendo os dados do(s) Relacionamento da Promoção...</string>
     <string name="recebendo_dados_parcela">Recebendo os dados da(s) Parcela(s)...</string>
+    <string name="recebendo_dados_lacamento_parcela">Recebendo os dados da(s) Laçamento(s)...</string>
+    <string name="recebendo_dados_versao">Recebendo os dados da Versão do App...</string>
     <string name="aguarde_mais_um_pouco_proxima_etapa">Aguarde mais um pouco, vamos para próxima etapa ...</string>
+    <string name="vamos_checar_cliente">Aguarde vamos checar os clientes ...</string>
     <string name="nao_tem_pedido_listar">Não tem pedido para pegar dados no dispositivo.</string>
     <string name="nao_conseguimos_validar_versao">Não conseguimos validar a versão do SAVARE, por favor, entre em contato com o suporte SAVARE.</string>
     <string name="terminamos_receber_dados">Terminamos de receber os primeiros dados, pode ir em frente e usar o SAVARE.</string>
@@ -317,7 +339,8 @@
     <string name="varejo">Varejo</string>
     <string name="apenas_produtos_novos">Apenas Produtos Novos</string>
     <string name="aguarde_distribuir_desconto_item_orcamento">Aguarde, vamor distribuir o desconto no(s) item(ns) do oçamento...</string>
-    <string name="aparentemente_servidor_webservice_offline">Aparentemente o Servidor Webservice está offline, pedimos que tente novamente, mas se não der certo entre em contato com o suporte SAVARE.</string>
+    <string name="aparentemente_servidor_webservice_offline">Aparentemente o Servidor Webservice está offline, pedimos que tente novamente, mas se não der certo entre em contato com o suporte da empresa ou do SAVARE.</string>
+    <string name="servidor_webservice_offline">Servidor Webservice está offline.</string>
     <string name="estamos_checando_webservice_online">Estamos checando se o servidor Webservice está online, Aguarde...</string>
     <string name="checando_versao_savare">Estamos checando a versão do SAVARE, Aguarde...</string>
     <string name="servidor_online">O servidor respondeu o nosso sinal. Agora vamos para próxima etapa, Aguarde...</string>
@@ -335,12 +358,29 @@
     <string name="sem_cidade">Sem Cidade</string>
     <string name="portador">Portador/Banco</string>
     <string name="calculando_preco_venda">Calculando Preço de Venda</string>
+    <string name="calculando_juros">Calculando Juros</string>
     <string name="critica_orcamento">Crítica de Orçamento</string>
     <string name="sem_razao_social">Sem razão social.</string>
     <string name="nao_achamos_cnpj">Não achamaos o CNPJ, volter e tente inserir novamente o CNPJ da empresa.</string>
+    <string name="nao_salvou_parametros_banco">Não conseguimos salvar os parâmetros no banco de dados. Tente novamente.</string>
     <string name="dispositivo_registrado">Dispositivo registrado com sucesso. Entre em contato com a sua empresa para associar o dispositivo ao seu cadastro.</string>
     <string name="zerado_sucesso">Apagado com sucesso.</string>
     <string name="nao_autorizado">Não autorizado</string>
+    <string name="porta_webservice">Porta Webservice</string>
+    <string name="nao_achamos_servidores_cadastrados">Não achamos nenhum servidor cadastrado.</string>
+    <string name="nao_conseguimos_registrar_dispositivo">Não conseguimos registrar o dispositivo em nosso servidor central. Tente novamente.</string>
+    <string name="erro_inesperado">Erro inesperado. </string>
+    <string name="para_cadastrar_dispositivo_precisa_internet">Para cadastrar o dispositivo precisamos de internet.</string>
+    <string name="nao_tem_produtos_orcamento_pedido">Não tem produtos dentro do orçamento/pedido</string>
+    <string name="digite_alguma_coisa_pesquisar">Digite alguma palavra para pesquisar</string>
+    <string name="aguarde_vamos_enviar_dados">Aguarde, vamor enviar os dados. Primeiro vamos ver se tem internet...</string>
+    <string name="versao_aplicacao">Versão: </string>
+    <string name="chave">Chave: </string>
+    <string name="valor_desconto_unitario">Vl. Desc. Unitário</string>
+    <string name="nao_conseguimos_inserir_foto">Não conseguimos inserir a foto.</string>
+    <string name="nao_conseguimos_pegar_embalagem_produto">Não conseguimos pegar as embalagens do produto. Favor, voltar e selecione novamente um produto.</string>
+    <string name="nao_conseguimos_pegar_plano_pagamento">Não conseguimos listar os planos de pagamentos. Favor, voltar e selecione novamente um produto.</string>
+    <string name="nao_conseguimos_pegar_lista_estoque">Não conseguimos listar as locações do estoque do produto. Favor, voltar e selecione novamente um produto.</string>
 
 
     <string-array name="tab_produto_md">

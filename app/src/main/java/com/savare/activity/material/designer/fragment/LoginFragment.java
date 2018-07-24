@@ -3,6 +3,7 @@ package com.savare.activity.material.designer.fragment;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.ContentValues;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,12 +14,13 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.github.johnpersano.supertoasts.SuperToast;
-import com.github.johnpersano.supertoasts.util.Style;
+import com.github.johnpersano.supertoasts.library.Style;
+import com.github.johnpersano.supertoasts.library.SuperActivityToast;
 import com.heinrichreimersoftware.materialintro.app.SlideFragment;
 import com.savare.R;
 import com.savare.activity.CadastroUsuarioActivity;
 import com.savare.activity.material.designer.RegistroChaveUsuarioMDActivity;
+import com.savare.banco.funcoesSql.ParametrosLocalSql;
 import com.savare.banco.funcoesSql.UsuarioSQL;
 import com.savare.configuracao.ConfiguracoesInternas;
 import com.savare.funcoes.FuncoesPersonalizadas;
@@ -73,84 +75,140 @@ public class LoginFragment extends SlideFragment {
                     textStatus.setText(R.string.aguarde_buscando_primeiros_dados);
 
                     final FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(getContext());
-                    funcoes.setValorXml("Usuario", username.getText().toString());
-                    funcoes.setValorXml("SenhaUsuario", funcoes.criptografaSenha(password.getText().toString()));
+                    funcoes.setValorXml(funcoes.TAG_USUARIO, username.getText().toString());
+                    funcoes.setValorXml(funcoes.TAG_SENHA_USUARIO, funcoes.criptografaSenha(password.getText().toString()));
 
-                    ((Activity) getContext()).runOnUiThread(new Runnable() {
-                        public void run() {
-                            progressBarStatus.setVisibility(View.VISIBLE);
+                    // Verifica se o CNPJ/CPF foi salvo
+                    if (!funcoes.getValorXml(funcoes.TAG_CNPJ_EMPRESA).equalsIgnoreCase(funcoes.NAO_ENCONTRADO)){
+                        // Verifica se o usuario e a senha foi salvo
+                        if ( (!funcoes.getValorXml(funcoes.TAG_USUARIO).equalsIgnoreCase(funcoes.NAO_ENCONTRADO)) &&
+                             (!funcoes.getValorXml(funcoes.TAG_SENHA_USUARIO).equalsIgnoreCase(funcoes.NAO_ENCONTRADO)) ){
 
-                            ReceberDadosWebserviceAsyncRotinas receberDadosWebservice = new ReceberDadosWebserviceAsyncRotinas(
-                                    new ReceberDadosWebserviceAsyncRotinas.OnTaskCompleted() {
-                                        @Override
-                                        public void onTaskCompleted() {
-                                            // Instancia a classe de rotinas
-                                            Rotinas rotinas = new Rotinas(getContext());
+                            ContentValues parametros = new ContentValues();
+                            parametros.put("NOME_PARAM", funcoes.TAG_USUARIO);
+                            parametros.put("VALOR_PARAM", funcoes.getValorXml(funcoes.TAG_USUARIO));
 
-                                            // Verfifica se existe algum usuario cadastrado, ou
-                                            if ((rotinas.existeUsuario() == true) && (!funcoes.getValorXml("CnpjEmpresa").equalsIgnoreCase(funcoes.NAO_ENCONTRADO))) {
+                            ParametrosLocalSql parametrosLocalSql = new ParametrosLocalSql(getContext());
+                            if (parametrosLocalSql.insert(parametros) > 0) {
 
-                                                SuperToast.create(getContext(), getResources().getString(R.string.usuario_atualizado_sucesso), SuperToast.Duration.LONG, Style.getStyle(Style.GREEN, SuperToast.Animations.POPUP)).show();
+                                parametros.put("NOME_PARAM", funcoes.TAG_CNPJ_EMPRESA);
+                                parametros.put("VALOR_PARAM", funcoes.getValorXml(funcoes.TAG_CNPJ_EMPRESA));
+                                // Adiciona os parametros no banco de dados
+                                // Checa se inserio no banco com sucesso pra poder proseguir
+                                if (parametrosLocalSql.insert(parametros) > 0) {
 
-                                                //login.setText(R.string.logado_sucesso);
-                                                textStatus.setText(R.string.logado_sucesso);
+                                    ((Activity) getContext()).runOnUiThread(new Runnable() {
+                                        public void run() {
+                                            progressBarStatus.setVisibility(View.VISIBLE);
 
-                                                // Deixa a barra de progresso invisivel
-                                                progressBarStatus.setVisibility(View.INVISIBLE);
+                                            ReceberDadosWebserviceAsyncRotinas receberDadosWebservice = new ReceberDadosWebserviceAsyncRotinas(
+                                                    new ReceberDadosWebserviceAsyncRotinas.OnTaskCompleted() {
+                                                        @Override
+                                                        public void onTaskCompleted() {
+                                                            // Verfifica se a marcacao AbriuAppPriveiraVez esta como Nao pra saber se foi cadastrado o dispositivo com sucesso
+                                                            if ((!funcoes.getValorXml("AbriuAppPriveiraVez").equalsIgnoreCase(funcoes.NAO_ENCONTRADO)) &&
+                                                                    funcoes.getValorXml("AbriuAppPriveiraVez").equalsIgnoreCase("N")) {
 
-                                            } else {
-                                                new MaterialDialog.Builder(getContext())
-                                                        .title(R.string.nao_conseguimos_atualizar_usuario)
-                                                        .content("Não conseguimos receber os dados do usuário, por favor, tente novamente.")
-                                                        .positiveText(R.string.button_ok)
-                                                        .show();
+                                                                //SuperActivityToast.create(getActivity(), getResources().getString(R.string.usuario_cadastrado_sucesso), SuperToast.Duration.LONG, Style.getStyle(Style.GREEN, SuperToast.Animations.POPUP)).show();
 
-                                                ((Activity) getContext()).runOnUiThread(new Runnable() {
-                                                    public void run() {
-                                                        textStatus.setText(R.string.nao_conseguimos_atualizar_usuario);
-                                                    }
-                                                });
+                                                                SuperActivityToast.create(getActivity(), getResources().getString(R.string.usuario_cadastrado_sucesso), Style.DURATION_LONG)
+                                                                        .setTextColor(Color.WHITE)
+                                                                        .setColor(Color.GREEN)
+                                                                        .setAnimations(Style.ANIMATIONS_POP)
+                                                                        .show();
 
+                                                                //login.setText(R.string.logado_sucesso);
+                                                                textStatus.setText(R.string.logado_sucesso);
 
-                                                // Abilita novamente os campos e o botao
-                                                username.setEnabled(true);
-                                                password.setEnabled(true);
-                                                login.setEnabled(true);
-                                                login.setText(R.string.registrar);
-                                                // Deixa a barra de progresso invisivel
-                                                progressBarStatus.setVisibility(View.INVISIBLE);
-                                            }
+                                                                // Deixa a barra de progresso invisivel
+                                                                progressBarStatus.setVisibility(View.INVISIBLE);
+
+                                                            } else {
+                                                                new MaterialDialog.Builder(getContext())
+                                                                        .title(R.string.nao_conseguimos_atualizar_usuario)
+                                                                        .content("Não conseguimos receber os dados do usuário, por favor, tente novamente.")
+                                                                        .positiveText(R.string.button_ok)
+                                                                        .show();
+
+                                                                ((Activity) getContext()).runOnUiThread(new Runnable() {
+                                                                    public void run() {
+                                                                        textStatus.setText(R.string.nao_conseguimos_atualizar_usuario);
+                                                                    }
+                                                                });
+
+                                                                // Abilita novamente os campos e o botao
+                                                                username.setEnabled(true);
+                                                                password.setEnabled(true);
+                                                                login.setEnabled(true);
+                                                                login.setText(R.string.registrar);
+                                                                // Deixa a barra de progresso invisivel
+                                                                progressBarStatus.setVisibility(View.INVISIBLE);
+                                                            }
+                                                        }
+                                                    },
+                                                    getContext(),
+                                                    null);
+
+                                            // Insiro um textView para mostra o status
+                                            receberDadosWebservice.setTextStatus(textStatus);
+                                            // Executa o asynctask
+                                            receberDadosWebservice.execute();
                                         }
-                                    },
-                                    getContext(),
-                                    new String[]{WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_SMADISPO});
+                                    });
+                                } else {
+                                    // Abilita novamente os campos e o botao
+                                    username.setEnabled(true);
+                                    password.setEnabled(true);
+                                    login.setEnabled(true);
+                                    login.setText(R.string.registrar);
 
-                            // Insiro um textView para mostra o status
-                            receberDadosWebservice.setTextStatus(textStatus);
+                                    new MaterialDialog.Builder(getContext())
+                                            .title(R.string.registrar_voce_como_usuario)
+                                            .content((R.string.nao_salvou_parametros_banco) + " - Parâmetro CNPJ Empresa")
+                                            .positiveText(R.string.button_ok)
+                                            .show();
+                                }
+                            } else {
+                                // Abilita novamente os campos e o botao
+                                username.setEnabled(true);
+                                password.setEnabled(true);
+                                login.setEnabled(true);
+                                login.setText(R.string.registrar);
 
-                            // Executa o asynctask
-                            receberDadosWebservice.execute();
+                                new MaterialDialog.Builder(getContext())
+                                        .title(R.string.registrar_voce_como_usuario)
+                                        .content((R.string.nao_salvou_parametros_banco) + " - Parametro Nome de Usuário")
+                                        .positiveText(R.string.button_ok)
+                                        .show();
+                            }
                         }
-                    });
+                    } else {
+                        // Abilita novamente os campos e o botao
+                        username.setEnabled(true);
+                        password.setEnabled(true);
+                        login.setEnabled(true);
+                        login.setText(R.string.registrar);
+
+                        new MaterialDialog.Builder(getContext())
+                                .title(R.string.registrar_voce_como_usuario)
+                                .content(R.string.nao_achamos_cnpj)
+                                .positiveText(R.string.button_ok)
+                                .show();
+                    }
                 } else {
-                    SuperToast.create(getContext(), getResources().getString(R.string.nome_login_invalido), SuperToast.Duration.LONG, Style.getStyle(Style.RED, SuperToast.Animations.POPUP)).show();
+                    //SuperActivityToast.create(getActivity(), getResources().getString(R.string.nome_login_invalido), SuperToast.Duration.LONG, Style.getStyle(Style.RED, SuperToast.Animations.POPUP)).show();
+
+                    SuperActivityToast.create(getActivity(), getResources().getString(R.string.nome_login_invalido), Style.DURATION_LONG)
+                            .setTextColor(Color.WHITE)
+                            .setColor(Color.RED)
+                            .setAnimations(Style.ANIMATIONS_POP)
+                            .show();
                 }
             }
         });
 
         return root;
     }
-
-    @Override
-    public void onDestroy() {
-
-        super.onDestroy();
-    }
-
-    /*@Override
-    public boolean canGoForward() {
-        return loggedIn;
-    }*/
 
     private boolean validarNomeUsuario(){
         boolean valido = true;

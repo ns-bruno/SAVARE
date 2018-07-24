@@ -1,6 +1,7 @@
 package com.savare.activity.material.designer.fragment;
 
 import android.content.ContentValues;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -13,8 +14,8 @@ import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.github.johnpersano.supertoasts.SuperToast;
-import com.github.johnpersano.supertoasts.util.Style;
+import com.github.johnpersano.supertoasts.library.Style;
+import com.github.johnpersano.supertoasts.library.SuperActivityToast;
 import com.savare.R;
 import com.savare.activity.material.designer.OrcamentoTabFragmentMDActivity;
 import com.savare.adapter.ItemUniversalAdapter;
@@ -187,7 +188,7 @@ public class OrcamentoPrazoMDFragment extends Fragment{
             // Intancia a classe do adapter
             adapterPlanoPagamento = new ItemUniversalAdapter(getActivity(), ItemUniversalAdapter.PLANO_PAGAMENTO);
             // Preenche o adapter com uma lista
-            adapterPlanoPagamento.setListaPlanoPagamento(planoPagamentoRotinas.listaPlanoPagamento(null, "DESCRICAO", atacadoVarejo));
+            adapterPlanoPagamento.setListaPlanoPagamento(planoPagamentoRotinas.listaPlanoPagamento("ATIVO = '1' AND ENVIA_PALM = '1'", "DESCRICAO", atacadoVarejo));
 
             // Instancia a classe para pegar os dados do orcamento
             OrcamentoRotinas orcamentoRotinas = new OrcamentoRotinas(getActivity());
@@ -294,7 +295,13 @@ public class OrcamentoPrazoMDFragment extends Fragment{
             // Salva o plano de pagamento nos itens do orcamento
             if (orcamentoRotinas.updatePlanoPagamentoItemOrcamento(valoresItemOrcamento, textCodigoOrcamento.getText().toString()) > 0){
 
-                SuperToast.create(getContext(), getResources().getString(R.string.atualizado_sucesso), SuperToast.Duration.SHORT, Style.getStyle(Style.GREEN, SuperToast.Animations.POPUP)).show();
+                //SuperActivityToast.create(getActivity(), getResources().getString(R.string.atualizado_sucesso), SuperToast.Duration.SHORT, Style.getStyle(Style.GREEN, SuperToast.Animations.POPUP)).show();
+
+                SuperActivityToast.create(getActivity(), getResources().getString(R.string.atualizado_sucesso), Style.DURATION_SHORT)
+                        .setTextColor(Color.WHITE)
+                        .setColor(Color.GREEN)
+                        .setAnimations(Style.ANIMATIONS_POP)
+                        .show();
             }
 
             progressBarStatus.setVisibility(View.GONE);

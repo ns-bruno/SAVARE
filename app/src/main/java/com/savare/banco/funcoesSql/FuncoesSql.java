@@ -8,16 +8,17 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
+import android.graphics.Color;
 import android.util.Log;
 
-import com.github.johnpersano.supertoasts.SuperToast;
-import com.github.johnpersano.supertoasts.util.Style;
+import com.afollestad.materialdialogs.MaterialDialog;
+import com.github.johnpersano.supertoasts.library.Style;
+import com.github.johnpersano.supertoasts.library.SuperActivityToast;
 import com.savare.R;
 import com.savare.banco.local.ConexaoBancoDeDados;
 import com.savare.funcoes.VersionUtils;
 import com.savare.funcoes.FuncoesPersonalizadas;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class FuncoesSql {
@@ -69,67 +70,56 @@ public class FuncoesSql {
 			id = bancoDados.insertWithOnConflict(tabela, null, values, SQLiteDatabase.CONFLICT_NONE);
 			//id = bancoDados.insert(tabela, null, values);
 			
-			if (id > 0){
-				SuperToast.create(context, context.getResources().getString(R.string.cadastro_sucesso), SuperToast.Duration.VERY_SHORT, Style.getStyle(Style.GREEN, SuperToast.Animations.POPUP)).show();
+			if (id <= 0){
+				((Activity) context.getApplicationContext()).runOnUiThread(new Runnable() {
+					public void run() {
+						//SuperActivityToast.create(((Activity)context), context.getResources().getString(R.string.cadastro_sucesso), SuperToast.Duration.VERY_SHORT, Style.getStyle(Style.GREEN, SuperToast.Animations.POPUP)).show();
 
-				/*ContentValues mensagem = new ContentValues();
-				mensagem.put("mensagem", "Cadastrado com Sucesso!");
-				mensagem.put("comando", 2);
-				mensagem.put("tela", tabela);
-
-				funcoes = new FuncoesPersonalizadas(context);
-				funcoes.menssagem(mensagem);*/
-				
-			} else {
-				ContentValues mensagem = new ContentValues();
-				mensagem.put("comando", 1);
-				mensagem.put("mensagem", context.getResources().getString(R.string.nao_foi_possivel_cadastrar) +"\n");
-				mensagem.put("tela", tabela);
-				
-				this.funcoes = new FuncoesPersonalizadas(context);
-				this.funcoes.menssagem(mensagem);
+						SuperActivityToast.create(context, context.getResources().getString(R.string.cadastro_sucesso), Style.DURATION_VERY_SHORT)
+								.setTextColor(Color.WHITE)
+								.setColor(Color.GREEN)
+								.setAnimations(Style.ANIMATIONS_POP)
+								.show();
+					}
+				});
+				new MaterialDialog.Builder(context)
+						.title("FuncoesSql")
+						.content(context.getResources().getString(R.string.nao_foi_possivel_cadastrar))
+						.positiveText(R.string.button_ok)
+						.show();
 			}
 			
-		} catch (SQLException e) {
+		} catch (final SQLException e) {
 			this.funcoes = new FuncoesPersonalizadas(context);
-
-			// Armazena as informacoes para para serem exibidas e enviadas
-			final ContentValues contentValues = new ContentValues();
-			contentValues.put("comando", 0);
-			contentValues.put("tela", tabela);
-			contentValues.put("mensagem", funcoes.tratamentoErroBancoDados(e.getMessage()));
-			contentValues.put("dados", values.toString());
-			// Pega os dados do usuario
-
-			contentValues.put("usuario", funcoes.getValorXml("Usuario"));
-			contentValues.put("empresa", funcoes.getValorXml("ChaveEmpresa"));
-			contentValues.put("email", funcoes.getValorXml("Email"));
 
 			((Activity) context).runOnUiThread(new Runnable() {
 				public void run() {
-					funcoes.menssagem(contentValues);
+					//funcoes.menssagem(contentValues);
+					new MaterialDialog.Builder(context)
+							.title("FuncoesSql")
+							.content(funcoes.tratamentoErroBancoDados(e.getMessage()))
+							.positiveText(R.string.button_ok)
+							.show();
 				}
 			});
 			
-		} catch (Exception e) {
-			this.funcoes = new FuncoesPersonalizadas(context);
-
-			// Armazena as informacoes para para serem exibidas e enviadas
-			final ContentValues contentValues = new ContentValues();
-			contentValues.put("comando", 0);
-			contentValues.put("tela", tabela);
-			contentValues.put("mensagem", funcoes.tratamentoErroBancoDados(e.getMessage()));
-			contentValues.put("dados", e.toString());
-			// Pega os dados do usuario
-			contentValues.put("usuario", funcoes.getValorXml("Usuario"));
-			contentValues.put("empresa", funcoes.getValorXml("ChaveEmpresa"));
-			contentValues.put("email", funcoes.getValorXml("Email"));
-
-			((Activity) context).runOnUiThread(new Runnable() {
+		} catch (final Exception e) {
+			//funcoes.menssagem(contentValues);
+			new MaterialDialog.Builder(context)
+					.title("FuncoesSql")
+					.content(context.getResources().getText(R.string.ip_servidor_webservice_nao_cadastrado) + "\n" + e.getMessage())
+					.positiveText(R.string.button_ok)
+					.show();
+			/*((Activity) context).runOnUiThread(new Runnable() {
 				public void run() {
-					funcoes.menssagem(contentValues);
+					//funcoes.menssagem(contentValues);
+					new MaterialDialog.Builder(context)
+							.title("FuncoesSql")
+							.content(context.getResources().getText(R.string.ip_servidor_webservice_nao_cadastrado) + "\n" + e.getMessage())
+							.positiveText(R.string.button_ok)
+							.show();
 				}
-			});
+			});*/
 			
 		} finally{
 			bancoDados.setTransactionSuccessful();
@@ -157,25 +147,7 @@ public class FuncoesSql {
 		try {
 			// Inseri os valores no banco de dados
 			id = bancoDados.insertWithOnConflict(tabela, null, values, SQLiteDatabase.CONFLICT_REPLACE);
-			/*if (id > 0){
-				ContentValues mensagem = new ContentValues();
-				mensagem.put("mensagem", "Cadastrado com Sucesso!");
-				mensagem.put("comando", 2);
-				mensagem.put("tela", tabela);
-				
-				funcoes = new FuncoesPersonalizadas(context);
-				//funcoes.menssagem(mensagem);
-				
-			} else {
-				ContentValues mensagem = new ContentValues();
-				mensagem.put("comando", 1);
-				mensagem.put("mensagem", "N�o foi poss�vel cadastrar! \n");
-				mensagem.put("tela", tabela);
-				
-				this.funcoes = new FuncoesPersonalizadas(context);
-				//this.funcoes.menssagem(mensagem);
-			}*/
-			
+
 		} catch (SQLException e) {
 			
 			// Armazena as informacoes para para serem exibidas e enviadas
@@ -184,11 +156,6 @@ public class FuncoesSql {
 			contentValues.put("tela", tabela);
 			contentValues.put("mensagem", funcoes.tratamentoErroBancoDados(e.getMessage()));
 			contentValues.put("dados", values.toString());
-			// Pega os dados do usuario
-			this.funcoes = new FuncoesPersonalizadas(context);
-			contentValues.put("usuario", funcoes.getValorXml("Usuario"));
-			contentValues.put("empresa", funcoes.getValorXml("ChaveFuncionario"));
-			contentValues.put("email", funcoes.getValorXml("Email"));
 
 			((Activity) context).runOnUiThread(new Runnable() {
 				public void run() {
@@ -204,11 +171,6 @@ public class FuncoesSql {
 			contentValues.put("tela", tabela);
 			contentValues.put("mensagem", funcoes.tratamentoErroBancoDados(e.getMessage()));
 			contentValues.put("dados", e.toString());
-			// Pega os dados do usuario
-			this.funcoes = new FuncoesPersonalizadas(context);
-			contentValues.put("usuario", funcoes.getValorXml("Usuario"));
-			contentValues.put("empresa", funcoes.getValorXml("ChaveEmpresa"));
-			contentValues.put("email", funcoes.getValorXml("Email"));
 
 			((Activity) context).runOnUiThread(new Runnable() {
 				public void run() {
@@ -321,42 +283,24 @@ public class FuncoesSql {
                 }
             }
 		} catch (final SQLException e) {
-
-			Log.e("SAVARE", e.getMessage());
-
-			final ContentValues contentValues = new ContentValues();
-			contentValues.put("comando", 0);
-			contentValues.put("tela", "FuncoesSql");
-			contentValues.put("mensagem", e.toString());
-			contentValues.put("dados", e.toString());
-			// Pega os dados do usuario
-			//contentValues.put("usuario", funcoes.getValorXml("Usuario"));
-			//contentValues.put("empresa", funcoes.getValorXml("ChaveEmpresa"));
-			//contentValues.put("email", funcoes.getValorXml("Email"));
-
 			((Activity) context).runOnUiThread(new Runnable() {
 				public void run() {
-					funcoes.menssagem(contentValues);
+					new MaterialDialog.Builder(context)
+							.title("FuncoesSql")
+							.content(e.toString())
+							.positiveText(R.string.button_ok)
+							.show();
 				}
 			});
 
 		} catch (final Exception e) {
-
-			Log.e("SAVARE", e.getMessage());
-
-			final ContentValues contentValues = new ContentValues();
-			contentValues.put("comando", 0);
-			contentValues.put("tela", "FuncoesSql");
-			contentValues.put("mensagem", e.toString());
-			contentValues.put("dados", e.toString());
-			// Pega os dados do usuario
-			//contentValues.put("usuario", funcoes.getValorXml("Usuario"));
-			//contentValues.put("empresa", funcoes.getValorXml("ChaveEmpresa"));
-			//contentValues.put("email", funcoes.getValorXml("Email"));
-
 			((Activity) context).runOnUiThread(new Runnable() {
 				public void run() {
-					funcoes.menssagem(contentValues);
+					new MaterialDialog.Builder(context)
+							.title("FuncoesSql")
+							.content(e.toString())
+							.positiveText(R.string.button_ok)
+							.show();
 				}
 			});
 
@@ -858,8 +802,14 @@ public class FuncoesSql {
 		bancoDados = conexaoBanco.abrirBanco();
 		int qtdRows = 0;
 		try {
-			cursor = bancoDados.rawQuery("SELECT COUNT(*) AS QTDROWS FROM " + tabela + ((where != null && where.length() > 0) ?
-										 " WHERE ( " + where + " );" : ";") , null);
+			String select = "SELECT COUNT(*) AS QTDROWS FROM " + tabela;
+
+			if ((where != null) && (!where.isEmpty())){
+				select += " WHERE ( " + where + " );";
+			}else {
+				select += ";";
+			}
+			cursor = bancoDados.rawQuery(select, null);
 
 			if((cursor != null) && (cursor.getCount() > 0)){
 				cursor.moveToFirst();

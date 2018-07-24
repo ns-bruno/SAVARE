@@ -1,10 +1,15 @@
 package com.savare.activity.material.designer;
 
+import android.Manifest;
 import android.content.ContentValues;
 import android.content.Intent;
-import android.database.Cursor;
+import android.content.pm.PackageManager;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -18,14 +23,13 @@ import android.widget.TextView;
 
 import com.savare.R;
 import com.savare.activity.CadastroUsuarioActivity;
-import com.savare.banco.funcoesSql.PessoaSql;
-import com.savare.banco.funcoesSql.UsuarioSQL;
 import com.savare.banco.local.ConexaoBancoDeDados;
+import com.savare.beans.ParametrosLocalBeans;
 import com.savare.funcoes.FuncoesPersonalizadas;
-import com.savare.funcoes.Rotinas;
 import com.savare.funcoes.VersionUtils;
-import com.savare.funcoes.rotinas.async.ReceberDadosWebserviceAsyncRotinas;
-import com.savare.webservice.WSSisinfoWebservice;
+import com.savare.funcoes.rotinas.ParametrosLocalRotina;
+
+import java.util.List;
 
 /**
  * Created by Bruno Nogueira Silva on 11/12/2015.
@@ -38,12 +42,30 @@ public class LoginMDActivity extends AppCompatActivity {
     private EditText editSenha;
     private Button buttonEntrar;
     private Toolbar toolbarLogin;
+    private static final int REQUEST_APP_SETTINGS = 1;
+    private static final String[] requiredPermissions = new String[]{
+            Manifest.permission.READ_SYNC_STATS,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.INTERNET,
+            Manifest.permission.READ_PHONE_STATE,
+            Manifest.permission.RECEIVE_BOOT_COMPLETED,
+            Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.ACCESS_COARSE_LOCATION,
+            Manifest.permission.READ_SYNC_SETTINGS,
+            Manifest.permission.WRITE_SYNC_SETTINGS,
+            Manifest.permission.VIBRATE
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login_md);
 
+       /* if (Build.VERSION.SDK_INT > 22 && !hasPermissions(requiredPermissions)) {
+            Toast.makeText(this, "Por favor selecione todas as permissões", Toast.LENGTH_LONG).show();
+            goToSettings();
+        }*/
         // Recupera o campo para manipular
         toolbarLogin = (Toolbar) findViewById(R.id.activity_login_md_toolbar_login);
         // Adiciona uma titulo para toolbar
@@ -57,6 +79,12 @@ public class LoginMDActivity extends AppCompatActivity {
         //getSupportActionBar().setHomeButtonEnabled(true);
 
         recuperarDadosTela();
+
+        if (!hasPermissions(requiredPermissions)){
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                requestPermissions(requiredPermissions, REQUEST_APP_SETTINGS);
+            }
+        }
 
         buttonEntrar.setOnClickListener(new View.OnClickListener() {
 
@@ -75,6 +103,15 @@ public class LoginMDActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         try {
+            // Instancia a classe de funcoes personalizadas
+            FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(LoginMDActivity.this);
+
+            // Verifica se os dados do dispositivo estao salvos
+            if (    (funcoes.getValorXml("UuidDispositivo").equalsIgnoreCase(funcoes.NAO_ENCONTRADO)) ||
+                    (funcoes.getValorXml("DescricaoDispositivo").equalsIgnoreCase(funcoes.NAO_ENCONTRADO)) ){
+                funcoes.setUuidDispositivo();
+            }
+
             if (!camposObrigatorioPreenchido()) {
                 ConexaoBancoDeDados conexaoBancoDeDados = new ConexaoBancoDeDados(LoginMDActivity.this, VersionUtils.getVersionCode(LoginMDActivity.this));
                 // Pega o banco de dados do SAVARE
@@ -86,51 +123,17 @@ public class LoginMDActivity extends AppCompatActivity {
                 Intent intent = new Intent(LoginMDActivity.this, RegistroChaveUsuarioMDActivity.class);
                 startActivity(intent);
                 return;
-            }
-
-            // Instancia a classe de funcoes personalizadas
-            FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(LoginMDActivity.this);
-            // Funca o codigo do usuario no xml
-            String cnpjEmpresa = funcoes.getValorXml("CnpjEmpresa");
-
-            // Instancia a classe de rotinas
-            Rotinas rotinas = new Rotinas(LoginMDActivity.this);
-
-            // Verfifica se existe algum usuario cadastrado, ou
-            if ((rotinas.existeUsuario() == false) || (cnpjEmpresa.equalsIgnoreCase(funcoes.NAO_ENCONTRADO))) {
-
-                ConexaoBancoDeDados conexaoBancoDeDados = new ConexaoBancoDeDados(LoginMDActivity.this, VersionUtils.getVersionCode(LoginMDActivity.this));
-                // Pega o banco de dados do SAVARE
-                SQLiteDatabase bancoDados = conexaoBancoDeDados.abrirBanco();
-                // Executa o onCreate para criar todas as tabelas do banco de dados
-                conexaoBancoDeDados.onCreate(bancoDados);
-
-                // Abre a tela inicial do sistema
-                //Intent intent = new Intent(LoginMDActivity.this, CadastroUsuarioActivity.class);
-                Intent intent = new Intent(LoginMDActivity.this, RegistroChaveUsuarioMDActivity.class);
-                startActivity(intent);
-
             } else {
-                textCodigoUsuario.setText(cnpjEmpresa);
-                PessoaSql pessoaSql = new PessoaSql(LoginMDActivity.this);
-                // Pega os dados do usuario(vendedor)
-                //Cursor dadosUsuario = pessoaSql.query("CODIGO_FUN = " + cnpjEmpresa);
 
-                UsuarioSQL usuarioSQL = new UsuarioSQL(LoginMDActivity.this);
-                Cursor dadosUsuario = usuarioSQL.query("LOGIN_USUA = '" + funcoes.getValorXml("Usuario") + "'");
-
-                if ((dadosUsuario != null) && (dadosUsuario.getCount() > 0)) {
-                    // Move para o primeiro registro
-                    dadosUsuario.moveToFirst();
-                    // Preenche os campos com os dados do usuario(vendedor)
-                    textUsuario.setText(dadosUsuario.getString(dadosUsuario.getColumnIndex("LOGIN_USUA")));
-                }
+                textCodigoUsuario.setText(funcoes.getValorXml("CnpjEmpresa"));
+                textUsuario.setText(funcoes.getValorXml("Usuario"));
             }
-            boolean enviaAutomatico = (funcoes.getValorXml("EnviarAutomatico").equalsIgnoreCase("S") ? true : false);
-            boolean receberAutomatico = (funcoes.getValorXml("ReceberAutomatico").equalsIgnoreCase("S") ? true : false);
+
+            //boolean enviaAutomatico = (funcoes.getValorXml("EnviarAutomatico").equalsIgnoreCase("S") ? true : false);
+            //boolean receberAutomatico = (funcoes.getValorXml("ReceberAutomatico").equalsIgnoreCase("S") ? true : false);
 
             // Cria o alarme se nao existir para enviar e receber dados
-            funcoes.criarAlarmeEnviarReceberDadosAutomatico(enviaAutomatico, receberAutomatico);
+            //funcoes.criarAlarmeEnviarReceberDadosAutomatico(enviaAutomatico, receberAutomatico);
 
         }catch (Exception e){
             FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(LoginMDActivity.this);
@@ -142,10 +145,6 @@ public class LoginMDActivity extends AppCompatActivity {
             contentValues.put("mensagem", funcoes.tratamentoErroBancoDados(e.getMessage()));
             contentValues.put("dados", LoginMDActivity.this.toString());
             // Pega os dados do usuario
-
-            contentValues.put("usuario", funcoes.getValorXml("Usuario"));
-            contentValues.put("empresa", funcoes.getValorXml("ChaveEmpresa"));
-            contentValues.put("email", funcoes.getValorXml("Email"));
 
             funcoes.menssagem(contentValues);
         }
@@ -215,8 +214,27 @@ public class LoginMDActivity extends AppCompatActivity {
                 (funcoes.getValorXml("CodigoEmpresa").equalsIgnoreCase(funcoes.NAO_ENCONTRADO)) ||
                 (funcoes.getValorXml("ChaveFuncionario").equalsIgnoreCase(funcoes.NAO_ENCONTRADO)) ||
                 (funcoes.getValorXml("ModoConexao").equalsIgnoreCase(funcoes.NAO_ENCONTRADO))*/ ){
-            retorno = false;
 
+            ParametrosLocalRotina parametrosLocalRotina = new ParametrosLocalRotina(getApplicationContext());
+
+            List<ParametrosLocalBeans> listaParam = parametrosLocalRotina.listaParametrosLocal(null);
+
+            if ( (listaParam != null) && (listaParam.size() > 0) ){
+                for (ParametrosLocalBeans param : listaParam){
+                    if ( (param.getNomeParam().equalsIgnoreCase(funcoes.TAG_USUARIO)) ){
+                        funcoes.setValorXml(funcoes.TAG_USUARIO, param.getValorParam());
+                    }
+                    if (param.getNomeParam().equalsIgnoreCase(funcoes.TAG_CNPJ_EMPRESA)){
+                        funcoes.setValorXml(funcoes.TAG_CNPJ_EMPRESA, param.getValorParam());
+                    }
+                }
+                if ( (funcoes.getValorXml("Usuario").equalsIgnoreCase(funcoes.NAO_ENCONTRADO)) ||
+                        (funcoes.getValorXml("CnpjEmpresa").equalsIgnoreCase(funcoes.NAO_ENCONTRADO)) ){
+                    retorno = false;
+                } else {
+                    retorno = true;
+                }
+            }
         } else {
             retorno = true;
         }
@@ -224,43 +242,24 @@ public class LoginMDActivity extends AppCompatActivity {
     }
 
     private void entrarAplicacao(){
-        Rotinas rotinas = new Rotinas(LoginMDActivity.this);
+        FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(getApplicationContext());
 
         // Checa se existe o codigo do usuario e o nome do usuario
-        if (rotinas.checaUsuario(textCodigoUsuario.getText().toString(), textUsuario.getText().toString())) {
+        if ( (funcoes.getValorXml("Usuario").equalsIgnoreCase(textUsuario.getText().toString())) ){
 
-            // Checa se a senha esta certa
-            try {
-                if (rotinas.checaUsuarioESenha(textCodigoUsuario.getText().toString(), textUsuario.getText().toString(), editSenha.getText().toString()) == true) {
-                    // Abre a tela inicial do sistema
-                    //Intent intent = new Intent(LoginActivity.this, InicioActivity.class);
-                    Intent intent = new Intent(LoginMDActivity.this, InicioMDActivity.class);
-                    // Tira a acitivity da pilha e inicia uma nova
-                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                    startActivity(intent);
-
-                    // Mostra uma mensagem caso a senha esteja errada
-                } else {
-                    ContentValues mensagem = new ContentValues();
-                    mensagem.put("comando", 1);
-                    mensagem.put("tela", "LoginActivitys");
-                    mensagem.put("mensagem", "Senha incorreta");
-
-                    FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(LoginMDActivity.this);
-                    funcoes.menssagem(mensagem);
-                }
-            } catch (Exception e) {
+            if ( (editSenha.getText().toString().equalsIgnoreCase(funcoes.descriptografaSenha(funcoes.getValorXml("SenhaUsuario")))) ){
+                Intent intent = new Intent(LoginMDActivity.this, InicioMDActivity.class);
+                // Tira a acitivity da pilha e inicia uma nova
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(intent);
+            } else {
                 ContentValues mensagem = new ContentValues();
                 mensagem.put("comando", 1);
                 mensagem.put("tela", "LoginActivitys");
-                mensagem.put("mensagem", "Senha incorreta \n" + e.getMessage());
-                mensagem.put("dados", e.toString());
+                mensagem.put("mensagem", "Senha incorreta");
 
-                FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(LoginMDActivity.this);
                 funcoes.menssagem(mensagem);
             }
-
-            // Mostra uma mensagem caso usuario esteja errado
         } else {
             ContentValues mensagem = new ContentValues();
             mensagem.put("comando", 1);
@@ -268,8 +267,23 @@ public class LoginMDActivity extends AppCompatActivity {
             mensagem.put("mensagem", "Usuário não existe");
             mensagem.put("dados", textCodigoUsuario.getText().toString() + textUsuario.getText().toString());
 
-            FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(LoginMDActivity.this);
             funcoes.menssagem(mensagem);
         }
+    }
+
+    private void goToSettings() {
+        Intent myAppSettings = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:" + getPackageName()));
+        myAppSettings.addCategory(Intent.CATEGORY_DEFAULT);
+        myAppSettings.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivityForResult(myAppSettings, REQUEST_APP_SETTINGS);
+    }
+
+    public boolean hasPermissions(@NonNull String... permissions) {
+        if (Build.VERSION.SDK_INT > 22) {
+            for (String permission : permissions)
+                if (PackageManager.PERMISSION_GRANTED != checkSelfPermission(permission))
+                    return false;
+        }
+        return true;
     }
 }

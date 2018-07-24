@@ -129,10 +129,10 @@ public class PesquisaListaProdutoAsyncRotinas extends AsyncTask<String, String, 
             if( (codigoOrcamento != null) && (codigoOrcamento.length() > 0) ){
 
                 // Cria a lista de produto e verifica se os produto existe no orcamento
-                listaProdutos = produtoRotinas.listaProduto(where, group, codigoOrcamento, progressBar, textProcessoPesquisa, produtoRotinas.SIM);
+                listaProdutos = produtoRotinas.listaProduto(where, group, codigoOrcamento, progressBar, textProcessoPesquisa, produtoRotinas.SIM, 0);
             }else {
                 // Cria a lista de produto sem verificar se o produto existe no orcamento
-                listaProdutos = produtoRotinas.listaProduto(where, group, null, progressBar, textProcessoPesquisa, produtoRotinas.SIM);
+                listaProdutos = produtoRotinas.listaProduto(where, group, null, progressBar, textProcessoPesquisa, produtoRotinas.SIM, 0);
             }
 
             // Lista todos os produtos, para o Campo de Pesquisa(actionBar)

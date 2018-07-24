@@ -1,5 +1,6 @@
 package com.savare.funcoes;
 
+import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 import android.annotation.SuppressLint;
@@ -13,8 +14,13 @@ import com.savare.banco.funcoesSql.UsuarioSQL;
 public class Rotinas {
 	
 	protected Context context;
-	public static final String SIM = "S", NAO = "N";
-	
+	public static final String
+			SIM = "S",
+			NAO = "N",
+			ATACADO = "0",
+			VAREJO = "1",
+			TODOS_ATACADO_VAREJO = "2";
+
 	public Rotinas(Context context) {
 		this.context = context;
 	}
@@ -90,6 +96,5 @@ public class Rotinas {
 		return UUID.randomUUID().toString().replace("-", "").substring(0, 16).toUpperCase();
 	}
 	
-	
-	
+
 } // Fim da classe

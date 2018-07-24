@@ -323,7 +323,7 @@ public class ClienteCadastroDadosFragment extends Fragment {
 			PlanoPagamentoRotinas planoPagamentoRotinas = new PlanoPagamentoRotinas(getActivity());
 			
 			List<PlanoPagamentoBeans> listaPlanoPagamento = new ArrayList<PlanoPagamentoBeans>();
-			listaPlanoPagamento = planoPagamentoRotinas.listaPlanoPagamento(null, "DESCRICAO", null);
+			listaPlanoPagamento = planoPagamentoRotinas.listaPlanoPagamento("ATIVO = '1' AND ENVIA_PALM = '1'", "DESCRICAO", null);
 			
 			if(listaPlanoPagamento != null && listaPlanoPagamento.size() > 0){
 				// Intancia a classe do adapter

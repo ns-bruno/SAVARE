@@ -1,7 +1,6 @@
 package com.savare.activity.material.designer;
 
-import android.content.ContentValues;
-import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -13,40 +12,31 @@ import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.github.johnpersano.supertoasts.SuperToast;
-import com.github.johnpersano.supertoasts.util.Style;
+import com.afollestad.materialdialogs.MaterialDialog;
+import com.github.johnpersano.supertoasts.library.Style;
+import com.github.johnpersano.supertoasts.library.SuperActivityToast;
 import com.savare.R;
+import com.savare.beans.PessoaBeans;
+import com.savare.beans.UltimaAtualizacaoBeans;
 import com.savare.funcoes.FuncoesPersonalizadas;
-import com.savare.funcoes.rotinas.ImportarDadosTxtRotinas;
+import com.savare.funcoes.rotinas.PessoaRotinas;
 import com.savare.funcoes.rotinas.UltimaAtualizacaoRotinas;
-import com.savare.funcoes.rotinas.UsuarioRotinas;
-import com.savare.funcoes.rotinas.async.ReceberDadosFtpAsyncRotinas;
 import com.savare.funcoes.rotinas.async.ReceberDadosWebserviceAsyncRotinas;
-import com.savare.webservice.WSSisinfoWebservice;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Bruno Nogueira Silva on 18/04/2016.
  */
 public class SincronizacaoMDActivity extends AppCompatActivity {
 
-    private ProgressBar progressReceberDados,
-            progressReceberDadosEmpresa,
-            progressReceberDadosClientes,
-            progressReceberDadosProdutos,
-            progressReceberDadosTitulos;
+    private ProgressBar progressReceberDados;
     private TextView textDataUltimoEnvio,
             textDataUltimoRecebimento,
             textReceberDados,
-            textReceberDadosEmpresa,
-            textReceberDadosClientes,
-            textReceberDadosProdutos,
-            textReceberDadosTitulos;
-    private Button buttonReceberDados,
-            buttonReceberDadosEmpresa,
-            buttonReceberDadosClientes,
-            buttonReceberDadosProdutos,
-            buttonReceberDadosTitulos;
-    private String modoConexao = "";
+            textStatus;
+    private Button buttonReceberDados;
     private Toolbar toolbarCabecalho;
 
     @Override
@@ -62,184 +52,78 @@ public class SincronizacaoMDActivity extends AppCompatActivity {
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-        if(!funcoes.getValorXml("CodigoUsuario").equalsIgnoreCase(funcoes.NAO_ENCONTRADO)) {
-            // Instancia a classe de rotinas da tabela usuario
-            UsuarioRotinas usuarioRotinas = new UsuarioRotinas(SincronizacaoMDActivity.this);
+        UltimaAtualizacaoRotinas ultimaAtualizacaoRotinas = new UltimaAtualizacaoRotinas(getApplicationContext());
 
-            // Pega a data do ultimo envio de pedido
-            textDataUltimoEnvio.setText(usuarioRotinas.dataUltimoEnvio(funcoes.getValorXml("CodigoUsuario")));
-            // Pega a data do ultimo recebimento de dados
-            textDataUltimoRecebimento.setText(usuarioRotinas.dataUltimoRecebimento(funcoes.getValorXml("CodigoUsuario")));
+        ArrayList<UltimaAtualizacaoBeans> listaUltimaAtualizacao = ultimaAtualizacaoRotinas.listaUltimaAtualizacaoTabelas("AEAORCAM");
+
+        if ((listaUltimaAtualizacao != null) && (listaUltimaAtualizacao.size() > 0)){
+            textDataUltimoEnvio.setText(funcoes.formataDataHora(listaUltimaAtualizacao.get(0).getDataUltimaAtualizacao()));
         } else {
             textDataUltimoEnvio.setText("");
+        }
+        // Pega a data do ultimo recebimento de dados
+        listaUltimaAtualizacao = ultimaAtualizacaoRotinas.listaUltimaAtualizacaoTabelas("SMAEMPRE");
+
+        if ((listaUltimaAtualizacao != null) && (listaUltimaAtualizacao.size() > 0)){
+            textDataUltimoRecebimento.setText(funcoes.formataDataHora(listaUltimaAtualizacao.get(0).getDataUltimaAtualizacao()));
+        } else {
             textDataUltimoRecebimento.setText("");
         }
+
         buttonReceberDados.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //ReceberDadosFtpAsyncRotinas receberDadosFtpAsync = new ReceberDadosFtpAsyncRotinas(SincronizacaoMDActivity.this, progressReceberDados, textReceberDados);
-                //receberDadosFtpAsync.execute();
 
                 ReceberDadosWebserviceAsyncRotinas receberDados = new ReceberDadosWebserviceAsyncRotinas(SincronizacaoMDActivity.this);
                 receberDados.setProgressBarStatus(progressReceberDados);
                 receberDados.setTextStatus(textReceberDados);
+                receberDados.setTextStatusErro(textStatus);
                 receberDados.execute();
             }
         });
 
-        buttonReceberDadosEmpresa.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //ReceberDadosFtpAsyncRotinas receberDadosFtpAsync = new ReceberDadosFtpAsyncRotinas(SincronizacaoMDActivity.this, progressReceberDadosEmpresa, textReceberDadosEmpresa);
-                //receberDadosFtpAsync.execute(ImportarDadosTxtRotinas.BLOCO_S);
 
-                String[] tabelaRecebeDados = {  WSSisinfoWebservice.FUNCTION_SELECT_SMAEMPRE};
-
-                ReceberDadosWebserviceAsyncRotinas receberDados = new ReceberDadosWebserviceAsyncRotinas(SincronizacaoMDActivity.this);
-                receberDados.setProgressBarStatus(progressReceberDadosEmpresa);
-                receberDados.setTextStatus(textReceberDadosEmpresa);
-                receberDados.setTabelaRecebeDados(tabelaRecebeDados);
-                receberDados.execute();
-            }
-        });
-
-        buttonReceberDadosClientes.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //ReceberDadosFtpAsyncRotinas receberDadosFtpAsync = new ReceberDadosFtpAsyncRotinas(SincronizacaoMDActivity.this, progressReceberDadosClientes, textReceberDadosClientes);
-                //receberDadosFtpAsync.execute(ImportarDadosTxtRotinas.BLOCO_C);
-
-
-                String[] tabelaRecebeDados = {  WSSisinfoWebservice.FUNCTION_SELECT_CFAAREAS,
-                                                WSSisinfoWebservice.FUNCTION_SELECT_SMAEMPRE,
-                                                WSSisinfoWebservice.FUNCTION_SELECT_CFAATIVI,
-                                                WSSisinfoWebservice.FUNCTION_SELECT_CFASTATU,
-                                                WSSisinfoWebservice.FUNCTION_SELECT_CFATPDOC,
-                                                WSSisinfoWebservice.FUNCTION_SELECT_CFACCRED,
-                                                WSSisinfoWebservice.FUNCTION_SELECT_CFAPORTA,
-                                                WSSisinfoWebservice.FUNCTION_SELECT_CFAPROFI,
-                                                WSSisinfoWebservice.FUNCTION_SELECT_CFATPCLI,
-                                                WSSisinfoWebservice.FUNCTION_SELECT_CFATPCOB,
-                                                WSSisinfoWebservice.FUNCTION_SELECT_CFAESTAD,
-                                                WSSisinfoWebservice.FUNCTION_SELECT_CFACIDAD,
-                                                WSSisinfoWebservice.FUNCTION_SELECT_CFACLIFO,
-                                                WSSisinfoWebservice.FUNCTION_SELECT_CFAENDER,
-                                                WSSisinfoWebservice.FUNCTION_SELECT_CFAPARAM,
-                                                WSSisinfoWebservice.FUNCTION_SELECT_CFAFOTOS};
-
-                ReceberDadosWebserviceAsyncRotinas receberDados = new ReceberDadosWebserviceAsyncRotinas(SincronizacaoMDActivity.this);
-                receberDados.setProgressBarStatus(progressReceberDadosClientes);
-                receberDados.setTextStatus(textReceberDadosClientes);
-                receberDados.setTabelaRecebeDados(tabelaRecebeDados);
-                receberDados.execute();
-            }
-        });
-
-        buttonReceberDadosProdutos.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //ReceberDadosFtpAsyncRotinas receberDadosFtpAsync = new ReceberDadosFtpAsyncRotinas(SincronizacaoMDActivity.this, progressReceberDadosProdutos, textReceberDadosProdutos);
-                //receberDadosFtpAsync.execute(ImportarDadosTxtRotinas.BLOCO_A);
-
-                String[] tabelaRecebeDados = {  WSSisinfoWebservice.FUNCTION_SELECT_AEAPLPGT,
-                                                WSSisinfoWebservice.FUNCTION_SELECT_AEACLASE,
-                                                WSSisinfoWebservice.FUNCTION_SELECT_AEAUNVEN,
-                                                WSSisinfoWebservice.FUNCTION_SELECT_AEAGRADE,
-                                                WSSisinfoWebservice.FUNCTION_SELECT_AEAMARCA,
-                                                WSSisinfoWebservice.FUNCTION_SELECT_AEACODST,
-                                                WSSisinfoWebservice.FUNCTION_SELECT_AEAPRODU,
-                                                WSSisinfoWebservice.FUNCTION_SELECT_AEAEMBAL,
-                                                WSSisinfoWebservice.FUNCTION_SELECT_AEAPLOJA,
-                                                WSSisinfoWebservice.FUNCTION_SELECT_AEALOCES,
-                                                WSSisinfoWebservice.FUNCTION_SELECT_AEAESTOQ,
-                                                WSSisinfoWebservice.FUNCTION_SELECT_AEAORCAM,
-                                                WSSisinfoWebservice.FUNCTION_SELECT_AEAITORC,
-                                                WSSisinfoWebservice.FUNCTION_SELECT_AEAPERCE,
-                                                WSSisinfoWebservice.FUNCTION_SELECT_AEAFATOR,
-                                                WSSisinfoWebservice.FUNCTION_SELECT_AEAPRREC};
-
-                ReceberDadosWebserviceAsyncRotinas receberDados = new ReceberDadosWebserviceAsyncRotinas(SincronizacaoMDActivity.this);
-                receberDados.setProgressBarStatus(progressReceberDadosProdutos);
-                receberDados.setTextStatus(textReceberDadosProdutos);
-                receberDados.setTabelaRecebeDados(tabelaRecebeDados);
-                receberDados.execute();
-            }
-        });
-
-        buttonReceberDadosTitulos.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //ReceberDadosFtpAsyncRotinas receberDadosFtpAsync = new ReceberDadosFtpAsyncRotinas(SincronizacaoMDActivity.this, progressReceberDadosTitulos, textReceberDadosTitulos);
-                //receberDadosFtpAsync.execute(ImportarDadosTxtRotinas.BLOCO_R);
-
-                String[] tabelaRecebeDados = {  WSSisinfoWebservice.FUNCTION_SELECT_RPAPARCE};
-
-                ReceberDadosWebserviceAsyncRotinas receberDados = new ReceberDadosWebserviceAsyncRotinas(SincronizacaoMDActivity.this);
-                receberDados.setProgressBarStatus(progressReceberDadosTitulos);
-                receberDados.setTextStatus(textReceberDadosTitulos);
-                receberDados.setTabelaRecebeDados(tabelaRecebeDados);
-                receberDados.execute();
-            }
-        });
     } // Fim onCreate
 
     @Override
     protected void onResume() {
         super.onResume();
 
-        UsuarioRotinas usuarioRotinas = new UsuarioRotinas(SincronizacaoMDActivity.this);
-        // Pega o modo de sincronizacao dos dados. FTP ou SavareSyncAdapter
-        modoConexao = usuarioRotinas.modoConexao();
+        final FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(getApplicationContext());
 
-        if (modoConexao.equalsIgnoreCase("S")){
-            textDataUltimoEnvio.setVisibility(View.INVISIBLE);
-            textDataUltimoRecebimento.setVisibility(View.INVISIBLE);
-            textReceberDados.setVisibility(View.INVISIBLE);
-            textReceberDadosEmpresa.setVisibility(View.INVISIBLE);
-            textReceberDadosClientes.setVisibility(View.INVISIBLE);
-            textReceberDadosProdutos.setVisibility(View.INVISIBLE);
-            textReceberDadosTitulos.setVisibility(View.INVISIBLE);
-            buttonReceberDados.setVisibility(View.INVISIBLE);
-            buttonReceberDadosEmpresa.setVisibility(View.INVISIBLE);
-            buttonReceberDadosClientes.setVisibility(View.INVISIBLE);
-            buttonReceberDadosProdutos.setVisibility(View.INVISIBLE);
-            buttonReceberDadosTitulos.setVisibility(View.INVISIBLE);
-            progressReceberDados.setVisibility(View.INVISIBLE);
-            progressReceberDadosEmpresa.setVisibility(View.INVISIBLE);
-            progressReceberDadosClientes.setVisibility(View.INVISIBLE);
-            progressReceberDadosProdutos.setVisibility(View.INVISIBLE);
-            progressReceberDadosTitulos.setVisibility(View.INVISIBLE);
-        } else {
+        if(!funcoes.getValorXml("CodigoUsuario").equalsIgnoreCase(funcoes.NAO_ENCONTRADO)) {
+            PessoaRotinas pessoaRotinas = new PessoaRotinas(getApplicationContext());
+            // Pega os dados do usuario
+            List<PessoaBeans> dadosUsuario = pessoaRotinas.listaPessoaResumido("CODIGO_FUN = " + funcoes.getValorXml("CodigoUsuario"), PessoaRotinas.KEY_TIPO_FUNCIONARIO, null);
 
-        }
-        if (usuarioRotinas.usuarioAtivo() == false){
+            // Checa se retornou algum dados do usuario
+            if (dadosUsuario != null && dadosUsuario.size() > 0) {
 
-            final ContentValues contentValues = new ContentValues();
-            contentValues.put("comando", 0);
-            contentValues.put("tela", "InicioMDActivity");
-            contentValues.put("mensagem", "O usuário está inativo, não vai ser possível usar o aplicativo. Entre em contato com a sua empresa ou com o suporte SAVARE.");
+                if ((dadosUsuario.get(0).getAtivo() != null) && (dadosUsuario.get(0).getAtivo().equalsIgnoreCase("0"))){
 
-            final FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(SincronizacaoMDActivity.this);
-
-            (SincronizacaoMDActivity.this).runOnUiThread(new Runnable() {
-                public void run() {
-                    funcoes.menssagem(contentValues);
+                    (SincronizacaoMDActivity.this).runOnUiThread(new Runnable() {
+                        public void run() {
+                            new MaterialDialog.Builder(SincronizacaoMDActivity.this)
+                                    .title("SincronizacaoMDActivity")
+                                    .content(R.string.usuario_inativo)
+                                    .positiveText(R.string.button_ok)
+                                    .show();
+                        }
+                    });
                 }
-            });
+            }
         }
 
         UltimaAtualizacaoRotinas ultimaAtualizacaoRotinas = new UltimaAtualizacaoRotinas(getApplicationContext());
 
         if(ultimaAtualizacaoRotinas.muitoTempoSemSincronizacao()){
-            final ContentValues contentValues = new ContentValues();
-            contentValues.put("comando", 0);
-            contentValues.put("tela", "InicioMDActivity");
-            contentValues.put("mensagem", "Tem mais de 10 dias sem fazer sincronização. Por favor realize uma sincronização para continuar usando o aplicativo.");
-
-            final FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(SincronizacaoMDActivity.this);
             (SincronizacaoMDActivity.this).runOnUiThread(new Runnable() {
                 public void run() {
-                    funcoes.menssagem(contentValues);
+                    new MaterialDialog.Builder(SincronizacaoMDActivity.this)
+                            .title("SincronizacaoMDActivity")
+                            .content("Tem mais de 10 dias sem fazer sincronização. Por favor realize uma sincronização para continuar usando o aplicativo.")
+                            .positiveText(R.string.button_ok)
+                            .show();
                 }
             });
         }
@@ -262,11 +146,7 @@ public class SincronizacaoMDActivity extends AppCompatActivity {
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-
-        // Checo se o modo de conexao eh diferente de SavareSyncAdapter
-        if (!modoConexao.equalsIgnoreCase("S")){
-            menu.getItem(0).setVisible(false);
-        }
+        menu.getItem(0).setVisible(false);
         return true;
     }
 
@@ -297,7 +177,12 @@ public class SincronizacaoMDActivity extends AppCompatActivity {
             case R.id.menu_sincronizacao_md_zerar_datas_sincronizacao:
                 UltimaAtualizacaoRotinas atualizacaoRotinas = new UltimaAtualizacaoRotinas(SincronizacaoMDActivity.this);
                 if (atualizacaoRotinas.apagarDatasSincronizacao() > 0){
-                    SuperToast.create(SincronizacaoMDActivity.this, getApplicationContext().getResources().getString(R.string.zerado_sucesso), SuperToast.Duration.VERY_SHORT, Style.getStyle(Style.GREEN, SuperToast.Animations.POPUP)).show();
+
+                    SuperActivityToast.create(this, this.getResources().getString(R.string.zerado_sucesso), Style.DURATION_SHORT)
+                            .setTextColor(Color.WHITE)
+                            .setColor(Color.GREEN)
+                            .setAnimations(Style.ANIMATIONS_POP)
+                            .show();
                 }
 
             default:
@@ -310,20 +195,9 @@ public class SincronizacaoMDActivity extends AppCompatActivity {
         textDataUltimoEnvio = (TextView) findViewById(R.id.activity_sincronizacao_md_text_data_ultimo_envio);
         textDataUltimoRecebimento = (TextView) findViewById(R.id.activity_sincronizacao_md_text_data_ultimo_recebimento);
         textReceberDados = (TextView) findViewById(R.id.activity_sincronizacao_md_textView_receber_dados);
-        textReceberDadosEmpresa = (TextView) findViewById(R.id.activity_sincronizacao_md_textView_receber_dados_bloco_s);
-        textReceberDadosClientes = (TextView) findViewById(R.id.activity_sincronizacao_md_textView_receber_dados_bloco_c);
-        textReceberDadosProdutos = (TextView) findViewById(R.id.activity_sincronizacao_md_textView_receber_dados_bloco_a);
-        textReceberDadosTitulos = (TextView) findViewById(R.id.activity_sincronizacao_md_textView_receber_dados_bloco_r);
+        textStatus = (TextView) findViewById(R.id.activity_sincronizacao_md_textView_status);
         buttonReceberDados = (Button) findViewById(R.id.activity_sincronizacao_md_button_receber_dados);
-        buttonReceberDadosEmpresa = (Button) findViewById(R.id.activity_sincronizacao_md_button_receber_dados_bloco_s);
-        buttonReceberDadosClientes = (Button) findViewById(R.id.activity_sincronizacao_md_button_receber_dados_bloco_c);
-        buttonReceberDadosProdutos = (Button) findViewById(R.id.activity_sincronizacao_md_button_receber_dados_bloco_a);
-        buttonReceberDadosTitulos = (Button) findViewById(R.id.activity_sincronizacao_md_button_receber_dados_bloco_r);
         progressReceberDados = (ProgressBar) findViewById(R.id.activity_sincronizacao_md_progressBar_receber_dados);
-        progressReceberDadosEmpresa = (ProgressBar) findViewById(R.id.activity_sincronizacao_md_progressBar_receber_dados_bloco_s);
-        progressReceberDadosClientes = (ProgressBar) findViewById(R.id.activity_sincronizacao_md_progressBar_receber_dados_bloco_c);
-        progressReceberDadosProdutos = (ProgressBar) findViewById(R.id.activity_sincronizacao_md_progressBar_receber_dados_bloco_a);
-        progressReceberDadosTitulos = (ProgressBar) findViewById(R.id.activity_sincronizacao_md_progressBar_receber_dados_bloco_r);
         toolbarCabecalho = (Toolbar) findViewById(R.id.activity_sincronizacao_md_toolbar_cabecalho);
         toolbarCabecalho.setTitleTextColor(getResources().getColor(R.color.branco));
         toolbarCabecalho.setTitle(getResources().getString(R.string.sincronizacao));

@@ -35,7 +35,8 @@ public class EmbalagemRotinas extends Rotinas {
 				   + "FROM AEAEMBAL "
 				   + "LEFT OUTER JOIN AEAUNVEN AEAUNVEN "
 				   + "ON(AEAEMBAL.ID_AEAUNVEN = AEAUNVEN.ID_AEAUNVEN)"
-				   + "WHERE (ID_AEAPRODU = " + idProduto + ") AND (AEAEMBAL.ATIVO = '1')";
+				   + "WHERE (ID_AEAPRODU = " + idProduto + ") AND (AEAEMBAL.ATIVO = '1') "
+				   + "ORDER BY COALESCE(AEAEMBAL.PRINCIPAL, AEAUNVEN.SIGLA, AEAEMBAL.DESCRICAO)";
 		
 		// Instancia a classe para manipular os dados do banco de dados
 		EmbalagemSql embalagemSql = new EmbalagemSql(context);

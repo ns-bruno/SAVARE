@@ -1,36 +1,29 @@
 package com.savare.activity.material.designer;
 
-import android.accounts.AccountManager;
 import android.annotation.TargetApi;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.database.Cursor;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.CompoundButton;
-import android.widget.Toast;
 
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.dexafree.materialList.card.Card;
-import com.dexafree.materialList.card.CardProvider;
-import com.dexafree.materialList.card.OnActionClickListener;
-import com.dexafree.materialList.card.action.TextViewAction;
 import com.dexafree.materialList.listeners.RecyclerItemClickListener;
 import com.dexafree.materialList.view.MaterialListView;
 import com.github.clans.fab.FloatingActionButton;
 import com.github.clans.fab.FloatingActionMenu;
-import com.github.johnpersano.supertoasts.SuperToast;
-import com.github.johnpersano.supertoasts.util.Style;
-import com.github.mikephil.charting.charts.PieChart;
+import com.github.johnpersano.supertoasts.library.Style;
+import com.github.johnpersano.supertoasts.library.SuperActivityToast;
 import com.mikepenz.materialdrawer.AccountHeader;
 import com.mikepenz.materialdrawer.AccountHeaderBuilder;
 import com.mikepenz.materialdrawer.Drawer;
@@ -45,20 +38,11 @@ import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 import com.savare.R;
 import com.savare.activity.LogActivity;
 import com.savare.activity.fragment.ClienteCadastroFragment;
-import com.savare.banco.funcoesSql.EnderecoSql;
-import com.savare.banco.funcoesSql.PessoaSql;
-import com.savare.banco.funcoesSql.UltimaAtualizacaoSql;
-import com.savare.banco.funcoesSql.UsuarioSQL;
-import com.savare.beans.EmpresaBeans;
 import com.savare.beans.PessoaBeans;
-import com.savare.beans.UsuarioBeans;
 import com.savare.funcoes.FuncoesPersonalizadas;
-import com.savare.funcoes.rotinas.EmpresaRotinas;
 import com.savare.funcoes.rotinas.OrcamentoRotinas;
 import com.savare.funcoes.rotinas.PessoaRotinas;
 import com.savare.funcoes.rotinas.UltimaAtualizacaoRotinas;
-import com.savare.funcoes.rotinas.UsuarioRotinas;
-import com.savare.funcoes.rotinas.async.ReceberDadosFtpAsyncRotinas;
 
 import java.util.List;
 import java.util.UUID;
@@ -68,6 +52,11 @@ import java.util.UUID;
  */
 public class InicioMDActivity extends AppCompatActivity {
 
+    public static String KEY_SALVA_PEDIDO_PDF = "salva_pedido_pdf";
+    public static String KEY_IMAGEM_PRODUTO = "imagem_produto";
+    public static String KEY_RECEBE_AUTOMATICO = "receber";
+    public static String KEY_ENVIA_AUTOMATICO = "enviar";
+    public static String KEY_ENVIAR_INSTANTENEAMENTE = "enviarInstantaneamente";
     private Toolbar toolbarInicio;
     private Drawer navegacaoDrawerEsquerdo;
     private AccountHeader cabecalhoDrawer;
@@ -75,10 +64,12 @@ public class InicioMDActivity extends AppCompatActivity {
     private int cliqueVoltar = 0;
     private int mPreviousVisibleItem;
     FloatingActionMenu menuFloatOpcoes;
-    AccountManager accountManager;
+    private SwitchDrawerItem switchEnviaInstantaneo;
     boolean enviaAutomatico = false;
     boolean recebeAutomatico = false;
     boolean imagemProduto = false;
+    boolean salvaPedidoPdf = false;
+    boolean enviaInstantaneamente = false;
 
     @TargetApi(Build.VERSION_CODES.M)
     @Override
@@ -91,7 +82,7 @@ public class InicioMDActivity extends AppCompatActivity {
         // Adiciona uma titulo para toolbar
         toolbarInicio.setTitle(this.getResources().getString(R.string.app_name));
         toolbarInicio.setTitleTextColor(getResources().getColor(R.color.branco));
-        //toolbarInicio.setLogo(R.mipmap.ic_launcher);
+
         // Seta uma toolBar para esta activiy(tela)
         setSupportActionBar(toolbarInicio); //
 
@@ -113,30 +104,54 @@ public class InicioMDActivity extends AppCompatActivity {
         String nomeCompletoUsua = funcoes.getValorXml("Usuario");
         String email = "nao encontrado";
 
-        if (funcoes.getValorXml("EnviarAutomatico").equalsIgnoreCase("S")){
+        if (funcoes.getValorXml(funcoes.TAG_ENVIAR_AUTOMATICO).equalsIgnoreCase("S")){
             enviaAutomatico = true;
         }
 
-        if (funcoes.getValorXml("ReceberAutomatico").equalsIgnoreCase("S")){
+        if (funcoes.getValorXml(funcoes.TAG_ENVIAR_INSTANTANEAMENTE).equalsIgnoreCase("S")){
+            enviaInstantaneamente = true;
+        }
+
+        if (funcoes.getValorXml(funcoes.TAG_RECEBER_AUTOMATICO).equalsIgnoreCase("S")){
             recebeAutomatico = true;
         }
 
-        if (funcoes.getValorXml("ImagemProduto").equalsIgnoreCase("S")){
+        if (funcoes.getValorXml(funcoes.TAG_IMAGEM_PRODUTO).equalsIgnoreCase("S")){
             imagemProduto = true;
         }
-        if(!funcoes.getValorXml("CodigoUsuario").equalsIgnoreCase(funcoes.NAO_ENCONTRADO)) {
+        if (funcoes.getValorXml(funcoes.TAG_SALVA_PEDIDO_PDF).equalsIgnoreCase("S")){
+            salvaPedidoPdf = true;
+        }
+        if(!funcoes.getValorXml(funcoes.TAG_CODIGO_USUARIO).equalsIgnoreCase(funcoes.NAO_ENCONTRADO)) {
             PessoaRotinas pessoaRotinas = new PessoaRotinas(getApplicationContext());
             // Pega os dados do usuario
-            List<PessoaBeans> dadosUsuario = pessoaRotinas.listaPessoaResumido("CODIGO_FUN = " + funcoes.getValorXml("CodigoUsuario"), PessoaRotinas.KEY_TIPO_FUNCIONARIO, null);
+            List<PessoaBeans> dadosUsuario = pessoaRotinas.listaPessoaResumido("CODIGO_FUN = " + funcoes.getValorXml(funcoes.TAG_CODIGO_USUARIO), PessoaRotinas.KEY_TIPO_FUNCIONARIO, null);
 
             // Checa se retornou algum dados do usuario
             if (dadosUsuario != null && dadosUsuario.size() > 0) {
-                // Pega o nome completo do usuario
-                nomeCompletoUsua = dadosUsuario.get(0).getNomeRazao();
 
-                if ((dadosUsuario.get(0).getEnderecoPessoa() != null) && (dadosUsuario.get(0).getEnderecoPessoa().getEmail() != null)) {
-                    email = dadosUsuario.get(0).getEnderecoPessoa().getEmail();
-                    funcoes.setValorXml("Email", email);
+                if ( (dadosUsuario.get(0).getAtivo() != null) && (dadosUsuario.get(0).getAtivo().equalsIgnoreCase("0")) ){
+
+                    (InicioMDActivity.this).runOnUiThread(new Runnable() {
+                        public void run() {
+                            new MaterialDialog.Builder(InicioMDActivity.this)
+                                    .title("InicioMDActivity")
+                                    .content(R.string.usuario_inativo)
+                                    .positiveText(R.string.button_ok)
+                                    .show();
+                        }
+                    });
+                    Intent intentListaConfiguracoes = new Intent(InicioMDActivity.this, SincronizacaoMDActivity.class);
+                    // Abre outra tela
+                    startActivity(intentListaConfiguracoes);
+                } else {
+                    // Pega o nome completo do usuario
+                    nomeCompletoUsua = dadosUsuario.get(0).getNomeRazao();
+
+                    if ((dadosUsuario.get(0).getEnderecoPessoa() != null) && (dadosUsuario.get(0).getEnderecoPessoa().getEmail() != null)) {
+                        email = dadosUsuario.get(0).getEnderecoPessoa().getEmail();
+                        funcoes.setValorXml("Email", email);
+                    }
                 }
             }
         }
@@ -154,6 +169,7 @@ public class InicioMDActivity extends AppCompatActivity {
                 })
                 .build();
 
+        switchEnviaInstantaneo = new SwitchDrawerItem().withName(R.string.enviar_instantaneamente).withIcon(R.mipmap.ic_auto_upload).withChecked(enviaInstantaneamente).withOnCheckedChangeListener(mOnCheckedChangeListener).withTag(KEY_ENVIAR_INSTANTENEAMENTE).withSelectable(enviaAutomatico).withSwitchEnabled(enviaAutomatico);
         //Instancia o drawer
         navegacaoDrawerEsquerdo = new DrawerBuilder()
                 .withActivity(this)
@@ -170,9 +186,13 @@ public class InicioMDActivity extends AppCompatActivity {
                         new PrimaryDrawerItem().withName(R.string.configuracoes).withIcon(R.drawable.ic_action_settings),
                         new SectionDrawerItem().withName(R.string.monitoramento),
                         new PrimaryDrawerItem().withName(R.string.logs).withIcon(R.drawable.ic_sim_alert),
-                        new SwitchDrawerItem().withName(R.string.enviar_automatico).withIcon(R.mipmap.ic_upload).withChecked(enviaAutomatico).withOnCheckedChangeListener(mOnCheckedChangeListener).withTag("enviar").withSelectable(false).withSwitchEnabled(false),
-                        new SwitchDrawerItem().withName(R.string.receber_automatico).withIcon(R.mipmap.ic_download).withChecked(recebeAutomatico).withOnCheckedChangeListener(mOnCheckedChangeListener).withTag("receber").withSelectable(false).withSwitchEnabled(false),
-                        new SwitchDrawerItem().withName(R.string.imagem_produto).withIcon(R.mipmap.ic_image_dark).withChecked(imagemProduto).withOnCheckedChangeListener(mOnCheckedChangeListener).withTag("imagem_produto").withSelectable(false).withSwitchEnabled(false)
+                        new SwitchDrawerItem().withName(R.string.enviar_automatico).withIcon(R.mipmap.ic_upload).withChecked(enviaAutomatico).withOnCheckedChangeListener(mOnCheckedChangeListener).withTag(KEY_ENVIA_AUTOMATICO),
+                        switchEnviaInstantaneo,
+                        new SwitchDrawerItem().withName(R.string.receber_automatico).withIcon(R.mipmap.ic_download).withChecked(recebeAutomatico).withOnCheckedChangeListener(mOnCheckedChangeListener).withTag(KEY_RECEBE_AUTOMATICO).withSelectable(false).withSwitchEnabled(false),
+                        new SwitchDrawerItem().withName(R.string.imagem_produto).withIcon(R.mipmap.ic_image_dark).withChecked(imagemProduto).withOnCheckedChangeListener(mOnCheckedChangeListener).withTag(KEY_IMAGEM_PRODUTO),
+                        new SwitchDrawerItem().withName(R.string.salva_pedido_pdf).withIcon(R.mipmap.ic_file_pdf).withChecked(salvaPedidoPdf).withOnCheckedChangeListener(mOnCheckedChangeListener).withTag(KEY_SALVA_PEDIDO_PDF),
+                        new SectionDrawerItem().withName(getResources().getString(R.string.versao_aplicacao) + " " + funcoes.getNomeVersaoAplicacao()),
+                        new SectionDrawerItem().withName(funcoes.getValorXml(funcoes.TAG_UUID_DISPOSITIVO))
 
                 )
             .withDisplayBelowStatusBar(true)
@@ -360,20 +380,6 @@ public class InicioMDActivity extends AppCompatActivity {
 
         navegacaoDrawerEsquerdo.setSelectionAtPosition(-1);
 
-        FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(InicioMDActivity.this);
-
-        if (!funcoes.getValorXml("RecebendoDados").equalsIgnoreCase("S")) {
-            // Marca nos parametro internos que a aplicacao que esta recebendo os dados
-            //funcoes.setValorXml("RecebendoDados", "S");
-
-            // Desavia o recebimento automatico
-            funcoes.criarAlarmeEnviarReceberDadosAutomatico(enviaAutomatico, recebeAutomatico);
-
-            ReceberDadosFtpAsyncRotinas receberDadosFtpAsync = new ReceberDadosFtpAsyncRotinas(InicioMDActivity.this, ReceberDadosFtpAsyncRotinas.TELA_INICIO);
-            receberDadosFtpAsync.execute();
-
-            Log.i("SAVARE", "Executou a rotina para receber os dados. - InicioActivity");
-        }
         // Checa se existe algum card view
         if (mListView.getAdapter().getItemCount() > 0) {
             // Remove todos a lista de cards
@@ -384,135 +390,9 @@ public class InicioMDActivity extends AppCompatActivity {
 
         checaLiberacaoDispositivo();
 
-        /*EmpresaRotinas empresaRotinas = new EmpresaRotinas(InicioMDActivity.this);
-        // Pega os dados da empresa
-        EmpresaBeans dadosEmpresa = empresaRotinas.empresa(funcoes.getValorXml("CodigoEmpresa"));
-
-        PessoaRotinas pessoaRotinas = new PessoaRotinas(InicioMDActivity.this);
-
-        pessoaRotinas.pessoaCompleta(funcoes.getValorXml());
-
-        //PessoaBeans dadosusuario = pessoaSql.
-        UsuarioRotinas usuarioRotinas = new UsuarioRotinas(InicioMDActivity.this);
-        // Pega os dados do usuario(vendedor)
-        UsuarioBeans dadosUsuario = usuarioRotinas.usuarioCompleto("ID_USUA = " + funcoes.getValorXml("CodigoUsuario"));
-
-        if (dadosEmpresa != null && dadosUsuario != null) {
-
-            // Checa se esta liberado para vender no atacado
-            if ((dadosUsuario.getVendeAtacadoUsuario() == '1') && (dadosEmpresa.getTitpoAcumuloCreditoAtacado().length() > 0) && (dadosEmpresa.getPeriodocrceditoAtacado().length() > 0)){
-                // Vareavel para salvar a descricao do card
-                String descricaoCard = "";
-
-                // Checa se o tipo de acumulo eh por valor para vendas no atacado
-                if (dadosEmpresa.getTitpoAcumuloCreditoAtacado().equalsIgnoreCase("V")) {
-
-                    descricaoCard += "Tpo de Acumulo de Desconto:  Por Valor. \n" +
-                            "Valor Desconto: " + getResources().getString(R.string.sigla_real) + " " + funcoes.arredondarValor(dadosUsuario.getValorCreditoAtacado() + " \n");
-
-                    // Checa se o tipo eh por percentual para vendas no atacado
-                } else if (dadosEmpresa.getTitpoAcumuloCreditoAtacado().equalsIgnoreCase("P")) {
-
-                    descricaoCard += "Tpo de Acumulo de Desconto:  Por Percentual. \n" +
-                            "Percentual Desconto: " + funcoes.arredondarValor(dadosUsuario.getPercentualCreditoAtacado())+"%" + " \n";
-
-                }
-                // Checa os periodo que vai ser acumulado os creditos para vendas no atacado
-                if (dadosEmpresa.getPeriodocrceditoAtacado().equalsIgnoreCase("M")) {
-                    descricaoCard += "\nPeríodo do Desconto está Mensal. \n";
-
-                } else if (dadosEmpresa.getPeriodocrceditoAtacado().equalsIgnoreCase("Q")) {
-                    descricaoCard += "\n Período do Desconto está Quinzenal. \n";
-
-                } else if (dadosEmpresa.getPeriodocrceditoAtacado().equalsIgnoreCase("S")) {
-                    descricaoCard += "\n Período do Desconto está Semanal. \n";
-
-                } else if (dadosEmpresa.getPeriodocrceditoAtacado().equalsIgnoreCase("T")) {
-                    descricaoCard += "\n Período do Desconto está Semestral. \n";
-
-                } else if (dadosEmpresa.getPeriodocrceditoAtacado().equalsIgnoreCase("A")) {
-                    descricaoCard += "\n Período do Desconto está Anual. \n";
-                }
-
-                Card cardCreditoAtacado = new Card.Builder(getApplicationContext())
-                        .withProvider(new CardProvider())
-                        .setLayout(R.layout.material_basic_buttons_card)
-                        .setTitle("Resumo de Credito no Atacado")
-                        .setDescription(descricaoCard)
-                        .addAction(R.id.right_text_button, new TextViewAction(getApplicationContext())
-                                .setText("Action")
-                                .setListener(new OnActionClickListener() {
-                                    @Override
-                                    public void onActionClicked(View view, Card card) {
-                                        String s = card.toString();
-                                    }
-
-                                }))
-                        .endConfig()
-                        .build();
-                // Adiciona o card view em uma lista
-                mListView.getAdapter().add(cardCreditoAtacado);
-
-                // Checa se esta liberado para vender no varejo
-            }
-
-            if ((dadosUsuario.getVendeVarejoUsuario() == '1') && (dadosEmpresa.getTitpoAcumuloCreditoVarejo().length() > 0) && (dadosEmpresa.getPeriodocrceditoVarejo().length() > 0)){
-                String descricaoCard = "";
-                // Checa se o tipo eh por valor para vendas no varejo
-                if (dadosEmpresa.getTitpoAcumuloCreditoVarejo().equalsIgnoreCase("V")) {
-                    descricaoCard += "Tpo de Acumulo de Desconto:  Por Valor. \n" +
-                            "Valor Desconto: " + getResources().getString(R.string.sigla_real) + " " + funcoes.arredondarValor(dadosUsuario.getValorCreditoVarejo() + "\n");
-
-                    // Checa se o tipo eh por percentual para vendas no atacado
-                } else if (dadosEmpresa.getTitpoAcumuloCreditoVarejo().equalsIgnoreCase("P")) {
-                    descricaoCard += "Tpo de Acumulo de Desconto:  Por Percentual. \n" +
-                            "Percentual Desconto: " + funcoes.arredondarValor(dadosUsuario.getPercentualCreditoVarejo())+"% \n";
-                }
-
-                // Checa os periodo que vai ser acumulado os creditos para vendas no atacado
-                if (dadosEmpresa.getPeriodocrceditoVarejo().equalsIgnoreCase("M")) {
-                    descricaoCard += "\n Período do Desconto está Mensal. \n";
-
-                } else if (dadosEmpresa.getPeriodocrceditoVarejo().equalsIgnoreCase("Q")) {
-                    descricaoCard += "\n Período do Desconto está Quinzenal. \n";
-
-                } else if (dadosEmpresa.getPeriodocrceditoVarejo().equalsIgnoreCase("S")) {
-                    descricaoCard += "\n Período do Desconto está Semanal. \n";
-
-                } else if (dadosEmpresa.getPeriodocrceditoVarejo().equalsIgnoreCase("T")) {
-                    descricaoCard += "\n Período do Desconto está Semestral. \n";
-
-                } else if (dadosEmpresa.getPeriodocrceditoVarejo().equalsIgnoreCase("A")) {
-                    descricaoCard += "\n Período do Desconto está Anual. \n";
-                }
-
-                Card cardCreditoVarejo = new Card.Builder(getApplicationContext())
-                        .withProvider(new CardProvider())
-                        .setLayout(R.layout.material_basic_buttons_card)
-                        .setTitle("Resumo de Credito no Varejo")
-                        .setDescription(descricaoCard)
-                        .addAction(R.id.right_text_button, new TextViewAction(getApplicationContext())
-                                .setText("Action")
-                                .setListener(new OnActionClickListener() {
-                                    @Override
-                                    public void onActionClicked(View view, Card card) {
-                                        String s = card.toString();
-                                    }
-
-                                }))
-                        .endConfig()
-                        .build();
-
-                mListView.getAdapter().add(cardCreditoVarejo);
-            }
-            // Checa se o modo de sincronizacao esta SyncAccount
-            if (dadosUsuario.getModoConexao().equalsIgnoreCase("S")) {
-                // Cria a conta para o envio automatico do syncAdapter
-                funcoes.CreateSyncAccount(InicioMDActivity.this);
-            } else {
-                funcoes.cancelarSincronizacaoSegundoPlano();
-            }
-        }*/
+        FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(InicioMDActivity.this);
+        funcoes.criarAlarmeReceberAutomatico(recebeAutomatico);
+        funcoes.criarAlarmeEnviarAutomatico(enviaAutomatico);
     } // Fim onResume
 
 
@@ -596,7 +476,14 @@ public class InicioMDActivity extends AppCompatActivity {
 
             if (cliqueVoltar < 1){
                 // Mostra uma mensagem para clicar novamente em voltar
-                SuperToast.create(InicioMDActivity.this, getResources().getString(R.string.clique_sair_novamente_para_sair), SuperToast.Duration.LONG, Style.getStyle(Style.GRAY, SuperToast.Animations.POPUP)).show();
+                //SuperToast.create(InicioMDActivity.this, getResources().getString(R.string.clique_sair_novamente_para_sair), SuperToast.Duration.LONG, Style.getStyle(Style.GRAY, SuperToast.Animations.POPUP)).show();
+
+                SuperActivityToast.create(InicioMDActivity.this, this.getResources().getString(R.string.clique_sair_novamente_para_sair), Style.DURATION_LONG)
+                        .setTextColor(Color.WHITE)
+                        .setColor(Color.GRAY)
+                        .setAnimations(Style.ANIMATIONS_POP)
+                        .show();
+
                 cliqueVoltar ++;
                 // Cria um temporizador para voltar a zero o clique depois que fechar a menssagem
                 Handler handler = new Handler();
@@ -628,34 +515,64 @@ public class InicioMDActivity extends AppCompatActivity {
             FuncoesPersonalizadas funcoesP = new FuncoesPersonalizadas(InicioMDActivity.this);
 
             // Checa se a opcao selecionada eh para enviar
-            if (iDrawerItem.getTag().toString().contains("enviar")){
+            if (iDrawerItem.getTag().toString().contentEquals(KEY_ENVIA_AUTOMATICO)){
                 // Checa se foi escolhido verdadeiro ou false
                 if (b){
-                    funcoesP.setValorXml("EnviarAutomatico", "S");
+                    funcoesP.setValorXml(funcoesP.TAG_ENVIAR_AUTOMATICO, "S");
+
                 } else {
-                    funcoesP.setValorXml("EnviarAutomatico", "N");
+                    funcoesP.setValorXml(funcoesP.TAG_ENVIAR_AUTOMATICO, "N");
+                    funcoesP.setValorXml(funcoesP.TAG_ENVIAR_INSTANTANEAMENTE, "N");
+                    enviaInstantaneamente = b;
+                    switchEnviaInstantaneo.withChecked(enviaInstantaneamente);
                 }
+                enviaAutomatico = b;
+                switchEnviaInstantaneo.withSelectable(b).withSwitchEnabled(b);
+                navegacaoDrawerEsquerdo.updateItem(switchEnviaInstantaneo);
+            }
+            if (iDrawerItem.getTag().toString().contentEquals(KEY_ENVIAR_INSTANTENEAMENTE)){
+                // Checa se foi escolhido verdadeiro ou false
+                if (b){
+                    funcoesP.setValorXml(funcoesP.TAG_ENVIAR_INSTANTANEAMENTE, "S");
+                } else {
+                    funcoesP.setValorXml(funcoesP.TAG_ENVIAR_INSTANTANEAMENTE, "N");
+                }
+                enviaInstantaneamente = b;
             }
             // Checa se a opcao selecionada eh para receber
-            if (iDrawerItem.getTag().toString().contains("receber")){
+            if (iDrawerItem.getTag().toString().contentEquals(KEY_RECEBE_AUTOMATICO)){
                 // Checa se foi escolhido verdadeiro ou false
                 if (b){
-                    funcoesP.setValorXml("ReceberAutomatico", "S");
+                    funcoesP.setValorXml(funcoesP.TAG_RECEBER_AUTOMATICO, "S");
                 } else {
-                    funcoesP.setValorXml("ReceberAutomatico", "N");
+                    funcoesP.setValorXml(funcoesP.TAG_RECEBER_AUTOMATICO, "N");
                 }
+                recebeAutomatico = b;
             }
             // Checa se a opcao seleciona eh para mostrar imagem de produto
-            if (iDrawerItem.getTag().toString().contains("imagem_produto")){
+            if (iDrawerItem.getTag().toString().contentEquals(KEY_IMAGEM_PRODUTO)){
                 // Checa se foi escolhido verdadeiro ou false
                 if (b){
                     funcoesP.setValorXml("ImagemProduto", "S");
                 } else {
                     funcoesP.setValorXml("ImagemProduto", "N");
                 }
+                imagemProduto = b;
+            }
+            // Checa se a opcao seleciona eh para salvar os pedidos automaticamente em pdf
+            if (iDrawerItem.getTag().toString().contentEquals(KEY_IMAGEM_PRODUTO)){
+                // Checa se foi escolhido verdadeiro ou false
+                if (b){
+                    funcoesP.setValorXml(funcoesP.TAG_SALVA_PEDIDO_PDF, "S");
+                } else {
+                    funcoesP.setValorXml(funcoesP.TAG_SALVA_PEDIDO_PDF, "N");
+                }
+                salvaPedidoPdf = b;
             }
             // Executa a funcao para criar os alarmes em background
-            funcoesP.criarAlarmeEnviarReceberDadosAutomatico(enviaAutomatico, recebeAutomatico);
+            funcoesP.criarAlarmeEnviarAutomatico(enviaAutomatico);
+            funcoesP.criarAlarmeReceberAutomatico(recebeAutomatico);
+            //funcoesP.criarAlarmeEnviarReceberDadosAutomatico(enviaAutomatico, recebeAutomatico);
         }
     };
 
@@ -740,19 +657,15 @@ public class InicioMDActivity extends AppCompatActivity {
         mListView.getAdapter().add(card3);*/
     }
 
+    /**
+     * Checa se a empresa esta ativa e se tem muito tempo sem fazer sincronizacao.
+     */
     private void checaLiberacaoDispositivo(){
 
-        UsuarioRotinas usuarioRotinas = new UsuarioRotinas(getApplicationContext());
-        if (usuarioRotinas.usuarioAtivo() == false){
-
-            Intent intentListaConfiguracoes = new Intent(InicioMDActivity.this, SincronizacaoMDActivity.class);
-            // Abre outra tela
-            startActivity(intentListaConfiguracoes);
-        }
-
         UltimaAtualizacaoRotinas ultimaAtualizacaoRotinas = new UltimaAtualizacaoRotinas(getApplicationContext());
+        FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(getApplicationContext());
 
-        if(ultimaAtualizacaoRotinas.muitoTempoSemSincronizacao()){
+        if( (ultimaAtualizacaoRotinas.muitoTempoSemSincronizacao()) || (funcoes.getValorXml(funcoes.TAG_EMPRESA_ATIVA).equalsIgnoreCase("0")) ){
             Intent intentSincronizacao = new Intent(InicioMDActivity.this, SincronizacaoMDActivity.class);
             // Abre outra tela
             startActivity(intentSincronizacao);

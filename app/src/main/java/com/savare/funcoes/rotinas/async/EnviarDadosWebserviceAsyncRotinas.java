@@ -1,10 +1,19 @@
 package com.savare.funcoes.rotinas.async;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.os.AsyncTask;
+import android.os.Build;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.content.ContextCompat;
 import android.telephony.TelephonyManager;
 import android.view.View;
 import android.widget.ProgressBar;
@@ -33,15 +42,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Random;
 import java.util.Vector;
 
-import br.com.goncalves.pugnotification.notification.Load;
-import br.com.goncalves.pugnotification.notification.PugNotification;
 
 /**
  * Created by Bruno on 14/09/2016.
  */
-public class EnviarDadosWebserviceAsyncRotinas  extends AsyncTask<Void, Void, Void> {
+public class EnviarDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Void> {
 
     private Context context;
     private String[] tabelaEnviarDados = null;
@@ -51,7 +59,9 @@ public class EnviarDadosWebserviceAsyncRotinas  extends AsyncTask<Void, Void, Vo
     private String[] idOrcamentoSelecionado = null;
     private OnTaskCompleted listenerTaskCompleted;
     // Cria uma notificacao para ser manipulado
-    Load mLoad;
+    NotificationManager notificationManager;
+    NotificationCompat.BigTextStyle bigTextStyle;
+    NotificationCompat.Builder mBuilder;
 
     public EnviarDadosWebserviceAsyncRotinas(Context context) {
         this.context = context;
@@ -62,17 +72,25 @@ public class EnviarDadosWebserviceAsyncRotinas  extends AsyncTask<Void, Void, Vo
         this.context = context;
     }
 
-    public interface OnTaskCompleted{
+    public interface OnTaskCompleted {
         void onTaskCompleted();
     }
 
-    public void setTabelaEnviarDados(String[] tabelaEnviarDados) {this.tabelaEnviarDados = tabelaEnviarDados; }
+    public void setTabelaEnviarDados(String[] tabelaEnviarDados) {
+        this.tabelaEnviarDados = tabelaEnviarDados;
+    }
 
-    public void setProgressBarStatus(ProgressBar progressBarStatus) { this.progressBarStatus = progressBarStatus; }
+    public void setProgressBarStatus(ProgressBar progressBarStatus) {
+        this.progressBarStatus = progressBarStatus;
+    }
 
-    public void setTextStatus(TextView textStatus) { this.textStatus = textStatus; }
+    public void setTextStatus(TextView textStatus) {
+        this.textStatus = textStatus;
+    }
 
-    public void setIdOrcamentoSelecionado(String[] idOrcamentoSelecionado) { this.idOrcamentoSelecionado = idOrcamentoSelecionado; }
+    public void setIdOrcamentoSelecionado(String[] idOrcamentoSelecionado) {
+        this.idOrcamentoSelecionado = idOrcamentoSelecionado;
+    }
 
     @Override
     protected void onPreExecute() {
@@ -82,7 +100,7 @@ public class EnviarDadosWebserviceAsyncRotinas  extends AsyncTask<Void, Void, Vo
         calendario = Calendar.getInstance();
 
         // Checo se o texto de status foi passado pro parametro
-        if (textStatus != null){
+        if (textStatus != null) {
             ((Activity) context).runOnUiThread(new Runnable() {
                 public void run() {
                     textStatus.setVisibility(View.VISIBLE);
@@ -90,7 +108,7 @@ public class EnviarDadosWebserviceAsyncRotinas  extends AsyncTask<Void, Void, Vo
                 }
             });
         }
-        if (progressBarStatus != null){
+        if (progressBarStatus != null) {
             ((Activity) context).runOnUiThread(new Runnable() {
                 public void run() {
                     progressBarStatus.setVisibility(View.VISIBLE);
@@ -98,7 +116,7 @@ public class EnviarDadosWebserviceAsyncRotinas  extends AsyncTask<Void, Void, Vo
                 }
             });
         }
-        mLoad = PugNotification.with(context).load()
+        /*mLoad = PugNotification.with(context).load()
                 .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_ENVIAR_DADOS)
                 .smallIcon(R.mipmap.ic_launcher)
                 .largeIcon(R.mipmap.ic_launcher)
@@ -106,7 +124,38 @@ public class EnviarDadosWebserviceAsyncRotinas  extends AsyncTask<Void, Void, Vo
                 .flags(Notification.DEFAULT_LIGHTS);
 
         mLoad.bigTextStyle("Aguarde, vamor enviar os dados. Primeiro vamos ver se tem internet...");
-        mLoad.progress().value(0, 0, true).build();
+        mLoad.progress().value(0, 0, true).build();*/
+
+        String name = "FileDownload";
+
+        notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+
+            NotificationChannel mChannel = new NotificationChannel(name, name, NotificationManager.IMPORTANCE_MIN);
+            mChannel.setDescription(context.getResources().getString(R.string.importar_dados_recebidos));
+            mChannel.enableLights(true);
+            mChannel.setLightColor(Color.BLUE);
+            notificationManager.createNotificationChannel(mChannel);
+        }
+
+        // Create a BigTextStyle object.
+        bigTextStyle = new NotificationCompat.BigTextStyle();
+        bigTextStyle.bigText(context.getResources().getString(R.string.aguarde_vamos_enviar_dados));
+        //bigTextStyle.setBigContentTitle("Happy Christmas Detail Info.");
+
+        mBuilder = new NotificationCompat.Builder(context)
+                .setSmallIcon(R.mipmap.ic_launcher_smallicon)
+                .setColor(ContextCompat.getColor(context, R.color.primary))
+                .setContentTitle(context.getResources().getString(R.string.enviar_pedido_nuvem))
+                //.setContentText(mActivity.getResources().getString(R.string.app_name))
+                .setStyle(bigTextStyle)
+                .setDefaults(Notification.DEFAULT_LIGHTS)
+                .setPriority(NotificationManager.IMPORTANCE_MIN)
+                .setSound(null, 0)
+                .setVibrate(new long[0])
+                .setOnlyAlertOnce(true)
+                .setProgress(0, 0, true);
+        notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_ENVIAR_DADOS, mBuilder.build());
     }
 
     @Override
@@ -116,17 +165,17 @@ public class EnviarDadosWebserviceAsyncRotinas  extends AsyncTask<Void, Void, Vo
         funcoes.setValorXml("EnviandoDados", "S");
 
         if (funcoes.existeConexaoInternet()) {
-
-            mLoad.bigTextStyle(R.string.estamos_checando_webservice_online);
-            mLoad.progress().value(0, 0, true).build();
+            bigTextStyle.bigText(context.getResources().getString(R.string.estamos_checando_webservice_online));
+            mBuilder.setStyle(bigTextStyle);
+            notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_ENVIAR_DADOS, mBuilder.build());
 
             try {
                 // Checa se a versao do savere eh compativel com o webservice
-                if (funcoes.checaVersao()){
+                if (funcoes.checaVersao()) {
                     // Envia os orcamento AEAORCAM
                     if (((tabelaEnviarDados != null) && (tabelaEnviarDados.length > 0) &&
-                            ((Arrays.asList(tabelaEnviarDados).contains(WSSisinfoWebservice.FUNCTION_INSERT_AEAORCAM)) || (Arrays.asList(tabelaEnviarDados).contains(WSSisinfoWebservice.FUNCTION_INSERT_AEAITORC))) ) ||
-                            (tabelaEnviarDados == null) ){
+                            ((Arrays.asList(tabelaEnviarDados).contains(WSSisinfoWebservice.FUNCTION_INSERT_AEAORCAM)) || (Arrays.asList(tabelaEnviarDados).contains(WSSisinfoWebservice.FUNCTION_INSERT_AEAITORC)))) ||
+                            (tabelaEnviarDados == null)) {
 
                         // Envia os dados
                         enviaPedido();
@@ -144,9 +193,9 @@ public class EnviarDadosWebserviceAsyncRotinas  extends AsyncTask<Void, Void, Vo
                     }
                 });
             }
-        }else {
+        } else {
             // Checa se o texto de status foi passado pro parametro
-            if (textStatus != null){
+            if (textStatus != null) {
                 ((Activity) context).runOnUiThread(new Runnable() {
                     public void run() {
                         textStatus.setText("Não existe conexão com a internet.");
@@ -173,35 +222,24 @@ public class EnviarDadosWebserviceAsyncRotinas  extends AsyncTask<Void, Void, Vo
         FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
 
         // Marca que a aplicacao esta recebendo dados
-        funcoes.setValorXml("EnviandoDados", "N");
-
-        // Checa se a interface de retorno do asynctask eh diferente de nula
-        if (listenerTaskCompleted != null) {
-            listenerTaskCompleted.onTaskCompleted();
-        }
+        funcoes.setValorXml(funcoes.TAG_ENVIANDO_DADOS, "N");
 
         // Cria uma notificacao para ser manipulado
-        PugNotification.with(context)
-                .load()
-                .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_ENVIAR_DADOS)
-                .title(R.string.enviar_pedido_nuvem)
-                //.message(context.getResources().getString(R.string.terminamos_enviar_dados))
-                .bigTextStyle(context.getResources().getString(R.string.terminamos_enviar_dados))
-                .smallIcon(R.mipmap.ic_launcher)
-                .largeIcon(R.mipmap.ic_launcher)
-                .flags(Notification.DEFAULT_LIGHTS)
-                .simple()
-                .build();
+        bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.enviar_pedido_nuvem))
+                    .bigText(context.getResources().getString(R.string.terminamos_enviar_dados));
+        mBuilder.setStyle(bigTextStyle)
+                .setProgress(0, 0, false);
+        notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_ENVIAR_DADOS, mBuilder.build());
 
         // Checo se o texto de status foi passado pro parametro
-        if (textStatus != null){
+        if (textStatus != null) {
             ((Activity) context).runOnUiThread(new Runnable() {
                 public void run() {
                     textStatus.setText(context.getResources().getString(R.string.terminamos_enviar_dados));
                 }
             });
         }
-        if (progressBarStatus != null){
+        if (progressBarStatus != null) {
             ((Activity) context).runOnUiThread(new Runnable() {
                 public void run() {
                     progressBarStatus.setIndeterminate(true);
@@ -209,30 +247,30 @@ public class EnviarDadosWebserviceAsyncRotinas  extends AsyncTask<Void, Void, Vo
                 }
             });
         }
-        /*ChecaDadosEnviadosWebserviceAsyncRotinas checaDadosEnviadosWebservice = new ChecaDadosEnviadosWebserviceAsyncRotinas(context);
-        if (idOrcamentoSelecionado != null && idOrcamentoSelecionado.length > 0){
-            checaDadosEnviadosWebservice.setIdOrcamentoSelecionado(idOrcamentoSelecionado);
+        // Checa se a interface de retorno do asynctask eh diferente de nula
+        if (listenerTaskCompleted != null) {
+            listenerTaskCompleted.onTaskCompleted();
         }
-        checaDadosEnviadosWebservice.execute();*/
     }
 
-    private void enviaPedido(){
+    private void enviaPedido() {
         JsonObject statuRetorno = null;
         int totalPedidoEnviado = 0;
         try {
             // Indica que essa notificacao eh do tipo progress
-            mLoad.bigTextStyle(context.getResources().getString(R.string.estamos_conectanto_servidor_nuvem));
-            mLoad.progress().value(0, 0, true).build();
+            bigTextStyle.bigText(context.getResources().getString(R.string.estamos_conectanto_servidor_nuvem));
+            mBuilder.setStyle(bigTextStyle);
+            notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_ENVIAR_DADOS, mBuilder.build());
 
             // Checo se o texto de status foi passado pro parametro
-            if (textStatus != null){
+            if (textStatus != null) {
                 ((Activity) context).runOnUiThread(new Runnable() {
                     public void run() {
                         textStatus.setText(context.getResources().getString(R.string.listando_pedidos_para_enviar));
                     }
                 });
             }
-            if (progressBarStatus != null){
+            if (progressBarStatus != null) {
                 ((Activity) context).runOnUiThread(new Runnable() {
                     public void run() {
                         progressBarStatus.setIndeterminate(true);
@@ -245,17 +283,17 @@ public class EnviarDadosWebserviceAsyncRotinas  extends AsyncTask<Void, Void, Vo
             final OrcamentoRotinas orcamentoRotinas = new OrcamentoRotinas(context);
 
             String where = null;
-            if ((idOrcamentoSelecionado != null) && (idOrcamentoSelecionado.length > 0)){
+            if ((idOrcamentoSelecionado != null) && (idOrcamentoSelecionado.length > 0)) {
                 // Adiciona a coluna a ser filtrada na tabela
                 where = "AEAORCAM.ID_AEAORCAM IN(";
 
                 int controle = 0;
                 // Passa por todos os id's de orcamentos
                 for (String id : idOrcamentoSelecionado) {
-                    controle ++;
+                    controle++;
                     where += id;
                     // Checa se eh o ultimo da lista de tipos de pesquisa
-                    if(controle < idOrcamentoSelecionado.length){
+                    if (controle < idOrcamentoSelecionado.length) {
                         where += ", ";
                     } else {
                         where += ")";
@@ -263,48 +301,50 @@ public class EnviarDadosWebserviceAsyncRotinas  extends AsyncTask<Void, Void, Vo
                 }
             }
             String[] listaTipo = null;
-            if (where != null){
-                listaTipo = new String[]{   OrcamentoRotinas.PEDIDO_NAO_ENVIADO,
-                                            OrcamentoRotinas.PEDIDO_ENVIADO,
-                                            OrcamentoRotinas.PEDIDO_RETORNADO_BLOQUEADO,
-                                            OrcamentoRotinas.PEDIDO_RETORNADO_LIBERADO,
-                                            OrcamentoRotinas.PEDIDO_RETORNADO_EXCLUIDO,
-                                            OrcamentoRotinas.PEDIDO_FATURADO};
+            if (where != null) {
+                listaTipo = new String[]{OrcamentoRotinas.PEDIDO_NAO_ENVIADO,
+                        OrcamentoRotinas.PEDIDO_ENVIADO,
+                        OrcamentoRotinas.PEDIDO_RETORNADO_BLOQUEADO,
+                        OrcamentoRotinas.PEDIDO_RETORNADO_LIBERADO,
+                        OrcamentoRotinas.PEDIDO_RETORNADO_EXCLUIDO,
+                        OrcamentoRotinas.PEDIDO_FATURADO};
             } else {
                 listaTipo = new String[]{OrcamentoRotinas.PEDIDO_NAO_ENVIADO};
             }
 
             // Indica que essa notificacao eh do tipo progress
-            mLoad.bigTextStyle(context.getResources().getString(R.string.listando_pedidos_para_enviar));
-            mLoad.progress().value(0, 0, true).build();
+            bigTextStyle.bigText(context.getResources().getString(R.string.listando_pedidos_para_enviar));
+            mBuilder.setStyle(bigTextStyle);
+            notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_ENVIAR_DADOS, mBuilder.build());
 
             // Busca todos os pedidos nao enviados
             listaOrcamento = orcamentoRotinas.listaOrcamentoPedido(listaTipo, where, OrcamentoRotinas.ORDEM_CRESCENTE);
 
             // Checa se retornou alguma coisa
-            if ((listaOrcamento != null) && (listaOrcamento.size() > 0)){
+            if ((listaOrcamento != null) && (listaOrcamento.size() > 0)) {
 
                 // Passa por todos os registros
                 for (final OrcamentoBeans orcamento : listaOrcamento) {
 
                     // Busta todos os itens do orcamento
-                    List<ItemOrcamentoBeans> listaItemOrcamento = orcamentoRotinas.listaItemOrcamentoResumida(null, ""+orcamento.getIdOrcamento(), null, null);
+                    List<ItemOrcamentoBeans> listaItemOrcamento = orcamentoRotinas.listaItemOrcamentoResumida(null, "" + orcamento.getIdOrcamento(), null, null);
 
                     orcamento.setListaItemOrcamento(listaItemOrcamento);
 
                     // Indica que essa notificacao eh do tipo progress
-                    mLoad.bigTextStyle(context.getResources().getString(R.string.enviando_pedidos_confirmando) + " Nº " + orcamento.getIdOrcamento());
-                    mLoad.progress().value(0, 0, true).build();
+                    bigTextStyle.bigText(context.getResources().getString(R.string.enviando_pedidos_confirmando) + " Nº " + orcamento.getIdOrcamento());
+                    mBuilder.setStyle(bigTextStyle);
+                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_ENVIAR_DADOS, mBuilder.build());
 
                     // Checo se o texto de status foi passado pro parametro
-                    if (textStatus != null){
+                    if (textStatus != null) {
                         ((Activity) context).runOnUiThread(new Runnable() {
                             public void run() {
                                 textStatus.setText(context.getResources().getString(R.string.enviando_pedidos_confirmando) + " Nº " + orcamento.getIdOrcamento());
                             }
                         });
                     }
-                    if (progressBarStatus != null){
+                    if (progressBarStatus != null) {
                         ((Activity) context).runOnUiThread(new Runnable() {
                             public void run() {
                                 progressBarStatus.setIndeterminate(true);
@@ -317,20 +357,21 @@ public class EnviarDadosWebserviceAsyncRotinas  extends AsyncTask<Void, Void, Vo
                     String tempJsonRetorno = webserviceSisInfo.executarSelectWebserviceJson(null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_INSERT_AEAORCAM, WSSisinfoWebservice.METODO_POST, gson.toJson(orcamento, orcamento.getClass()), null);
                     JsonObject retornoWebservice = gson.fromJson(tempJsonRetorno, JsonObject.class);
 
-                    if ((retornoWebservice != null) && (retornoWebservice.has(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO))){
+                    if ((retornoWebservice != null) && (retornoWebservice.has(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO))) {
                         // Indica que essa notificacao eh do tipo progress
-                        mLoad.bigTextStyle(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
-                        mLoad.progress().value(0, 0, true).build();
+                        bigTextStyle.bigText(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
+                        mBuilder.setStyle(bigTextStyle);
+                        notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_ENVIAR_DADOS, mBuilder.build());
 
                         // Checo se o texto de status foi passado pro parametro
-                        if (textStatus != null){
+                        if (textStatus != null) {
                             ((Activity) context).runOnUiThread(new Runnable() {
                                 public void run() {
                                     textStatus.setText(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
                                 }
                             });
                         }
-                        if (progressBarStatus != null){
+                        if (progressBarStatus != null) {
                             ((Activity) context).runOnUiThread(new Runnable() {
                                 public void run() {
                                     progressBarStatus.setIndeterminate(true);
@@ -342,18 +383,19 @@ public class EnviarDadosWebserviceAsyncRotinas  extends AsyncTask<Void, Void, Vo
 
                         if (statuRetorno != null) {
                             // Indica que essa notificacao eh do tipo progress
-                            mLoad.bigTextStyle(context.getResources().getString(R.string.salvando_critica_retorno));
-                            mLoad.progress().value(0, 0, true).build();
+                            bigTextStyle.bigText(context.getResources().getString(R.string.salvando_critica_retorno));
+                            mBuilder.setStyle(bigTextStyle);
+                            notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_ENVIAR_DADOS, mBuilder.build());
 
                             // Checo se o texto de status foi passado pro parametro
-                            if (textStatus != null){
+                            if (textStatus != null) {
                                 ((Activity) context).runOnUiThread(new Runnable() {
                                     public void run() {
                                         textStatus.setText(context.getResources().getString(R.string.salvando_critica_retorno));
                                     }
                                 });
                             }
-                            if (progressBarStatus != null){
+                            if (progressBarStatus != null) {
                                 ((Activity) context).runOnUiThread(new Runnable() {
                                     public void run() {
                                         progressBarStatus.setIndeterminate(true);
@@ -365,7 +407,7 @@ public class EnviarDadosWebserviceAsyncRotinas  extends AsyncTask<Void, Void, Vo
                             dadosCritica.put("ID_AEAORCAM", orcamento.getIdOrcamento());
                             dadosCritica.put("CODIGO_RETORNO_WEBSERVICE", ((statuRetorno.has(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO)) ? statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO).getAsInt() : -1));
                             dadosCritica.put("RETORNO_WEBSERVICE", ((statuRetorno.has(WSSisinfoWebservice.KEY_ELEMENT_MENSAGEM_RETORNO) ? statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_MENSAGEM_RETORNO).getAsString() : "") +
-                                                                    (statuRetorno.has(WSSisinfoWebservice.KEY_ELEMENT_EXTRA_RETORNO) ? " \n " + statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_EXTRA_RETORNO).getAsString() : "")));
+                                    (statuRetorno.has(WSSisinfoWebservice.KEY_ELEMENT_EXTRA_RETORNO) ? " \n " + statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_EXTRA_RETORNO).getAsString() : "")));
 
                             if (statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO).getAsInt() == HttpURLConnection.HTTP_OK) {
 
@@ -387,8 +429,9 @@ public class EnviarDadosWebserviceAsyncRotinas  extends AsyncTask<Void, Void, Vo
 
                                     orcamentoSql.update(dadosPedido, "AEAORCAM.ID_AEAORCAM = " + orcamento.getIdOrcamento());
 
-                                    mLoad.bigTextStyle(context.getResources().getString(R.string.marcando_pedido_enviado_sucesso));
-                                    mLoad.progress().value(0, 0, true).build();
+                                    bigTextStyle.bigText(context.getResources().getString(R.string.marcando_pedido_enviado_sucesso));
+                                    mBuilder.setStyle(bigTextStyle);
+                                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_ENVIAR_DADOS, mBuilder.build());
 
                                     // Checo se o texto de status foi passado pro parametro
                                     if (textStatus != null) {
@@ -405,7 +448,7 @@ public class EnviarDadosWebserviceAsyncRotinas  extends AsyncTask<Void, Void, Vo
                                 listaOrcamento.remove(listaOrcamento.indexOf(orcamento));
 
                                 // Cria uma notificacao para ser manipulado
-                                Load mLoad = PugNotification.with(context).load()
+                                /*Load mLoad = PugNotification.with(context).load()
                                         .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_ENVIAR_DADOS + context.hashCode())
                                         .smallIcon(R.mipmap.ic_launcher)
                                         .largeIcon(R.mipmap.ic_launcher)
@@ -414,7 +457,15 @@ public class EnviarDadosWebserviceAsyncRotinas  extends AsyncTask<Void, Void, Vo
                                                 + "Mensagem: " + ((statuRetorno != null && statuRetorno.has(WSSisinfoWebservice.KEY_ELEMENT_MENSAGEM_RETORNO)) ? statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_MENSAGEM_RETORNO).getAsString() + "\n" : "Não conseguimos enviar o pedido Nº " + orcamento.getIdOrcamento() + "\n")
                                                 + "Extra: " + ((statuRetorno != null && statuRetorno.has(WSSisinfoWebservice.KEY_ELEMENT_EXTRA_RETORNO)) ? statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_EXTRA_RETORNO).getAsString() : "\n"))
                                         .flags(Notification.DEFAULT_LIGHTS);
-                                mLoad.simple().build();
+                                mLoad.simple().build();*/
+
+                                bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.enviar_pedido_nuvem))
+                                            .bigText("Código Retorno: " + ((statuRetorno != null && statuRetorno.has(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO)) ? statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO).getAsInt() + "\n" : "Sem código.\n")
+                                                   + "Mensagem: " + ((statuRetorno != null && statuRetorno.has(WSSisinfoWebservice.KEY_ELEMENT_MENSAGEM_RETORNO)) ? statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_MENSAGEM_RETORNO).getAsString() + "\n" : "Não conseguimos enviar o pedido Nº " + orcamento.getIdOrcamento() + "\n")
+                                                   + "Extra: " + ((statuRetorno != null && statuRetorno.has(WSSisinfoWebservice.KEY_ELEMENT_EXTRA_RETORNO)) ? statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_EXTRA_RETORNO).getAsString() : "\n"));
+                                mBuilder.setStyle(bigTextStyle)
+                                        .setProgress(0, 0, false);
+                                notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_ENVIAR_DADOS + new Random().nextInt(100), mBuilder.build());
                             }
                             final CriticaOrcamentoRotina criticaOrcamentoRotina = new CriticaOrcamentoRotina(context);
 
@@ -426,24 +477,30 @@ public class EnviarDadosWebserviceAsyncRotinas  extends AsyncTask<Void, Void, Vo
                         }
                     } else {
                         // Cria uma notificacao para ser manipulado
-                        Load mLoad = PugNotification.with(context).load()
+                        /*Load mLoad = PugNotification.with(context).load()
                                 .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_ENVIAR_DADOS)
                                 .smallIcon(R.mipmap.ic_launcher)
                                 .largeIcon(R.mipmap.ic_launcher)
                                 .title(R.string.enviar_pedido_nuvem)
                                 .bigTextStyle(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice))
                                 .flags(Notification.DEFAULT_LIGHTS);
-                        mLoad.simple().build();
+                        mLoad.simple().build();*/
+
+                        bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.enviar_pedido_nuvem))
+                                    .bigText(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice));
+                        mBuilder.setStyle(bigTextStyle)
+                                .setProgress(0, 0, false);
+                        notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_ENVIAR_DADOS + new Random().nextInt(100), mBuilder.build());
 
                         // Checo se o texto de status foi passado pro parametro
-                        if (textStatus != null){
+                        if (textStatus != null) {
                             ((Activity) context).runOnUiThread(new Runnable() {
                                 public void run() {
                                     textStatus.setText(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice));
                                 }
                             });
                         }
-                        if (progressBarStatus != null){
+                        if (progressBarStatus != null) {
                             ((Activity) context).runOnUiThread(new Runnable() {
                                 public void run() {
                                     progressBarStatus.setVisibility(View.GONE);
@@ -590,26 +647,32 @@ public class EnviarDadosWebserviceAsyncRotinas  extends AsyncTask<Void, Void, Vo
                     }*/
                 }
             }
-            if (totalPedidoEnviado == listaOrcamento.size()){
+            if (totalPedidoEnviado == listaOrcamento.size()) {
                 // Cria uma notificacao para ser manipulado
-                Load mLoad = PugNotification.with(context).load()
+                /*Load mLoad = PugNotification.with(context).load()
                         .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_ENVIAR_DADOS)
                         .smallIcon(R.mipmap.ic_launcher)
                         .largeIcon(R.mipmap.ic_launcher)
                         .title(R.string.enviar_pedido_nuvem)
                         .message(R.string.pedidos_enviados)
                         .flags(Notification.DEFAULT_SOUND);
-                mLoad.simple().build();
+                mLoad.simple().build();*/
+
+                bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.enviar_pedido_nuvem))
+                        .bigText(context.getResources().getString(R.string.pedidos_enviados));
+                mBuilder.setStyle(bigTextStyle)
+                        .setProgress(0, 0, false);
+                notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_ENVIAR_DADOS + new Random().nextInt(100), mBuilder.build());
 
                 // Checo se o texto de status foi passado pro parametro
-                if (textStatus != null){
+                if (textStatus != null) {
                     ((Activity) context).runOnUiThread(new Runnable() {
                         public void run() {
                             textStatus.setText(context.getResources().getString(R.string.pedidos_enviados));
                         }
                     });
                 }
-                if (progressBarStatus != null){
+                if (progressBarStatus != null) {
                     ((Activity) context).runOnUiThread(new Runnable() {
                         public void run() {
                             progressBarStatus.setVisibility(View.GONE);
@@ -617,26 +680,32 @@ public class EnviarDadosWebserviceAsyncRotinas  extends AsyncTask<Void, Void, Vo
                     });
                 }
 
-            } else if (totalPedidoEnviado < listaOrcamento.size()){
+            } else if (totalPedidoEnviado < listaOrcamento.size()) {
                 // Cria uma notificacao para ser manipulado
-                Load mLoad = PugNotification.with(context).load()
+                /*Load mLoad = PugNotification.with(context).load()
                         .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_ENVIAR_DADOS)
                         .smallIcon(R.mipmap.ic_launcher)
                         .largeIcon(R.mipmap.ic_launcher)
                         .title(R.string.enviar_pedido_nuvem)
                         .message(R.string.nem_todos_pedidos_foram_enviados_tente_novamente)
                         .flags(Notification.DEFAULT_SOUND);
-                mLoad.simple().build();
+                mLoad.simple().build();*/
+
+                bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.enviar_pedido_nuvem))
+                        .bigText(context.getResources().getString(R.string.nem_todos_pedidos_foram_enviados_tente_novamente));
+                mBuilder.setStyle(bigTextStyle)
+                        .setProgress(0, 0, false);
+                notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_ENVIAR_DADOS + new Random().nextInt(100), mBuilder.build());
 
                 // Checo se o texto de status foi passado pro parametro
-                if (textStatus != null){
+                if (textStatus != null) {
                     ((Activity) context).runOnUiThread(new Runnable() {
                         public void run() {
                             textStatus.setText(context.getResources().getString(R.string.nem_todos_pedidos_foram_enviados_tente_novamente));
                         }
                     });
                 }
-                if (progressBarStatus != null){
+                if (progressBarStatus != null) {
                     ((Activity) context).runOnUiThread(new Runnable() {
                         public void run() {
                             progressBarStatus.setVisibility(View.GONE);
@@ -644,24 +713,32 @@ public class EnviarDadosWebserviceAsyncRotinas  extends AsyncTask<Void, Void, Vo
                     });
                 }
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             // Cria uma notificacao para ser manipulado
-            Load mLoad = PugNotification.with(context).load()
+            /*Load mLoad = PugNotification.with(context).load()
                     .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
                     .smallIcon(R.mipmap.ic_launcher)
                     .largeIcon(R.mipmap.ic_launcher)
                     .title(R.string.importar_dados_recebidos)
                     .bigTextStyle(e.getMessage())
                     .flags(Notification.DEFAULT_SOUND);
-            mLoad.simple().build();
+            mLoad.simple().build();*/
+
+            bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.importar_dados_recebidos))
+                    .bigText(context.getResources().getString(R.string.msg_error) + "\n" + e.getMessage());
+            mBuilder.setStyle(bigTextStyle)
+                    .setProgress(0, 0, false);
+            notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO + new Random().nextInt(100), mBuilder.build());
         }
     }
 
 
-    private void enviaItemPedido(List<OrcamentoBeans> listaOrcamento){
+    private void enviaItemPedido(List<OrcamentoBeans> listaOrcamento) {
         try {
-            mLoad.bigTextStyle(context.getResources().getString(R.string.vamos_enviar_item_pedido));
-            mLoad.progress().value(0, 0, true).build();
+            bigTextStyle.bigText(context.getResources().getString(R.string.vamos_enviar_item_pedido));
+            mBuilder.setStyle(bigTextStyle)
+                    .setProgress(0, 0, true);
+            notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_ENVIAR_DADOS, mBuilder.build());
 
             // Passa por todos os orcamentos para enviar os itens
             for (final OrcamentoBeans orcamento : listaOrcamento) {
@@ -672,10 +749,10 @@ public class EnviarDadosWebserviceAsyncRotinas  extends AsyncTask<Void, Void, Vo
                 OrcamentoRotinas orcamentoRotinas = new OrcamentoRotinas(context);
 
                 // Busta todos os itens do orcamento
-                listaItemOrcamento = orcamentoRotinas.listaItemOrcamentoResumida(null, ""+orcamento.getIdOrcamento(), null, null);
+                listaItemOrcamento = orcamentoRotinas.listaItemOrcamentoResumida(null, "" + orcamento.getIdOrcamento(), null, null);
 
                 // Checa se retornou alguma coisa
-                if ((listaItemOrcamento != null) && (listaItemOrcamento.size() > 0)){
+                if ((listaItemOrcamento != null) && (listaItemOrcamento.size() > 0)) {
 
                     // Passa por todos os registros
                     for (int i = 0; i < listaItemOrcamento.size(); i++) {
@@ -689,8 +766,8 @@ public class EnviarDadosWebserviceAsyncRotinas  extends AsyncTask<Void, Void, Vo
                     // Vareavel para saber o total de enviados com sucesso
                     int totalEnviadoSucesso = 0;
 
-                    for (int i = 0; i < listaItemOrcamento.size(); i ++){
-                    //for (final ItemOrcamentoBeans itemOrc : listaItemOrcamento) {
+                    for (int i = 0; i < listaItemOrcamento.size(); i++) {
+                        //for (final ItemOrcamentoBeans itemOrc : listaItemOrcamento) {
 
                         final ItemOrcamentoBeans itemOrc = listaItemOrcamento.get(i);
 
@@ -704,21 +781,23 @@ public class EnviarDadosWebserviceAsyncRotinas  extends AsyncTask<Void, Void, Vo
 
                         listaPropertyInfos.add(propertyOrcamento);
 
-                        mLoad.bigTextStyle( context.getResources().getString(R.string.enviando_pedidos) + " Nº " + orcamento.getIdOrcamento() + "\n" +
-                                            context.getResources().getString(R.string.enviando_item_pedido) + " Nº " + itemOrc.getSequencia() + "/" + listaItemOrcamento.size());
-                        mLoad.progress().value(itemOrc.getSequencia(), listaItemOrcamento.size(), false).build();
+                        bigTextStyle.bigText(context.getResources().getString(R.string.enviando_pedidos) + " Nº " + orcamento.getIdOrcamento() + "\n" +
+                                context.getResources().getString(R.string.enviando_item_pedido) + " Nº " + itemOrc.getSequencia() + "/" + listaItemOrcamento.size());
+                        mBuilder.setStyle(bigTextStyle)
+                                .setProgress(listaItemOrcamento.size(), itemOrc.getSequencia(), false);
+                        notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_ENVIAR_DADOS, mBuilder.build());
 
                         // Checo se o texto de status foi passado pro parametro
-                        if (textStatus != null){
+                        if (textStatus != null) {
                             final int finalListaItemOrcamento = listaItemOrcamento.size();
                             ((Activity) context).runOnUiThread(new Runnable() {
                                 public void run() {
-                                    textStatus.setText( context.getResources().getString(R.string.enviando_pedidos) + " Nº " + orcamento.getIdOrcamento() + "\n" +
-                                                        context.getResources().getString(R.string.enviando_item_pedido) + " Nº " + itemOrc.getSequencia() + "/" + finalListaItemOrcamento);
+                                    textStatus.setText(context.getResources().getString(R.string.enviando_pedidos) + " Nº " + orcamento.getIdOrcamento() + "\n" +
+                                            context.getResources().getString(R.string.enviando_item_pedido) + " Nº " + itemOrc.getSequencia() + "/" + finalListaItemOrcamento);
                                 }
                             });
                         }
-                        if (progressBarStatus != null){
+                        if (progressBarStatus != null) {
                             ((Activity) context).runOnUiThread(new Runnable() {
                                 public void run() {
                                     progressBarStatus.setIndeterminate(true);
@@ -735,18 +814,20 @@ public class EnviarDadosWebserviceAsyncRotinas  extends AsyncTask<Void, Void, Vo
                             // Vareavel para saber se todos os dados foram inseridos com sucesso
                             boolean todosSucesso = true;
 
-                            mLoad.bigTextStyle(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
-                            mLoad.progress().value(0, 0, true).build();
+                            bigTextStyle.bigText(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
+                            mBuilder.setStyle(bigTextStyle)
+                                    .setProgress(0, 0, true);
+                            notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_ENVIAR_DADOS, mBuilder.build());
 
                             // Checo se o texto de status foi passado pro parametro
-                            if (textStatus != null){
+                            if (textStatus != null) {
                                 ((Activity) context).runOnUiThread(new Runnable() {
                                     public void run() {
                                         textStatus.setText(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
                                     }
                                 });
                             }
-                            if (progressBarStatus != null){
+                            if (progressBarStatus != null) {
                                 ((Activity) context).runOnUiThread(new Runnable() {
                                     public void run() {
                                         progressBarStatus.setIndeterminate(false);
@@ -760,18 +841,19 @@ public class EnviarDadosWebserviceAsyncRotinas  extends AsyncTask<Void, Void, Vo
                             for (SoapObject objetoIndividual : listaRetornoWeb) {
                                 final int finalControle = controle;
 
-                                mLoad.bigTextStyle(context.getResources().getString(R.string.recebendo_dados_item_orcamento) + " - " + (finalControle + 1) + "/" + listaRetornoWeb.size());
-                                mLoad.progress().value(0, 0, true).build();
+                                bigTextStyle.bigText(context.getResources().getString(R.string.recebendo_dados_item_orcamento) + " - " + (finalControle + 1) + "/" + listaRetornoWeb.size());
+                                mBuilder.setStyle(bigTextStyle);
+                                notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_ENVIAR_DADOS, mBuilder.build());
 
                                 // Checo se o texto de status foi passado pro parametro
-                                if (textStatus != null){
+                                if (textStatus != null) {
                                     ((Activity) context).runOnUiThread(new Runnable() {
                                         public void run() {
                                             textStatus.setText(context.getResources().getString(R.string.recebendo_dados_item_orcamento) + " - " + (finalControle + 1) + "/" + listaRetornoWeb.size());
                                         }
                                     });
                                 }
-                                if (progressBarStatus != null){
+                                if (progressBarStatus != null) {
 
                                     ((Activity) context).runOnUiThread(new Runnable() {
                                         public void run() {
@@ -779,7 +861,7 @@ public class EnviarDadosWebserviceAsyncRotinas  extends AsyncTask<Void, Void, Vo
                                         }
                                     });
                                 }
-                                controle ++;
+                                controle++;
 
                                 SoapObject objeto;
 
@@ -789,17 +871,18 @@ public class EnviarDadosWebserviceAsyncRotinas  extends AsyncTask<Void, Void, Vo
                                     objeto = objetoIndividual;
                                 }
                                 // Checa se voltou algum codigo de retorno
-                                if (objeto.hasProperty("codigoRetorno")){
+                                if (objeto.hasProperty("codigoRetorno")) {
                                     // Checa se o retorno foi o numero 100 (inserido com sucesso)
-                                    if (Integer.parseInt(objeto.getProperty("codigoRetorno").toString()) == 100){
+                                    if (Integer.parseInt(objeto.getProperty("codigoRetorno").toString()) == 100) {
                                         // Incrementa o total de enviado com sucesso
-                                        totalEnviadoSucesso ++;
+                                        totalEnviadoSucesso++;
 
-                                        mLoad.bigTextStyle(context.getResources().getString(R.string.marcando_item_enviado_sucesso));
-                                        mLoad.progress().value(0, 0, true).build();
+                                        bigTextStyle.bigText(context.getResources().getString(R.string.marcando_item_enviado_sucesso));
+                                        mBuilder.setStyle(bigTextStyle);
+                                        notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_ENVIAR_DADOS, mBuilder.build());
 
                                         // Checo se o texto de status foi passado pro parametro
-                                        if (textStatus != null){
+                                        if (textStatus != null) {
                                             ((Activity) context).runOnUiThread(new Runnable() {
                                                 public void run() {
                                                     textStatus.setText(context.getResources().getString(R.string.marcando_item_enviado_sucesso));
@@ -812,7 +895,7 @@ public class EnviarDadosWebserviceAsyncRotinas  extends AsyncTask<Void, Void, Vo
 
                                         ItemOrcamentoSql itemOrcamentoSql = new ItemOrcamentoSql(context);
 
-                                        if (itemOrcamentoSql.update(dadosPedido, "AEAITORC.ID_AEAITORC = " + itemOrc.getIdItemOrcamento()) <= 0){
+                                        if (itemOrcamentoSql.update(dadosPedido, "AEAITORC.ID_AEAITORC = " + itemOrc.getIdItemOrcamento()) <= 0) {
                                             todosSucesso = false;
                                         }
                                     }
@@ -821,7 +904,7 @@ public class EnviarDadosWebserviceAsyncRotinas  extends AsyncTask<Void, Void, Vo
                         }
                     }
                     // Checa se foram todos enviados com sucesso
-                    if (totalEnviadoSucesso == listaItemOrcamento.size()){
+                    if (totalEnviadoSucesso == listaItemOrcamento.size()) {
 
                         // Cria uma lista para salvar todas as propriedades
                         List<PropertyInfo> listaPropertyInfos = new ArrayList<PropertyInfo>();
@@ -835,11 +918,12 @@ public class EnviarDadosWebserviceAsyncRotinas  extends AsyncTask<Void, Void, Vo
 
                         WSSisinfoWebservice webserviceSisInfo = new WSSisinfoWebservice(context);
 
-                        mLoad.bigTextStyle(context.getResources().getString(R.string.vamos_checar_pedido_enviado));
-                        mLoad.progress().value(0, 0, true).build();
+                        bigTextStyle.bigText(context.getResources().getString(R.string.vamos_checar_pedido_enviado));
+                        mBuilder.setStyle(bigTextStyle);
+                        notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_ENVIAR_DADOS, mBuilder.build());
 
                         // Checo se o texto de status foi passado pro parametro
-                        if (textStatus != null){
+                        if (textStatus != null) {
                             ((Activity) context).runOnUiThread(new Runnable() {
                                 public void run() {
                                     textStatus.setText(context.getResources().getString(R.string.vamos_checar_pedido_enviado));
@@ -847,7 +931,7 @@ public class EnviarDadosWebserviceAsyncRotinas  extends AsyncTask<Void, Void, Vo
                             });
                         }
 
-                        if (progressBarStatus != null){
+                        if (progressBarStatus != null) {
 
                             ((Activity) context).runOnUiThread(new Runnable() {
                                 public void run() {
@@ -870,10 +954,10 @@ public class EnviarDadosWebserviceAsyncRotinas  extends AsyncTask<Void, Void, Vo
                                     objeto = objetoIndividual;
                                 }
                                 // Checa se voltou algum codigo de retorno
-                                if (objeto.hasProperty("codigoRetorno")){
+                                if (objeto.hasProperty("codigoRetorno")) {
 
                                     // Checa se o retorno foi o numero 101 (atualizado com sucesso)
-                                    if (Integer.parseInt(objeto.getProperty("codigoRetorno").toString()) == 101){
+                                    if (Integer.parseInt(objeto.getProperty("codigoRetorno").toString()) == 101) {
 
                                         inserirUltimaAtualizacao("AEAITORC_ENVIAR");
                                         inserirUltimaAtualizacao("AEAORCAM_ENVIAR");
@@ -884,17 +968,18 @@ public class EnviarDadosWebserviceAsyncRotinas  extends AsyncTask<Void, Void, Vo
 
                                         ItemOrcamentoSql itemOrcamentoSql = new ItemOrcamentoSql(context);
 
-                                        if (itemOrcamentoSql.update(dadosPedido, "AEAITORC.ID_AEAORCAM = " + orcamento.getIdOrcamento()) > 0){
+                                        if (itemOrcamentoSql.update(dadosPedido, "AEAITORC.ID_AEAORCAM = " + orcamento.getIdOrcamento()) > 0) {
 
                                             OrcamentoSql orcamentoSql = new OrcamentoSql(context);
 
                                             orcamentoSql.update(dadosPedido, "AEAORCAM.ID_AEAORCAM = " + orcamento.getIdOrcamento());
 
-                                            mLoad.bigTextStyle(context.getResources().getString(R.string.marcando_pedido_enviado_sucesso));
-                                            mLoad.progress().value(0, 0, true).build();
+                                            bigTextStyle.bigText(context.getResources().getString(R.string.marcando_pedido_enviado_sucesso));
+                                            mBuilder.setStyle(bigTextStyle);
+                                            notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_ENVIAR_DADOS, mBuilder.build());
 
                                             // Checo se o texto de status foi passado pro parametro
-                                            if (textStatus != null){
+                                            if (textStatus != null) {
                                                 ((Activity) context).runOnUiThread(new Runnable() {
                                                     public void run() {
                                                         textStatus.setText(context.getResources().getString(R.string.marcando_pedido_enviado_sucesso));
@@ -909,23 +994,27 @@ public class EnviarDadosWebserviceAsyncRotinas  extends AsyncTask<Void, Void, Vo
                     }
                 }
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             // Cria uma notificacao para ser manipulado
-            Load mLoad = PugNotification.with(context).load()
+            /*Load mLoad = PugNotification.with(context).load()
                     .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
                     .smallIcon(R.mipmap.ic_launcher)
                     .largeIcon(R.mipmap.ic_launcher)
                     .title(R.string.importar_dados_recebidos)
                     .message(e.getMessage())
                     .flags(Notification.DEFAULT_SOUND);
-            mLoad.simple().build();
+            mLoad.simple().build();*/
+
+            bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.enviar_pedido_nuvem))
+                    .bigText(context.getResources().getString(R.string.msg_error) + "\n" + e.getMessage());
+            mBuilder.setStyle(bigTextStyle)
+                    .setProgress(0, 0, false);
+            notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO + new Random().nextInt(100), mBuilder.build());
         }
     }
 
 
-
-
-    private void inserirUltimaAtualizacao(String tabela){
+    private void inserirUltimaAtualizacao(String tabela) {
         TelephonyManager telephonyManager = (TelephonyManager) context.getSystemService(context.TELEPHONY_SERVICE);
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -935,7 +1024,9 @@ public class EnviarDadosWebserviceAsyncRotinas  extends AsyncTask<Void, Void, Vo
         Calendar dtAlt = Calendar.getInstance();
 
         ContentValues dataAtualizacao = new ContentValues();
-        dataAtualizacao.put("ID_DISPOSITIVO", telephonyManager.getDeviceId());
+        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
+            dataAtualizacao.put("ID_DISPOSITIVO", telephonyManager.getDeviceId());
+        }
         dataAtualizacao.put("TABELA", tabela);
         dataAtualizacao.put("DT_ALT", sdf.format(dtAlt.getTime()));
         dataAtualizacao.put("DATA_ULTIMA_ATUALIZACAO", dataInicioAtualizacao);

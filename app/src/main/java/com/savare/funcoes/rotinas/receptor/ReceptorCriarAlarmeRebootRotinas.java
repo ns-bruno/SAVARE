@@ -16,15 +16,16 @@ public class ReceptorCriarAlarmeRebootRotinas extends BroadcastReceiver {
 
 		FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
 
-		if (funcoes.getValorXml("EnviarAutomatico").equalsIgnoreCase("S")){
+		if (funcoes.getValorXml(funcoes.TAG_ENVIAR_AUTOMATICO).equalsIgnoreCase("S")){
 			enviarAutomatico = true;
 		}
 
-		if (funcoes.getValorXml("ReceberAutomatico").equalsIgnoreCase("S")){
+		if (funcoes.getValorXml(funcoes.TAG_RECEBER_AUTOMATICO).equalsIgnoreCase("S")){
 			receberAutomatico = true;
 		}
 
-		funcoes.criarAlarmeEnviarReceberDadosAutomatico(enviarAutomatico, receberAutomatico);
+		funcoes.criarAlarmeEnviarAutomatico(enviarAutomatico);
+		funcoes.criarAlarmeReceberAutomatico(receberAutomatico);
 
 	}
 

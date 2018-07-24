@@ -23,6 +23,10 @@ public class UltimaAtualizacaoRotinas extends Rotinas {
         super(context);
     }
 
+    /**
+     * Verifica se tem mais de 10 dias sem atualizar.
+     * @return
+     */
     public Boolean muitoTempoSemSincronizacao(){
         UltimaAtualizacaoSql ultimaAtualizacaoSql = new UltimaAtualizacaoSql(context);
 

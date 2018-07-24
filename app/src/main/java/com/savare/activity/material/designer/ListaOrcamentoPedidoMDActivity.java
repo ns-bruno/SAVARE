@@ -1,6 +1,7 @@
 package com.savare.activity.material.designer;
 
 import android.app.ActionBar;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
@@ -8,6 +9,7 @@ import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -32,8 +34,8 @@ import android.widget.Toast;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.github.clans.fab.FloatingActionButton;
 import com.github.clans.fab.FloatingActionMenu;
-import com.github.johnpersano.supertoasts.SuperToast;
-import com.github.johnpersano.supertoasts.util.Style;
+import com.github.johnpersano.supertoasts.library.Style;
+import com.github.johnpersano.supertoasts.library.SuperActivityToast;
 import com.savare.R;
 import com.savare.adapter.ItemUniversalAdapter;
 import com.savare.banco.funcoesSql.OrcamentoSql;
@@ -46,6 +48,7 @@ import com.savare.funcoes.rotinas.OrcamentoRotinas;
 import com.savare.funcoes.rotinas.PessoaRotinas;
 import com.savare.funcoes.rotinas.async.EnviarDadosWebserviceAsyncRotinas;
 import com.savare.funcoes.rotinas.async.EnviarOrcamentoFtpAsyncRotinas;
+import com.savare.funcoes.rotinas.async.GerarPdfAsyncRotinas;
 import com.savare.funcoes.rotinas.async.ReceberDadosWebserviceAsyncRotinas;
 import com.savare.webservice.WSSisinfoWebservice;
 
@@ -281,68 +284,109 @@ public class ListaOrcamentoPedidoMDActivity extends AppCompatActivity{
                                 .itemsCallback(new MaterialDialog.ListCallback() {
                                     @Override
                                     public void onSelection(MaterialDialog dialog, View view, int which, CharSequence text) {
+                                        try {
+                                            // Valida a opcao selecionada 1 = Visitou, mas, não comprou e 2 = Não estava
+                                            if ((which != 1) && (which != 2)) {
 
-                                        // Valida a opcao selecionada 1 = Visitou, mas, não comprou e 2 = Não estava
-                                        if ((which != 1) && (which != 2)) {
-
-                                            // Instancia a classe para manipular os orcamento no banco de dados
-                                            OrcamentoSql orcamentoSql = new OrcamentoSql(ListaOrcamentoPedidoMDActivity.this);
-                                            int totalAtualizado = 0;
-                                            for (int i = 0; i < listaItemOrcamentoSelecionado.size(); i++) {
-
-                                                ContentValues dadosPedido = new ContentValues();
-                                                dadosPedido.put("STATUS", "P");
-
-                                                totalAtualizado = totalAtualizado + orcamentoSql.update(dadosPedido, "AEAORCAM.ID_AEAORCAM = " +
-                                                        adapterListaOrcamentoPedido.getListaOrcamentoPediso().get(listaItemOrcamentoSelecionado.get(i)).getIdOrcamento());
-                                            }
-                                            // Dados da mensagem
-                                            ContentValues mensagem = new ContentValues();
-                                            mensagem.put("comando", 2);
-                                            mensagem.put("tela", "ListaOrcamentoPedidoMDActivity");
-
-                                            // Verifica se foi deletado algum registro
-                                            if (totalAtualizado > 0) {
-                                                SuperToast.create(ListaOrcamentoPedidoMDActivity.this, totalAtualizado + " Transformado(s) em Pedido(s).", SuperToast.Duration.VERY_SHORT, Style.getStyle(Style.GREEN, SuperToast.Animations.FLYIN)).show();
-                                                //mensagem.put("mensagem", totalAtualizado + " Transformado(s) em Pedido(s). \n");
-
+                                                // Instancia a classe para manipular os orcamento no banco de dados
+                                                OrcamentoSql orcamentoSql = new OrcamentoSql(ListaOrcamentoPedidoMDActivity.this);
+                                                int totalAtualizado = 0;
                                                 for (int i = 0; i < listaItemOrcamentoSelecionado.size(); i++) {
 
-                                                    int idOrcamento = adapterListaOrcamentoPedido.getListaOrcamentoPediso().get(listaItemOrcamentoSelecionado.get(i)).getIdOrcamento();
+                                                    ContentValues dadosPedido = new ContentValues();
+                                                    dadosPedido.put("STATUS", "P");
 
-                                                    // Pega os dados da positivacao
-                                                    String sqlInsert = "INSERT OR REPLACE INTO CFAPOSIT(STATUS, VALOR_VENDA, DATA_VISITA, ID_CFACLIFO, ID_AEAORCAM) VALUES " +
-                                                            "(" + which + ", " +
-                                                            "(SELECT AEAORCAM.FC_VL_TOTAL FROM AEAORCAM WHERE AEAORCAM.ID_AEAORCAM = " + idOrcamento + "), " +
-                                                            "(SELECT (DATE('NOW', 'localtime'))), " +
-                                                            "(SELECT AEAORCAM.ID_CFACLIFO FROM AEAORCAM WHERE AEAORCAM.ID_AEAORCAM = " + idOrcamento + "), " +
-                                                            idOrcamento + ")";
-
-                                                    PositivacaoSql positivacaoSql = new PositivacaoSql(ListaOrcamentoPedidoMDActivity.this);
-
-                                                    // Inseri a positivacao e checa se inseriu com sucesso
-                                                    positivacaoSql.execSQL(sqlInsert);
+                                                    totalAtualizado = totalAtualizado + orcamentoSql.update(dadosPedido, "AEAORCAM.ID_AEAORCAM = " +
+                                                            adapterListaOrcamentoPedido.getListaOrcamentoPediso().get(listaItemOrcamentoSelecionado.get(i)).getIdOrcamento());
                                                 }
+                                                // Dados da mensagem
+                                                ContentValues mensagem = new ContentValues();
+                                                mensagem.put("comando", 2);
+                                                mensagem.put("tela", "ListaOrcamentoPedidoMDActivity");
 
-                                                // Recarrega a lista de orcamento
-                                                CarregarDadosOrcamentoPedido carregarDadosOrcamentoPedido = new CarregarDadosOrcamentoPedido(spinnerListaCidade.getSelectedItemPosition());
-                                                carregarDadosOrcamentoPedido.execute();
+                                                // Verifica se foi deletado algum registro
+                                                if (totalAtualizado > 0) {
+                                                    //SuperToast.create(ListaOrcamentoPedidoMDActivity.this, totalAtualizado + " Transformado(s) em Pedido(s).", SuperToast.Duration.VERY_SHORT, Style.getStyle(Style.GREEN, SuperToast.Animations.FLYIN)).show();
+                                                    SuperActivityToast.create(ListaOrcamentoPedidoMDActivity.this, totalAtualizado + " Transformado(s) em Pedido(s).", Style.DURATION_VERY_SHORT)
+                                                            .setTextColor(Color.WHITE)
+                                                            .setColor(Color.GREEN)
+                                                            .setAnimations(Style.ANIMATIONS_POP)
+                                                            .show();
+
+                                                    for (int i = 0; i < listaItemOrcamentoSelecionado.size(); i++) {
+
+                                                        int idOrcamento = adapterListaOrcamentoPedido.getListaOrcamentoPediso().get(listaItemOrcamentoSelecionado.get(i)).getIdOrcamento();
+
+                                                        FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(getApplicationContext());
+
+                                                        // Verifica se eh pra salvar o PDF do pedido automatico
+                                                        if ((funcoes.getValorXml(funcoes.TAG_SALVA_PEDIDO_PDF).equalsIgnoreCase(funcoes.SIM)) && (idOrcamento > 0)) {
+
+                                                            GerarPdfAsyncRotinas gerarPdfSalvar = new GerarPdfAsyncRotinas(getApplicationContext());
+                                                            // Seta(envia) os dados do orcamento
+                                                            gerarPdfSalvar.setOrcamento(adapterListaOrcamentoPedido.getListaOrcamentoPediso().get(listaItemOrcamentoSelecionado.get(i)));
+
+                                                            OrcamentoRotinas orcamentoRotinas = new OrcamentoRotinas(getApplicationContext());
+                                                            // Seta(envia) a lista de produtos do orcamento
+                                                            gerarPdfSalvar.setListaItensOrcamento(orcamentoRotinas.listaItemOrcamentoResumida(null, String.valueOf(idOrcamento), null, null));
+                                                            gerarPdfSalvar.setTipoGerarPdf(gerarPdfSalvar.NAO);
+
+                                                            String caminhoPdf = gerarPdfSalvar.execute("").get();
+
+                                                            SuperActivityToast.create(ListaOrcamentoPedidoMDActivity.this, (getApplicationContext().getResources().getString(R.string.pdf_salvo_sucesso)) + "\n" + caminhoPdf, Style.DURATION_LONG)
+                                                                    .setTextColor(Color.WHITE)
+                                                                    .setColor(Color.GRAY)
+                                                                    .setAnimations(Style.ANIMATIONS_POP)
+                                                                    .show();
+                                                        }
+                                                        // Pega os dados da positivacao
+                                                        String sqlInsert = "INSERT OR REPLACE INTO CFAPOSIT(STATUS, VALOR_VENDA, DATA_VISITA, ID_CFACLIFO, ID_AEAORCAM) VALUES " +
+                                                                "(" + which + ", " +
+                                                                "(SELECT AEAORCAM.FC_VL_TOTAL FROM AEAORCAM WHERE AEAORCAM.ID_AEAORCAM = " + idOrcamento + "), " +
+                                                                "(SELECT (DATE('NOW', 'localtime'))), " +
+                                                                "(SELECT AEAORCAM.ID_CFACLIFO FROM AEAORCAM WHERE AEAORCAM.ID_AEAORCAM = " + idOrcamento + "), " +
+                                                                idOrcamento + ")";
+
+                                                        PositivacaoSql positivacaoSql = new PositivacaoSql(ListaOrcamentoPedidoMDActivity.this);
+
+                                                        // Inseri a positivacao e checa se inseriu com sucesso
+                                                        positivacaoSql.execSQL(sqlInsert);
+                                                    }
+
+                                                    // Recarrega a lista de orcamento
+                                                    CarregarDadosOrcamentoPedido carregarDadosOrcamentoPedido = new CarregarDadosOrcamentoPedido(spinnerListaCidade.getSelectedItemPosition());
+                                                    carregarDadosOrcamentoPedido.execute();
+
+                                                } else {
+                                                    //mensagem.put("mensagem", getResources().getString(R.string.nao_foi_possivel_transformar_orcamento_pedido));
+                                                    //SuperToast.create(ListaOrcamentoPedidoMDActivity.this, getResources().getString(R.string.nao_foi_possivel_transformar_orcamento_pedido), SuperToast.Duration.SHORT, Style.getStyle(Style.RED, SuperToast.Animations.FLYIN)).show();
+                                                    SuperActivityToast.create(ListaOrcamentoPedidoMDActivity.this, getResources().getString(R.string.nao_foi_possivel_transformar_orcamento_pedido), Style.DURATION_SHORT)
+                                                            .setTextColor(Color.WHITE)
+                                                            .setColor(Color.RED)
+                                                            .setAnimations(Style.ANIMATIONS_POP)
+                                                            .show();
+                                                }
+                                                // Fecha o menu context
+                                                mode.finish();
 
                                             } else {
-                                                //mensagem.put("mensagem", getResources().getString(R.string.nao_foi_possivel_transformar_orcamento_pedido));
-                                                SuperToast.create(ListaOrcamentoPedidoMDActivity.this, getResources().getString(R.string.nao_foi_possivel_transformar_orcamento_pedido), SuperToast.Duration.SHORT, Style.getStyle(Style.RED, SuperToast.Animations.FLYIN)).show();
+                                                SuperActivityToast.create(ListaOrcamentoPedidoMDActivity.this, getResources().getString(R.string.opcao_positivacao_nao_valida_para_esta_tela), Style.DURATION_LONG)
+                                                        .setTextColor(Color.WHITE)
+                                                        .setColor(Color.RED)
+                                                        .setAnimations(Style.ANIMATIONS_POP)
+                                                        .show();
+                                                //SuperToast.create(ListaOrcamentoPedidoMDActivity.this, getResources().getString(R.string.opcao_positivacao_nao_valida_para_esta_tela), SuperToast.Duration.LONG, Style.getStyle(Style.RED, SuperToast.Animations.FLYIN)).show();
                                             }
-                                            // Esvazia a lista de selecionados
-                                            //listaItemOrcamentoSelecionado = null;
-
-                                            // Instancia a classe  de funcoes para mostra a mensagem
-                                            FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(ListaOrcamentoPedidoMDActivity.this);
-                                            funcoes.menssagem(mensagem);
-                                            // Fecha o menu context
-                                            mode.finish();
-
-                                        } else {
-                                            SuperToast.create(ListaOrcamentoPedidoMDActivity.this, getResources().getString(R.string.opcao_positivacao_nao_valida_para_esta_tela), SuperToast.Duration.LONG, Style.getStyle(Style.RED, SuperToast.Animations.FLYIN)).show();
+                                        } catch (final Exception e){
+                                            (ListaOrcamentoPedidoMDActivity.this).runOnUiThread(new Runnable() {
+                                                public void run() {
+                                                    new MaterialDialog.Builder(ListaOrcamentoPedidoMDActivity.this)
+                                                            .title("ListaOrcamentoPedidoMDActivity")
+                                                            .content(getApplicationContext().getResources().getString(R.string.msg_error) + "\n" + e.getMessage())
+                                                            .positiveText(R.string.button_ok)
+                                                            .show();
+                                                }
+                                            });
                                         }
                                     }
                                 })
@@ -350,10 +394,11 @@ public class ListaOrcamentoPedidoMDActivity extends AppCompatActivity{
 
                         break;
 
+                    case R.id.menu_lista_pedido_context_md_deletar:
                     case R.id.menu_lista_orcamento_context_md_deletar:
 
                         // Checa se eh orcamento
-                        if (tipoOrcamentoPedido.equals("O")) {
+                        if ((tipoOrcamentoPedido.equals(OrcamentoRotinas.ORCAMENTO)) || (tipoOrcamentoPedido.equalsIgnoreCase(OrcamentoRotinas.PEDIDO_NAO_ENVIADO)) ) {
 
                             AlertDialog.Builder builder = new AlertDialog.Builder(ListaOrcamentoPedidoMDActivity.this);
                             builder.setMessage(getResources().getString(R.string.tem_certeza_que_deseja_excluir_pedido))
@@ -661,6 +706,15 @@ public class ListaOrcamentoPedidoMDActivity extends AppCompatActivity{
     public boolean onCreateOptionsMenu(Menu menu) {
         //super.onCreateOptionsMenu(menu);
         getMenuInflater().inflate(R.menu.lista_orcamento_md, menu);
+        // Checa se eh orcamento
+        if (tipoOrcamentoPedido.equals("O")) {
+
+            menu.findItem(R.id.menu_lista_orcamento_md_enviar_todos_pedidos).setVisible(false);
+            // Checa se eh pedido
+        } else if (tipoOrcamentoPedido.equals("E")) {
+            menu.findItem(R.id.menu_lista_orcamento_md_enviar_todos_pedidos).setVisible(false);
+        }
+
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -852,7 +906,7 @@ public class ListaOrcamentoPedidoMDActivity extends AppCompatActivity{
                 },
                 ListaOrcamentoPedidoMDActivity.this);
 
-                String[] tabelaRecebeDados = {WSSisinfoWebservice.FUNCTION_SELECT_AEAORCAM};
+                String[] tabelaRecebeDados = {WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEAORCAM};
 
                 receberDadosWebservice.setTabelaRecebeDados(tabelaRecebeDados);
                 receberDadosWebservice.setListaGuidOrcamento((listaGuidOrcamento != null && listaGuidOrcamento.size() > 0) ? listaGuidOrcamento : null);
@@ -1070,7 +1124,12 @@ public class ListaOrcamentoPedidoMDActivity extends AppCompatActivity{
                 startActivity(Intent.createChooser(dadosEmail, "Enviar e-mail..."));
 
             } catch (android.content.ActivityNotFoundException ex) {
-                SuperToast.create(ListaOrcamentoPedidoMDActivity.this, getResources().getString(R.string.nao_possivel_compartilhar_arquivo), SuperToast.Duration.LONG, Style.getStyle(Style.RED, SuperToast.Animations.FLYIN)).show();
+                //SuperToast.create(ListaOrcamentoPedidoMDActivity.this, getResources().getString(R.string.nao_possivel_compartilhar_arquivo), SuperToast.Duration.LONG, Style.getStyle(Style.RED, SuperToast.Animations.FLYIN)).show();
+                SuperActivityToast.create(ListaOrcamentoPedidoMDActivity.this, getResources().getString(R.string.nao_possivel_compartilhar_arquivo), Style.DURATION_LONG)
+                        .setTextColor(Color.WHITE)
+                        .setColor(Color.RED)
+                        .setAnimations(Style.ANIMATIONS_POP)
+                        .show();
             }
         }
     } // Fim enviar email
@@ -1411,7 +1470,12 @@ public class ListaOrcamentoPedidoMDActivity extends AppCompatActivity{
                     startActivity(Intent.createChooser(dadosEmail, "Enviar e-mail..."));
 
                 } catch (android.content.ActivityNotFoundException ex) {
-                    SuperToast.create(ListaOrcamentoPedidoMDActivity.this, getResources().getString(R.string.nao_possivel_compartilhar_arquivo), SuperToast.Duration.LONG, Style.getStyle(Style.RED, SuperToast.Animations.FLYIN)).show();
+                    //SuperToast.create(ListaOrcamentoPedidoMDActivity.this, getResources().getString(R.string.nao_possivel_compartilhar_arquivo), SuperToast.Duration.LONG, Style.getStyle(Style.RED, SuperToast.Animations.FLYIN)).show();
+                    SuperActivityToast.create(ListaOrcamentoPedidoMDActivity.this, getResources().getString(R.string.nao_possivel_compartilhar_arquivo), Style.DURATION_LONG)
+                            .setTextColor(Color.WHITE)
+                            .setColor(Color.RED)
+                            .setAnimations(Style.ANIMATIONS_POP)
+                            .show();
                 }
             }
             progress.dismiss();

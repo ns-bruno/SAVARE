@@ -27,8 +27,8 @@
     <item
         android:id="@+id/menu_orcamento_tab_md_enviar_email"
         android:orderInCategory="3"
-        android:icon="@mipmap/ic_email_dark"
-        android:title="@string/enviar_email"
+        android:icon="@mipmap/ic_share_variant_dark"
+        android:title="@string/compartilhar"
         app:showAsAction="always" />
 
     <item

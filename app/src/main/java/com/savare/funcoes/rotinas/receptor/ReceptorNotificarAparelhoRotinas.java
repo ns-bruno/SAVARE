@@ -1,8 +1,7 @@
 package com.savare.funcoes.rotinas.receptor;
 
 import com.savare.R;
-import com.savare.activity.InicioActivity;
-import com.savare.activity.LoginActivity;
+import com.savare.activity.material.designer.InicioMDActivity;
 
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -43,7 +42,7 @@ public class ReceptorNotificarAparelhoRotinas extends BroadcastReceiver {
 	
 	
 	public void gerarNotificacao(Context context, Intent intent, CharSequence ticker, CharSequence titulo, CharSequence descricao){
-		intent.setClass(context, InicioActivity.class);
+		intent.setClass(context, InicioMDActivity.class);
 		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 		NotificationManager nm = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 		PendingIntent p = PendingIntent.getActivity(context, 0, intent, 0);

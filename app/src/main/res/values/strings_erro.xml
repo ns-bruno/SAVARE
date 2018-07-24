@@ -15,6 +15,7 @@
     <string name="nao_pode_ser_inserido_novos_produtos">Não pode ser inserido novos produtos.</string>
     <string name="nao_pode_ser_inserido_atualizado_alguma_observacao">Não pode ser inserido e nem atualizado o campo de observação.</string>
     <string name="nao_pode_deletado">Não pode ser deletado.</string>
+    <string name="deletados">Deletado(s).</string>
     <string name="nao_foi_possivel_salvar_orcamento_pdf">Não foi possível salvar orçamento de PDF</string>
     <string name="nao_possivel_inserir_alterar_orcamento">Não é possível Inserir/Alterar o Orçamento</string>
     <string name="nao_conseguimos_deletar_itens">Não conseguimos deletar o(s) item(ns) selecionados.</string>

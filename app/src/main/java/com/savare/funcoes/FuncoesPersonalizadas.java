@@ -1,5 +1,6 @@
 package com.savare.funcoes;
 
+import android.Manifest;
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.annotation.TargetApi;
@@ -7,6 +8,8 @@ import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.ContentResolver;
 import android.content.ContentValues;
@@ -16,14 +19,19 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.pm.ActivityInfo;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.content.ContextCompat;
 import android.telephony.TelephonyManager;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -32,26 +40,22 @@ import android.util.Log;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
-import com.github.johnpersano.supertoasts.SuperToast;
-import com.github.johnpersano.supertoasts.util.Style;
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
+import com.github.johnpersano.supertoasts.library.Style;
+import com.github.johnpersano.supertoasts.library.SuperActivityToast;
 import com.savare.R;
 import com.savare.banco.ConexaoTask;
-import com.savare.banco.funcoesSql.EmpresaSql;
 import com.savare.banco.local.ConexaoBancoDeDados;
-import com.savare.beans.DispositivoBeans;
 import com.savare.beans.EmpresaBeans;
 import com.savare.configuracao.ConfiguracoesInternas;
 import com.savare.configuracao.ServicosWeb;
 import com.savare.funcoes.rotinas.EmpresaRotinas;
+import com.savare.funcoes.rotinas.receptor.ReceptorAlarmeEnviarOrcamentoBroadcastRotinas;
+import com.savare.funcoes.rotinas.receptor.ReceptorAlarmeReceberDadosBroadcastRotinas;
 import com.savare.sincronizacao.SavareAutenticadorService;
-import com.savare.webservice.WSSisinfoWebservice;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 import org.jasypt.util.text.BasicTextEncryptor;
-import org.ksoap2.serialization.SoapObject;
 
 import java.io.File;
 import java.io.IOException;
@@ -73,12 +77,10 @@ import java.util.Enumeration;
 import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Locale;
+import java.util.Random;
 import java.util.Scanner;
 import java.util.UUID;
-import java.util.Vector;
-
-import br.com.goncalves.pugnotification.notification.Load;
-import br.com.goncalves.pugnotification.notification.PugNotification;
+import java.util.concurrent.TimeUnit;
 
 public class FuncoesPersonalizadas {
 
@@ -87,6 +89,23 @@ public class FuncoesPersonalizadas {
 	private static final int RAPIDO = 2;
 	private static final String CHAVE_UNICA = "117ff1e4cfcafb0370b3517042bf90c9";
 	private static final String TAG = "SAVARE";
+	public static final String TAG_ENVIANDO_DADOS = "EnviandoDados",
+							   TAG_ENVIAR_AUTOMATICO = "EnviarAutomatico",
+							   TAG_ENVIAR_INSTANTANEAMENTE = "EnviarInstantaneamente",
+							   TAG_RECEBER_AUTOMATICO = "ReceberAutomatico",
+							   TAG_RECEBENDO_DADOS = "RecebendoDados",
+							   TAG_IMAGEM_PRODUTO = "ImagemProduto",
+							   TAG_EMPRESA_ATIVA = "EmpresaAtiva",
+							   TAG_CODIGO_USUARIO = "CodigoUsuario",
+							   TAG_USUARIO = "Usuario",
+							   TAG_SENHA_USUARIO = "SenhaUsuario",
+							   TAG_ABRIU_PRIMEIRA_VEZ = "AbriuAppPriveiraVez",
+							   TAG_CNPJ_EMPRESA = "CnpjEmpresa",
+							   TAG_CODIGO_EMPRESA = "CodigoEmpresa",
+							   TAG_CHAVE_FUNCIONARIO = "ChaveFuncionario",
+							   TAG_SALVA_PEDIDO_PDF = "SalvaPedidoPdf",
+							   TAG_UUID_DISPOSITIVO = "UuidDispositivo";
+	public static final String SIM = "S", NAO = "N";
 	public static final String ENVIAR_ORCAMENTO_SAVARE = "ENVIAR_ORCAMENTO_SAVARE";
 	public static final String RECEBER_DADOS_SAVARE = "RECEBER_DADOS_SAVARE";
 	public static final String ENVIAR_OUTROS_DADOS_SAVARE = "ENVIAR_OUTROS_DADOS_SAVARE";
@@ -101,6 +120,10 @@ public class FuncoesPersonalizadas {
 	private Context context;
 	public static final String NAO_ENCONTRADO = "nao encontrado";
 	private int orientacaoTela;
+	// Cria uma notificacao para ser manipulado
+	NotificationManager notificationManager;
+	NotificationCompat.BigTextStyle bigTextStyle;
+	NotificationCompat.Builder mBuilder;
 
 	
 	public FuncoesPersonalizadas(Context context) {
@@ -244,7 +267,12 @@ public class FuncoesPersonalizadas {
 	 */
 	private void menssagemRapida(ContentValues contentValues){
 		
-		SuperToast.create(context, contentValues.getAsString("mensagem"), SuperToast.Duration.LONG, Style.getStyle(Style.GRAY, SuperToast.Animations.POPUP)).show();
+		//SuperToast.create(context, contentValues.getAsString("mensagem"), SuperToast.Duration.LONG, Style.getStyle(Style.GRAY, SuperToast.Animations.POPUP)).show();
+		SuperActivityToast.create(context, contentValues.getAsString("mensagem"), Style.DURATION_LONG)
+				.setTextColor(Color.WHITE)
+				.setColor(Color.GRAY)
+				.setAnimations(Style.ANIMATIONS_POP)
+				.show();
 	}
 	
 	
@@ -486,16 +514,16 @@ public class FuncoesPersonalizadas {
 		if (connectivity != null) {
 			NetworkInfo netInfo = connectivity.getActiveNetworkInfo();
 
-			// Se n�o existe nenhum tipo de conex�o retorna false
+			// Se nao existe nenhum tipo de conexao retorna false
 			if (netInfo == null) {
 				return false;
 			}
 
 			int netType = netInfo.getType();
 
-			// Verifica se a conex�o � do tipo WiFi ou Mobile e
+			// Verifica se a conexao eh do tipo WiFi ou Mobile e
 			// retorna true se estiver conectado ou false em
-			// caso contr�rio
+			// caso contrario
 			if (netType == ConnectivityManager.TYPE_WIFI || netType == ConnectivityManager.TYPE_MOBILE) {
 				return netInfo.isConnected();
 
@@ -506,121 +534,75 @@ public class FuncoesPersonalizadas {
 			return false;
 		}
 	}
-	
-	
-	public void criarAlarmeEnviarReceberDadosAutomatico(Boolean ativarEnvio, Boolean ativarRecebimento){
-		
-		// Checa se o alarme nao foi criado
-		boolean alarmeEnviarDesativado =  (PendingIntent.getBroadcast(context, 0, new Intent(ENVIAR_ORCAMENTO_SAVARE), PendingIntent.FLAG_NO_CREATE) == null);
-		boolean alarmeReceberDesativado = (PendingIntent.getBroadcast(context, 0, new Intent(RECEBER_DADOS_SAVARE), PendingIntent.FLAG_NO_CREATE) == null);
-		boolean alarmeEnviarOutrosDesativado = (PendingIntent.getBroadcast(context, 0, new Intent(ENVIAR_OUTROS_DADOS_SAVARE), PendingIntent.FLAG_NO_CREATE) == null);
 
-		// Checa se esta configurado para enviar os orcamentos automaticos
-		if( ((getValorXml("EnviarAutomatico").equalsIgnoreCase("S")) || (getValorXml("EnviarAutomatico") == null) || (ativarEnvio == true)) &&
-				(!getValorXml("ModoConexao").equalsIgnoreCase("S"))){
-		
-			// Checa se o alarme de envio de orcamento esta desativado
-			if(alarmeEnviarDesativado){
-				Log.i(TAG, "Novo alarme Enviar");
-				
-				// Cria a intent com identificacao do alarme
-				Intent intent = new Intent(ENVIAR_ORCAMENTO_SAVARE);
-				PendingIntent alarmIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
-				
-				Calendar tempoInicio = Calendar.getInstance();
-				// Pega a hora atual do sistema em milesegundo
-				tempoInicio.setTimeInMillis(System.currentTimeMillis());
-				// Adiciona mais alguns segundo para executar o alarme depois de alguns segundo que esta Activity for abaerta
-				tempoInicio.add(Calendar.SECOND, 10);
-				// Cria um intervalo de quanto em quanto tempo o alarme vai repetir
-				long intervalo = 1200 * 1000; // 20 Minutos
-				
-				AlarmManager alarmeEnviarOrcamento = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-				alarmeEnviarOrcamento.setRepeating(AlarmManager.RTC_WAKEUP, tempoInicio.getTimeInMillis(), intervalo, alarmIntent);
-			}
+	public void criarAlarmeEnviarAutomatico(Boolean ativarEnvioAutomatico){
+		Intent intentAlarme = new Intent(context, ReceptorAlarmeEnviarOrcamentoBroadcastRotinas.class);
+		intentAlarme.setAction(ReceptorAlarmeEnviarOrcamentoBroadcastRotinas.TAG_ENVIAR_ORCAMENTO_SAVARE);
+        boolean alarmeEnviarDesativado =  (PendingIntent.getBroadcast(context, ReceptorAlarmeEnviarOrcamentoBroadcastRotinas.TAG_ID_ALARME_ENVIAR, intentAlarme, PendingIntent.FLAG_NO_CREATE) == null);
 
-			// Checa se o alarme de envio de outros dados qualquers esta desativado
-			if (alarmeEnviarOutrosDesativado){
-				Log.i(TAG, "Novo alarme Enviar Outros Dados");
+        // Checa se eh para criar o alarme de envio automatico
+        if ((getValorXml(TAG_ENVIAR_AUTOMATICO).equalsIgnoreCase("S")) && ((getValorXml(TAG_ENVIAR_INSTANTANEAMENTE).equalsIgnoreCase("N")) || (getValorXml(TAG_ENVIAR_INSTANTANEAMENTE).equalsIgnoreCase(NAO_ENCONTRADO))) &&
+                (ativarEnvioAutomatico)){
+            // Checa se o alarme de envio de orcamento esta desativado
+            if(alarmeEnviarDesativado){
+                // Cria a intent com identificacao do alarme
+                PendingIntent alarmIntent = PendingIntent.getBroadcast(context, ReceptorAlarmeEnviarOrcamentoBroadcastRotinas.TAG_ID_ALARME_ENVIAR, intentAlarme, 0);
 
-				// Cria a intent com identificacao do alarme
-				Intent intent = new Intent(ENVIAR_OUTROS_DADOS_SAVARE);
-				PendingIntent alarmIntentOutros = PendingIntent.getBroadcast(context, 0, intent, 0);
+                Calendar tempoInicio = Calendar.getInstance();
+                // Pega a hora atual do sistema em milesegundo
+                tempoInicio.setTimeInMillis(System.currentTimeMillis());
+                // Adiciona mais alguns segundo para executar o alarme depois de alguns segundo que esta Activity for abaerta
+                tempoInicio.add(Calendar.SECOND, 30);
+                // Cria um intervalo de quanto em quanto tempo o alarme vai repetir
+                long intervalo = 1200 * 1000; // 20 Minutos
 
-				Calendar tempoInicio = Calendar.getInstance();
-				// Pega a hora atual do sistema em milesegundo
-				tempoInicio.setTimeInMillis(System.currentTimeMillis());
-				// Adiciona mais alguns segundo para executar o alarme depois de alguns segundo que esta Activity for abaerta
-				tempoInicio.add(Calendar.SECOND, 20);
-				// Cria um intervalo de quanto em quanto tempo o alarme vai repetir
-				long intervalo = 1200 * 1000; // 20 Minutos
+                AlarmManager alarmeEnviarOrcamento = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+                alarmeEnviarOrcamento.setRepeating(AlarmManager.RTC_WAKEUP, tempoInicio.getTimeInMillis(), intervalo, alarmIntent);
+            }
+        } else {
+        	if (alarmeEnviarDesativado == false) {
+				PendingIntent alarmeIntent = PendingIntent.getBroadcast(context, ReceptorAlarmeEnviarOrcamentoBroadcastRotinas.TAG_ID_ALARME_ENVIAR, intentAlarme, PendingIntent.FLAG_CANCEL_CURRENT);
 
-				AlarmManager alarmeEnviarOrcamento = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-				alarmeEnviarOrcamento.setRepeating(AlarmManager.RTC_WAKEUP, tempoInicio.getTimeInMillis(), intervalo, alarmIntentOutros);
-
-			} else if (ativarEnvio == false){
-					Intent intentCancelar = new Intent(ENVIAR_ORCAMENTO_SAVARE);
-					PendingIntent alarmeIntent = PendingIntent.getBroadcast(context, 0, intentCancelar, 0);
-
-					AlarmManager alarme = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-					alarme.cancel(alarmeIntent);
-					Log.i(TAG, "Desativado alarme Enviar");
-			}
-		} else {
-			// Checa se o alarme foi cria para enviar a desativacao
-			if((!alarmeEnviarDesativado) || (ativarEnvio == false)){
-				Intent intentCancelar = new Intent(ENVIAR_ORCAMENTO_SAVARE);
-				PendingIntent alarmeIntent = PendingIntent.getBroadcast(context, 0, intentCancelar, 0);
-				
 				AlarmManager alarme = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 				alarme.cancel(alarmeIntent);
-				Log.i(TAG, "Desativado alarme Enviar");
+				alarmeIntent.cancel();
 			}
-		}
-		
-		// Checa se esta configurado para receber dados automaticos
-		if( ((getValorXml("ReceberAutomatico").equalsIgnoreCase("S")) || (getValorXml("ReceberAutomatico") == null) || (ativarRecebimento == true)) &&
-				(!getValorXml("ModoConexao").equalsIgnoreCase("S"))){
-			
-			// Checa se o alarme de recebimento de dados esta desativado
-			if(alarmeReceberDesativado){
-				Log.i(TAG, "Novo alarme Receber");
-				
-				Intent intent = new Intent(RECEBER_DADOS_SAVARE);
-				PendingIntent alarmIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
-				
-				Calendar tempoInicio = Calendar.getInstance();
-				// Pega a hora atual do sistema em milesegundo
-				tempoInicio.setTimeInMillis(System.currentTimeMillis());
-				// Adiciona mais alguns segundo para executar o alarme depois de alguns segundo que esta Activity for abaerta
-				tempoInicio.add(Calendar.SECOND, 10);
-				
-				long intervalo = 3600 * 1000; // 60 Minutos
-				
-				AlarmManager alarmeReceberOrcamento = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-				alarmeReceberOrcamento.setRepeating(AlarmManager.RTC_WAKEUP, tempoInicio.getTimeInMillis(), intervalo, alarmIntent);
+        }
+    }
 
-			} else if (ativarRecebimento == false){
-					Log.i(TAG, "Desativado alarme Receber");
 
-				Intent intentCancelar = new Intent(RECEBER_DADOS_SAVARE);
-					PendingIntent alarmeIntent = PendingIntent.getBroadcast(context, 0, intentCancelar, 0);
+    public void criarAlarmeReceberAutomatico(Boolean ativarRecebimentoAutomatico){
+		Intent intentAlarme = new Intent(context, ReceptorAlarmeReceberDadosBroadcastRotinas.class);
+		intentAlarme.setAction(ReceptorAlarmeReceberDadosBroadcastRotinas.TAG_RECEBER_DADOS_SAVARE);
+        boolean alarmeReceberDesativado = (PendingIntent.getBroadcast(context, ReceptorAlarmeReceberDadosBroadcastRotinas.TAG_ID_ALARME_RECEBER, intentAlarme, PendingIntent.FLAG_NO_CREATE) == null);
 
-					AlarmManager alarme = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-					alarme.cancel(alarmeIntent);
-			}
-		} else {
-			// Checa se o alarme foi criado para podermos desativalo
-			if((!alarmeReceberDesativado) || (ativarRecebimento == false)){
-				Log.i(TAG, "Desativado alarme Receber");
-				Intent intentCancelar = new Intent(RECEBER_DADOS_SAVARE);
-				PendingIntent alarmeIntent = PendingIntent.getBroadcast(context, 0, intentCancelar, 0);
-				
+        // Checa se eh para criar o alarme de envio automatico
+        if ((getValorXml(TAG_RECEBER_AUTOMATICO).equalsIgnoreCase("S")) && (ativarRecebimentoAutomatico)){
+            // Checa se o alarme de recebimento de dados esta desativado
+            if(alarmeReceberDesativado){
+                PendingIntent alarmPending = PendingIntent.getBroadcast(context, ReceptorAlarmeReceberDadosBroadcastRotinas.TAG_ID_ALARME_RECEBER, intentAlarme, 0);
+
+                Calendar tempoInicio = Calendar.getInstance();
+                // Pega a hora atual do sistema em milesegundo
+                tempoInicio.setTimeInMillis(System.currentTimeMillis());
+                // Adiciona mais alguns segundo para executar o alarme depois de alguns segundo que esta Activity for abaerta
+                tempoInicio.add(Calendar.SECOND, 30);
+
+                long intervalo = 3600 * 1000; // 60 Minutos
+
+                AlarmManager alarmeReceberOrcamento = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+                alarmeReceberOrcamento.setRepeating(AlarmManager.RTC_WAKEUP, tempoInicio.getTimeInMillis(), intervalo, alarmPending);
+            }
+        } else {
+        	if (alarmeReceberDesativado == false) {
+				PendingIntent alarmeIntent = PendingIntent.getBroadcast(context, ReceptorAlarmeReceberDadosBroadcastRotinas.TAG_ID_ALARME_RECEBER, intentAlarme, PendingIntent.FLAG_CANCEL_CURRENT);
+
 				AlarmManager alarme = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 				alarme.cancel(alarmeIntent);
+				alarmeIntent.cancel();
 			}
-		}
-	}
+        }
+    }
 	
 	
 	public void bloqueiaOrientacaoTela() {
@@ -848,6 +830,93 @@ public class FuncoesPersonalizadas {
 		}
 		return retorno;
 	} // Fim diferencaEntreDataHora
+
+	/**
+	 * Se o retorno for positivo a dataFinal eh maior que a dataInicial.
+	 * dataFital - @dataInicial
+	 * @param TIPO - MILISEGUNDOS, MINUTOS, HORAS, DIAS
+	 * @param dataInicial - dd/mm/yyyy
+	 * @param dataFinal - dd/mm/yyyy
+	 * @return
+	 */
+	public String diferencaEntreData(int TIPO, String dataInicial, String dataFinal){
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
+
+		String retorno = "0";
+		try {
+			Date date1 = sdf.parse(dataInicial);
+			Date date2 = sdf.parse(dataFinal);
+			long differenceMilliSeconds = date2.getTime() - date1.getTime();
+
+			if (TIPO == MILISEGUNDOS){
+				retorno = ""+differenceMilliSeconds;
+			} else if (TIPO == SEGUNDOS){
+				retorno = "" + (differenceMilliSeconds/1000);
+			} else if (TIPO == MINUTOS){
+				retorno = "" + (differenceMilliSeconds/1000/60);
+			} else if (TIPO == HORAS) {
+				retorno = "" + (differenceMilliSeconds/1000/60/60);
+			} else if (TIPO == DIAS){
+				retorno = "" + (differenceMilliSeconds/1000/60/60/24);
+			}
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+		return retorno;
+	} // Fim diferencaEntreDataHora
+
+	public String adicionaDataHora(int tipo, String dataHora, int quantidade){
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MMM-dd HH:mm:ss", Locale.ENGLISH);
+
+		String retorno = "0";
+		try {
+			Date date1 = sdf.parse(dataHora);
+			long differenceMilliSeconds = date1.getTime();
+
+			if (tipo == MILISEGUNDOS){
+				date1.setTime(differenceMilliSeconds + quantidade );
+			} else if (tipo == SEGUNDOS){
+				date1.setTime(differenceMilliSeconds + (quantidade * 1000));
+			} else if (tipo == MINUTOS){
+				date1.setTime(differenceMilliSeconds + (quantidade *1000 * 60));
+			} else if (tipo == HORAS) {
+				date1.setTime(differenceMilliSeconds + ( quantidade * 1000 * 60  * 60));
+			} else if (tipo == DIAS){
+				date1.setTime(differenceMilliSeconds + (1000 * 60 * 60 * 24));
+			}
+			retorno = date1.toString();
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+		return retorno;
+	}
+
+	public String adicionaData(int tipo, String dataHora, int quantidade){
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
+
+		String retorno = "0";
+		try {
+			Date date1 = sdf.parse(dataHora);
+			long differenceMilliSeconds = date1.getTime();
+
+			if (tipo == MILISEGUNDOS){
+				date1.setTime(differenceMilliSeconds + quantidade );
+			} else if (tipo == SEGUNDOS){
+				date1.setTime(differenceMilliSeconds + (quantidade * 1000));
+			} else if (tipo == MINUTOS){
+				date1.setTime(differenceMilliSeconds + (quantidade *1000 * 60));
+			} else if (tipo == HORAS) {
+				date1.setTime(differenceMilliSeconds + ( quantidade * 1000 * 60  * 60));
+			} else if (tipo == DIAS){
+				date1.setTime(differenceMilliSeconds + (1000 * 60 * 60 * 24));
+			}
+			retorno = sdf.format(date1);
+			//retorno = date1.toString();
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+		return retorno;
+	}
 
 	public String tratamentoErroBancoDados(String erro){
 		// Tratamento para erro de registro unico
@@ -1154,10 +1223,34 @@ public class FuncoesPersonalizadas {
 
 	public boolean checaVersao(){
 		boolean valido = false;
+        String name = "FileNotification";
+
+        notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+
+            NotificationChannel mChannel = new NotificationChannel(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_CHANNEL, name, NotificationManager.IMPORTANCE_MIN);
+            mChannel.setDescription(context.getResources().getString(R.string.importar_dados_recebidos));
+            mChannel.enableLights(true);
+            mChannel.setLightColor(Color.BLUE);
+            notificationManager.createNotificationChannel(mChannel);
+        }
+        // Create a BigTextStyle object.
+        bigTextStyle = new NotificationCompat.BigTextStyle();
+
+        mBuilder = new NotificationCompat.Builder(context, ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_CHANNEL)
+                .setSmallIcon(R.mipmap.ic_launcher_smallicon)
+                .setContentTitle(context.getResources().getString(R.string.versao_savare_desatualizada))
+                .setStyle(bigTextStyle)
+                .setDefaults(Notification.DEFAULT_LIGHTS)
+                .setPriority(NotificationManager.IMPORTANCE_MIN)
+                .setSound(null, 0)
+                .setVibrate(new long[0])
+                .setOnlyAlertOnce(true);
+
 		try {
 			EmpresaRotinas empresaRotinas = new EmpresaRotinas(context);
 
-			EmpresaBeans empresaBeans = empresaRotinas.empresa(getValorXml("CodigoEmpresa"));
+			EmpresaBeans empresaBeans = empresaRotinas.empresa(getValorXml(TAG_CODIGO_EMPRESA));
 
 			if (empresaBeans != null){
 				int versaoLocal = VersionUtils.getVersionCode(context);
@@ -1165,29 +1258,17 @@ public class FuncoesPersonalizadas {
 
 				// Checa se o SAVARE esta desatualizado
 				if (versaoLocal < empresaBeans.getVersaoSavare()) {
-
 					// Cria uma notificacao para ser manipulado
-					Load mLoad = PugNotification.with(context).load()
-							.identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR)
-							.smallIcon(R.mipmap.ic_launcher)
-							.largeIcon(R.mipmap.ic_launcher)
-							.title(R.string.versao_savare_desatualizada)
-							.bigTextStyle(R.string.savare_desatualizado_favor_atualize)
-							.flags(Notification.DEFAULT_LIGHTS);
-					mLoad.simple().build();
+                    bigTextStyle.bigText(context.getResources().getString(R.string.savare_desatualizado_favor_atualize));
+                    mBuilder.setStyle(bigTextStyle);
+                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR  + new Random().nextInt(100), mBuilder.build());
 
 					// Checa se o SAVARE esta mais atualizado que o webservice
 				} else if (versaoLocal > empresaBeans.getVersaoSavare()) {
-
 					// Cria uma notificacao para ser manipulado
-					Load mLoad = PugNotification.with(context).load()
-							.identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR)
-							.smallIcon(R.mipmap.ic_launcher)
-							.largeIcon(R.mipmap.ic_launcher)
-							.title(R.string.versao_savare_desatualizada)
-							.bigTextStyle(R.string.savare_mais_atualizado_que_webservice)
-							.flags(Notification.DEFAULT_LIGHTS);
-					mLoad.simple().build();
+                    bigTextStyle.bigText(context.getResources().getString(R.string.savare_mais_atualizado_que_webservice));
+                    mBuilder.setStyle(bigTextStyle);
+                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
 
 					valido = true;
 
@@ -1196,153 +1277,20 @@ public class FuncoesPersonalizadas {
 					valido = true;
 				}
 			} else {
-				// Cria uma notificacao para ser manipulado
-				Load mLoad = PugNotification.with(context).load()
-						.identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_ENVIAR_DADOS)
-						.smallIcon(R.mipmap.ic_launcher)
-						.largeIcon(R.mipmap.ic_launcher)
-						.title(R.string.recebendo_dados)
-						.bigTextStyle(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice))
-						.flags(Notification.DEFAULT_LIGHTS);
-				mLoad.simple().build();
+                bigTextStyle.bigText(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice));
+                mBuilder.setStyle(bigTextStyle);
+                notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
 			}
 
-			/*WSSisinfoWebservice webserviceSisInfo = new WSSisinfoWebservice(context);
-
-			//Vector<SoapObject> listaVersao = webserviceSisInfo.executarSelectWebservice(null, WSSisinfoWebservice.FUNCTION_SELECT_VERSAO_SAVARE, null);
-
-            //String retornoWebservice = webserviceSisInfo.executarSelectWebserviceJson(null, WSSisinfoWebservice.FUNCTION_JSON_SELECT_VERSAO_SAVARE, WSSisinfoWebservice.METODO_GET, null);
-            JsonObject retornoWebservice = new Gson().fromJson(webserviceSisInfo.executarSelectWebserviceJson(null, WSSisinfoWebservice.FUNCTION_JSON_SELECT_VERSAO_SAVARE, WSSisinfoWebservice.METODO_GET, null), JsonObject.class);
-
-            // Checa se retornou todas as informações necessarias
-            if ((retornoWebservice != null) && (retornoWebservice.has(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO)) && (retornoWebservice.has(WSSisinfoWebservice.KEY_OBJECT_OBJECT_RETORNO))) {
-
-                statuRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO);
-
-                if (statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO).getAsInt() == 300) {
-
-                    // Checa se retornou alguma coisa
-                    if ((retornoWebservice.has(WSSisinfoWebservice.KEY_OBJECT_OBJECT_RETORNO))){
-                    //if ((listaVersao != null) && (listaVersao.size() > 0)) {
-
-                        int versaoWebservice = retornoWebservice.get(WSSisinfoWebservice.KEY_OBJECT_OBJECT_RETORNO).getAsInt();
-
-                        // Passa por toda a lista
-                        //for (SoapObject objetoIndividual : listaVersao) {
-                            // Cria uma vareavel para receber os dados retornado do webservice
-                            //SoapObject objeto;
-
-                    *//*if (objetoIndividual.hasProperty("return")) {
-                        objeto = (SoapObject) objetoIndividual.getProperty("return");
-                    } else {
-                        objeto = objetoIndividual;
-                    }*//*
-
-                            int versaoLocal = VersionUtils.getVersionCode(context);
-                            //int versaoWebservice = Integer.parseInt(objetoIndividual.getProperty("return").toString());
-
-                            // Checa se o SAVARE esta desatualizado
-                            if (versaoLocal < versaoWebservice) {
-
-                                // Cria uma notificacao para ser manipulado
-                                Load mLoad = PugNotification.with(context).load()
-                                        .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR)
-                                        .smallIcon(R.mipmap.ic_launcher)
-                                        .largeIcon(R.mipmap.ic_launcher)
-                                        .title(R.string.versao_savare_desatualizada)
-                                        .bigTextStyle(R.string.savare_desatualizado_favor_atualize)
-                                        .flags(Notification.DEFAULT_LIGHTS);
-                                mLoad.simple().build();
-
-                                // Checa se o SAVARE esta mais atualizado que o webservice
-                            } else if (versaoLocal > versaoWebservice) {
-
-                                // Cria uma notificacao para ser manipulado
-                                Load mLoad = PugNotification.with(context).load()
-                                        .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR)
-                                        .smallIcon(R.mipmap.ic_launcher)
-                                        .largeIcon(R.mipmap.ic_launcher)
-                                        .title(R.string.versao_savare_desatualizada)
-                                        .bigTextStyle(R.string.savare_mais_atualizado_que_webservice)
-                                        .flags(Notification.DEFAULT_LIGHTS);
-                                mLoad.simple().build();
-
-                                valido = true;
-
-                                // Checa se o SAVARE esta na mesma versao que o webservice
-                            } else if (versaoLocal == versaoWebservice) {
-                                valido = true;
-                            }
-                        //}
-                    } else {
-                        // Cria uma notificacao para ser manipulado
-                        Load mLoad = PugNotification.with(context).load()
-                                .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR)
-                                .smallIcon(R.mipmap.ic_launcher)
-                                .largeIcon(R.mipmap.ic_launcher)
-                                .title(R.string.versao_savare_desatualizada)
-                                .bigTextStyle(context.getResources().getString(R.string.numero_vensao_savare_nao_chegou))
-                                .flags(Notification.DEFAULT_LIGHTS);
-                        mLoad.simple().build();
-                    }
-                } else {
-                    // Cria uma notificacao para ser manipulado
-                    Load mLoad = PugNotification.with(context).load()
-                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR)
-                            .smallIcon(R.mipmap.ic_launcher)
-                            .largeIcon(R.mipmap.ic_launcher)
-                            .title(R.string.versao_savare_desatualizada)
-                            .bigTextStyle("Código Retorno: " + ((statuRetorno != null && statuRetorno.has(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO)) ? statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO) : "Sem código.\n")
-                                        + "Mensagem: " + ((statuRetorno != null && statuRetorno.has(WSSisinfoWebservice.KEY_ELEMENT_MENSAGEM_RETORNO)) ? statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_MENSAGEM_RETORNO) : "Erro ao pegar o status do retorno do Webservice.\n")
-                                        + "Extra: " + ((statuRetorno != null && statuRetorno.has(WSSisinfoWebservice.KEY_ELEMENT_EXTRA_RETORNO)) ? statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_EXTRA_RETORNO) : "\n"))
-                            .flags(Notification.DEFAULT_LIGHTS);
-                    mLoad.simple().build();
-                }
-            } else {
-                // Cria uma notificacao para ser manipulado
-                Load mLoad = PugNotification.with(context).load()
-                        .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_ENVIAR_DADOS)
-                        .smallIcon(R.mipmap.ic_launcher)
-                        .largeIcon(R.mipmap.ic_launcher)
-                        .title(R.string.recebendo_dados)
-                        .bigTextStyle(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice))
-                        .flags(Notification.DEFAULT_LIGHTS);
-                mLoad.simple().build();
-            }*/
-		}catch (Exception e){
-			// Cria uma notificacao para ser manipulado
-			Load mLoad = PugNotification.with(context).load()
-					.identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_ENVIAR_DADOS)
-					.smallIcon(R.mipmap.ic_launcher)
-					.largeIcon(R.mipmap.ic_launcher)
-					.title(R.string.versao_savare_desatualizada)
-					.bigTextStyle(context.getResources().getString(R.string.erro_validar_versao) + " \n " + e.getMessage())
-					.flags(Notification.DEFAULT_LIGHTS);
-			mLoad.simple().build();
+		} catch (Exception e){
+            bigTextStyle.bigText(context.getResources().getString(R.string.erro_validar_versao) + " \n " + e.getMessage());
+            mBuilder.setStyle(bigTextStyle);
+            notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
 		}
 
 		return valido;
 	}
 
-	public DispositivoBeans dispositivo(){
-		DispositivoBeans dispositivoBeans = null;
-		if ((!getValorXml("ChaveFuncionario").equalsIgnoreCase(NAO_ENCONTRADO)) && (getValorXml("ChaveFuncionario").length() >= 16)) {
-
-			// Instancia uma classe para pegar os dados do dispositivo
-			dispositivoBeans = new DispositivoBeans();
-			dispositivoBeans.setChaveUsuario(getValorXml("ChaveFuncionario"));
-			dispositivoBeans.setNomeDispositivo(android.os.Build.MODEL + " - "+ android.os.Build.PRODUCT);
-			dispositivoBeans.setSistemaOperacionalDispositivo(""+android.os.Build.VERSION.SDK_INT);
-			dispositivoBeans.setNumeroSerialDispositivo(Build.SERIAL.replace("unknown", ""));
-			dispositivoBeans.setMarcaDispositivo(android.os.Build.MANUFACTURER);
-			dispositivoBeans.setIpHost(getLocalIpAddress());
-
-			TelephonyManager telephonyManager = (TelephonyManager) context.getSystemService(context.TELEPHONY_SERVICE);
-			dispositivoBeans.setIdDispositivo(telephonyManager.getDeviceId());
-			dispositivoBeans.setOperadoraDispositivo(telephonyManager.getSimOperatorName());
-		}
-		return dispositivoBeans;
-	}
 
 	public void fecharTecladoVirtual(){
 		//criaListaDeProdutos(where, null, 1);
@@ -1372,4 +1320,91 @@ public class FuncoesPersonalizadas {
     public static boolean pingWebserviceSisInfo(){
         return pingHost(ServicosWeb.IP_SERVIDOR_WEBSERVICE, 8080);
     }
+
+    public void setUuidDispositivo(){
+        if ( (Build.VERSION.SDK_INT >= 23)) {
+
+        	if (ContextCompat.checkSelfPermission( context, Manifest.permission.READ_PHONE_STATE ) != PackageManager.PERMISSION_GRANTED &&
+                ContextCompat.checkSelfPermission( context, android.Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
+
+            	ActivityCompat.requestPermissions((Activity) context, new String[] {  Manifest.permission.READ_PHONE_STATE  }, PackageManager.PERMISSION_GRANTED );
+			}
+        }
+		TelephonyManager tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
+		String androidId = "" + android.provider.Settings.Secure.getString(context.getContentResolver(), android.provider.Settings.Secure.ANDROID_ID);
+
+		UUID deviceUuid = new UUID(androidId.hashCode(), ((long) tm.getDeviceId().hashCode() << 32) | tm.getSimSerialNumber().hashCode());
+		String descricao = (Build.VERSION.RELEASE + " - "+ Build.MODEL).toUpperCase();
+
+		setValorXml("UuidDispositivo", deviceUuid.toString().toUpperCase());
+		setValorXml("DescricaoDispositivo", (descricao.length() > 40 ? descricao.substring(0, 39) : descricao));
+	}
+
+	public void setPermission(){
+		if ( (Build.VERSION.SDK_INT >= 23)) {
+
+			if (ContextCompat.checkSelfPermission( context, Manifest.permission.READ_PHONE_STATE ) != PackageManager.PERMISSION_GRANTED &&
+					ContextCompat.checkSelfPermission( context, android.Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
+
+				ActivityCompat.requestPermissions((Activity) context, new String[] {  Manifest.permission.READ_PHONE_STATE  }, PackageManager.PERMISSION_GRANTED );
+			}
+
+			if (ContextCompat.checkSelfPermission( context, Manifest.permission.WRITE_EXTERNAL_STORAGE ) != PackageManager.PERMISSION_GRANTED &&
+					ContextCompat.checkSelfPermission( context, android.Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+
+				ActivityCompat.requestPermissions((Activity) context, new String[] {  Manifest.permission.WRITE_EXTERNAL_STORAGE  }, PackageManager.PERMISSION_GRANTED );
+			}
+
+			if (ContextCompat.checkSelfPermission( context, Manifest.permission.READ_EXTERNAL_STORAGE ) != PackageManager.PERMISSION_GRANTED &&
+					ContextCompat.checkSelfPermission( context, android.Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+
+				ActivityCompat.requestPermissions((Activity) context, new String[] {  Manifest.permission.READ_EXTERNAL_STORAGE  }, PackageManager.PERMISSION_GRANTED );
+			}
+
+			if (ContextCompat.checkSelfPermission( context, Manifest.permission.INTERNET ) != PackageManager.PERMISSION_GRANTED &&
+					ContextCompat.checkSelfPermission( context, Manifest.permission.INTERNET) != PackageManager.PERMISSION_GRANTED) {
+
+				ActivityCompat.requestPermissions((Activity) context, new String[] {  Manifest.permission.INTERNET  }, PackageManager.PERMISSION_GRANTED );
+			}
+
+			if (ContextCompat.checkSelfPermission( context, Manifest.permission.ACCESS_FINE_LOCATION ) != PackageManager.PERMISSION_GRANTED &&
+					ContextCompat.checkSelfPermission( context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+
+				ActivityCompat.requestPermissions((Activity) context, new String[] {  Manifest.permission.ACCESS_FINE_LOCATION  }, PackageManager.PERMISSION_GRANTED );
+			}
+
+			if (ContextCompat.checkSelfPermission( context, Manifest.permission.CAMERA ) != PackageManager.PERMISSION_GRANTED &&
+					ContextCompat.checkSelfPermission( context, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+
+				ActivityCompat.requestPermissions((Activity) context, new String[] {  Manifest.permission.CAMERA  }, PackageManager.PERMISSION_GRANTED );
+			}
+		}
+	}
+
+	public String getNomeVersaoAplicacao(){
+        try {
+            PackageInfo pInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
+            return pInfo.versionName;
+            //int versionCode = pInfo.versionCode;
+            //Log.d("MyApp", "Version Name : "+version + "\n Version Code : "+versionCode);
+        }catch(PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+            //Log.d("MyApp", "PackageManager Catch : "+e.toString());
+        }
+        return "";
+    }
+
+    public Integer getNumeroVersaoAplicacao(){
+        try {
+            PackageInfo pInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
+            return pInfo.versionCode;
+            //int versionCode = pInfo.versionCode;
+            //Log.d("MyApp", "Version Name : "+version + "\n Version Code : "+versionCode);
+        }catch(PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+            //Log.d("MyApp", "PackageManager Catch : "+e.toString());
+        }
+        return 0;
+    }
+
 } // Fecha classe

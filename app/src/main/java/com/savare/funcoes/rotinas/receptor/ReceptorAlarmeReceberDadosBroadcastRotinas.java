@@ -13,6 +13,9 @@ import android.util.Log;
 
 public class ReceptorAlarmeReceberDadosBroadcastRotinas extends BroadcastReceiver {
 
+	public static String TAG_RECEBER_DADOS_SAVARE = "RECEBER_DADOS_SAVARE";
+	public static Integer TAG_ID_ALARME_RECEBER = 1002;
+
 	@Override
 	public void onReceive(Context context, Intent intent) {
 		Log.i("SAVARE", "onReceive - ReceptorAlarmeReceberDadosBroadcastRotinas");
@@ -20,12 +23,13 @@ public class ReceptorAlarmeReceberDadosBroadcastRotinas extends BroadcastReceive
 		FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
 
 		UsuarioRotinas usuarioRotinas = new UsuarioRotinas(context);
-
-		if (usuarioRotinas.quantidadeHorasUltimoRecebimento() > 3){
-			funcoes.setValorXml("RecebendoDados", "N");
+		// Checa se tem mais de 2 horas que foi enviado os ultimos dados
+		if (usuarioRotinas.quantidadeHorasUltimoRecebimento() > 2){
+			funcoes.setValorXml(funcoes.TAG_RECEBENDO_DADOS, "N");
 		}
 
-		if ((!funcoes.getValorXml("RecebendoDados").equalsIgnoreCase("S")) && (usuarioRotinas.existeUsuario() == true) && (!funcoes.getValorXml("CodigoUsuario").equalsIgnoreCase(funcoes.NAO_ENCONTRADO)) ) {
+		if ((!funcoes.getValorXml(funcoes.TAG_RECEBENDO_DADOS).equalsIgnoreCase("S")) && (usuarioRotinas.existeUsuario() == true) &&
+				(!funcoes.getValorXml("CodigoUsuario").equalsIgnoreCase(funcoes.NAO_ENCONTRADO)) ) {
 
 			// Checa se o tipo de conexao eh por webservice
 			if (funcoes.getValorXml("ModoConexao").equalsIgnoreCase("W")){
@@ -34,19 +38,8 @@ public class ReceptorAlarmeReceberDadosBroadcastRotinas extends BroadcastReceive
 				receberDadosWebservice.execute();
 
 			} else {
-				// Marca nos parametro internos que a aplicacao que esta recebendo os dados
-				//funcoes.setValorXml("RecebendoDados", "S");
-
 				// Desavia o recebimento automatico
-				funcoes.criarAlarmeEnviarReceberDadosAutomatico(true, false);
-
-				//ReceberDadosFtpAsyncRotinas receberDadosFtpAsync = new ReceberDadosFtpAsyncRotinas(context, ReceberDadosFtpAsyncRotinas.TELA_RECEPTOR_ALARME);
-				//receberDadosFtpAsync.execute();
-
-				ReceberDadosWebserviceAsyncRotinas receberDadosWebservice = new ReceberDadosWebserviceAsyncRotinas(context);
-				receberDadosWebservice.execute();
-
-				Log.i("SAVARE", "Executou a rotina para receber os dados. - ReceptorAlarmeReceberDadosBroadcastRotinas");
+				funcoes.criarAlarmeReceberAutomatico(false);
 			}
 		}
 

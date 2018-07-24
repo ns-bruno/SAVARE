@@ -1,19 +1,16 @@
 package com.savare.funcoes.rotinas;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 
 import com.savare.R;
-import com.savare.banco.funcoesSql.PlanoPagamentoSql;
 import com.savare.banco.funcoesSql.TipoDocumentoSql;
-import com.savare.beans.PlanoPagamentoBeans;
 import com.savare.beans.TipoDocumentoBeans;
 import com.savare.funcoes.FuncoesPersonalizadas;
 import com.savare.funcoes.Rotinas;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class TipoDocumentoRotinas extends Rotinas {
 

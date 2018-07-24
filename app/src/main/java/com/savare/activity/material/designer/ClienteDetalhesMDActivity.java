@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
@@ -17,8 +18,8 @@ import android.widget.Toast;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.github.clans.fab.FloatingActionButton;
 import com.github.clans.fab.FloatingActionMenu;
-import com.github.johnpersano.supertoasts.SuperToast;
-import com.github.johnpersano.supertoasts.util.Style;
+import com.github.johnpersano.supertoasts.library.Style;
+import com.github.johnpersano.supertoasts.library.SuperActivityToast;
 import com.ogaclejapan.smarttablayout.SmartTabLayout;
 import com.savare.R;
 import com.savare.adapter.ClienteDetalhesFragmentAdapter;
@@ -241,10 +242,21 @@ public class ClienteDetalhesMDActivity extends AppCompatActivity{
                                     // Inseri a positivacao e checa se inseriu com sucesso
                                     positivacaoSql.execSQL(sqlInsert);
 
-                                    SuperToast.create(getApplicationContext(), getResources().getString(R.string.positivado_sucesso), SuperToast.Duration.LONG, Style.getStyle(Style.GREEN, SuperToast.Animations.POPUP)).show();
+                                    //SuperToast.create(getApplicationContext(), getResources().getString(R.string.positivado_sucesso), SuperToast.Duration.LONG, Style.getStyle(Style.GREEN, SuperToast.Animations.POPUP)).show();
+
+                                    SuperActivityToast.create(ClienteDetalhesMDActivity.this, getResources().getString(R.string.positivado_sucesso), Style.DURATION_LONG)
+                                            .setTextColor(Color.WHITE)
+                                            .setColor(Color.GREEN)
+                                            .setAnimations(Style.ANIMATIONS_POP)
+                                            .show();
 
                                 } else {
-                                    SuperToast.create(getApplicationContext(), getResources().getString(R.string.opcao_positivacao_nao_valida_para_esta_tela), SuperToast.Duration.LONG, Style.getStyle(Style.RED, SuperToast.Animations.FLYIN)).show();
+                                    //SuperToast.create(getApplicationContext(), getResources().getString(R.string.opcao_positivacao_nao_valida_para_esta_tela), SuperToast.Duration.LONG, Style.getStyle(Style.RED, SuperToast.Animations.FLYIN)).show();
+                                    SuperActivityToast.create(ClienteDetalhesMDActivity.this, getResources().getString(R.string.opcao_positivacao_nao_valida_para_esta_tela), Style.DURATION_LONG)
+                                            .setTextColor(Color.WHITE)
+                                            .setColor(Color.RED)
+                                            .setAnimations(Style.ANIMATIONS_POP)
+                                            .show();
                                 }
                             }
                         })

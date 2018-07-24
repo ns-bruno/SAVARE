@@ -40,8 +40,6 @@ import com.savare.banco.funcoesSql.UsuarioSQL;
 import com.savare.configuracao.ConfiguracoesInternas;
 import com.savare.funcoes.FuncoesPersonalizadas;
 
-import br.com.goncalves.pugnotification.notification.Load;
-import br.com.goncalves.pugnotification.notification.PugNotification;
 
 public class ReceberArquivoTxtServidorFtpRotinas {
 
@@ -55,7 +53,7 @@ public class ReceberArquivoTxtServidorFtpRotinas {
 	private double tamanhoArquivo = 0;
 	private int telaChamou = -1;
     List<FTPFile> listaDadosArquivoFtp; // Cria uma vareavel para pegar a lista de arquivos que estao no servidor FTP
-	Load mLoad;
+	//Load mLoad;
 	public static final int TELA_RECEPTOR_ALARME = 0;
 	public static final String EXTENCAO_DOWNLOADS_UNIVERSAL = ".SAVARE",
                                EXTENCAO_DOWNLOADS_BLOCO_S = "BLOCO_S.SAVARE",
@@ -127,13 +125,13 @@ public class ReceberArquivoTxtServidorFtpRotinas {
 	public ArrayList<String> downloadArquivoTxtServidorFtp(){
 
 		// Cria uma notificacao para ser manipulado
-		mLoad = PugNotification.with(context).load()
+		/*mLoad = PugNotification.with(context).load()
 				.identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
 				.smallIcon(R.mipmap.ic_launcher)
 				.largeIcon(R.mipmap.ic_launcher)
 				.title(R.string.importar_dados_recebidos)
 				.bigTextStyle("Estamos Conectando no Servidor em Nuvem...")
-				.flags(Notification.DEFAULT_SOUND);
+				.flags(Notification.DEFAULT_SOUND);*/
 
 		ArrayList<String> localArquivoRecebido = new ArrayList<String>();
 		
@@ -169,7 +167,7 @@ public class ReceberArquivoTxtServidorFtpRotinas {
 					conexaoFtp.setDefaultTimeout(30 * 1000);
 
 					// Indica que essa notificacao eh do tipo progress
-					mLoad.progress().value(0, 0, true).build();
+					//mLoad.progress().value(0, 0, true).build();
 
 					if(telaChamou != TELA_RECEPTOR_ALARME){
 						((Activity) context).runOnUiThread(new Runnable() {
@@ -188,7 +186,7 @@ public class ReceberArquivoTxtServidorFtpRotinas {
 					if (FTPReply.isPositiveCompletion(conexaoFtp.getReplyCode())) {
 
 						// Atualiza a mensagem na notificacao
-						mLoad.bigTextStyle("Conseguimos Conectar no Servidor, agora vamos logar...").progress().build();
+						//mLoad.bigTextStyle("Conseguimos Conectar no Servidor, agora vamos logar...").progress().build();
 
 						if(telaChamou != TELA_RECEPTOR_ALARME){
 							((Activity) context).runOnUiThread(new Runnable() {
@@ -202,7 +200,7 @@ public class ReceberArquivoTxtServidorFtpRotinas {
 						status = conexaoFtp.login(usuarioFtp, funcoes.descriptografaSenha(senhaFtp));
 					} else {
 						// Atualiza a mensagem na notificacao
-						mLoad.bigTextStyle("Erro ao conectar no Servidor em Nuvem, nem conseguimos logar.").progress().build();
+						//mLoad.bigTextStyle("Erro ao conectar no Servidor em Nuvem, nem conseguimos logar.").progress().build();
 
 						if(telaChamou != TELA_RECEPTOR_ALARME){
 							((Activity) context).runOnUiThread(new Runnable() {
@@ -218,7 +216,7 @@ public class ReceberArquivoTxtServidorFtpRotinas {
 
 					if (status){
 						// Atualiza a mensagem na notificacao
-						mLoad.bigTextStyle("Logado com sucesso.").progress().build();
+						//mLoad.bigTextStyle("Logado com sucesso.").progress().build();
 
 						if(telaChamou != TELA_RECEPTOR_ALARME){
 							((Activity) context).runOnUiThread(new Runnable() {
@@ -252,7 +250,7 @@ public class ReceberArquivoTxtServidorFtpRotinas {
 						if(telaChamou != TELA_RECEPTOR_ALARME){
 
 							// Atualiza a mensagem na notificacao
-							mLoad.bigTextStyle("Aquarde... Estamos solicitando os dados.").progress().build();
+							//mLoad.bigTextStyle("Aquarde... Estamos solicitando os dados.").progress().build();
 
 							((Activity) context).runOnUiThread(new Runnable() {
 								public void run() {
@@ -281,7 +279,7 @@ public class ReceberArquivoTxtServidorFtpRotinas {
 									if (renomeaArquivoFtp(nomeTemp, arquivoSolicitacao.getName())) {
 
 										// Atualiza a mensagem na notificacao
-										mLoad.bigTextStyle("Solicitação Enviada. 1ª Tentativa para receber os dados. Aguarde...").progress().build();
+										//mLoad.bigTextStyle("Solicitação Enviada. 1ª Tentativa para receber os dados. Aguarde...").progress().build();
 
 										((Activity) context).runOnUiThread(new Runnable() {
 											public void run() {
@@ -302,7 +300,7 @@ public class ReceberArquivoTxtServidorFtpRotinas {
 
 								if (controle == 3){
 									// Atualiza a mensagem na notificacao
-									mLoad.bigTextStyle("Solicitação Enviada. Última tentativa para receber os dados. Aguarde... ").progress().build();
+									//mLoad.bigTextStyle("Solicitação Enviada. Última tentativa para receber os dados. Aguarde... ").progress().build();
 
 									((Activity) context).runOnUiThread(new Runnable() {
 										public void run() {
@@ -312,7 +310,7 @@ public class ReceberArquivoTxtServidorFtpRotinas {
 									});
 								} else {
 									// Atualiza a mensagem na notificacao
-									mLoad.bigTextStyle("Solicitação Enviada. " + controle + "ª Tentativa para receber os dados. Aguarde... ").progress().build();
+									//mLoad.bigTextStyle("Solicitação Enviada. " + controle + "ª Tentativa para receber os dados. Aguarde... ").progress().build();
 
 									final int finalControle = controle;
 									((Activity) context).runOnUiThread(new Runnable() {
@@ -372,9 +370,9 @@ public class ReceberArquivoTxtServidorFtpRotinas {
 								if (dadosArquivoFtp != null) {
 
 									// Atualiza a mensagem na notificacao
-									mLoad.bigTextStyle("Achamos o arquivo " + dadosArquivoFtp.getName());
+									//mLoad.bigTextStyle("Achamos o arquivo " + dadosArquivoFtp.getName());
 									// Transforma a barra de progresso em determinado
-									mLoad.progress().value(0, (int) dadosArquivoFtp.getSize(), false).build();
+									//mLoad.progress().value(0, (int) dadosArquivoFtp.getSize(), false).build();
 
 									// Checa qual classe chamou esta
 									if (telaChamou != TELA_RECEPTOR_ALARME) {
@@ -418,7 +416,7 @@ public class ReceberArquivoTxtServidorFtpRotinas {
 							//mLoad.bigTextStyle("Não achamos nenhum arquivo para fazer downloads.").simple().build();
 
 							// Cria uma notificacao para ser manipulado
-							mLoad = PugNotification.with(context)
+							/*mLoad = PugNotification.with(context)
 									.load()
 									.identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
 									.smallIcon(R.mipmap.ic_launcher)
@@ -427,7 +425,7 @@ public class ReceberArquivoTxtServidorFtpRotinas {
 									.bigTextStyle("Não achamos nenhum arquivo para fazer downloads.")
 									.flags(Notification.DEFAULT_SOUND);
 
-							mLoad.simple().build();
+							mLoad.simple().build();*/
 
 							if(telaChamou != TELA_RECEPTOR_ALARME){
 								((Activity) context).runOnUiThread(new Runnable() {
@@ -481,7 +479,7 @@ public class ReceberArquivoTxtServidorFtpRotinas {
 		if( (mensagemErro != null) && (mensagemErro.length() > 1) ){
 
 			// Atualiza a mensagem na notificacao
-			mLoad.bigTextStyle(mensagemErro).simple().build();
+			//mLoad.bigTextStyle(mensagemErro).simple().build();
 
 			if(telaChamou != TELA_RECEPTOR_ALARME){
 				((Activity) context).runOnUiThread(new Runnable() {
@@ -537,11 +535,11 @@ public class ReceberArquivoTxtServidorFtpRotinas {
 	        		// Calcula em percentual do total transferido do arquivo XML
 	        		final double percentual = ((totalTransferido / tamanhoArquivo) * 100);
 
-					if (mLoad != null) {
+					/*if (mLoad != null) {
 						// Atualiza a mensagem na notificacao
 						mLoad.bigTextStyle("Fazendo o Download do arquivo " + nomeAquivo + " ... " + format.format(percentual) + "% ");
 						mLoad.progress().value((int)totalBytesTransferred, (int) tamanhoArquivo, false).build();
-					}
+					}*/
 					if(telaChamou != TELA_RECEPTOR_ALARME){
 		        		((Activity) context).runOnUiThread(new Runnable() {
 	    					  public void run() {
@@ -570,7 +568,7 @@ public class ReceberArquivoTxtServidorFtpRotinas {
 	        FileOutputStream destinoFileStream = new FileOutputStream(pastaDestino + "/" + nomeAquivo);
 
 			// Atualiza a mensagem na notificacao
-			mLoad.bigTextStyle("Fazendo o Download... ").progress().build();
+			//mLoad.bigTextStyle("Fazendo o Download... ").progress().build();
 
 	        if(telaChamou != TELA_RECEPTOR_ALARME){
 		        ((Activity) context).runOnUiThread(new Runnable() {
@@ -590,7 +588,7 @@ public class ReceberArquivoTxtServidorFtpRotinas {
 	        // Checa se foi feito download com sucesso
 	        if(status){
 				// Atualiza a mensagem na notificacao
-				mLoad.bigTextStyle("Download do arquivo " + nomeAquivo + " efetuado com sucesso... ").progress().build();
+				//mLoad.bigTextStyle("Download do arquivo " + nomeAquivo + " efetuado com sucesso... ").progress().build();
 
 	        	if(telaChamou != TELA_RECEPTOR_ALARME){
 		        	((Activity) context).runOnUiThread(new Runnable() {

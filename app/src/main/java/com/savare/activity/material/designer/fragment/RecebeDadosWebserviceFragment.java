@@ -39,39 +39,39 @@ public class RecebeDadosWebserviceFragment extends SlideFragment {
         textStatus = (TextView) root.findViewById(R.id.fragment_recebe_dados_webservice_text_status);
 
         String[] tabelaRecebeDados = {  WSSisinfoWebservice.FUNCTION_SELECT_USUARIO_USUA,
-                                        WSSisinfoWebservice.FUNCTION_SELECT_SMAEMPRE,
-                                        WSSisinfoWebservice.FUNCTION_SELECT_CFAAREAS,
-                                        WSSisinfoWebservice.FUNCTION_SELECT_CFAATIVI,
-                                        WSSisinfoWebservice.FUNCTION_SELECT_CFASTATU,
-                                        WSSisinfoWebservice.FUNCTION_SELECT_CFATPDOC,
-                                        WSSisinfoWebservice.FUNCTION_SELECT_CFACCRED,
-                                        WSSisinfoWebservice.FUNCTION_SELECT_CFAPORTA,
-                                        WSSisinfoWebservice.FUNCTION_SELECT_CFAPROFI,
-                                        WSSisinfoWebservice.FUNCTION_SELECT_CFATPCLI,
-                                        WSSisinfoWebservice.FUNCTION_SELECT_CFATPCOB,
-                                        WSSisinfoWebservice.FUNCTION_SELECT_CFAESTAD,
-                                        WSSisinfoWebservice.FUNCTION_SELECT_CFACIDAD,
-                                        WSSisinfoWebservice.FUNCTION_SELECT_CFACLIFO,
-                                        WSSisinfoWebservice.FUNCTION_SELECT_CFAENDER,
-                                        WSSisinfoWebservice.FUNCTION_SELECT_CFAPARAM,
+                                        WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_SMAEMPRE,
+                                        WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_CFAAREAS,
+                                        WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_CFAATIVI,
+                                        WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_CFASTATU,
+                                        WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_CFATPDOC,
+                                        WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_CFACCRED,
+                                        WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_CFAPORTA,
+                                        WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_CFAPROFI,
+                                        WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_CFATPCLI,
+                                        WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_CFATPCOB,
+                                        WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_CFAESTAD,
+                                        WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_CFACIDAD,
+                                        WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_CFACLIFO,
+                                        WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_CFAENDER,
+                                        WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_CFAPARAM,
                                         //WSSisinfoWebservice.FUNCTION_SELECT_CFAFOTOS,
-                                        WSSisinfoWebservice.FUNCTION_SELECT_AEAPLPGT,
-                                        WSSisinfoWebservice.FUNCTION_SELECT_AEACLASE,
-                                        WSSisinfoWebservice.FUNCTION_SELECT_AEAUNVEN,
-                                        WSSisinfoWebservice.FUNCTION_SELECT_AEAGRADE,
-                                        WSSisinfoWebservice.FUNCTION_SELECT_AEAMARCA,
+                                        WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEAPLPGT,
+                                        WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEACLASE,
+                                        WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEAUNVEN,
+                                        WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEAGRADE,
+                                        WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEAMARCA,
                                         //WSSisinfoWebservice.FUNCTION_SELECT_AEACODST,
-                                        WSSisinfoWebservice.FUNCTION_SELECT_AEAPRODU,
-                                        WSSisinfoWebservice.FUNCTION_SELECT_AEAEMBAL,
-                                        WSSisinfoWebservice.FUNCTION_SELECT_AEAPLOJA,
-                                        WSSisinfoWebservice.FUNCTION_SELECT_AEALOCES,
-                                        WSSisinfoWebservice.FUNCTION_SELECT_AEAESTOQ,
+                                        WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEAPRODU,
+                                        WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEAEMBAL,
+                                        WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEAPLOJA,
+                                        WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEALOCES,
+                                        WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEAESTOQ,
                                         //WSSisinfoWebservice.FUNCTION_SELECT_AEAORCAM,
                                         //WSSisinfoWebservice.FUNCTION_SELECT_AEAITORC,
-                                        WSSisinfoWebservice.FUNCTION_SELECT_AEAPERCE,
-                                        WSSisinfoWebservice.FUNCTION_SELECT_AEAFATOR,
-                                        WSSisinfoWebservice.FUNCTION_SELECT_AEAPRREC,
-                                        WSSisinfoWebservice.FUNCTION_SELECT_RPAPARCE};
+                                        WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEAPERCE,
+                                        WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEAFATOR,
+                                        WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEAPRREC,
+                                        WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_RPAPARCE};
 
         ReceberDadosWebserviceAsyncRotinas receberDadosWebservice = new ReceberDadosWebserviceAsyncRotinas(new ReceberDadosWebserviceAsyncRotinas.OnTaskCompleted() {
             @Override
@@ -83,7 +83,7 @@ public class RecebeDadosWebserviceFragment extends SlideFragment {
 
         receberDadosWebservice.setProgressBarStatus(progressBarStatus);
         receberDadosWebservice.setTextStatus(textStatus);
-        receberDadosWebservice.setTabelaRecebeDados(tabelaRecebeDados);
+        //receberDadosWebservice.setTabelaRecebeDados(tabelaRecebeDados);
         receberDadosWebservice.execute();
 
         return root;

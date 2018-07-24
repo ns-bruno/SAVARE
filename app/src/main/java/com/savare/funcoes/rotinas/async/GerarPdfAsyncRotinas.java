@@ -1,16 +1,14 @@
 package com.savare.funcoes.rotinas.async;
 
-import java.io.File;
 import java.util.List;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.Intent;
-import android.net.Uri;
 import android.os.AsyncTask;
-import android.widget.Toast;
 
-import com.savare.activity.OrcamentoActivity;
+import com.afollestad.materialdialogs.MaterialDialog;
+import com.savare.R;
 import com.savare.beans.ItemOrcamentoBeans;
 import com.savare.beans.OrcamentoBeans;
 import com.savare.funcoes.rotinas.GerarPdfRotinas;
@@ -22,8 +20,10 @@ public class GerarPdfAsyncRotinas extends AsyncTask<String, String, String> {
 	private OrcamentoBeans orcamento;
 	private List<ItemOrcamentoBeans> listaItensOrcamento;
 	private int tipoGerarPdf = -1;
-	
-	
+	public static final int SIM = 1;
+	public static final int NAO = 0;
+
+
 	public GerarPdfAsyncRotinas(Context context) {
 		this.context = context;
 	}
@@ -77,11 +77,16 @@ public class GerarPdfAsyncRotinas extends AsyncTask<String, String, String> {
 	@Override
 	protected void onPreExecute() {
 		//super.onPreExecute();
-		if(tipoGerarPdf == 0){
-			//Cria novo um ProgressDialogo e exibe
-			progress = new ProgressDialog(context);
-	        progress.setMessage("Aguarde, Gerando o PDF...");
-	        progress.show();
+		if(tipoGerarPdf == SIM){
+
+			((Activity) context).runOnUiThread(new Runnable() {
+				public void run() {
+						//Cria novo um ProgressDialogo e exibe
+						progress = new ProgressDialog(context);
+						progress.setMessage("Aguarde, Gerando o PDF...");
+						progress.show();
+				}
+			});
 		}
 	}
 	
@@ -103,16 +108,20 @@ public class GerarPdfAsyncRotinas extends AsyncTask<String, String, String> {
 	@Override
 	protected void onPostExecute(String result) {
 		//super.onPostExecute(result);
-		if(tipoGerarPdf == 0){
-			// Cancela progressDialogo
-			progress.dismiss();
+		if(tipoGerarPdf == SIM){
+			((Activity) context).runOnUiThread(new Runnable() {
+				public void run() {
+					// Cancela progressDialogo
+					progress.dismiss();
+				}
+			});
 		}
 	}
 	
 	@Override
 	protected void onProgressUpdate(String... values) {
 		//super.onProgressUpdate(values);
-		/*if(tipoGerarPdf == 0){
+		/*if(tipoGerarPdf == SIM){
 			//Atualiza mensagem
 			progress.setMessage("Ainda esta sendo gerado o PDF, Aguarde Por Favor...");
 		}*/

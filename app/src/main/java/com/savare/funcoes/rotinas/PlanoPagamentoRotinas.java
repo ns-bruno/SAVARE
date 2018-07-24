@@ -34,11 +34,11 @@ public class PlanoPagamentoRotinas extends Rotinas {
 		// Checa se a clausula where esta nula
 		if( where != null ){
 			// Checa se o tipoVenda esta nulo
-			if (tipoVenda != null){
+			if ((tipoVenda != null) && (!tipoVenda.isEmpty())){
 				where = where + " AND ( (ATAC_VAREJO = '2') OR (ATAC_VAREJO = '" + tipoVenda + "') )";
 			}
 			
-		} else if(tipoVenda != null){
+		} else if((tipoVenda != null) && (!tipoVenda.isEmpty())){
 			where = "( (ATAC_VAREJO = '2') OR (ATAC_VAREJO = '" + tipoVenda + "') )";
 		}
 		// Cria uma variavel para salvar todos os planos de pagamentos
@@ -136,23 +136,52 @@ public class PlanoPagamentoRotinas extends Rotinas {
 	
 	public int posicaoPlanoPagamentoLista(List<PlanoPagamentoBeans> lista, String idOrcamento){
 		int posicao = 0;
+		int idPlanoPgto = 0;
+		String atacadoVarejo = "";
 		
 		try {
-			
 			PlanoPagamentoSql planoPagamentoSql = new PlanoPagamentoSql(context);
 			
-			String sql = "SELECT AEAITORC.ID_AEAPLPGT FROM AEAITORC WHERE AEAITORC.ID_AEAORCAM = " + idOrcamento + " ORDER BY AEAITORC.ID_AEAPLPGT DESC LIMIT 1";
+			String sql = "SELECT AEAITORC.ID_AEAPLPGT FROM AEAITORC WHERE AEAITORC.ID_AEAORCAM = " + idOrcamento + " ORDER BY AEAITORC.ID_AEAITORC DESC LIMIT 1";
 			
 			Cursor planoPagamentoOrcamento = planoPagamentoSql.sqlSelect(sql);
 			// Checa se retornou algum registro
-			if(planoPagamentoOrcamento.getCount() > 0){
+			if((planoPagamentoOrcamento != null) && (planoPagamentoOrcamento.getCount() > 0) ){
 				planoPagamentoOrcamento.moveToFirst();
-				// Passa por toda a lista de documentos
-				for(int i = 0; i < lista.size(); i++){
-					// Checa se o id da lista eh igual ao id do banco de dados salvo no orcamento
-					if(lista.get(i).getIdPlanoPagamento() == planoPagamentoOrcamento.getInt(planoPagamentoOrcamento.getColumnIndex("ID_AEAPLPGT"))){
-						posicao = i;
-					}
+				idPlanoPgto = planoPagamentoOrcamento.getInt(planoPagamentoOrcamento.getColumnIndex("ID_AEAPLPGT"));
+			} else {
+				sql = "SELECT AEAORCAM.ATAC_VAREJO FROM AEAORCAM WHERE AEAORCAM.ID_AEAORCAM = " + idOrcamento;
+				Cursor dados = planoPagamentoSql.sqlSelect(sql);
+
+				if ((dados != null) && (dados.getCount() > 0)){
+					dados.moveToFirst();
+					atacadoVarejo = dados.getString(dados.getColumnIndex("ATAC_VAREJO"));
+				}
+				dados = null;
+				// Verifica se foi retornado o tipo de venda do orcamento
+				if ((atacadoVarejo != null) && (!atacadoVarejo.isEmpty())){
+					FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
+					sql = "SELECT SMAEMPRE.ID_AEAPLPGT_VARE, SMAEMPRE.ID_AEAPLPGT_ATAC FROM SMAEMPRE WHERE SMAEMPRE.ID_SMAEMPRE = " + funcoes.getValorXml(funcoes.TAG_CODIGO_EMPRESA);
+					dados = planoPagamentoSql.sqlSelect(sql);
+
+					if ((dados != null) && (dados.getCount() > 0)) {
+					    dados.moveToFirst();
+
+                        // Checa se a venda eh atacado
+                        if (atacadoVarejo.equalsIgnoreCase("0")) {
+                            idPlanoPgto = dados.getInt(dados.getColumnIndex("ID_AEAPLPGT_ATAC"));
+                        } else {
+                            idPlanoPgto = dados.getInt(dados.getColumnIndex("ID_AEAPLPGT_VARE"));
+                        }
+                    }
+				}
+			}
+			// Passa por toda a lista de documentos
+			for(int i = 0; i < lista.size(); i++){
+				// Checa se o id da lista eh igual ao id do banco de dados salvo no orcamento
+				if(lista.get(i).getIdPlanoPagamento() == idPlanoPgto){
+					posicao = i;
+					return posicao;
 				}
 			}
 			
@@ -161,7 +190,7 @@ public class PlanoPagamentoRotinas extends Rotinas {
 			// Cria uma variavem para inserir as propriedades da mensagem
 			final ContentValues mensagem = new ContentValues();
 			mensagem.put("comando", 0);
-			mensagem.put("tela", "TipoDocumentoRotinas");
+			mensagem.put("tela", "PlanoPagamentoRotinas");
 			mensagem.put("mensagem", "Erro ao descobrir posicao do documento da lista. \n" + e.getMessage());
 			mensagem.put("dados", "TipoDocumentoRotinas: " + e + " | " + lista);
 			mensagem.put("usuario", funcoes.getValorXml("Usuario"));

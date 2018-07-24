@@ -2,18 +2,24 @@ package com.savare.funcoes.rotinas.async;
 
 import android.app.Activity;
 import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.os.AsyncTask;
-import android.telephony.TelephonyManager;
-import android.util.Base64;
+import android.os.Build;
+import android.os.Environment;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.content.ContextCompat;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.github.johnpersano.supertoasts.SuperToast;
-import com.github.johnpersano.supertoasts.util.Style;
+import com.afollestad.materialdialogs.MaterialDialog;
+import com.github.johnpersano.supertoasts.library.Style;
+import com.github.johnpersano.supertoasts.library.SuperActivityToast;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -24,6 +30,7 @@ import com.savare.banco.funcoesSql.CartaoSql;
 import com.savare.banco.funcoesSql.CidadeSql;
 import com.savare.banco.funcoesSql.ClasseSql;
 import com.savare.banco.funcoesSql.CobrancaSql;
+import com.savare.banco.funcoesSql.CotacaoSql;
 import com.savare.banco.funcoesSql.EmbalagemSql;
 import com.savare.banco.funcoesSql.EmpresaSql;
 import com.savare.banco.funcoesSql.EnderecoSql;
@@ -32,10 +39,14 @@ import com.savare.banco.funcoesSql.EstoqueSql;
 import com.savare.banco.funcoesSql.FatorSql;
 import com.savare.banco.funcoesSql.FotosSql;
 import com.savare.banco.funcoesSql.GradeSql;
+import com.savare.banco.funcoesSql.ItemExcaoPromocaoSql;
 import com.savare.banco.funcoesSql.ItemOrcamentoSql;
+import com.savare.banco.funcoesSql.ItemPromocaoSql;
+import com.savare.banco.funcoesSql.LancamentoParcelaSql;
 import com.savare.banco.funcoesSql.LocacaoSql;
 import com.savare.banco.funcoesSql.MarcaSql;
 import com.savare.banco.funcoesSql.OrcamentoSql;
+import com.savare.banco.funcoesSql.ParametrosLocalSql;
 import com.savare.banco.funcoesSql.ParametrosSql;
 import com.savare.banco.funcoesSql.ParcelaSql;
 import com.savare.banco.funcoesSql.PercentualSql;
@@ -50,21 +61,32 @@ import com.savare.banco.funcoesSql.ProfissaoSql;
 import com.savare.banco.funcoesSql.RamoAtividadeSql;
 import com.savare.banco.funcoesSql.SituacaoTributariaSql;
 import com.savare.banco.funcoesSql.StatusSql;
+import com.savare.banco.funcoesSql.TabelaItemPromocaoSql;
+import com.savare.banco.funcoesSql.TabelaPromocaoSql;
 import com.savare.banco.funcoesSql.TipoClienteSql;
 import com.savare.banco.funcoesSql.TipoDocumentoSql;
 import com.savare.banco.funcoesSql.UltimaAtualizacaoSql;
 import com.savare.banco.funcoesSql.UnidadeVendaSql;
 import com.savare.banco.funcoesSql.UsuarioSQL;
+import com.savare.beans.OrcamentoBeans;
+import com.savare.beans.ServidoresBeans;
 import com.savare.beans.UltimaAtualizacaoBeans;
 import com.savare.configuracao.ConfiguracoesInternas;
+import com.savare.configuracao.ServicosWeb;
 import com.savare.funcoes.FuncoesPersonalizadas;
+import com.savare.funcoes.rotinas.OrcamentoRotinas;
+import com.savare.funcoes.rotinas.ServidoresRotinas;
 import com.savare.funcoes.rotinas.UltimaAtualizacaoRotinas;
 import com.savare.webservice.WSSisinfoWebservice;
 
 import org.ksoap2.serialization.PropertyInfo;
 import org.ksoap2.serialization.SoapObject;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.net.HttpURLConnection;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -73,8 +95,6 @@ import java.util.List;
 import java.util.Random;
 import java.util.Vector;
 
-import br.com.goncalves.pugnotification.notification.Load;
-import br.com.goncalves.pugnotification.notification.PugNotification;
 
 /**
  * Created by Bruno Nogueira Silva on 29/06/2016.
@@ -85,12 +105,16 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
     private String[] tabelaRecebeDados = null;
     private ProgressBar progressBarStatus = null;
     private TextView textStatus = null;
+    private TextView textStatusErro = null;
     private OnTaskCompleted listenerTaskCompleted;
     private Calendar calendario;
     private String[] idOrcamentoSelecionado = null;
     private List<String> listaGuidOrcamento = null;
+    private ServidoresBeans servidorAtivo;
     // Cria uma notificacao para ser manipulado
-    Load mLoad;
+    NotificationManager notificationManager;
+    NotificationCompat.BigTextStyle bigTextStyle;
+    NotificationCompat.Builder mBuilder;
 
     public ReceberDadosWebserviceAsyncRotinas(Context context) {
         this.context = context;
@@ -124,23 +148,50 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
         super.onPreExecute();
         // Inicializa a data
         calendario = Calendar.getInstance();
+        String name = "FileDownload";
 
-        mLoad = PugNotification.with(context).load()
-                .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR)
-                .smallIcon(R.mipmap.ic_launcher)
-                .largeIcon(R.mipmap.ic_launcher)
-                .title(R.string.importar_dados_recebidos)
-                .flags(Notification.DEFAULT_LIGHTS);
+        notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
 
-        mLoad.bigTextStyle(context.getResources().getString(R.string.aguarde_estamos_checando_se_existe_internet));
-        mLoad.progress().value(0, 0, true).build();
+            NotificationChannel mChannel = new NotificationChannel(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_CHANNEL, name, NotificationManager.IMPORTANCE_MIN);
+            mChannel.setDescription(context.getResources().getString(R.string.importar_dados_recebidos));
+            mChannel.enableLights(true);
+            mChannel.setLightColor(Color.BLUE);
+            notificationManager.createNotificationChannel(mChannel);
+        }
+
+        // Create a BigTextStyle object.
+        bigTextStyle = new NotificationCompat.BigTextStyle();
+        bigTextStyle.bigText(context.getResources().getString(R.string.aguarde_estamos_pegando_lista_servidores));
+        //bigTextStyle.setBigContentTitle("Happy Christmas Detail Info.");
+
+        mBuilder = new NotificationCompat.Builder(context, ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_CHANNEL)
+                .setSmallIcon(R.mipmap.ic_launcher_smallicon)
+                .setColor(ContextCompat.getColor(context, R.color.primary))
+                .setContentTitle(context.getResources().getString(R.string.importar_dados_recebidos))
+                //.setContentText(mActivity.getResources().getString(R.string.app_name))
+                .setStyle(bigTextStyle)
+                .setDefaults(Notification.DEFAULT_LIGHTS)
+                .setPriority(NotificationManager.IMPORTANCE_MIN)
+                .setSound(null, 0)
+                .setVibrate(new long[0])
+                .setOnlyAlertOnce(true)
+                .setProgress(0, 0, true);
+        notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
         // Checo se o texto de status foi passado pro parametro
         if (textStatus != null) {
             ((Activity) context).runOnUiThread(new Runnable() {
                 public void run() {
                     textStatus.setVisibility(View.VISIBLE);
-                    textStatus.setText(context.getResources().getString(R.string.aguarde_estamos_checando_se_existe_internet));
+                    textStatus.setText(context.getResources().getString(R.string.aguarde_estamos_pegando_lista_servidores));
+                }
+            });
+        }
+        if (textStatusErro != null) {
+            ((Activity) context).runOnUiThread(new Runnable() {
+                public void run() {
+                    textStatusErro.setText("");
                 }
             });
         }
@@ -159,35 +210,73 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
         final FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
         // Marca que a aplicacao esta recebendo dados
-        funcoes.setValorXml("RecebendoDados", "S");
+        funcoes.setValorXml(funcoes.TAG_RECEBENDO_DADOS, "S");
+        try {
+            ServidoresRotinas servidoresRotinas = new ServidoresRotinas(context);
 
-        if (funcoes.existeConexaoInternet()) try {
+            List<ServidoresBeans> listaServidores = servidoresRotinas.listaServidores(null, "ID_SERVIDORES ASC", null);
+            // Verifica se retornou alguma lista de servidores
+            if ( (listaServidores!= null) && (listaServidores.size() > 0)){
 
-            mLoad.bigTextStyle(R.string.estamos_checando_webservice_online);
-            mLoad.progress().value(0, 0, true).build();
 
-            // Checo se o texto de status foi passado pro parametro
-            if (textStatus != null) {
-                ((Activity) context).runOnUiThread(new Runnable() {
-                    public void run() {
-                        textStatus.setVisibility(View.VISIBLE);
-                        textStatus.setText(context.getResources().getText(R.string.estamos_checando_webservice_online));
+                // Passa por todos os servidores para verficar qual eh o primeiro que esta online
+                for (final ServidoresBeans servidor : listaServidores) {
+                    bigTextStyle.bigText(context.getResources().getString(R.string.estamos_checando_webservice_online) + " - " + servidor.getNomeServidor());
+                    mBuilder.setStyle(bigTextStyle);
+                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
+
+                    // Checo se o texto de status foi passado pro parametro
+                    if (textStatus != null) {
+                        ((Activity) context).runOnUiThread(new Runnable() {
+                            public void run() {
+                                //final String nomeServidor = servidor.getNomeServidor();
+                                textStatus.setText(context.getResources().getText(R.string.estamos_checando_webservice_online) + " - " + servidor.getNomeServidor());
+                            }
+                        });
                     }
-                });
-            }
-            if (progressBarStatus != null) {
-                ((Activity) context).runOnUiThread(new Runnable() {
-                    public void run() {
-                        progressBarStatus.setVisibility(View.VISIBLE);
-                        progressBarStatus.setIndeterminate(true);
+                    if (progressBarStatus != null) {
+                        ((Activity) context).runOnUiThread(new Runnable() {
+                            public void run() {
+                                progressBarStatus.setVisibility(View.VISIBLE);
+                                progressBarStatus.setIndeterminate(true);
+                            }
+                        });
                     }
-                });
-            }
-            // Verifica se o servidor webservice esta online
-            if (funcoes.pingWebserviceSisInfo()) {
-
-                mLoad.bigTextStyle(R.string.checando_versao_savare);
-                mLoad.progress().value(0, 0, true).build();
+                    // Pinga o IP da lista
+                    if (funcoes.pingHost(servidor.getIpServidor(), servidor.getPorta())){
+                        servidorAtivo = new ServidoresBeans();
+                        servidorAtivo = servidor;
+                        break;
+                    } else {
+                        if (textStatusErro != null) {
+                            ((Activity) context).runOnUiThread(new Runnable() {
+                                public void run() {
+                                    textStatusErro.append("\n*" +context.getResources().getText(R.string.servidor_webservice_offline) + " - " + servidor.getNomeServidor());
+                                }
+                            });
+                        }
+                    }
+                } // Fim for listaServidores
+                // Verifica se tem algum servidor ativo
+                if (servidorAtivo == null){
+                    new MaterialDialog.Builder(context)
+                            .title("ReceberDadosWebserviceAsyncRotinas")
+                            .content(context.getResources().getString(R.string.aparentemente_servidor_webservice_offline))
+                            .positiveText(R.string.button_ok)
+                            .show();
+                    return null;
+                } else {
+                    if (textStatusErro != null) {
+                        ((Activity) context).runOnUiThread(new Runnable() {
+                            public void run() {
+                                textStatusErro.append("\n*" +context.getResources().getText(R.string.estamos_conectanto_servidor_webservice) + " - " + servidorAtivo.getNomeServidor());
+                            }
+                        });
+                    }
+                }
+                bigTextStyle.bigText(context.getResources().getString(R.string.checando_versao_savare));
+                mBuilder.setStyle(bigTextStyle);
+                notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                 // Checo se o texto de status foi passado pro parametro
                 if (textStatus != null) {
@@ -206,9 +295,30 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                         }
                     });
                 }
-                if ((funcoes.getValorXml("AbriuAppPriveiraVez").equalsIgnoreCase("S")) || (funcoes.getValorXml("AbriuAppPriveiraVez").equalsIgnoreCase(funcoes.NAO_ENCONTRADO))) {
-                    cadastrarDispositivo();
-
+                // Verifica se eh a primeira vez que esta abrindo o app
+                if ((funcoes.getValorXml(funcoes.TAG_ABRIU_PRIMEIRA_VEZ).equalsIgnoreCase("S")) ||
+                        (funcoes.getValorXml(funcoes.TAG_ABRIU_PRIMEIRA_VEZ).equalsIgnoreCase(funcoes.NAO_ENCONTRADO))) {
+                    // Checa se tem internet
+                    if (funcoes.existeConexaoInternet()){
+                        // Cadastra o dispositivo no Webservice central (admin)
+                        if (cadastrarDispositivoWebserviceCentral()){
+                            // Cadastro o dispositivo no Webservice local da empresa
+                            cadastrarDispositivo();
+                        } else {
+                            return null;
+                        }
+                    } else {
+                        if (textStatusErro != null) {
+                            ((Activity) context).runOnUiThread(new Runnable() {
+                                public void run() {
+                                    textStatusErro.append("\n*" +
+                                            context.getResources().getText(R.string.nao_existe_conexao_internet) + "\n" +
+                                            context.getResources().getText(R.string.para_cadastrar_dispositivo_precisa_internet));
+                                }
+                            });
+                        }
+                        return null;
+                    }
                 } else {
                     // Checa se a versao do savere eh compativel com o webservice
                     if ((checarEmpresaAdmin()) && (checaFuncionarioAtivo())) {
@@ -216,31 +326,31 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                         importaDadosEmpresa();
 
                         if (funcoes.checaVersao()) {
+                            if (textStatusErro != null) {
+                                ((Activity) context).runOnUiThread(new Runnable() {
+                                    public void run() {
+                                        textStatusErro.append("\n*" +context.getResources().getText(R.string.versao_savare_valida));
+                                        textStatusErro.append("\n*" +context.getResources().getText(R.string.recebendo_dados));
+                                    }
+                                });
+                            }
                             // Recebe os dados da tabela
-                            if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SELECT_USUARIO_USUA))) ||
+                            /*if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SELECT_USUARIO_USUA))) ||
                                     (tabelaRecebeDados == null)) {
 
                                 if (checaFuncionarioAtivo() == false) {
                                     return null;
                                 }
-                            }
+                            }*/
                             // Recebe os dados da tabela CFAAREAS
-                            if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SELECT_CFAAREAS))) ||
+                            if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_CFAAREAS))) ||
                                     (tabelaRecebeDados == null)) {
 
                                 importarDadosArea();
                             }
 
-                            // Recebe os dados da tabela SMAEMPRES
-                            if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SELECT_SMAEMPRE))) ||
-                                    (tabelaRecebeDados == null)) {
-
-                                // Importa os dados da empresa
-                                //importaDadosEmpresa();
-                            }
-
                             // Recebe os dados da tabela CFAATIVI
-                            if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SELECT_CFAATIVI))) ||
+                            if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_CFAATIVI))) ||
                                     (tabelaRecebeDados == null)) {
 
                                 // Importa os dados da empresa
@@ -248,7 +358,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                             }
 
                             // Recebe os dados da tabela CFASTATU
-                            if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SELECT_CFASTATU))) ||
+                            if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_CFASTATU))) ||
                                     (tabelaRecebeDados == null)) {
 
                                 // Importa os dados
@@ -257,7 +367,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
 
                             // Recebe os dados da tabela CFATPDOC
-                            if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SELECT_CFATPDOC))) ||
+                            if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_CFATPDOC))) ||
                                     (tabelaRecebeDados == null)) {
 
                                 // Importa os dados
@@ -265,7 +375,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                             }
 
                             // Recebe os dados da tabela CFACCRED
-                            if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SELECT_CFACCRED))) ||
+                            if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_CFACCRED))) ||
                                     (tabelaRecebeDados == null)) {
 
                                 // Importa os dados
@@ -273,7 +383,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                             }
 
                             // Recebe os dados da tabela CFAPORTA
-                            if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SELECT_CFAPORTA))) ||
+                            if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_CFAPORTA))) ||
                                     (tabelaRecebeDados == null)) {
 
                                 // Importa os dados
@@ -281,7 +391,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                             }
 
                             // Recebe os dados da tabela CFAPROFI
-                            if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SELECT_CFAPROFI))) ||
+                            if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_CFAPROFI))) ||
                                     (tabelaRecebeDados == null)) {
 
                                 // Importa os dados
@@ -289,7 +399,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                             }
 
                             // Recebe os dados da tabela CFATPCLI
-                            if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SELECT_CFATPCLI))) ||
+                            if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_CFATPCLI))) ||
                                     (tabelaRecebeDados == null)) {
 
                                 // Importa os dados
@@ -297,7 +407,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                             }
 
                             // Recebe os dados da tabela CFATPCOB
-                            if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SELECT_CFATPCOB))) ||
+                            if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_CFATPCOB))) ||
                                     (tabelaRecebeDados == null)) {
 
                                 // Importa os dados
@@ -305,7 +415,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                             }
 
                             // Recebe os dados da tabela CFAESTAD
-                            if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SELECT_CFAESTAD))) ||
+                            if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_CFAESTAD))) ||
                                     (tabelaRecebeDados == null)) {
 
                                 // Importa os dados
@@ -313,7 +423,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                             }
 
                             // Recebe os dados da tabela CFACIDAD
-                            if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SELECT_CFACIDAD))) ||
+                            if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_CFACIDAD))) ||
                                     (tabelaRecebeDados == null)) {
 
                                 // Importa os dados
@@ -321,15 +431,26 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                             }
 
                             // Recebe os dados da tabela CFACLIFO
-                            if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SELECT_CFACLIFO))) ||
+                            if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_CFACLIFO))) ||
                                     (tabelaRecebeDados == null)) {
 
                                 // Importa os dados
                                 importarDadosClifo();
+                                importarDadosRemoveClifo();
+                            }
+
+                            // Recebe os dados da tabela CFACOTAC
+                            if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && ((Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_CFACOTAC)) ||
+                                    (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_CFACOTAC)))) ||
+                                    (tabelaRecebeDados == null)) {
+
+                                // Importa os dados
+                                importarDadosCotacao();
                             }
 
                             // Recebe os dados da tabela CFAENDER
-                            if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SELECT_CFAENDER))) ||
+                            if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && ((Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_CFAENDER)) ||
+                                    (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_CFAENDER_CUSTOM)))) ||
                                     (tabelaRecebeDados == null)) {
 
                                 // Importa os dados
@@ -337,7 +458,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                             }
 
                             // Recebe os dados da tabela CFAPARAM
-                            if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SELECT_CFAPARAM))) ||
+                            if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_CFAPARAM))) ||
                                     (tabelaRecebeDados == null)) {
 
                                 // Importa os dados
@@ -345,7 +466,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                             }
 
                             // Recebe os dados da tabela CFAFOTOS
-                            if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SELECT_CFAFOTOS))) ||
+                            if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_CFAFOTOS))) ||
                                     (tabelaRecebeDados == null)) {
 
                                 // Importa os dados
@@ -353,7 +474,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                             }
 
                             // Recebe os dados da tabela AEAPLPGT
-                            if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SELECT_AEAPLPGT))) ||
+                            if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEAPLPGT))) ||
                                     (tabelaRecebeDados == null)) {
 
                                 // Importa os dados
@@ -361,7 +482,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                             }
 
                             // Recebe os dados da tabela AEACLASE
-                            if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SELECT_AEACLASE))) ||
+                            if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEACLASE))) ||
                                     (tabelaRecebeDados == null)) {
 
                                 // Importa os dados
@@ -369,7 +490,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                             }
 
                             // Recebe os dados da tabela AEAUNVEN
-                            if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SELECT_AEAUNVEN))) ||
+                            if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEAUNVEN))) ||
                                     (tabelaRecebeDados == null)) {
 
                                 // Importa os dados
@@ -377,7 +498,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                             }
 
                             // Recebe os dados da tabela AEAUNVEN
-                            if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SELECT_AEAGRADE))) ||
+                            if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEAGRADE))) ||
                                     (tabelaRecebeDados == null)) {
 
                                 // Importa os dados
@@ -385,7 +506,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                             }
 
                             // Recebe os dados da tabela AEAMARCA
-                            if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SELECT_AEAMARCA))) ||
+                            if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEAMARCA))) ||
                                     (tabelaRecebeDados == null)) {
 
                                 // Importa os dados
@@ -393,7 +514,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                             }
 
                             // Recebe os dados da tabela AEACODST
-                            if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SELECT_AEACODST))) ||
+                            if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEACODST))) ||
                                     (tabelaRecebeDados == null)) {
 
                                 // Importa os dados
@@ -401,7 +522,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                             }
 
                             // Recebe os dados da tabela AEAPRODU
-                            if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SELECT_AEAPRODU))) ||
+                            if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEAPRODU))) ||
                                     (tabelaRecebeDados == null)) {
 
                                 // Importa os dados
@@ -409,7 +530,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                             }
 
                             // Recebe os dados da tabela AEAPRECO
-                            if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SELECT_AEAPRECO))) ||
+                            if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEAPRECO))) ||
                                     (tabelaRecebeDados == null)) {
 
                                 // Importa os dados
@@ -417,7 +538,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                             }
 
                             // Recebe os dados da tabela AEAEMBAL
-                            if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SELECT_AEAEMBAL))) ||
+                            if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEAEMBAL))) ||
                                     (tabelaRecebeDados == null)) {
 
                                 // Importa os dados
@@ -425,7 +546,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                             }
 
                             // Recebe os dados da tabela AEAPLOJA
-                            if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SELECT_AEAPLOJA))) ||
+                            if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEAPLOJA))) ||
                                     (tabelaRecebeDados == null)) {
 
                                 // Importa os dados
@@ -433,7 +554,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                             }
 
                             // Recebe os dados da tabela AEALOCES
-                            if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SELECT_AEALOCES))) ||
+                            if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEALOCES))) ||
                                     (tabelaRecebeDados == null)) {
 
                                 // Importa os dados
@@ -441,7 +562,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                             }
 
                             // Recebe os dados da tabela AEAESTOQ
-                            if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SELECT_AEAESTOQ))) ||
+                            if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEAESTOQ))) ||
                                     (tabelaRecebeDados == null)) {
 
                                 // Importa os dados
@@ -449,7 +570,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                             }
 
                             // Recebe os dados da tabela AEAORCAM
-                            if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SELECT_AEAORCAM))) ||
+                            if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEAORCAM))) ||
                                     (tabelaRecebeDados == null)) {
 
                                 // Importa os dados
@@ -457,7 +578,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                             }
 
                             // Recebe os dados da tabela AEAITORC
-                            if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SELECT_AEAITORC))) ||
+                            if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEAITORC))) ||
                                     (tabelaRecebeDados == null)) {
 
                                 // Importa os dados
@@ -465,7 +586,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                             }
 
                             // Recebe os dados da tabela AEAPERCE
-                            if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SELECT_AEAPERCE))) ||
+                            if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEAPERCE))) ||
                                     (tabelaRecebeDados == null)) {
 
                                 // Importa os dados
@@ -473,7 +594,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                             }
 
                             // Recebe os dados da tabela AEAFATOR
-                            if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SELECT_AEAFATOR))) ||
+                            if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEAFATOR))) ||
                                     (tabelaRecebeDados == null)) {
 
                                 // Importa os dados
@@ -481,73 +602,180 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                             }
 
                             // Recebe os dados da tabela AEAPRREC
-                            if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SELECT_AEAPRREC))) ||
+                            if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEAPRREC))) ||
                                     (tabelaRecebeDados == null)) {
 
                                 // Importa os dados
                                 importarDadosProdutoRecomendado();
                             }
 
+                            // Recebe os dados da tabela AEATBPRO
+                            if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEATBPRO))) ||
+                                    (tabelaRecebeDados == null)) {
+
+                                // Importa os dados
+                                importarDadosTabelaPromocao();
+                            }
+
+                            // Recebe os dados da tabela AEAITTBP
+                            if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEAITTBP))) ||
+                                    (tabelaRecebeDados == null)) {
+
+                                // Importa os dados
+                                importarDadosItemPromocao();
+                            }
+
+                            // Recebe os dados da tabela AEAEXTBP
+                            if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEAEXTBP))) ||
+                                    (tabelaRecebeDados == null)) {
+
+                                // Importa os dados
+                                importarDadosExcaoPromocao();
+                            }
+
+                            // Recebe os dados da tabela AEAEMTBP
+                            if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEAEMTBP))) ||
+                                    (tabelaRecebeDados == null)) {
+
+                                // Importa os dados
+                                importarDadosTabelaItemPromocao();
+                            }
+
+                            // Recebe os dados da tabela RPALCPAR
+                            if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_RPALCPAR))) ||
+                                    (tabelaRecebeDados == null)) {
+
+                                // Importa os dados
+                                importarDadosLancamentoParcela();
+                            }
+
                             // Recebe os dados da tabela RPAPARCE
-                            if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SELECT_RPAPARCE))) ||
+                            if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_RPAPARCE))) ||
                                     (tabelaRecebeDados == null)) {
 
                                 // Importa os dados
                                 importarDadosParcela();
                             }
+
+                            // Verifica se tem uma nova atualizacao e ja faz download pra atualizar
+                            if ((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_SMAVERPR)) ) {
+
+                                // Importa os dados
+                                importarNovaVersao();
+                            }
+                        } else {
+                            ((Activity) context).runOnUiThread(new Runnable() {
+                                public void run() {
+                                    new MaterialDialog.Builder(context)
+                                            .title("ReceberDadosWebserviceAsyncRotinas")
+                                            .content(context.getResources().getString(R.string.nao_conseguimos_validar_versao))
+                                            .positiveText(R.string.button_ok)
+                                            .show();
+                                }
+                            });
+                            if (textStatusErro != null) {
+                                ((Activity) context).runOnUiThread(new Runnable() {
+                                    public void run() {
+                                        textStatusErro.append("\n*" +context.getResources().getText(R.string.nao_conseguimos_validar_versao));
+                                    }
+                                });
+                            }
+                            ((Activity) context).runOnUiThread(new Runnable() {
+                                public void run() {
+                                    new MaterialDialog.Builder(context)
+                                            .title("ReceberDadosWebserviceAsyncRotinas")
+                                            .content(context.getResources().getString(R.string.nao_conseguimos_validar_versao))
+                                            .positiveText(R.string.button_ok)
+                                            .show();
+                                }
+                            });
                         }
-
                     } else {
-                        // Armazena as informacoes para para serem exibidas e enviadas
-                        final ContentValues contentValues = new ContentValues();
-                        contentValues.put("comando", 0);
-                        contentValues.put("tela", "ReceberDadosWebserviceAsyncRotinas");
-                        contentValues.put("mensagem", context.getResources().getString(R.string.nao_conseguimos_validar_versao));
-                        contentValues.put("dados", "");
-                        // Pega os dados do usuario
-
-                        contentValues.put("usuario", funcoes.getValorXml("Usuario"));
-                        contentValues.put("empresa", funcoes.getValorXml("ChaveEmpresa"));
-                        contentValues.put("email", funcoes.getValorXml("Email"));
-
                         ((Activity) context).runOnUiThread(new Runnable() {
                             public void run() {
-                                funcoes.menssagem(contentValues);
+                                new MaterialDialog.Builder(context)
+                                        .title("ReceberDadosWebserviceAsyncRotinas")
+                                        .content(context.getResources().getString(R.string.empresa_usuario_inativo))
+                                        .positiveText(R.string.button_ok)
+                                        .show();
+                            }
+                        });
+                        if (textStatusErro != null) {
+                            ((Activity) context).runOnUiThread(new Runnable() {
+                                public void run() {
+                                    textStatusErro.append("\n*" +context.getResources().getText(R.string.empresa_usuario_inativo));
+                                }
+                            });
+                        }
+                        ((Activity) context).runOnUiThread(new Runnable() {
+                            public void run() {
+                                new MaterialDialog.Builder(context)
+                                        .title("ReceberDadosWebserviceAsyncRotinas")
+                                        .content(context.getResources().getString(R.string.empresa_usuario_inativo))
+                                        .positiveText(R.string.button_ok)
+                                        .show();
                             }
                         });
                     }
                 }
             } else {
-                // Armazena as informacoes para para serem exibidas e enviadas
-                final ContentValues contentValues = new ContentValues();
-                contentValues.put("comando", 0);
-                contentValues.put("tela", "ReceberDadosWebserviceAsyncRotinas");
-                contentValues.put("mensagem", context.getResources().getString(R.string.aparentemente_servidor_webservice_offline));
-                contentValues.put("dados", "");
-                // Pega os dados do usuario
+                // Atualiza a notificacao
+                bigTextStyle.bigText(context.getResources().getString(R.string.nao_achamos_servidores_cadastrados));
+                mBuilder.setStyle(bigTextStyle)
+                        .setProgress(0, 0, false);
+                notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
-                contentValues.put("usuario", funcoes.getValorXml("Usuario"));
-                contentValues.put("empresa", funcoes.getValorXml("ChaveEmpresa"));
-                contentValues.put("email", funcoes.getValorXml("Email"));
-
+                // Checo se o texto de status foi passado pro parametro
+                if (textStatus != null) {
+                    ((Activity) context).runOnUiThread(new Runnable() {
+                        public void run() {
+                            textStatus.setText(context.getResources().getString(R.string.nao_achamos_servidores_cadastrados));
+                        }
+                    });
+                }
+                if (textStatusErro != null) {
+                    ((Activity) context).runOnUiThread(new Runnable() {
+                        public void run() {
+                            textStatusErro.append("\n*" +context.getResources().getString(R.string.nao_achamos_servidores_cadastrados));
+                        }
+                    });
+                }
+                if (progressBarStatus != null) {
+                    ((Activity) context).runOnUiThread(new Runnable() {
+                        public void run() {
+                            progressBarStatus.setVisibility(View.INVISIBLE);
+                        }
+                    });
+                }
                 ((Activity) context).runOnUiThread(new Runnable() {
                     public void run() {
-                        funcoes.menssagem(contentValues);
+                        new MaterialDialog.Builder(context)
+                                .title("ReceberDadosWebserviceAsyncRotinas")
+                                .content(context.getResources().getString(R.string.nao_achamos_servidores_cadastrados))
+                                .positiveText(R.string.button_ok)
+                                .show();
                     }
                 });
             }
-
         } catch (final Exception e) {
-
             // Atualiza a notificacao
-            mLoad.bigTextStyle(context.getResources().getString(R.string.msg_error) + ": " + e.getMessage());
-            mLoad.simple().build();
+            bigTextStyle.bigText(context.getResources().getString(R.string.msg_error) + ": " + e.getMessage());
+            mBuilder.setStyle(bigTextStyle)
+                    .setProgress(0, 0, false);
+            notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
+            if (textStatusErro != null) {
+                ((Activity) context).runOnUiThread(new Runnable() {
+                    public void run() {
+                        textStatusErro.append("\n*" + context.getResources().getText(R.string.msg_error) + e.getMessage());
+                    }
+                });
+            }
             // Checo se o texto de status foi passado pro parametro
             if (textStatus != null) {
                 ((Activity) context).runOnUiThread(new Runnable() {
                     public void run() {
-                        textStatus.setText(context.getResources().getString(R.string.msg_error) + e.getMessage());
+                        textStatus.append("\n" +context.getResources().getString(R.string.msg_error) + e.getMessage());
                     }
                 });
             }
@@ -558,56 +786,17 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                     }
                 });
             }
-
-            // Armazena as informacoes para para serem exibidas e enviadas
-            final ContentValues contentValues = new ContentValues();
-            contentValues.put("comando", 0);
-            contentValues.put("tela", "ReceberDadosWebserviceAsyncRotinas");
-            contentValues.put("mensagem", funcoes.tratamentoErroBancoDados(e.toString()));
-            contentValues.put("dados", e.toString());
-            // Pega os dados do usuario
-
-            contentValues.put("usuario", funcoes.getValorXml("Usuario"));
-            contentValues.put("empresa", funcoes.getValorXml("ChaveEmpresa"));
-            contentValues.put("email", funcoes.getValorXml("Email"));
-
             ((Activity) context).runOnUiThread(new Runnable() {
                 public void run() {
-                    funcoes.menssagem(contentValues);
+                    new MaterialDialog.Builder(context)
+                            .title("ReceberDadosWebserviceAsyncRotinas")
+                            .content(context.getResources().getString(R.string.msg_error) + ": " + e.getMessage())
+                            .positiveText(R.string.button_ok)
+                            .show();
                 }
             });
+            return null;
         }
-        else {
-
-            PugNotification.with(context)
-                    .load()
-                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR)
-                    .title(R.string.importar_dados_recebidos)
-                    .bigTextStyle("Não conseguimos identificar uma conexão de internet")
-                    .smallIcon(R.drawable.ic_launcher)
-                    .largeIcon(R.drawable.ic_launcher)
-                    .flags(Notification.DEFAULT_LIGHTS)
-                    .simple()
-                    .build();
-
-            // Checa se o texto de status foi passado pro parametro
-            if (textStatus != null) {
-                ((Activity) context).runOnUiThread(new Runnable() {
-                    public void run() {
-                        textStatus.setText("Não existe conexão com a internet.");
-
-
-                    }
-                });
-            }
-            ContentValues mensagem = new ContentValues();
-            mensagem.put("comando", 2);
-            mensagem.put("tela", "ReceberDadosWebServiceAsyncRotinas");
-            mensagem.put("mensagem", (context.getResources().getString((R.string.nao_existe_conexao_internet))));
-
-            funcoes.menssagem(mensagem);
-        }
-
         return null;
     } // Fim Background
 
@@ -627,7 +816,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
         }
 
         // Cria uma notificacao para ser manipulado
-        PugNotification.with(context)
+        /*PugNotification.with(context)
                 .load()
                 .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR)
                 .title(R.string.importar_dados_recebidos)
@@ -637,13 +826,26 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 .largeIcon(R.mipmap.ic_launcher)
                 .flags(Notification.DEFAULT_LIGHTS)
                 .simple()
-                .build();
+                .build();*/
+        bigTextStyle.bigText(context.getResources().getString(R.string.terminamos_atualizacao))
+                .setBigContentTitle(context.getResources().getString(R.string.importar_dados_recebidos));
+        mBuilder.setStyle(bigTextStyle)
+                .setProgress(0, 0, false);
+        notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
         // Checo se o texto de status foi passado pro parametro
         if (textStatus != null) {
             ((Activity) context).runOnUiThread(new Runnable() {
                 public void run() {
                     textStatus.setText(context.getResources().getString(R.string.terminamos));
+                }
+            });
+        }
+        // Checo se o texto de status foi passado pro parametro
+        if (textStatusErro != null) {
+            ((Activity) context).runOnUiThread(new Runnable() {
+                public void run() {
+                    textStatusErro.append("\n*" +context.getResources().getString(R.string.terminamos));
                 }
             });
         }
@@ -659,15 +861,22 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
     private void salvarDadosXml(ContentValues usuario) {
         FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
+        ContentValues parametros = new ContentValues();
 
         if (usuario.containsKey("CODIGO_FUN")) {
-            funcoes.setValorXml("CodigoUsuario", usuario.getAsString("CODIGO_FUN"));
+            funcoes.setValorXml(funcoes.TAG_CODIGO_USUARIO, usuario.getAsString("CODIGO_FUN"));
+            parametros.put("NOME_PARAM", funcoes.TAG_CODIGO_USUARIO);
+            parametros.put("VALOR_PARAM", funcoes.getValorXml(funcoes.TAG_CODIGO_USUARIO));
         }
         if (usuario.containsKey("ID_SMAEMPRE")) {
-            funcoes.setValorXml("CodigoEmpresa", usuario.getAsString("ID_SMAEMPRE"));
+            funcoes.setValorXml(funcoes.TAG_CODIGO_EMPRESA, usuario.getAsString("ID_SMAEMPRE"));
+            parametros.put("NOME_PARAM", funcoes.TAG_CODIGO_EMPRESA);
+            parametros.put("VALOR_PARAM", funcoes.getValorXml(funcoes.TAG_CODIGO_EMPRESA));
         }
         if (usuario.containsKey("GUID")) {
-            funcoes.setValorXml("ChaveFuncionario", usuario.getAsString("GUID"));
+            funcoes.setValorXml(funcoes.TAG_CHAVE_FUNCIONARIO, usuario.getAsString("GUID"));
+            parametros.put("NOME_PARAM", funcoes.TAG_CHAVE_FUNCIONARIO);
+            parametros.put("VALOR_PARAM", funcoes.getValorXml(funcoes.TAG_CHAVE_FUNCIONARIO));
         }
         if (usuario.containsKey("EMAIL")) {
             funcoes.setValorXml("Email", usuario.getAsString("EMAIL"));
@@ -684,27 +893,9 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
         if (funcoes.getValorXml("AbriuAppPriveiraVez").equalsIgnoreCase(funcoes.NAO_ENCONTRADO)) {
             funcoes.setValorXml("AbriuAppPriveiraVez", "S");
         }
-        if (usuario.containsKey("MODO_CONEXAO")) {
-            funcoes.setValorXml("ModoConexao", usuario.getAsString("MODO_CONEXAO"));
-        }
-        if (usuario.containsKey("IP_SERVIDOR_WEBSERVICE")) {
-            funcoes.setValorXml("IPServidorWebservice", usuario.getAsString("IP_SERVIDOR_WEBSERVICE"));
-        }
-        if (usuario.containsKey("IP_SERVIDOR_SISINFO")) {
-            funcoes.setValorXml("IPServidor", usuario.getAsString("IP_SERVIDOR_SISINFO"));
-        }
-        if (usuario.containsKey("CAMINHO_BANCO_SISINFO")) {
-            funcoes.setValorXml("CaminhoBancoDados", usuario.getAsString("CAMINHO_BANCO_SISINFO"));
-        }
-        if (usuario.containsKey("PORTA_BANCO_SISINFO")) {
-            funcoes.setValorXml("PortaBancoDados", usuario.getAsString("PORTA_BANCO_SISINFO"));
-        }
-        if (usuario.containsKey("USUARIO_SISINFO_WEBSERVICE")) {
-            funcoes.setValorXml("UsuarioServidor", usuario.getAsString("USUARIO_SISINFO_WEBSERVICE"));
-        }
-        if (usuario.containsKey("SENHA_SISINFO_WEBSERVICE")) {
-            funcoes.setValorXml("SenhaServidor", funcoes.criptografaSenha(usuario.getAsString("SENHA_SISINFO_WEBSERVICE")));
-        }
+        // Adiciona os parametros no banco de dados
+        ParametrosLocalSql parametrosLocalSql = new ParametrosLocalSql(context);
+        parametrosLocalSql.insert(parametros);
     }
 
     public void setProgressBarStatus(ProgressBar progressBarStatus) {
@@ -713,6 +904,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
     public void setTextStatus(TextView textStatus) {
         this.textStatus = textStatus;
+    }
+
+    public void setTextStatusErro(TextView textStatusErro) {
+        this.textStatusErro = textStatusErro;
     }
 
     public void setIdOrcamento(String[] idOrcamentoSelecionado) {
@@ -732,8 +927,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
         JsonObject statuRetorno = null;
 
         // Atualiza a notificacao
-        mLoad.bigTextStyle(context.getResources().getString(R.string.procurando_dados) + " Funcionário");
-        mLoad.progress().value(0, 0, true).build();
+        bigTextStyle.bigText(context.getResources().getString(R.string.procurando_dados) + " Funcionário");
+        mBuilder.setStyle(bigTextStyle)
+                .setProgress(0, 0, true);
+        notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
         // Checo se o texto de status foi passado pro parametro
         if (textStatus != null) {
@@ -757,13 +954,13 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                 if ((ultimaData != null) && (!ultimaData.isEmpty())) {
 
-                    parametrosWebservice += "&where= (DT_ALT >= '" + ultimaData + "') AND (ID_CFACLIFO = (SELECT SMADISPO.ID_CFACLIFO_FUN FROM SMADISPO WHERE SMADISPO.IDENTIFICACAO = '" + funcoes.getValorXml("UuidDispositivo") + "') )";
+                    parametrosWebservice += "&where= (DT_ALT >= '" + ultimaData + "') AND (ID_CFACLIFO = (SELECT SMADISPO.ID_CFACLIFO_FUN FROM SMADISPO WHERE SMADISPO.IDENTIFICACAO = '" + uuidDispositivo + "') )";
                 } else {
-                    parametrosWebservice += "&where= (ID_CFACLIFO = (SELECT SMADISPO.ID_CFACLIFO_FUN FROM SMADISPO WHERE SMADISPO.IDENTIFICACAO = '" + funcoes.getValorXml("UuidDispositivo") + "') )";
+                    parametrosWebservice += "&where= (ID_CFACLIFO = (SELECT SMADISPO.ID_CFACLIFO_FUN FROM SMADISPO WHERE SMADISPO.IDENTIFICACAO = '" + uuidDispositivo + "') )";
                 }
             }
             WSSisinfoWebservice webserviceSisInfo = new WSSisinfoWebservice(context);
-            JsonObject retornoWebservice = new Gson().fromJson(webserviceSisInfo.executarSelectWebserviceJson(null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_CFACLIFO, WSSisinfoWebservice.METODO_GET, parametrosWebservice, null), JsonObject.class);
+            JsonObject retornoWebservice = new Gson().fromJson(webserviceSisInfo.executarWebserviceJson(servidorAtivo, null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_CFACLIFO, WSSisinfoWebservice.METODO_GET, parametrosWebservice, null), JsonObject.class);
 
             if ((retornoWebservice != null) && (retornoWebservice.has(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO))) {
                 statuRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO);
@@ -771,8 +968,9 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 if (statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO).getAsInt() == HttpURLConnection.HTTP_OK) {
 
                     // Atualiza a notificacao
-                    mLoad.bigTextStyle(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
-                    mLoad.progress().value(0, 0, true).build();
+                    bigTextStyle.bigText(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
+                    mBuilder.setStyle(bigTextStyle);
+                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                     // Checo se o texto de status foi passado pro parametro
                     if (textStatus != null) {
@@ -788,8 +986,9 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                         boolean todosSucesso = true;
 
                         // Atualiza a notificacao
-                        mLoad.bigTextStyle(context.getResources().getString(R.string.recebendo_dados_usuario));
-                        mLoad.progress().value(0, 0, true).build();
+                        bigTextStyle.bigText(context.getResources().getString(R.string.recebendo_dados_usuario));
+                        mBuilder.setStyle(bigTextStyle);
+                        notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                         // Checo se o texto de status foi passado pro parametro
                         if (textStatus != null) {
@@ -814,15 +1013,24 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                             final JsonObject usuarioRetorno = listaUsuarioRetorno.get(i).getAsJsonObject();
 
                             // Atualiza a notificacao
-                            mLoad.bigTextStyle(context.getResources().getString(R.string.achamos_usuario_servidor_nuvem) + " - Funcionário: " + usuarioRetorno.get("nomeRazao").toString());
-                            //mLoad.progress().update(0, i, listaUsuarioRetorno.size(), false).build();
-                            mLoad.progress().value(0, 0, true).build();
+                            bigTextStyle.bigText(context.getResources().getString(R.string.achamos_usuario_servidor_nuvem) + " - Funcionário: " + usuarioRetorno.get("nomeRazao").toString());
+                            mBuilder.setStyle(bigTextStyle);
+                            notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                             // Checo se o texto de status foi passado pro parametro
                             if (textStatus != null) {
                                 ((Activity) context).runOnUiThread(new Runnable() {
                                     public void run() {
                                         textStatus.setText(context.getResources().getString(R.string.achamos_usuario_servidor_nuvem) + " - Funcionário: " + usuarioRetorno.get("nomeRazao").toString());
+                                    }
+                                });
+                            }
+                            if (textStatusErro != null) {
+                                ((Activity) context).runOnUiThread(new Runnable() {
+                                    public void run() {
+                                        textStatusErro.append("\n*" +
+                                                        context.getResources().getString(R.string.recebendo_dados_usuario) +
+                                                        " - Funcionário: " + usuarioRetorno.get("nomeRazao").toString());
                                     }
                                 });
                             }
@@ -833,24 +1041,49 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                     }
                                 });
                             }
+                            final ContentValues dadosUsuario = new ContentValues();
+                            dadosUsuario.put("ID_CFACLIFO", usuarioRetorno.get("idCfaclifo").getAsInt());
+                            dadosUsuario.put("ID_CFAPROFI", (usuarioRetorno.has("idCfaprofi")) ? usuarioRetorno.get("idCfaprofi").getAsInt() : null);
+                            dadosUsuario.put("ID_CFAATIVI", (usuarioRetorno.has("idCfaativi")) ? usuarioRetorno.get("idCfaativi").getAsInt() : null);
+                            dadosUsuario.put("ID_CFAAREAS", (usuarioRetorno.has("idCfaareas")) ? usuarioRetorno.get("idCfaareas").getAsInt() : null);
+                            dadosUsuario.put("ID_CFATPCLI", (usuarioRetorno.has("idCfatpcli")) ? usuarioRetorno.get("idCfatpcli").getAsInt() : null);
+                            dadosUsuario.put("ID_CFASTATU", (usuarioRetorno.has("idCfastatu")) ? usuarioRetorno.get("idCfastatu").getAsInt() : null);
+                            dadosUsuario.put("ID_SMAEMPRE", (usuarioRetorno.has("idSmaempre")) ? usuarioRetorno.get("idSmaempre").getAsInt() : null);
+                            dadosUsuario.put("DT_ALT", (usuarioRetorno.has("dtAlt")) ? usuarioRetorno.get("dtAlt").getAsString() : null);
+                            dadosUsuario.put("GUID", usuarioRetorno.get("guid").getAsString());
+                            dadosUsuario.put("CPF_CNPJ", (usuarioRetorno.has("cpfCgc")) ? usuarioRetorno.get("cpfCgc").getAsString() : null);
+                            dadosUsuario.put("IE_RG", (usuarioRetorno.has("ieRg")) ? usuarioRetorno.get("ieRg").getAsString() : null);
+                            dadosUsuario.put("NOME_RAZAO", (usuarioRetorno.has("nomeRazao")) ? usuarioRetorno.get("nomeRazao").getAsString() : null);
+                            dadosUsuario.put("NOME_FANTASIA", (usuarioRetorno.has("nomeFantasia")) ? usuarioRetorno.get("nomeFantasia").getAsString() : "");
+                            dadosUsuario.put("DT_NASCIMENTO", (usuarioRetorno.has("dtNascimento")) ? usuarioRetorno.get("dtNascimento").getAsString() : "");
+                            dadosUsuario.put("CODIGO_CLI", (usuarioRetorno.has("codigoCli")) ? usuarioRetorno.get("codigoCli").getAsInt() : null);
+                            dadosUsuario.put("CODIGO_FUN", (usuarioRetorno.has("codigoFun")) ? usuarioRetorno.get("codigoFun").getAsInt() : null);
+                            dadosUsuario.put("CODIGO_USU", (usuarioRetorno.has("codigoUsu")) ? usuarioRetorno.get("codigoUsu").getAsInt() : null);
+                            dadosUsuario.put("CODIGO_TRA", (usuarioRetorno.has("codigoTra")) ? usuarioRetorno.get("codigoTra").getAsInt() : null);
+                            dadosUsuario.put("CLIENTE", (usuarioRetorno.has("cliente")) ? usuarioRetorno.get("cliente").getAsString() : "");
+                            dadosUsuario.put("FUNCIONARIO", (usuarioRetorno.has("funcionario")) ? usuarioRetorno.get("funcionario").getAsString() : "");
+                            dadosUsuario.put("USUARIO", (usuarioRetorno.has("usuario")) ? usuarioRetorno.get("usuario").getAsString() : "");
+                            dadosUsuario.put("TRANSPORTADORA", (usuarioRetorno.has("transportadora")) ? usuarioRetorno.get("transportadora").getAsString() : "");
+                            dadosUsuario.put("SEXO", (usuarioRetorno.has("sexo")) ? usuarioRetorno.get("sexo").getAsString() : "");
+                            dadosUsuario.put("INSC_JUNTA", (usuarioRetorno.has("inscJunta")) ? usuarioRetorno.get("inscJunta").getAsString() : "");
+                            dadosUsuario.put("INSC_SUFRAMA", (usuarioRetorno.has("inscSuframa")) ? usuarioRetorno.get("inscSuframa").getAsString() : "");
+                            dadosUsuario.put("INSC_MUNICIPAL", (usuarioRetorno.has("inscMunicipal")) ? usuarioRetorno.get("inscMunicipal").getAsString() : "");
+                            dadosUsuario.put("INSC_PRODUTOR", (usuarioRetorno.has("inscProdutor")) ? usuarioRetorno.get("inscProdutor").getAsString() : "");
+                            dadosUsuario.put("ATIVO", (usuarioRetorno.has("ativo")) ? usuarioRetorno.get("ativo").getAsString() : null);
+
+                            salvarDadosXml(dadosUsuario);
+
+                            listaDadosUsuario.add(dadosUsuario);
+
                             // Checa se o usuario esta ativo
                             if (usuarioRetorno.get("ativo").toString().equalsIgnoreCase("0")) {
-
-                                ContentValues dadosInativo = new ContentValues();
-                                dadosInativo.put("ATIVO_USUA", "0");
-
-                                UsuarioSQL usuarioSQL = new UsuarioSQL(context);
-                                usuarioSQL.update(dadosInativo, "LOGIN_USUA = '" + funcoes.getValorXml("Usuario") + "'");
 
                                 final ContentValues contentValues = new ContentValues();
                                 contentValues.put("comando", 0);
                                 contentValues.put("tela", "ReceberDadosWebserviceAsyncRotinas");
                                 contentValues.put("mensagem", "O funcionário dessa chave esta inativo, não podemos baixar os dados dele. Entre em contato com a empresa ou com o suporte SAVARE.");
                                 contentValues.put("dados", "");
-                                // Pega os dados do usuario
-                                contentValues.put("usuario", funcoes.getValorXml("Usuario"));
-                                contentValues.put("empresa", funcoes.getValorXml("ChaveFuncionario"));
-                                contentValues.put("email", funcoes.getValorXml("Email"));
+
 
                                 ((Activity) context).runOnUiThread(new Runnable() {
                                     public void run() {
@@ -858,48 +1091,8 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                     }
                                 });
                                 return false;
-                            } else {
-                                final ContentValues dadosUsuario = new ContentValues();
-                                dadosUsuario.put("ID_CFACLIFO", usuarioRetorno.get("idCfaclifo").getAsInt());
-                                dadosUsuario.put("ID_CFAPROFI", (usuarioRetorno.has("idCfaprofi")) ? usuarioRetorno.get("idCfaprofi").getAsInt() : null);
-                                dadosUsuario.put("ID_CFAATIVI", (usuarioRetorno.has("idCfaativi")) ? usuarioRetorno.get("idCfaativi").getAsInt() : null);
-                                dadosUsuario.put("ID_CFAAREAS", (usuarioRetorno.has("idCfaareas")) ? usuarioRetorno.get("idCfaareas").getAsInt() : null);
-                                dadosUsuario.put("ID_CFATPCLI", (usuarioRetorno.has("idCfatpcli")) ? usuarioRetorno.get("idCfatpcli").getAsInt() : null);
-                                dadosUsuario.put("ID_CFASTATU", (usuarioRetorno.has("idCfastatu")) ? usuarioRetorno.get("idCfastatu").getAsInt() : null);
-                                dadosUsuario.put("ID_SMAEMPRE", (usuarioRetorno.has("idSmaempre")) ? usuarioRetorno.get("idSmaempre").getAsInt() : null);
-                                dadosUsuario.put("DT_ALT", (usuarioRetorno.has("dtAlt")) ?  usuarioRetorno.get("dtAlt").getAsString() : null);
-                                dadosUsuario.put("GUID", usuarioRetorno.get("guid").getAsString());
-                                dadosUsuario.put("CPF_CNPJ", (usuarioRetorno.has("cpfCgc")) ? usuarioRetorno.get("cpfCgc").getAsString() : null);
-                                dadosUsuario.put("IE_RG", (usuarioRetorno.has("ieRg")) ?  usuarioRetorno.get("ieRg").getAsString() : null);
-                                dadosUsuario.put("NOME_RAZAO", (usuarioRetorno.has("nomeRazao")) ?  usuarioRetorno.get("nomeRazao").getAsString() : null);
-                                dadosUsuario.put("NOME_FANTASIA", (usuarioRetorno.has("nomeFantasia")) ? usuarioRetorno.get("nomeFantasia").getAsString() : "");
-                                dadosUsuario.put("DT_NASCIMENTO", (usuarioRetorno.has("dtNascimento")) ? usuarioRetorno.get("dtNascimento").getAsString() : "");
-                                dadosUsuario.put("CODIGO_CLI", (usuarioRetorno.has("codigoCli")) ? usuarioRetorno.get("codigoCli").getAsInt() : null);
-                                dadosUsuario.put("CODIGO_FUN", (usuarioRetorno.has("codigoFun")) ? usuarioRetorno.get("codigoFun").getAsInt() : null);
-                                dadosUsuario.put("CODIGO_USU", (usuarioRetorno.has("codigoUsu")) ? usuarioRetorno.get("codigoUsu").getAsInt() : null);
-                                dadosUsuario.put("CODIGO_TRA", (usuarioRetorno.has("codigoTra")) ? usuarioRetorno.get("codigoTra").getAsInt() : null);
-                                dadosUsuario.put("CLIENTE", (usuarioRetorno.has("cliente")) ? usuarioRetorno.get("cliente").getAsString() : "");
-                                dadosUsuario.put("FUNCIONARIO", (usuarioRetorno.has("funcionario")) ? usuarioRetorno.get("funcionario").getAsString() : "");
-                                dadosUsuario.put("USUARIO", (usuarioRetorno.has("usuario")) ? usuarioRetorno.get("usuario").getAsString() : "");
-                                dadosUsuario.put("TRANSPORTADORA", (usuarioRetorno.has("transportadora")) ? usuarioRetorno.get("transportadora").getAsString() : "");
-                                dadosUsuario.put("SEXO", (usuarioRetorno.has("sexo")) ? usuarioRetorno.get("sexo").getAsString() : "");
-                                dadosUsuario.put("INSC_JUNTA", (usuarioRetorno.has("inscJunta")) ? usuarioRetorno.get("inscJunta").getAsString() : "");
-                                dadosUsuario.put("INSC_SUFRAMA", (usuarioRetorno.has("inscSuframa")) ? usuarioRetorno.get("inscSuframa").getAsString() : "");
-                                dadosUsuario.put("INSC_MUNICIPAL", (usuarioRetorno.has("inscMunicipal")) ? usuarioRetorno.get("inscMunicipal").getAsString() : "");
-                                dadosUsuario.put("INSC_PRODUTOR", (usuarioRetorno.has("inscProdutor")) ? usuarioRetorno.get("inscProdutor").getAsString() : "");
-                                dadosUsuario.put("ATIVO", (usuarioRetorno.has("ativo")) ?  usuarioRetorno.get("ativo").getAsString() : null);
-
-                                salvarDadosXml(dadosUsuario);
-
-                                listaDadosUsuario.add(dadosUsuario);
-
-                                ContentValues dadosInativo = new ContentValues();
-                                dadosInativo.put("ATIVO_USUA", "1");
-
-                                UsuarioSQL usuarioSQL = new UsuarioSQL(context);
-                                usuarioSQL.update(dadosInativo, "LOGIN_USUA = '" + funcoes.getValorXml("Usuario") + "'");
                             }
-                        }
+                        } // Fim for listaUsuarioRetorno
 
                         final PessoaSql pessoaSql = new PessoaSql(context);
 
@@ -909,7 +1102,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                         if (todosSucesso) {
                             inserirUltimaAtualizacao("CFACLIFO_FUN");
                         } else {
-                            PugNotification.with(context)
+                            /*PugNotification.with(context)
                                     .load()
                                     .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR)
                                     .title(R.string.importar_dados_recebidos)
@@ -919,7 +1112,13 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                     .largeIcon(R.mipmap.ic_launcher)
                                     .flags(Notification.DEFAULT_LIGHTS)
                                     .simple()
-                                    .build();
+                                    .build();*/
+
+                            bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.importar_dados_recebidos))
+                                        .bigText(context.getResources().getString(R.string.nao_conseguimos_atualizar_usuario));
+                            mBuilder.setStyle(bigTextStyle)
+                                    .setProgress(0, 0, false);
+                            notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
 
                             // Checa se o texto de status foi passado pro parametro
                             if (textStatus != null) {
@@ -933,8 +1132,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                         }
 
                         // Atualiza a notificacao
-                        mLoad.bigTextStyle(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
-                        mLoad.progress().value(0, 0, true).build();
+                        bigTextStyle.bigText(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
+                        mBuilder.setStyle(bigTextStyle)
+                            .setProgress(0, 0, true);
+                        notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                         // Checo se o texto de status foi passado pro parametro
                         if (textStatus != null) {
@@ -954,46 +1155,78 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                     }
                 } else {
                     // Cria uma notificacao para ser manipulado
-                    Load mLoad = PugNotification.with(context).load()
-                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
+                    /*Load mLoad = PugNotification.with(context).load()
+                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                             .smallIcon(R.mipmap.ic_launcher)
                             .largeIcon(R.mipmap.ic_launcher)
                             .title(R.string.recebendo_dados_usuario)
                             .bigTextStyle(context.getResources().getString(R.string.nao_chegou_dados_servidor_empresa) + "\n" + retornoWebservice.toString())
                             .flags(Notification.DEFAULT_LIGHTS);
-                    mLoad.simple().build();
+                    mLoad.simple().build();*/
+
+                    bigTextStyle.bigText(context.getResources().getString(R.string.nao_chegou_dados_servidor_empresa) + "\n" + retornoWebservice.toString())
+                        .setBigContentTitle(context.getResources().getString(R.string.recebendo_dados_usuario));
+                    mBuilder.setStyle(bigTextStyle)
+                            .setProgress(0, 0, false);
+                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
+
+                    if (textStatusErro != null) {
+                        final JsonObject finalStatuRetorno = statuRetorno;
+                        ((Activity) context).runOnUiThread(new Runnable() {
+                            public void run() {
+                                textStatusErro.append("\n*" +
+                                        context.getResources().getString(R.string.nao_chegou_dados_servidor_empresa) + " \n" +
+                                        finalStatuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO) + " \n" +
+                                        finalStatuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_MENSAGEM_RETORNO));
+                            }
+                        });
+                    }
                 }
             } else {
                 // Cria uma notificacao para ser manipulado
-                Load mLoad = PugNotification.with(context).load()
-                        .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
+                /*Load mLoad = PugNotification.with(context).load()
+                        .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                         .smallIcon(R.mipmap.ic_launcher)
                         .largeIcon(R.mipmap.ic_launcher)
                         .title(R.string.recebendo_dados)
                         .bigTextStyle(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.get(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO))
                         .flags(Notification.DEFAULT_LIGHTS);
-                mLoad.simple().build();
+                mLoad.simple().build();*/
+
+                bigTextStyle.bigText(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.get(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO))
+                        .setBigContentTitle(context.getResources().getString(R.string.recebendo_dados));
+                mBuilder.setStyle(bigTextStyle)
+                        .setProgress(0, 0, false);
+                notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
             }
         } catch (Exception e) {
             // Cria uma notificacao
-            PugNotification.with(context)
+            /*PugNotification.with(context)
                     .load()
-                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + e.hashCode())
+                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                     .title(R.string.importar_dados_recebidos)
                     .bigTextStyle("ImportaDadosEmpresa- " + e.getMessage())
                     .smallIcon(R.mipmap.ic_launcher)
                     .largeIcon(R.mipmap.ic_launcher)
                     .flags(Notification.DEFAULT_ALL)
                     .simple()
-                    .build();
+                    .build();*/
+
+            bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.importar_dados_recebidos))
+                        .bigText("ImportaDadosEmpresa- " + e.getMessage());
+            mBuilder.setStyle(bigTextStyle)
+                    .setProgress(0, 0, false);
+            notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
         }
         return true;
     }
 
     private void cadastrarDispositivo() {
         // Atualiza a notificacao
-        mLoad.bigTextStyle(context.getResources().getString(R.string.procurando_dados) + " Vamos cadastrar o Dispositivo");
-        mLoad.progress().value(0, 0, true).build();
+        bigTextStyle.bigText(context.getResources().getString(R.string.procurando_dados) + " Vamos cadastrar o Dispositivo");
+        mBuilder.setStyle(bigTextStyle)
+                .setProgress(0, 0, true);
+        notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
         // Checo se o texto de status foi passado pro parametro
         if (textStatus != null) {
@@ -1005,7 +1238,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
         }
         final FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
         try {
-            String cnpjEmpresa = funcoes.getValorXml("CnpjEmpresa");
+            String cnpjEmpresa = funcoes.getValorXml(funcoes.TAG_CNPJ_EMPRESA);
             String parametrosWebservice = "";
             JsonObject statuRetorno = null;
 
@@ -1016,32 +1249,33 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                     parametrosWebservice += "&cnpjUrl=" + cnpjEmpresa;
                     WSSisinfoWebservice webserviceSisInfo = new WSSisinfoWebservice(context);
-                    JsonObject retornoWebservice = new Gson().fromJson(webserviceSisInfo.executarSelectWebserviceJson(null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_SMADISPO, WSSisinfoWebservice.METODO_POST, null, parametrosWebservice), JsonObject.class);
+
+                    JsonObject retornoWebservice = new Gson().fromJson(webserviceSisInfo.executarWebserviceJson(servidorAtivo, null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_SMADISPO, WSSisinfoWebservice.METODO_POST, null, parametrosWebservice), JsonObject.class);
 
                     if ((retornoWebservice != null) && (retornoWebservice.has(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO))) {
                         statuRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO);
                         // Verifica se retornou com sucesso
                         if (statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO).getAsInt() == HttpURLConnection.HTTP_OK) {
 
-                            ContentValues dadosUsuario = new ContentValues();
-                            dadosUsuario.put("LOGIN_USUA", funcoes.getValorXml("Usuario"));
-                            dadosUsuario.put("SENHA_USUA", funcoes.criptografaSenha(funcoes.getValorXml("SenhaUsuario")));
+                            funcoes.setValorXml("AbriuAppPriveiraVez", "N");
 
-                            UsuarioSQL usuarioSQL = new UsuarioSQL(context);
-                            usuarioSQL.delete(null);
-
-                            if (usuarioSQL.insert(dadosUsuario) > 0) {
-                                funcoes.setValorXml("AbriuAppPriveiraVez", "N");
-                            }
                             // Atualiza a notificacao
-                            mLoad.bigTextStyle(context.getResources().getString(R.string.dispositivo_registrado));
-                            mLoad.progress().value(0, 0, true).build();
+                            bigTextStyle.bigText(context.getResources().getString(R.string.dispositivo_registrado));
+                            mBuilder.setStyle(bigTextStyle);
+                            notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                             // Checo se o texto de status foi passado pro parametro
                             if (textStatus != null) {
                                 ((Activity) context).runOnUiThread(new Runnable() {
                                     public void run() {
                                         textStatus.setText(context.getResources().getString(R.string.dispositivo_registrado));
+                                    }
+                                });
+                            }
+                            if (textStatusErro != null) {
+                                ((Activity) context).runOnUiThread(new Runnable() {
+                                    public void run() {
+                                        textStatusErro.append("\n*" +context.getResources().getString(R.string.dispositivo_registrado));
                                     }
                                 });
                             }
@@ -1056,72 +1290,104 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                         } else {
                             // Cria uma notificacao para ser manipulado
-                            Load mLoad = PugNotification.with(context).load()
-                                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
+                            /*Load mLoad = PugNotification.with(context).load()
+                                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                                     .smallIcon(R.mipmap.ic_launcher)
                                     .largeIcon(R.mipmap.ic_launcher)
                                     .title(R.string.recebendo_dados_usuario)
-                                    .bigTextStyle(context.getResources().getString(R.string.nao_chegou_dados_servidor_empresa) + "\n" + retornoWebservice.toString())
+                                    .bigTextStyle(context.getResources().getString(
+                                            R.string.nao_chegou_dados_servidor_empresa) + "\n" +
+                                            "Codigo: " + statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO) + "\n"+
+                                            "Mensagem: " + statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_MENSAGEM_RETORNO))
                                     .flags(Notification.DEFAULT_LIGHTS);
-                            mLoad.simple().build();
+                            mLoad.simple().build();*/
 
-                            // Armazena as informacoes para para serem exibidas e enviadas
-                            final ContentValues contentValues = new ContentValues();
-                            contentValues.put("comando", 0);
-                            contentValues.put("tela", "ReceberDadosWebserviceAsyncRotinas");
-                            contentValues.put("mensagem", "Não conseguimos cadastrar o dispositivo, tente novamente. \n" +
-                                    "Se o erro persistir entre em contato com o suporte SAVARE.");
-                            contentValues.put("dados", "");
-                            // Pega os dados do usuario
+                            bigTextStyle.bigText(context.getResources().getString(
+                                    R.string.nao_chegou_dados_servidor_empresa) + "\n" +
+                                    "Codigo: " + statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO) + "\n"+
+                                    "Mensagem: " + statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_MENSAGEM_RETORNO))
+                                    .setBigContentTitle(context.getResources().getString(R.string.recebendo_dados_usuario));
+                            mBuilder.setStyle(bigTextStyle)
+                                    .setProgress(0, 0, false);
+                            notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
 
-                            contentValues.put("usuario", funcoes.getValorXml("Usuario"));
-                            contentValues.put("empresa", funcoes.getValorXml("ChaveEmpresa"));
-                            contentValues.put("email", funcoes.getValorXml("Email"));
-
+                            if (textStatusErro != null) {
+                                final JsonObject finalStatuRetorno = statuRetorno;
+                                ((Activity) context).runOnUiThread(new Runnable() {
+                                    public void run() {
+                                        textStatusErro.append("\n*" +
+                                                context.getResources().getString(R.string.nao_conseguimos_registrar_dispositivo) + "\n" +
+                                                "Codigo: " + finalStatuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO) + "\n"+
+                                                "Mensagem: " + finalStatuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_MENSAGEM_RETORNO));
+                                    }
+                                });
+                            }
+                            final JsonObject finalStatuRetorno = statuRetorno;
                             ((Activity) context).runOnUiThread(new Runnable() {
                                 public void run() {
-                                    funcoes.menssagem(contentValues);
+                                    new MaterialDialog.Builder(context)
+                                            .title("ReceberDadosWebserviceAsyncRotinas")
+                                            .content(context.getResources().getString(R.string.nao_conseguimos_registrar_dispositivo) + "\n" +
+                                                    "Codigo: " + finalStatuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO) +
+                                                    "Mensagem: " + finalStatuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_MENSAGEM_RETORNO))
+                                            .positiveText(R.string.button_ok)
+                                            .show();
                                 }
                             });
                         }
                     } else {
                         // Cria uma notificacao para ser manipulado
-                        Load mLoad = PugNotification.with(context).load()
-                                .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
-                                .smallIcon(R.mipmap.ic_launcher)
-                                .largeIcon(R.mipmap.ic_launcher)
-                                .title(R.string.recebendo_dados)
-                                .bigTextStyle(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.get(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO))
-                                .flags(Notification.DEFAULT_LIGHTS);
-                        mLoad.simple().build();
+                        bigTextStyle.bigText(context.getResources().getString(R.string.nao_conseguimos_registrar_dispositivo) + "\n" +
+                                    "Codigo: " + statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO) + "\n" +
+                                    "Mensagem: " + statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_MENSAGEM_RETORNO))
+                                    .setBigContentTitle(context.getResources().getString(R.string.recebendo_dados));
+                        mBuilder.setStyle(bigTextStyle)
+                                .setProgress(0, 0, false);
+                        notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
+
+                        if (textStatus != null) {
+                            final JsonObject finalStatuRetorno = statuRetorno;
+                            ((Activity) context).runOnUiThread(new Runnable() {
+                                public void run() {
+                                    textStatusErro.append("\n*" +context.getResources().getString(R.string.nao_conseguimos_registrar_dispositivo) + "\n" +
+                                            "Codigo: " + finalStatuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO) +
+                                            "Mensagem: " + finalStatuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_MENSAGEM_RETORNO));
+                                }
+                            });
+                        }
+
                     }
                 }
             } else {
                 // Cria uma notificacao para ser manipulado
-                Load mLoad = PugNotification.with(context).load()
-                        .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
-                        .smallIcon(R.mipmap.ic_launcher)
-                        .largeIcon(R.mipmap.ic_launcher)
-                        .title(R.string.recebendo_dados_usuario)
-                        .bigTextStyle(context.getResources().getString(R.string.nao_achamos_cnpj) + "\n")
-                        .flags(Notification.DEFAULT_LIGHTS);
-                mLoad.simple().build();
+                bigTextStyle.bigText(context.getResources().getString(R.string.nao_achamos_cnpj))
+                            .setBigContentTitle(context.getResources().getString(R.string.recebendo_dados_usuario));
+                mBuilder.setStyle(bigTextStyle)
+                        .setProgress(0, 0, false);
+                notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
 
-                SuperToast.create(context, context.getResources().getString(R.string.nao_achamos_cnpj), SuperToast.Duration.LONG, Style.getStyle(Style.RED, SuperToast.Animations.POPUP)).show();
+                if (textStatusErro != null) {
+                    ((Activity) context).runOnUiThread(new Runnable() {
+                        public void run() {
+                            textStatusErro.append("\n*" +context.getResources().getString(R.string.nao_achamos_cnpj) );
+                        }
+                    });
+                }
+
+                //SuperToast.create(context, context.getResources().getString(R.string.nao_achamos_cnpj), SuperToast.Duration.LONG, Style.getStyle(Style.RED, SuperToast.Animations.POPUP)).show();
+                SuperActivityToast.create(context, context.getResources().getString(R.string.nao_achamos_cnpj), Style.DURATION_LONG)
+                        .setTextColor(Color.WHITE)
+                        .setColor(Color.RED)
+                        .setAnimations(Style.ANIMATIONS_POP)
+                        .show();
             }
 
         } catch (final Exception e) {
-            // Cria uma notificacao
-            PugNotification.with(context)
-                    .load()
-                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + e.hashCode())
-                    .title(R.string.importar_dados_recebidos)
-                    .bigTextStyle("CadastrarDispositivo - " + e.getMessage())
-                    .smallIcon(R.mipmap.ic_launcher)
-                    .largeIcon(R.mipmap.ic_launcher)
-                    .flags(Notification.DEFAULT_ALL)
-                    .simple()
-                    .build();
+            bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.importar_dados_recebidos))
+                        .bigText("CadastrarDispositivo - " + e.getMessage());
+            mBuilder.setStyle(bigTextStyle)
+                    .setProgress(0, 0, false);
+            notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
 
             // Checo se o texto de status foi passado pro parametro
             if (textStatus != null) {
@@ -1131,6 +1397,15 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                     }
                 });
             }
+
+            if (textStatusErro != null) {
+                ((Activity) context).runOnUiThread(new Runnable() {
+                    public void run() {
+                        textStatusErro.append(context.getResources().getString(R.string.msg_error) + e.getMessage());
+                    }
+                });
+            }
+
             if (progressBarStatus != null) {
                 ((Activity) context).runOnUiThread(new Runnable() {
                     public void run() {
@@ -1142,13 +1417,223 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
         }
     }
 
+    /**
+     * Cadastra o dispositivo no Webservice central {@link com.savare.configuracao.ServicosWeb}.IP_SERVIDOR_WEBSERVICE.
+     * E o Webservice central retorna se pode ou nao cadastrar um novo dispositivo.
+     */
+    private boolean cadastrarDispositivoWebserviceCentral() {
+        // Atualiza a notificacao
+        bigTextStyle.bigText(context.getResources().getString(R.string.procurando_dados) + " Vamos cadastrar o Dispositivo no Webservice Central");
+        mBuilder.setStyle(bigTextStyle)
+                .setProgress(0, 0, true);
+        notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
+
+        // Checo se o texto de status foi passado pro parametro
+        if (textStatus != null) {
+            ((Activity) context).runOnUiThread(new Runnable() {
+                public void run() {
+                    textStatus.setText(context.getResources().getString(R.string.procurando_dados) + " Vamos cadastrar o Dispositivo no Webservice Central");
+                }
+            });
+        }
+        if (textStatusErro != null) {
+            ((Activity) context).runOnUiThread(new Runnable() {
+                public void run() {
+                    textStatusErro.append("\n*" + "Vamos cadastrar o Dispositivo no Webservice Central");
+                }
+            });
+        }
+        final FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
+        try {
+            String cnpjEmpresa = funcoes.getValorXml(funcoes.TAG_CNPJ_EMPRESA);
+            String parametrosWebservice = "";
+            JsonObject statuRetorno = null;
+
+            if ((cnpjEmpresa != null) && (!cnpjEmpresa.equalsIgnoreCase(funcoes.NAO_ENCONTRADO))) {
+                //String abriuAppPrimeiraVez = funcoes.getValorXml("AbriuAppPriveiraVez");
+
+                parametrosWebservice += "&cnpjUrl=" + cnpjEmpresa;
+                WSSisinfoWebservice webserviceSisInfo = new WSSisinfoWebservice(context);
+                ServidoresBeans servidorCentral = new ServidoresBeans();
+                servidorCentral.setIpServidor(ServicosWeb.IP_SERVIDOR_WEBSERVICE);
+                servidorCentral.setPorta(Integer.parseInt(ServicosWeb.PORTA_JSON));
+
+                JsonObject retornoWebservice = new Gson().fromJson(webserviceSisInfo.executarWebserviceJson(servidorCentral, null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_SMADISPO, WSSisinfoWebservice.METODO_POST, null, parametrosWebservice), JsonObject.class);
+
+                if ((retornoWebservice != null) && (retornoWebservice.has(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO))) {
+                    statuRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO);
+                    // Verifica se retornou com sucesso
+                    if (statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO).getAsInt() == HttpURLConnection.HTTP_OK) {
+
+                        // Atualiza a notificacao
+                        bigTextStyle.bigText(context.getResources().getString(R.string.dispositivo_registrado));
+                        mBuilder.setStyle(bigTextStyle);
+                        notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
+
+                        // Checo se o texto de status foi passado pro parametro
+                        if (textStatus != null) {
+                            ((Activity) context).runOnUiThread(new Runnable() {
+                                public void run() {
+                                    textStatus.setText(context.getResources().getString(R.string.dispositivo_registrado));
+                                }
+                            });
+                        }
+                        if (textStatusErro != null) {
+                            ((Activity) context).runOnUiThread(new Runnable() {
+                                public void run() {
+                                    textStatusErro.append("\n*" +context.getResources().getString(R.string.dispositivo_registrado));
+                                }
+                            });
+                        }
+                        if (progressBarStatus != null) {
+                            ((Activity) context).runOnUiThread(new Runnable() {
+                                public void run() {
+                                    progressBarStatus.setIndeterminate(true);
+                                    progressBarStatus.setVisibility(View.INVISIBLE);
+                                }
+                            });
+                        }
+                        return true;
+                    } else {
+                        // Cria uma notificacao para ser manipulado
+                        bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.msg_error))
+                                    .bigText(context.getResources().getString(R.string.nao_chegou_dados_servidor_empresa) + "\n" +
+                                    "Codigo: " + statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO) + "\n"+
+                                    "Mensagem: " + statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_MENSAGEM_RETORNO));
+                        mBuilder.setStyle(bigTextStyle)
+                                .setProgress(0, 0, false);
+                        notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
+
+                        if (textStatusErro != null) {
+                            final JsonObject finalStatuRetorno = statuRetorno;
+                            ((Activity) context).runOnUiThread(new Runnable() {
+                                public void run() {
+                                    textStatusErro.append("\n*" +
+                                            context.getResources().getString(R.string.nao_conseguimos_registrar_dispositivo) + "\n" +
+                                            "Codigo: " + finalStatuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO) + "\n"+
+                                            "Mensagem: " + finalStatuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_MENSAGEM_RETORNO));
+                                }
+                            });
+                        }
+                        final JsonObject finalStatuRetorno = statuRetorno;
+                        ((Activity) context).runOnUiThread(new Runnable() {
+                            public void run() {
+                                new MaterialDialog.Builder(context)
+                                        .title("ReceberDadosWebserviceAsyncRotinas")
+                                        .content(context.getResources().getString(R.string.nao_conseguimos_registrar_dispositivo) + "\n" +
+                                                "Codigo: " + finalStatuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO) + "\n" +
+                                                "Mensagem: " + finalStatuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_MENSAGEM_RETORNO))
+                                        .positiveText(R.string.button_ok)
+                                        .show();
+                            }
+                        });
+                    }
+                } else {
+                    // Cria uma notificacao para ser manipulado
+                    bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.msg_error))
+                            .bigText(context.getResources().getString(R.string.nao_conseguimos_registrar_dispositivo) + "\n" +
+                                    "Codigo: " + statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO) + "\n" +
+                                    "Mensagem: " + statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_MENSAGEM_RETORNO));
+                    mBuilder.setStyle(bigTextStyle)
+                            .setProgress(0, 0, false);
+                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
+
+                    if (textStatus != null) {
+                        final JsonObject finalStatuRetorno = statuRetorno;
+                        ((Activity) context).runOnUiThread(new Runnable() {
+                            public void run() {
+                                textStatusErro.append("\n*" +context.getResources().getString(R.string.nao_conseguimos_registrar_dispositivo) + "\n" +
+                                        "Codigo: " + finalStatuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO) +
+                                        "Mensagem: " + finalStatuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_MENSAGEM_RETORNO));
+                            }
+                        });
+                    }
+
+                }
+            } else {
+                // Cria uma notificacao para ser manipulado
+                bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.msg_error))
+                        .bigText(context.getResources().getString(R.string.nao_achamos_cnpj));
+                mBuilder.setStyle(bigTextStyle)
+                        .setProgress(0, 0, false);
+                notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
+
+                if (textStatus != null) {
+                    ((Activity) context).runOnUiThread(new Runnable() {
+                        public void run() {
+                            textStatus.append(context.getResources().getString(R.string.nao_achamos_cnpj) );
+                        }
+                    });
+                }
+
+                if (textStatusErro != null) {
+                    ((Activity) context).runOnUiThread(new Runnable() {
+                        public void run() {
+                            textStatusErro.append("\n*" +context.getResources().getString(R.string.nao_achamos_cnpj) );
+                        }
+                    });
+                }
+
+                //SuperToast.create(context, context.getResources().getString(R.string.nao_achamos_cnpj), SuperToast.Duration.LONG, Style.getStyle(Style.RED, SuperToast.Animations.POPUP)).show();
+            }
+
+        } catch (final Exception e) {
+            // Cria uma notificacao
+//            PugNotification.with(context)
+//                    .load()
+//                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
+//                    .title(R.string.msg_error)
+//                    .bigTextStyle("CadastrarDispositivo - " + e.getMessage())
+//                    .smallIcon(R.mipmap.ic_launcher)
+//                    .largeIcon(R.mipmap.ic_launcher)
+//                    .flags(Notification.DEFAULT_ALL)
+//                    .simple()
+//                    .build();
+
+            bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.msg_error))
+                        .bigText("CadastrarDispositivo - " + e.getMessage());
+            mBuilder.setStyle(bigTextStyle)
+                    .setProgress(0, 0, false);
+            notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
+
+            // Checo se o texto de status foi passado pro parametro
+            if (textStatus != null) {
+                ((Activity) context).runOnUiThread(new Runnable() {
+                    public void run() {
+                        textStatus.setText(context.getResources().getString(R.string.msg_error) + e.getMessage());
+                    }
+                });
+            }
+
+            if (textStatusErro != null) {
+                ((Activity) context).runOnUiThread(new Runnable() {
+                    public void run() {
+                        textStatus.setText("\n*" + context.getResources().getString(R.string.msg_error) + e.getMessage());
+                    }
+                });
+            }
+
+            if (progressBarStatus != null) {
+                ((Activity) context).runOnUiThread(new Runnable() {
+                    public void run() {
+                        progressBarStatus.setIndeterminate(true);
+                        progressBarStatus.setVisibility(View.INVISIBLE);
+                    }
+                });
+            }
+        }
+        return false;
+    }
+
 
     private boolean checarEmpresaAdmin() {
         JsonObject statuRetorno = null;
 
         // Atualiza a notificacao
-        mLoad.bigTextStyle(context.getResources().getString(R.string.procurando_dados) + " Dados de licença da empresa");
-        mLoad.progress().value(0, 0, true).build();
+        bigTextStyle.bigText(context.getResources().getString(R.string.procurando_dados) + " Dados de licença da empresa");
+        mBuilder.setStyle(bigTextStyle)
+                .setProgress(0, 0, true);
+        notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
         // Checo se o texto de status foi passado pro parametro
         if (textStatus != null) {
@@ -1174,7 +1659,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                     parametrosWebservice += "&where= ( CFACLIFO.ID_CFACLIFO = ( SELECT SMADISPO.ID_CFACLIFO FROM SMADISPO WHERE SMADISPO.IDENTIFICACAO = '" + uuidDispositivo + "') )";
                 }
                 WSSisinfoWebservice webserviceSisInfo = new WSSisinfoWebservice(context);
-                JsonObject retornoWebservice = new Gson().fromJson(webserviceSisInfo.executarSelectWebserviceJson(null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_CFACLIFO_ADMIN, WSSisinfoWebservice.METODO_GET, parametrosWebservice, null), JsonObject.class);
+                JsonObject retornoWebservice = new Gson().fromJson(webserviceSisInfo.executarWebserviceJson(servidorAtivo, null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_CFACLIFO_ADMIN, WSSisinfoWebservice.METODO_GET, parametrosWebservice, null), JsonObject.class);
 
                 if ((retornoWebservice != null) && (retornoWebservice.has(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO))) {
                     // Pega o status que retornou do webservice
@@ -1183,8 +1668,9 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                     // Verifica se retornou com sucesso
                     if (statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO).getAsInt() == HttpURLConnection.HTTP_OK) {
                         // Atualiza a notificacao
-                        mLoad.bigTextStyle(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
-                        mLoad.progress().value(0, 0, true).build();
+                        bigTextStyle.bigText(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
+                        mBuilder.setStyle(bigTextStyle);
+                        notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                         // Checo se o texto de status foi passado pro parametro
                         if (textStatus != null) {
@@ -1202,8 +1688,9 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                 boolean todosSucesso = true;
 
                                 // Atualiza a notificacao
-                                mLoad.bigTextStyle(context.getResources().getString(R.string.recebendo_dados_licenca));
-                                mLoad.progress().value(0, 0, true).build();
+                                bigTextStyle.bigText(context.getResources().getString(R.string.recebendo_dados_licenca));
+                                mBuilder.setStyle(bigTextStyle);
+                                notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                 // Checo se o texto de status foi passado pro parametro
                                 if (textStatus != null) {
@@ -1230,15 +1717,22 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                     final JsonObject usuarioRetorno = listaUsuarioRetorno.get(i).getAsJsonObject();
 
                                     // Atualiza a notificacao
-                                    mLoad.bigTextStyle(context.getResources().getString(R.string.achamos_usuario_servidor_nuvem) + " - Empresa: " + usuarioRetorno.get("nomeRazao").toString());
-                                    //mLoad.progress().update(0, i, listaUsuarioRetorno.size(), false).build();
-                                    mLoad.progress().value(0, 0, true).build();
+                                    bigTextStyle.bigText(context.getResources().getString(R.string.achamos_alguma_coisa) + " - Empresa: " + usuarioRetorno.get("nomeRazao").toString());
+                                    mBuilder.setStyle(bigTextStyle);
+                                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                     // Checo se o texto de status foi passado pro parametro
                                     if (textStatus != null) {
                                         ((Activity) context).runOnUiThread(new Runnable() {
                                             public void run() {
-                                                textStatus.setText(context.getResources().getString(R.string.achamos_usuario_servidor_nuvem) + " - Empresa: " + usuarioRetorno.get("nomeRazao").toString());
+                                                textStatus.setText(context.getResources().getString(R.string.achamos_alguma_coisa) + " - Empresa: " + usuarioRetorno.get("nomeRazao").toString());
+                                            }
+                                        });
+                                    }
+                                    if (textStatusErro != null) {
+                                        ((Activity) context).runOnUiThread(new Runnable() {
+                                            public void run() {
+                                                textStatusErro.append("\n*" +context.getResources().getString(R.string.achamos_alguma_coisa) + " - Empresa: " + usuarioRetorno.get("nomeRazao").toString());
                                             }
                                         });
                                     }
@@ -1251,83 +1745,48 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                     }
                                     // Checa se o usuario esta ativo
                                     if (usuarioRetorno.get("ativo").toString().equalsIgnoreCase("0")) {
-                                        ContentValues dadosInativo = new ContentValues();
-                                        dadosInativo.put("ATIVO_USUA", "0");
-
-                                        usuarioSQL.update(dadosInativo, "LOGIN_USUA = '" + funcoes.getValorXml("Usuario") + "'");
-
-                                        final ContentValues contentValues = new ContentValues();
-                                        contentValues.put("comando", 0);
-                                        contentValues.put("tela", "ReceberDadosWebserviceAsyncRotinas");
-                                        contentValues.put("mensagem", "Está inativo, não podemos baixar os dados dele. Entre em contato com a sua empresa ou com o suporte SAVARE.");
-                                        contentValues.put("dados", "");
-                                        // Pega os dados do usuario
+                                        // Marca que a empresa esta inativa
+                                        funcoes.setValorXml("EmpresaAtiva", "0");
 
                                         ((Activity) context).runOnUiThread(new Runnable() {
                                             public void run() {
-                                                funcoes.menssagem(contentValues);
+                                                new MaterialDialog.Builder(context)
+                                                        .title("ReceberDadosWebserviceAsyncRotinas")
+                                                        .content("Empresa está inativa, não podemos baixar os dados dele. Entre em contato com a sua empresa ou com o suporte SAVARE.")
+                                                        .positiveText(R.string.button_ok)
+                                                        .show();
                                             }
                                         });
                                         return false;
                                     } else {
-                                        dadosServidor.put("ATIVO_USUA", "1");
-                                        dadosServidor.put("IP_SERVIDOR_USUA", (usuarioRetorno.has("ipServidorSisinfo")) ? usuarioRetorno.get("ipServidorSisinfo").getAsString() : "");
-                                        dadosServidor.put("IP_SERVIDOR_WEBSERVICE_USUA", (usuarioRetorno.has("ipServidorWebservice")) ? usuarioRetorno.get("ipServidorWebservice").getAsString() : "");
-                                        dadosServidor.put("USUARIO_SERVIDOR_USUA", (usuarioRetorno.has("usuSisinfoWebservice")) ? usuarioRetorno.get("usuSisinfoWebservice").getAsString() : "");
-                                        dadosServidor.put("SENHA_SERVIDOR_USUA", (usuarioRetorno.has("senhaSisinfoWebservice")) ? usuarioRetorno.get("senhaSisinfoWebservice").getAsString() : "");
-                                        dadosServidor.put("CAMINHO_BANCO_DADOS_USUA", (usuarioRetorno.has("caminhoBancoSisinfo")) ? usuarioRetorno.get("caminhoBancoSisinfo").getAsString() : "");
-                                        dadosServidor.put("PORTA_BANCO_DADOS_USUA", (usuarioRetorno.has("portaBancoSisinfo")) ? usuarioRetorno.get("portaBancoSisinfo").getAsString() : "");
-                                        dadosServidor.put("MODO_CONEXAO", (usuarioRetorno.has("modoConexaoWebservice")) ? usuarioRetorno.get("modoConexaoWebservice").getAsString() : "");
-
-                                        salvarDadosXml(dadosServidor);
-                                    }
-                                }
-                                // Atualiza os dados do usuario
-                                if ((dadosServidor.size() > 0) && (usuarioSQL.update(dadosServidor, "LOGIN_USUA = '" + funcoes.getValorXml("Usuario") + "'") > 0)) {
-                                    inserirUltimaAtualizacao("CFACLIFO_ADMIN");
-                                    return true;
-                                } else {
-                                    PugNotification.with(context)
-                                            .load()
-                                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR)
-                                            .title(R.string.importar_dados_recebidos)
-                                            //.message(context.getResources().getString(R.string.nao_conseguimos_atualizar_usuario))
-                                            .bigTextStyle(context.getResources().getString(R.string.nao_conseguimos_atualizar_usuario))
-                                            .smallIcon(R.mipmap.ic_launcher)
-                                            .largeIcon(R.mipmap.ic_launcher)
-                                            .flags(Notification.DEFAULT_LIGHTS)
-                                            .simple()
-                                            .build();
-
-                                    // Checa se o texto de status foi passado pro parametro
-                                    if (textStatus != null) {
-
-                                        ((Activity) context).runOnUiThread(new Runnable() {
-                                            public void run() {
-                                                textStatus.setText(context.getResources().getString(R.string.nao_conseguimos_atualizar_usuario));
-                                            }
-                                        });
+                                        funcoes.setValorXml("EmpresaAtiva", "1");
                                     }
                                 }
                             }
+                            inserirUltimaAtualizacao("CFACLIFO_ADMIN");
                         }
-                        inserirUltimaAtualizacao("CFACLIFO_ADMIN");
                     } else if (statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO).getAsInt() == HttpURLConnection.HTTP_UNAUTHORIZED) {
-                        ContentValues dadosInativo = new ContentValues();
-                        dadosInativo.put("ATIVO_USUA", "0");
-
-                        UsuarioSQL usuarioSQL = new UsuarioSQL(context);
-                        usuarioSQL.update(dadosInativo, "LOGIN_USUA = '" + funcoes.getValorXml("Usuario") + "'");
+                        // Marca que a empresa esta inativa
+                        funcoes.setValorXml("EmpresaAtiva", "0");
 
                         // Atualiza a notificacao
-                        mLoad.bigTextStyle(context.getResources().getString(R.string.nao_autorizado));
-                        mLoad.progress().value(0, 0, true).build();
+                        bigTextStyle.bigText(context.getResources().getString(R.string.nao_autorizado));
+                        mBuilder.setStyle(bigTextStyle);
+                        notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
+
 
                         // Checo se o texto de status foi passado pro parametro
                         if (textStatus != null) {
                             ((Activity) context).runOnUiThread(new Runnable() {
                                 public void run() {
                                     textStatus.setText(context.getResources().getString(R.string.nao_autorizado));
+                                }
+                            });
+                        }
+                        if (textStatusErro != null) {
+                            ((Activity) context).runOnUiThread(new Runnable() {
+                                public void run() {
+                                    textStatusErro.append("\n*" +"Empresa " + context.getResources().getString(R.string.nao_autorizado));
                                 }
                             });
                         }
@@ -1342,27 +1801,46 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                     }
                                 });
                             }
+                            if (textStatusErro != null) {
+                                ((Activity) context).runOnUiThread(new Runnable() {
+                                    public void run() {
+                                        textStatusErro.append("\n*" +mensagem.get("mensagemRetorno").getAsString());
+                                    }
+                                });
+                            }
                             // Cria uma notificacao para ser manipulado
-                            Load mLoad = PugNotification.with(context).load()
-                                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
+                            /*Load mLoad = PugNotification.with(context).load()
+                                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                                     .smallIcon(R.mipmap.ic_launcher)
                                     .largeIcon(R.mipmap.ic_launcher)
                                     .title(R.string.recebendo_dados_usuario)
                                     .bigTextStyle(mensagem.get("mensagemRetorno").getAsString())
                                     .flags(Notification.DEFAULT_LIGHTS);
-                            mLoad.simple().build();
+                            mLoad.simple().build();*/
+
+                            bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.recebendo_dados_usuario))
+                                    .bigText(mensagem.get("mensagemRetorno").getAsString());
+                            mBuilder.setStyle(bigTextStyle)
+                                    .setProgress(0, 0, false);
+                            notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
                         }
                         return false;
                     } else {
                         // Cria uma notificacao para ser manipulado
-                        Load mLoad = PugNotification.with(context).load()
-                                .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
+                        /*Load mLoad = PugNotification.with(context).load()
+                                .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                                 .smallIcon(R.mipmap.ic_launcher)
                                 .largeIcon(R.mipmap.ic_launcher)
-                                .title(R.string.recebendo_dados_usuario)
+                                .title(R.string.msg_error)
                                 .bigTextStyle(context.getResources().getString(R.string.nao_chegou_dados_servidor_empresa) + "\n" + retornoWebservice.toString())
                                 .flags(Notification.DEFAULT_LIGHTS);
-                        mLoad.simple().build();
+                        mLoad.simple().build();*/
+
+                        bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.msg_error))
+                                .bigText(context.getResources().getString(R.string.nao_chegou_dados_servidor_empresa) + "\n" + retornoWebservice.toString());
+                        mBuilder.setStyle(bigTextStyle)
+                                .setProgress(0, 0, false);
+                        notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
 
                         if (textStatus != null) {
                             ((Activity) context).runOnUiThread(new Runnable() {
@@ -1371,17 +1849,34 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                 }
                             });
                         }
+                        if (textStatusErro != null) {
+                            final JsonObject finalStatuRetorno = statuRetorno;
+                            ((Activity) context).runOnUiThread(new Runnable() {
+                                public void run() {
+                                    textStatusErro.append("\n*" +
+                                            context.getResources().getString(R.string.nao_chegou_dados_servidor_empresa) + "\n" +
+                                            "Não sebemos se a empresa esta autorizada ou ativa." + "\n" +
+                                            finalStatuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_MENSAGEM_RETORNO));
+                                }
+                            });
+                        }
                     }
                 } else {
                     // Cria uma notificacao para ser manipulado
-                    Load mLoad = PugNotification.with(context).load()
-                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
+                    /*Load mLoad = PugNotification.with(context).load()
+                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                             .smallIcon(R.mipmap.ic_launcher)
                             .largeIcon(R.mipmap.ic_launcher)
-                            .title(R.string.recebendo_dados)
+                            .title(R.string.msg_error)
                             .bigTextStyle(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.get(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO))
                             .flags(Notification.DEFAULT_LIGHTS);
-                    mLoad.simple().build();
+                    mLoad.simple().build();*/
+
+                    bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.msg_error))
+                            .bigText(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.get(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO));
+                    mBuilder.setStyle(bigTextStyle)
+                            .setProgress(0, 0, false);
+                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
 
                     if (textStatus != null) {
                         ((Activity) context).runOnUiThread(new Runnable() {
@@ -1390,21 +1885,25 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                             }
                         });
                     }
+                    if (textStatusErro != null) {
+                        ((Activity) context).runOnUiThread(new Runnable() {
+                            public void run() {
+                                textStatusErro.append("\n*" +
+                                                context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) +
+                                                " Servidor webservice não retornou os dados de licença da empresa");
+                            }
+                        });
+                    }
                 }
             }
 
         } catch (Exception e) {
             // Cria uma notificacao
-            PugNotification.with(context)
-                    .load()
-                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + e.hashCode())
-                    .title(R.string.importar_dados_recebidos)
-                    .bigTextStyle("ImportaDadosFuncionario- " + e.getMessage())
-                    .smallIcon(R.mipmap.ic_launcher)
-                    .largeIcon(R.mipmap.ic_launcher)
-                    .flags(Notification.DEFAULT_ALL)
-                    .simple()
-                    .build();
+            bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.msg_error))
+                    .bigText("ImportaDadosFuncionario- " + e.getMessage());
+            mBuilder.setStyle(bigTextStyle)
+                    .setProgress(0, 0, false);
+            notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
         }
         return true;
     }
@@ -1414,8 +1913,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
         JsonObject statuRetorno = null;
 
         // Atualiza a notificacao
-        mLoad.bigTextStyle(context.getResources().getString(R.string.procurando_dados) + " Empresa");
-        mLoad.progress().value(0, 0, true).build();
+        bigTextStyle.bigText(context.getResources().getString(R.string.procurando_dados) + " Empresa");
+        mBuilder.setStyle(bigTextStyle)
+                .setProgress(0, 0, true);
+        notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
         // Checo se o texto de status foi passado pro parametro
         if (textStatus != null) {
@@ -1435,14 +1936,14 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
 
             if ((ultimaData != null) && (!ultimaData.isEmpty())) {
-                parametrosWebservice += "&where= (DT_ALT >= '" + ultimaData + "') AND (ID_SMAEMPRE = (SELECT CFACLIFO.ID_SMAEMPRE FROM CFACLIFO WHERE CFACLIFO.GUID = '" + funcoes.getValorXml("ChaveFuncionario") + "'))";
+                parametrosWebservice += "&where= (DT_ALT >= '" + ultimaData + "') AND (ID_SMAEMPRE = (SELECT CFACLIFO.ID_SMAEMPRE FROM CFACLIFO WHERE CFACLIFO.GUID = '" + funcoes.getValorXml(funcoes.TAG_CHAVE_FUNCIONARIO) + "'))";
             } else {
-                parametrosWebservice += "&where= (ID_SMAEMPRE = (SELECT CFACLIFO.ID_SMAEMPRE FROM CFACLIFO WHERE CFACLIFO.GUID = '" + funcoes.getValorXml("ChaveFuncionario") + "'))";
+                parametrosWebservice += "&where= (ID_SMAEMPRE = (SELECT CFACLIFO.ID_SMAEMPRE FROM CFACLIFO WHERE CFACLIFO.GUID = '" + funcoes.getValorXml(funcoes.TAG_CHAVE_FUNCIONARIO) + "'))";
             }
             WSSisinfoWebservice webserviceSisInfo = new WSSisinfoWebservice(context);
 
-            //JsonObject retornoWebservice = gson.fromJson(webserviceSisInfo.executarSelectWebserviceJson(null, WSSisinfoWebservice.FUNCTION_JSON_SELECT_SMAEMPRE, WSSisinfoWebservice.METODO_GET, objectparametros.toString()), JsonObject.class);
-            JsonObject retornoWebservice = gson.fromJson(webserviceSisInfo.executarSelectWebserviceJson(null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_SMAEMPRE, WSSisinfoWebservice.METODO_GET, parametrosWebservice, null), JsonObject.class);
+            //JsonObject retornoWebservice = gson.fromJson(webserviceSisInfo.executarWebserviceJson(servidorAtivo, null, WSSisinfoWebservice.FUNCTION_JSON_SELECT_SMAEMPRE, WSSisinfoWebservice.METODO_GET, objectparametros.toString()), JsonObject.class);
+            JsonObject retornoWebservice = gson.fromJson(webserviceSisInfo.executarWebserviceJson(servidorAtivo, null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_SMAEMPRE, WSSisinfoWebservice.METODO_GET, parametrosWebservice, null), JsonObject.class);
 
             if ((retornoWebservice != null) && (retornoWebservice.has(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO))) {
                 statuRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO);
@@ -1452,7 +1953,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                     JsonObject pageRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_PAGE_RETORNO);
 
-                    if (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) {
+                    if ( (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0) ) {
                         final int totalPages = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt();
                         int pageNumber = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_PAGE_NUMBER_RETORNO).getAsInt();
 
@@ -1462,8 +1963,9 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                             // Verifica se retornou com sucesso
                             if (statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO).getAsInt() == HttpURLConnection.HTTP_OK) {
                                 // Atualiza a notificacao
-                                mLoad.bigTextStyle(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
-                                mLoad.progress().value(0, 0, true).build();
+                                bigTextStyle.bigText(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
+                                mBuilder.setStyle(bigTextStyle);
+                                notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                 // Checo se o texto de status foi passado pro parametro
                                 if (textStatus != null) {
@@ -1483,8 +1985,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                         for (int i = 0; i < listaEmpresaRetorno.size(); i++) {
 
                                             // Atualiza a notificacao
-                                            mLoad.bigTextStyle(context.getResources().getString(R.string.recebendo_dados_empresa) + " - Parte " + (pageNumber + 1) + "/" + totalPages + " - " + i + "/" + listaEmpresaRetorno.size());
-                                            mLoad.progress().update(0, i, listaEmpresaRetorno.size(), false).build();
+                                            bigTextStyle.bigText(context.getResources().getString(R.string.recebendo_dados_empresa) + " - Parte " + (pageNumber + 1) + "/" + totalPages + " - " + i + "/" + listaEmpresaRetorno.size());
+                                            mBuilder.setStyle(bigTextStyle)
+                                                .setProgress(listaEmpresaRetorno.size(), i, false);
+                                            notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                             // Checo se o texto de status foi passado pro parametro
                                             if (textStatus != null) {
@@ -1512,20 +2016,55 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                             if (empresaRetorno.has("idAeaplpgtVare")) {
                                                 dadosEmpresa.put("ID_AEAPLPGT_VARE", empresaRetorno.get("idAeaplpgtVare").getAsInt());
                                             }
-                                            if (empresaRetorno.has("idAeaplpgtAtac")) {
+                                            if ( (empresaRetorno.has("idAeaplpgtAtac")) && (empresaRetorno.get("idAeaplpgtAtac").getAsInt() > 0) ) {
                                                 dadosEmpresa.put("ID_AEAPLPGT_ATAC", empresaRetorno.get("idAeaplpgtAtac").getAsInt());
                                             }
+                                            dadosEmpresa.put("ID_AEAPLPGT_VARE_VISTA", (empresaRetorno.has("idAeaplpgtVareVista") ? empresaRetorno.get("idAeaplpgtVareVista").getAsInt() : null));
+                                            dadosEmpresa.put("ID_AEAPLPGT_ATAC_VISTA", (empresaRetorno.has("idAeaplpgtAtacVista") ? empresaRetorno.get("idAeaplpgtAtacVista").getAsInt() : null));
+                                            if ( (empresaRetorno.has("idCfastatu")) && (empresaRetorno.get("idCfastatu").getAsInt() > 0) ) {dadosEmpresa.put("ID_CFASTATU", empresaRetorno.get("idCfastatu").getAsInt());}
+                                            if ( (empresaRetorno.has("idCfaativi")) && (empresaRetorno.get("idCfaativi").getAsInt() > 0) ) {dadosEmpresa.put("ID_CFAATIVI", empresaRetorno.get("idCfaativi").getAsInt());}
+                                            if ( (empresaRetorno.has("guid")) && (empresaRetorno.get("guid").getAsString().length() > 0) ) {dadosEmpresa.put("GUID", empresaRetorno.get("guid").getAsString());}
+                                            if ( (empresaRetorno.has("usCad")) && (empresaRetorno.get("usCad").getAsString().length() > 0) ) {dadosEmpresa.put("US_CAD", empresaRetorno.get("usCad").getAsString());}
+                                            if ( (empresaRetorno.has("codigo")) && (empresaRetorno.get("codigo").getAsInt() > 0) ) {dadosEmpresa.put("CODIGO", empresaRetorno.get("codigo").getAsInt());}
                                             dadosEmpresa.put("DT_ALT", empresaRetorno.get("dtAlt").getAsString());
                                             dadosEmpresa.put("NOME_RAZAO", empresaRetorno.get("nomeRazao").getAsString());
                                             dadosEmpresa.put("NOME_FANTASIA", empresaRetorno.has("nomeFantasia") ? empresaRetorno.get("nomeFantasia").getAsString() : "");
                                             dadosEmpresa.put("CPF_CGC", empresaRetorno.has("cpfCgc") ? empresaRetorno.get("cpfCgc").getAsString() : "");
+                                            if ( (empresaRetorno.has("curvaAFis")) ) {dadosEmpresa.put("CURVA_A_FIS", empresaRetorno.get("curvaAFis").getAsDouble());}
+                                            if ( (empresaRetorno.has("curvaBFis")) ) {dadosEmpresa.put("CURVA_B_FIS", empresaRetorno.get("curvaBFis").getAsDouble());}
+                                            if ( (empresaRetorno.has("curvaCFis")) ) {dadosEmpresa.put("CURVA_C_FIS", empresaRetorno.get("curvaCFis").getAsDouble());}
+                                            if ( (empresaRetorno.has("curvaAFin")) ) {dadosEmpresa.put("CURVA_A_FIN", empresaRetorno.get("curvaAFin").getAsDouble());}
+                                            if ( (empresaRetorno.has("curvaBFin")) ) {dadosEmpresa.put("CURVA_B_FIN", empresaRetorno.get("curvaBFin").getAsDouble());}
+                                            if ( (empresaRetorno.has("curvaCFin")) ) {dadosEmpresa.put("CURVA_C_FIN", empresaRetorno.get("curvaCFin").getAsDouble());}
+                                            if ( (empresaRetorno.has("atacVarejo")) && (empresaRetorno.get("atacVarejo").getAsString().length() > 0) ) {dadosEmpresa.put("ATAC_VAREJO", empresaRetorno.get("atacVarejo").getAsString());}
+                                            if ( (empresaRetorno.has("vendeAtacVare")) && (empresaRetorno.get("vendeAtacVare").getAsString().length() > 0) ) {dadosEmpresa.put("VENDE_ATAC_VARE", empresaRetorno.get("vendeAtacVare").getAsString());}
                                             dadosEmpresa.put("ORC_SEM_ESTOQUE", empresaRetorno.get("orcSemEstoque").getAsString());
+                                            if ( (empresaRetorno.has("pedSemEstoque")) && (empresaRetorno.get("pedSemEstoque").getAsString().length() > 0) ) {dadosEmpresa.put("PED_SEM_ESTOQUE", empresaRetorno.get("pedSemEstoque").getAsString());}
+                                            if ( (empresaRetorno.has("centavos")) && (empresaRetorno.get("centavos").getAsString().length() > 0) ) {dadosEmpresa.put("CENTAVOS", empresaRetorno.get("centavos").getAsString());}
+                                            if ( (empresaRetorno.has("valMarkupAtac1")) ) {dadosEmpresa.put("VAL_MARKUP_ATAC1", empresaRetorno.get("valMarkupAtac1").getAsDouble());}
+                                            if ( (empresaRetorno.has("valMarkupAtac2")) ) {dadosEmpresa.put("VAL_MARKUP_ATAC2", empresaRetorno.get("valMarkupAtac2").getAsDouble());}
+                                            if ( (empresaRetorno.has("valMarkupAtac3")) ) {dadosEmpresa.put("VAL_MARKUP_ATAC3", empresaRetorno.get("valMarkupAtac3").getAsDouble());}
+                                            if ( (empresaRetorno.has("valMarkupVare1")) ) {dadosEmpresa.put("VAL_MARKUP_VARE1", empresaRetorno.get("valMarkupVare1").getAsDouble());}
+                                            if ( (empresaRetorno.has("valMarkupVare2")) ) {dadosEmpresa.put("VAL_MARKUP_VARE2", empresaRetorno.get("valMarkupVare2").getAsDouble());}
+                                            if ( (empresaRetorno.has("valMarkupVare3")) ) {dadosEmpresa.put("VAL_MARKUP_VARE3", empresaRetorno.get("valMarkupVare3").getAsDouble());}
+                                            if ( (empresaRetorno.has("markupAtac1")) ) {dadosEmpresa.put("MARKUP_ATAC1", empresaRetorno.get("markupAtac1").getAsDouble());}
+                                            if ( (empresaRetorno.has("markupAtac2")) ) {dadosEmpresa.put("MARKUP_ATAC2", empresaRetorno.get("markupAtac2").getAsDouble());}
+                                            if ( (empresaRetorno.has("markupAtac3")) ) {dadosEmpresa.put("MARKUP_ATAC3", empresaRetorno.get("markupAtac3").getAsDouble());}
+                                            if ( (empresaRetorno.has("markupVare1")) ) {dadosEmpresa.put("MARKUP_VARE1", empresaRetorno.get("markupVare1").getAsDouble());}
+                                            if ( (empresaRetorno.has("markupVare2")) ) {dadosEmpresa.put("MARKUP_VARE2", empresaRetorno.get("markupVare2").getAsDouble());}
+                                            if ( (empresaRetorno.has("markupVare3")) ) {dadosEmpresa.put("MARKUP_VARE3", empresaRetorno.get("markupVare3").getAsDouble());}
                                             dadosEmpresa.put("DIAS_ATRAZO", empresaRetorno.get("diasAtrazo").getAsInt());
                                             dadosEmpresa.put("SEM_MOVIMENTO", empresaRetorno.get("semMovimento").getAsInt());
                                             dadosEmpresa.put("JUROS_DIARIO", empresaRetorno.get("jurosDiario").getAsDouble());
+                                            if ( (empresaRetorno.has("capitaliza")) && (empresaRetorno.get("capitaliza").getAsString().length() > 0) ) { dadosEmpresa.put("CAPITALIZA", empresaRetorno.get("capitaliza").getAsString()); }
+                                            if ( (empresaRetorno.has("indexa")) && (empresaRetorno.get("indexa").getAsString().length() > 0) ) { dadosEmpresa.put("INDEXA", empresaRetorno.get("indexa").getAsString()); }
+                                            if ( (empresaRetorno.has("indiceValor")) && (empresaRetorno.get("indiceValor").getAsString().length() > 0) ) { dadosEmpresa.put("INDICE_VALOR", empresaRetorno.get("indiceValor").getAsString()); }
                                             dadosEmpresa.put("VENDE_BLOQUEADO_ORC", empresaRetorno.has("vendeBloqueadoOrc") ? empresaRetorno.get("vendeBloqueadoOrc").getAsString() : "");
                                             dadosEmpresa.put("VENDE_BLOQUEADO_PED", empresaRetorno.has("vendeBloqueadoPed") ? empresaRetorno.get("vendeBloqueadoPed").getAsString() : "");
                                             dadosEmpresa.put("VALIDADE_FICHA_CLIENTE", empresaRetorno.get("validadeFichaCliente").getAsInt());
+                                            if ( (empresaRetorno.has("percJrVencParcMaior")) ) { dadosEmpresa.put("PERC_JR_VENC_PARC_MAIOR", empresaRetorno.get("percJrVencParcMaior").getAsDouble()); }
+                                                if ( (empresaRetorno.has("percJurosDiaRefat")) ) { dadosEmpresa.put("PERC_JUROS_DIA_REFAT", empresaRetorno.get("percJurosDiaRefat").getAsDouble()); }
+                                            if ( (empresaRetorno.has("percMulta")) ) { dadosEmpresa.put("PERC_MULTA", empresaRetorno.get("percMulta").getAsDouble()); };
                                             dadosEmpresa.put("VL_MIN_PRAZO_VAREJO", empresaRetorno.get("vlMinPrazoVarejo").getAsDouble());
                                             dadosEmpresa.put("VL_MIN_PRAZO_ATACADO", empresaRetorno.get("vlMinPrazoAtacado").getAsDouble());
                                             dadosEmpresa.put("VL_MIN_VISTA_VAREJO", empresaRetorno.get("vlMinVistaVarejo").getAsDouble());
@@ -1549,8 +2088,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                         todosSucesso = empresaSql.insertList(listaDadosEmpresa);
                                     }
                                     // Atualiza a notificacao
-                                    mLoad.bigTextStyle(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
-                                    mLoad.progress().value(0, 0, true).build();
+                                    bigTextStyle.bigText(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
+                                    mBuilder.setStyle(bigTextStyle)
+                                            .setProgress(0, 0, true);
+                                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                     // Checo se o texto de status foi passado pro parametro
                                     if (textStatus != null) {
@@ -1568,33 +2109,56 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                         });
                                     }
                                 } else {
-                                    // Cria uma notificacao para ser manipulado
-                                    Load mLoad = PugNotification.with(context).load()
-                                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
-                                            .smallIcon(R.mipmap.ic_launcher)
-                                            .largeIcon(R.mipmap.ic_launcher)
-                                            .title(R.string.recebendo_dados_empresa)
-                                            .bigTextStyle(context.getResources().getString(R.string.nao_chegou_dados_servidor_empresa) + "\n" + retornoWebservice.toString())
-                                            .flags(Notification.DEFAULT_LIGHTS);
-                                    mLoad.simple().build();
+                                    final JsonObject finalRetornoWebservice = retornoWebservice;
+                                    ((Activity) context).runOnUiThread(new Runnable() {
+                                        public void run() {
+                                            textStatusErro.append("\n*" +
+                                                    context.getResources().getString(R.string.nao_chegou_dados_servidor_empresa) + "\n" +
+                                                            finalRetornoWebservice.toString() + "\n" +
+                                                            "O retorno do webservice chegou vazio com os dados da empresa.");
+                                        }
+                                    });
+                                    bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.recebendo_dados_empresa))
+                                                .bigText(context.getResources().getString(R.string.nao_chegou_dados_servidor_empresa) + "\n" + retornoWebservice.toString());
+                                    mBuilder.setStyle(bigTextStyle)
+                                            .setProgress(0, 0, false);
+                                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
                                 }
                                 // Incrementa o total de paginas
                                 pageNumber++;
                                 if (pageNumber < totalPages) {
-                                    retornoWebservice = gson.fromJson(webserviceSisInfo.executarSelectWebserviceJson(null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_SMAEMPRE, WSSisinfoWebservice.METODO_GET, parametrosWebservice + "&pageNumber=" + pageNumber, null), JsonObject.class);
+                                    retornoWebservice = gson.fromJson(webserviceSisInfo.executarWebserviceJson(servidorAtivo, null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_SMAEMPRE, WSSisinfoWebservice.METODO_GET, parametrosWebservice + "&pageNumber=" + pageNumber, null), JsonObject.class);
                                 }
                             } else {
                                 todosSucesso = false;
 
+                                if (textStatusErro != null) {
+                                    final JsonObject finalStatuRetorno = statuRetorno;
+                                    ((Activity) context).runOnUiThread(new Runnable() {
+                                        public void run() {
+                                            textStatusErro.append("\n*" +
+                                                            context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa) + "\n" +
+                                                            "Código: " + finalStatuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO) + "\n" +
+                                                            "Mensagem: " + finalStatuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_MENSAGEM_RETORNO));
+                                        }
+                                    });
+                                }
+
                                 // Cria uma notificacao para ser manipulado
-                                Load mLoad = PugNotification.with(context).load()
-                                        .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
+                                /*Load mLoad = PugNotification.with(context).load()
+                                        .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                                         .smallIcon(R.mipmap.ic_launcher)
                                         .largeIcon(R.mipmap.ic_launcher)
                                         .title(R.string.recebendo_dados)
                                         .bigTextStyle(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString())
                                         .flags(Notification.DEFAULT_LIGHTS);
-                                mLoad.simple().build();
+                                mLoad.simple().build();*/
+
+                                bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.recebendo_dados))
+                                            .bigText(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString());
+                                mBuilder.setStyle(bigTextStyle)
+                                        .setProgress(0, 0, false);
+                                notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
                             }
                         }// Fim do for ia (page)
                         // Checa se todos foram inseridos/atualizados com sucesso
@@ -1603,29 +2167,28 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                         }
                     }
                 } else {
-                    // Cria uma notificacao para ser manipulado
-                    Load mLoad = PugNotification.with(context).load()
-                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
-                            .smallIcon(R.mipmap.ic_launcher)
-                            .largeIcon(R.mipmap.ic_launcher)
-                            .title(R.string.recebendo_dados)
-                            .bigTextStyle(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.get(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO))
-                            .flags(Notification.DEFAULT_LIGHTS);
-                    mLoad.simple().build();
+                    bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.msg_error))
+                            .bigText(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.get(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO));
+                    mBuilder.setStyle(bigTextStyle)
+                            .setProgress(0, 0, false);
+                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
                 }
             }
-        } catch (Exception e) {
-            // Cria uma notificacao
-            PugNotification.with(context)
-                    .load()
-                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + e.hashCode())
-                    .title(R.string.importar_dados_recebidos)
-                    .bigTextStyle("ImportaDadosEmpresa- " + e.getMessage())
-                    .smallIcon(R.mipmap.ic_launcher)
-                    .largeIcon(R.mipmap.ic_launcher)
-                    .flags(Notification.DEFAULT_ALL)
-                    .simple()
-                    .build();
+        } catch (final Exception e) {
+            bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.msg_error))
+                        .bigText("ImportarDadosEmpresa - " + e.getMessage());
+            mBuilder.setStyle(bigTextStyle)
+                    .setProgress(0, 0, false);
+            notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
+
+            if (textStatusErro != null) {
+                final JsonObject finalStatuRetorno = statuRetorno;
+                ((Activity) context).runOnUiThread(new Runnable() {
+                    public void run() {
+                        textStatusErro.append("\n*" +"ImportarDadosEmpresa- " + e.getMessage());
+                    }
+                });
+            }
         }
     }
 
@@ -1633,8 +2196,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
         JsonObject statuRetorno = null;
 
         // Atualiza a notificacao
-        mLoad.bigTextStyle(context.getResources().getString(R.string.procurando_dados) + " Área de Atuação");
-        mLoad.progress().value(0, 0, true).build();
+        bigTextStyle.bigText(context.getResources().getString(R.string.procurando_dados) + " Área de Atuação");
+        mBuilder.setStyle(bigTextStyle)
+                .setProgress(0, 0, true);
+        notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
         // Checo se o texto de status foi passado pro parametro
         if (textStatus != null) {
@@ -1655,7 +2220,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 parametrosWebservice += "&where= (DT_ALT >= '" + ultimaData + "')";
             }
             WSSisinfoWebservice webserviceSisInfo = new WSSisinfoWebservice(context);
-            JsonObject retornoWebservice = gson.fromJson(webserviceSisInfo.executarSelectWebserviceJson(null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_CFAAREAS, WSSisinfoWebservice.METODO_GET, parametrosWebservice, null), JsonObject.class);
+            JsonObject retornoWebservice = gson.fromJson(webserviceSisInfo.executarWebserviceJson(servidorAtivo, null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_CFAAREAS, WSSisinfoWebservice.METODO_GET, parametrosWebservice, null), JsonObject.class);
 
             if ((retornoWebservice != null) && (retornoWebservice.has(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO))) {
                 statuRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO);
@@ -1665,7 +2230,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                     JsonObject pageRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_PAGE_RETORNO);
 
-                    if (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) {
+                    if ( (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0) ) {
                         final int totalPages = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt();
                         int pageNumber = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_PAGE_NUMBER_RETORNO).getAsInt();
 
@@ -1676,8 +2241,9 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                             // Verifica se retornou com sucesso
                             if (statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO).getAsInt() == HttpURLConnection.HTTP_OK) {
                                 // Atualiza a notificacao
-                                mLoad.bigTextStyle(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
-                                mLoad.progress().value(0, 0, true).build();
+                                bigTextStyle.bigText(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
+                                mBuilder.setStyle(bigTextStyle);
+                                notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                 // Checo se o texto de status foi passado pro parametro
                                 if (textStatus != null) {
@@ -1693,8 +2259,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                     // Checa se retornou algum dados na lista
                                     if (listaAreasRetorno.size() > 0) {
                                         // Atualiza a notificacao
-                                        mLoad.bigTextStyle(context.getResources().getString(R.string.recebendo_dados_areas));
-                                        mLoad.progress().value(0, listaAreasRetorno.size(), false).build();
+                                        bigTextStyle.bigText(context.getResources().getString(R.string.recebendo_dados_areas));
+                                        mBuilder.setStyle(bigTextStyle)
+                                                .setProgress(listaAreasRetorno.size(), 0, false);
+                                        notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                         // Checo se o texto de status foi passado pro parametro
                                         if (textStatus != null) {
@@ -1715,8 +2283,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                         List<ContentValues> listaDadosAreas = new ArrayList<ContentValues>();
                                         for (int i = 0; i < listaAreasRetorno.size(); i++) {
                                             // Atualiza a notificacao
-                                            mLoad.bigTextStyle(context.getResources().getString(R.string.recebendo_dados_areas) + " - Parte " + (pageNumber + 1) + "/" + totalPages + " - " + "/" + listaAreasRetorno.size());
-                                            mLoad.progress().update(0, i, listaAreasRetorno.size(), false).build();
+                                            bigTextStyle.bigText(context.getResources().getString(R.string.recebendo_dados_areas) + " - Parte " + (pageNumber + 1) + "/" + totalPages + " - " + "/" + listaAreasRetorno.size());
+                                            mBuilder.setStyle(bigTextStyle)
+                                                    .setProgress(listaAreasRetorno.size(), i, false);
+                                            notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                             // Checo se o texto de status foi passado pro parametro
                                             if (textStatus != null) {
@@ -1759,8 +2329,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                         todosSucesso = areasSql.insertList(listaDadosAreas);
                                     }
                                     // Atualiza a notificacao
-                                    mLoad.bigTextStyle(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
-                                    mLoad.progress().value(0, 0, true).build();
+                                    bigTextStyle.bigText(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
+                                    mBuilder.setStyle(bigTextStyle)
+                                            .setProgress(0, 0, true);
+                                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                     // Checo se o texto de status foi passado pro parametro
                                     if (textStatus != null) {
@@ -1779,32 +2351,44 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                     }
                                 } else {
                                     // Cria uma notificacao para ser manipulado
-                                    Load mLoad = PugNotification.with(context).load()
-                                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
+                                    /*Load mLoad = PugNotification.with(context).load()
+                                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                                             .smallIcon(R.mipmap.ic_launcher)
                                             .largeIcon(R.mipmap.ic_launcher)
-                                            .title(R.string.recebendo_dados_areas)
+                                            .title(R.string.msg_error)
                                             .bigTextStyle(context.getResources().getString(R.string.nao_chegou_dados_servidor_empresa) + "\n" + retornoWebservice.toString())
                                             .flags(Notification.DEFAULT_LIGHTS);
-                                    mLoad.simple().build();
+                                    mLoad.simple().build();*/
+
+                                    bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.msg_error))
+                                            .bigText(context.getResources().getString(R.string.nao_chegou_dados_servidor_empresa) + "\n" + retornoWebservice.toString());
+                                    mBuilder.setStyle(bigTextStyle)
+                                            .setProgress(0, 0, false);
+                                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
                                 }
                                 // Incrementa o total de paginas
                                 pageNumber++;
                                 if (pageNumber < totalPages) {
-                                    retornoWebservice = gson.fromJson(webserviceSisInfo.executarSelectWebserviceJson(null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_CFAAREAS, WSSisinfoWebservice.METODO_GET, parametrosWebservice + "&pageNumber=" + pageNumber, null), JsonObject.class);
+                                    retornoWebservice = gson.fromJson(webserviceSisInfo.executarWebserviceJson(servidorAtivo, null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_CFAAREAS, WSSisinfoWebservice.METODO_GET, parametrosWebservice + "&pageNumber=" + pageNumber, null), JsonObject.class);
                                 }
                             } else {
                                 todosSucesso = false;
 
                                 // Cria uma notificacao para ser manipulado
-                                Load mLoad = PugNotification.with(context).load()
-                                        .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
+                                /*Load mLoad = PugNotification.with(context).load()
+                                        .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                                         .smallIcon(R.mipmap.ic_launcher)
                                         .largeIcon(R.mipmap.ic_launcher)
-                                        .title(R.string.recebendo_dados)
+                                        .title(R.string.msg_error)
                                         .bigTextStyle(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString())
                                         .flags(Notification.DEFAULT_LIGHTS);
-                                mLoad.simple().build();
+                                mLoad.simple().build();*/
+
+                                bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.msg_error))
+                                        .bigText(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + retornoWebservice.toString());
+                                mBuilder.setStyle(bigTextStyle)
+                                        .setProgress(0, 0, false);
+                                notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
                             }
                         } // Fim do for ia (page)
                         // Checa se todos foram inseridos/atualizados com sucesso
@@ -1814,29 +2398,36 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                     }
                 } else {
                     // Cria uma notificacao para ser manipulado
-                    Load mLoad = PugNotification.with(context).load()
-                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
+                    /*Load mLoad = PugNotification.with(context).load()
+                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                             .smallIcon(R.mipmap.ic_launcher)
                             .largeIcon(R.mipmap.ic_launcher)
-                            .title(R.string.recebendo_dados)
+                            .title(R.string.msg_error)
                             .bigTextStyle(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString())
                             .flags(Notification.DEFAULT_LIGHTS);
-                    mLoad.simple().build();
+                    mLoad.simple().build();*/
+
+                    bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.msg_error))
+                            .bigText(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString());
+                    mBuilder.setStyle(bigTextStyle)
+                            .setProgress(0, 0, false);
+                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
                 }
             }
 
-        } catch (Exception e) {
-            // Cria uma notificacao para ser manipulado
-            PugNotification.with(context)
-                    .load()
-                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + e.hashCode())
-                    .title(R.string.importar_dados_recebidos)
-                    .bigTextStyle("ImportaDadosArea - " + e.getMessage())
-                    .smallIcon(R.mipmap.ic_launcher)
-                    .largeIcon(R.mipmap.ic_launcher)
-                    .flags(Notification.DEFAULT_ALL)
-                    .simple()
-                    .build();
+        } catch (final Exception e) {
+            if (textStatusErro != null) {
+                ((Activity) context).runOnUiThread(new Runnable() {
+                    public void run() {
+                        textStatusErro.append("\n*" + context.getResources().getText(R.string.erro_inesperado) + " - Área : " + e.getMessage());
+                    }
+                });
+            }
+            bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.msg_error))
+                    .bigText("ImportaDadosArea - " + e.getMessage());
+            mBuilder.setStyle(bigTextStyle)
+                    .setProgress(0, 0, false);
+            notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
         }
     }
 
@@ -1845,8 +2436,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
         JsonObject statuRetorno = null;
 
         // Atualiza a notificacao
-        mLoad.bigTextStyle(context.getResources().getString(R.string.procurando_dados) + " Ramo de Atividade");
-        mLoad.progress().value(0, 0, true).build();
+        bigTextStyle.bigText(context.getResources().getString(R.string.procurando_dados) + " Ramo de Atividade");
+        mBuilder.setStyle(bigTextStyle)
+                .setProgress(0, 0, true);
+        notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
         // Checo se o texto de status foi passado pro parametro
         if (textStatus != null) {
@@ -1868,7 +2461,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 parametrosWebservice += "&where= (DT_ALT >= '" + ultimaData + "')";
             }
             WSSisinfoWebservice webserviceSisInfo = new WSSisinfoWebservice(context);
-            JsonObject retornoWebservice = gson.fromJson(webserviceSisInfo.executarSelectWebserviceJson(null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_CFAATIVI, WSSisinfoWebservice.METODO_GET, parametrosWebservice, null), JsonObject.class);
+            JsonObject retornoWebservice = gson.fromJson(webserviceSisInfo.executarWebserviceJson(servidorAtivo, null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_CFAATIVI, WSSisinfoWebservice.METODO_GET, parametrosWebservice, null), JsonObject.class);
 
             if ((retornoWebservice != null) && (retornoWebservice.has(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO))) {
                 statuRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO);
@@ -1878,7 +2471,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                     JsonObject pageRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_PAGE_RETORNO);
 
-                    if (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) {
+                    if ( (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0) ) {
                         final int totalPages = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt();
                         int pageNumber = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_PAGE_NUMBER_RETORNO).getAsInt();
 
@@ -1889,8 +2482,9 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                             // Verifica se retornou com sucesso
                             if (statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO).getAsInt() == HttpURLConnection.HTTP_OK) {
                                 // Atualiza a notificacao
-                                mLoad.bigTextStyle(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
-                                mLoad.progress().value(0, 0, true).build();
+                                bigTextStyle.bigText(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
+                                mBuilder.setStyle(bigTextStyle);
+                                notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                 // Checo se o texto de status foi passado pro parametro
                                 if (textStatus != null) {
@@ -1906,8 +2500,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                     // Checa se retornou algum dados na lista
                                     if (listaAtividadeRetorno.size() > 0) {
                                         // Atualiza a notificacao
-                                        mLoad.bigTextStyle(context.getResources().getString(R.string.recebendo_dados_atividade));
-                                        mLoad.progress().value(0, listaAtividadeRetorno.size(), false).build();
+                                        bigTextStyle.bigText(context.getResources().getString(R.string.recebendo_dados_atividade));
+                                        mBuilder.setStyle(bigTextStyle)
+                                                .setProgress(listaAtividadeRetorno.size(), 0, false);
+                                        notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                         // Checo se o texto de status foi passado pro parametro
                                         if (textStatus != null) {
@@ -1928,8 +2524,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                         List<ContentValues> listaDadosAtividade = new ArrayList<ContentValues>();
                                         for (int i = 0; i < listaAtividadeRetorno.size(); i++) {
                                             // Atualiza a notificacao
-                                            mLoad.bigTextStyle(context.getResources().getString(R.string.recebendo_dados_atividade) + " - Parte " + (pageNumber + 1) + "/" + totalPages + " - " + i + "/" + listaAtividadeRetorno.size());
-                                            mLoad.progress().update(0, i, listaAtividadeRetorno.size(), false).build();
+                                            bigTextStyle.bigText(context.getResources().getString(R.string.recebendo_dados_atividade) + " - Parte " + (pageNumber + 1) + "/" + totalPages + " - " + i + "/" + listaAtividadeRetorno.size());
+                                            mBuilder.setStyle(bigTextStyle)
+                                                    .setProgress(listaAtividadeRetorno.size(), i, false);
+                                            notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                             // Checo se o texto de status foi passado pro parametro
                                             if (textStatus != null) {
@@ -1960,6 +2558,8 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                             dadosAtividade.put("DESC_ATAC_PRAZO", atividadeRetorno.get("descAtacPrazo").getAsDouble());
                                             dadosAtividade.put("DESC_VARE_VISTA", atividadeRetorno.get("descVareVista").getAsDouble());
                                             dadosAtividade.put("DESC_VARE_PRAZO", atividadeRetorno.get("descVarePrazo").getAsDouble());
+                                            dadosAtividade.put("DESC_SERV_VISTA", atividadeRetorno.get("descServVista").getAsDouble());
+                                            dadosAtividade.put("DESC_SERV_PRAZO", atividadeRetorno.get("descServPrazo").getAsDouble());
                                             if ((atividadeRetorno.has("descPromocao"))) {
                                                 dadosAtividade.put("DESC_PROMOCAO", atividadeRetorno.get("descPromocao").getAsString());
                                             }
@@ -1969,8 +2569,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                         todosSucesso = ramoAtividadeSql.insertList(listaDadosAtividade);
                                     }
                                     // Atualiza a notificacao
-                                    mLoad.bigTextStyle(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
-                                    mLoad.progress().value(0, 0, true).build();
+                                    bigTextStyle.bigText(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
+                                    mBuilder.setStyle(bigTextStyle)
+                                            .setProgress(0, 0, true);
+                                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                     // Checo se o texto de status foi passado pro parametro
                                     if (textStatus != null) {
@@ -1990,32 +2592,26 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                                 } else {
                                     // Cria uma notificacao para ser manipulado
-                                    Load mLoad = PugNotification.with(context).load()
-                                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
-                                            .smallIcon(R.mipmap.ic_launcher)
-                                            .largeIcon(R.mipmap.ic_launcher)
-                                            .title(R.string.recebendo_dados_atividade)
-                                            .bigTextStyle(context.getResources().getString(R.string.nao_chegou_dados_servidor_empresa) + "\n" + retornoWebservice.toString())
-                                            .flags(Notification.DEFAULT_LIGHTS);
-                                    mLoad.simple().build();
+                                    bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.msg_error))
+                                            .bigText(context.getResources().getString(R.string.nao_chegou_dados_servidor_empresa) + "\n" + retornoWebservice.toString());
+                                    mBuilder.setStyle(bigTextStyle)
+                                            .setProgress(0, 0, false);
+                                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
                                 }
                                 // Incrementa o total de paginas
                                 pageNumber++;
                                 if (pageNumber < totalPages) {
-                                    retornoWebservice = gson.fromJson(webserviceSisInfo.executarSelectWebserviceJson(null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_CFAATIVI, WSSisinfoWebservice.METODO_GET, parametrosWebservice + "&pageNumber=" + pageNumber, null), JsonObject.class);
+                                    retornoWebservice = gson.fromJson(webserviceSisInfo.executarWebserviceJson(servidorAtivo, null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_CFAATIVI, WSSisinfoWebservice.METODO_GET, parametrosWebservice + "&pageNumber=" + pageNumber, null), JsonObject.class);
                                 }
                             } else {
                                 todosSucesso = false;
 
                                 // Cria uma notificacao para ser manipulado
-                                Load mLoad = PugNotification.with(context).load()
-                                        .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
-                                        .smallIcon(R.mipmap.ic_launcher)
-                                        .largeIcon(R.mipmap.ic_launcher)
-                                        .title(R.string.recebendo_dados)
-                                        .bigTextStyle(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString())
-                                        .flags(Notification.DEFAULT_LIGHTS);
-                                mLoad.simple().build();
+                                bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.msg_error))
+                                        .bigText(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString());
+                                mBuilder.setStyle(bigTextStyle)
+                                        .setProgress(0, 0, false);
+                                notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
                             }
                         } // Fim do for ia (page)
                         // Checa se todos foram inseridos/atualizados com sucesso
@@ -2025,29 +2621,28 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                     }
                 } else {
                     // Cria uma notificacao para ser manipulado
-                    Load mLoad = PugNotification.with(context).load()
-                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
-                            .smallIcon(R.mipmap.ic_launcher)
-                            .largeIcon(R.mipmap.ic_launcher)
-                            .title(R.string.recebendo_dados)
-                            .bigTextStyle(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString())
-                            .flags(Notification.DEFAULT_LIGHTS);
-                    mLoad.simple().build();
+                    bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.msg_error))
+                            .bigText(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString());
+                    mBuilder.setStyle(bigTextStyle)
+                            .setProgress(0, 0, false);
+                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
                 }
             }
 
-        } catch (Exception e) {
+        } catch (final Exception e) {
+            if (textStatusErro != null) {
+                ((Activity) context).runOnUiThread(new Runnable() {
+                    public void run() {
+                        textStatusErro.append("\n*" + context.getResources().getText(R.string.erro_inesperado) + " - Atividade : " + e.getMessage());
+                    }
+                });
+            }
             // Cria uma notificacao para ser manipulado
-            PugNotification.with(context)
-                    .load()
-                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + e.hashCode())
-                    .title(R.string.importar_dados_recebidos)
-                    .bigTextStyle("ImportaDadosAtividade - " + e.getMessage())
-                    .smallIcon(R.mipmap.ic_launcher)
-                    .largeIcon(R.mipmap.ic_launcher)
-                    .flags(Notification.DEFAULT_ALL)
-                    .simple()
-                    .build();
+            bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.msg_error))
+                    .bigText("ImportaDadosAtividades - " + e.getMessage());
+            mBuilder.setStyle(bigTextStyle)
+                    .setProgress(0, 0, false);
+            notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
         }
     }
 
@@ -2056,8 +2651,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
         JsonObject statuRetorno = null;
 
         // Atualiza a notificacao
-        mLoad.bigTextStyle(context.getResources().getString(R.string.procurando_dados) + " Status");
-        mLoad.progress().value(0, 0, true).build();
+        bigTextStyle.bigText(context.getResources().getString(R.string.procurando_dados) + " Status");
+        mBuilder.setStyle(bigTextStyle)
+                .setProgress(0, 0, true);
+        notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
         // Checo se o texto de status foi passado pro parametro
         if (textStatus != null) {
@@ -2079,7 +2676,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 parametrosWebservice += "&where= (DT_ALT >= '" + ultimaData + "')";
             }
             WSSisinfoWebservice webserviceSisInfo = new WSSisinfoWebservice(context);
-            JsonObject retornoWebservice = gson.fromJson(webserviceSisInfo.executarSelectWebserviceJson(null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_CFASTATU, WSSisinfoWebservice.METODO_GET, parametrosWebservice, null), JsonObject.class);
+            JsonObject retornoWebservice = gson.fromJson(webserviceSisInfo.executarWebserviceJson(servidorAtivo, null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_CFASTATU, WSSisinfoWebservice.METODO_GET, parametrosWebservice, null), JsonObject.class);
 
             if ((retornoWebservice != null) && (retornoWebservice.has(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO))) {
                 statuRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO);
@@ -2089,7 +2686,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                     JsonObject pageRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_PAGE_RETORNO);
 
-                    if (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) {
+                    if ( (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0) ) {
                         final int totalPages = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt();
                         int pageNumber = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_PAGE_NUMBER_RETORNO).getAsInt();
 
@@ -2100,8 +2697,9 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                             // Verifica se retornou com sucesso
                             if (statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO).getAsInt() == HttpURLConnection.HTTP_OK) {
                                 // Atualiza a notificacao
-                                mLoad.bigTextStyle(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
-                                mLoad.progress().value(0, 0, true).build();
+                                bigTextStyle.bigText(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
+                                mBuilder.setStyle(bigTextStyle);
+                                notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                 // Checo se o texto de status foi passado pro parametro
                                 if (textStatus != null) {
@@ -2117,8 +2715,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                     // Checa se retornou algum dados na lista
                                     if (listaStatusRetorno.size() > 0) {
                                         // Atualiza a notificacao
-                                        mLoad.bigTextStyle(context.getResources().getString(R.string.recebendo_dados_status));
-                                        mLoad.progress().value(0, listaStatusRetorno.size(), false).build();
+                                        bigTextStyle.bigText(context.getResources().getString(R.string.recebendo_dados_status));
+                                        mBuilder.setStyle(bigTextStyle)
+                                                .setProgress(listaStatusRetorno.size(), 0, false);
+                                        notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                         // Checo se o texto de status foi passado pro parametro
                                         if (textStatus != null) {
@@ -2139,8 +2739,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                         List<ContentValues> listaDadosStatus = new ArrayList<ContentValues>();
                                         for (int i = 0; i < listaStatusRetorno.size(); i++) {
                                             // Atualiza a notificacao
-                                            mLoad.bigTextStyle(context.getResources().getString(R.string.recebendo_dados_status) + " - Parte " + (pageNumber + 1) + "/" + totalPages + " - " + i + "/" + listaStatusRetorno.size());
-                                            mLoad.progress().update(0, i, listaStatusRetorno.size(), false).build();
+                                            bigTextStyle.bigText(context.getResources().getString(R.string.recebendo_dados_status) + " - Parte " + (pageNumber + 1) + "/" + totalPages + " - " + i + "/" + listaStatusRetorno.size());
+                                            mBuilder.setStyle(bigTextStyle)
+                                                    .setProgress(listaStatusRetorno.size(), i, false);
+                                            notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                             // Checo se o texto de status foi passado pro parametro
                                             if (textStatus != null) {
@@ -2183,6 +2785,8 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                             dadosStatus.put("DESC_ATAC_PRAZO", statusObsRetorno.get("descAtacPrazo").getAsDouble());
                                             dadosStatus.put("DESC_VARE_VISTA", statusObsRetorno.get("descVareVista").getAsDouble());
                                             dadosStatus.put("DESC_VARE_PRAZO", statusObsRetorno.get("descVarePrazo").getAsDouble());
+                                            dadosStatus.put("DESC_SERV_VISTA", statusObsRetorno.get("descServVista").getAsDouble());
+                                            dadosStatus.put("DESC_SERV_PRAZO", statusObsRetorno.get("descServPrazo").getAsDouble());
                                             if ((statusObsRetorno.has("descPromocao"))) {
                                                 dadosStatus.put("DESC_PROMOCAO", statusObsRetorno.get("descPromocao").getAsString());
                                             }
@@ -2193,8 +2797,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                         todosSucesso = statusSql.insertList(listaDadosStatus);
                                     }
                                     // Atualiza a notificacao
-                                    mLoad.bigTextStyle(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
-                                    mLoad.progress().value(0, 0, true).build();
+                                    bigTextStyle.bigText(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
+                                    mBuilder.setStyle(bigTextStyle)
+                                            .setProgress(0, 0, true);
+                                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                     // Checo se o texto de status foi passado pro parametro
                                     if (textStatus != null) {
@@ -2213,32 +2819,26 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                     }
                                 } else {
                                     // Cria uma notificacao para ser manipulado
-                                    Load mLoad = PugNotification.with(context).load()
-                                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
-                                            .smallIcon(R.mipmap.ic_launcher)
-                                            .largeIcon(R.mipmap.ic_launcher)
-                                            .title(R.string.versao_savare_desatualizada)
-                                            .bigTextStyle(context.getResources().getString(R.string.nao_chegou_dados_servidor_empresa) + "\n" + retornoWebservice.toString())
-                                            .flags(Notification.DEFAULT_LIGHTS);
-                                    mLoad.simple().build();
+                                    bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.msg_error))
+                                            .bigText(context.getResources().getString(R.string.nao_chegou_dados_servidor_empresa) + "\n" + retornoWebservice.toString());
+                                    mBuilder.setStyle(bigTextStyle)
+                                            .setProgress(0, 0, false);
+                                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
                                 }
                                 // Incrementa o total de paginas
                                 pageNumber++;
                                 if (pageNumber < totalPages) {
-                                    retornoWebservice = gson.fromJson(webserviceSisInfo.executarSelectWebserviceJson(null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_CFASTATU, WSSisinfoWebservice.METODO_GET, parametrosWebservice + "&pageNumber=" + pageNumber, null), JsonObject.class);
+                                    retornoWebservice = gson.fromJson(webserviceSisInfo.executarWebserviceJson(servidorAtivo, null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_CFASTATU, WSSisinfoWebservice.METODO_GET, parametrosWebservice + "&pageNumber=" + pageNumber, null), JsonObject.class);
                                 }
                             } else {
                                 todosSucesso = false;
 
                                 // Cria uma notificacao para ser manipulado
-                                Load mLoad = PugNotification.with(context).load()
-                                        .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
-                                        .smallIcon(R.mipmap.ic_launcher)
-                                        .largeIcon(R.mipmap.ic_launcher)
-                                        .title(R.string.recebendo_dados)
-                                        .bigTextStyle(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString())
-                                        .flags(Notification.DEFAULT_LIGHTS);
-                                mLoad.simple().build();
+                                bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.msg_error))
+                                        .bigText(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString());
+                                mBuilder.setStyle(bigTextStyle)
+                                        .setProgress(0, 0, false);
+                                notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
                             }
                         } // Fim do for ia (page)
                         // Checa se todos foram inseridos/atualizados com sucesso
@@ -2248,28 +2848,27 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                     }
                 } else {
                     // Cria uma notificacao para ser manipulado
-                    Load mLoad = PugNotification.with(context).load()
-                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
-                            .smallIcon(R.mipmap.ic_launcher)
-                            .largeIcon(R.mipmap.ic_launcher)
-                            .title(R.string.recebendo_dados)
-                            .bigTextStyle(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString())
-                            .flags(Notification.DEFAULT_LIGHTS);
-                    mLoad.simple().build();
+                    bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.msg_error))
+                            .bigText(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString());
+                    mBuilder.setStyle(bigTextStyle)
+                            .setProgress(0, 0, false);
+                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
                 }
             }
-        } catch (Exception e) {
+        } catch (final Exception e) {
+            if (textStatusErro != null) {
+                ((Activity) context).runOnUiThread(new Runnable() {
+                    public void run() {
+                        textStatusErro.append("\n*" + context.getResources().getText(R.string.erro_inesperado) + " - Status : " + e.getMessage());
+                    }
+                });
+            }
             // Cria uma notificacao para ser manipulado
-            PugNotification.with(context)
-                    .load()
-                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + e.hashCode())
-                    .title(R.string.importar_dados_recebidos)
-                    .bigTextStyle("ImportaDadosStatus - " + e.getMessage())
-                    .smallIcon(R.mipmap.ic_launcher)
-                    .largeIcon(R.mipmap.ic_launcher)
-                    .flags(Notification.DEFAULT_ALL)
-                    .simple()
-                    .build();
+            bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.msg_error))
+                    .bigText("ImportaDadosStatus - " + e.getMessage());
+            mBuilder.setStyle(bigTextStyle)
+                    .setProgress(0, 0, false);
+            notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
         }
     }
 
@@ -2278,8 +2877,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
         JsonObject statuRetorno = null;
 
         // Atualiza a notificacao
-        mLoad.bigTextStyle(context.getResources().getString(R.string.procurando_dados) + " Tipo Documento");
-        mLoad.progress().value(0, 0, true).build();
+        bigTextStyle.bigText(context.getResources().getString(R.string.procurando_dados) + " Tipo Documento");
+        mBuilder.setStyle(bigTextStyle)
+                .setProgress(0, 0, true);
+        notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
         // Checo se o texto de status foi passado pro parametro
         if (textStatus != null) {
@@ -2301,7 +2902,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 parametrosWebservice += "&where= (DT_ALT >= '" + ultimaData + "')";
             }
             WSSisinfoWebservice webserviceSisInfo = new WSSisinfoWebservice(context);
-            JsonObject retornoWebservice = gson.fromJson(webserviceSisInfo.executarSelectWebserviceJson(null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_CFATPDOC, WSSisinfoWebservice.METODO_GET, parametrosWebservice, null), JsonObject.class);
+            JsonObject retornoWebservice = gson.fromJson(webserviceSisInfo.executarWebserviceJson(servidorAtivo, null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_CFATPDOC, WSSisinfoWebservice.METODO_GET, parametrosWebservice, null), JsonObject.class);
 
             if ((retornoWebservice != null) && (retornoWebservice.has(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO))) {
                 statuRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO);
@@ -2311,7 +2912,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                     JsonObject pageRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_PAGE_RETORNO);
 
-                    if (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) {
+                    if( (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0) ) {
                         final int totalPages = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt();
                         int pageNumber = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_PAGE_NUMBER_RETORNO).getAsInt();
 
@@ -2322,8 +2923,9 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                             // Verifica se retornou com sucesso
                             if (statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO).getAsInt() == HttpURLConnection.HTTP_OK) {
                                 // Atualiza a notificacao
-                                mLoad.bigTextStyle(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
-                                mLoad.progress().value(0, 0, true).build();
+                                bigTextStyle.bigText(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
+                                mBuilder.setStyle(bigTextStyle);
+                                notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                 // Checo se o texto de status foi passado pro parametro
                                 if (textStatus != null) {
@@ -2339,8 +2941,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                     // Checa se retornou algum dados na lista
                                     if (listaTipoDocumentoRetorno.size() > 0) {
                                         // Atualiza a notificacao
-                                        mLoad.bigTextStyle(context.getResources().getString(R.string.recebendo_dados_tipo_documento));
-                                        mLoad.progress().value(0, listaTipoDocumentoRetorno.size(), false).build();
+                                        bigTextStyle.bigText(context.getResources().getString(R.string.recebendo_dados_tipo_documento));
+                                        mBuilder.setStyle(bigTextStyle)
+                                                .setProgress(listaTipoDocumentoRetorno.size(), 0, false);
+                                        notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                         // Checo se o texto de status foi passado pro parametro
                                         if (textStatus != null) {
@@ -2361,8 +2965,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                         List<ContentValues> listaDadosDocumento = new ArrayList<ContentValues>();
                                         for (int i = 0; i < listaTipoDocumentoRetorno.size(); i++) {
                                             // Atualiza a notificacao
-                                            mLoad.bigTextStyle(context.getResources().getString(R.string.recebendo_dados_tipo_documento) + " - Parte " + (pageNumber + 1) + "/" + totalPages + " - " + i + "/" + listaTipoDocumentoRetorno.size());
-                                            mLoad.progress().update(0, i, listaTipoDocumentoRetorno.size(), false).build();
+                                            bigTextStyle.bigText(context.getResources().getString(R.string.recebendo_dados_tipo_documento) + " - Parte " + (pageNumber + 1) + "/" + totalPages + " - " + i + "/" + listaTipoDocumentoRetorno.size());
+                                            mBuilder.setStyle(bigTextStyle)
+                                                    .setProgress(listaTipoDocumentoRetorno.size(), i, false);
+                                            notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                             // Checo se o texto de status foi passado pro parametro
                                             if (textStatus != null) {
@@ -2405,8 +3011,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                         todosSucesso = tipoDocumentoSql.insertList(listaDadosDocumento);
                                     }
                                     // Atualiza a notificacao
-                                    mLoad.bigTextStyle(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
-                                    mLoad.progress().value(0, 0, true).build();
+                                    bigTextStyle.bigText(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
+                                    mBuilder.setStyle(bigTextStyle)
+                                            .setProgress(0, 0, true);
+                                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                     // Checo se o texto de status foi passado pro parametro
                                     if (textStatus != null) {
@@ -2425,30 +3033,33 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                     }
                                 } else {
                                     // Cria uma notificacao para ser manipulado
-                                    Load mLoad = PugNotification.with(context).load()
-                                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
-                                            .smallIcon(R.mipmap.ic_launcher)
-                                            .largeIcon(R.mipmap.ic_launcher)
-                                            .title(R.string.versao_savare_desatualizada)
-                                            .bigTextStyle(context.getResources().getString(R.string.nao_chegou_dados_servidor_empresa) + "\n" + retornoWebservice.toString())
-                                            .flags(Notification.DEFAULT_LIGHTS);
-                                    mLoad.simple().build();
+                                    bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.msg_error))
+                                            .bigText(context.getResources().getString(R.string.nao_chegou_dados_servidor_empresa) + "\n" + retornoWebservice.toString());
+                                    mBuilder.setStyle(bigTextStyle)
+                                            .setProgress(0, 0, false);
+                                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
                                 }
                             } else {
                                 // Cria uma notificacao para ser manipulado
-                                Load mLoad = PugNotification.with(context).load()
-                                        .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
+                                /*Load mLoad = PugNotification.with(context).load()
+                                        .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                                         .smallIcon(R.mipmap.ic_launcher)
                                         .largeIcon(R.mipmap.ic_launcher)
-                                        .title(R.string.recebendo_dados_parcela)
+                                        .title(R.string.msg_error)
                                         .bigTextStyle(context.getResources().getString(R.string.nao_chegou_dados_servidor_empresa) + "\n" + retornoWebservice.toString())
                                         .flags(Notification.DEFAULT_LIGHTS);
-                                mLoad.simple().build();
+                                mLoad.simple().build();*/
+
+                                bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.msg_error))
+                                            .bigText(context.getResources().getString(R.string.nao_chegou_dados_servidor_empresa) + "\n" + retornoWebservice.toString());
+                                mBuilder.setStyle(bigTextStyle)
+                                        .setProgress(0, 0, false);
+                                notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
                             }
                             // Incrementa o total de paginas
                             pageNumber++;
                             if (pageNumber < totalPages) {
-                                retornoWebservice = gson.fromJson(webserviceSisInfo.executarSelectWebserviceJson(null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_CFATPDOC, WSSisinfoWebservice.METODO_GET, parametrosWebservice + "&pageNumber=" + pageNumber, null), JsonObject.class);
+                                retornoWebservice = gson.fromJson(webserviceSisInfo.executarWebserviceJson(servidorAtivo, null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_CFATPDOC, WSSisinfoWebservice.METODO_GET, parametrosWebservice + "&pageNumber=" + pageNumber, null), JsonObject.class);
                             }
                         } // Fim do for ia (page)
                         // Checa se todos foram inseridos/atualizados com sucesso
@@ -2458,28 +3069,27 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                     }
                 } else {
                     // Cria uma notificacao para ser manipulado
-                    Load mLoad = PugNotification.with(context).load()
-                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
-                            .smallIcon(R.mipmap.ic_launcher)
-                            .largeIcon(R.mipmap.ic_launcher)
-                            .title(R.string.recebendo_dados)
-                            .bigTextStyle(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString())
-                            .flags(Notification.DEFAULT_LIGHTS);
-                    mLoad.simple().build();
+                    bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.msg_error))
+                            .bigText(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString());
+                    mBuilder.setStyle(bigTextStyle)
+                            .setProgress(0, 0, false);
+                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
                 }
             }
-        } catch (Exception e) {
+        } catch (final Exception e) {
+            if (textStatusErro != null) {
+                ((Activity) context).runOnUiThread(new Runnable() {
+                    public void run() {
+                        textStatusErro.append("\n*" + context.getResources().getText(R.string.erro_inesperado) + " - Tipo de Documento : " + e.getMessage());
+                    }
+                });
+            }
             // Cria uma notificacao para ser manipulado
-            PugNotification.with(context)
-                    .load()
-                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + e.hashCode())
-                    .title(R.string.importar_dados_recebidos)
-                    .bigTextStyle("ImportaDadosTipoDocumento - " + e.getMessage())
-                    .smallIcon(R.mipmap.ic_launcher)
-                    .largeIcon(R.mipmap.ic_launcher)
-                    .flags(Notification.DEFAULT_ALL)
-                    .simple()
-                    .build();
+            bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.msg_error))
+                    .bigText("ImportaDadosTipoDocumento - " + e.getMessage());
+            mBuilder.setStyle(bigTextStyle)
+                    .setProgress(0, 0, false);
+            notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
         }
     }
 
@@ -2488,8 +3098,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
         JsonObject statuRetorno = null;
 
         // Atualiza a notificacao
-        mLoad.bigTextStyle(context.getResources().getString(R.string.procurando_dados) + " Cartão Credito");
-        mLoad.progress().value(0, 0, true).build();
+        bigTextStyle.bigText(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa) + " Cartão Credito");
+        mBuilder.setStyle(bigTextStyle)
+                .setProgress(0, 0, true);
+        notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
         // Checo se o texto de status foi passado pro parametro
         if (textStatus != null) {
@@ -2511,7 +3123,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 parametrosWebservice += "&where= (DT_ALT >= '" + ultimaData + "')";
             }
             WSSisinfoWebservice webserviceSisInfo = new WSSisinfoWebservice(context);
-            JsonObject retornoWebservice = gson.fromJson(webserviceSisInfo.executarSelectWebserviceJson(null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_CFACCRED, WSSisinfoWebservice.METODO_GET, parametrosWebservice, null), JsonObject.class);
+            JsonObject retornoWebservice = gson.fromJson(webserviceSisInfo.executarWebserviceJson(servidorAtivo, null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_CFACCRED, WSSisinfoWebservice.METODO_GET, parametrosWebservice, null), JsonObject.class);
 
             if ((retornoWebservice != null) && (retornoWebservice.has(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO))) {
                 statuRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO);
@@ -2521,7 +3133,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                     JsonObject pageRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_PAGE_RETORNO);
 
-                    if (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) {
+                    if ( (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0) ) {
                         final int totalPages = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt();
                         int pageNumber = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_PAGE_NUMBER_RETORNO).getAsInt();
 
@@ -2532,8 +3144,9 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                             // Verifica se retornou com sucesso
                             if (statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO).getAsInt() == HttpURLConnection.HTTP_OK) {
                                 // Atualiza a notificacao
-                                mLoad.bigTextStyle(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
-                                mLoad.progress().value(0, 0, true).build();
+                                bigTextStyle.bigText(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
+                                mBuilder.setStyle(bigTextStyle);
+                                notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                 // Checo se o texto de status foi passado pro parametro
                                 if (textStatus != null) {
@@ -2549,8 +3162,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                     // Checa se retornou algum dados na lista
                                     if (listaCartaoRetorno.size() > 0) {
                                         // Atualiza a notificacao
-                                        mLoad.bigTextStyle(context.getResources().getString(R.string.recebendo_dados_cartao));
-                                        mLoad.progress().value(0, listaCartaoRetorno.size(), false).build();
+                                        bigTextStyle.bigText(context.getResources().getString(R.string.recebendo_dados_cartao));
+                                        mBuilder.setStyle(bigTextStyle)
+                                                .setProgress(listaCartaoRetorno.size(), 0, false);
+                                        notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                         // Checo se o texto de status foi passado pro parametro
                                         if (textStatus != null) {
@@ -2571,8 +3186,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                         List<ContentValues> listaDadosCartao = new ArrayList<ContentValues>();
                                         for (int i = 0; i < listaCartaoRetorno.size(); i++) {
                                             // Atualiza a notificacao
-                                            mLoad.bigTextStyle(context.getResources().getString(R.string.recebendo_dados_cartao) + " - Parte " + (pageNumber + 1) + "/" + totalPages + " - " + i + "/" + listaCartaoRetorno.size());
-                                            mLoad.progress().update(0, i, listaCartaoRetorno.size(), false).build();
+                                            bigTextStyle.bigText(context.getResources().getString(R.string.recebendo_dados_cartao) + " - Parte " + (pageNumber + 1) + "/" + totalPages + " - " + i + "/" + listaCartaoRetorno.size());
+                                            mBuilder.setStyle(bigTextStyle)
+                                                    .setProgress(listaCartaoRetorno.size(), i, false);
+                                            notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                             // Checo se o texto de status foi passado pro parametro
                                             if (textStatus != null) {
@@ -2596,9 +3213,54 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                             ContentValues dadosCartao = new ContentValues();
 
                                             dadosCartao.put("ID_CFACCRED", cartaoRetorno.get("idCfaccred").getAsInt());
+                                            if (cartaoRetorno.has("idCbaplctaTaxa") && cartaoRetorno.get("idCbaplctaTaxa").getAsInt() > 0) {
+                                                dadosCartao.put("ID_CBAPLCTA_TAXA", cartaoRetorno.get("idCbaplctaTaxa").getAsInt());
+                                            }
+                                            if (cartaoRetorno.has("idCfaporta") && cartaoRetorno.get("idCfaporta").getAsInt() > 0) {
+                                                dadosCartao.put("ID_CFAPORTA", cartaoRetorno.get("idCfaporta").getAsInt());
+                                            }
+                                            dadosCartao.put("GUID", cartaoRetorno.get("guid").getAsString());
+                                            dadosCartao.put("US_CAD", cartaoRetorno.get("usCad").getAsString());
+                                            dadosCartao.put("DT_CAD", cartaoRetorno.get("dtCad").getAsString());
                                             dadosCartao.put("DT_ALT", cartaoRetorno.get("dtAlt").getAsString());
                                             dadosCartao.put("CODIGO", cartaoRetorno.get("codigo").getAsInt());
                                             dadosCartao.put("DESCRICAO", cartaoRetorno.get("descricao").getAsString());
+                                            if (cartaoRetorno.has("parcelaFim1") && cartaoRetorno.get("parcelaFim1").getAsInt() > 0) {
+                                                dadosCartao.put("PARCELA_FIM1", cartaoRetorno.get("parcelaFim1").getAsInt());
+                                            }
+                                            if (cartaoRetorno.has("parcelaFim2") && cartaoRetorno.get("parcelaFim2").getAsInt() > 0) {
+                                                dadosCartao.put("PARCELA_FIM2", cartaoRetorno.get("parcelaFim2").getAsInt());
+                                            }
+                                            if (cartaoRetorno.has("parcelaFim3") && cartaoRetorno.get("parcelaFim3").getAsInt() > 0) {
+                                                dadosCartao.put("PARCELA_FIM3", cartaoRetorno.get("parcelaFim3").getAsInt());
+                                            }
+                                            if (cartaoRetorno.has("taxa1")) {
+                                                dadosCartao.put("TAXA1", cartaoRetorno.get("taxa1").getAsDouble());
+                                            }
+                                            if (cartaoRetorno.has("taxa2")) {
+                                                dadosCartao.put("TAXA2", cartaoRetorno.get("taxa2").getAsDouble());
+                                            }
+                                            if (cartaoRetorno.has("taxa3")) {
+                                                dadosCartao.put("TAXA3", cartaoRetorno.get("taxa3").getAsDouble());
+                                            }
+                                            if (cartaoRetorno.has("taxaDeb")) {
+                                                dadosCartao.put("TAXA_DEB", cartaoRetorno.get("taxaDeb").getAsDouble());
+                                            }
+                                            if (cartaoRetorno.has("diasDeb")) {
+                                                dadosCartao.put("DIAS_DEB", cartaoRetorno.get("diasDeb").getAsInt());
+                                            }
+                                            if (cartaoRetorno.has("diasCre")) {
+                                                dadosCartao.put("DIAS_CRE", cartaoRetorno.get("diasCre").getAsInt());
+                                            }
+                                            if (cartaoRetorno.has("antecipa")) {
+                                                dadosCartao.put("ANTECIPA", cartaoRetorno.get("antecipa").getAsString());
+                                            }
+                                            if (cartaoRetorno.has("tarifaPorTransacao")) {
+                                                dadosCartao.put("TARIFA_POR_TRANSACAO", cartaoRetorno.get("tarifaPorTransacao").getAsDouble());
+                                            }
+                                            if (cartaoRetorno.has("taxaIntermediacao")) {
+                                                dadosCartao.put("TAXA_INTERMEDIACAO", cartaoRetorno.get("taxaIntermediacao").getAsDouble());
+                                            }
 
                                             listaDadosCartao.add(dadosCartao);
                                         }
@@ -2609,8 +3271,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                                     }
                                     // Atualiza a notificacao
-                                    mLoad.bigTextStyle(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
-                                    mLoad.progress().value(0, 0, true).build();
+                                    bigTextStyle.bigText(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
+                                    mBuilder.setStyle(bigTextStyle)
+                                            .setProgress(0, 0, true);
+                                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                     // Checo se o texto de status foi passado pro parametro
                                     if (textStatus != null) {
@@ -2629,32 +3293,26 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                     }
                                 } else {
                                     // Cria uma notificacao para ser manipulado
-                                    Load mLoad = PugNotification.with(context).load()
-                                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
-                                            .smallIcon(R.mipmap.ic_launcher)
-                                            .largeIcon(R.mipmap.ic_launcher)
-                                            .title(R.string.versao_savare_desatualizada)
-                                            .bigTextStyle(context.getResources().getString(R.string.nao_chegou_dados_servidor_empresa) + "\n" + retornoWebservice.toString())
-                                            .flags(Notification.DEFAULT_LIGHTS);
-                                    mLoad.simple().build();
+                                    bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.msg_error))
+                                            .bigText(context.getResources().getString(R.string.nao_chegou_dados_servidor_empresa) + "\n" + retornoWebservice.toString());
+                                    mBuilder.setStyle(bigTextStyle)
+                                            .setProgress(0, 0, false);
+                                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
                                 }
                                 // Incrementa o total de paginas
                                 pageNumber++;
                                 if (pageNumber < totalPages) {
-                                    retornoWebservice = gson.fromJson(webserviceSisInfo.executarSelectWebserviceJson(null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_CFACCRED, WSSisinfoWebservice.METODO_GET, parametrosWebservice + "&pageNumber=" + pageNumber, null), JsonObject.class);
+                                    retornoWebservice = gson.fromJson(webserviceSisInfo.executarWebserviceJson(servidorAtivo, null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_CFACCRED, WSSisinfoWebservice.METODO_GET, parametrosWebservice + "&pageNumber=" + pageNumber, null), JsonObject.class);
                                 }
                             } else {
                                 todosSucesso = false;
 
                                 // Cria uma notificacao para ser manipulado
-                                Load mLoad = PugNotification.with(context).load()
-                                        .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
-                                        .smallIcon(R.mipmap.ic_launcher)
-                                        .largeIcon(R.mipmap.ic_launcher)
-                                        .title(R.string.recebendo_dados)
-                                        .bigTextStyle(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString())
-                                        .flags(Notification.DEFAULT_LIGHTS);
-                                mLoad.simple().build();
+                                bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.msg_error))
+                                        .bigText(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString());
+                                mBuilder.setStyle(bigTextStyle)
+                                        .setProgress(0, 0, false);
+                                notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
                             }
                         } // Fim for ia (page)
                         // Checa se todos foram inseridos/atualizados com sucesso
@@ -2664,28 +3322,28 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                     }
                 } else {
                     // Cria uma notificacao para ser manipulado
-                    Load mLoad = PugNotification.with(context).load()
-                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
-                            .smallIcon(R.mipmap.ic_launcher)
-                            .largeIcon(R.mipmap.ic_launcher)
-                            .title(R.string.recebendo_dados)
-                            .bigTextStyle(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString())
-                            .flags(Notification.DEFAULT_LIGHTS);
-                    mLoad.simple().build();
+                    bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.msg_error))
+                            .bigText(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString());
+                    mBuilder.setStyle(bigTextStyle)
+                            .setProgress(0, 0, false);
+                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
                 }
             }
-        } catch (Exception e) {
+        } catch (final Exception e) {
+            if (textStatusErro != null) {
+                ((Activity) context).runOnUiThread(new Runnable() {
+                    public void run() {
+                        textStatusErro.append("\n*" + context.getResources().getText(R.string.erro_inesperado) + " - Cartão de Crédito : " + e.getMessage());
+                    }
+                });
+            }
             // Cria uma notificacao para ser manipulado
-            PugNotification.with(context)
-                    .load()
-                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + hashCode())
-                    .title(R.string.importar_dados_recebidos)
-                    .bigTextStyle("ImportaDadosCartaoCredito - " + e.getMessage())
-                    .smallIcon(R.mipmap.ic_launcher)
-                    .largeIcon(R.mipmap.ic_launcher)
-                    .flags(Notification.DEFAULT_ALL)
-                    .simple()
-                    .build();
+            bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.msg_error))
+                    .bigText("ImportaDadosCartaoCredito - " + e.getMessage());
+            mBuilder.setStyle(bigTextStyle)
+                    .setProgress(0, 0, false);
+            notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
+
         }
     }
 
@@ -2693,8 +3351,11 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
         JsonObject statuRetorno = null;
 
         // Atualiza a notificacao
-        mLoad.bigTextStyle(context.getResources().getString(R.string.procurando_dados) + " Portador (Banco)");
-        mLoad.progress().value(0, 0, true).build();
+        bigTextStyle.bigText(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa) + " Portador (Banco)");
+        mBuilder.setStyle(bigTextStyle)
+                .setProgress(0, 0, true);
+        notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
+        notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
         // Checo se o texto de status foi passado pro parametro
         if (textStatus != null) {
@@ -2716,7 +3377,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 parametrosWebservice += "&where= (DT_ALT >= '" + ultimaData + "')";
             }
             WSSisinfoWebservice webserviceSisInfo = new WSSisinfoWebservice(context);
-            JsonObject retornoWebservice = gson.fromJson(webserviceSisInfo.executarSelectWebserviceJson(null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_CFAPORTA, WSSisinfoWebservice.METODO_GET, parametrosWebservice, null), JsonObject.class);
+            JsonObject retornoWebservice = gson.fromJson(webserviceSisInfo.executarWebserviceJson(servidorAtivo, null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_CFAPORTA, WSSisinfoWebservice.METODO_GET, parametrosWebservice, null), JsonObject.class);
 
             if ((retornoWebservice != null) && (retornoWebservice.has(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO))) {
                 statuRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO);
@@ -2726,7 +3387,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                     JsonObject pageRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_PAGE_RETORNO);
 
-                    if (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) {
+                    if ( (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0) ) {
                         final int totalPages = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt();
                         int pageNumber = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_PAGE_NUMBER_RETORNO).getAsInt();
 
@@ -2737,8 +3398,9 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                             // Verifica se retornou com sucesso
                             if (statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO).getAsInt() == HttpURLConnection.HTTP_OK) {
                                 // Atualiza a notificacao
-                                mLoad.bigTextStyle(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
-                                mLoad.progress().value(0, 0, true).build();
+                                bigTextStyle.bigText(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
+                                mBuilder.setStyle(bigTextStyle);
+                                notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
 
                                 // Checo se o texto de status foi passado pro parametro
@@ -2755,8 +3417,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                     // Checa se retornou algum dados na lista
                                     if (listaPortadorRetorno.size() > 0) {
                                         // Atualiza a notificacao
-                                        mLoad.bigTextStyle(context.getResources().getString(R.string.recebendo_dados_portador));
-                                        mLoad.progress().value(0, listaPortadorRetorno.size(), false).build();
+                                        bigTextStyle.bigText(context.getResources().getString(R.string.recebendo_dados_portador));
+                                        mBuilder.setStyle(bigTextStyle)
+                                                .setProgress(listaPortadorRetorno.size(), 0, false);
+                                        notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                         // Checo se o texto de status foi passado pro parametro
                                         if (textStatus != null) {
@@ -2777,8 +3441,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                         List<ContentValues> listaDadosPortador = new ArrayList<ContentValues>();
                                         for (int i = 0; i < listaPortadorRetorno.size(); i++) {
                                             // Atualiza a notificacao
-                                            mLoad.bigTextStyle(context.getResources().getString(R.string.recebendo_dados_portador) + " - Parte " + (pageNumber + 1) + "/" + totalPages + " - " + i + "/" + listaPortadorRetorno.size());
-                                            mLoad.progress().update(0, i, listaPortadorRetorno.size(), false).build();
+                                            bigTextStyle.bigText(context.getResources().getString(R.string.recebendo_dados_portador) + " - Parte " + (pageNumber + 1) + "/" + totalPages + " - " + i + "/" + listaPortadorRetorno.size());
+                                            mBuilder.setStyle(bigTextStyle)
+                                                    .setProgress(listaPortadorRetorno.size(), i, false);
+                                            notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                             // Checo se o texto de status foi passado pro parametro
                                             if (textStatus != null) {
@@ -2823,8 +3489,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                         todosSucesso = portadorBancoSql.insertList(listaDadosPortador);
                                     }
                                     // Atualiza a notificacao
-                                    mLoad.bigTextStyle(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
-                                    mLoad.progress().value(0, 0, true).build();
+                                    bigTextStyle.bigText(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
+                                    mBuilder.setStyle(bigTextStyle)
+                                            .setProgress(0, 0, true);
+                                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                     // Checo se o texto de status foi passado pro parametro
                                     if (textStatus != null) {
@@ -2843,32 +3511,26 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                     }
                                 } else {
                                     // Cria uma notificacao para ser manipulado
-                                    Load mLoad = PugNotification.with(context).load()
-                                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
-                                            .smallIcon(R.mipmap.ic_launcher)
-                                            .largeIcon(R.mipmap.ic_launcher)
-                                            .title(R.string.versao_savare_desatualizada)
-                                            .bigTextStyle(context.getResources().getString(R.string.nao_chegou_dados_servidor_empresa) + "\n" + retornoWebservice.toString())
-                                            .flags(Notification.DEFAULT_LIGHTS);
-                                    mLoad.simple().build();
+                                    bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.msg_error))
+                                            .bigText(context.getResources().getString(R.string.nao_chegou_dados_servidor_empresa) + "\n" + retornoWebservice.toString());
+                                    mBuilder.setStyle(bigTextStyle)
+                                            .setProgress(0, 0, false);
+                                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
                                 }
                                 // Incrementa o total de paginas
                                 pageNumber++;
                                 if (pageNumber < totalPages) {
-                                    retornoWebservice = gson.fromJson(webserviceSisInfo.executarSelectWebserviceJson(null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_CFAPORTA, WSSisinfoWebservice.METODO_GET, parametrosWebservice + "&pageNumber=" + pageNumber, null), JsonObject.class);
+                                    retornoWebservice = gson.fromJson(webserviceSisInfo.executarWebserviceJson(servidorAtivo, null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_CFAPORTA, WSSisinfoWebservice.METODO_GET, parametrosWebservice + "&pageNumber=" + pageNumber, null), JsonObject.class);
                                 }
                             } else {
                                 todosSucesso = false;
 
                                 // Cria uma notificacao para ser manipulado
-                                Load mLoad = PugNotification.with(context).load()
-                                        .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
-                                        .smallIcon(R.mipmap.ic_launcher)
-                                        .largeIcon(R.mipmap.ic_launcher)
-                                        .title(R.string.recebendo_dados)
-                                        .bigTextStyle(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString())
-                                        .flags(Notification.DEFAULT_LIGHTS);
-                                mLoad.simple().build();
+                                bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.msg_error))
+                                        .bigText(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString());
+                                mBuilder.setStyle(bigTextStyle)
+                                        .setProgress(0, 0, false);
+                                notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
                             }
                         } // Fim do for ia (page)
                         // Checa se todos foram inseridos/atualizados com sucesso
@@ -2878,28 +3540,27 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                     }
                 } else {
                     // Cria uma notificacao para ser manipulado
-                    Load mLoad = PugNotification.with(context).load()
-                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
-                            .smallIcon(R.mipmap.ic_launcher)
-                            .largeIcon(R.mipmap.ic_launcher)
-                            .title(R.string.recebendo_dados)
-                            .bigTextStyle(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString())
-                            .flags(Notification.DEFAULT_LIGHTS);
-                    mLoad.simple().build();
+                    bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.msg_error))
+                            .bigText(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString());
+                    mBuilder.setStyle(bigTextStyle)
+                            .setProgress(0, 0, false);
+                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
                 }
             }
-        } catch (Exception e) {
+        } catch (final Exception e) {
+            if (textStatusErro != null) {
+                ((Activity) context).runOnUiThread(new Runnable() {
+                    public void run() {
+                        textStatusErro.append("\n*" + context.getResources().getText(R.string.erro_inesperado) + " - Portador : " + e.getMessage());
+                    }
+                });
+            }
             // Cria uma notificacao para ser manipulado
-            PugNotification.with(context)
-                    .load()
-                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + e.hashCode())
-                    .title(R.string.importar_dados_recebidos)
-                    .bigTextStyle("ImportaDadosPortador - " + e.getMessage())
-                    .smallIcon(R.mipmap.ic_launcher)
-                    .largeIcon(R.mipmap.ic_launcher)
-                    .flags(Notification.DEFAULT_ALL)
-                    .simple()
-                    .build();
+            bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.msg_error))
+                    .bigText("ImportaDadosPortador - " + e.getMessage());
+            mBuilder.setStyle(bigTextStyle)
+                    .setProgress(0, 0, false);
+            notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
         }
     }
 
@@ -2907,8 +3568,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
         JsonObject statuRetorno = null;
 
         // Atualiza a notificacao
-        mLoad.bigTextStyle(context.getResources().getString(R.string.procurando_dados) + " Profissão");
-        mLoad.progress().value(0, 0, true).build();
+        bigTextStyle.bigText(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa) + " Profissão");
+        mBuilder.setStyle(bigTextStyle)
+                .setProgress(0, 0, true);
+        notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
         // Checo se o texto de status foi passado pro parametro
         if (textStatus != null) {
@@ -2930,7 +3593,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 parametrosWebservice += "&where= (DT_ALT >= '" + ultimaData + "')";
             }
             WSSisinfoWebservice webserviceSisInfo = new WSSisinfoWebservice(context);
-            JsonObject retornoWebservice = gson.fromJson(webserviceSisInfo.executarSelectWebserviceJson(null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_CFAPROFI, WSSisinfoWebservice.METODO_GET, parametrosWebservice, null), JsonObject.class);
+            JsonObject retornoWebservice = gson.fromJson(webserviceSisInfo.executarWebserviceJson(servidorAtivo, null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_CFAPROFI, WSSisinfoWebservice.METODO_GET, parametrosWebservice, null), JsonObject.class);
 
             if ((retornoWebservice != null) && (retornoWebservice.has(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO))) {
                 statuRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO);
@@ -2940,7 +3603,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                     JsonObject pageRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_PAGE_RETORNO);
 
-                    if (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) {
+                    if ( (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0) ) {
                         final int totalPages = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt();
                         int pageNumber = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_PAGE_NUMBER_RETORNO).getAsInt();
 
@@ -2951,8 +3614,9 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                             // Verifica se retornou com sucesso
                             if (statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO).getAsInt() == HttpURLConnection.HTTP_OK) {
                                 // Atualiza a notificacao
-                                mLoad.bigTextStyle(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
-                                mLoad.progress().value(0, 0, true).build();
+                                bigTextStyle.bigText(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
+                                mBuilder.setStyle(bigTextStyle);
+                                notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                 // Checo se o texto de status foi passado pro parametro
                                 if (textStatus != null) {
@@ -2968,8 +3632,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                     // Checa se retornou algum dados na lista
                                     if (listaProfissaoRetorno.size() > 0) {
                                         // Atualiza a notificacao
-                                        mLoad.bigTextStyle(context.getResources().getString(R.string.recebendo_dados_profisao));
-                                        mLoad.progress().value(0, listaProfissaoRetorno.size(), false).build();
+                                        bigTextStyle.bigText(context.getResources().getString(R.string.recebendo_dados_profisao));
+                                        mBuilder.setStyle(bigTextStyle)
+                                                .setProgress(listaProfissaoRetorno.size(), 0, false);
+                                        notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                         // Checo se o texto de status foi passado pro parametro
                                         if (textStatus != null) {
@@ -2990,8 +3656,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                         List<ContentValues> listaDadosProfissao = new ArrayList<ContentValues>();
                                         for (int i = 0; i < listaProfissaoRetorno.size(); i++) {
                                             // Atualiza a notificacao
-                                            mLoad.bigTextStyle(context.getResources().getString(R.string.recebendo_dados_profisao) + " - Parte " + (pageNumber + 1) + "/" + totalPages + " - " + i + "/" + listaProfissaoRetorno.size());
-                                            mLoad.progress().update(0, i, listaProfissaoRetorno.size(), false).build();
+                                            bigTextStyle.bigText(context.getResources().getString(R.string.recebendo_dados_profisao) + " - Parte " + (pageNumber + 1) + "/" + totalPages + " - " + i + "/" + listaProfissaoRetorno.size());
+                                            mBuilder.setStyle(bigTextStyle)
+                                                    .setProgress(listaProfissaoRetorno.size(), i, false);
+                                            notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                             // Checo se o texto de status foi passado pro parametro
                                             if (textStatus != null) {
@@ -3025,6 +3693,8 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                             dadosProfissao.put("DESC_ATAC_PRAZO", profissaoRetorno.get("descAtacPrazo").getAsDouble());
                                             dadosProfissao.put("DESC_VARE_PRAZO", profissaoRetorno.get("descVarePrazo").getAsDouble());
                                             dadosProfissao.put("DESC_VARE_VISTA", profissaoRetorno.get("descVareVista").getAsDouble());
+                                            dadosProfissao.put("DESC_SERV_VISTA", profissaoRetorno.get("descServVista").getAsDouble());
+                                            dadosProfissao.put("DESC_SERV_PRAZO", profissaoRetorno.get("descServPrazo").getAsDouble());
                                             if (profissaoRetorno.has("descPromocao")) {
                                                 dadosProfissao.put("DESC_PROMOCAO", profissaoRetorno.get("descPromocao").getAsString());
                                             }
@@ -3035,8 +3705,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                         todosSucesso = profissaoSql.insertList(listaDadosProfissao);
                                     }
                                     // Atualiza a notificacao
-                                    mLoad.bigTextStyle(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
-                                    mLoad.progress().value(0, 0, true).build();
+                                    bigTextStyle.bigText(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
+                                    mBuilder.setStyle(bigTextStyle)
+                                            .setProgress(0, 0, true);
+                                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                     // Checo se o texto de status foi passado pro parametro
                                     if (textStatus != null) {
@@ -3055,32 +3727,26 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                     }
                                 } else {
                                     // Cria uma notificacao para ser manipulado
-                                    Load mLoad = PugNotification.with(context).load()
-                                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
-                                            .smallIcon(R.mipmap.ic_launcher)
-                                            .largeIcon(R.mipmap.ic_launcher)
-                                            .title(R.string.versao_savare_desatualizada)
-                                            .bigTextStyle(context.getResources().getString(R.string.nao_chegou_dados_servidor_empresa) + "\n" + retornoWebservice.toString())
-                                            .flags(Notification.DEFAULT_LIGHTS);
-                                    mLoad.simple().build();
+                                    bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.msg_error))
+                                            .bigText(context.getResources().getString(R.string.nao_chegou_dados_servidor_empresa) + "\n" + retornoWebservice.toString());
+                                    mBuilder.setStyle(bigTextStyle)
+                                            .setProgress(0, 0, false);
+                                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
                                 }
                                 // Incrementa o total de paginas
                                 pageNumber++;
                                 if (pageNumber < totalPages) {
-                                    retornoWebservice = gson.fromJson(webserviceSisInfo.executarSelectWebserviceJson(null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_CFAPROFI, WSSisinfoWebservice.METODO_GET, parametrosWebservice + "&pageNumber=" + pageNumber, null), JsonObject.class);
+                                    retornoWebservice = gson.fromJson(webserviceSisInfo.executarWebserviceJson(servidorAtivo, null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_CFAPROFI, WSSisinfoWebservice.METODO_GET, parametrosWebservice + "&pageNumber=" + pageNumber, null), JsonObject.class);
                                 }
                             } else {
                                 todosSucesso = false;
 
                                 // Cria uma notificacao para ser manipulado
-                                Load mLoad = PugNotification.with(context).load()
-                                        .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
-                                        .smallIcon(R.mipmap.ic_launcher)
-                                        .largeIcon(R.mipmap.ic_launcher)
-                                        .title(R.string.recebendo_dados)
-                                        .bigTextStyle(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString())
-                                        .flags(Notification.DEFAULT_LIGHTS);
-                                mLoad.simple().build();
+                                bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.recebendo_dados))
+                                        .bigText(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString());
+                                mBuilder.setStyle(bigTextStyle)
+                                        .setProgress(0, 0, false);
+                                notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
                             }
                         } // Fim do for ia (page)
                         // Checa se todos foram inseridos/atualizados com sucesso
@@ -3090,28 +3756,36 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                     }
                 } else {
                     // Cria uma notificacao para ser manipulado
-                    Load mLoad = PugNotification.with(context).load()
-                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
+                    /*Load mLoad = PugNotification.with(context).load()
+                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                             .smallIcon(R.mipmap.ic_launcher)
                             .largeIcon(R.mipmap.ic_launcher)
                             .title(R.string.recebendo_dados)
                             .bigTextStyle(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString())
                             .flags(Notification.DEFAULT_LIGHTS);
-                    mLoad.simple().build();
+                    mLoad.simple().build();*/
+
+                    bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.recebendo_dados))
+                            .bigText(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString());
+                    mBuilder.setStyle(bigTextStyle)
+                            .setProgress(0, 0, false);
+                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
                 }
             }
-        } catch (Exception e) {
+        } catch (final Exception e) {
+            if (textStatusErro != null) {
+                ((Activity) context).runOnUiThread(new Runnable() {
+                    public void run() {
+                        textStatusErro.append("\n*" + context.getResources().getText(R.string.erro_inesperado) + " - Profissão : " + e.getMessage());
+                    }
+                });
+            }
             // Cria uma notificacao para ser manipulado
-            PugNotification.with(context)
-                    .load()
-                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + e.hashCode())
-                    .title(R.string.importar_dados_recebidos)
-                    .bigTextStyle("ImportaDadosProfissao - " + e.getMessage())
-                    .smallIcon(R.mipmap.ic_launcher)
-                    .largeIcon(R.mipmap.ic_launcher)
-                    .flags(Notification.DEFAULT_ALL)
-                    .simple()
-                    .build();
+            bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.msg_error))
+                    .bigText("ImportaDadosProfissao - " + e.getMessage());
+            mBuilder.setStyle(bigTextStyle)
+                    .setProgress(0, 0, false);
+            notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
         }
     }
 
@@ -3120,8 +3794,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
         JsonObject statuRetorno = null;
 
         // Atualiza a notificacao
-        mLoad.bigTextStyle(context.getResources().getString(R.string.procurando_dados) + " Tipo Cliente");
-        mLoad.progress().value(0, 0, true).build();
+        bigTextStyle.bigText(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa) + " Tipo Cliente");
+        mBuilder.setStyle(bigTextStyle)
+                .setProgress(0, 0, true);
+        notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
 
         // Checo se o texto de status foi passado pro parametro
@@ -3144,7 +3820,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 parametrosWebservice += "&where= (DT_ALT >= '" + ultimaData + "')";
             }
             WSSisinfoWebservice webserviceSisInfo = new WSSisinfoWebservice(context);
-            JsonObject retornoWebservice = gson.fromJson(webserviceSisInfo.executarSelectWebserviceJson(null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_CFATPCLI, WSSisinfoWebservice.METODO_GET, parametrosWebservice, null), JsonObject.class);
+            JsonObject retornoWebservice = gson.fromJson(webserviceSisInfo.executarWebserviceJson(servidorAtivo, null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_CFATPCLI, WSSisinfoWebservice.METODO_GET, parametrosWebservice, null), JsonObject.class);
 
             if ((retornoWebservice != null) && (retornoWebservice.has(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO))) {
                 statuRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO);
@@ -3154,7 +3830,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                     JsonObject pageRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_PAGE_RETORNO);
 
-                    if (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) {
+                    if ( (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0) ) {
                         final int totalPages = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt();
                         int pageNumber = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_PAGE_NUMBER_RETORNO).getAsInt();
 
@@ -3165,8 +3841,9 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                             // Verifica se retornou com sucesso
                             if (statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO).getAsInt() == HttpURLConnection.HTTP_OK) {
                                 // Atualiza a notificacao
-                                mLoad.bigTextStyle(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
-                                mLoad.progress().value(0, 0, true).build();
+                                bigTextStyle.bigText(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
+                                mBuilder.setStyle(bigTextStyle);
+                                notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                 // Checo se o texto de status foi passado pro parametro
                                 if (textStatus != null) {
@@ -3182,8 +3859,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                     // Checa se retornou algum dados na lista
                                     if (listaTipoClienteRetorno.size() > 0) {
                                         // Atualiza a notificacao
-                                        mLoad.bigTextStyle(context.getResources().getString(R.string.recebendo_dados_tipo_cliente));
-                                        mLoad.progress().value(0, listaTipoClienteRetorno.size(), false).build();
+                                        bigTextStyle.bigText(context.getResources().getString(R.string.recebendo_dados_tipo_cliente));
+                                        mBuilder.setStyle(bigTextStyle)
+                                                .setProgress(listaTipoClienteRetorno.size(), 0, false);
+                                        notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                         // Checo se o texto de status foi passado pro parametro
                                         if (textStatus != null) {
@@ -3204,8 +3883,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                         List<ContentValues> listaDadosTipoCliente = new ArrayList<ContentValues>();
                                         for (int i = 0; i < listaTipoClienteRetorno.size(); i++) {
                                             // Atualiza a notificacao
-                                            mLoad.bigTextStyle(context.getResources().getString(R.string.recebendo_dados_tipo_cliente) + " - Parte " + (pageNumber + 1) + "/" + totalPages + " - " + i + "/" + listaTipoClienteRetorno.size());
-                                            mLoad.progress().update(0, i, listaTipoClienteRetorno.size(), false).build();
+                                            bigTextStyle.bigText(context.getResources().getString(R.string.recebendo_dados_tipo_cliente) + " - Parte " + (pageNumber + 1) + "/" + totalPages + " - " + i + "/" + listaTipoClienteRetorno.size());
+                                            mBuilder.setStyle(bigTextStyle)
+                                                    .setProgress(listaTipoClienteRetorno.size(), i, false);
+                                            notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                             // Checo se o texto de status foi passado pro parametro
                                             if (textStatus != null) {
@@ -3236,6 +3917,8 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                             dadosTipoCliente.put("DESC_ATAC_PRAZO", tipoClienteRetorno.get("descAtacPrazo").getAsDouble());
                                             dadosTipoCliente.put("DESC_VARE_PRAZO", tipoClienteRetorno.get("descVarePrazo").getAsDouble());
                                             dadosTipoCliente.put("DESC_VARE_VISTA", tipoClienteRetorno.get("descVareVista").getAsDouble());
+                                            dadosTipoCliente.put("DESC_SERV_VISTA", tipoClienteRetorno.get("descServVista").getAsDouble());
+                                            dadosTipoCliente.put("DESC_SERV_PRAZO", tipoClienteRetorno.get("descServPrazo").getAsDouble());
                                             if (tipoClienteRetorno.has("descPromocao")) {
                                                 dadosTipoCliente.put("DESC_PROMOCAO", tipoClienteRetorno.get("descPromocao").getAsString());
                                             }
@@ -3249,8 +3932,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                         todosSucesso = tipoClienteSql.insertList(listaDadosTipoCliente);
                                     }
                                     // Atualiza a notificacao
-                                    mLoad.bigTextStyle(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
-                                    mLoad.progress().value(0, 0, true).build();
+                                    bigTextStyle.bigText(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
+                                    mBuilder.setStyle(bigTextStyle)
+                                            .setProgress(0, 0, true);
+                                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                     // Checo se o texto de status foi passado pro parametro
                                     if (textStatus != null) {
@@ -3269,32 +3954,26 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                     }
                                 } else {
                                     // Cria uma notificacao para ser manipulado
-                                    Load mLoad = PugNotification.with(context).load()
-                                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
-                                            .smallIcon(R.mipmap.ic_launcher)
-                                            .largeIcon(R.mipmap.ic_launcher)
-                                            .title(R.string.versao_savare_desatualizada)
-                                            .bigTextStyle(context.getResources().getString(R.string.nao_chegou_dados_servidor_empresa) + "\n" + retornoWebservice.toString())
-                                            .flags(Notification.DEFAULT_LIGHTS);
-                                    mLoad.simple().build();
+                                    bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.msg_error))
+                                            .bigText(context.getResources().getString(R.string.nao_chegou_dados_servidor_empresa) + "\n" + retornoWebservice.toString());
+                                    mBuilder.setStyle(bigTextStyle)
+                                            .setProgress(0, 0, false);
+                                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
                                 }
                                 // Incrementa o total de paginas
                                 pageNumber++;
                                 if (pageNumber < totalPages) {
-                                    retornoWebservice = gson.fromJson(webserviceSisInfo.executarSelectWebserviceJson(null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_CFATPCLI, WSSisinfoWebservice.METODO_GET, parametrosWebservice + "&pageNumber=" + pageNumber, null), JsonObject.class);
+                                    retornoWebservice = gson.fromJson(webserviceSisInfo.executarWebserviceJson(servidorAtivo, null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_CFATPCLI, WSSisinfoWebservice.METODO_GET, parametrosWebservice + "&pageNumber=" + pageNumber, null), JsonObject.class);
                                 }
                             } else {
                                 todosSucesso = false;
 
                                 // Cria uma notificacao para ser manipulado
-                                Load mLoad = PugNotification.with(context).load()
-                                        .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
-                                        .smallIcon(R.mipmap.ic_launcher)
-                                        .largeIcon(R.mipmap.ic_launcher)
-                                        .title(R.string.recebendo_dados)
-                                        .bigTextStyle(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString())
-                                        .flags(Notification.DEFAULT_LIGHTS);
-                                mLoad.simple().build();
+                                bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.recebendo_dados))
+                                        .bigText(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString());
+                                mBuilder.setStyle(bigTextStyle)
+                                        .setProgress(0, 0, false);
+                                notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
                             }
                         } // Fim do for ia (page)
                         // Checa se todos foram inseridos/atualizados com sucesso
@@ -3304,28 +3983,27 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                     }
                 } else {
                     // Cria uma notificacao para ser manipulado
-                    Load mLoad = PugNotification.with(context).load()
-                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
-                            .smallIcon(R.mipmap.ic_launcher)
-                            .largeIcon(R.mipmap.ic_launcher)
-                            .title(R.string.recebendo_dados)
-                            .bigTextStyle(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString())
-                            .flags(Notification.DEFAULT_LIGHTS);
-                    mLoad.simple().build();
+                    bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.recebendo_dados))
+                            .bigText(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString());
+                    mBuilder.setStyle(bigTextStyle)
+                            .setProgress(0, 0, false);
+                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
                 }
             }
-        } catch (Exception e) {
+        } catch (final Exception e) {
+            if (textStatusErro != null) {
+                ((Activity) context).runOnUiThread(new Runnable() {
+                    public void run() {
+                        textStatusErro.append("\n*" + context.getResources().getText(R.string.erro_inesperado) + " - Tipo Cliente : " + e.getMessage());
+                    }
+                });
+            }
             // Cria uma notificacao para ser manipulado
-            PugNotification.with(context)
-                    .load()
-                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + e.hashCode())
-                    .title(R.string.importar_dados_recebidos)
-                    .bigTextStyle("ImportaDadosTipoCliente - " + e.getMessage())
-                    .smallIcon(R.mipmap.ic_launcher)
-                    .largeIcon(R.mipmap.ic_launcher)
-                    .flags(Notification.DEFAULT_ALL)
-                    .simple()
-                    .build();
+            bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.importar_dados_recebidos))
+                    .bigText("ImportaDadosTipoCliente - " + e.getMessage());
+            mBuilder.setStyle(bigTextStyle)
+                    .setProgress(0, 0, false);
+            notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
         }
     }
 
@@ -3334,8 +4012,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
         JsonObject statuRetorno = null;
 
         // Atualiza a notificacao
-        mLoad.bigTextStyle(context.getResources().getString(R.string.procurando_dados) + " Tipo de Cobrança");
-        mLoad.progress().value(0, 0, true).build();
+        bigTextStyle.bigText(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa) + " Tipo de Cobrança");
+        mBuilder.setStyle(bigTextStyle)
+                .setProgress(0, 0, true);
+        notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
         // Checo se o texto de status foi passado pro parametro
         if (textStatus != null) {
@@ -3357,7 +4037,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 parametrosWebservice += "&where= (DT_ALT >= '" + ultimaData + "')";
             }
             WSSisinfoWebservice webserviceSisInfo = new WSSisinfoWebservice(context);
-            JsonObject retornoWebservice = gson.fromJson(webserviceSisInfo.executarSelectWebserviceJson(null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_CFATPCOB, WSSisinfoWebservice.METODO_GET, parametrosWebservice, null), JsonObject.class);
+            JsonObject retornoWebservice = gson.fromJson(webserviceSisInfo.executarWebserviceJson(servidorAtivo, null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_CFATPCOB, WSSisinfoWebservice.METODO_GET, parametrosWebservice, null), JsonObject.class);
 
             if ((retornoWebservice != null) && (retornoWebservice.has(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO))) {
                 statuRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO);
@@ -3367,7 +4047,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                     JsonObject pageRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_PAGE_RETORNO);
 
-                    if (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) {
+                    if ( (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0) ) {
                         final int totalPages = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt();
                         int pageNumber = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_PAGE_NUMBER_RETORNO).getAsInt();
 
@@ -3378,8 +4058,9 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                             // Verifica se retornou com sucesso
                             if (statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO).getAsInt() == HttpURLConnection.HTTP_OK) {
                                 // Atualiza a notificacao
-                                mLoad.bigTextStyle(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
-                                mLoad.progress().value(0, 0, true).build();
+                                bigTextStyle.bigText(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
+                                mBuilder.setStyle(bigTextStyle);
+                                notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                 // Checo se o texto de status foi passado pro parametro
                                 if (textStatus != null) {
@@ -3395,8 +4076,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                     // Checa se retornou algum dados na lista
                                     if (listaTipoCobrancaRetorno.size() > 0) {
                                         // Atualiza a notificacao
-                                        mLoad.bigTextStyle(context.getResources().getString(R.string.recebendo_dados_tipo_cobranca));
-                                        mLoad.progress().value(0, listaTipoCobrancaRetorno.size(), false).build();
+                                        bigTextStyle.bigText(context.getResources().getString(R.string.recebendo_dados_tipo_cobranca));
+                                        mBuilder.setStyle(bigTextStyle)
+                                                .setProgress(listaTipoCobrancaRetorno.size(), 0, false);
+                                        notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                         // Checo se o texto de status foi passado pro parametro
                                         if (textStatus != null) {
@@ -3417,8 +4100,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                         List<ContentValues> listaDadosTipoCobranca = new ArrayList<ContentValues>();
                                         for (int i = 0; i < listaTipoCobrancaRetorno.size(); i++) {
                                             // Atualiza a notificacao
-                                            mLoad.bigTextStyle(context.getResources().getString(R.string.recebendo_dados_tipo_cobranca) + " - Parte " + (pageNumber + 1) + "/" + totalPages + " - " + i + "/" + listaTipoCobrancaRetorno.size());
-                                            mLoad.progress().update(0, i, listaTipoCobrancaRetorno.size(), false).build();
+                                            bigTextStyle.bigText(context.getResources().getString(R.string.recebendo_dados_tipo_cobranca) + " - Parte " + (pageNumber + 1) + "/" + totalPages + " - " + i + "/" + listaTipoCobrancaRetorno.size());
+                                            mBuilder.setStyle(bigTextStyle)
+                                                    .setProgress(listaTipoCobrancaRetorno.size(), i, false);
+                                            notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                             // Checo se o texto de status foi passado pro parametro
                                             if (textStatus != null) {
@@ -3454,8 +4139,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                         todosSucesso = cobrancaSql.insertList(listaDadosTipoCobranca);
                                     }
                                     // Atualiza a notificacao
-                                    mLoad.bigTextStyle(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
-                                    mLoad.progress().value(0, 0, true).build();
+                                    bigTextStyle.bigText(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
+                                    mBuilder.setStyle(bigTextStyle)
+                                            .setProgress(0, 0, true);
+                                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                     // Checo se o texto de status foi passado pro parametro
                                     if (textStatus != null) {
@@ -3474,32 +4161,35 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                     }
                                 } else {
                                     // Cria uma notificacao para ser manipulado
-                                    Load mLoad = PugNotification.with(context).load()
-                                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
+                                    /*Load mLoad = PugNotification.with(context).load()
+                                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                                             .smallIcon(R.mipmap.ic_launcher)
                                             .largeIcon(R.mipmap.ic_launcher)
                                             .title(R.string.versao_savare_desatualizada)
                                             .bigTextStyle(context.getResources().getString(R.string.nao_chegou_dados_servidor_empresa) + "\n" + retornoWebservice.toString())
                                             .flags(Notification.DEFAULT_LIGHTS);
-                                    mLoad.simple().build();
+                                    mLoad.simple().build();*/
+
+                                    bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.versao_savare_desatualizada))
+                                            .bigText(context.getResources().getString(R.string.nao_chegou_dados_servidor_empresa) + "\n" + retornoWebservice.toString());
+                                    mBuilder.setStyle(bigTextStyle)
+                                            .setProgress(0, 0, false);
+                                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
                                 }
                                 // Incrementa o total de paginas
                                 pageNumber++;
                                 if (pageNumber < totalPages) {
-                                    retornoWebservice = gson.fromJson(webserviceSisInfo.executarSelectWebserviceJson(null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_CFATPCOB, WSSisinfoWebservice.METODO_GET, parametrosWebservice + "&pageNumber=" + pageNumber, null), JsonObject.class);
+                                    retornoWebservice = gson.fromJson(webserviceSisInfo.executarWebserviceJson(servidorAtivo, null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_CFATPCOB, WSSisinfoWebservice.METODO_GET, parametrosWebservice + "&pageNumber=" + pageNumber, null), JsonObject.class);
                                 }
                             } else {
                                 todosSucesso = false;
 
                                 // Cria uma notificacao para ser manipulado
-                                Load mLoad = PugNotification.with(context).load()
-                                        .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
-                                        .smallIcon(R.mipmap.ic_launcher)
-                                        .largeIcon(R.mipmap.ic_launcher)
-                                        .title(R.string.recebendo_dados)
-                                        .bigTextStyle(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString())
-                                        .flags(Notification.DEFAULT_LIGHTS);
-                                mLoad.simple().build();
+                                bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.recebendo_dados))
+                                        .bigText(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString());
+                                mBuilder.setStyle(bigTextStyle)
+                                        .setProgress(0, 0, false);
+                                notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
                             }
                         } // Fim do for ia (page)
                         // Checa se todos foram inseridos/atualizados com sucesso
@@ -3509,28 +4199,27 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                     }
                 } else {
                     // Cria uma notificacao para ser manipulado
-                    Load mLoad = PugNotification.with(context).load()
-                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
-                            .smallIcon(R.mipmap.ic_launcher)
-                            .largeIcon(R.mipmap.ic_launcher)
-                            .title(R.string.recebendo_dados)
-                            .bigTextStyle(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString())
-                            .flags(Notification.DEFAULT_LIGHTS);
-                    mLoad.simple().build();
+                    bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.recebendo_dados))
+                            .bigText(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString());
+                    mBuilder.setStyle(bigTextStyle)
+                            .setProgress(0, 0, false);
+                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
                 }
             }
-        } catch (Exception e) {
+        } catch (final Exception e) {
+            if (textStatusErro != null) {
+                ((Activity) context).runOnUiThread(new Runnable() {
+                    public void run() {
+                        textStatusErro.append("\n*" + context.getResources().getText(R.string.erro_inesperado) + " - TIpo Cobrança : " + e.getMessage());
+                    }
+                });
+            }
             // Cria uma notificacao para ser manipulado
-            PugNotification.with(context)
-                    .load()
-                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + e.hashCode())
-                    .title(R.string.importar_dados_recebidos)
-                    .bigTextStyle("ImportaDadosTipoCobranca - " + e.getMessage())
-                    .smallIcon(R.mipmap.ic_launcher)
-                    .largeIcon(R.mipmap.ic_launcher)
-                    .flags(Notification.DEFAULT_ALL)
-                    .simple()
-                    .build();
+            bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.importar_dados_recebidos))
+                    .bigText("ImportaDadosTipoCobranca - " + e.getMessage());
+            mBuilder.setStyle(bigTextStyle)
+                    .setProgress(0, 0, false);
+            notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
         }
     }
 
@@ -3539,8 +4228,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
         JsonObject statuRetorno = null;
 
         // Atualiza a notificacao
-        mLoad.bigTextStyle(context.getResources().getString(R.string.procurando_dados) + " Estado");
-        mLoad.progress().value(0, 0, true).build();
+        bigTextStyle.bigText(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa) + " Estado");
+        mBuilder.setStyle(bigTextStyle)
+                .setProgress(0, 0, true);
+        notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
         // Checo se o texto de status foi passado pro parametro
         if (textStatus != null) {
@@ -3554,6 +4245,8 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
             // Pega quando foi a ultima data que recebeu dados
             String ultimaData = pegaUltimaDataAtualizacao("CFAESTAD");
+            String ultimaDataParam = pegaUltimaDataAtualizacao("CFAPARAM");
+            String ultimaDataEnder = pegaUltimaDataAtualizacao("CFAENDER");
             // Cria uma variavel para salvar todos os paramentros em json
             String parametrosWebservice = "";
             String filtraEstadoPorFuncionario =
@@ -3562,14 +4255,39 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                             "AND (CFAPARAM.ID_CFACLIFO_VENDE = (SELECT CLIFO_VENDE.ID_CFACLIFO FROM CFACLIFO CLIFO_VENDE WHERE CLIFO_VENDE.CODIGO_FUN = " + funcoes.getValorXml("CodigoUsuario") + ")))))";
 
             Gson gson = new Gson();
-            if ((ultimaData != null) && (!ultimaData.isEmpty())) {
+            String whereDatas = "";
+
+            /*if ((ultimaData != null) && (!ultimaData.isEmpty())) {
+                whereDatas += "(DT_ALT >= '" + ultimaData + "') ";
+            }
+            // CHECA SE TEVE ALGUMA ALTERACAO NA TABELA PARAM
+            if ((ultimaDataParam != null) && (!ultimaDataParam.isEmpty())) {
+                if ((!whereDatas.isEmpty()) && (whereDatas.length() > 5)){
+                    whereDatas += " OR ";
+                }
+                whereDatas += "((SELECT CFAPARAM.DT_ALT FROM CFAPARAM WHERE (CFAPARAM.ID_SMAEMPRE = " + funcoes.getValorXml("CodigoEmpresa") + ") \n" +
+                        " AND (CFAPARAM.ID_CFACLIFO_VENDE = (SELECT CLIFO_VENDE.ID_CFACLIFO FROM CFACLIFO CLIFO_VENDE WHERE \n" +
+                        " CLIFO_VENDE.CODIGO_FUN = " + funcoes.getValorXml("CodigoUsuario") + "))) >= '" + ultimaDataParam + "')";
+            }
+            // CHECA SE TEVE ALGUMA ALTERACAO NA TABELA ENDERECO DA LISTA DE CLIENTES DO VENDEDOR
+            if ((ultimaDataEnder != null) && (!ultimaDataEnder.isEmpty())) {
+                if ((!whereDatas.isEmpty()) && (whereDatas.length() > 5)){
+                    whereDatas += " OR ";
+                }
+                whereDatas += "( (SELECT CFAENDER.DT_ALT FROM CFAENDER WHERE \n" +
+                        " CFAENDER.ID_CFACLIFO IN (SELECT CFAPARAM.ID_CFACLIFO FROM CFAPARAM WHERE (CFAPARAM.ID_SMAEMPRE = " + funcoes.getValorXml("CodigoEmpresa") + ") \n" +
+                        " AND (CFAPARAM.ID_CFACLIFO_VENDE = (SELECT CLIFO_VENDE.ID_CFACLIFO FROM CFACLIFO CLIFO_VENDE WHERE \n" +
+                        " CLIFO_VENDE.CODIGO_FUN = " + funcoes.getValorXml("CodigoUsuario") + ")))) >= '" + ultimaDataEnder + "')";
+            }*/
+
+            if ((whereDatas != null) && (!whereDatas.isEmpty())) {
 
                 parametrosWebservice += "&where= (DT_ALT >= '" + ultimaData + "') AND " + filtraEstadoPorFuncionario;
             } else {
                 parametrosWebservice += "&where= " + filtraEstadoPorFuncionario;
             }
             WSSisinfoWebservice webserviceSisInfo = new WSSisinfoWebservice(context);
-            JsonObject retornoWebservice = gson.fromJson(webserviceSisInfo.executarSelectWebserviceJson(null, WSSisinfoWebservice.FUNCTION_JSON_SELECT_CFAESTAD, WSSisinfoWebservice.METODO_GET, parametrosWebservice, null), JsonObject.class);
+            JsonObject retornoWebservice = gson.fromJson(webserviceSisInfo.executarWebserviceJson(servidorAtivo, null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_CFAESTAD, WSSisinfoWebservice.METODO_GET, parametrosWebservice, null), JsonObject.class);
 
             if ((retornoWebservice != null) && (retornoWebservice.has(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO))) {
                 statuRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO);
@@ -3579,7 +4297,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                     JsonObject pageRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_PAGE_RETORNO);
 
-                    if (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) {
+                    if ( (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0) ) {
                         final int totalPages = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt();
                         int pageNumber = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_PAGE_NUMBER_RETORNO).getAsInt();
 
@@ -3590,8 +4308,9 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                             // Verifica se retornou com sucesso
                             if (statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO).getAsInt() == HttpURLConnection.HTTP_OK) {
                                 // Atualiza a notificacao
-                                mLoad.bigTextStyle(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
-                                mLoad.progress().value(0, 0, true).build();
+                                bigTextStyle.bigText(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
+                                mBuilder.setStyle(bigTextStyle);
+                                notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                 // Checo se o texto de status foi passado pro parametro
                                 if (textStatus != null) {
@@ -3607,8 +4326,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                     // Checa se retornou algum dados na lista
                                     if (listaEstadoRetorno.size() > 0) {
                                         // Atualiza a notificacao
-                                        mLoad.bigTextStyle(context.getResources().getString(R.string.recebendo_dados_estado));
-                                        mLoad.progress().value(0, listaEstadoRetorno.size(), false).build();
+                                        bigTextStyle.bigText(context.getResources().getString(R.string.recebendo_dados_estado));
+                                        mBuilder.setStyle(bigTextStyle)
+                                                .setProgress(listaEstadoRetorno.size(), 0, false);
+                                        notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                         // Checo se o texto de status foi passado pro parametro
                                         if (textStatus != null) {
@@ -3629,8 +4350,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                         List<ContentValues> listaDadosEstado = new ArrayList<ContentValues>();
                                         for (int i = 0; i < listaEstadoRetorno.size(); i++) {
                                             // Atualiza a notificacao
-                                            mLoad.bigTextStyle(context.getResources().getString(R.string.recebendo_dados_estado) + " - Parte " + (pageNumber + 1) + "/" + totalPages + " - " + i + "/" + listaEstadoRetorno.size());
-                                            mLoad.progress().update(0, i, listaEstadoRetorno.size(), false).build();
+                                            bigTextStyle.bigText(context.getResources().getString(R.string.recebendo_dados_estado) + " - Parte " + (pageNumber + 1) + "/" + totalPages + " - " + i + "/" + listaEstadoRetorno.size());
+                                            mBuilder.setStyle(bigTextStyle)
+                                                    .setProgress(listaEstadoRetorno.size(), i, false);
+                                            notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                             // Checo se o texto de status foi passado pro parametro
                                             if (textStatus != null) {
@@ -3673,8 +4396,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                         todosSucesso = estadoSql.insertList(listaDadosEstado);
                                     }
                                     // Atualiza a notificacao
-                                    mLoad.bigTextStyle(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
-                                    mLoad.progress().value(0, 0, true).build();
+                                    bigTextStyle.bigText(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
+                                    mBuilder.setStyle(bigTextStyle)
+                                            .setProgress(0, 0, true);
+                                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                     // Checo se o texto de status foi passado pro parametro
                                     if (textStatus != null) {
@@ -3693,32 +4418,26 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                     }
                                 } else {
                                     // Cria uma notificacao para ser manipulado
-                                    Load mLoad = PugNotification.with(context).load()
-                                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
-                                            .smallIcon(R.mipmap.ic_launcher)
-                                            .largeIcon(R.mipmap.ic_launcher)
-                                            .title(R.string.versao_savare_desatualizada)
-                                            .bigTextStyle(context.getResources().getString(R.string.nao_chegou_dados_servidor_empresa) + "\n" + retornoWebservice.toString())
-                                            .flags(Notification.DEFAULT_LIGHTS);
-                                    mLoad.simple().build();
+                                    bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.versao_savare_desatualizada))
+                                            .bigText(context.getResources().getString(R.string.nao_chegou_dados_servidor_empresa) + "\n" + retornoWebservice.toString());
+                                    mBuilder.setStyle(bigTextStyle)
+                                            .setProgress(0, 0, false);
+                                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
                                 }
                                 // Incrementa o total de paginas
                                 pageNumber++;
                                 if (pageNumber < totalPages) {
-                                    retornoWebservice = gson.fromJson(webserviceSisInfo.executarSelectWebserviceJson(null, WSSisinfoWebservice.FUNCTION_JSON_SELECT_CFAESTAD, WSSisinfoWebservice.METODO_GET, parametrosWebservice + "&pageNumber=" + pageNumber, null), JsonObject.class);
+                                    retornoWebservice = gson.fromJson(webserviceSisInfo.executarWebserviceJson(servidorAtivo, null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_CFAESTAD, WSSisinfoWebservice.METODO_GET, parametrosWebservice + "&pageNumber=" + pageNumber, null), JsonObject.class);
                                 }
                             } else {
                                 todosSucesso = false;
 
                                 // Cria uma notificacao para ser manipulado
-                                Load mLoad = PugNotification.with(context).load()
-                                        .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
-                                        .smallIcon(R.mipmap.ic_launcher)
-                                        .largeIcon(R.mipmap.ic_launcher)
-                                        .title(R.string.recebendo_dados)
-                                        .bigTextStyle(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString())
-                                        .flags(Notification.DEFAULT_LIGHTS);
-                                mLoad.simple().build();
+                                bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.recebendo_dados))
+                                        .bigText(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString());
+                                mBuilder.setStyle(bigTextStyle)
+                                        .setProgress(0, 0, false);
+                                notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
                             }
                         } // Fim do for ia (page)
                         // Checa se todos foram inseridos/atualizados com sucesso
@@ -3728,28 +4447,27 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                     }
                 } else {
                     // Cria uma notificacao para ser manipulado
-                    Load mLoad = PugNotification.with(context).load()
-                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
-                            .smallIcon(R.mipmap.ic_launcher)
-                            .largeIcon(R.mipmap.ic_launcher)
-                            .title(R.string.recebendo_dados)
-                            .bigTextStyle(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString())
-                            .flags(Notification.DEFAULT_LIGHTS);
-                    mLoad.simple().build();
+                    bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.recebendo_dados))
+                            .bigText(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString());
+                    mBuilder.setStyle(bigTextStyle)
+                            .setProgress(0, 0, false);
+                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
                 }
             }
-        } catch (Exception e) {
+        } catch (final Exception e) {
+            if (textStatusErro != null) {
+                ((Activity) context).runOnUiThread(new Runnable() {
+                    public void run() {
+                        textStatusErro.append("\n*" + context.getResources().getText(R.string.erro_inesperado) + " - Estado : " + e.getMessage());
+                    }
+                });
+            }
             // Cria uma notificacao para ser manipulado
-            PugNotification.with(context)
-                    .load()
-                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + e.hashCode())
-                    .title(R.string.importar_dados_recebidos)
-                    .bigTextStyle("ImportaDadosEstado - " + e.getMessage())
-                    .smallIcon(R.mipmap.ic_launcher)
-                    .largeIcon(R.mipmap.ic_launcher)
-                    .flags(Notification.DEFAULT_ALL)
-                    .simple()
-                    .build();
+            bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.importar_dados_recebidos))
+                    .bigText("ImportaDadosEstado - " + e.getMessage());
+            mBuilder.setStyle(bigTextStyle)
+                    .setProgress(0, 0, false);
+            notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
         }
     }
 
@@ -3758,8 +4476,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
         JsonObject statuRetorno = null;
 
         // Atualiza a notificacao
-        mLoad.bigTextStyle(context.getResources().getString(R.string.procurando_dados) + " Cidade");
-        mLoad.progress().value(0, 0, true).build();
+        bigTextStyle.bigText(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa) + " Cidade");
+        mBuilder.setStyle(bigTextStyle)
+                .setProgress(0, 0, true);
+        notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
         // Checo se o texto de status foi passado pro parametro
         if (textStatus != null) {
@@ -3773,6 +4493,9 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
             // Pega quando foi a ultima data que recebeu dados
             String ultimaData = pegaUltimaDataAtualizacao("CFACIDAD");
+            String ultimaDataParam = pegaUltimaDataAtualizacao("CFAPARAM");
+            String ultimaDataEnder = pegaUltimaDataAtualizacao("CFAENDER");
+            String ultimaDataEstad = pegaUltimaDataAtualizacao("CFAESTAD");
             // Cria uma variavel para salvar todos os paramentros em json
             String parametrosWebservice = "";
             String filtraCidadePorFuncionario =
@@ -3791,14 +4514,42 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                             "WHERE \n" +
                             "CFAPARAM.ID_CFACLIFO_VENDE = (SELECT CFACLIFO_VEND_CIDADE.ID_CFACLIFO FROM CFACLIFO CFACLIFO_VEND_CIDADE WHERE CFACLIFO_VEND_CIDADE.CODIGO_FUN = " + funcoes.getValorXml("CodigoUsuario") + ")";
             Gson gson = new Gson();
-            if ((ultimaData != null) && (!ultimaData.isEmpty())) {
+            String whereDatas = "";
 
-                parametrosWebservice += "&sqlQuery= " + sqlQuery + " AND (CFACIDAD.DT_ALT >= '" + ultimaData + "') ";
+            if ((ultimaData != null) && (!ultimaData.isEmpty())) {
+                whereDatas += "(CFACIDAD.DT_ALT >= '" + ultimaData + "') ";
+
+                // CHECA SE TEVE ALGUMA ALTERACAO NA TABELA PARAM
+                if ((ultimaDataParam != null) && (!ultimaDataParam.isEmpty())) {
+                    if ((!whereDatas.isEmpty()) && (whereDatas.length() > 5)) {
+                        whereDatas += " OR ";
+                    }
+                    whereDatas += "(CFAPARAM.DT_ALT >= '" + ultimaDataParam + "')";
+                }
+                // CHECA SE TEVE ALGUMA ALTERACAO NA TABELA ENDERECO DA LISTA DE CLIENTES DO VENDEDOR
+                if ((ultimaDataEnder != null) && (!ultimaDataEnder.isEmpty())) {
+                    if ((!whereDatas.isEmpty()) && (whereDatas.length() > 5)) {
+                        whereDatas += " OR ";
+                    }
+                    whereDatas += "( CFAENDER.DT_ALT >= '" + ultimaDataEnder + "')";
+                }
+                // CHECA SE TEVE ALGUMA ALTERACAO NA TABELA ESTADO
+                if ((ultimaDataEstad != null) && (!ultimaDataEstad.isEmpty())) {
+                    if ((!whereDatas.isEmpty()) && (whereDatas.length() > 5)) {
+                        whereDatas += " OR ";
+                    }
+                    whereDatas += "( CFAESTAD.DT_ALT >= '" + ultimaDataEstad + "')";
+                }
+            }
+
+            if ((whereDatas != null) && (!whereDatas.isEmpty())) {
+
+                parametrosWebservice += "&sqlQuery= " + sqlQuery + " AND ( " + whereDatas + " ) ";
             } else {
                 parametrosWebservice += "&sqlQuery= " + sqlQuery;
             }
             WSSisinfoWebservice webserviceSisInfo = new WSSisinfoWebservice(context);
-            JsonObject retornoWebservice = gson.fromJson(webserviceSisInfo.executarSelectWebserviceJson(null, WSSisinfoWebservice.FUNCTION_JSON_SELECT_CFACIDAD, WSSisinfoWebservice.METODO_GET, parametrosWebservice, null), JsonObject.class);
+            JsonObject retornoWebservice = gson.fromJson(webserviceSisInfo.executarWebserviceJson(servidorAtivo, null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_CFACIDAD, WSSisinfoWebservice.METODO_GET, parametrosWebservice, null), JsonObject.class);
 
             if ((retornoWebservice != null) && (retornoWebservice.has(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO))) {
                 statuRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO);
@@ -3808,7 +4559,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                     JsonObject pageRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_PAGE_RETORNO);
 
-                    if (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) {
+                    if ( (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0) ) {
                         final int totalPages = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt();
                         int pageNumber = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_PAGE_NUMBER_RETORNO).getAsInt();
 
@@ -3819,8 +4570,9 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                             // Verifica se retornou com sucesso
                             if (statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO).getAsInt() == HttpURLConnection.HTTP_OK) {
                                 // Atualiza a notificacao
-                                mLoad.bigTextStyle(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
-                                mLoad.progress().value(0, 0, true).build();
+                                bigTextStyle.bigText(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
+                                mBuilder.setStyle(bigTextStyle);
+                                notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                 // Checo se o texto de status foi passado pro parametro
                                 if (textStatus != null) {
@@ -3836,8 +4588,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                     // Checa se retornou algum dados na lista
                                     if (listaCidadeRetorno.size() > 0) {
                                         // Atualiza a notificacao
-                                        mLoad.bigTextStyle(context.getResources().getString(R.string.recebendo_dados_cidade));
-                                        mLoad.progress().value(0, listaCidadeRetorno.size(), false).build();
+                                        bigTextStyle.bigText(context.getResources().getString(R.string.recebendo_dados_cidade));
+                                        mBuilder.setStyle(bigTextStyle)
+                                                .setProgress(listaCidadeRetorno.size(), 0, false);
+                                        notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                         // Checo se o texto de status foi passado pro parametro
                                         if (textStatus != null) {
@@ -3858,8 +4612,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                         List<ContentValues> listaDadosStatus = new ArrayList<ContentValues>();
                                         for (int i = 0; i < listaCidadeRetorno.size(); i++) {
                                             // Atualiza a notificacao
-                                            mLoad.bigTextStyle(context.getResources().getString(R.string.recebendo_dados_cidade) + " - Parte " + (pageNumber + 1) + "/" + totalPages + " - " + i + "/" + listaCidadeRetorno.size());
-                                            mLoad.progress().update(0, i, listaCidadeRetorno.size(), false).build();
+                                            bigTextStyle.bigText(context.getResources().getString(R.string.recebendo_dados_cidade) + " - Parte " + (pageNumber + 1) + "/" + totalPages + " - " + i + "/" + listaCidadeRetorno.size());
+                                            mBuilder.setStyle(bigTextStyle)
+                                                    .setProgress(listaCidadeRetorno.size(), i, false);
+                                            notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                             // Checo se o texto de status foi passado pro parametro
                                             if (textStatus != null) {
@@ -3895,8 +4651,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                         todosSucesso = cidadeSql.insertList(listaDadosStatus);
                                     }
                                     // Atualiza a notificacao
-                                    mLoad.bigTextStyle(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
-                                    mLoad.progress().value(0, 0, true).build();
+                                    bigTextStyle.bigText(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
+                                    mBuilder.setStyle(bigTextStyle)
+                                            .setProgress(0, 0, true);
+                                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                     // Checo se o texto de status foi passado pro parametro
                                     if (textStatus != null) {
@@ -3915,32 +4673,26 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                     }
                                 } else {
                                     // Cria uma notificacao para ser manipulado
-                                    Load mLoad = PugNotification.with(context).load()
-                                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
-                                            .smallIcon(R.mipmap.ic_launcher)
-                                            .largeIcon(R.mipmap.ic_launcher)
-                                            .title(R.string.versao_savare_desatualizada)
-                                            .bigTextStyle(context.getResources().getString(R.string.nao_chegou_dados_servidor_empresa) + "\n" + retornoWebservice.toString())
-                                            .flags(Notification.DEFAULT_LIGHTS);
-                                    mLoad.simple().build();
+                                    bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.versao_savare_desatualizada))
+                                            .bigText(context.getResources().getString(R.string.nao_chegou_dados_servidor_empresa) + "\n" + retornoWebservice.toString());
+                                    mBuilder.setStyle(bigTextStyle)
+                                            .setProgress(0, 0, false);
+                                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
                                 }
                                 // Incrementa o total de paginas
                                 pageNumber++;
                                 if (pageNumber < totalPages) {
-                                    retornoWebservice = gson.fromJson(webserviceSisInfo.executarSelectWebserviceJson(null, WSSisinfoWebservice.FUNCTION_JSON_SELECT_CFACIDAD, WSSisinfoWebservice.METODO_GET, parametrosWebservice + "&pageNumber=" + pageNumber, null), JsonObject.class);
+                                    retornoWebservice = gson.fromJson(webserviceSisInfo.executarWebserviceJson(servidorAtivo, null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_CFACIDAD, WSSisinfoWebservice.METODO_GET, parametrosWebservice + "&pageNumber=" + pageNumber, null), JsonObject.class);
                                 }
                             } else {
                                 todosSucesso = false;
 
                                 // Cria uma notificacao para ser manipulado
-                                Load mLoad = PugNotification.with(context).load()
-                                        .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
-                                        .smallIcon(R.mipmap.ic_launcher)
-                                        .largeIcon(R.mipmap.ic_launcher)
-                                        .title(R.string.recebendo_dados)
-                                        .bigTextStyle(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString())
-                                        .flags(Notification.DEFAULT_LIGHTS);
-                                mLoad.simple().build();
+                                bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.recebendo_dados))
+                                        .bigText(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString());
+                                mBuilder.setStyle(bigTextStyle)
+                                        .setProgress(0, 0, false);
+                                notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
                             }
                         } // Fim do for ia (page)
                         // Checa se todos foram inseridos/atualizados com sucesso
@@ -3950,28 +4702,27 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                     }
                 } else {
                     // Cria uma notificacao para ser manipulado
-                    Load mLoad = PugNotification.with(context).load()
-                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
-                            .smallIcon(R.mipmap.ic_launcher)
-                            .largeIcon(R.mipmap.ic_launcher)
-                            .title(R.string.recebendo_dados)
-                            .bigTextStyle(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString())
-                            .flags(Notification.DEFAULT_LIGHTS);
-                    mLoad.simple().build();
+                    bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.recebendo_dados))
+                            .bigText(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString());
+                    mBuilder.setStyle(bigTextStyle)
+                            .setProgress(0, 0, false);
+                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
                 }
             }
-        } catch (Exception e) {
+        } catch (final Exception e) {
+            if (textStatusErro != null) {
+                ((Activity) context).runOnUiThread(new Runnable() {
+                    public void run() {
+                        textStatusErro.append("\n*" + context.getResources().getText(R.string.erro_inesperado) + " - Cidade : " + e.getMessage());
+                    }
+                });
+            }
             // Cria uma notificacao para ser manipulado
-            PugNotification.with(context)
-                    .load()
-                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + e.hashCode())
-                    .title(R.string.importar_dados_recebidos)
-                    .bigTextStyle("ImportaDadosCidade - " + e.getMessage())
-                    .smallIcon(R.mipmap.ic_launcher)
-                    .largeIcon(R.mipmap.ic_launcher)
-                    .flags(Notification.DEFAULT_ALL)
-                    .simple()
-                    .build();
+            bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.importar_dados_recebidos))
+                    .bigText("ImportaDadosCidade - " + e.getMessage());
+            mBuilder.setStyle(bigTextStyle)
+                    .setProgress(0, 0, false);
+            notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
         }
     }
 
@@ -3980,8 +4731,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
         JsonObject statuRetorno = null;
 
         // Atualiza a notificacao
-        mLoad.bigTextStyle(context.getResources().getString(R.string.procurando_dados) + " Cliente e Fornecedor");
-        mLoad.progress().value(0, 0, true).build();
+        bigTextStyle.bigText(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa) + " Cliente e Fornecedor");
+        mBuilder.setStyle(bigTextStyle)
+                .setProgress(0, 0, true);
+        notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
         // Checo se o texto de status foi passado pro parametro
         if (textStatus != null) {
@@ -3996,23 +4749,35 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
             // Pega quando foi a ultima data que recebeu dados
             String ultimaData = pegaUltimaDataAtualizacao("CFACLIFO");
-            // Cria uma variavel para salvar todos os paramentros em json
-            String parametrosWebservice = "";
-            String filraClientePorVendedor =
-                    "((CFACLIFO.ID_CFACLIFO IN \n" +
-                            "(SELECT CFAPARAM.ID_CFACLIFO FROM CFAPARAM WHERE CFAPARAM.ID_SMAEMPRE = " + funcoes.getValorXml("CodigoEmpresa") + " AND \n" +
-                            "CFAPARAM.ID_CFACLIFO_VENDE = (SELECT CLIFO_VENDE.ID_CFACLIFO FROM CFACLIFO CLIFO_VENDE WHERE CLIFO_VENDE.CODIGO_FUN = " + funcoes.getValorXml("CodigoUsuario") + "))) \n" +
-                            "OR (CFACLIFO.NOME_RAZAO LIKE '%CONSUMIDOR%FINAL%'))";
+            String ultimaDataParam = pegaUltimaDataAtualizacao("CFAPARAM");
 
-            Gson gson = new Gson();
+            String filtraClientePorParametro =
+                    "SELECT CFAPARAM.ID_CFACLIFO FROM CFAPARAM WHERE (CFAPARAM.ID_SMAEMPRE = " + funcoes.getValorXml("CodigoEmpresa") + ") AND \n" +
+                            "(CFAPARAM.ID_CFACLIFO_VENDE = (SELECT CLIFO_VENDE.ID_CFACLIFO FROM CFACLIFO CLIFO_VENDE WHERE CLIFO_VENDE.CODIGO_FUN = " + funcoes.getValorXml("CodigoUsuario") + "))  \n";
+
+            // CHECA SE TEVE ALGUMA ALTERACAO NA TABELA PARAM
+            if ((ultimaDataParam != null) && (!ultimaDataParam.isEmpty())) {
+
+                filtraClientePorParametro += " AND (CFAPARAM.DT_ALT >= '" + ultimaDataParam + "')";
+            }
+
+            // Cria uma variavel para salvar todos os paramentros em json
+            String filtraClientePorVendedor =
+                    "((CFACLIFO.ID_CFACLIFO IN \n" +
+                            "(" + filtraClientePorParametro + " ) " +
+                            ") \n" +
+                            "OR ( (CFACLIFO.NOME_RAZAO LIKE '%CONSUMIDOR%FINAL%') " + ((ultimaData != null && !ultimaData.isEmpty()) ? " AND (CFACLIFO.DT_ALT >= '" + ultimaData + "')" : "") + " ))";
+
+            String parametrosWebservice = "";
             if ((ultimaData != null) && (!ultimaData.isEmpty())) {
 
-                parametrosWebservice += "&where= (DT_ALT >= '" + ultimaData + "') AND " + filraClientePorVendedor;
+                parametrosWebservice += "&where= (DT_ALT >= '" + ultimaData + "') AND " + filtraClientePorVendedor;
             } else {
-                parametrosWebservice += "&where= " + filraClientePorVendedor;
+                parametrosWebservice += "&where= " + filtraClientePorVendedor;
             }
+            Gson gson = new Gson();
             WSSisinfoWebservice webserviceSisInfo = new WSSisinfoWebservice(context);
-            JsonObject retornoWebservice = gson.fromJson(webserviceSisInfo.executarSelectWebserviceJson(null, WSSisinfoWebservice.FUNCTION_JSON_SELECT_CFACLIFO, WSSisinfoWebservice.METODO_GET, parametrosWebservice, null), JsonObject.class);
+            JsonObject retornoWebservice = gson.fromJson(webserviceSisInfo.executarWebserviceJson(servidorAtivo, null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_CFACLIFO, WSSisinfoWebservice.METODO_GET, parametrosWebservice, null), JsonObject.class);
 
             if ((retornoWebservice != null) && (retornoWebservice.has(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO))) {
                 statuRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO);
@@ -4022,7 +4787,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                     JsonObject pageRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_PAGE_RETORNO);
 
-                    if (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) {
+                    if ( (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0) ) {
                         final int totalPages = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt();
                         int pageNumber = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_PAGE_NUMBER_RETORNO).getAsInt();
 
@@ -4033,8 +4798,9 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                             // Verifica se retornou com sucesso
                             if (statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO).getAsInt() == HttpURLConnection.HTTP_OK) {
                                 // Atualiza a notificacao
-                                mLoad.bigTextStyle(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
-                                mLoad.progress().value(0, 0, true).build();
+                                bigTextStyle.bigText(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
+                                mBuilder.setStyle(bigTextStyle);
+                                notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                 // Checo se o texto de status foi passado pro parametro
                                 if (textStatus != null) {
@@ -4050,8 +4816,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                     // Checa se retornou algum dados na lista
                                     if (listaClienteRetorno.size() > 0) {
                                         // Atualiza a notificacao
-                                        mLoad.bigTextStyle(context.getResources().getString(R.string.recebendo_dados_cliente));
-                                        mLoad.progress().value(0, listaClienteRetorno.size(), false).build();
+                                        bigTextStyle.bigText(context.getResources().getString(R.string.recebendo_dados_cliente));
+                                        mBuilder.setStyle(bigTextStyle)
+                                                .setProgress(listaClienteRetorno.size(), 0, false);
+                                        notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                         // Checo se o texto de status foi passado pro parametro
                                         if (textStatus != null) {
@@ -4072,8 +4840,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                         List<ContentValues> listaDadosClifo = new ArrayList<ContentValues>();
                                         for (int i = 0; i < listaClienteRetorno.size(); i++) {
                                             // Atualiza a notificacao
-                                            mLoad.bigTextStyle(context.getResources().getString(R.string.recebendo_dados_cliente) + " - Parte " + (pageNumber + 1) + "/" + totalPages + " - " + i + "/" + listaClienteRetorno.size());
-                                            mLoad.progress().update(0, i, listaClienteRetorno.size(), false).build();
+                                            bigTextStyle.bigText(context.getResources().getString(R.string.recebendo_dados_cliente) + " - Parte " + (pageNumber + 1) + "/" + totalPages + " - " + i + "/" + listaClienteRetorno.size());
+                                            mBuilder.setStyle(bigTextStyle)
+                                                    .setProgress(listaClienteRetorno.size(), i, false);
+                                            notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                             // Checo se o texto de status foi passado pro parametro
                                             if (textStatus != null) {
@@ -4262,8 +5032,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                         todosSucesso = pessoaSql.insertList(listaDadosClifo);
                                     }
                                     // Atualiza a notificacao
-                                    mLoad.bigTextStyle(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
-                                    mLoad.progress().value(0, 0, true).build();
+                                    bigTextStyle.bigText(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
+                                    mBuilder.setStyle(bigTextStyle)
+                                            .setProgress(0, 0, true);
+                                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                     // Checo se o texto de status foi passado pro parametro
                                     if (textStatus != null) {
@@ -4282,32 +5054,26 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                     }
                                 } else {
                                     // Cria uma notificacao para ser manipulado
-                                    Load mLoad = PugNotification.with(context).load()
-                                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
-                                            .smallIcon(R.mipmap.ic_launcher)
-                                            .largeIcon(R.mipmap.ic_launcher)
-                                            .title(R.string.versao_savare_desatualizada)
-                                            .bigTextStyle(context.getResources().getString(R.string.nao_chegou_dados_servidor_empresa) + "\n" + retornoWebservice.toString())
-                                            .flags(Notification.DEFAULT_LIGHTS);
-                                    mLoad.simple().build();
+                                    bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.versao_savare_desatualizada))
+                                            .bigText(context.getResources().getString(R.string.nao_chegou_dados_servidor_empresa) + "\n" + retornoWebservice.toString());
+                                    mBuilder.setStyle(bigTextStyle)
+                                            .setProgress(0, 0, false);
+                                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
                                 }
                                 // Incrementa o total de paginas
                                 pageNumber++;
                                 if (pageNumber < totalPages) {
-                                    retornoWebservice = gson.fromJson(webserviceSisInfo.executarSelectWebserviceJson(null, WSSisinfoWebservice.FUNCTION_JSON_SELECT_CFACLIFO, WSSisinfoWebservice.METODO_GET, parametrosWebservice + "&pageNumber=" + pageNumber, null), JsonObject.class);
+                                    retornoWebservice = gson.fromJson(webserviceSisInfo.executarWebserviceJson(servidorAtivo, null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_CFACLIFO, WSSisinfoWebservice.METODO_GET, parametrosWebservice + "&pageNumber=" + pageNumber, null), JsonObject.class);
                                 }
                             } else {
                                 todosSucesso = false;
 
                                 // Cria uma notificacao para ser manipulado
-                                Load mLoad = PugNotification.with(context).load()
-                                        .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
-                                        .smallIcon(R.mipmap.ic_launcher)
-                                        .largeIcon(R.mipmap.ic_launcher)
-                                        .title(R.string.recebendo_dados)
-                                        .bigTextStyle(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString())
-                                        .flags(Notification.DEFAULT_LIGHTS);
-                                mLoad.simple().build();
+                                bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.recebendo_dados))
+                                        .bigText(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString());
+                                mBuilder.setStyle(bigTextStyle)
+                                        .setProgress(0, 0, false);
+                                notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
                             }
                         } // Fim do for ia (page)
                         // Checa se todos foram inseridos/atualizados com sucesso
@@ -4317,42 +5083,513 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                     }
                 } else {
                     // Cria uma notificacao para ser manipulado
-                    Load mLoad = PugNotification.with(context).load()
-                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
-                            .smallIcon(R.mipmap.ic_launcher)
-                            .largeIcon(R.mipmap.ic_launcher)
-                            .title(R.string.recebendo_dados)
-                            .bigTextStyle(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString())
-                            .flags(Notification.DEFAULT_LIGHTS);
-                    mLoad.simple().build();
+                    bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.recebendo_dados))
+                            .bigText(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString());
+                    mBuilder.setStyle(bigTextStyle)
+                            .setProgress(0, 0, false);
+                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
+                }
+            }
+        } catch (final JsonParseException e) {
+            if (textStatusErro != null) {
+                ((Activity) context).runOnUiThread(new Runnable() {
+                    public void run() {
+                        textStatusErro.append("\n*" + context.getResources().getText(R.string.erro_inesperado) + " - Cliente e Fornecedor : " + e.getMessage());
+                    }
+                });
+            }
+            // Cria uma notificacao para ser manipulado
+            bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.importar_dados_recebidos))
+                    .bigText("ImportaDadosClifo - " + e.getMessage());
+            mBuilder.setStyle(bigTextStyle)
+                    .setProgress(0, 0, false);
+            notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
+
+        } catch (final Exception e) {
+            if (textStatusErro != null) {
+                ((Activity) context).runOnUiThread(new Runnable() {
+                    public void run() {
+                        textStatusErro.append("\n*" + context.getResources().getText(R.string.erro_inesperado) + " - Cliente e Fornecedor : " + e.getMessage());
+                    }
+                });
+            }
+
+            // Cria uma notificacao para ser manipulado
+            bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.importar_dados_recebidos))
+                    .bigText("ImportaDadosClifo - " + e.getMessage());
+            mBuilder.setStyle(bigTextStyle)
+                    .setProgress(0, 0, false);
+            notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
+        }
+    }
+
+
+    private void importarDadosRemoveClifo() {
+        JsonObject statuRetorno;
+
+        // Atualiza a notificacao
+        bigTextStyle.bigText(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa) + " Remover Cliente e Fornecedor");
+        mBuilder.setStyle(bigTextStyle)
+                .setProgress(0, 0, true);
+        notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
+
+        // Checo se o texto de status foi passado pro parametro
+        if (textStatus != null) {
+            ((Activity) context).runOnUiThread(new Runnable() {
+                public void run() {
+                    textStatus.setText(context.getResources().getString(R.string.procurando_dados) + " Remover Cliente e Fornecedor");
+                }
+            });
+        }
+        try {
+            FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
+
+            // Cria uma variavel para salvar todos os paramentros em json
+            String parametrosWebservice = "";
+
+            String filtraClientePorParametro =
+                    "SELECT CFAPARAM.ID_CFACLIFO FROM CFAPARAM WHERE (CFAPARAM.ID_SMAEMPRE = " + funcoes.getValorXml("CodigoEmpresa") + ") AND \n" +
+                            "(CFAPARAM.ID_CFACLIFO_VENDE = (SELECT CLIFO_VENDE.ID_CFACLIFO FROM CFACLIFO CLIFO_VENDE WHERE CLIFO_VENDE.CODIGO_FUN = " + funcoes.getValorXml("CodigoUsuario") + "))  \n";
+
+            String filtraClientePorVendedor =
+                    "((CFACLIFO.ID_CFACLIFO IN \n" +
+                            "(" + filtraClientePorParametro + " ) " +
+                            ") \n" +
+                            "OR (CFACLIFO.NOME_RAZAO LIKE '%CONSUMIDOR%FINAL%'))";
+
+            parametrosWebservice += "&where= " + filtraClientePorVendedor;
+
+            WSSisinfoWebservice webserviceSisInfo = new WSSisinfoWebservice(context);
+            Gson gson = new Gson();
+            JsonObject retornoWebservice = gson.fromJson(webserviceSisInfo.executarWebserviceJson(servidorAtivo, null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_CFACLIFO, WSSisinfoWebservice.METODO_GET, parametrosWebservice, null), JsonObject.class);
+
+            if ((retornoWebservice != null) && (retornoWebservice.has(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO))) {
+                statuRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO);
+                // Verifica se retornou com sucesso
+                if (statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO).getAsInt() == HttpURLConnection.HTTP_OK) {
+                    //boolean todosSucesso = true;
+
+                    JsonObject pageRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_PAGE_RETORNO);
+
+                    if ( (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0) ) {
+                        final int totalPages = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt();
+                        int pageNumber = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_PAGE_NUMBER_RETORNO).getAsInt();
+
+                        List<ContentValues> listaTodosClifo = new ArrayList<ContentValues>();
+
+                        for (int ia = pageNumber; ia < totalPages; ia++) {
+
+                            statuRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO);
+
+                            // Verifica se retornou com sucesso
+                            if (statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO).getAsInt() == HttpURLConnection.HTTP_OK) {
+                                // Atualiza a notificacao
+                                bigTextStyle.bigText(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
+                                mBuilder.setStyle(bigTextStyle);
+                                notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
+
+                                // Checo se o texto de status foi passado pro parametro
+                                if (textStatus != null) {
+                                    ((Activity) context).runOnUiThread(new Runnable() {
+                                        public void run() {
+                                            textStatus.setText(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
+                                        }
+                                    });
+                                }
+                                // Checa se retornou alguma coisa
+                                if ((retornoWebservice.has(WSSisinfoWebservice.KEY_OBJECT_OBJECT_RETORNO))) {
+                                    final JsonArray listaClienteRetorno = retornoWebservice.getAsJsonArray(WSSisinfoWebservice.KEY_OBJECT_OBJECT_RETORNO);
+                                    // Checa se retornou algum dados na lista
+                                    if (listaClienteRetorno.size() > 0) {
+                                        bigTextStyle.bigText(context.getResources().getString(R.string.recebendo_dados_cliente));
+                                        mBuilder.setStyle(bigTextStyle)
+                                                .setProgress(listaClienteRetorno.size(), 0, false);
+                                        notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
+
+                                        // Checo se o texto de status foi passado pro parametro
+                                        if (textStatus != null) {
+                                            ((Activity) context).runOnUiThread(new Runnable() {
+                                                public void run() {
+                                                    textStatus.setText(context.getResources().getString(R.string.recebendo_dados_cliente));
+                                                }
+                                            });
+                                        }
+                                        if (progressBarStatus != null) {
+                                            ((Activity) context).runOnUiThread(new Runnable() {
+                                                public void run() {
+                                                    progressBarStatus.setIndeterminate(false);
+                                                    progressBarStatus.setMax(listaClienteRetorno.size());
+                                                }
+                                            });
+                                        }
+
+                                        for (int i = 0; i < listaClienteRetorno.size(); i++) {
+                                            // Atualiza a notificacao
+                                            bigTextStyle.bigText(context.getResources().getString(R.string.recebendo_dados_cliente) + " a Remover - Parte " + (pageNumber + 1) + "/" + totalPages + " - " + i + "/" + listaClienteRetorno.size());
+                                            mBuilder.setStyle(bigTextStyle)
+                                                    .setProgress(listaClienteRetorno.size(), i, false);
+                                            notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
+
+                                            // Checo se o texto de status foi passado pro parametro
+                                            if (textStatus != null) {
+                                                final int finalI1 = i;
+                                                final int finalPageNumber = pageNumber + 1;
+                                                ((Activity) context).runOnUiThread(new Runnable() {
+                                                    public void run() {
+                                                        textStatus.setText(context.getResources().getString(R.string.recebendo_dados_cliente) + " a Remover - Parte " + finalPageNumber + "/" + totalPages + " - " + finalI1 + "/" + listaClienteRetorno.size());
+                                                    }
+                                                });
+                                            }
+                                            if (progressBarStatus != null) {
+                                                final int finalI = i;
+                                                ((Activity) context).runOnUiThread(new Runnable() {
+                                                    public void run() {
+                                                        progressBarStatus.setProgress(finalI);
+                                                    }
+                                                });
+                                            }
+                                            JsonObject clienteRetorno = listaClienteRetorno.get(i).getAsJsonObject();
+                                            ContentValues dadosClifo = new ContentValues();
+
+                                            dadosClifo.put("ID_CFACLIFO", clienteRetorno.get("idCfaclifo").getAsInt());
+                                            dadosClifo.put("ID_SMAEMPRE", clienteRetorno.get("idSmaempre").getAsInt());
+                                            dadosClifo.put("CPF_CNPJ", clienteRetorno.has("cpfCgc") ? clienteRetorno.get("cpfCgc").getAsString() : "");
+                                            dadosClifo.put("NOME_RAZAO", clienteRetorno.get("nomeRazao").getAsString());
+
+                                            listaTodosClifo.add(dadosClifo);
+                                        }
+                                    }
+                                    // Atualiza a notificacao
+                                    bigTextStyle.bigText(context.getResources().getString(R.string.vamos_checar_cliente));
+                                    mBuilder.setStyle(bigTextStyle)
+                                            .setProgress(0, 0, true);
+                                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
+
+                                    // Checo se o texto de status foi passado pro parametro
+                                    if (textStatus != null) {
+                                        ((Activity) context).runOnUiThread(new Runnable() {
+                                            public void run() {
+                                                textStatus.setText(context.getResources().getString(R.string.vamos_checar_cliente));
+                                            }
+                                        });
+                                    }
+                                    if (progressBarStatus != null) {
+                                        ((Activity) context).runOnUiThread(new Runnable() {
+                                            public void run() {
+                                                progressBarStatus.setIndeterminate(true);
+                                            }
+                                        });
+                                    }
+                                } else {
+                                    // Cria uma notificacao para ser manipulado
+                                    bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.versao_savare_desatualizada))
+                                            .bigText(context.getResources().getString(R.string.nao_chegou_dados_servidor_empresa) + "\n" + retornoWebservice.toString());
+                                    mBuilder.setStyle(bigTextStyle)
+                                            .setProgress(0, 0, false);
+                                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
+                                }
+                                // Incrementa o total de paginas
+                                pageNumber++;
+                                if (pageNumber < totalPages) {
+                                    retornoWebservice = gson.fromJson(webserviceSisInfo.executarWebserviceJson(servidorAtivo,null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_CFACLIFO, WSSisinfoWebservice.METODO_GET, parametrosWebservice + "&pageNumber=" + pageNumber, null), JsonObject.class);
+                                }
+                            } else {
+                                // Cria uma notificacao para ser manipulado
+                                bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.recebendo_dados))
+                                        .bigText(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString());
+                                mBuilder.setStyle(bigTextStyle)
+                                        .setProgress(0, 0, false);
+                                notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
+                            }
+                        } // Fim do for ia (page)
+                        if ((listaTodosClifo != null) && (listaTodosClifo.size() > 0) ){
+                            PessoaSql pessoaSql = new PessoaSql(context);
+
+                            //Cursor listaClifoApp = pessoaSql.query("CLIENTE = '1' AND CODIGO_CLI IS NOT NULL");
+                            Cursor listaClifoApp = pessoaSql.query(filtraClientePorVendedor);
+
+                            if ((listaClifoApp != null) & (listaClifoApp.getCount() > 0)){
+
+                                if (listaTodosClifo.size() != listaClifoApp.getCount()) {
+
+                                    while (listaClifoApp.moveToNext()) {
+                                        Integer idClifoTab = listaClifoApp.getInt(listaClifoApp.getColumnIndex("ID_CFACLIFO"));
+                                        Boolean naoEstaLista = true;
+
+                                        for (ContentValues v : listaTodosClifo) {
+                                            if (v.getAsInteger("ID_CFACLIFO").equals(idClifoTab)) {
+                                                naoEstaLista = false;
+                                                break;
+                                            } else {
+                                                naoEstaLista = true;
+                                            }
+                                        }
+                                        if (naoEstaLista) {
+                                            pessoaSql.delete("ID_CFACLIFO = " + idClifoTab);
+                                            ParametrosSql parametrosSql = new ParametrosSql(context);
+                                            parametrosSql.delete("ID_CFACLIFO = " + idClifoTab);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        bigTextStyle.bigText(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
+                        mBuilder.setStyle(bigTextStyle)
+                                .setProgress(0, 0, true);
+                        notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
+
+                        // Checo se o texto de status foi passado pro parametro
+                        if (textStatus != null) {
+                            ((Activity) context).runOnUiThread(new Runnable() {
+                                public void run() {
+                                    textStatus.setText(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
+                                }
+                            });
+                        }
+                        if (progressBarStatus != null) {
+                            ((Activity) context).runOnUiThread(new Runnable() {
+                                public void run() {
+                                    progressBarStatus.setIndeterminate(true);
+                                }
+                            });
+                        }
+                    }
+                } else {
+                    // Cria uma notificacao para ser manipulado
+                    bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.recebendo_dados))
+                            .bigText(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString());
+                    mBuilder.setStyle(bigTextStyle)
+                            .setProgress(0, 0, false);
+                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
                 }
             }
         } catch (JsonParseException e) {
-
             // Cria uma notificacao para ser manipulado
-            PugNotification.with(context)
-                    .load()
-                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + e.hashCode())
-                    .title(R.string.importar_dados_recebidos)
-                    .bigTextStyle("ImportaDadosClifo - " + e.getMessage())
-                    .smallIcon(R.mipmap.ic_launcher)
-                    .largeIcon(R.mipmap.ic_launcher)
-                    .flags(Notification.DEFAULT_ALL)
-                    .simple()
-                    .build();
+            bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.importar_dados_recebidos))
+                    .bigText("ImportaDadosClifo - " + e.getMessage());
+            mBuilder.setStyle(bigTextStyle)
+                    .setProgress(0, 0, false);
+            notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
+
         } catch (Exception e) {
 
             // Cria uma notificacao para ser manipulado
-            PugNotification.with(context)
-                    .load()
-                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + e.hashCode())
-                    .title(R.string.importar_dados_recebidos)
-                    .bigTextStyle("ImportaDadosClifo - " + e.getMessage())
-                    .smallIcon(R.mipmap.ic_launcher)
-                    .largeIcon(R.mipmap.ic_launcher)
-                    .flags(Notification.DEFAULT_ALL)
-                    .simple()
-                    .build();
+            bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.importar_dados_recebidos))
+                    .bigText("ImportaDadosClifo - " + e.getMessage());
+            mBuilder.setStyle(bigTextStyle)
+                    .setProgress(0, 0, false);
+            notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
+        }
+    }
+
+
+    private void importarDadosCotacao() {
+        JsonObject statuRetorno = null;
+
+        // Atualiza a notificacao
+        bigTextStyle.bigText(context.getResources().getString(R.string.procurando_dados) + " Cotação");
+        mBuilder.setStyle(bigTextStyle)
+                .setProgress(0, 0, true);
+        notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
+
+        // Checo se o texto de status foi passado pro parametro
+        if (textStatus != null) {
+            ((Activity) context).runOnUiThread(new Runnable() {
+                public void run() {
+                    textStatus.setText(context.getResources().getString(R.string.procurando_dados) + " Cotação");
+                }
+            });
+        }
+        try {
+            // Pega quando foi a ultima data que recebeu dados
+            String ultimaData = pegaUltimaDataAtualizacao("CFACOTAC");
+            // Cria uma variavel para salvar todos os paramentros em json
+            String parametrosWebservice = "";
+
+            Gson gson = new Gson();
+            if ((ultimaData != null) && (!ultimaData.isEmpty())) {
+
+                parametrosWebservice += "&where= (DT_ALT >= '" + ultimaData + "')";
+            }
+            WSSisinfoWebservice webserviceSisInfo = new WSSisinfoWebservice(context);
+            JsonObject retornoWebservice = gson.fromJson(webserviceSisInfo.executarWebserviceJson(servidorAtivo, null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_CFACOTAC, WSSisinfoWebservice.METODO_GET, parametrosWebservice, null), JsonObject.class);
+
+            if ((retornoWebservice != null) && (retornoWebservice.has(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO))) {
+                statuRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO);
+                // Verifica se retornou com sucesso
+                if (statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO).getAsInt() == HttpURLConnection.HTTP_OK) {
+                    boolean todosSucesso = true;
+
+                    JsonObject pageRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_PAGE_RETORNO);
+
+                    if ( (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0) ) {
+                        final int totalPages = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt();
+                        int pageNumber = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_PAGE_NUMBER_RETORNO).getAsInt();
+
+                        for (int ia = pageNumber; ia < totalPages; ia++) {
+
+                            statuRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO);
+
+                            // Verifica se retornou com sucesso
+                            if (statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO).getAsInt() == HttpURLConnection.HTTP_OK) {
+                                // Atualiza a notificacao
+                                bigTextStyle.bigText(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
+                                mBuilder.setStyle(bigTextStyle);
+                                notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
+
+                                // Checo se o texto de status foi passado pro parametro
+                                if (textStatus != null) {
+                                    ((Activity) context).runOnUiThread(new Runnable() {
+                                        public void run() {
+                                            textStatus.setText(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
+                                        }
+                                    });
+                                }
+                                // Checa se retornou alguma coisa
+                                if ((retornoWebservice.has(WSSisinfoWebservice.KEY_OBJECT_OBJECT_RETORNO))) {
+                                    final JsonArray listaCotacaoRetorno = retornoWebservice.getAsJsonArray(WSSisinfoWebservice.KEY_OBJECT_OBJECT_RETORNO);
+                                    // Checa se retornou algum dados na lista
+                                    if (listaCotacaoRetorno.size() > 0) {
+                                        // Atualiza a notificacao
+                                        bigTextStyle.bigText(context.getResources().getString(R.string.recebendo_dados_cotacao));
+                                        mBuilder.setStyle(bigTextStyle)
+                                                .setProgress(listaCotacaoRetorno.size(), 0, false);
+                                        notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
+
+                                        // Checo se o texto de status foi passado pro parametro
+                                        if (textStatus != null) {
+                                            ((Activity) context).runOnUiThread(new Runnable() {
+                                                public void run() {
+                                                    textStatus.setText(context.getResources().getString(R.string.recebendo_dados_cotacao));
+                                                }
+                                            });
+                                        }
+                                        if (progressBarStatus != null) {
+                                            ((Activity) context).runOnUiThread(new Runnable() {
+                                                public void run() {
+                                                    progressBarStatus.setIndeterminate(false);
+                                                    progressBarStatus.setMax(listaCotacaoRetorno.size());
+                                                }
+                                            });
+                                        }
+                                        List<ContentValues> listaDadosCotacao = new ArrayList<ContentValues>();
+                                        for (int i = 0; i < listaCotacaoRetorno.size(); i++) {
+                                            // Atualiza a notificacao
+                                            bigTextStyle.bigText(context.getResources().getString(R.string.recebendo_dados_cotacao) + " - Parte " + (pageNumber + 1) + "/" + totalPages + " - " + i + "/" + listaCotacaoRetorno.size());
+                                            mBuilder.setStyle(bigTextStyle)
+                                                    .setProgress(listaCotacaoRetorno.size(), i, false);
+                                            notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
+
+                                            // Checo se o texto de status foi passado pro parametro
+                                            if (textStatus != null) {
+                                                final int finalI1 = i;
+                                                final int finalPageNumber = pageNumber + 1;
+                                                ((Activity) context).runOnUiThread(new Runnable() {
+                                                    public void run() {
+                                                        textStatus.setText(context.getResources().getString(R.string.recebendo_dados_cotacao) + " - Parte " + finalPageNumber + "/" + totalPages + " - " + finalI1 + "/" + listaCotacaoRetorno.size());
+                                                    }
+                                                });
+                                            }
+                                            if (progressBarStatus != null) {
+                                                final int finalI = i;
+                                                ((Activity) context).runOnUiThread(new Runnable() {
+                                                    public void run() {
+                                                        progressBarStatus.setProgress(finalI);
+                                                    }
+                                                });
+                                            }
+                                            JsonObject cotacaoRetorno = listaCotacaoRetorno.get(i).getAsJsonObject();
+                                            ContentValues dadosCotacao = new ContentValues();
+
+                                            dadosCotacao.put("ID_CFACOTAC", cotacaoRetorno.get("idCfaativi").getAsInt());
+                                            dadosCotacao.put("ID_CFAMOEDA", cotacaoRetorno.get("idCfamoeda").getAsInt());
+                                            dadosCotacao.put("GUID", cotacaoRetorno.get("guid").getAsString());
+                                            dadosCotacao.put("US_CAD", cotacaoRetorno.get("usCad").getAsString());
+                                            dadosCotacao.put("DT_CAD", cotacaoRetorno.get("dtCad").getAsString());
+                                            dadosCotacao.put("DT_ALT", cotacaoRetorno.get("dtAlt").getAsString());
+                                            dadosCotacao.put("DATA", cotacaoRetorno.get("data").getAsString());
+                                            dadosCotacao.put("VALOR", cotacaoRetorno.get("valor").getAsDouble());
+
+                                            listaDadosCotacao.add(dadosCotacao);
+                                        } // FIm do for
+                                        CotacaoSql cotacaoSql = new CotacaoSql(context);
+                                        todosSucesso = cotacaoSql.insertList(listaDadosCotacao);
+                                    }
+                                    // Atualiza a notificacao
+                                    bigTextStyle.bigText(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
+                                    mBuilder.setStyle(bigTextStyle)
+                                            .setProgress(0, 0, true);
+                                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
+
+                                    // Checo se o texto de status foi passado pro parametro
+                                    if (textStatus != null) {
+                                        ((Activity) context).runOnUiThread(new Runnable() {
+                                            public void run() {
+                                                textStatus.setText(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
+                                            }
+                                        });
+                                    }
+                                    if (progressBarStatus != null) {
+                                        ((Activity) context).runOnUiThread(new Runnable() {
+                                            public void run() {
+                                                progressBarStatus.setIndeterminate(true);
+                                            }
+                                        });
+                                    }
+
+                                } else {
+                                    // Cria uma notificacao para ser manipulado
+                                    bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.msg_error))
+                                            .bigText(context.getResources().getString(R.string.nao_chegou_dados_servidor_empresa) + "\n" + retornoWebservice.toString());
+                                    mBuilder.setStyle(bigTextStyle)
+                                            .setProgress(0, 0, false);
+                                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
+                                }
+                                // Incrementa o total de paginas
+                                pageNumber++;
+                                if (pageNumber < totalPages) {
+                                    retornoWebservice = gson.fromJson(webserviceSisInfo.executarWebserviceJson(servidorAtivo, null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_CFACOTAC, WSSisinfoWebservice.METODO_GET, parametrosWebservice + "&pageNumber=" + pageNumber, null), JsonObject.class);
+                                }
+                            } else {
+                                todosSucesso = false;
+
+                                // Cria uma notificacao para ser manipulado
+                                bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.msg_error))
+                                        .bigText(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString());
+                                mBuilder.setStyle(bigTextStyle)
+                                        .setProgress(0, 0, false);
+                                notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
+                            }
+                        } // Fim do for ia (page)
+                        // Checa se todos foram inseridos/atualizados com sucesso
+                        if (todosSucesso) {
+                            inserirUltimaAtualizacao("CFACOTAC");
+                        }
+                    }
+                } else {
+                    // Cria uma notificacao para ser manipulado
+                    bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.msg_error))
+                            .bigText(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString());
+                    mBuilder.setStyle(bigTextStyle)
+                            .setProgress(0, 0, false);
+                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
+                }
+            }
+
+        } catch (final Exception e) {
+            if (textStatusErro != null) {
+                ((Activity) context).runOnUiThread(new Runnable() {
+                    public void run() {
+                        textStatusErro.append("\n*" + context.getResources().getText(R.string.erro_inesperado) + " - Cotação : " + e.getMessage());
+                    }
+                });
+            }
+            // Cria uma notificacao para ser manipulado
+            bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.msg_error))
+                    .bigText("ImportaDadosCotação - " + e.getMessage());
+            mBuilder.setStyle(bigTextStyle)
+                    .setProgress(0, 0, false);
+            notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
         }
     }
 
@@ -4361,8 +5598,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
         JsonObject statuRetorno = null;
 
         // Atualiza a notificacao
-        mLoad.bigTextStyle(context.getResources().getString(R.string.procurando_dados) + " Endereço");
-        mLoad.progress().value(0, 0, true).build();
+        bigTextStyle.bigText(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa) + " Endereço");
+        mBuilder.setStyle(bigTextStyle)
+                .setProgress(0, 0, true);
+        notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
         // Checo se o texto de status foi passado pro parametro
         if (textStatus != null) {
@@ -4393,7 +5632,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 parametrosWebservice += "&where= " + filtraEnder;
             }
             WSSisinfoWebservice webserviceSisInfo = new WSSisinfoWebservice(context);
-            JsonObject retornoWebservice = gson.fromJson(webserviceSisInfo.executarSelectWebserviceJson(null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_CFAENDER_CUSTOM, WSSisinfoWebservice.METODO_GET, parametrosWebservice, null), JsonObject.class);
+            JsonObject retornoWebservice = gson.fromJson(webserviceSisInfo.executarWebserviceJson(servidorAtivo, null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_CFAENDER_CUSTOM, WSSisinfoWebservice.METODO_GET, parametrosWebservice, null), JsonObject.class);
 
             if ((retornoWebservice != null) && (retornoWebservice.has(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO))) {
                 statuRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO);
@@ -4403,7 +5642,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                     JsonObject pageRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_PAGE_RETORNO);
 
-                    if (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) {
+                    if ( (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0) ) {
                         final int totalPages = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt();
                         int pageNumber = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_PAGE_NUMBER_RETORNO).getAsInt();
 
@@ -4414,8 +5653,9 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                             // Verifica se retornou com sucesso
                             if (statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO).getAsInt() == HttpURLConnection.HTTP_OK) {
                                 // Atualiza a notificacao
-                                mLoad.bigTextStyle(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
-                                mLoad.progress().value(0, 0, true).build();
+                                bigTextStyle.bigText(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
+                                mBuilder.setStyle(bigTextStyle);
+                                notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                 // Checo se o texto de status foi passado pro parametro
                                 if (textStatus != null) {
@@ -4431,8 +5671,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                     // Checa se retornou algum dados na lista
                                     if (listaEnderecoRetorno.size() > 0) {
                                         // Atualiza a notificacao
-                                        mLoad.bigTextStyle(context.getResources().getString(R.string.recebendo_dados_endereco));
-                                        mLoad.progress().value(0, listaEnderecoRetorno.size(), false).build();
+                                        bigTextStyle.bigText(context.getResources().getString(R.string.recebendo_dados_endereco));
+                                        mBuilder.setStyle(bigTextStyle)
+                                                .setProgress(listaEnderecoRetorno.size(), 0, false);
+                                        notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                         // Checo se o texto de status foi passado pro parametro
                                         if (textStatus != null) {
@@ -4453,8 +5695,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                         List<ContentValues> listaDadosEndereco = new ArrayList<ContentValues>();
                                         for (int i = 0; i < listaEnderecoRetorno.size(); i++) {
                                             // Atualiza a notificacao
-                                            mLoad.bigTextStyle(context.getResources().getString(R.string.recebendo_dados_endereco) + " - Parte " + (pageNumber + 1) + "/" + totalPages + " - " + i + "/" + listaEnderecoRetorno.size());
-                                            mLoad.progress().update(0, i, listaEnderecoRetorno.size(), false).build();
+                                            bigTextStyle.bigText(context.getResources().getString(R.string.recebendo_dados_endereco) + " - Parte " + (pageNumber + 1) + "/" + totalPages + " - " + i + "/" + listaEnderecoRetorno.size());
+                                            mBuilder.setStyle(bigTextStyle)
+                                                    .setProgress(listaEnderecoRetorno.size(), i, false);
+                                            notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                             // Checo se o texto de status foi passado pro parametro
                                             if (textStatus != null) {
@@ -4519,8 +5763,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                         todosSucesso = enderecoSql.insertList(listaDadosEndereco);
                                     }
                                     // Atualiza a notificacao
-                                    mLoad.bigTextStyle(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
-                                    mLoad.progress().value(0, 0, true).build();
+                                    bigTextStyle.bigText(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
+                                    mBuilder.setStyle(bigTextStyle)
+                                            .setProgress(0, 0, true);
+                                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                     // Checo se o texto de status foi passado pro parametro
                                     if (textStatus != null) {
@@ -4539,32 +5785,26 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                     }
                                 } else {
                                     // Cria uma notificacao para ser manipulado
-                                    Load mLoad = PugNotification.with(context).load()
-                                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
-                                            .smallIcon(R.mipmap.ic_launcher)
-                                            .largeIcon(R.mipmap.ic_launcher)
-                                            .title(R.string.versao_savare_desatualizada)
-                                            .bigTextStyle(context.getResources().getString(R.string.nao_chegou_dados_servidor_empresa) + "\n" + retornoWebservice.toString())
-                                            .flags(Notification.DEFAULT_LIGHTS);
-                                    mLoad.simple().build();
+                                    bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.versao_savare_desatualizada))
+                                            .bigText(context.getResources().getString(R.string.nao_chegou_dados_servidor_empresa) + "\n" + retornoWebservice.toString());
+                                    mBuilder.setStyle(bigTextStyle)
+                                            .setProgress(0, 0, false);
+                                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
                                 }
                                 // Incrementa o total de paginas
                                 pageNumber++;
                                 if (pageNumber < totalPages) {
-                                    retornoWebservice = gson.fromJson(webserviceSisInfo.executarSelectWebserviceJson(null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_CFAENDER_CUSTOM, WSSisinfoWebservice.METODO_GET, parametrosWebservice + "&pageNumber=" + pageNumber, null), JsonObject.class);
+                                    retornoWebservice = gson.fromJson(webserviceSisInfo.executarWebserviceJson(servidorAtivo, null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_CFAENDER_CUSTOM, WSSisinfoWebservice.METODO_GET, parametrosWebservice + "&pageNumber=" + pageNumber, null), JsonObject.class);
                                 }
                             } else {
                                 todosSucesso = false;
 
                                 // Cria uma notificacao para ser manipulado
-                                Load mLoad = PugNotification.with(context).load()
-                                        .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
-                                        .smallIcon(R.mipmap.ic_launcher)
-                                        .largeIcon(R.mipmap.ic_launcher)
-                                        .title(R.string.recebendo_dados)
-                                        .bigTextStyle(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString())
-                                        .flags(Notification.DEFAULT_LIGHTS);
-                                mLoad.simple().build();
+                                bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.recebendo_dados))
+                                        .bigText(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString());
+                                mBuilder.setStyle(bigTextStyle)
+                                        .setProgress(0, 0, false);
+                                notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
                             }
                         } // Fim do for ia (page)
                         // Checa se todos foram inseridos/atualizados com sucesso
@@ -4574,41 +5814,42 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                     }
                 } else {
                     // Cria uma notificacao para ser manipulado
-                    Load mLoad = PugNotification.with(context).load()
-                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
-                            .smallIcon(R.mipmap.ic_launcher)
-                            .largeIcon(R.mipmap.ic_launcher)
-                            .title(R.string.recebendo_dados)
-                            .bigTextStyle(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString())
-                            .flags(Notification.DEFAULT_LIGHTS);
-                    mLoad.simple().build();
+                    bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.recebendo_dados))
+                            .bigText(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString());
+                    mBuilder.setStyle(bigTextStyle)
+                            .setProgress(0, 0, false);
+                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
                 }
             }
-        } catch (JsonParseException e) {
+        } catch (final JsonParseException e) {
+            if (textStatusErro != null) {
+                ((Activity) context).runOnUiThread(new Runnable() {
+                    public void run() {
+                        textStatusErro.append("\n*" + context.getResources().getText(R.string.erro_inesperado) + " - Endereço : " + e.getMessage());
+                    }
+                });
+            }
             // Cria uma notificacao para ser manipulado
-            PugNotification.with(context)
-                    .load()
-                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + e.hashCode())
-                    .title(R.string.importar_dados_recebidos)
-                    .bigTextStyle("ImportaDadosEndereco - " + e.getMessage())
-                    .smallIcon(R.mipmap.ic_launcher)
-                    .largeIcon(R.mipmap.ic_launcher)
-                    .flags(Notification.DEFAULT_ALL)
-                    .simple()
-                    .build();
+            bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.importar_dados_recebidos))
+                    .bigText("ImportaDadosEndereco - " + e.getMessage());
+            mBuilder.setStyle(bigTextStyle)
+                    .setProgress(0, 0, false);
+            notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
 
-        } catch (Exception e) {
+        } catch (final Exception e) {
+            if (textStatusErro != null) {
+                ((Activity) context).runOnUiThread(new Runnable() {
+                    public void run() {
+                        textStatusErro.append("\n*" + context.getResources().getText(R.string.erro_inesperado) + " - Endereço : " + e.getMessage());
+                    }
+                });
+            }
             // Cria uma notificacao para ser manipulado
-            PugNotification.with(context)
-                    .load()
-                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + e.hashCode())
-                    .title(R.string.importar_dados_recebidos)
-                    .bigTextStyle("ImportaDadosEndereco - " + e.getMessage())
-                    .smallIcon(R.mipmap.ic_launcher)
-                    .largeIcon(R.mipmap.ic_launcher)
-                    .flags(Notification.DEFAULT_ALL)
-                    .simple()
-                    .build();
+            bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.importar_dados_recebidos))
+                    .bigText("ImportaDadosEndereco - " + e.getMessage());
+            mBuilder.setStyle(bigTextStyle)
+                    .setProgress(0, 0, false);
+            notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
 
         }
     }
@@ -4618,8 +5859,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
         JsonObject statuRetorno = null;
 
         // Atualiza a notificacao
-        mLoad.bigTextStyle(context.getResources().getString(R.string.procurando_dados) + " Parâmetros");
-        mLoad.progress().value(0, 0, true).build();
+        bigTextStyle.bigText(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa) + " Parâmetros");
+        mBuilder.setStyle(bigTextStyle)
+                .setProgress(0, 0, true);
+        notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
         // Checo se o texto de status foi passado pro parametro
         if (textStatus != null) {
@@ -4648,7 +5891,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 parametrosWebservice += "&where= " + filtraParam;
             }
             WSSisinfoWebservice webserviceSisInfo = new WSSisinfoWebservice(context);
-            JsonObject retornoWebservice = gson.fromJson(webserviceSisInfo.executarSelectWebserviceJson(null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_CFAPARAM, WSSisinfoWebservice.METODO_GET, parametrosWebservice, null), JsonObject.class);
+            JsonObject retornoWebservice = gson.fromJson(webserviceSisInfo.executarWebserviceJson(servidorAtivo, null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_CFAPARAM, WSSisinfoWebservice.METODO_GET, parametrosWebservice, null), JsonObject.class);
 
             if ((retornoWebservice != null) && (retornoWebservice.has(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO))) {
                 statuRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO);
@@ -4658,7 +5901,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                     JsonObject pageRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_PAGE_RETORNO);
 
-                    if (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) {
+                    if ( (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0) ) {
                         final int totalPages = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt();
                         int pageNumber = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_PAGE_NUMBER_RETORNO).getAsInt();
 
@@ -4669,8 +5912,9 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                             // Verifica se retornou com sucesso
                             if (statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO).getAsInt() == HttpURLConnection.HTTP_OK) {
                                 // Atualiza a notificacao
-                                mLoad.bigTextStyle(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
-                                mLoad.progress().value(0, 0, true).build();
+                                bigTextStyle.bigText(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
+                                mBuilder.setStyle(bigTextStyle);
+                                notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                 // Checo se o texto de status foi passado pro parametro
                                 if (textStatus != null) {
@@ -4686,8 +5930,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                     // Checa se retornou algum dados na lista
                                     if (listaParametroRetorno.size() > 0) {
                                         // Atualiza a notificacao
-                                        mLoad.bigTextStyle(context.getResources().getString(R.string.recebendo_dados_parametro));
-                                        mLoad.progress().value(0, listaParametroRetorno.size(), false).build();
+                                        bigTextStyle.bigText(context.getResources().getString(R.string.recebendo_dados_parametro));
+                                        mBuilder.setStyle(bigTextStyle)
+                                                .setProgress(listaParametroRetorno.size(), 0, false);
+                                        notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                         // Checo se o texto de status foi passado pro parametro
                                         if (textStatus != null) {
@@ -4708,8 +5954,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                         List<ContentValues> listaDadosStatus = new ArrayList<ContentValues>();
                                         for (int i = 0; i < listaParametroRetorno.size(); i++) {
                                             // Atualiza a notificacao
-                                            mLoad.bigTextStyle(context.getResources().getString(R.string.recebendo_dados_parametro) + " - Parte " + (pageNumber + 1) + "/" + totalPages + " - " + i + "/" + listaParametroRetorno.size());
-                                            mLoad.progress().update(0, i, listaParametroRetorno.size(), false).build();
+                                            bigTextStyle.bigText(context.getResources().getString(R.string.recebendo_dados_parametro) + " - Parte " + (pageNumber + 1) + "/" + totalPages + " - " + i + "/" + listaParametroRetorno.size());
+                                            mBuilder.setStyle(bigTextStyle)
+                                                    .setProgress(listaParametroRetorno.size(), i, false);
+                                            notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                             // Checo se o texto de status foi passado pro parametro
                                             if (textStatus != null) {
@@ -4786,7 +6034,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                                 dadosParametros.put("DT_PROXIMO_CONTATO", parametroRetorno.get("dtProximoContato").getAsString());
                                             }
                                             if (parametroRetorno.has("atacadoVarejo")) {
-                                                dadosParametros.put("ATACADO_VEREJO", parametroRetorno.get("atacadoVarejo").getAsString());
+                                                dadosParametros.put("ATACADO_VAREJO", parametroRetorno.get("atacadoVarejo").getAsString());
                                             }
                                             if (parametroRetorno.has("vistaPrazo")) {
                                                 dadosParametros.put("VISTA_PRAZO", parametroRetorno.get("vistaPrazo").getAsString());
@@ -4797,6 +6045,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                             if (parametroRetorno.has("parcelaEmAberto")) {
                                                 dadosParametros.put("PARCELA_EM_ABERTO", parametroRetorno.get("parcelaEmAberto").getAsString());
                                             }
+                                            if (parametroRetorno.has("capitaliza")) { dadosParametros.put("CAPITALIZA", parametroRetorno.get("capitaliza").getAsString()); }
                                             if (parametroRetorno.has("limite")) {
                                                 dadosParametros.put("LIMITE", parametroRetorno.get("limite").getAsDouble());
                                             }
@@ -4812,6 +6061,8 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                             if (parametroRetorno.has("descontoVarejoPrazo")) {
                                                 dadosParametros.put("DESC_VARE_PRAZO", parametroRetorno.get("descVarePrazo").getAsDouble());
                                             }
+                                            dadosParametros.put("DESC_SERV_VISTA", parametroRetorno.get("descServVista").getAsDouble());
+                                            dadosParametros.put("DESC_SERV_PRAZO", parametroRetorno.get("descServPrazo").getAsDouble());
                                             if (parametroRetorno.has("jurosDiario")) {
                                                 dadosParametros.put("JUROS_DIARIO", parametroRetorno.get("jurosDiario").getAsDouble());
                                             }
@@ -4822,8 +6073,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                         todosSucesso = parametrosSql.insertList(listaDadosStatus);
                                     }
                                     // Atualiza a notificacao
-                                    mLoad.bigTextStyle(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
-                                    mLoad.progress().value(0, 0, true).build();
+                                    bigTextStyle.bigText(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
+                                    mBuilder.setStyle(bigTextStyle)
+                                            .setProgress(0, 0, true);
+                                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                     // Checo se o texto de status foi passado pro parametro
                                     if (textStatus != null) {
@@ -4842,32 +6095,26 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                     }
                                 } else {
                                     // Cria uma notificacao para ser manipulado
-                                    Load mLoad = PugNotification.with(context).load()
-                                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
-                                            .smallIcon(R.mipmap.ic_launcher)
-                                            .largeIcon(R.mipmap.ic_launcher)
-                                            .title(R.string.versao_savare_desatualizada)
-                                            .bigTextStyle(context.getResources().getString(R.string.nao_chegou_dados_servidor_empresa) + "\n" + retornoWebservice.toString())
-                                            .flags(Notification.DEFAULT_LIGHTS);
-                                    mLoad.simple().build();
+                                    bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.versao_savare_desatualizada))
+                                            .bigText(context.getResources().getString(R.string.nao_chegou_dados_servidor_empresa) + "\n" + retornoWebservice.toString());
+                                    mBuilder.setStyle(bigTextStyle)
+                                            .setProgress(0, 0, false);
+                                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
                                 }
                                 // Incrementa o total de paginas
                                 pageNumber++;
                                 if (pageNumber < totalPages) {
-                                    retornoWebservice = gson.fromJson(webserviceSisInfo.executarSelectWebserviceJson(null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_CFAPARAM, WSSisinfoWebservice.METODO_GET, parametrosWebservice + "&pageNumber=" + pageNumber, null), JsonObject.class);
+                                    retornoWebservice = gson.fromJson(webserviceSisInfo.executarWebserviceJson(servidorAtivo, null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_CFAPARAM, WSSisinfoWebservice.METODO_GET, parametrosWebservice + "&pageNumber=" + pageNumber, null), JsonObject.class);
                                 }
                             } else {
                                 todosSucesso = false;
 
                                 // Cria uma notificacao para ser manipulado
-                                Load mLoad = PugNotification.with(context).load()
-                                        .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
-                                        .smallIcon(R.mipmap.ic_launcher)
-                                        .largeIcon(R.mipmap.ic_launcher)
-                                        .title(R.string.recebendo_dados)
-                                        .bigTextStyle(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString())
-                                        .flags(Notification.DEFAULT_LIGHTS);
-                                mLoad.simple().build();
+                                bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.recebendo_dados))
+                                        .bigText(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString());
+                                mBuilder.setStyle(bigTextStyle)
+                                        .setProgress(0, 0, false);
+                                notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
                             }
                         } // Fim do for ia (page)
                         // Checa se todos foram inseridos/atualizados com sucesso
@@ -4877,28 +6124,27 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                     }
                 } else {
                     // Cria uma notificacao para ser manipulado
-                    Load mLoad = PugNotification.with(context).load()
-                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
-                            .smallIcon(R.mipmap.ic_launcher)
-                            .largeIcon(R.mipmap.ic_launcher)
-                            .title(R.string.recebendo_dados)
-                            .bigTextStyle(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString())
-                            .flags(Notification.DEFAULT_LIGHTS);
-                    mLoad.simple().build();
+                    bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.recebendo_dados))
+                            .bigText(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString());
+                    mBuilder.setStyle(bigTextStyle)
+                            .setProgress(0, 0, false);
+                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
                 }
             }
-        } catch (Exception e) {
+        } catch (final Exception e) {
+            if (textStatusErro != null) {
+                ((Activity) context).runOnUiThread(new Runnable() {
+                    public void run() {
+                        textStatusErro.append("\n*" + context.getResources().getText(R.string.erro_inesperado) + " - Parametros : " + e.getMessage());
+                    }
+                });
+            }
             // Cria uma notificacao para ser manipulado
-            PugNotification.with(context)
-                    .load()
-                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + e.hashCode())
-                    .title(R.string.importar_dados_recebidos)
-                    .bigTextStyle("ImportaDadosParametros - " + e.getMessage())
-                    .smallIcon(R.mipmap.ic_launcher)
-                    .largeIcon(R.mipmap.ic_launcher)
-                    .flags(Notification.DEFAULT_ALL)
-                    .simple()
-                    .build();
+            bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.importar_dados_recebidos))
+                    .bigText("ImportaDadosParametros - " + e.getMessage());
+            mBuilder.setStyle(bigTextStyle)
+                    .setProgress(0, 0, false);
+            notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
         }
     }
 
@@ -4907,8 +6153,11 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
         JsonObject statuRetorno = null;
 
         // Atualiza a notificacao
-        mLoad.bigTextStyle(context.getResources().getString(R.string.procurando_dados) + " Imagens");
-        mLoad.progress().value(0, 0, true).build();
+        bigTextStyle.bigText(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa) + " Imagens");
+        mBuilder.setStyle(bigTextStyle)
+                .setProgress(0, 0, true);
+        notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
+
         // Checo se o texto de status foi passado pro parametro
         if (textStatus != null) {
             ((Activity) context).runOnUiThread(new Runnable() {
@@ -4937,7 +6186,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                     parametrosWebservice += "&where= " + filtraFotos + "&size=50";
                 }
                 WSSisinfoWebservice webserviceSisInfo = new WSSisinfoWebservice(context);
-                JsonObject retornoWebservice = gson.fromJson(webserviceSisInfo.executarSelectWebserviceJson(null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_CFAFOTOS, WSSisinfoWebservice.METODO_GET, parametrosWebservice, null), JsonObject.class);
+                JsonObject retornoWebservice = gson.fromJson(webserviceSisInfo.executarWebserviceJson(servidorAtivo, null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_CFAFOTOS, WSSisinfoWebservice.METODO_GET, parametrosWebservice, null), JsonObject.class);
 
                 if ((retornoWebservice != null) && (retornoWebservice.has(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO))) {
                     statuRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO);
@@ -4947,10 +6196,12 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                         JsonObject pageRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_PAGE_RETORNO);
 
-                        if (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) {
+                        if ( (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0) ) {
                             final int totalPages = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt();
                             int pageNumber = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_PAGE_NUMBER_RETORNO).getAsInt();
-
+                            if (pageNumber == 15){
+                                Integer valueInt = pageNumber;
+                            }
                             for (int ia = pageNumber; ia < totalPages; ia++) {
 
                                 statuRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO);
@@ -4959,8 +6210,9 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                 if (statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO).getAsInt() == HttpURLConnection.HTTP_OK) {
 
                                     // Atualiza a notificacao
-                                    mLoad.bigTextStyle(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
-                                    mLoad.progress().value(0, 0, true).build();
+                                    bigTextStyle.bigText(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
+                                    mBuilder.setStyle(bigTextStyle);
+                                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                     // Checo se o texto de status foi passado pro parametro
                                     if (textStatus != null) {
@@ -4976,8 +6228,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                         // Checa se retornou algum dados na lista
                                         if (listaFotosRetorno.size() > 0) {
                                             // Atualiza a notificacao
-                                            mLoad.bigTextStyle(context.getResources().getString(R.string.recebendo_dados_fotos));
-                                            mLoad.progress().value(0, listaFotosRetorno.size(), false).build();
+                                            bigTextStyle.bigText(context.getResources().getString(R.string.recebendo_dados_fotos));
+                                            mBuilder.setStyle(bigTextStyle)
+                                                    .setProgress(listaFotosRetorno.size(), 0, false);
+                                            notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                             // Checo se o texto de status foi passado pro parametro
                                             if (textStatus != null) {
@@ -4996,10 +6250,13 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                                 });
                                             }
                                             List<ContentValues> listaDadosFotos = new ArrayList<ContentValues>();
+                                            FotosSql fotosSql = new FotosSql(context);
                                             for (int i = 0; i < listaFotosRetorno.size(); i++) {
                                                 // Atualiza a notificacao
-                                                mLoad.bigTextStyle(context.getResources().getString(R.string.recebendo_dados_fotos) + " - Parte " + (pageNumber + 1) + "/" + totalPages + " - " + i + "/" + listaFotosRetorno.size());
-                                                mLoad.progress().update(0, i, listaFotosRetorno.size(), false).build();
+                                                bigTextStyle.bigText(context.getResources().getString(R.string.recebendo_dados_fotos) + " - Parte " + (pageNumber + 1) + "/" + totalPages + " - " + i + "/" + listaFotosRetorno.size());
+                                                mBuilder.setStyle(bigTextStyle)
+                                                        .setProgress(listaFotosRetorno.size(), i, false);
+                                                notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                                 // Checo se o texto de status foi passado pro parametro
                                                 if (textStatus != null) {
@@ -5020,7 +6277,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                                     });
                                                 }
                                                 JsonObject fotosRetorno = listaFotosRetorno.get(i).getAsJsonObject();
-                                                ContentValues dadosFotos = new ContentValues();
+                                                final ContentValues dadosFotos = new ContentValues();
 
                                                 if (fotosRetorno.has("foto")) {
 
@@ -5032,23 +6289,37 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                                     if (fotosRetorno.has("idAeaprodu") && fotosRetorno.get("idAeaprodu").getAsInt() > 0) {
                                                         dadosFotos.put("ID_AEAPRODU", fotosRetorno.get("idAeaprodu").getAsInt());
                                                     }
-                                                    if (fotosRetorno.has("foto")) {
-                                                        dadosFotos.put("FOTO", Base64.decode(fotosRetorno.get("foto").getAsString(), Base64.DEFAULT));
-                                                        //byte[] b1 = fotosRetorno.getAsJsonArray("foto").toString().getBytes();
-
-                                                        //dadosFotos.put("FOTO", Base64.decode(fotosRetorno.getAsJsonArray("foto").toString().getBytes(), Base64.DEFAULT));
-                                                        //dadosFotos.put("FOTO", Base64.decode(fotosRetorno.getAsJsonArray("foto").toString().getBytes(), Base64.DEFAULT));
+                                                    byte[] tmp = new byte[fotosRetorno.getAsJsonArray("foto").size()];
+                                                    for(int j = 0; j < fotosRetorno.getAsJsonArray("foto").size(); j++){
+                                                        tmp[j]=(byte)(((int)fotosRetorno.getAsJsonArray("foto").get(j).getAsInt()) & 0xFF);
                                                     }
-                                                    listaDadosFotos.add(dadosFotos);
+                                                    dadosFotos.put("FOTO", tmp);
+                                                    //listaDadosFotos.add(dadosFotos);
+
+                                                    if (fotosSql.insertOrReplace(dadosFotos) < 1){
+                                                        if (textStatusErro != null) {
+                                                            ((Activity) context).runOnUiThread(new Runnable() {
+                                                                public void run() {
+                                                                    textStatusErro.append("\n*" + context.getResources().getText(R.string.nao_conseguimos_inserir_foto) + ": " + dadosFotos.getAsInteger("ID_CFAFOTOS"));
+                                                                }
+                                                            });
+                                                        }
+                                                        todosSucesso = false;
+                                                    }
+                                                    dadosFotos.clear();
+                                                    fotosRetorno = null;
                                                 }
                                             }
-                                            FotosSql fotosSql = new FotosSql(context);
+                                            //FotosSql fotosSql = new FotosSql(context);
 
-                                            todosSucesso = fotosSql.insertList(listaDadosFotos);
+                                            //todosSucesso = fotosSql.insertList(listaDadosFotos);
                                         }
                                         // Atualiza a notificacao
-                                        mLoad.bigTextStyle(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
-                                        mLoad.progress().value(0, 0, true).build();
+                                        bigTextStyle.bigText(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
+                                        mBuilder.setStyle(bigTextStyle)
+                                                .setProgress(0, 0, true);
+                                        notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
+
 
                                         // Checo se o texto de status foi passado pro parametro
                                         if (textStatus != null) {
@@ -5066,33 +6337,27 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                             });
                                         }
                                     } else {
-                                        // Cria uma notificacao para ser manipulado
-                                        Load mLoad = PugNotification.with(context).load()
-                                                .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
-                                                .smallIcon(R.mipmap.ic_launcher)
-                                                .largeIcon(R.mipmap.ic_launcher)
-                                                .title(R.string.versao_savare_desatualizada)
-                                                .bigTextStyle(context.getResources().getString(R.string.nao_chegou_dados_servidor_empresa) + "\n" + retornoWebservice.toString())
-                                                .flags(Notification.DEFAULT_LIGHTS);
-                                        mLoad.simple().build();
+                                        bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.versao_savare_desatualizada))
+                                                .bigText(context.getResources().getString(R.string.nao_chegou_dados_servidor_empresa) + "\n" + retornoWebservice.toString());
+                                        mBuilder.setStyle(bigTextStyle)
+                                                .setProgress(0, 0, false);
+                                        notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
                                     }
+                                    // Esvazia memoria
+                                    retornoWebservice = null;
                                     // Incrementa o total de paginas
                                     pageNumber++;
                                     if (pageNumber < totalPages) {
-                                        retornoWebservice = gson.fromJson(webserviceSisInfo.executarSelectWebserviceJson(null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_CFAFOTOS, WSSisinfoWebservice.METODO_GET, parametrosWebservice + "&pageNumber=" + pageNumber, null), JsonObject.class);
+                                        retornoWebservice = gson.fromJson(webserviceSisInfo.executarWebserviceJson(servidorAtivo, null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_CFAFOTOS, WSSisinfoWebservice.METODO_GET, parametrosWebservice + "&pageNumber=" + pageNumber, null), JsonObject.class);
                                     }
                                 } else {
                                     todosSucesso = false;
 
-                                    // Cria uma notificacao para ser manipulado
-                                    Load mLoad = PugNotification.with(context).load()
-                                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
-                                            .smallIcon(R.mipmap.ic_launcher)
-                                            .largeIcon(R.mipmap.ic_launcher)
-                                            .title(R.string.recebendo_dados)
-                                            .bigTextStyle(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString())
-                                            .flags(Notification.DEFAULT_LIGHTS);
-                                    mLoad.simple().build();
+                                    bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.recebendo_dados))
+                                            .bigText(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString());
+                                    mBuilder.setStyle(bigTextStyle)
+                                            .setProgress(0, 0, false);
+                                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
                                 }
                             } // Fim do for ia (page)
                             // Checa se todos foram inseridos/atualizados com sucesso
@@ -5101,62 +6366,48 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                             }
                         }
                     } else {
-                        // Cria uma notificacao para ser manipulado
-                        Load mLoad = PugNotification.with(context).load()
-                                .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
-                                .smallIcon(R.mipmap.ic_launcher)
-                                .largeIcon(R.mipmap.ic_launcher)
-                                .title(R.string.recebendo_dados)
-                                .bigTextStyle(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString())
-                                .flags(Notification.DEFAULT_LIGHTS);
-                        mLoad.simple().build();
+                        bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.recebendo_dados))
+                                .bigText(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString());
+                        mBuilder.setStyle(bigTextStyle)
+                                .setProgress(0, 0, false);
+                        notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
                     }
                 } else {
-                    // Cria uma notificacao para ser manipulado
-                    Load mLoad = PugNotification.with(context).load()
-                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
-                            .smallIcon(R.mipmap.ic_launcher)
-                            .largeIcon(R.mipmap.ic_launcher)
-                            .title(R.string.recebendo_dados)
-                            .bigTextStyle(context.getResources().getString(R.string.nao_retornou_dados_fotos) + "\n - As Fotos voltou vazia do Servidor.")
-                            .flags(Notification.DEFAULT_LIGHTS);
-                    mLoad.simple().build();
+                    bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.recebendo_dados))
+                            .bigText(context.getResources().getString(R.string.nao_retornou_dados_fotos) + "\n - As Fotos voltou vazia do Servidor.");
+                    mBuilder.setStyle(bigTextStyle)
+                            .setProgress(0, 0, false);
+                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
                 }
             }
-        } catch (JsonParseException e) {
-            // Cria uma notificacao para ser manipulado
-            PugNotification.with(context)
-                    .load()
-                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + e.hashCode())
-                    .title(R.string.importar_dados_recebidos)
-                    .bigTextStyle("ImportaDadosFotos - " + e.getMessage())
-                    .smallIcon(R.mipmap.ic_launcher)
-                    .largeIcon(R.mipmap.ic_launcher)
-                    .flags(Notification.DEFAULT_ALL)
-                    .simple()
-                    .build();
-        } catch (Exception e) {
-            // Cria uma notificacao para ser manipulado
-            PugNotification.with(context)
-                    .load()
-                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + e.hashCode())
-                    .title(R.string.importar_dados_recebidos)
-                    .bigTextStyle("ImportaDadosFotos - \n" + e.getMessage())
-                    .smallIcon(R.mipmap.ic_launcher)
-                    .largeIcon(R.mipmap.ic_launcher)
-                    .flags(Notification.DEFAULT_ALL)
-                    .simple()
-                    .build();
+        } catch (final JsonParseException e) {
+            if (textStatusErro != null) {
+                ((Activity) context).runOnUiThread(new Runnable() {
+                    public void run() {
+                        textStatusErro.append("\n*" + context.getResources().getText(R.string.erro_inesperado) + " - Fotos : " + e.getMessage());
+                    }
+                });
+            }
+            bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.importar_dados_recebidos))
+                        .bigText("ImportarDadosFotos - " + e.getMessage());
+            mBuilder.setStyle(bigTextStyle)
+                    .setProgress(0, 0, false);
+            notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
 
-            // Cria uma notificacao para ser manipulado
-            Load mLoad = PugNotification.with(context).load()
-                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
-                    .smallIcon(R.mipmap.ic_launcher)
-                    .largeIcon(R.mipmap.ic_launcher)
-                    .title(R.string.recebendo_dados)
-                    .bigTextStyle("ImportaDadosFotos - \n" + e.getMessage())
-                    .flags(Notification.DEFAULT_LIGHTS);
-            mLoad.simple().build();
+        } catch (final Exception e) {
+            if (textStatusErro != null) {
+                ((Activity) context).runOnUiThread(new Runnable() {
+                    public void run() {
+                        textStatusErro.append("\n*" + context.getResources().getText(R.string.erro_inesperado) + " - Fotos : " + e.getMessage());
+                    }
+                });
+            }
+            bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.recebendo_dados))
+                    .bigText("ImportarDadosFotos - \n" + e.getMessage());
+            mBuilder.setStyle(bigTextStyle)
+                    .setProgress(0, 0, false);
+            notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
+
         }
     }
 
@@ -5165,8 +6416,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
         JsonObject statuRetorno = null;
 
         // Atualiza a notificacao
-        mLoad.bigTextStyle(context.getResources().getString(R.string.procurando_dados) + " Plano de Pagamento");
-        mLoad.progress().value(0, 0, true).build();
+        bigTextStyle.bigText(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa) + " Plano de Pagamento");
+        mBuilder.setStyle(bigTextStyle)
+                .setProgress(0, 0, true);
+        notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
         // Checo se o texto de status foi passado pro parametro
         if (textStatus != null) {
@@ -5194,7 +6447,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 parametrosWebservice += "&where= " + filtraPlanoPagamento;
             }
             WSSisinfoWebservice webserviceSisInfo = new WSSisinfoWebservice(context);
-            JsonObject retornoWebservice = gson.fromJson(webserviceSisInfo.executarSelectWebserviceJson(null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEAPLPGT, WSSisinfoWebservice.METODO_GET, parametrosWebservice, null), JsonObject.class);
+            JsonObject retornoWebservice = gson.fromJson(webserviceSisInfo.executarWebserviceJson(servidorAtivo, null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEAPLPGT, WSSisinfoWebservice.METODO_GET, parametrosWebservice, null), JsonObject.class);
 
             if ((retornoWebservice != null) && (retornoWebservice.has(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO))) {
                 statuRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO);
@@ -5204,7 +6457,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                     JsonObject pageRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_PAGE_RETORNO);
 
-                    if (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) {
+                    if ( (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0) ) {
                         final int totalPages = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt();
                         int pageNumber = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_PAGE_NUMBER_RETORNO).getAsInt();
 
@@ -5215,8 +6468,9 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                             // Verifica se retornou com sucesso
                             if (statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO).getAsInt() == HttpURLConnection.HTTP_OK) {
                                 // Atualiza a notificacao
-                                mLoad.bigTextStyle(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
-                                mLoad.progress().value(0, 0, true).build();
+                                bigTextStyle.bigText(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
+                                mBuilder.setStyle(bigTextStyle);
+                                notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                 // Checo se o texto de status foi passado pro parametro
                                 if (textStatus != null) {
@@ -5232,8 +6486,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                     // Checa se retornou algum dados na lista
                                     if (listaPlanoPagamentoRetorno.size() > 0) {
                                         // Atualiza a notificacao
-                                        mLoad.bigTextStyle(context.getResources().getString(R.string.recebendo_dados_plano_pagamento));
-                                        mLoad.progress().value(0, listaPlanoPagamentoRetorno.size(), false).build();
+                                        bigTextStyle.bigText(context.getResources().getString(R.string.recebendo_dados_plano_pagamento));
+                                        mBuilder.setStyle(bigTextStyle)
+                                                .setProgress(listaPlanoPagamentoRetorno.size(), 0, false);
+                                        notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                         // Checo se o texto de status foi passado pro parametro
                                         if (textStatus != null) {
@@ -5254,8 +6510,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                         List<ContentValues> listaDadosPagamento = new ArrayList<ContentValues>();
                                         for (int i = 0; i < listaPlanoPagamentoRetorno.size(); i++) {
                                             // Atualiza a notificacao
-                                            mLoad.bigTextStyle(context.getResources().getString(R.string.recebendo_dados_plano_pagamento) + " - Parte " + (pageNumber + 1) + "/" + totalPages + " - " + i + "/" + listaPlanoPagamentoRetorno.size());
-                                            mLoad.progress().update(0, i, listaPlanoPagamentoRetorno.size(), false).build();
+                                            bigTextStyle.bigText(context.getResources().getString(R.string.recebendo_dados_plano_pagamento) + " - Parte " + (pageNumber + 1) + "/" + totalPages + " - " + i + "/" + listaPlanoPagamentoRetorno.size());
+                                            mBuilder.setStyle(bigTextStyle)
+                                                    .setProgress(listaPlanoPagamentoRetorno.size(), i, false);
+                                            notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                             // Checo se o texto de status foi passado pro parametro
                                             if (textStatus != null) {
@@ -5280,6 +6538,21 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                                             dadosPagamento.put("ID_AEAPLPGT", pagamentoRetorno.get("idAeaplpgt").getAsInt());
                                             dadosPagamento.put("ID_SMAEMPRE", pagamentoRetorno.get("idSmaempre").getAsInt());
+                                            if (pagamentoRetorno.has("idCfamoeda")) {
+                                                dadosPagamento.put("ID_CFAMOEDA", pagamentoRetorno.get("idCfamoeda").getAsString());
+                                            }
+                                            if (pagamentoRetorno.has("idCfatpdoc")) {
+                                                dadosPagamento.put("ID_CFATPDOC", pagamentoRetorno.get("idCfatpdoc").getAsString());
+                                            }
+                                            if (pagamentoRetorno.has("idAeaplpgtEquivalente")) {
+                                                dadosPagamento.put("ID_AEAPLPGT_EQUIVALENTE", pagamentoRetorno.get("idAeaplpgtEquivalente").getAsString());
+                                            }
+                                            if (pagamentoRetorno.has("idAeaforma")) {
+                                                dadosPagamento.put("ID_AEAFORMA", pagamentoRetorno.get("idAeaforma").getAsString());
+                                            }
+                                            dadosPagamento.put("GUID", pagamentoRetorno.get("guid").getAsString());
+                                            dadosPagamento.put("US_CAD", pagamentoRetorno.get("usCad").getAsString());
+                                            dadosPagamento.put("DT_CAD", pagamentoRetorno.get("dtCad").getAsString());
                                             dadosPagamento.put("DT_ALT", pagamentoRetorno.get("dtAlt").getAsString());
                                             dadosPagamento.put("CODIGO", pagamentoRetorno.get("codigo").getAsInt());
                                             dadosPagamento.put("DESCRICAO", pagamentoRetorno.get("descricao").getAsString());
@@ -5289,16 +6562,39 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                             }
                                             dadosPagamento.put("ATAC_VAREJO", pagamentoRetorno.get("atacVarejo").getAsString());
                                             dadosPagamento.put("VISTA_PRAZO", pagamentoRetorno.get("vistaPrazo").getAsString());
+                                            dadosPagamento.put("COMISSAO", pagamentoRetorno.get("comissao").getAsString());
+                                            dadosPagamento.put("PERC_DESC_COMISSAO", pagamentoRetorno.get("percDescComissao").getAsDouble());
                                             dadosPagamento.put("PERC_DESC_ATAC", pagamentoRetorno.get("percDescAtac").getAsDouble());
                                             dadosPagamento.put("PERC_DESC_VARE", pagamentoRetorno.get("percDescVare").getAsDouble());
+                                            dadosPagamento.put("PERC_DESC_SERV", pagamentoRetorno.get("percDescServ").getAsDouble());
                                             if (pagamentoRetorno.has("descPromocao")) {
                                                 dadosPagamento.put("DESC_PROMOCAO", pagamentoRetorno.get("descPromocao").getAsString());
                                             }
+                                            dadosPagamento.put("PERC_ENTRADA", pagamentoRetorno.get("percEntrada").getAsDouble());
+                                            dadosPagamento.put("QTDE_PARCELAS1", pagamentoRetorno.get("qtdeParcelas1").getAsInt());
+                                            dadosPagamento.put("DIAS_ENTRADA", pagamentoRetorno.get("diasEntrada").getAsInt());
+                                            dadosPagamento.put("QTDE_PARCELAS2", pagamentoRetorno.get("qtdeParcelas2").getAsInt());
+                                            dadosPagamento.put("DIAS_PARCELAS2", pagamentoRetorno.get("diasParcelas2").getAsInt());
+                                            dadosPagamento.put("QTDE_PARCELAS3", pagamentoRetorno.get("qtdeParcelas3").getAsInt());
+                                            dadosPagamento.put("DIAS_PARCELAS3", pagamentoRetorno.get("diasParcelas3").getAsInt());
                                             if (pagamentoRetorno.has("juroMedioAtac")) {
                                                 dadosPagamento.put("JURO_MEDIO_ATAC", pagamentoRetorno.get("juroMedioAtac").getAsDouble());
                                             }
-                                            dadosPagamento.put("JURO_MEDIO_VARE", pagamentoRetorno.get("juroMedioVare").getAsDouble());
-                                            //dadosPagamento.put("DIAS_MEDIOS", pagamentoRetorno.get("diasMedios").getAsInt());
+                                            if (pagamentoRetorno.has("juroMedioVare")) {
+                                                dadosPagamento.put("JURO_MEDIO_VARE", pagamentoRetorno.get("juroMedioVare").getAsDouble());
+                                            }
+                                            if (pagamentoRetorno.has("juroMedioServ")) {
+                                                dadosPagamento.put("JURO_MEDIO_SERV", pagamentoRetorno.get("juroMedioServ").getAsDouble());
+                                            }
+                                            if (pagamentoRetorno.has("juroMedioLocal")) {
+                                                dadosPagamento.put("JURO_MEDIO_LOCAL", pagamentoRetorno.get("juroMedioLocal").getAsString());
+                                            }
+                                            if (pagamentoRetorno.has("temRegras")) {
+                                                dadosPagamento.put("TEM_REGRAS", pagamentoRetorno.get("temRegras").getAsInt());
+                                            }
+                                            if (pagamentoRetorno.has("enviaPalm")) {
+                                                dadosPagamento.put("ENVIA_PALM", pagamentoRetorno.get("enviaPalm").getAsString());
+                                            }
                                             listaDadosPagamento.add(dadosPagamento);
                                         }
                                         PlanoPagamentoSql planoPagamentoSql = new PlanoPagamentoSql(context);
@@ -5306,8 +6602,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                         todosSucesso = planoPagamentoSql.insertList(listaDadosPagamento);
                                     }
                                     // Atualiza a notificacao
-                                    mLoad.bigTextStyle(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
-                                    mLoad.progress().value(0, 0, true).build();
+                                    bigTextStyle.bigText(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
+                                    mBuilder.setStyle(bigTextStyle)
+                                            .setProgress(0, 0, true);
+                                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                     // Checo se o texto de status foi passado pro parametro
                                     if (textStatus != null) {
@@ -5326,32 +6624,26 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                     }
                                 } else {
                                     // Cria uma notificacao para ser manipulado
-                                    Load mLoad = PugNotification.with(context).load()
-                                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
-                                            .smallIcon(R.mipmap.ic_launcher)
-                                            .largeIcon(R.mipmap.ic_launcher)
-                                            .title(R.string.versao_savare_desatualizada)
-                                            .bigTextStyle(context.getResources().getString(R.string.nao_chegou_dados_servidor_empresa) + "\n" + retornoWebservice.toString())
-                                            .flags(Notification.DEFAULT_LIGHTS);
-                                    mLoad.simple().build();
+                                    bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.versao_savare_desatualizada))
+                                            .bigText(context.getResources().getString(R.string.nao_chegou_dados_servidor_empresa) + "\n" + retornoWebservice.toString());
+                                    mBuilder.setStyle(bigTextStyle)
+                                            .setProgress(0, 0, false);
+                                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
                                 }
                                 // Incrementa o total de paginas
                                 pageNumber++;
                                 if (pageNumber < totalPages) {
-                                    retornoWebservice = gson.fromJson(webserviceSisInfo.executarSelectWebserviceJson(null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEAPLPGT, WSSisinfoWebservice.METODO_GET, parametrosWebservice + "&pageNumber=" + pageNumber, null), JsonObject.class);
+                                    retornoWebservice = gson.fromJson(webserviceSisInfo.executarWebserviceJson(servidorAtivo, null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEAPLPGT, WSSisinfoWebservice.METODO_GET, parametrosWebservice + "&pageNumber=" + pageNumber, null), JsonObject.class);
                                 }
                             } else {
                                 todosSucesso = false;
 
                                 // Cria uma notificacao para ser manipulado
-                                Load mLoad = PugNotification.with(context).load()
-                                        .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
-                                        .smallIcon(R.mipmap.ic_launcher)
-                                        .largeIcon(R.mipmap.ic_launcher)
-                                        .title(R.string.recebendo_dados)
-                                        .bigTextStyle(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString())
-                                        .flags(Notification.DEFAULT_LIGHTS);
-                                mLoad.simple().build();
+                                bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.recebendo_dados))
+                                        .bigText(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString());
+                                mBuilder.setStyle(bigTextStyle)
+                                        .setProgress(0, 0, false);
+                                notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
                             }
                         } //Fim for ia (page)
                         // Checa se todos foram inseridos/atualizados com sucesso
@@ -5361,28 +6653,26 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                     }
                 } else {
                     // Cria uma notificacao para ser manipulado
-                    Load mLoad = PugNotification.with(context).load()
-                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
-                            .smallIcon(R.mipmap.ic_launcher)
-                            .largeIcon(R.mipmap.ic_launcher)
-                            .title(R.string.recebendo_dados)
-                            .bigTextStyle(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString())
-                            .flags(Notification.DEFAULT_LIGHTS);
-                    mLoad.simple().build();
+                    bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.recebendo_dados))
+                            .bigText(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString());
+                    mBuilder.setStyle(bigTextStyle)
+                            .setProgress(0, 0, false);
+                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
                 }
             }
-        } catch (Exception e) {
-            // Cria uma notificacao para ser manipulado
-            PugNotification.with(context)
-                    .load()
-                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + e.hashCode())
-                    .title(R.string.importar_dados_recebidos)
-                    .bigTextStyle("ImportaDadosPlanoPagamento - " + e.getMessage())
-                    .smallIcon(R.mipmap.ic_launcher)
-                    .largeIcon(R.mipmap.ic_launcher)
-                    .flags(Notification.DEFAULT_ALL)
-                    .simple()
-                    .build();
+        } catch (final Exception e) {
+            if (textStatusErro != null) {
+                ((Activity) context).runOnUiThread(new Runnable() {
+                    public void run() {
+                        textStatusErro.append("\n*" + context.getResources().getText(R.string.erro_inesperado) + " - Plano de Pagamento : " + e.getMessage());
+                    }
+                });
+            }
+            bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.importar_dados_recebidos))
+                    .bigText("ImportaDadosPlanoPagamento - " + e.getMessage());
+            mBuilder.setStyle(bigTextStyle)
+                    .setProgress(0, 0, false);
+            notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
         }
     }
 
@@ -5391,8 +6681,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
         JsonObject statuRetorno = null;
 
         // Atualiza a notificacao
-        mLoad.bigTextStyle(context.getResources().getString(R.string.procurando_dados) + " Classe de Produto");
-        mLoad.progress().value(0, 0, true).build();
+        bigTextStyle.bigText(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa) + " Classe de Produto");
+        mBuilder.setStyle(bigTextStyle)
+                .setProgress(0, 0, true);
+        notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
         // Checo se o texto de status foi passado pro parametro
         if (textStatus != null) {
@@ -5414,7 +6706,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 parametrosWebservice += "&where= (DT_ALT >= '" + ultimaData + "')";
             }
             WSSisinfoWebservice webserviceSisInfo = new WSSisinfoWebservice(context);
-            JsonObject retornoWebservice = gson.fromJson(webserviceSisInfo.executarSelectWebserviceJson(null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEACLASE, WSSisinfoWebservice.METODO_GET, parametrosWebservice, null), JsonObject.class);
+            JsonObject retornoWebservice = gson.fromJson(webserviceSisInfo.executarWebserviceJson(servidorAtivo, null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEACLASE, WSSisinfoWebservice.METODO_GET, parametrosWebservice, null), JsonObject.class);
 
             if ((retornoWebservice != null) && (retornoWebservice.has(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO))) {
                 statuRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO);
@@ -5424,7 +6716,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                     JsonObject pageRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_PAGE_RETORNO);
 
-                    if (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) {
+                    if ( (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0) ) {
                         final int totalPages = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt();
                         int pageNumber = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_PAGE_NUMBER_RETORNO).getAsInt();
 
@@ -5436,8 +6728,9 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                             if (statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO).getAsInt() == HttpURLConnection.HTTP_OK) {
 
                                 // Atualiza a notificacao
-                                mLoad.bigTextStyle(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
-                                mLoad.progress().value(0, 0, true).build();
+                                bigTextStyle.bigText(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
+                                mBuilder.setStyle(bigTextStyle);
+                                notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                 // Checo se o texto de status foi passado pro parametro
                                 if (textStatus != null) {
@@ -5453,8 +6746,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                     // Checa se retornou algum dados na lista
                                     if (listaClasseRetorno.size() > 0) {
                                         // Atualiza a notificacao
-                                        mLoad.bigTextStyle(context.getResources().getString(R.string.recebendo_dados_classe_produto));
-                                        mLoad.progress().value(0, listaClasseRetorno.size(), false).build();
+                                        bigTextStyle.bigText(context.getResources().getString(R.string.recebendo_dados_classe_produto));
+                                        mBuilder.setStyle(bigTextStyle)
+                                                .setProgress(listaClasseRetorno.size(), 0, false);
+                                        notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                         // Checo se o texto de status foi passado pro parametro
                                         if (textStatus != null) {
@@ -5475,8 +6770,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                         List<ContentValues> listaDadosClasse = new ArrayList<ContentValues>();
                                         for (int i = 0; i < listaClasseRetorno.size(); i++) {
                                             // Atualiza a notificacao
-                                            mLoad.bigTextStyle(context.getResources().getString(R.string.recebendo_dados_classe_produto) + " - Parte " + (pageNumber + 1) + "/" + totalPages + " - " + i + "/" + listaClasseRetorno.size());
-                                            mLoad.progress().update(0, i, listaClasseRetorno.size(), false).build();
+                                            bigTextStyle.bigText(context.getResources().getString(R.string.recebendo_dados_classe_produto) + " - Parte " + (pageNumber + 1) + "/" + totalPages + " - " + i + "/" + listaClasseRetorno.size());
+                                            mBuilder.setStyle(bigTextStyle)
+                                                    .setProgress(listaClasseRetorno.size(), i, false);
+                                            notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                             // Checo se o texto de status foi passado pro parametro
                                             if (textStatus != null) {
@@ -5511,8 +6808,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                         todosSucesso = classeSql.insertList(listaDadosClasse);
                                     }
                                     // Atualiza a notificacao
-                                    mLoad.bigTextStyle(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
-                                    mLoad.progress().value(0, 0, true).build();
+                                    bigTextStyle.bigText(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
+                                    mBuilder.setStyle(bigTextStyle)
+                                            .setProgress(0, 0, true);
+                                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                     // Checo se o texto de status foi passado pro parametro
                                     if (textStatus != null) {
@@ -5531,32 +6830,26 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                     }
                                 } else {
                                     // Cria uma notificacao para ser manipulado
-                                    Load mLoad = PugNotification.with(context).load()
-                                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
-                                            .smallIcon(R.mipmap.ic_launcher)
-                                            .largeIcon(R.mipmap.ic_launcher)
-                                            .title(R.string.versao_savare_desatualizada)
-                                            .bigTextStyle(context.getResources().getString(R.string.nao_chegou_dados_servidor_empresa) + "\n" + retornoWebservice.toString())
-                                            .flags(Notification.DEFAULT_LIGHTS);
-                                    mLoad.simple().build();
+                                    bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.versao_savare_desatualizada))
+                                            .bigText(context.getResources().getString(R.string.nao_chegou_dados_servidor_empresa) + "\n" + retornoWebservice.toString());
+                                    mBuilder.setStyle(bigTextStyle)
+                                            .setProgress(0, 0, false);
+                                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
                                 }
                                 // Incrementa o total de paginas
                                 pageNumber++;
                                 if (pageNumber < totalPages) {
-                                    retornoWebservice = gson.fromJson(webserviceSisInfo.executarSelectWebserviceJson(null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEACLASE, WSSisinfoWebservice.METODO_GET, parametrosWebservice + "&pageNumber=" + pageNumber, null), JsonObject.class);
+                                    retornoWebservice = gson.fromJson(webserviceSisInfo.executarWebserviceJson(servidorAtivo, null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEACLASE, WSSisinfoWebservice.METODO_GET, parametrosWebservice + "&pageNumber=" + pageNumber, null), JsonObject.class);
                                 }
                             } else {
                                 todosSucesso = false;
 
                                 // Cria uma notificacao para ser manipulado
-                                Load mLoad = PugNotification.with(context).load()
-                                        .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
-                                        .smallIcon(R.mipmap.ic_launcher)
-                                        .largeIcon(R.mipmap.ic_launcher)
-                                        .title(R.string.recebendo_dados)
-                                        .bigTextStyle(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString())
-                                        .flags(Notification.DEFAULT_LIGHTS);
-                                mLoad.simple().build();
+                                bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.recebendo_dados))
+                                        .bigText(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString());
+                                mBuilder.setStyle(bigTextStyle)
+                                        .setProgress(0, 0, false);
+                                notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
                             }
                         } // Fim for ia (page)
                         // Checa se todos foram inseridos/atualizados com sucesso
@@ -5566,28 +6859,26 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                     }
                 } else {
                     // Cria uma notificacao para ser manipulado
-                    Load mLoad = PugNotification.with(context).load()
-                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
-                            .smallIcon(R.mipmap.ic_launcher)
-                            .largeIcon(R.mipmap.ic_launcher)
-                            .title(R.string.recebendo_dados)
-                            .bigTextStyle(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString())
-                            .flags(Notification.DEFAULT_LIGHTS);
-                    mLoad.simple().build();
+                    bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.recebendo_dados))
+                            .bigText(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString());
+                    mBuilder.setStyle(bigTextStyle)
+                            .setProgress(0, 0, false);
+                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
                 }
             }
-        } catch (Exception e) {
-            // Cria uma notificacao para ser manipulado
-            PugNotification.with(context)
-                    .load()
-                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + e.hashCode())
-                    .title(R.string.importar_dados_recebidos)
-                    .bigTextStyle("ImportaDadosClasseProdutos - " + e.getMessage())
-                    .smallIcon(R.mipmap.ic_launcher)
-                    .largeIcon(R.mipmap.ic_launcher)
-                    .flags(Notification.DEFAULT_ALL)
-                    .simple()
-                    .build();
+        } catch (final Exception e) {
+            if (textStatusErro != null) {
+                ((Activity) context).runOnUiThread(new Runnable() {
+                    public void run() {
+                        textStatusErro.append("\n*" + context.getResources().getText(R.string.erro_inesperado) + " - Classe de Produtos : " + e.getMessage());
+                    }
+                });
+            }
+            bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.importar_dados_recebidos))
+                    .bigText("ImportaDadosClasseProdutos - " + e.getMessage());
+            mBuilder.setStyle(bigTextStyle)
+                    .setProgress(0, 0, false);
+            notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
         }
     }
 
@@ -5596,8 +6887,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
         JsonObject statuRetorno = null;
 
         // Atualiza a notificacao
-        mLoad.bigTextStyle(context.getResources().getString(R.string.procurando_dados) + " Unidade de Venda");
-        mLoad.progress().value(0, 0, true).build();
+        bigTextStyle.bigText(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa) + " Unidade de Venda");
+        mBuilder.setStyle(bigTextStyle)
+                .setProgress(0, 0, true);
+        notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
         // Checo se o texto de status foi passado pro parametro
         if (textStatus != null) {
@@ -5619,7 +6912,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 parametrosWebservice += "&where= (DT_ALT >= '" + ultimaData + "')";
             }
             WSSisinfoWebservice webserviceSisInfo = new WSSisinfoWebservice(context);
-            JsonObject retornoWebservice = gson.fromJson(webserviceSisInfo.executarSelectWebserviceJson(null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEAUNVEN, WSSisinfoWebservice.METODO_GET, parametrosWebservice, null), JsonObject.class);
+            JsonObject retornoWebservice = gson.fromJson(webserviceSisInfo.executarWebserviceJson(servidorAtivo, null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEAUNVEN, WSSisinfoWebservice.METODO_GET, parametrosWebservice, null), JsonObject.class);
 
             if ((retornoWebservice != null) && (retornoWebservice.has(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO))) {
                 statuRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO);
@@ -5629,7 +6922,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                     JsonObject pageRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_PAGE_RETORNO);
 
-                    if (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) {
+                    if ( (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0) ) {
                         final int totalPages = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt();
                         int pageNumber = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_PAGE_NUMBER_RETORNO).getAsInt();
 
@@ -5640,8 +6933,9 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                             // Verifica se retornou com sucesso
                             if (statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO).getAsInt() == HttpURLConnection.HTTP_OK) {
                                 // Atualiza a notificacao
-                                mLoad.bigTextStyle(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
-                                mLoad.progress().value(0, 0, true).build();
+                                bigTextStyle.bigText(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
+                                mBuilder.setStyle(bigTextStyle);
+                                notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                 // Checo se o texto de status foi passado pro parametro
                                 if (textStatus != null) {
@@ -5657,8 +6951,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                     // Checa se retornou algum dados na lista
                                     if (listaUnidadeVendaRetorno.size() > 0) {
                                         // Atualiza a notificacao
-                                        mLoad.bigTextStyle(context.getResources().getString(R.string.recebendo_dados_unidade_venda));
-                                        mLoad.progress().value(0, listaUnidadeVendaRetorno.size(), false).build();
+                                        bigTextStyle.bigText(context.getResources().getString(R.string.recebendo_dados_unidade_venda));
+                                        mBuilder.setStyle(bigTextStyle)
+                                                .setProgress(listaUnidadeVendaRetorno.size(), 0, false);
+                                        notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                         // Checo se o texto de status foi passado pro parametro
                                         if (textStatus != null) {
@@ -5679,8 +6975,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                         List<ContentValues> listaDadosUnidade = new ArrayList<ContentValues>();
                                         for (int i = 0; i < listaUnidadeVendaRetorno.size(); i++) {
                                             // Atualiza a notificacao
-                                            mLoad.bigTextStyle(context.getResources().getString(R.string.recebendo_dados_unidade_venda) + " - Parte " + (pageNumber + 1) + "/" + totalPages + " - " + i + "/" + listaUnidadeVendaRetorno.size());
-                                            mLoad.progress().update(0, i, listaUnidadeVendaRetorno.size(), false).build();
+                                            bigTextStyle.bigText(context.getResources().getString(R.string.recebendo_dados_unidade_venda) + " - Parte " + (pageNumber + 1) + "/" + totalPages + " - " + i + "/" + listaUnidadeVendaRetorno.size());
+                                            mBuilder.setStyle(bigTextStyle)
+                                                    .setProgress(listaUnidadeVendaRetorno.size(), i, false);
+                                            notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                             // Checo se o texto de status foi passado pro parametro
                                             if (textStatus != null) {
@@ -5715,8 +7013,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                         todosSucesso = unidadeVendaSql.insertList(listaDadosUnidade);
                                     }
                                     // Atualiza a notificacao
-                                    mLoad.bigTextStyle(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
-                                    mLoad.progress().value(0, 0, true).build();
+                                    bigTextStyle.bigText(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
+                                    mBuilder.setStyle(bigTextStyle)
+                                            .setProgress(0, 0, true);
+                                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                     // Checo se o texto de status foi passado pro parametro
                                     if (textStatus != null) {
@@ -5735,32 +7035,26 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                     }
                                 } else {
                                     // Cria uma notificacao para ser manipulado
-                                    Load mLoad = PugNotification.with(context).load()
-                                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
-                                            .smallIcon(R.mipmap.ic_launcher)
-                                            .largeIcon(R.mipmap.ic_launcher)
-                                            .title(R.string.versao_savare_desatualizada)
-                                            .bigTextStyle(context.getResources().getString(R.string.nao_chegou_dados_servidor_empresa) + "\n" + retornoWebservice.toString())
-                                            .flags(Notification.DEFAULT_LIGHTS);
-                                    mLoad.simple().build();
+                                    bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.versao_savare_desatualizada))
+                                            .bigText(context.getResources().getString(R.string.nao_chegou_dados_servidor_empresa) + "\n" + retornoWebservice.toString());
+                                    mBuilder.setStyle(bigTextStyle)
+                                            .setProgress(0, 0, false);
+                                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
                                 }
                                 // Incrementa o total de paginas
                                 pageNumber++;
                                 if (pageNumber < totalPages) {
-                                    retornoWebservice = gson.fromJson(webserviceSisInfo.executarSelectWebserviceJson(null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEAUNVEN, WSSisinfoWebservice.METODO_GET, parametrosWebservice + "&pageNumber=" + pageNumber, null), JsonObject.class);
+                                    retornoWebservice = gson.fromJson(webserviceSisInfo.executarWebserviceJson(servidorAtivo, null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEAUNVEN, WSSisinfoWebservice.METODO_GET, parametrosWebservice + "&pageNumber=" + pageNumber, null), JsonObject.class);
                                 }
                             } else {
                                 todosSucesso = false;
 
                                 // Cria uma notificacao para ser manipulado
-                                Load mLoad = PugNotification.with(context).load()
-                                        .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
-                                        .smallIcon(R.mipmap.ic_launcher)
-                                        .largeIcon(R.mipmap.ic_launcher)
-                                        .title(R.string.recebendo_dados)
-                                        .bigTextStyle(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString())
-                                        .flags(Notification.DEFAULT_LIGHTS);
-                                mLoad.simple().build();
+                                bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.recebendo_dados))
+                                        .bigText(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString());
+                                mBuilder.setStyle(bigTextStyle)
+                                        .setProgress(0, 0, false);
+                                notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
                             }
                         } //Fim for ia (page)
                         // Checa se todos foram inseridos/atualizados com sucesso
@@ -5770,28 +7064,26 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                     }
                 } else {
                     // Cria uma notificacao para ser manipulado
-                    Load mLoad = PugNotification.with(context).load()
-                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
-                            .smallIcon(R.mipmap.ic_launcher)
-                            .largeIcon(R.mipmap.ic_launcher)
-                            .title(R.string.recebendo_dados)
-                            .bigTextStyle(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString())
-                            .flags(Notification.DEFAULT_LIGHTS);
-                    mLoad.simple().build();
+                    bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.recebendo_dados))
+                            .bigText(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString());
+                    mBuilder.setStyle(bigTextStyle)
+                            .setProgress(0, 0, false);
+                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
                 }
             }
-        } catch (Exception e) {
-            // Cria uma notificacao para ser manipulado
-            PugNotification.with(context)
-                    .load()
-                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + e.hashCode())
-                    .title(R.string.importar_dados_recebidos)
-                    .bigTextStyle("ImportaDadosUnidadeVenda - " + e.getMessage())
-                    .smallIcon(R.mipmap.ic_launcher)
-                    .largeIcon(R.mipmap.ic_launcher)
-                    .flags(Notification.DEFAULT_ALL)
-                    .simple()
-                    .build();
+        } catch (final Exception e) {
+            if (textStatusErro != null) {
+                ((Activity) context).runOnUiThread(new Runnable() {
+                    public void run() {
+                        textStatusErro.append("\n*" + context.getResources().getText(R.string.erro_inesperado) + " - Unidade de Venda : " + e.getMessage());
+                    }
+                });
+            }
+            bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.importar_dados_recebidos))
+                    .bigText("ImportaDadosUnidadeVenda - " + e.getMessage());
+            mBuilder.setStyle(bigTextStyle)
+                    .setProgress(0, 0, false);
+            notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
         }
     }
 
@@ -5799,8 +7091,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
         JsonObject statuRetorno = null;
 
         // Atualiza a notificacao
-        mLoad.bigTextStyle(context.getResources().getString(R.string.procurando_dados) + " Grade de Produto");
-        mLoad.progress().value(0, 0, true).build();
+        bigTextStyle.bigText(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa) + " Grade de Produto");
+        mBuilder.setStyle(bigTextStyle)
+                .setProgress(0, 0, true);
+        notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
         // Checo se o texto de status foi passado pro parametro
         if (textStatus != null) {
@@ -5822,7 +7116,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 parametrosWebservice += "&where= (DT_ALT >= '" + ultimaData + "')";
             }
             WSSisinfoWebservice webserviceSisInfo = new WSSisinfoWebservice(context);
-            JsonObject retornoWebservice = gson.fromJson(webserviceSisInfo.executarSelectWebserviceJson(null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEAGRADE, WSSisinfoWebservice.METODO_GET, parametrosWebservice, null), JsonObject.class);
+            JsonObject retornoWebservice = gson.fromJson(webserviceSisInfo.executarWebserviceJson(servidorAtivo, null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEAGRADE, WSSisinfoWebservice.METODO_GET, parametrosWebservice, null), JsonObject.class);
 
             if ((retornoWebservice != null) && (retornoWebservice.has(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO))) {
                 statuRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO);
@@ -5832,7 +7126,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                     JsonObject pageRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_PAGE_RETORNO);
 
-                    if (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) {
+                    if ( (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0) ) {
                         final int totalPages = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt();
                         int pageNumber = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_PAGE_NUMBER_RETORNO).getAsInt();
 
@@ -5843,8 +7137,9 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                             // Verifica se retornou com sucesso
                             if (statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO).getAsInt() == HttpURLConnection.HTTP_OK) {
                                 // Atualiza a notificacao
-                                mLoad.bigTextStyle(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
-                                mLoad.progress().value(0, 0, true).build();
+                                bigTextStyle.bigText(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
+                                mBuilder.setStyle(bigTextStyle);
+                                notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                 // Checo se o texto de status foi passado pro parametro
                                 if (textStatus != null) {
@@ -5860,8 +7155,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                     // Checa se retornou algum dados na lista
                                     if (listaGradeRetorno.size() > 0) {
                                         // Atualiza a notificacao
-                                        mLoad.bigTextStyle(context.getResources().getString(R.string.recebendo_dados_grade));
-                                        mLoad.progress().value(0, listaGradeRetorno.size(), false).build();
+                                        bigTextStyle.bigText(context.getResources().getString(R.string.recebendo_dados_grade));
+                                        mBuilder.setStyle(bigTextStyle)
+                                                .setProgress(listaGradeRetorno.size(), 0, false);
+                                        notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                         // Checo se o texto de status foi passado pro parametro
                                         if (textStatus != null) {
@@ -5882,8 +7179,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                         List<ContentValues> listaDadosGrade = new ArrayList<ContentValues>();
                                         for (int i = 0; i < listaGradeRetorno.size(); i++) {
                                             // Atualiza a notificacao
-                                            mLoad.bigTextStyle(context.getResources().getString(R.string.recebendo_dados_grade) + " - Parte " + (pageNumber + 1) + "/" + totalPages + " - " + i + "/" + listaGradeRetorno.size());
-                                            mLoad.progress().update(0, i, listaGradeRetorno.size(), false).build();
+                                            bigTextStyle.bigText(context.getResources().getString(R.string.recebendo_dados_grade) + " - Parte " + (pageNumber + 1) + "/" + totalPages + " - " + i + "/" + listaGradeRetorno.size());
+                                            mBuilder.setStyle(bigTextStyle)
+                                                    .setProgress(listaGradeRetorno.size(), i, false);
+                                            notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                             // Checo se o texto de status foi passado pro parametro
                                             if (textStatus != null) {
@@ -5917,8 +7216,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                         todosSucesso = gradeSql.insertList(listaDadosGrade);
                                     }
                                     // Atualiza a notificacao
-                                    mLoad.bigTextStyle(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
-                                    mLoad.progress().value(0, 0, true).build();
+                                    bigTextStyle.bigText(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
+                                    mBuilder.setStyle(bigTextStyle)
+                                            .setProgress(0, 0, true);
+                                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                     // Checo se o texto de status foi passado pro parametro
                                     if (textStatus != null) {
@@ -5937,32 +7238,26 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                     }
                                 } else {
                                     // Cria uma notificacao para ser manipulado
-                                    Load mLoad = PugNotification.with(context).load()
-                                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
-                                            .smallIcon(R.mipmap.ic_launcher)
-                                            .largeIcon(R.mipmap.ic_launcher)
-                                            .title(R.string.versao_savare_desatualizada)
-                                            .bigTextStyle(context.getResources().getString(R.string.nao_chegou_dados_servidor_empresa) + "\n" + retornoWebservice.toString())
-                                            .flags(Notification.DEFAULT_LIGHTS);
-                                    mLoad.simple().build();
+                                    bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.versao_savare_desatualizada))
+                                            .bigText(context.getResources().getString(R.string.nao_chegou_dados_servidor_empresa) + "\n" + retornoWebservice.toString());
+                                    mBuilder.setStyle(bigTextStyle)
+                                            .setProgress(0, 0, false);
+                                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
                                 }
                                 // Incrementa o total de paginas
                                 pageNumber++;
                                 if (pageNumber < totalPages) {
-                                    retornoWebservice = gson.fromJson(webserviceSisInfo.executarSelectWebserviceJson(null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEAGRADE, WSSisinfoWebservice.METODO_GET, parametrosWebservice + "&pageNumber=" + pageNumber, null), JsonObject.class);
+                                    retornoWebservice = gson.fromJson(webserviceSisInfo.executarWebserviceJson(servidorAtivo, null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEAGRADE, WSSisinfoWebservice.METODO_GET, parametrosWebservice + "&pageNumber=" + pageNumber, null), JsonObject.class);
                                 }
                             } else {
                                 todosSucesso = false;
 
                                 // Cria uma notificacao para ser manipulado
-                                Load mLoad = PugNotification.with(context).load()
-                                        .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
-                                        .smallIcon(R.mipmap.ic_launcher)
-                                        .largeIcon(R.mipmap.ic_launcher)
-                                        .title(R.string.recebendo_dados)
-                                        .bigTextStyle(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString())
-                                        .flags(Notification.DEFAULT_LIGHTS);
-                                mLoad.simple().build();
+                                bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.recebendo_dados))
+                                        .bigText(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString());
+                                mBuilder.setStyle(bigTextStyle)
+                                        .setProgress(0, 0, false);
+                                notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
                             }
                         } // Fim do for ia (page)
                         // Checa se todos foram inseridos/atualizados com sucesso
@@ -5972,28 +7267,26 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                     }
                 } else {
                     // Cria uma notificacao para ser manipulado
-                    Load mLoad = PugNotification.with(context).load()
-                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
-                            .smallIcon(R.mipmap.ic_launcher)
-                            .largeIcon(R.mipmap.ic_launcher)
-                            .title(R.string.recebendo_dados)
-                            .bigTextStyle(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString())
-                            .flags(Notification.DEFAULT_LIGHTS);
-                    mLoad.simple().build();
+                    bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.recebendo_dados))
+                            .bigText(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString());
+                    mBuilder.setStyle(bigTextStyle)
+                            .setProgress(0, 0, false);
+                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
                 }
             }
-        } catch (Exception e) {
-            // Cria uma notificacao para ser manipulado
-            PugNotification.with(context)
-                    .load()
-                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + e.hashCode())
-                    .title(R.string.importar_dados_recebidos)
-                    .bigTextStyle("ImportaDadosGrade - " + e.getMessage())
-                    .smallIcon(R.mipmap.ic_launcher)
-                    .largeIcon(R.mipmap.ic_launcher)
-                    .flags(Notification.DEFAULT_ALL)
-                    .simple()
-                    .build();
+        } catch (final Exception e) {
+            if (textStatusErro != null) {
+                ((Activity) context).runOnUiThread(new Runnable() {
+                    public void run() {
+                        textStatusErro.append("\n*" + context.getResources().getText(R.string.erro_inesperado) + " - Grade de Produtos : " + e.getMessage());
+                    }
+                });
+            }
+            bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.importar_dados_recebidos))
+                    .bigText("ImportaDadosGrade - " + e.getMessage());
+            mBuilder.setStyle(bigTextStyle)
+                    .setProgress(0, 0, false);
+            notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
         }
     }
 
@@ -6001,8 +7294,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
         JsonObject statuRetorno = null;
 
         // Atualiza a notificacao
-        mLoad.bigTextStyle(context.getResources().getString(R.string.procurando_dados) + " Marca");
-        mLoad.progress().value(0, 0, true).build();
+        bigTextStyle.bigText(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa) + " Marca");
+        mBuilder.setStyle(bigTextStyle)
+                .setProgress(0, 0, true);
+        notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
         // Checo se o texto de status foi passado pro parametro
         if (textStatus != null) {
@@ -6024,7 +7319,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 parametrosWebservice += "&where= (DT_ALT >= '" + ultimaData + "')";
             }
             WSSisinfoWebservice webserviceSisInfo = new WSSisinfoWebservice(context);
-            JsonObject retornoWebservice = gson.fromJson(webserviceSisInfo.executarSelectWebserviceJson(null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEAMARCA, WSSisinfoWebservice.METODO_GET, parametrosWebservice, null), JsonObject.class);
+            JsonObject retornoWebservice = gson.fromJson(webserviceSisInfo.executarWebserviceJson(servidorAtivo, null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEAMARCA, WSSisinfoWebservice.METODO_GET, parametrosWebservice, null), JsonObject.class);
 
             if ((retornoWebservice != null) && (retornoWebservice.has(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO))) {
                 statuRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO);
@@ -6034,7 +7329,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                     JsonObject pageRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_PAGE_RETORNO);
 
-                    if (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) {
+                    if ( (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0) ) {
                         final int totalPages = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt();
                         int pageNumber = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_PAGE_NUMBER_RETORNO).getAsInt();
 
@@ -6046,8 +7341,9 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                             if (statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO).getAsInt() == HttpURLConnection.HTTP_OK) {
 
                                 // Atualiza a notificacao
-                                mLoad.bigTextStyle(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
-                                mLoad.progress().value(0, 0, true).build();
+                                bigTextStyle.bigText(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
+                                mBuilder.setStyle(bigTextStyle);
+                                notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                 // Checo se o texto de status foi passado pro parametro
                                 if (textStatus != null) {
@@ -6063,8 +7359,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                     // Checa se retornou algum dados na lista
                                     if (listaMarcaRetorno.size() > 0) {
                                         // Atualiza a notificacao
-                                        mLoad.bigTextStyle(context.getResources().getString(R.string.recebendo_dados_marca));
-                                        mLoad.progress().value(0, listaMarcaRetorno.size(), false).build();
+                                        bigTextStyle.bigText(context.getResources().getString(R.string.recebendo_dados_marca));
+                                        mBuilder.setStyle(bigTextStyle)
+                                                .setProgress(listaMarcaRetorno.size(), 0, false);
+                                        notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                         // Checo se o texto de status foi passado pro parametro
                                         if (textStatus != null) {
@@ -6085,8 +7383,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                         List<ContentValues> listaDadosMarca = new ArrayList<ContentValues>();
                                         for (int i = 0; i < listaMarcaRetorno.size(); i++) {
                                             // Atualiza a notificacao
-                                            mLoad.bigTextStyle(context.getResources().getString(R.string.recebendo_dados_marca) + " - Parte " + (pageNumber + 1) + "/" + totalPages + " - " + i + "/" + listaMarcaRetorno.size());
-                                            mLoad.progress().update(0, i, listaMarcaRetorno.size(), false).build();
+                                            bigTextStyle.bigText(context.getResources().getString(R.string.recebendo_dados_marca) + " - Parte " + (pageNumber + 1) + "/" + totalPages + " - " + i + "/" + listaMarcaRetorno.size());
+                                            mBuilder.setStyle(bigTextStyle)
+                                                    .setProgress(listaMarcaRetorno.size(), i, false);
+                                            notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                             // Checo se o texto de status foi passado pro parametro
                                             if (textStatus != null) {
@@ -6122,8 +7422,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                                     }
                                     // Atualiza a notificacao
-                                    mLoad.bigTextStyle(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
-                                    mLoad.progress().value(0, 0, true).build();
+                                    bigTextStyle.bigText(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
+                                    mBuilder.setStyle(bigTextStyle)
+                                            .setProgress(0, 0, true);
+                                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                     // Checo se o texto de status foi passado pro parametro
                                     if (textStatus != null) {
@@ -6142,32 +7444,26 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                     }
                                 } else {
                                     // Cria uma notificacao para ser manipulado
-                                    Load mLoad = PugNotification.with(context).load()
-                                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
-                                            .smallIcon(R.mipmap.ic_launcher)
-                                            .largeIcon(R.mipmap.ic_launcher)
-                                            .title(R.string.versao_savare_desatualizada)
-                                            .bigTextStyle(context.getResources().getString(R.string.nao_chegou_dados_servidor_empresa) + "\n" + retornoWebservice.toString())
-                                            .flags(Notification.DEFAULT_LIGHTS);
-                                    mLoad.simple().build();
+                                    bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.versao_savare_desatualizada))
+                                            .bigText(context.getResources().getString(R.string.nao_chegou_dados_servidor_empresa) + "\n" + retornoWebservice.toString());
+                                    mBuilder.setStyle(bigTextStyle)
+                                            .setProgress(0, 0, false);
+                                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
                                 }
                                 // Incrementa o total de paginas
                                 pageNumber++;
                                 if (pageNumber < totalPages) {
-                                    retornoWebservice = gson.fromJson(webserviceSisInfo.executarSelectWebserviceJson(null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEAMARCA, WSSisinfoWebservice.METODO_GET, parametrosWebservice + "&pageNumber=" + pageNumber, null), JsonObject.class);
+                                    retornoWebservice = gson.fromJson(webserviceSisInfo.executarWebserviceJson(servidorAtivo, null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEAMARCA, WSSisinfoWebservice.METODO_GET, parametrosWebservice + "&pageNumber=" + pageNumber, null), JsonObject.class);
                                 }
                             } else {
                                 todosSucesso = false;
 
                                 // Cria uma notificacao para ser manipulado
-                                Load mLoad = PugNotification.with(context).load()
-                                        .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
-                                        .smallIcon(R.mipmap.ic_launcher)
-                                        .largeIcon(R.mipmap.ic_launcher)
-                                        .title(R.string.recebendo_dados)
-                                        .bigTextStyle(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString())
-                                        .flags(Notification.DEFAULT_LIGHTS);
-                                mLoad.simple().build();
+                                bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.recebendo_dados))
+                                        .bigText(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString());
+                                mBuilder.setStyle(bigTextStyle)
+                                        .setProgress(0, 0, false);
+                                notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
                             }
                         } // Fim for ia (page)
                         // Checa se todos foram inseridos/atualizados com sucesso
@@ -6177,28 +7473,26 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                     }
                 } else {
                     // Cria uma notificacao para ser manipulado
-                    Load mLoad = PugNotification.with(context).load()
-                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
-                            .smallIcon(R.mipmap.ic_launcher)
-                            .largeIcon(R.mipmap.ic_launcher)
-                            .title(R.string.recebendo_dados)
-                            .bigTextStyle(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString())
-                            .flags(Notification.DEFAULT_LIGHTS);
-                    mLoad.simple().build();
+                    bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.recebendo_dados))
+                            .bigText(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString());
+                    mBuilder.setStyle(bigTextStyle)
+                            .setProgress(0, 0, false);
+                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
                 }
             }
-        } catch (Exception e) {
-            // Cria uma notificacao para ser manipulado
-            PugNotification.with(context)
-                    .load()
-                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + e.hashCode())
-                    .title(R.string.importar_dados_recebidos)
-                    .bigTextStyle("ImportaDadosMarca - " + e.getMessage())
-                    .smallIcon(R.mipmap.ic_launcher)
-                    .largeIcon(R.mipmap.ic_launcher)
-                    .flags(Notification.DEFAULT_ALL)
-                    .simple()
-                    .build();
+        } catch (final Exception e) {
+            if (textStatusErro != null) {
+                ((Activity) context).runOnUiThread(new Runnable() {
+                    public void run() {
+                        textStatusErro.append("\n*" + context.getResources().getText(R.string.erro_inesperado) + " - Marca : " + e.getMessage());
+                    }
+                });
+            }
+            bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.importar_dados_recebidos))
+                    .bigText("ImportaDadosMarca - " + e.getMessage());
+            mBuilder.setStyle(bigTextStyle)
+                    .setProgress(0, 0, false);
+            notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
         }
     }
 
@@ -6206,8 +7500,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
         JsonObject statuRetorno = null;
 
         // Atualiza a notificacao
-        mLoad.bigTextStyle(context.getResources().getString(R.string.procurando_dados) + " Situação Tributária");
-        mLoad.progress().value(0, 0, true).build();
+        bigTextStyle.bigText(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa) + " Situação Tributária");
+        mBuilder.setStyle(bigTextStyle)
+                .setProgress(0, 0, true);
+        notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
         // Checo se o texto de status foi passado pro parametro
         if (textStatus != null) {
@@ -6229,7 +7525,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 parametrosWebservice += "&where= (DT_ALT >= '" + ultimaData + "')";
             }
             WSSisinfoWebservice webserviceSisInfo = new WSSisinfoWebservice(context);
-            JsonObject retornoWebservice = gson.fromJson(webserviceSisInfo.executarSelectWebserviceJson(null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEACODST, WSSisinfoWebservice.METODO_GET, parametrosWebservice, null), JsonObject.class);
+            JsonObject retornoWebservice = gson.fromJson(webserviceSisInfo.executarWebserviceJson(servidorAtivo, null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEACODST, WSSisinfoWebservice.METODO_GET, parametrosWebservice, null), JsonObject.class);
 
             if ((retornoWebservice != null) && (retornoWebservice.has(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO))) {
                 statuRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO);
@@ -6239,7 +7535,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                     JsonObject pageRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_PAGE_RETORNO);
 
-                    if (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) {
+                    if ( (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0) ) {
                         final int totalPages = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt();
                         int pageNumber = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_PAGE_NUMBER_RETORNO).getAsInt();
 
@@ -6250,8 +7546,9 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                             // Verifica se retornou com sucesso
                             if (statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO).getAsInt() == HttpURLConnection.HTTP_OK) {
                                 // Atualiza a notificacao
-                                mLoad.bigTextStyle(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
-                                mLoad.progress().value(0, 0, true).build();
+                                bigTextStyle.bigText(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
+                                mBuilder.setStyle(bigTextStyle);
+                                notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                 // Checo se o texto de status foi passado pro parametro
                                 if (textStatus != null) {
@@ -6267,8 +7564,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                     // Checa se retornou algum dados na lista
                                     if (listaTributariaRetorno.size() > 0) {
                                         // Atualiza a notificacao
-                                        mLoad.bigTextStyle(context.getResources().getString(R.string.recebendo_dados_situacao_tributaria));
-                                        mLoad.progress().value(0, listaTributariaRetorno.size(), false).build();
+                                        bigTextStyle.bigText(context.getResources().getString(R.string.recebendo_dados_situacao_tributaria));
+                                        mBuilder.setStyle(bigTextStyle)
+                                                .setProgress(listaTributariaRetorno.size(), 0, false);
+                                        notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                         // Checo se o texto de status foi passado pro parametro
                                         if (textStatus != null) {
@@ -6289,8 +7588,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                         List<ContentValues> listaDadosSituacao = new ArrayList<ContentValues>();
                                         for (int i = 0; i < listaTributariaRetorno.size(); i++) {
                                             // Atualiza a notificacao
-                                            mLoad.bigTextStyle(context.getResources().getString(R.string.recebendo_dados_situacao_tributaria) + " - Parte " + (pageNumber + 1) + "/" + totalPages + " - " + i + "/" + listaTributariaRetorno.size());
-                                            mLoad.progress().update(0, i, listaTributariaRetorno.size(), false).build();
+                                            bigTextStyle.bigText(context.getResources().getString(R.string.recebendo_dados_situacao_tributaria) + " - Parte " + (pageNumber + 1) + "/" + totalPages + " - " + i + "/" + listaTributariaRetorno.size());
+                                            mBuilder.setStyle(bigTextStyle)
+                                                    .setProgress(listaTributariaRetorno.size(), i, false);
+                                            notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                             // Checo se o texto de status foi passado pro parametro
                                             if (textStatus != null) {
@@ -6328,8 +7629,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                         todosSucesso = situacaoTributariaSql.insertList(listaDadosSituacao);
                                     }
                                     // Atualiza a notificacao
-                                    mLoad.bigTextStyle(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
-                                    mLoad.progress().value(0, 0, true).build();
+                                    bigTextStyle.bigText(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
+                                    mBuilder.setStyle(bigTextStyle)
+                                            .setProgress(0, 0, true);
+                                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                     // Checo se o texto de status foi passado pro parametro
                                     if (textStatus != null) {
@@ -6348,32 +7651,26 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                     }
                                 } else {
                                     // Cria uma notificacao para ser manipulado
-                                    Load mLoad = PugNotification.with(context).load()
-                                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
-                                            .smallIcon(R.mipmap.ic_launcher)
-                                            .largeIcon(R.mipmap.ic_launcher)
-                                            .title(R.string.versao_savare_desatualizada)
-                                            .bigTextStyle(context.getResources().getString(R.string.nao_chegou_dados_servidor_empresa) + "\n" + retornoWebservice.toString())
-                                            .flags(Notification.DEFAULT_LIGHTS);
-                                    mLoad.simple().build();
+                                    bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.versao_savare_desatualizada))
+                                            .bigText(context.getResources().getString(R.string.nao_chegou_dados_servidor_empresa) + "\n" + retornoWebservice.toString());
+                                    mBuilder.setStyle(bigTextStyle)
+                                            .setProgress(0, 0, false);
+                                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
                                 }
                                 // Incrementa o total de paginas
                                 pageNumber++;
                                 if (pageNumber < totalPages) {
-                                    retornoWebservice = gson.fromJson(webserviceSisInfo.executarSelectWebserviceJson(null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEACODST, WSSisinfoWebservice.METODO_GET, parametrosWebservice + "&pageNumber=" + pageNumber, null), JsonObject.class);
+                                    retornoWebservice = gson.fromJson(webserviceSisInfo.executarWebserviceJson(servidorAtivo, null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEACODST, WSSisinfoWebservice.METODO_GET, parametrosWebservice + "&pageNumber=" + pageNumber, null), JsonObject.class);
                                 }
                             } else {
                                 todosSucesso = false;
 
                                 // Cria uma notificacao para ser manipulado
-                                Load mLoad = PugNotification.with(context).load()
-                                        .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
-                                        .smallIcon(R.mipmap.ic_launcher)
-                                        .largeIcon(R.mipmap.ic_launcher)
-                                        .title(R.string.recebendo_dados)
-                                        .bigTextStyle(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString())
-                                        .flags(Notification.DEFAULT_LIGHTS);
-                                mLoad.simple().build();
+                                bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.recebendo_dados))
+                                        .bigText(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString());
+                                mBuilder.setStyle(bigTextStyle)
+                                        .setProgress(0, 0, false);
+                                notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
                             }
                         } // FIm do for ia (page)
                         // Checa se todos foram inseridos/atualizados com sucesso
@@ -6383,28 +7680,26 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                     }
                 } else {
                     // Cria uma notificacao para ser manipulado
-                    Load mLoad = PugNotification.with(context).load()
-                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
-                            .smallIcon(R.mipmap.ic_launcher)
-                            .largeIcon(R.mipmap.ic_launcher)
-                            .title(R.string.recebendo_dados)
-                            .bigTextStyle(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString())
-                            .flags(Notification.DEFAULT_LIGHTS);
-                    mLoad.simple().build();
+                    bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.recebendo_dados))
+                            .bigText(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString());
+                    mBuilder.setStyle(bigTextStyle)
+                            .setProgress(0, 0, false);
+                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
                 }
             }
-        } catch (Exception e) {
-            // Cria uma notificacao para ser manipulado
-            PugNotification.with(context)
-                    .load()
-                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + e.hashCode())
-                    .title(R.string.importar_dados_recebidos)
-                    .bigTextStyle("ImportaDadosSituacaoTributaria - " + e.getMessage())
-                    .smallIcon(R.mipmap.ic_launcher)
-                    .largeIcon(R.mipmap.ic_launcher)
-                    .flags(Notification.DEFAULT_ALL)
-                    .simple()
-                    .build();
+        } catch (final Exception e) {
+            if (textStatusErro != null) {
+                ((Activity) context).runOnUiThread(new Runnable() {
+                    public void run() {
+                        textStatusErro.append("\n*" + context.getResources().getText(R.string.erro_inesperado) + " - Situação Trib. : " + e.getMessage());
+                    }
+                });
+            }
+            bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.importar_dados_recebidos))
+                    .bigText("ImportaDadosSituacaoTributaria - " + e.getMessage());
+            mBuilder.setStyle(bigTextStyle)
+                    .setProgress(0, 0, false);
+            notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
         }
     }
 
@@ -6413,8 +7708,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
         JsonObject statuRetorno = null;
 
         // Atualiza a notificacao
-        mLoad.bigTextStyle(context.getResources().getString(R.string.procurando_dados) + " Produto");
-        mLoad.progress().value(0, 0, true).build();
+        bigTextStyle.bigText(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa) + " Produto");
+        mBuilder.setStyle(bigTextStyle)
+                .setProgress(0, 0, true);
+        notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
         // Checo se o texto de status foi passado pro parametro
         if (textStatus != null) {
@@ -6441,7 +7738,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 parametrosWebservice += "&where= (ATIVO = '1') ";
             }
             WSSisinfoWebservice webserviceSisInfo = new WSSisinfoWebservice(context);
-            JsonObject retornoWebservice = gson.fromJson(webserviceSisInfo.executarSelectWebserviceJson(null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEAPRODU, WSSisinfoWebservice.METODO_GET, parametrosWebservice, null), JsonObject.class);
+            JsonObject retornoWebservice = gson.fromJson(webserviceSisInfo.executarWebserviceJson(servidorAtivo, null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEAPRODU, WSSisinfoWebservice.METODO_GET, parametrosWebservice, null), JsonObject.class);
 
             if ((retornoWebservice != null) && (retornoWebservice.has(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO))) {
                 statuRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO);
@@ -6451,7 +7748,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                     JsonObject pageRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_PAGE_RETORNO);
 
-                    if (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) {
+                    if ( (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0) ) {
                         final int totalPages = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt();
                         int pageNumber = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_PAGE_NUMBER_RETORNO).getAsInt();
 
@@ -6462,8 +7759,9 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                             // Verifica se retornou com sucesso
                             if (statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO).getAsInt() == HttpURLConnection.HTTP_OK) {
                                 // Atualiza a notificacao
-                                mLoad.bigTextStyle(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
-                                mLoad.progress().value(0, 0, true).build();
+                                bigTextStyle.bigText(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
+                                mBuilder.setStyle(bigTextStyle);
+                                notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                 // Checo se o texto de status foi passado pro parametro
                                 if (textStatus != null) {
@@ -6479,8 +7777,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                     // Checa se retornou algum dados na lista
                                     if (listaProdutoRetorno.size() > 0) {
                                         // Atualiza a notificacao
-                                        mLoad.bigTextStyle(context.getResources().getString(R.string.recebendo_dados_produto));
-                                        mLoad.progress().value(0, listaProdutoRetorno.size(), false).build();
+                                        bigTextStyle.bigText(context.getResources().getString(R.string.recebendo_dados_produto));
+                                        mBuilder.setStyle(bigTextStyle)
+                                                .setProgress(listaProdutoRetorno.size(), 0, false);
+                                        notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                         // Checo se o texto de status foi passado pro parametro
                                         if (textStatus != null) {
@@ -6501,8 +7801,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                         List<ContentValues> listaDadosProduto = new ArrayList<ContentValues>();
                                         for (int i = 0; i < listaProdutoRetorno.size(); i++) {
                                             // Atualiza a notificacao
-                                            mLoad.bigTextStyle(context.getResources().getString(R.string.recebendo_dados_produto) + " - Parte " + (pageNumber + 1) + "/" + totalPages + " - " + i + "/" + listaProdutoRetorno.size());
-                                            mLoad.progress().update(0, i, listaProdutoRetorno.size(), false).build();
+                                            bigTextStyle.bigText(context.getResources().getString(R.string.recebendo_dados_produto) + " - Parte " + (pageNumber + 1) + "/" + totalPages + " - " + i + "/" + listaProdutoRetorno.size());
+                                            mBuilder.setStyle(bigTextStyle)
+                                                    .setProgress(listaProdutoRetorno.size(), i, false);
+                                            notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                             // Checo se o texto de status foi passado pro parametro
                                             if (textStatus != null) {
@@ -6526,8 +7828,17 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                             ContentValues dadosProduto = new ContentValues();
 
                                             dadosProduto.put("ID_AEAPRODU", produtoRetorno.get("idAeaprodu").getAsInt());
+                                            if (produtoRetorno.has("idAeafamil") && produtoRetorno.get("idAeafamil").getAsInt() > 0) {
+                                                dadosProduto.put("ID_AEAFAMIL", produtoRetorno.get("idAeafamil").getAsInt());
+                                            }
                                             if (produtoRetorno.has("idAeaclase") && produtoRetorno.get("idAeaclase").getAsInt() > 0) {
                                                 dadosProduto.put("ID_AEACLASE", produtoRetorno.get("idAeaclase").getAsInt());
+                                            }
+                                            if (produtoRetorno.has("idAeagrupo") && produtoRetorno.get("idAeagrupo").getAsInt() > 0) {
+                                                dadosProduto.put("ID_AEAGRUPO", produtoRetorno.get("idAeagrupo").getAsInt());
+                                            }
+                                            if (produtoRetorno.has("idAeasgrup") && produtoRetorno.get("idAeasgrup").getAsInt() > 0) {
+                                                dadosProduto.put("ID_AEASGRUP", produtoRetorno.get("idAeasgrup").getAsInt());
                                             }
                                             if (produtoRetorno.has("idAeamarca") && produtoRetorno.get("idAeamarca").getAsInt() > 0) {
                                                 dadosProduto.put("ID_AEAMARCA", produtoRetorno.get("idAeamarca").getAsInt());
@@ -6565,8 +7876,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                         todosSucesso = produtoSql.insertList(listaDadosProduto);
                                     }
                                     // Atualiza a notificacao
-                                    mLoad.bigTextStyle(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
-                                    mLoad.progress().value(0, 0, true).build();
+                                    bigTextStyle.bigText(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
+                                    mBuilder.setStyle(bigTextStyle)
+                                            .setProgress(0, 0, true);
+                                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                     // Checo se o texto de status foi passado pro parametro
                                     if (textStatus != null) {
@@ -6585,32 +7898,26 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                     }
                                 } else {
                                     // Cria uma notificacao para ser manipulado
-                                    Load mLoad = PugNotification.with(context).load()
-                                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
-                                            .smallIcon(R.mipmap.ic_launcher)
-                                            .largeIcon(R.mipmap.ic_launcher)
-                                            .title(R.string.versao_savare_desatualizada)
-                                            .bigTextStyle(context.getResources().getString(R.string.nao_chegou_dados_servidor_empresa) + "\n" + retornoWebservice.toString())
-                                            .flags(Notification.DEFAULT_LIGHTS);
-                                    mLoad.simple().build();
+                                    bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.versao_savare_desatualizada))
+                                            .bigText(context.getResources().getString(R.string.nao_chegou_dados_servidor_empresa) + "\n" + retornoWebservice.toString());
+                                    mBuilder.setStyle(bigTextStyle)
+                                            .setProgress(0, 0, false);
+                                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
                                 }
                                 // Incrementa o total de paginas
                                 pageNumber++;
                                 if (pageNumber < totalPages) {
-                                    retornoWebservice = gson.fromJson(webserviceSisInfo.executarSelectWebserviceJson(null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEAPRODU, WSSisinfoWebservice.METODO_GET, parametrosWebservice + "&pageNumber=" + pageNumber, null), JsonObject.class);
+                                    retornoWebservice = gson.fromJson(webserviceSisInfo.executarWebserviceJson(servidorAtivo, null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEAPRODU, WSSisinfoWebservice.METODO_GET, parametrosWebservice + "&pageNumber=" + pageNumber, null), JsonObject.class);
                                 }
                             } else {
                                 todosSucesso = false;
 
                                 // Cria uma notificacao para ser manipulado
-                                Load mLoad = PugNotification.with(context).load()
-                                        .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
-                                        .smallIcon(R.mipmap.ic_launcher)
-                                        .largeIcon(R.mipmap.ic_launcher)
-                                        .title(R.string.recebendo_dados)
-                                        .bigTextStyle(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString())
-                                        .flags(Notification.DEFAULT_LIGHTS);
-                                mLoad.simple().build();
+                                bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.recebendo_dados))
+                                        .bigText(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString());
+                                mBuilder.setStyle(bigTextStyle)
+                                        .setProgress(0, 0, false);
+                                notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
                             }
                         } // Fim do for ia (page)
                         // Checa se todos foram inseridos/atualizados com sucesso
@@ -6620,28 +7927,26 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                     }
                 } else {
                     // Cria uma notificacao para ser manipulado
-                    Load mLoad = PugNotification.with(context).load()
-                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
-                            .smallIcon(R.mipmap.ic_launcher)
-                            .largeIcon(R.mipmap.ic_launcher)
-                            .title(R.string.recebendo_dados)
-                            .bigTextStyle(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString())
-                            .flags(Notification.DEFAULT_LIGHTS);
-                    mLoad.simple().build();
+                    bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.recebendo_dados))
+                            .bigText(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString());
+                    mBuilder.setStyle(bigTextStyle)
+                            .setProgress(0, 0, false);
+                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
                 }
             }
-        } catch (Exception e) {
-            // Cria uma notificacao para ser manipulado
-            PugNotification.with(context)
-                    .load()
-                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + e.hashCode())
-                    .title(R.string.importar_dados_recebidos)
-                    .bigTextStyle("ImportaDadosProduto - " + e.getMessage())
-                    .smallIcon(R.mipmap.ic_launcher)
-                    .largeIcon(R.mipmap.ic_launcher)
-                    .flags(Notification.DEFAULT_ALL)
-                    .simple()
-                    .build();
+        } catch (final Exception e) {
+            if (textStatusErro != null) {
+                ((Activity) context).runOnUiThread(new Runnable() {
+                    public void run() {
+                        textStatusErro.append("\n*" + context.getResources().getText(R.string.erro_inesperado) + " - Produto : " + e.getMessage());
+                    }
+                });
+            }
+            bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.importar_dados_recebidos))
+                    .bigText("ImportaDadosProduto - " + e.getMessage());
+            mBuilder.setStyle(bigTextStyle)
+                    .setProgress(0, 0, false);
+            notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
         }
     }
 
@@ -6650,8 +7955,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
         JsonObject statuRetorno = null;
 
         // Atualiza a notificacao
-        mLoad.bigTextStyle(context.getResources().getString(R.string.procurando_dados) + " Preço");
-        mLoad.progress().value(0, 0, true).build();
+        bigTextStyle.bigText(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa) + " Preço");
+        mBuilder.setStyle(bigTextStyle)
+                .setProgress(0, 0, true);
+        notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
         // Checo se o texto de status foi passado pro parametro
         if (textStatus != null) {
@@ -6677,7 +7984,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 parametrosWebservice += "&where= " + filtro;
             }
             WSSisinfoWebservice webserviceSisInfo = new WSSisinfoWebservice(context);
-            JsonObject retornoWebservice = gson.fromJson(webserviceSisInfo.executarSelectWebserviceJson(null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEAPRECO, WSSisinfoWebservice.METODO_GET, parametrosWebservice, null), JsonObject.class);
+            JsonObject retornoWebservice = gson.fromJson(webserviceSisInfo.executarWebserviceJson(servidorAtivo, null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEAPRECO, WSSisinfoWebservice.METODO_GET, parametrosWebservice, null), JsonObject.class);
 
             if ((retornoWebservice != null) && (retornoWebservice.has(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO))) {
                 statuRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO);
@@ -6687,7 +7994,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                     JsonObject pageRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_PAGE_RETORNO);
 
-                    if (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) {
+                    if ( (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0) ) {
                         final int totalPages = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt();
                         int pageNumber = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_PAGE_NUMBER_RETORNO).getAsInt();
 
@@ -6698,8 +8005,9 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                             // Verifica se retornou com sucesso
                             if (statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO).getAsInt() == HttpURLConnection.HTTP_OK) {
                                 // Atualiza a notificacao
-                                mLoad.bigTextStyle(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
-                                mLoad.progress().value(0, 0, true).build();
+                                bigTextStyle.bigText(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
+                                mBuilder.setStyle(bigTextStyle);
+                                notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                 // Checo se o texto de status foi passado pro parametro
                                 if (textStatus != null) {
@@ -6715,8 +8023,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                     // Checa se retornou algum dados na lista
                                     if (listaPrecoRetorno.size() > 0) {
                                         // Atualiza a notificacao
-                                        mLoad.bigTextStyle(context.getResources().getString(R.string.recebendo_dados_preco));
-                                        mLoad.progress().value(0, listaPrecoRetorno.size(), false).build();
+                                        bigTextStyle.bigText(context.getResources().getString(R.string.recebendo_dados_preco));
+                                        mBuilder.setStyle(bigTextStyle)
+                                                .setProgress(listaPrecoRetorno.size(), 0, false);
+                                        notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                         // Checo se o texto de status foi passado pro parametro
                                         if (textStatus != null) {
@@ -6737,8 +8047,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                         List<ContentValues> listaDadosPreco = new ArrayList<ContentValues>();
                                         for (int i = 0; i < listaPrecoRetorno.size(); i++) {
                                             // Atualiza a notificacao
-                                            mLoad.bigTextStyle(context.getResources().getString(R.string.recebendo_dados_preco) + " - Parte " + (pageNumber + 1) + "/" + totalPages + " - " + i + "/" + listaPrecoRetorno.size());
-                                            mLoad.progress().update(0, i, listaPrecoRetorno.size(), false).build();
+                                            bigTextStyle.bigText(context.getResources().getString(R.string.recebendo_dados_preco) + " - Parte " + (pageNumber + 1) + "/" + totalPages + " - " + i + "/" + listaPrecoRetorno.size());
+                                            mBuilder.setStyle(bigTextStyle)
+                                                    .setProgress(listaPrecoRetorno.size(), i, false);
+                                            notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                             // Checo se o texto de status foi passado pro parametro
                                             if (textStatus != null) {
@@ -6782,8 +8094,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                         todosSucesso = precoSql.insertList(listaDadosPreco);
                                     }
                                     // Atualiza a notificacao
-                                    mLoad.bigTextStyle(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
-                                    mLoad.progress().value(0, 0, true).build();
+                                    bigTextStyle.bigText(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
+                                    mBuilder.setStyle(bigTextStyle)
+                                            .setProgress(0, 0, true);
+                                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                     // Checo se o texto de status foi passado pro parametro
                                     if (textStatus != null) {
@@ -6802,32 +8116,35 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                     }
                                 } else {
                                     // Cria uma notificacao para ser manipulado
-                                    Load mLoad = PugNotification.with(context).load()
-                                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode() + new Random().nextInt())
+                                    /*Load mLoad = PugNotification.with(context).load()
+                                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100) + new Random().nextInt(100))
                                             .smallIcon(R.mipmap.ic_launcher)
                                             .largeIcon(R.mipmap.ic_launcher)
                                             .title(R.string.recebendo_dados_preco)
                                             .bigTextStyle(context.getResources().getString(R.string.nao_chegou_dados_servidor_empresa) + "\n" + retornoWebservice.toString())
                                             .flags(Notification.DEFAULT_LIGHTS);
-                                    mLoad.simple().build();
+                                    mLoad.simple().build();*/
+
+                                    bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.recebendo_dados_preco))
+                                            .bigText(context.getResources().getString(R.string.nao_chegou_dados_servidor_empresa) + "\n" + retornoWebservice.toString());
+                                    mBuilder.setStyle(bigTextStyle)
+                                            .setProgress(0, 0, false);
+                                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
                                 }
                                 // Incrementa o total de paginas
                                 pageNumber++;
                                 if (pageNumber < totalPages) {
-                                    retornoWebservice = gson.fromJson(webserviceSisInfo.executarSelectWebserviceJson(null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEAPRECO, WSSisinfoWebservice.METODO_GET, parametrosWebservice + "&pageNumber=" + pageNumber, null), JsonObject.class);
+                                    retornoWebservice = gson.fromJson(webserviceSisInfo.executarWebserviceJson(servidorAtivo, null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEAPRECO, WSSisinfoWebservice.METODO_GET, parametrosWebservice + "&pageNumber=" + pageNumber, null), JsonObject.class);
                                 }
                             } else {
                                 todosSucesso = false;
 
                                 // Cria uma notificacao para ser manipulado
-                                Load mLoad = PugNotification.with(context).load()
-                                        .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
-                                        .smallIcon(R.mipmap.ic_launcher)
-                                        .largeIcon(R.mipmap.ic_launcher)
-                                        .title(R.string.recebendo_dados)
-                                        .bigTextStyle(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString())
-                                        .flags(Notification.DEFAULT_LIGHTS);
-                                mLoad.simple().build();
+                                bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.recebendo_dados))
+                                        .bigText(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString());
+                                mBuilder.setStyle(bigTextStyle)
+                                        .setProgress(0, 0, false);
+                                notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
                             }
                         } // Fim do for ia (page)
                         // Checa se todos foram inseridos/atualizados com sucesso
@@ -6837,28 +8154,27 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                     }
                 } else {
                     // Cria uma notificacao para ser manipulado
-                    Load mLoad = PugNotification.with(context).load()
-                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
-                            .smallIcon(R.mipmap.ic_launcher)
-                            .largeIcon(R.mipmap.ic_launcher)
-                            .title(R.string.recebendo_dados)
-                            .bigTextStyle(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString())
-                            .flags(Notification.DEFAULT_LIGHTS);
-                    mLoad.simple().build();
+                    bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.recebendo_dados))
+                            .bigText(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString());
+                    mBuilder.setStyle(bigTextStyle)
+                            .setProgress(0, 0, false);
+                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
                 }
             }
-        } catch (Exception e) {
+        } catch (final Exception e) {
+            if (textStatusErro != null) {
+                ((Activity) context).runOnUiThread(new Runnable() {
+                    public void run() {
+                        textStatusErro.append("\n*" + context.getResources().getText(R.string.erro_inesperado) + " - Preço : " + e.getMessage());
+                    }
+                });
+            }
             // Cria uma notificacao para ser manipulado
-            PugNotification.with(context)
-                    .load()
-                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + e.hashCode() + new Random().nextInt())
-                    .title(R.string.importar_dados_recebidos)
-                    .bigTextStyle("ImportaDadosPreco - " + e.getMessage())
-                    .smallIcon(R.mipmap.ic_launcher)
-                    .largeIcon(R.mipmap.ic_launcher)
-                    .flags(Notification.DEFAULT_ALL)
-                    .simple()
-                    .build();
+            bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.importar_dados_recebidos))
+                    .bigText("ImportaDadosPreco - " + e.getMessage());
+            mBuilder.setStyle(bigTextStyle)
+                    .setProgress(0, 0, false);
+            notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
         }
     }
 
@@ -6866,8 +8182,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
         JsonObject statuRetorno = null;
 
         // Atualiza a notificacao
-        mLoad.bigTextStyle(context.getResources().getString(R.string.procurando_dados) + " Embalagem de Produto");
-        mLoad.progress().value(0, 0, true).build();
+        bigTextStyle.bigText(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa) + " Embalagem de Produto");
+        mBuilder.setStyle(bigTextStyle)
+                .setProgress(0, 0, true);
+        notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
         // Checo se o texto de status foi passado pro parametro
         if (textStatus != null) {
@@ -6894,7 +8212,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 parametrosWebservice += "&where= " + filtro;
             }
             WSSisinfoWebservice webserviceSisInfo = new WSSisinfoWebservice(context);
-            JsonObject retornoWebservice = gson.fromJson(webserviceSisInfo.executarSelectWebserviceJson(null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEAEMBAL, WSSisinfoWebservice.METODO_GET, parametrosWebservice, null), JsonObject.class);
+            JsonObject retornoWebservice = gson.fromJson(webserviceSisInfo.executarWebserviceJson(servidorAtivo, null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEAEMBAL, WSSisinfoWebservice.METODO_GET, parametrosWebservice, null), JsonObject.class);
 
             if ((retornoWebservice != null) && (retornoWebservice.has(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO))) {
                 statuRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO);
@@ -6904,7 +8222,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                     JsonObject pageRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_PAGE_RETORNO);
 
-                    if (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) {
+                    if ( (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0) ) {
                         final int totalPages = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt();
                         int pageNumber = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_PAGE_NUMBER_RETORNO).getAsInt();
 
@@ -6915,8 +8233,9 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                             // Verifica se retornou com sucesso
                             if (statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO).getAsInt() == HttpURLConnection.HTTP_OK) {
                                 // Atualiza a notificacao
-                                mLoad.bigTextStyle(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
-                                mLoad.progress().value(0, 0, true).build();
+                                bigTextStyle.bigText(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
+                                mBuilder.setStyle(bigTextStyle);
+                                notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                 // Checo se o texto de status foi passado pro parametro
                                 if (textStatus != null) {
@@ -6932,8 +8251,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                     // Checa se retornou algum dados na lista
                                     if (listaEmbalagemRetorno.size() > 0) {
                                         // Atualiza a notificacao
-                                        mLoad.bigTextStyle(context.getResources().getString(R.string.recebendo_dados_embalagem));
-                                        mLoad.progress().value(0, listaEmbalagemRetorno.size(), false).build();
+                                        bigTextStyle.bigText(context.getResources().getString(R.string.recebendo_dados_embalagem));
+                                        mBuilder.setStyle(bigTextStyle)
+                                                .setProgress(listaEmbalagemRetorno.size(), 0, false);
+                                        notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                         // Checo se o texto de status foi passado pro parametro
                                         if (textStatus != null) {
@@ -6954,8 +8275,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                         List<ContentValues> listaDadosEmbalagem = new ArrayList<ContentValues>();
                                         for (int i = 0; i < listaEmbalagemRetorno.size(); i++) {
                                             // Atualiza a notificacao
-                                            mLoad.bigTextStyle(context.getResources().getString(R.string.recebendo_dados_embalagem) + " - Parte " + (pageNumber + 1) + "/" + totalPages + " - " + i + "/" + listaEmbalagemRetorno.size());
-                                            mLoad.progress().update(0, i, listaEmbalagemRetorno.size(), false).build();
+                                            bigTextStyle.bigText(context.getResources().getString(R.string.recebendo_dados_embalagem) + " - Parte " + (pageNumber + 1) + "/" + totalPages + " - " + i + "/" + listaEmbalagemRetorno.size());
+                                            mBuilder.setStyle(bigTextStyle)
+                                                    .setProgress(listaEmbalagemRetorno.size(), i, false);
+                                            notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                             // Checo se o texto de status foi passado pro parametro
                                             if (textStatus != null) {
@@ -7016,8 +8339,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                                     }
                                     // Atualiza a notificacao
-                                    mLoad.bigTextStyle(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
-                                    mLoad.progress().value(0, 0, true).build();
+                                    bigTextStyle.bigText(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
+                                    mBuilder.setStyle(bigTextStyle)
+                                            .setProgress(0, 0, true);
+                                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                     // Checo se o texto de status foi passado pro parametro
                                     if (textStatus != null) {
@@ -7036,32 +8361,26 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                     }
                                 } else {
                                     // Cria uma notificacao para ser manipulado
-                                    Load mLoad = PugNotification.with(context).load()
-                                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
-                                            .smallIcon(R.mipmap.ic_launcher)
-                                            .largeIcon(R.mipmap.ic_launcher)
-                                            .title(R.string.versao_savare_desatualizada)
-                                            .bigTextStyle(context.getResources().getString(R.string.nao_chegou_dados_servidor_empresa) + "\n" + retornoWebservice.toString())
-                                            .flags(Notification.DEFAULT_LIGHTS);
-                                    mLoad.simple().build();
+                                    bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.versao_savare_desatualizada))
+                                            .bigText(context.getResources().getString(R.string.nao_chegou_dados_servidor_empresa) + "\n" + retornoWebservice.toString());
+                                    mBuilder.setStyle(bigTextStyle)
+                                            .setProgress(0, 0, false);
+                                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
                                 }
                                 // Incrementa o total de paginas
                                 pageNumber++;
                                 if (pageNumber < totalPages) {
-                                    retornoWebservice = gson.fromJson(webserviceSisInfo.executarSelectWebserviceJson(null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEAEMBAL, WSSisinfoWebservice.METODO_GET, parametrosWebservice + "&pageNumber=" + pageNumber, null), JsonObject.class);
+                                    retornoWebservice = gson.fromJson(webserviceSisInfo.executarWebserviceJson(servidorAtivo, null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEAEMBAL, WSSisinfoWebservice.METODO_GET, parametrosWebservice + "&pageNumber=" + pageNumber, null), JsonObject.class);
                                 }
                             } else {
                                 todosSucesso = false;
 
                                 // Cria uma notificacao para ser manipulado
-                                Load mLoad = PugNotification.with(context).load()
-                                        .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
-                                        .smallIcon(R.mipmap.ic_launcher)
-                                        .largeIcon(R.mipmap.ic_launcher)
-                                        .title(R.string.recebendo_dados)
-                                        .bigTextStyle(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString())
-                                        .flags(Notification.DEFAULT_LIGHTS);
-                                mLoad.simple().build();
+                                bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.recebendo_dados))
+                                        .bigText(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString());
+                                mBuilder.setStyle(bigTextStyle)
+                                        .setProgress(0, 0, false);
+                                notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
                             }
                         } //Fim for ia (pager)
                         // Checa se todos foram inseridos/atualizados com sucesso
@@ -7071,28 +8390,26 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                     }
                 } else {
                     // Cria uma notificacao para ser manipulado
-                    Load mLoad = PugNotification.with(context).load()
-                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
-                            .smallIcon(R.mipmap.ic_launcher)
-                            .largeIcon(R.mipmap.ic_launcher)
-                            .title(R.string.recebendo_dados)
-                            .bigTextStyle(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString())
-                            .flags(Notification.DEFAULT_LIGHTS);
-                    mLoad.simple().build();
+                    bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.recebendo_dados))
+                            .bigText(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString());
+                    mBuilder.setStyle(bigTextStyle)
+                            .setProgress(0, 0, false);
+                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
                 }
             }
-        } catch (Exception e) {
-            // Cria uma notificacao para ser manipulado
-            PugNotification.with(context)
-                    .load()
-                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + e.hashCode())
-                    .title(R.string.importar_dados_recebidos)
-                    .bigTextStyle("ImportaDadosEmbalagem - " + e.getMessage())
-                    .smallIcon(R.mipmap.ic_launcher)
-                    .largeIcon(R.mipmap.ic_launcher)
-                    .flags(Notification.DEFAULT_ALL)
-                    .simple()
-                    .build();
+        } catch (final Exception e) {
+            if (textStatusErro != null) {
+                ((Activity) context).runOnUiThread(new Runnable() {
+                    public void run() {
+                        textStatusErro.append("\n*" + context.getResources().getText(R.string.erro_inesperado) + " - Embalagem : " + e.getMessage());
+                    }
+                });
+            }
+            bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.importar_dados_recebidos))
+                    .bigText("ImportaDadosEmbalagem - " + e.getMessage());
+            mBuilder.setStyle(bigTextStyle)
+                    .setProgress(0, 0, false);
+            notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
         }
     }
 
@@ -7101,8 +8418,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
         JsonObject statuRetorno = null;
 
         // Atualiza a notificacao
-        mLoad.bigTextStyle(context.getResources().getString(R.string.procurando_dados) + " Produto por Loja");
-        mLoad.progress().value(0, 0, true).build();
+        bigTextStyle.bigText(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa) + " Produto por Loja");
+        mBuilder.setStyle(bigTextStyle)
+                .setProgress(0, 0, true);
+        notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
         // Checo se o texto de status foi passado pro parametro
         if (textStatus != null) {
@@ -7132,7 +8451,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 parametrosWebservice += "&where= " + filtro;
             }
             WSSisinfoWebservice webserviceSisInfo = new WSSisinfoWebservice(context);
-            JsonObject retornoWebservice = gson.fromJson(webserviceSisInfo.executarSelectWebserviceJson(null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEAPLOJA, WSSisinfoWebservice.METODO_GET, parametrosWebservice, null), JsonObject.class);
+            JsonObject retornoWebservice = gson.fromJson(webserviceSisInfo.executarWebserviceJson(servidorAtivo, null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEAPLOJA, WSSisinfoWebservice.METODO_GET, parametrosWebservice, null), JsonObject.class);
 
             if ((retornoWebservice != null) && (retornoWebservice.has(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO))) {
                 statuRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO);
@@ -7142,7 +8461,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                     JsonObject pageRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_PAGE_RETORNO);
 
-                    if (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) {
+                    if ( (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0) ) {
 
                         final int totalPages = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt();
                         int pageNumber = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_PAGE_NUMBER_RETORNO).getAsInt();
@@ -7153,8 +8472,9 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                             // Verifica se retornou com sucesso
                             if (statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO).getAsInt() == HttpURLConnection.HTTP_OK) {
                                 // Atualiza a notificacao
-                                mLoad.bigTextStyle(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
-                                mLoad.progress().value(0, 0, true).build();
+                                bigTextStyle.bigText(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
+                                mBuilder.setStyle(bigTextStyle);
+                                notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                 // Checo se o texto de status foi passado pro parametro
                                 if (textStatus != null) {
@@ -7170,8 +8490,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                     // Checa se retornou algum dados na lista
                                     if (listaProdutoLojaRetorno.size() > 0) {
                                         // Atualiza a notificacao
-                                        mLoad.bigTextStyle(context.getResources().getString(R.string.recebendo_dados_produto_loja) + " - Parte " + (pageNumber + 1) + "/" + totalPages);
-                                        mLoad.progress().value(0, listaProdutoLojaRetorno.size(), false).build();
+                                        bigTextStyle.bigText(context.getResources().getString(R.string.recebendo_dados_produto_loja) + " - Parte " + (pageNumber + 1) + "/" + totalPages);
+                                        mBuilder.setStyle(bigTextStyle)
+                                                .setProgress(listaProdutoLojaRetorno.size(), 0, false);
+                                        notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                         // Checo se o texto de status foi passado pro parametro
                                         if (textStatus != null) {
@@ -7192,8 +8514,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                         List<ContentValues> listaDadosProdutoLoja = new ArrayList<ContentValues>();
                                         for (int i = 0; i < listaProdutoLojaRetorno.size(); i++) {
                                             // Atualiza a notificacao
-                                            mLoad.bigTextStyle(context.getResources().getString(R.string.recebendo_dados_produto_loja) + " - Parte " + (pageNumber + 1) + "/" + totalPages + " - " + i + "/" + listaProdutoLojaRetorno.size());
-                                            mLoad.progress().update(0, i, listaProdutoLojaRetorno.size(), false).build();
+                                            bigTextStyle.bigText(context.getResources().getString(R.string.recebendo_dados_produto_loja) + " - Parte " + (pageNumber + 1) + "/" + totalPages + " - " + i + "/" + listaProdutoLojaRetorno.size());
+                                            mBuilder.setStyle(bigTextStyle)
+                                                    .setProgress(listaProdutoLojaRetorno.size(), i, false);
+                                            notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                             // Checo se o texto de status foi passado pro parametro
                                             if (textStatus != null) {
@@ -7235,6 +8559,12 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                             }
                                             if (produtoLojaRetorno.has("dtEntradaN")) {
                                                 dadosProdutoLoja.put("DT_ENTRADA_N", produtoLojaRetorno.get("dtEntradaN").getAsString());
+                                            }
+                                            if (produtoLojaRetorno.has("dtReajusteVare")) {
+                                                dadosProdutoLoja.put("DT_REAJUSTE_VARE", produtoLojaRetorno.get("dtReajusteVare").getAsString());
+                                            }
+                                            if (produtoLojaRetorno.has("dtReajusteAtac")) {
+                                                dadosProdutoLoja.put("DT_REAJUSTE_ATAC", produtoLojaRetorno.get("dtReajusteAtac").getAsString());
                                             }
                                             if (produtoLojaRetorno.has("ctReposicaoN")) {
                                                 dadosProdutoLoja.put("CT_REPOSICAO_N", produtoLojaRetorno.get("ctReposicaoN").getAsDouble());
@@ -7281,8 +8611,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                         todosSucesso = produtoLojaSql.insertList(listaDadosProdutoLoja);
                                     }
                                     // Atualiza a notificacao
-                                    mLoad.bigTextStyle(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
-                                    mLoad.progress().value(0, 0, true).build();
+                                    bigTextStyle.bigText(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
+                                    mBuilder.setStyle(bigTextStyle)
+                                            .setProgress(0, 0, true);
+                                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                     // Checo se o texto de status foi passado pro parametro
                                     if (textStatus != null) {
@@ -7301,32 +8633,26 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                     }
                                 } else {
                                     // Cria uma notificacao para ser manipulado
-                                    Load mLoad = PugNotification.with(context).load()
-                                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
-                                            .smallIcon(R.mipmap.ic_launcher)
-                                            .largeIcon(R.mipmap.ic_launcher)
-                                            .title(R.string.versao_savare_desatualizada)
-                                            .bigTextStyle(context.getResources().getString(R.string.nao_chegou_dados_servidor_empresa) + "\n" + retornoWebservice.toString())
-                                            .flags(Notification.DEFAULT_LIGHTS);
-                                    mLoad.simple().build();
+                                    bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.versao_savare_desatualizada))
+                                            .bigText(context.getResources().getString(R.string.nao_chegou_dados_servidor_empresa) + "\n" + retornoWebservice.toString());
+                                    mBuilder.setStyle(bigTextStyle)
+                                            .setProgress(0, 0, false);
+                                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
                                 }
                                 // Incrementa o total de paginas
                                 pageNumber++;
                                 if (pageNumber < totalPages) {
-                                    retornoWebservice = gson.fromJson(webserviceSisInfo.executarSelectWebserviceJson(null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEAPLOJA, WSSisinfoWebservice.METODO_GET, parametrosWebservice + "&pageNumber=" + pageNumber, null), JsonObject.class);
+                                    retornoWebservice = gson.fromJson(webserviceSisInfo.executarWebserviceJson(servidorAtivo, null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEAPLOJA, WSSisinfoWebservice.METODO_GET, parametrosWebservice + "&pageNumber=" + pageNumber, null), JsonObject.class);
                                 }
                             } else {
                                 todosSucesso = false;
 
                                 // Cria uma notificacao para ser manipulado
-                                Load mLoad = PugNotification.with(context).load()
-                                        .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
-                                        .smallIcon(R.mipmap.ic_launcher)
-                                        .largeIcon(R.mipmap.ic_launcher)
-                                        .title(R.string.recebendo_dados)
-                                        .bigTextStyle(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString())
-                                        .flags(Notification.DEFAULT_LIGHTS);
-                                mLoad.simple().build();
+                                bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.recebendo_dados))
+                                        .bigText(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString());
+                                mBuilder.setStyle(bigTextStyle)
+                                        .setProgress(0, 0, false);
+                                notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
                             }
                         } // Fim do for ia
                         // Checa se todos foram inseridos/atualizados com sucesso
@@ -7336,28 +8662,26 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                     }
                 } else {
                     // Cria uma notificacao para ser manipulado
-                    Load mLoad = PugNotification.with(context).load()
-                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
-                            .smallIcon(R.mipmap.ic_launcher)
-                            .largeIcon(R.mipmap.ic_launcher)
-                            .title(R.string.recebendo_dados)
-                            .bigTextStyle(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString())
-                            .flags(Notification.DEFAULT_LIGHTS);
-                    mLoad.simple().build();
+                    bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.recebendo_dados))
+                            .bigText(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString());
+                    mBuilder.setStyle(bigTextStyle)
+                            .setProgress(0, 0, false);
+                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
                 }
             }
-        } catch (Exception e) {
-            // Cria uma notificacao para ser manipulado
-            PugNotification.with(context)
-                    .load()
-                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + e.hashCode())
-                    .title(R.string.importar_dados_recebidos)
-                    .bigTextStyle("ImportaDadosProdutoPorLoja - " + e.getMessage())
-                    .smallIcon(R.mipmap.ic_launcher)
-                    .largeIcon(R.mipmap.ic_launcher)
-                    .flags(Notification.DEFAULT_ALL)
-                    .simple()
-                    .build();
+        } catch (final Exception e) {
+            if (textStatusErro != null) {
+                ((Activity) context).runOnUiThread(new Runnable() {
+                    public void run() {
+                        textStatusErro.append("\n*" + context.getResources().getText(R.string.erro_inesperado) + " - Produtos por Loja : " + e.getMessage());
+                    }
+                });
+            }
+            bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.importar_dados_recebidos))
+                    .bigText("ImportaDadosProdutoPorLoja - " + e.getMessage());
+            mBuilder.setStyle(bigTextStyle)
+                    .setProgress(0, 0, false);
+            notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
         }
     }
 
@@ -7366,8 +8690,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
         JsonObject statuRetorno = null;
 
         // Atualiza a notificacao
-        mLoad.bigTextStyle(context.getResources().getString(R.string.procurando_dados) + " Local de Estoque");
-        mLoad.progress().value(0, 0, true).build();
+        bigTextStyle.bigText(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa) + " Local de Estoque");
+        mBuilder.setStyle(bigTextStyle)
+                .setProgress(0, 0, true);
+        notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
         // Checo se o texto de status foi passado pro parametro
         if (textStatus != null) {
@@ -7397,7 +8723,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 parametrosWebservice += "&where= " + filtro;
             }
             WSSisinfoWebservice webserviceSisInfo = new WSSisinfoWebservice(context);
-            JsonObject retornoWebservice = gson.fromJson(webserviceSisInfo.executarSelectWebserviceJson(null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEALOCES, WSSisinfoWebservice.METODO_GET, parametrosWebservice, null), JsonObject.class);
+            JsonObject retornoWebservice = gson.fromJson(webserviceSisInfo.executarWebserviceJson(servidorAtivo, null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEALOCES, WSSisinfoWebservice.METODO_GET, parametrosWebservice, null), JsonObject.class);
 
             if ((retornoWebservice != null) && (retornoWebservice.has(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO))) {
                 statuRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO);
@@ -7407,7 +8733,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                     JsonObject pageRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_PAGE_RETORNO);
 
-                    if (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) {
+                    if ( (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0) ) {
                         final int totalPages = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt();
                         int pageNumber = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_PAGE_NUMBER_RETORNO).getAsInt();
 
@@ -7418,8 +8744,9 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                             // Verifica se retornou com sucesso
                             if (statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO).getAsInt() == HttpURLConnection.HTTP_OK) {
                                 // Atualiza a notificacao
-                                mLoad.bigTextStyle(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
-                                mLoad.progress().value(0, 0, true).build();
+                                bigTextStyle.bigText(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
+                                mBuilder.setStyle(bigTextStyle);
+                                notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                 // Checo se o texto de status foi passado pro parametro
                                 if (textStatus != null) {
@@ -7435,8 +8762,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                     // Checa se retornou algum dados na lista
                                     if (listaLocalEstoqueRetorno.size() > 0) {
                                         // Atualiza a notificacao
-                                        mLoad.bigTextStyle(context.getResources().getString(R.string.recebendo_dados_local_estoque));
-                                        mLoad.progress().value(0, listaLocalEstoqueRetorno.size(), false).build();
+                                        bigTextStyle.bigText(context.getResources().getString(R.string.recebendo_dados_local_estoque));
+                                        mBuilder.setStyle(bigTextStyle)
+                                                .setProgress(listaLocalEstoqueRetorno.size(), 0, false);
+                                        notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                         // Checo se o texto de status foi passado pro parametro
                                         if (textStatus != null) {
@@ -7457,8 +8786,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                         List<ContentValues> listaDadosLocal = new ArrayList<ContentValues>();
                                         for (int i = 0; i < listaLocalEstoqueRetorno.size(); i++) {
                                             // Atualiza a notificacao
-                                            mLoad.bigTextStyle(context.getResources().getString(R.string.recebendo_dados_local_estoque) + " - Parte " + (pageNumber + 1) + "/" + totalPages + " - " + i + "/" + listaLocalEstoqueRetorno.size());
-                                            mLoad.progress().update(0, i, listaLocalEstoqueRetorno.size(), false).build();
+                                            bigTextStyle.bigText(context.getResources().getString(R.string.recebendo_dados_local_estoque) + " - Parte " + (pageNumber + 1) + "/" + totalPages + " - " + i + "/" + listaLocalEstoqueRetorno.size());
+                                            mBuilder.setStyle(bigTextStyle)
+                                                    .setProgress(listaLocalEstoqueRetorno.size(), i, false);
+                                            notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                             // Checo se o texto de status foi passado pro parametro
                                             if (textStatus != null) {
@@ -7495,8 +8826,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                         todosSucesso = locacaoSql.insertList(listaDadosLocal);
                                     }
                                     // Atualiza a notificacao
-                                    mLoad.bigTextStyle(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
-                                    mLoad.progress().value(0, 0, true).build();
+                                    bigTextStyle.bigText(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
+                                    mBuilder.setStyle(bigTextStyle)
+                                            .setProgress(0, 0, true);
+                                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                     // Checo se o texto de status foi passado pro parametro
                                     if (textStatus != null) {
@@ -7515,32 +8848,26 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                     }
                                 } else {
                                     // Cria uma notificacao para ser manipulado
-                                    Load mLoad = PugNotification.with(context).load()
-                                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
-                                            .smallIcon(R.mipmap.ic_launcher)
-                                            .largeIcon(R.mipmap.ic_launcher)
-                                            .title(R.string.versao_savare_desatualizada)
-                                            .bigTextStyle(context.getResources().getString(R.string.nao_chegou_dados_servidor_empresa) + "\n" + retornoWebservice.toString())
-                                            .flags(Notification.DEFAULT_LIGHTS);
-                                    mLoad.simple().build();
+                                    bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.versao_savare_desatualizada))
+                                            .bigText(context.getResources().getString(R.string.nao_chegou_dados_servidor_empresa) + "\n" + retornoWebservice.toString());
+                                    mBuilder.setStyle(bigTextStyle)
+                                            .setProgress(0, 0, false);
+                                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
                                 }
                                 // Incrementa o total de paginas
                                 pageNumber++;
                                 if (pageNumber < totalPages) {
-                                    retornoWebservice = gson.fromJson(webserviceSisInfo.executarSelectWebserviceJson(null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEALOCES, WSSisinfoWebservice.METODO_GET, parametrosWebservice + "&pageNumber=" + pageNumber, null), JsonObject.class);
+                                    retornoWebservice = gson.fromJson(webserviceSisInfo.executarWebserviceJson(servidorAtivo, null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEALOCES, WSSisinfoWebservice.METODO_GET, parametrosWebservice + "&pageNumber=" + pageNumber, null), JsonObject.class);
                                 }
                             } else {
                                 todosSucesso = false;
 
                                 // Cria uma notificacao para ser manipulado
-                                Load mLoad = PugNotification.with(context).load()
-                                        .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
-                                        .smallIcon(R.mipmap.ic_launcher)
-                                        .largeIcon(R.mipmap.ic_launcher)
-                                        .title(R.string.recebendo_dados)
-                                        .bigTextStyle(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString())
-                                        .flags(Notification.DEFAULT_LIGHTS);
-                                mLoad.simple().build();
+                                bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.recebendo_dados))
+                                        .bigText(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString());
+                                mBuilder.setStyle(bigTextStyle)
+                                        .setProgress(0, 0, false);
+                                notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
                             }
                         } // Fim do for ia (page)
                         // Checa se todos foram inseridos/atualizados com sucesso
@@ -7550,28 +8877,26 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                     }
                 } else {
                     // Cria uma notificacao para ser manipulado
-                    Load mLoad = PugNotification.with(context).load()
-                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
-                            .smallIcon(R.mipmap.ic_launcher)
-                            .largeIcon(R.mipmap.ic_launcher)
-                            .title(R.string.recebendo_dados)
-                            .bigTextStyle(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString())
-                            .flags(Notification.DEFAULT_LIGHTS);
-                    mLoad.simple().build();
+                    bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.recebendo_dados))
+                            .bigText(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString());
+                    mBuilder.setStyle(bigTextStyle)
+                            .setProgress(0, 0, false);
+                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
                 }
             }
-        } catch (Exception e) {
-            // Cria uma notificacao para ser manipulado
-            PugNotification.with(context)
-                    .load()
-                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + e.hashCode())
-                    .title(R.string.importar_dados_recebidos)
-                    .bigTextStyle("ImportaDadosLocalEstoque - " + e.getMessage())
-                    .smallIcon(R.mipmap.ic_launcher)
-                    .largeIcon(R.mipmap.ic_launcher)
-                    .flags(Notification.DEFAULT_ALL)
-                    .simple()
-                    .build();
+        } catch (final Exception e) {
+            if (textStatusErro != null) {
+                ((Activity) context).runOnUiThread(new Runnable() {
+                    public void run() {
+                        textStatusErro.append("\n*" + context.getResources().getText(R.string.erro_inesperado) + " - Local de Estoque : " + e.getMessage());
+                    }
+                });
+            }
+            bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.importar_dados_recebidos))
+                    .bigText("ImportaDadosLocalEstoque - " + e.getMessage());
+            mBuilder.setStyle(bigTextStyle)
+                    .setProgress(0, 0, false);
+            notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
         }
     }
 
@@ -7580,8 +8905,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
         JsonObject statuRetorno = null;
 
         // Atualiza a notificacao
-        mLoad.bigTextStyle(context.getResources().getString(R.string.procurando_dados) + " Estoque de Produto");
-        mLoad.progress().value(0, 0, true).build();
+        bigTextStyle.bigText(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa) + " Estoque de Produto");
+        mBuilder.setStyle(bigTextStyle)
+                .setProgress(0, 0, true);
+        notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
         // Checo se o texto de status foi passado pro parametro
         if (textStatus != null) {
@@ -7609,7 +8936,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 parametrosWebservice += "&where= " + filtro;
             }
             WSSisinfoWebservice webserviceSisInfo = new WSSisinfoWebservice(context);
-            JsonObject retornoWebservice = gson.fromJson(webserviceSisInfo.executarSelectWebserviceJson(null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEAESTOQ, WSSisinfoWebservice.METODO_GET, parametrosWebservice, null), JsonObject.class);
+            JsonObject retornoWebservice = gson.fromJson(webserviceSisInfo.executarWebserviceJson(servidorAtivo, null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEAESTOQ, WSSisinfoWebservice.METODO_GET, parametrosWebservice, null), JsonObject.class);
 
             if ((retornoWebservice != null) && (retornoWebservice.has(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO))) {
                 statuRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO);
@@ -7619,7 +8946,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                     JsonObject pageRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_PAGE_RETORNO);
 
-                    if (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) {
+                    if ( (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0) ) {
                         final int totalPages = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt();
                         int pageNumber = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_PAGE_NUMBER_RETORNO).getAsInt();
 
@@ -7630,8 +8957,9 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                             // Verifica se retornou com sucesso
                             if (statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO).getAsInt() == HttpURLConnection.HTTP_OK) {
                                 // Atualiza a notificacao
-                                mLoad.bigTextStyle(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
-                                mLoad.progress().value(0, 0, true).build();
+                                bigTextStyle.bigText(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
+                                mBuilder.setStyle(bigTextStyle);
+                                notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                 // Checo se o texto de status foi passado pro parametro
                                 if (textStatus != null) {
@@ -7647,8 +8975,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                     // Checa se retornou algum dados na lista
                                     if (listaEstoqueRetorno.size() > 0) {
                                         // Atualiza a notificacao
-                                        mLoad.bigTextStyle(context.getResources().getString(R.string.recebendo_dados_estoque));
-                                        mLoad.progress().value(0, listaEstoqueRetorno.size(), false).build();
+                                        bigTextStyle.bigText(context.getResources().getString(R.string.recebendo_dados_estoque));
+                                        mBuilder.setStyle(bigTextStyle)
+                                                .setProgress(listaEstoqueRetorno.size(), 0, false);
+                                        notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                         // Checo se o texto de status foi passado pro parametro
                                         if (textStatus != null) {
@@ -7669,8 +8999,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                         List<ContentValues> listaDadosEstoque = new ArrayList<ContentValues>();
                                         for (int i = 0; i < listaEstoqueRetorno.size(); i++) {
                                             // Atualiza a notificacao
-                                            mLoad.bigTextStyle(context.getResources().getString(R.string.recebendo_dados_estoque) + " - Parte " + (pageNumber + 1) + "/" + totalPages + " - " + i + "/" + listaEstoqueRetorno.size());
-                                            mLoad.progress().update(0, i, listaEstoqueRetorno.size(), false).build();
+                                            bigTextStyle.bigText(context.getResources().getString(R.string.recebendo_dados_estoque) + " - Parte " + (pageNumber + 1) + "/" + totalPages + " - " + i + "/" + listaEstoqueRetorno.size());
+                                            mBuilder.setStyle(bigTextStyle)
+                                                    .setProgress(listaEstoqueRetorno.size(), i, false);
+                                            notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                             // Checo se o texto de status foi passado pro parametro
                                             if (textStatus != null) {
@@ -7710,8 +9042,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                         todosSucesso = estoqueSql.insertList(listaDadosEstoque);
                                     }
                                     // Atualiza a notificacao
-                                    mLoad.bigTextStyle(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
-                                    mLoad.progress().value(0, 0, true).build();
+                                    bigTextStyle.bigText(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
+                                    mBuilder.setStyle(bigTextStyle)
+                                            .setProgress(0, 0, true);
+                                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                     // Checo se o texto de status foi passado pro parametro
                                     if (textStatus != null) {
@@ -7730,32 +9064,26 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                     }
                                 } else {
                                     // Cria uma notificacao para ser manipulado
-                                    Load mLoad = PugNotification.with(context).load()
-                                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
-                                            .smallIcon(R.mipmap.ic_launcher)
-                                            .largeIcon(R.mipmap.ic_launcher)
-                                            .title(R.string.versao_savare_desatualizada)
-                                            .bigTextStyle(context.getResources().getString(R.string.nao_chegou_dados_servidor_empresa) + "\n" + retornoWebservice.toString())
-                                            .flags(Notification.DEFAULT_LIGHTS);
-                                    mLoad.simple().build();
+                                    bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.versao_savare_desatualizada))
+                                            .bigText(context.getResources().getString(R.string.nao_chegou_dados_servidor_empresa) + "\n" + retornoWebservice.toString());
+                                    mBuilder.setStyle(bigTextStyle)
+                                            .setProgress(0, 0, false);
+                                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
                                 }
                                 // Incrementa o total de paginas
                                 pageNumber++;
                                 if (pageNumber < totalPages) {
-                                    retornoWebservice = gson.fromJson(webserviceSisInfo.executarSelectWebserviceJson(null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEAESTOQ, WSSisinfoWebservice.METODO_GET, parametrosWebservice + "&pageNumber=" + pageNumber, null), JsonObject.class);
+                                    retornoWebservice = gson.fromJson(webserviceSisInfo.executarWebserviceJson(servidorAtivo, null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEAESTOQ, WSSisinfoWebservice.METODO_GET, parametrosWebservice + "&pageNumber=" + pageNumber, null), JsonObject.class);
                                 }
                             } else {
                                 todosSucesso = false;
 
                                 // Cria uma notificacao para ser manipulado
-                                Load mLoad = PugNotification.with(context).load()
-                                        .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
-                                        .smallIcon(R.mipmap.ic_launcher)
-                                        .largeIcon(R.mipmap.ic_launcher)
-                                        .title(R.string.recebendo_dados)
-                                        .bigTextStyle(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString())
-                                        .flags(Notification.DEFAULT_LIGHTS);
-                                mLoad.simple().build();
+                                bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.recebendo_dados))
+                                        .bigText(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString());
+                                mBuilder.setStyle(bigTextStyle)
+                                        .setProgress(0, 0, false);
+                                notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
                             }
                         } // Fim do for ia (page)
                         // Checa se todos foram inseridos/atualizados com sucesso
@@ -7765,28 +9093,26 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                     }
                 } else {
                     // Cria uma notificacao para ser manipulado
-                    Load mLoad = PugNotification.with(context).load()
-                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
-                            .smallIcon(R.mipmap.ic_launcher)
-                            .largeIcon(R.mipmap.ic_launcher)
-                            .title(R.string.recebendo_dados)
-                            .bigTextStyle(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString())
-                            .flags(Notification.DEFAULT_LIGHTS);
-                    mLoad.simple().build();
+                    bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.recebendo_dados))
+                            .bigText(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString());
+                    mBuilder.setStyle(bigTextStyle)
+                            .setProgress(0, 0, false);
+                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
                 }
             }
-        } catch (Exception e) {
-            // Cria uma notificacao para ser manipulado
-            PugNotification.with(context)
-                    .load()
-                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + e.hashCode())
-                    .title(R.string.importar_dados_recebidos)
-                    .bigTextStyle("ImportaDadosEstoque - " + e.getMessage())
-                    .smallIcon(R.mipmap.ic_launcher)
-                    .largeIcon(R.mipmap.ic_launcher)
-                    .flags(Notification.DEFAULT_ALL)
-                    .simple()
-                    .build();
+        } catch (final Exception e) {
+            if (textStatusErro != null) {
+                ((Activity) context).runOnUiThread(new Runnable() {
+                    public void run() {
+                        textStatusErro.append("\n*" + context.getResources().getText(R.string.erro_inesperado) + " - Estoque : " + e.getMessage());
+                    }
+                });
+            }
+            bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.importar_dados_recebidos))
+                    .bigText("ImportaDadosEstoque - " + e.getMessage());
+            mBuilder.setStyle(bigTextStyle)
+                    .setProgress(0, 0, false);
+            notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
         }
     }
 
@@ -7795,8 +9121,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
         JsonObject statuRetorno = null;
 
         // Atualiza a notificacao
-        mLoad.bigTextStyle(context.getResources().getString(R.string.procurando_dados) + " Orçamento");
-        mLoad.progress().value(0, 0, true).build();
+        bigTextStyle.bigText(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa) + " Orçamento");
+        mBuilder.setStyle(bigTextStyle)
+                .setProgress(0, 0, true);
+        notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
         // Checo se o texto de status foi passado pro parametro
         if (textStatus != null) {
@@ -7817,29 +9145,451 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
 
             // Pega quando foi a ultima data que recebeu dados
+            String ultimaData = pegaUltimaDataAtualizacao("AEASAIDA_ORC");
+            // Cria uma variavel para salvar todos os paramentros em json
+            String parametrosWebservice = "";
+
+            List<OrcamentoBeans> listaOrcamento = new ArrayList<OrcamentoBeans>();
+
+            OrcamentoRotinas orcamentoRotinas = new OrcamentoRotinas(context);
+            String [] listaTipo = new String[]{ OrcamentoRotinas.PEDIDO_ENVIADO,
+                    OrcamentoRotinas.PEDIDO_RETORNADO_BLOQUEADO,
+                    OrcamentoRotinas.PEDIDO_RETORNADO_LIBERADO};
+
+            listaOrcamento = orcamentoRotinas.listaOrcamentoPedido(listaTipo, null, OrcamentoRotinas.ORDEM_DECRESCENTE);
+
+            if ( (listaOrcamento != null) && (listaOrcamento.size() > 0) ) {
+                String whereGuidOrcamento = "(GUID IN (";
+                int controle = 0;
+                for (OrcamentoBeans orcamento : listaOrcamento) {
+                    controle++;
+                    whereGuidOrcamento += "'" + orcamento.getGuid() + "'";
+                    if (controle < listaOrcamento.size()) {
+                        whereGuidOrcamento += ", ";
+                    }
+                }
+                whereGuidOrcamento += ") )";
+
+                if ((ultimaData != null) && (!ultimaData.isEmpty())) {
+                    parametrosWebservice += "&where= ( (DT_ALT >= '" + ultimaData + "') AND " + whereGuidOrcamento + ")";
+                } else {
+                    parametrosWebservice += "&where= " + whereGuidOrcamento;
+                }
+                if (!parametrosWebservice.isEmpty()) {
+                    Gson gson = new Gson();
+                    WSSisinfoWebservice webserviceSisInfo = new WSSisinfoWebservice(context);
+                    JsonObject retornoWebservice = gson.fromJson(webserviceSisInfo.executarSelectWebserviceJson(null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEAORCAM, WSSisinfoWebservice.METODO_GET, parametrosWebservice, null), JsonObject.class);
+
+                    if ((retornoWebservice != null) && (retornoWebservice.has(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO))) {
+                        statuRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO);
+
+                        if (statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO).getAsInt() == HttpURLConnection.HTTP_OK) {
+                            boolean todosSucesso = true;
+
+                            JsonObject pageRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_PAGE_RETORNO);
+
+                            if ( (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0) ) {
+                                final int totalPages = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt();
+                                int pageNumber = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_PAGE_NUMBER_RETORNO).getAsInt();
+
+                                for (int ia = pageNumber; ia < totalPages; ia++) {
+
+                                    statuRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO);
+
+                                    // Verifica se retornou com sucesso
+                                    if (statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO).getAsInt() == HttpURLConnection.HTTP_OK) {
+                                        // Atualiza a notificacao
+                                        bigTextStyle.bigText(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
+                                        mBuilder.setStyle(bigTextStyle);
+                                        notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
+
+                                        // Checo se o texto de status foi passado pro parametro
+                                        if (textStatus != null) {
+                                            ((Activity) context).runOnUiThread(new Runnable() {
+                                                public void run() {
+                                                    textStatus.setText(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
+                                                }
+                                            });
+                                        }
+                                        // Checa se retornou alguma coisa
+                                        if ((retornoWebservice.has(WSSisinfoWebservice.KEY_OBJECT_OBJECT_RETORNO))) {
+                                            final JsonArray listaPedidoRetorno = retornoWebservice.getAsJsonArray(WSSisinfoWebservice.KEY_OBJECT_OBJECT_RETORNO);
+                                            // Checa se retornou algum dados na lista
+                                            if (listaPedidoRetorno.size() > 0) {
+                                                // Atualiza a notificacao
+                                                bigTextStyle.bigText(context.getResources().getString(R.string.recebendo_dados_orcamento));
+                                                mBuilder.setStyle(bigTextStyle)
+                                                        .setProgress(listaPedidoRetorno.size(), 0, false);
+                                                notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
+
+                                                // Checo se o texto de status foi passado pro parametro
+                                                if (textStatus != null) {
+                                                    ((Activity) context).runOnUiThread(new Runnable() {
+                                                        public void run() {
+                                                            textStatus.setText(context.getResources().getString(R.string.recebendo_dados_orcamento));
+                                                        }
+                                                    });
+                                                }
+                                                if (progressBarStatus != null) {
+                                                    ((Activity) context).runOnUiThread(new Runnable() {
+                                                        public void run() {
+                                                            progressBarStatus.setIndeterminate(false);
+                                                            progressBarStatus.setMax(listaPedidoRetorno.size());
+                                                        }
+                                                    });
+                                                }
+
+                                                for (int i = 0; i < listaPedidoRetorno.size(); i++) {
+                                                    // Atualiza a notificacao
+                                                    bigTextStyle.bigText(context.getResources().getString(R.string.recebendo_dados_orcamento) + " - Parte " + (pageNumber + 1) + "/" + totalPages + " - " + i + "/" + listaPedidoRetorno.size());
+                                                    mBuilder.setStyle(bigTextStyle)
+                                                            .setProgress(listaPedidoRetorno.size(), i, false);
+                                                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
+
+                                                    // Checo se o texto de status foi passado pro parametro
+                                                    if (textStatus != null) {
+                                                        final int finalI1 = i;
+                                                        final int finalPageNumber = pageNumber + 1;
+                                                        ((Activity) context).runOnUiThread(new Runnable() {
+                                                            public void run() {
+                                                                textStatus.setText(context.getResources().getString(R.string.recebendo_dados_orcamento) + " - Parte " + finalPageNumber + "/" + totalPages + " - " + finalI1 + "/" + listaPedidoRetorno.size());
+                                                            }
+                                                        });
+                                                    }
+                                                    if (progressBarStatus != null) {
+                                                        final int finalI = i;
+                                                        ((Activity) context).runOnUiThread(new Runnable() {
+                                                            public void run() {
+                                                                progressBarStatus.setProgress(finalI);
+                                                            }
+                                                        });
+                                                    }
+                                                    JsonObject pedidoRetorno = listaPedidoRetorno.get(i).getAsJsonObject();
+                                                    ContentValues dadosOrcamento = new ContentValues();
+                                                    dadosOrcamento.put("ID_SMAEMPRE", pedidoRetorno.get("idSmaempre").getAsInt());
+                                                    if (pedidoRetorno.has("idCfaclifo") && pedidoRetorno.get("idCfaclifo").getAsInt() > 0) {
+                                                        dadosOrcamento.put("ID_CFACLIFO", pedidoRetorno.get("idCfaclifo").getAsInt());
+                                                    }
+                                                    if (pedidoRetorno.has("idCfaestad") && pedidoRetorno.get("idCfaestad").getAsInt() > 0) {
+                                                        dadosOrcamento.put("ID_CFAESTAD", pedidoRetorno.get("idCfaestad").getAsInt());
+                                                    }
+                                                    if (pedidoRetorno.has("idCfacidad") && pedidoRetorno.get("idCfacidad").getAsInt() > 0) {
+                                                        dadosOrcamento.put("ID_CFACIDAD", pedidoRetorno.get("idCfacidad").getAsInt());
+                                                    }
+                                                    if (pedidoRetorno.has("idAearoman") && pedidoRetorno.get("idAearoman").getAsInt() > 0) {
+                                                        dadosOrcamento.put("ID_AEAROMAN", pedidoRetorno.get("idAearoman").getAsInt());
+                                                    }
+                                                    if (pedidoRetorno.has("idCfatpdoc") && pedidoRetorno.get("idCfatpdoc").getAsInt() > 0) {
+                                                        dadosOrcamento.put("ID_CFATPDOC", pedidoRetorno.get("idCfatpdoc").getAsInt());
+                                                    }
+                                                    //dadosOrcamento.put("GUID", pedidoRetorno.get("guid").getAsString());
+                                                    //dadosOrcamento.put("NUMERO", pedidoRetorno.get("numero").getAsInt());
+                                                    if (pedidoRetorno.has("vlFrete")) {
+                                                        dadosOrcamento.put("VL_FRETE", pedidoRetorno.get("vlFrete").getAsDouble());
+                                                    }
+                                                    if (pedidoRetorno.has("vlSeguro")) {
+                                                        dadosOrcamento.put("VL_SEGURO", pedidoRetorno.get("vlSeguro").getAsDouble());
+                                                    }
+                                                    if (pedidoRetorno.has("vlOutros")) {
+                                                        dadosOrcamento.put("VL_OUTROS", pedidoRetorno.get("vlOutros").getAsDouble());
+                                                    }
+                                                    if (pedidoRetorno.has("vlEncargosFinanceiros")) {
+                                                        dadosOrcamento.put("VL_ENCARGOS_FINANCEIROS", pedidoRetorno.get("vlEncargosFinanceiros").getAsDouble());
+                                                    }
+                                                    if (pedidoRetorno.has("vlTabelaFaturado")) {
+                                                        dadosOrcamento.put("VL_TABELA_FATURADO", pedidoRetorno.get("vlTabelaFaturado").getAsDouble());
+                                                    }
+                                                    if (pedidoRetorno.has("fcVlTotalFaturado")) {
+                                                        dadosOrcamento.put("FC_VL_TOTAL_FATURADO", pedidoRetorno.get("fcVlTotalFaturado").getAsDouble());
+                                                    }
+                                                    dadosOrcamento.put("ATAC_VAREJO", pedidoRetorno.get("atacVarejo").getAsString());
+                                                    if (pedidoRetorno.has("pessoaCliente")) {
+                                                        dadosOrcamento.put("PESSOA_CLIENTE", pedidoRetorno.get("pessoaCliente").getAsString());
+                                                    }
+                                                    if (pedidoRetorno.has("nomeCliente")) {
+                                                        dadosOrcamento.put("NOME_CLIENTE", pedidoRetorno.get("nomeCliente").getAsString());
+                                                    }
+                                                    if (pedidoRetorno.has("ieRgCliente")) {
+                                                        dadosOrcamento.put("IE_RG_CLIENTE", pedidoRetorno.get("ieRgCliente").getAsString());
+                                                    }
+                                                    if (pedidoRetorno.has("cpfCgcCliente")) {
+                                                        dadosOrcamento.put("CPF_CGC_CLIENTE", pedidoRetorno.get("cpfCgcCliente").getAsString());
+                                                    }
+                                                    if (pedidoRetorno.has("enderecoCliente")) {
+                                                        dadosOrcamento.put("ENDERECO_CLIENTE", pedidoRetorno.get("enderecoCliente").getAsString());
+                                                    }
+                                                    if (pedidoRetorno.has("bairroCliente")) {
+                                                        dadosOrcamento.put("BAIRRO_CLIENTE", pedidoRetorno.get("bairroCliente").getAsString());
+                                                    }
+                                                    if (pedidoRetorno.has("cepCliente")) {
+                                                        dadosOrcamento.put("CEP_CLIENTE", pedidoRetorno.get("cepCliente").getAsString());
+                                                    }
+                                                    if (pedidoRetorno.has("obs")) {
+                                                        dadosOrcamento.put("OBS", pedidoRetorno.get("obs").getAsString());
+                                                    }
+                                                    if (pedidoRetorno.has("andamento")) {
+                                                        String situacao = pedidoRetorno.get("andamento").getAsString();
+
+                                                        if (situacao.equalsIgnoreCase("0") || situacao.equalsIgnoreCase("3")) {
+                                                            // Marca o status como retorno liberado
+                                                            dadosOrcamento.put("STATUS", "RL");
+
+                                                        } else if (situacao.equalsIgnoreCase("1")) {
+                                                            // Marca o peiddo como enviado
+                                                            dadosOrcamento.put("STATUS", "N");
+
+                                                        } else if (situacao.equalsIgnoreCase("X") || situacao.equalsIgnoreCase("2")) {
+                                                            // Marca o status como retorno como excluido ou bloqueado
+                                                            dadosOrcamento.put("STATUS", "RB");
+
+                                                        } else if (situacao.equalsIgnoreCase("7")) {
+                                                            // Marca o status como retorno como conferido
+                                                            dadosOrcamento.put("STATUS", "C");
+
+                                                        } else if (situacao.equalsIgnoreCase("8") || situacao.equalsIgnoreCase("9") ||
+                                                                situacao.equalsIgnoreCase("A") || situacao.equalsIgnoreCase("B")) {
+                                                            // Marca o status como retorno como faturado
+                                                            dadosOrcamento.put("STATUS", "F");
+
+                                                        } else if (situacao.equalsIgnoreCase("99")) {
+                                                            // Marca o status como retorno como excluido
+                                                            dadosOrcamento.put("STATUS", "RE");
+
+                                                        } else {
+                                                            dadosOrcamento.put("STATUS", "N");
+                                                        }
+                                                    }
+                                                    if (pedidoRetorno.has("tipoEntrega")) {
+                                                        dadosOrcamento.put("TIPO_ENTREGA", pedidoRetorno.get("tipoEntrega").getAsString());
+                                                    }
+                                                    OrcamentoSql orcamentoSql = new OrcamentoSql(context);
+
+                                                    //if (orcamentoSql.updateFast(dadosOrcamento, "AEAORCAM.GUID = '" + dadosOrcamento.getAsString("GUID") + "'") == 0) {
+                                                    if (orcamentoSql.updateFast(dadosOrcamento, "AEAORCAM.GUID = '" + pedidoRetorno.get("guid").getAsString() + "'") == 0) {
+
+                                                        dadosOrcamento.put("GUID", pedidoRetorno.get("guid").getAsString());
+                                                        dadosOrcamento.put("NUMERO", pedidoRetorno.get("numero").getAsInt());
+
+                                                        if (pedidoRetorno.has("vlTabela")) {
+                                                            dadosOrcamento.put("VL_TABELA", pedidoRetorno.get("vlTabela").getAsDouble());
+                                                            dadosOrcamento.put("VL_MERC_BRUTO", pedidoRetorno.get("vlMercBruto").getAsDouble());
+                                                        }
+                                                        if (pedidoRetorno.has("vlMercCusto")) {
+                                                            dadosOrcamento.put("VL_MERC_CUSTO", pedidoRetorno.get("vlMercCusto").getAsDouble());
+                                                        }
+                                                        if (pedidoRetorno.has("fcVlTotal")) {
+                                                            dadosOrcamento.put("FC_VL_TOTAL", pedidoRetorno.get("fcVlTotal").getAsDouble());
+                                                        }
+                                                        dadosOrcamento.put("DT_CAD", pedidoRetorno.get("dtCad").getAsString());
+                                                        dadosOrcamento.put("DT_ALT", pedidoRetorno.get("dtAlt").getAsString());
+
+                                                        if (orcamentoSql.insertOrReplace(dadosOrcamento) <= 0) {
+                                                            todosSucesso = false;
+                                                        }
+                                                    }
+                                                    for (int j = 0; j < listaOrcamento.size(); j++) {
+                                                        if (listaOrcamento.get(j).getGuid().equalsIgnoreCase(pedidoRetorno.get("guid").getAsString())){
+                                                            listaOrcamento.remove(j);
+                                                            break;
+                                                        }
+                                                    }
+                                                } // Fim do for
+                                            }
+                                            // Atualiza a notificacao
+                                            bigTextStyle.bigText(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
+                                            mBuilder.setStyle(bigTextStyle)
+                                                    .setProgress(0, 0, true);
+                                            notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
+
+                                            // Checo se o texto de status foi passado pro parametro
+                                            if (textStatus != null) {
+                                                ((Activity) context).runOnUiThread(new Runnable() {
+                                                    public void run() {
+                                                        textStatus.setText(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
+                                                    }
+                                                });
+                                            }
+                                            if (progressBarStatus != null) {
+                                                ((Activity) context).runOnUiThread(new Runnable() {
+                                                    public void run() {
+                                                        progressBarStatus.setIndeterminate(true);
+                                                    }
+                                                });
+                                            }
+                                        } else {
+                                            // Cria uma notificacao para ser manipulado
+                                            /*Load mLoad = PugNotification.with(context).load()
+                                                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
+                                                    .smallIcon(R.mipmap.ic_launcher)
+                                                    .largeIcon(R.mipmap.ic_launcher)
+                                                    .title(R.string.versao_savare_desatualizada)
+                                                    .bigTextStyle(context.getResources().getString(R.string.nao_chegou_dados_servidor_empresa) + "\n" + retornoWebservice.toString())
+                                                    .flags(Notification.DEFAULT_LIGHTS);
+                                            mLoad.simple().build();*/
+
+                                            bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.versao_savare_desatualizada))
+                                                    .bigText(context.getResources().getString(R.string.nao_chegou_dados_servidor_empresa) + "\n" + retornoWebservice.toString());
+                                            mBuilder.setStyle(bigTextStyle)
+                                                    .setProgress(0, 0, false);
+                                            notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
+                                        }
+                                        // Incrementa o total de paginas
+                                        pageNumber++;
+                                        if (pageNumber < totalPages) {
+                                            retornoWebservice = gson.fromJson(webserviceSisInfo.executarSelectWebserviceJson(null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEAORCAM, WSSisinfoWebservice.METODO_GET, parametrosWebservice + "&pageNumber=" + pageNumber, null), JsonObject.class);
+                                        }
+                                    } else {
+                                        todosSucesso = false;
+
+                                        // Cria uma notificacao para ser manipulado
+                                        /*Load mLoad = PugNotification.with(context).load()
+                                                .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
+                                                .smallIcon(R.mipmap.ic_launcher)
+                                                .largeIcon(R.mipmap.ic_launcher)
+                                                .title(R.string.recebendo_dados)
+                                                .bigTextStyle(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString())
+                                                .flags(Notification.DEFAULT_LIGHTS);
+                                        mLoad.simple().build();*/
+
+                                        bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.recebendo_dados))
+                                                .bigText(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString());
+                                        mBuilder.setStyle(bigTextStyle)
+                                                .setProgress(0, 0, false);
+                                        notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
+                                    }
+                                } // Fim do for ia (page)
+                                if (todosSucesso) {
+                                    inserirUltimaAtualizacao("AEASAIDA_ORC");
+                                }
+                            }
+                        } else {
+                            // Cria uma notificacao para ser manipulado
+                            /*Load mLoad = PugNotification.with(context).load()
+                                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
+                                    .smallIcon(R.mipmap.ic_launcher)
+                                    .largeIcon(R.mipmap.ic_launcher)
+                                    .title(R.string.recebendo_dados)
+                                    .bigTextStyle(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.get(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO))
+                                    .flags(Notification.DEFAULT_LIGHTS);
+                            mLoad.simple().build();*/
+
+                            bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.recebendo_dados))
+                                    .bigText(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.get(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO));
+                            mBuilder.setStyle(bigTextStyle)
+                                    .setProgress(0, 0, false);
+                            notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
+                        }
+                    }
+                }
+                importarDadosPedido(listaOrcamento);
+            }
+        } catch (Exception e) {
+            // Cria uma notificacao para ser manipulado
+            /*PugNotification.with(context)
+                    .load()
+                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + e.hashCode())
+                    .title(R.string.importar_dados_recebidos)
+                    .bigTextStyle("ImportarDadosOrcamento - " + e.getMessage())
+                    .smallIcon(R.mipmap.ic_launcher)
+                    .largeIcon(R.mipmap.ic_launcher)
+                    .flags(Notification.DEFAULT_ALL)
+                    .simple()
+                    .build();*/
+
+            bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.importar_dados_recebidos))
+                        .bigText("ImportaDadosOrcamento - " + e.getMessage());
+            mBuilder.setStyle(bigTextStyle)
+                    .setProgress(0, 0, false);
+            notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
+        }
+    }
+
+
+    /**
+     * Pega os dados do pedido que foi enviado pelo dispositivo.
+     * Ou seja, pelo numero do orcamento eh pego os dados depois que o orcamento eh transformado
+     * em pedido.
+     */
+    private void importarDadosPedido(List<OrcamentoBeans> listaPedidosDispositivo) {
+        JsonObject statuRetorno = null;
+
+        // Atualiza a notificacao
+        bigTextStyle.bigText(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa) + " Pedido");
+        mBuilder.setStyle(bigTextStyle)
+                .setProgress(0, 0, true);
+        notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
+
+        // Checo se o texto de status foi passado pro parametro
+        if (textStatus != null) {
+            ((Activity) context).runOnUiThread(new Runnable() {
+                public void run() {
+                    textStatus.setText(context.getResources().getString(R.string.procurando_dados) + " Pedido");
+                }
+            });
+        }
+        if (progressBarStatus != null) {
+            ((Activity) context).runOnUiThread(new Runnable() {
+                public void run() {
+                    progressBarStatus.setIndeterminate(true);
+                }
+            });
+        }
+        try {
+            FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
+
+            // Pega quando foi a ultima data que recebeu dados
             String ultimaData = pegaUltimaDataAtualizacao("AEASAIDA");
             // Cria uma variavel para salvar todos os paramentros em json
             String parametrosWebservice = "";
 
-            Gson gson = new Gson();
-            if ((ultimaData != null) && (!ultimaData.isEmpty())) {
+            List<OrcamentoBeans> listaOrcamento = new ArrayList<OrcamentoBeans>();
 
-                parametrosWebservice += "&where= (DT_ALT >= '" + ultimaData + "') AND " +
-                        "(AEASAIDA.ID_CFACLIFO_VENDEDOR_INI = (SELECT CFACLIFO.ID_CFACLIFO FROM CFACLIFO WHERE CFACLIFO.CODIGO_FUN = " + funcoes.getValorXml("CodigoUsuario") + "))";
+            if ((listaPedidosDispositivo != null) && (listaPedidosDispositivo.size() > 0)){
+                listaOrcamento = listaPedidosDispositivo;
+
+            } else if(listaPedidosDispositivo == null) {
+                OrcamentoRotinas orcamentoRotinas = new OrcamentoRotinas(context);
+                String[] listaTipo = new String[]{  OrcamentoRotinas.PEDIDO_ENVIADO,
+                        OrcamentoRotinas.PEDIDO_RETORNADO_BLOQUEADO,
+                        OrcamentoRotinas.PEDIDO_RETORNADO_LIBERADO};
+
+                listaOrcamento = orcamentoRotinas.listaOrcamentoPedido(listaTipo, null, OrcamentoRotinas.ORDEM_DECRESCENTE);
             }
-            if ((listaGuidOrcamento != null) && (listaGuidOrcamento.size() > 0)) {
-                parametrosWebservice += " AND (GUID IN(";
+
+            String whereGuidOrcamento = "";
+
+            if ( (listaOrcamento != null) && (listaOrcamento.size() > 0) ) {
+                whereGuidOrcamento = "( (SERIE_ORC = (SELECT AEASERIE.CODIGO FROM SMAEMPRE, AEASERIE WHERE (SMAEMPRE.ID_AEASERIE_ORC_PALM = AEASERIE.ID_AEASERIE) " +
+                        "AND (SMAEMPRE.ID_SMAEMPRE = " + funcoes.getValorXml("CodigoEmpresa") + "))) AND " +
+                        "(NUMERO_ORC IN (";
                 int controle = 0;
-                for (String guid : listaGuidOrcamento) {
+                for (OrcamentoBeans orcamento : listaOrcamento) {
                     controle++;
-                    parametrosWebservice += "'" + guid + "'";
-                    if (controle < listaGuidOrcamento.size()) {
-                        parametrosWebservice += ", ";
+                    whereGuidOrcamento += orcamento.getNumero();
+                    if (controle < listaOrcamento.size()) {
+                        whereGuidOrcamento += ", ";
                     }
                 }
-                parametrosWebservice += " ))";
+                whereGuidOrcamento += ")) )";
             }
+
+            if ((ultimaData != null) && (!ultimaData.isEmpty())) {
+                parametrosWebservice += "&where=  ( (DT_ALT >= '" + ultimaData + "' ) AND " +
+                        "(AEASAIDA.ID_CFACLIFO_VENDEDOR_INI = (SELECT ID_CFACLIFO FROM CFACLIFO WHERE CFACLIFO.CODIGO_FUN = " + funcoes.getValorXml("CodigoUsuario") + ")) AND " +
+                        "(AEASAIDA.ID_CFACLIFO IS NOT NULL) AND (AEASAIDA.ID_CFACIDAD IS NOT NULL) ) \n";;
+
+                if (!whereGuidOrcamento.isEmpty()){
+                    parametrosWebservice += " OR ( (DT_ALT >= '" + ultimaData + "') AND " + whereGuidOrcamento + ")";
+                }
+            } else if (!whereGuidOrcamento.isEmpty()) {
+                parametrosWebservice += "&where= " + whereGuidOrcamento;
+            } else {
+                return;
+            }
+
+            // Verifica se teve algum parametro
             if (!parametrosWebservice.isEmpty()) {
+                Gson gson = new Gson();
                 WSSisinfoWebservice webserviceSisInfo = new WSSisinfoWebservice(context);
                 JsonObject retornoWebservice = gson.fromJson(webserviceSisInfo.executarSelectWebserviceJson(null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEASAIDA, WSSisinfoWebservice.METODO_GET, parametrosWebservice, null), JsonObject.class);
 
@@ -7847,13 +9597,11 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                     statuRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO);
 
                     if (statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO).getAsInt() == HttpURLConnection.HTTP_OK) {
-                        //JsonObject objectRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_OBJECT_RETORNO);
-
                         boolean todosSucesso = true;
 
                         JsonObject pageRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_PAGE_RETORNO);
 
-                        if (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) {
+                        if ( (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0) ) {
                             final int totalPages = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt();
                             int pageNumber = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_PAGE_NUMBER_RETORNO).getAsInt();
 
@@ -7864,8 +9612,9 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                 // Verifica se retornou com sucesso
                                 if (statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO).getAsInt() == HttpURLConnection.HTTP_OK) {
                                     // Atualiza a notificacao
-                                    mLoad.bigTextStyle(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
-                                    mLoad.progress().value(0, 0, true).build();
+                                    bigTextStyle.bigText(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
+                                    mBuilder.setStyle(bigTextStyle);
+                                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                     // Checo se o texto de status foi passado pro parametro
                                     if (textStatus != null) {
@@ -7881,8 +9630,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                         // Checa se retornou algum dados na lista
                                         if (listaPedidoRetorno.size() > 0) {
                                             // Atualiza a notificacao
-                                            mLoad.bigTextStyle(context.getResources().getString(R.string.recebendo_dados_orcamento));
-                                            mLoad.progress().value(0, listaPedidoRetorno.size(), false).build();
+                                            bigTextStyle.bigText(context.getResources().getString(R.string.recebendo_dados_orcamento));
+                                            mBuilder.setStyle(bigTextStyle)
+                                                    .setProgress(listaPedidoRetorno.size(), 0, false);
+                                            notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                             // Checo se o texto de status foi passado pro parametro
                                             if (textStatus != null) {
@@ -7903,8 +9654,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                                             for (int i = 0; i < listaPedidoRetorno.size(); i++) {
                                                 // Atualiza a notificacao
-                                                mLoad.bigTextStyle(context.getResources().getString(R.string.recebendo_dados_orcamento) + " - Parte " + (pageNumber + 1) + "/" + totalPages + " - " + i + "/" + listaPedidoRetorno.size());
-                                                mLoad.progress().update(0, i, listaPedidoRetorno.size(), false).build();
+                                                bigTextStyle.bigText(context.getResources().getString(R.string.recebendo_dados_orcamento) + " - Parte " + (pageNumber + 1) + "/" + totalPages + " - " + i + "/" + listaPedidoRetorno.size());
+                                                mBuilder.setStyle(bigTextStyle)
+                                                        .setProgress(listaPedidoRetorno.size(), i, false);
+                                                notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                                 // Checo se o texto de status foi passado pro parametro
                                                 if (textStatus != null) {
@@ -7966,8 +9719,8 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                                 if (pedidoRetorno.has("pessoaCliente")) {
                                                     dadosOrcamento.put("PESSOA_CLIENTE", pedidoRetorno.get("pessoaCliente").getAsString());
                                                 }
-                                                if (pedidoRetorno.has("nomeRazao")) {
-                                                    dadosOrcamento.put("NOME_CLIENTE", pedidoRetorno.get("nomeRazao").getAsString());
+                                                if (pedidoRetorno.has("nomeCliente")) {
+                                                    dadosOrcamento.put("NOME_CLIENTE", pedidoRetorno.get("nomeCliente").getAsString());
                                                 }
                                                 if (pedidoRetorno.has("ieRgCliente")) {
                                                     dadosOrcamento.put("IE_RG_CLIENTE", pedidoRetorno.get("ieRgCliente").getAsString());
@@ -8016,19 +9769,23 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                                         dadosOrcamento.put("STATUS", "RE");
 
                                                     } else {
-                                                        dadosOrcamento.put("STATUS", "N");
+                                                        dadosOrcamento.put("STATUS", "F");
                                                     }
+                                                } else {
+                                                    dadosOrcamento.put("STATUS", "F");
                                                 }
                                                 if (pedidoRetorno.has("tipoEntrega")) {
                                                     dadosOrcamento.put("TIPO_ENTREGA", pedidoRetorno.get("tipoEntrega").getAsString());
                                                 }
                                                 OrcamentoSql orcamentoSql = new OrcamentoSql(context);
 
-                                                //if (orcamentoSql.updateFast(dadosOrcamento, "AEAORCAM.GUID = '" + dadosOrcamento.getAsString("GUID") + "'") == 0) {
-                                                if (orcamentoSql.updateFast(dadosOrcamento, "AEAORCAM.GUID = '" + dadosOrcamento.getAsString("GUID") + "'") == 0) {
+                                                if (orcamentoSql.updateFast(dadosOrcamento, "AEAORCAM.NUMERO = " + pedidoRetorno.get("numeroOrc") ) == 0) {
 
-                                                    if (pedidoRetorno.has("vlTabela")) {
-                                                        dadosOrcamento.put("VL_TABELA", pedidoRetorno.get("vlTabela").getAsDouble());
+                                                    if (pedidoRetorno.has("vlMercTabela")) {
+                                                        dadosOrcamento.put("VL_TABELA", pedidoRetorno.get("vlMercTabela").getAsDouble());
+                                                        dadosOrcamento.put("VL_TABELA_FATURADO", pedidoRetorno.get("vlMercTabela").getAsDouble());
+                                                    }
+                                                    if (pedidoRetorno.has("vlMercBruto")) {
                                                         dadosOrcamento.put("VL_MERC_BRUTO", pedidoRetorno.get("vlMercBruto").getAsDouble());
                                                     }
                                                     if (pedidoRetorno.has("vlMercCusto")) {
@@ -8036,6 +9793,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                                     }
                                                     if (pedidoRetorno.has("fcVlTotal")) {
                                                         dadosOrcamento.put("FC_VL_TOTAL", pedidoRetorno.get("fcVlTotal").getAsDouble());
+                                                        dadosOrcamento.put("FC_VL_TOTAL_FATURADO", pedidoRetorno.get("fcVlTotal").getAsDouble());
                                                     }
                                                     dadosOrcamento.put("DT_CAD", pedidoRetorno.get("dtCad").getAsString());
                                                     dadosOrcamento.put("DT_ALT", pedidoRetorno.get("dtAlt").getAsString());
@@ -8047,8 +9805,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                             } // Fim do for
                                         }
                                         // Atualiza a notificacao
-                                        mLoad.bigTextStyle(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
-                                        mLoad.progress().value(0, 0, true).build();
+                                        bigTextStyle.bigText(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
+                                        mBuilder.setStyle(bigTextStyle)
+                                                .setProgress(0, 0, true);
+                                        notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                         // Checo se o texto de status foi passado pro parametro
                                         if (textStatus != null) {
@@ -8067,14 +9827,11 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                         }
                                     } else {
                                         // Cria uma notificacao para ser manipulado
-                                        Load mLoad = PugNotification.with(context).load()
-                                                .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
-                                                .smallIcon(R.mipmap.ic_launcher)
-                                                .largeIcon(R.mipmap.ic_launcher)
-                                                .title(R.string.versao_savare_desatualizada)
-                                                .bigTextStyle(context.getResources().getString(R.string.nao_chegou_dados_servidor_empresa) + "\n" + retornoWebservice.toString())
-                                                .flags(Notification.DEFAULT_LIGHTS);
-                                        mLoad.simple().build();
+                                        bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.versao_savare_desatualizada))
+                                                .bigText(context.getResources().getString(R.string.nao_chegou_dados_servidor_empresa) + "\n" + retornoWebservice.toString());
+                                        mBuilder.setStyle(bigTextStyle)
+                                                .setProgress(0, 0, false);
+                                        notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
                                     }
                                     // Incrementa o total de paginas
                                     pageNumber++;
@@ -8085,14 +9842,11 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                     todosSucesso = false;
 
                                     // Cria uma notificacao para ser manipulado
-                                    Load mLoad = PugNotification.with(context).load()
-                                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
-                                            .smallIcon(R.mipmap.ic_launcher)
-                                            .largeIcon(R.mipmap.ic_launcher)
-                                            .title(R.string.recebendo_dados)
-                                            .bigTextStyle(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString())
-                                            .flags(Notification.DEFAULT_LIGHTS);
-                                    mLoad.simple().build();
+                                    bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.recebendo_dados))
+                                            .bigText(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString());
+                                    mBuilder.setStyle(bigTextStyle)
+                                            .setProgress(0, 0, false);
+                                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
                                 }
                             } // Fim do for ia (page)
                             if (todosSucesso) {
@@ -8101,20 +9855,26 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                         }
                     } else {
                         // Cria uma notificacao para ser manipulado
-                        Load mLoad = PugNotification.with(context).load()
-                                .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
+                        /*Load mLoad = PugNotification.with(context).load()
+                                .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                                 .smallIcon(R.mipmap.ic_launcher)
                                 .largeIcon(R.mipmap.ic_launcher)
                                 .title(R.string.recebendo_dados)
                                 .bigTextStyle(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.get(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO))
                                 .flags(Notification.DEFAULT_LIGHTS);
-                        mLoad.simple().build();
+                        mLoad.simple().build();*/
+
+                        bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.recebendo_dados))
+                                .bigText(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.get(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO));
+                        mBuilder.setStyle(bigTextStyle)
+                                .setProgress(0, 0, false);
+                        notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
                     }
                 }
             }
         } catch (Exception e) {
             // Cria uma notificacao para ser manipulado
-            PugNotification.with(context)
+            /*PugNotification.with(context)
                     .load()
                     .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + e.hashCode())
                     .title(R.string.importar_dados_recebidos)
@@ -8123,15 +9883,24 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                     .largeIcon(R.mipmap.ic_launcher)
                     .flags(Notification.DEFAULT_ALL)
                     .simple()
-                    .build();
+                    .build();*/
+
+            bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.msg_error))
+                    .bigText("ImportaDadosOrcamento - " + e.getMessage());
+            mBuilder.setStyle(bigTextStyle)
+                    .setProgress(0, 0, false);
+            notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
         }
     }
 
 
+
     private void importarDadosItemOrcamento() {
         // Atualiza a notificacao
-        mLoad.bigTextStyle(context.getResources().getString(R.string.procurando_dados) + " Item de Orçamento");
-        mLoad.progress().value(0, 0, true).build();
+        bigTextStyle.bigText(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa) + " Item de Orçamento");
+        mBuilder.setStyle(bigTextStyle)
+                .setProgress(0, 0, true);
+        notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
         // Checo se o texto de status foi passado pro parametro
         if (textStatus != null) {
@@ -8144,7 +9913,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
         try {
             WSSisinfoWebservice webserviceSisInfo = new WSSisinfoWebservice(context);
 
-            final Vector<SoapObject> listaItemOrcamentoObject = webserviceSisInfo.executarSelectWebservice(null, WSSisinfoWebservice.FUNCTION_SELECT_AEAITORC, criaPropriedadeDataAlteracaoWebservice("AEAITORC"));
+            final Vector<SoapObject> listaItemOrcamentoObject = webserviceSisInfo.executarSelectWebservice(null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEAITORC, criaPropriedadeDataAlteracaoWebservice("AEAITORC"));
 
             // Checa se retornou alguma coisa
             if ((listaItemOrcamentoObject != null) && (listaItemOrcamentoObject.size() > 0)) {
@@ -8152,8 +9921,9 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 boolean todosSucesso = true;
 
                 // Atualiza a notificacao
-                mLoad.bigTextStyle(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
-                mLoad.progress().value(0, listaItemOrcamentoObject.size(), false).build();
+                bigTextStyle.bigText(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
+                mBuilder.setStyle(bigTextStyle);
+                notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                 // Checo se o texto de status foi passado pro parametro
                 if (textStatus != null) {
@@ -8178,8 +9948,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                     final int finalControle = controle;
 
                     // Atualiza a notificacao
-                    mLoad.bigTextStyle(context.getResources().getString(R.string.recebendo_dados_item_orcamento) + " - " + (finalControle + 1) + "/" + listaItemOrcamentoObject.size());
-                    mLoad.progress().update(0, controle, listaItemOrcamentoObject.size(), false).build();
+                    bigTextStyle.bigText(context.getResources().getString(R.string.recebendo_dados_item_orcamento) + " - " + (finalControle + 1) + "/" + listaItemOrcamentoObject.size());
+                    mBuilder.setStyle(bigTextStyle)
+                            .setProgress(listaItemOrcamentoObject.size(), 0, false);
+                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                     // Checo se o texto de status foi passado pro parametro
                     if (textStatus != null) {
@@ -8341,8 +10113,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                     inserirUltimaAtualizacao("AEAITORC");
                 }
                 // Atualiza a notificacao
-                mLoad.bigTextStyle(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
-                mLoad.progress().value(0, 0, true).build();
+                bigTextStyle.bigText(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
+                mBuilder.setStyle(bigTextStyle)
+                        .setProgress(0, 0, true);
+                notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                 // Checo se o texto de status foi passado pro parametro
                 if (textStatus != null) {
@@ -8360,19 +10134,19 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                     });
                 }
             }
-        } catch (Exception e) {
-            // Cria uma notificacao para ser manipulado
-            PugNotification.with(context)
-                    .load()
-                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + e.hashCode())
-                    .title(R.string.importar_dados_recebidos)
-                    .bigTextStyle("ImportaDadosItemOrcamento" + e.getMessage())
-                    .smallIcon(R.mipmap.ic_launcher)
-                    .largeIcon(R.mipmap.ic_launcher)
-                    .flags(Notification.DEFAULT_ALL)
-                    .simple()
-                    .build();
-            ;
+        } catch (final Exception e) {
+            if (textStatusErro != null) {
+                ((Activity) context).runOnUiThread(new Runnable() {
+                    public void run() {
+                        textStatusErro.append("\n*" + context.getResources().getText(R.string.erro_inesperado) + " - Item Orçamento : " + e.getMessage());
+                    }
+                });
+            }
+            bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.importar_dados_recebidos))
+                    .bigText("ImportaDadosItemOrcamento - " + e.getMessage());
+            mBuilder.setStyle(bigTextStyle)
+                    .setProgress(0, 0, false);
+            notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
         }
     }
 
@@ -8381,8 +10155,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
         JsonObject statuRetorno = null;
 
         // Atualiza a notificacao
-        mLoad.bigTextStyle(context.getResources().getString(R.string.procurando_dados) + " Percentual");
-        mLoad.progress().value(0, 0, true).build();
+        bigTextStyle.bigText(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa) + " Percentual");
+        mBuilder.setStyle(bigTextStyle)
+                .setProgress(0, 0, true);
+        notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
         // Checo se o texto de status foi passado pro parametro
         if (textStatus != null) {
@@ -8404,7 +10180,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 parametrosWebservice += "&where= (DT_ALT >= '" + ultimaData + "')";
             }
             WSSisinfoWebservice webserviceSisInfo = new WSSisinfoWebservice(context);
-            JsonObject retornoWebservice = gson.fromJson(webserviceSisInfo.executarSelectWebserviceJson(null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEAPERCE, WSSisinfoWebservice.METODO_GET, parametrosWebservice, null), JsonObject.class);
+            JsonObject retornoWebservice = gson.fromJson(webserviceSisInfo.executarWebserviceJson(servidorAtivo, null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEAPERCE, WSSisinfoWebservice.METODO_GET, parametrosWebservice, null), JsonObject.class);
 
             if ((retornoWebservice != null) && (retornoWebservice.has(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO))) {
                 statuRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO);
@@ -8414,7 +10190,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                     JsonObject pageRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_PAGE_RETORNO);
 
-                    if (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) {
+                    if ( (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0) ) {
                         final int totalPages = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt();
                         int pageNumber = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_PAGE_NUMBER_RETORNO).getAsInt();
 
@@ -8426,8 +10202,9 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                             if (statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO).getAsInt() == HttpURLConnection.HTTP_OK) {
 
                                 // Atualiza a notificacao
-                                mLoad.bigTextStyle(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
-                                mLoad.progress().value(0, 0, true).build();
+                                bigTextStyle.bigText(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
+                                mBuilder.setStyle(bigTextStyle);
+                                notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                 // Checo se o texto de status foi passado pro parametro
                                 if (textStatus != null) {
@@ -8443,8 +10220,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                     // Checa se retornou algum dados na lista
                                     if (listaPercentualRetorno.size() > 0) {
                                         // Atualiza a notificacao
-                                        mLoad.bigTextStyle(context.getResources().getString(R.string.recebendo_dados_percentual));
-                                        mLoad.progress().value(0, listaPercentualRetorno.size(), false).build();
+                                        bigTextStyle.bigText(context.getResources().getString(R.string.recebendo_dados_percentual));
+                                        mBuilder.setStyle(bigTextStyle)
+                                                .setProgress(listaPercentualRetorno.size(), 0, false);
+                                        notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                         // Checo se o texto de status foi passado pro parametro
                                         if (textStatus != null) {
@@ -8465,8 +10244,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                         List<ContentValues> listaDadosPercentual = new ArrayList<ContentValues>();
                                         for (int i = 0; i < listaPercentualRetorno.size(); i++) {
                                             // Atualiza a notificacao
-                                            mLoad.bigTextStyle(context.getResources().getString(R.string.recebendo_dados_percentual) + " - Parte " + (pageNumber + 1) + "/" + totalPages + " - " + i + "/" + listaPercentualRetorno.size());
-                                            mLoad.progress().update(0, i, listaPercentualRetorno.size(), false).build();
+                                            bigTextStyle.bigText(context.getResources().getString(R.string.recebendo_dados_percentual) + " - Parte " + (pageNumber + 1) + "/" + totalPages + " - " + i + "/" + listaPercentualRetorno.size());
+                                            mBuilder.setStyle(bigTextStyle)
+                                                    .setProgress(listaPercentualRetorno.size(), i, false);
+                                            notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                             // Checo se o texto de status foi passado pro parametro
                                             if (textStatus != null) {
@@ -8518,6 +10299,9 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                             }
                                             if (percentualRetorno.has("idCfaparamVendedor") && percentualRetorno.get("idCfaparamVendedor").getAsInt() > 0) {
                                                 dadosPercentual.put("ID_CFAPARAM_VENDEDOR", percentualRetorno.get("idCfaparamVendedor").getAsInt());
+                                            }
+                                            if (percentualRetorno.has("idAeafator") && percentualRetorno.get("idAeafator").getAsInt() > 0) {
+                                                dadosPercentual.put("ID_AEAFATOR", percentualRetorno.get("idAeafator").getAsInt());
                                             }
                                             dadosPercentual.put("DT_ALT", percentualRetorno.get("dtAlt").getAsString());
                                             if (percentualRetorno.has("tipoIss")) {
@@ -8572,8 +10356,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                         todosSucesso = percentualSql.insertList(listaDadosPercentual);
                                     }
                                     // Atualiza a notificacao
-                                    mLoad.bigTextStyle(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
-                                    mLoad.progress().value(0, 0, true).build();
+                                    bigTextStyle.bigText(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
+                                    mBuilder.setStyle(bigTextStyle)
+                                            .setProgress(0, 0, true);
+                                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                     // Checo se o texto de status foi passado pro parametro
                                     if (textStatus != null) {
@@ -8592,32 +10378,26 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                     }
                                 } else {
                                     // Cria uma notificacao para ser manipulado
-                                    Load mLoad = PugNotification.with(context).load()
-                                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
-                                            .smallIcon(R.mipmap.ic_launcher)
-                                            .largeIcon(R.mipmap.ic_launcher)
-                                            .title(R.string.versao_savare_desatualizada)
-                                            .bigTextStyle(context.getResources().getString(R.string.nao_chegou_dados_servidor_empresa) + "\n" + retornoWebservice.toString())
-                                            .flags(Notification.DEFAULT_LIGHTS);
-                                    mLoad.simple().build();
+                                    bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.versao_savare_desatualizada))
+                                            .bigText(context.getResources().getString(R.string.nao_chegou_dados_servidor_empresa) + "\n" + retornoWebservice.toString());
+                                    mBuilder.setStyle(bigTextStyle)
+                                            .setProgress(0, 0, false);
+                                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
                                 }
                                 // Incrementa o total de paginas
                                 pageNumber++;
                                 if (pageNumber < totalPages) {
-                                    retornoWebservice = gson.fromJson(webserviceSisInfo.executarSelectWebserviceJson(null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEAPERCE, WSSisinfoWebservice.METODO_GET, parametrosWebservice + "&pageNumber=" + pageNumber, null), JsonObject.class);
+                                    retornoWebservice = gson.fromJson(webserviceSisInfo.executarWebserviceJson(servidorAtivo, null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEAPERCE, WSSisinfoWebservice.METODO_GET, parametrosWebservice + "&pageNumber=" + pageNumber, null), JsonObject.class);
                                 }
                             } else {
                                 todosSucesso = false;
 
                                 // Cria uma notificacao para ser manipulado
-                                Load mLoad = PugNotification.with(context).load()
-                                        .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
-                                        .smallIcon(R.mipmap.ic_launcher)
-                                        .largeIcon(R.mipmap.ic_launcher)
-                                        .title(R.string.recebendo_dados)
-                                        .bigTextStyle(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString())
-                                        .flags(Notification.DEFAULT_LIGHTS);
-                                mLoad.simple().build();
+                                bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.recebendo_dados))
+                                        .bigText(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString());
+                                mBuilder.setStyle(bigTextStyle)
+                                        .setProgress(0, 0, false);
+                                notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
                             }
                         } //Fim do for ia (page)
                         // Checa se todos foram inseridos/atualizados com sucesso
@@ -8627,29 +10407,26 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                     }
                 } else {
                     // Cria uma notificacao para ser manipulado
-                    Load mLoad = PugNotification.with(context).load()
-                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
-                            .smallIcon(R.mipmap.ic_launcher)
-                            .largeIcon(R.mipmap.ic_launcher)
-                            .title(R.string.recebendo_dados)
-                            .bigTextStyle(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.get(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO))
-                            .flags(Notification.DEFAULT_LIGHTS);
-                    mLoad.simple().build();
+                    bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.recebendo_dados))
+                            .bigText(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.get(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO));
+                    mBuilder.setStyle(bigTextStyle)
+                            .setProgress(0, 0, false);
+                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
                 }
             }
-        } catch (Exception e) {
-            // Cria uma notificacao para ser manipulado
-            PugNotification.with(context)
-                    .load()
-                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + e.hashCode())
-                    .title(R.string.importar_dados_recebidos)
-                    .bigTextStyle("ImportaDadosPercentual" + e.getMessage())
-                    .smallIcon(R.mipmap.ic_launcher)
-                    .largeIcon(R.mipmap.ic_launcher)
-                    .flags(Notification.DEFAULT_ALL)
-                    .simple()
-                    .build();
-            ;
+        } catch (final Exception e) {
+            if (textStatusErro != null) {
+                ((Activity) context).runOnUiThread(new Runnable() {
+                    public void run() {
+                        textStatusErro.append("\n*" + context.getResources().getText(R.string.erro_inesperado) + " - Percentual : " + e.getMessage());
+                    }
+                });
+            }
+            bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.importar_dados_recebidos))
+                    .bigText("ImportaDadosPercentual - " + e.getMessage());
+            mBuilder.setStyle(bigTextStyle)
+                    .setProgress(0, 0, false);
+            notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
         }
     }
 
@@ -8658,8 +10435,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
         JsonObject statuRetorno = null;
 
         // Atualiza a notificacao
-        mLoad.bigTextStyle(context.getResources().getString(R.string.procurando_dados) + " Fator");
-        mLoad.progress().value(0, 0, true).build();
+        bigTextStyle.bigText(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa) + " Fator");
+        mBuilder.setStyle(bigTextStyle)
+                .setProgress(0, 0, true);
+        notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
         // Checo se o texto de status foi passado pro parametro
         if (textStatus != null) {
@@ -8681,7 +10460,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 parametrosWebservice += "&where= (DT_ALT >= '" + ultimaData + "')";
             }
             WSSisinfoWebservice webserviceSisInfo = new WSSisinfoWebservice(context);
-            JsonObject retornoWebservice = gson.fromJson(webserviceSisInfo.executarSelectWebserviceJson(null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEAFATOR, WSSisinfoWebservice.METODO_GET, parametrosWebservice, null), JsonObject.class);
+            JsonObject retornoWebservice = gson.fromJson(webserviceSisInfo.executarWebserviceJson(servidorAtivo, null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEAFATOR, WSSisinfoWebservice.METODO_GET, parametrosWebservice, null), JsonObject.class);
 
             if ((retornoWebservice != null) && (retornoWebservice.has(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO))) {
                 statuRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO);
@@ -8691,7 +10470,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                     JsonObject pageRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_PAGE_RETORNO);
 
-                    if (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) {
+                    if ( (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0) ) {
                         final int totalPages = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt();
                         int pageNumber = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_PAGE_NUMBER_RETORNO).getAsInt();
 
@@ -8702,8 +10481,9 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                             // Verifica se retornou com sucesso
                             if (statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO).getAsInt() == HttpURLConnection.HTTP_OK) {
                                 // Atualiza a notificacao
-                                mLoad.bigTextStyle(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
-                                mLoad.progress().value(0, 0, true).build();
+                                bigTextStyle.bigText(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
+                                mBuilder.setStyle(bigTextStyle);
+                                notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
 
                                 // Checo se o texto de status foi passado pro parametro
@@ -8720,8 +10500,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                     // Checa se retornou algum dados na lista
                                     if (listaFatorRetorno.size() > 0) {
                                         // Atualiza a notificacao
-                                        mLoad.bigTextStyle(context.getResources().getString(R.string.recebendo_dados_fator));
-                                        mLoad.progress().value(0, listaFatorRetorno.size(), false).build();
+                                        bigTextStyle.bigText(context.getResources().getString(R.string.recebendo_dados_fator));
+                                        mBuilder.setStyle(bigTextStyle)
+                                                .setProgress(listaFatorRetorno.size(), 0, false);
+                                        notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                         // Checo se o texto de status foi passado pro parametro
                                         if (textStatus != null) {
@@ -8742,8 +10524,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                         List<ContentValues> listaDadosFator = new ArrayList<ContentValues>();
                                         for (int i = 0; i < listaFatorRetorno.size(); i++) {
                                             // Atualiza a notificacao
-                                            mLoad.bigTextStyle(context.getResources().getString(R.string.recebendo_dados_fator) + " - Parte " + (pageNumber + 1) + "/" + totalPages + " - " + i + "/" + listaFatorRetorno.size());
-                                            mLoad.progress().update(0, i, listaFatorRetorno.size(), false).build();
+                                            bigTextStyle.bigText(context.getResources().getString(R.string.recebendo_dados_fator) + " - Parte " + (pageNumber + 1) + "/" + totalPages + " - " + i + "/" + listaFatorRetorno.size());
+                                            mBuilder.setStyle(bigTextStyle)
+                                                    .setProgress(listaFatorRetorno.size(), i, false);
+                                            notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                             // Checo se o texto de status foi passado pro parametro
                                             if (textStatus != null) {
@@ -8806,8 +10590,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                         todosSucesso = fatorSql.insertList(listaDadosFator);
                                     }
                                     // Atualiza a notificacao
-                                    mLoad.bigTextStyle(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
-                                    mLoad.progress().value(0, 0, true).build();
+                                    bigTextStyle.bigText(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
+                                    mBuilder.setStyle(bigTextStyle)
+                                            .setProgress(0, 0, true);
+                                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                     // Checo se o texto de status foi passado pro parametro
                                     if (textStatus != null) {
@@ -8826,32 +10612,26 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                     }
                                 } else {
                                     // Cria uma notificacao para ser manipulado
-                                    Load mLoad = PugNotification.with(context).load()
-                                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
-                                            .smallIcon(R.mipmap.ic_launcher)
-                                            .largeIcon(R.mipmap.ic_launcher)
-                                            .title(R.string.versao_savare_desatualizada)
-                                            .bigTextStyle(context.getResources().getString(R.string.nao_chegou_dados_servidor_empresa) + "\n" + retornoWebservice.toString())
-                                            .flags(Notification.DEFAULT_LIGHTS);
-                                    mLoad.simple().build();
+                                    bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.versao_savare_desatualizada))
+                                            .bigText(context.getResources().getString(R.string.nao_chegou_dados_servidor_empresa) + "\n" + retornoWebservice.toString());
+                                    mBuilder.setStyle(bigTextStyle)
+                                            .setProgress(0, 0, false);
+                                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
                                 }
                                 // Incrementa o total de paginas
                                 pageNumber++;
                                 if (pageNumber < totalPages) {
-                                    retornoWebservice = gson.fromJson(webserviceSisInfo.executarSelectWebserviceJson(null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEAFATOR, WSSisinfoWebservice.METODO_GET, parametrosWebservice + "&pageNumber=" + pageNumber, null), JsonObject.class);
+                                    retornoWebservice = gson.fromJson(webserviceSisInfo.executarWebserviceJson(servidorAtivo, null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEAFATOR, WSSisinfoWebservice.METODO_GET, parametrosWebservice + "&pageNumber=" + pageNumber, null), JsonObject.class);
                                 }
                             } else {
                                 todosSucesso = false;
 
                                 // Cria uma notificacao para ser manipulado
-                                Load mLoad = PugNotification.with(context).load()
-                                        .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
-                                        .smallIcon(R.mipmap.ic_launcher)
-                                        .largeIcon(R.mipmap.ic_launcher)
-                                        .title(R.string.recebendo_dados)
-                                        .bigTextStyle(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString())
-                                        .flags(Notification.DEFAULT_LIGHTS);
-                                mLoad.simple().build();
+                                bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.recebendo_dados))
+                                        .bigText(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString());
+                                mBuilder.setStyle(bigTextStyle)
+                                        .setProgress(0, 0, false);
+                                notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
                             }
                         } // Fim do for ia (page)
                         // Checa se todos foram inseridos/atualizados com sucesso
@@ -8861,28 +10641,26 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                     }
                 } else {
                     // Cria uma notificacao para ser manipulado
-                    Load mLoad = PugNotification.with(context).load()
-                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
-                            .smallIcon(R.mipmap.ic_launcher)
-                            .largeIcon(R.mipmap.ic_launcher)
-                            .title(R.string.recebendo_dados)
-                            .bigTextStyle(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString())
-                            .flags(Notification.DEFAULT_LIGHTS);
-                    mLoad.simple().build();
+                    bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.recebendo_dados))
+                            .bigText(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString());
+                    mBuilder.setStyle(bigTextStyle)
+                            .setProgress(0, 0, false);
+                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
                 }
             }
-        } catch (Exception e) {
-            // Cria uma notificacao para ser manipulado
-            PugNotification.with(context)
-                    .load()
-                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + e.hashCode())
-                    .title(R.string.importar_dados_recebidos)
-                    .bigTextStyle("ImportaDadosFator" + e.getMessage())
-                    .smallIcon(R.mipmap.ic_launcher)
-                    .largeIcon(R.mipmap.ic_launcher)
-                    .flags(Notification.DEFAULT_ALL)
-                    .simple()
-                    .build();
+        } catch (final Exception e) {
+            if (textStatusErro != null) {
+                ((Activity) context).runOnUiThread(new Runnable() {
+                    public void run() {
+                        textStatusErro.append("\n*" + context.getResources().getText(R.string.erro_inesperado) + " - Fator : " + e.getMessage());
+                    }
+                });
+            }
+            bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.importar_dados_recebidos))
+                    .bigText("ImportaDadosFator - " + e.getMessage());
+            mBuilder.setStyle(bigTextStyle)
+                    .setProgress(0, 0, false);
+            notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
         }
     }
 
@@ -8891,8 +10669,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
         JsonObject statuRetorno = null;
 
         // Atualiza a notificacao
-        mLoad.bigTextStyle(context.getResources().getString(R.string.procurando_dados) + " Produto Recomendado");
-        mLoad.progress().value(0, 0, true).build();
+        bigTextStyle.bigText(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa) + " Produto Recomendado");
+        mBuilder.setStyle(bigTextStyle)
+                .setProgress(0, 0, true);
+        notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
         // Checo se o texto de status foi passado pro parametro
         if (textStatus != null) {
@@ -8914,7 +10694,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 parametrosWebservice += "&where= (DT_ALT >= '" + ultimaData + "') ";
             }
             WSSisinfoWebservice webserviceSisInfo = new WSSisinfoWebservice(context);
-            JsonObject retornoWebservice = gson.fromJson(webserviceSisInfo.executarSelectWebserviceJson(null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEAPRREC, WSSisinfoWebservice.METODO_GET, parametrosWebservice, null), JsonObject.class);
+            JsonObject retornoWebservice = gson.fromJson(webserviceSisInfo.executarWebserviceJson(servidorAtivo, null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEAPRREC, WSSisinfoWebservice.METODO_GET, parametrosWebservice, null), JsonObject.class);
 
             if ((retornoWebservice != null) && (retornoWebservice.has(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO))) {
                 statuRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO);
@@ -8924,7 +10704,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                     JsonObject pageRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_PAGE_RETORNO);
 
-                    if (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) {
+                    if ( (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0) ) {
                         final int totalPages = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt();
                         int pageNumber = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_PAGE_NUMBER_RETORNO).getAsInt();
 
@@ -8935,8 +10715,9 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                             // Verifica se retornou com sucesso
                             if (statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO).getAsInt() == HttpURLConnection.HTTP_OK) {
                                 // Atualiza a notificacao
-                                mLoad.bigTextStyle(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
-                                mLoad.progress().value(0, 0, true).build();
+                                bigTextStyle.bigText(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
+                                mBuilder.setStyle(bigTextStyle);
+                                notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                 // Checo se o texto de status foi passado pro parametro
                                 if (textStatus != null) {
@@ -8952,8 +10733,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                     // Checa se retornou algum dados na lista
                                     if (listaProdutoRecomendadoRetorno.size() > 0) {
                                         // Atualiza a notificacao
-                                        mLoad.bigTextStyle(context.getResources().getString(R.string.recebendo_dados_recomendado));
-                                        mLoad.progress().value(0, listaProdutoRecomendadoRetorno.size(), false).build();
+                                        bigTextStyle.bigText(context.getResources().getString(R.string.recebendo_dados_recomendado));
+                                        mBuilder.setStyle(bigTextStyle)
+                                                .setProgress(listaProdutoRecomendadoRetorno.size(), 0, false);
+                                        notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                         // Checo se o texto de status foi passado pro parametro
                                         if (textStatus != null) {
@@ -8974,8 +10757,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                         List<ContentValues> listaDadosRecomendado = new ArrayList<ContentValues>();
                                         for (int i = 0; i < listaProdutoRecomendadoRetorno.size(); i++) {
                                             // Atualiza a notificacao
-                                            mLoad.bigTextStyle(context.getResources().getString(R.string.recebendo_dados_recomendado) + " - Parte " + (pageNumber + 1) + "/" + totalPages + " - " + i + "/" + listaProdutoRecomendadoRetorno.size());
-                                            mLoad.progress().update(0, i, listaProdutoRecomendadoRetorno.size(), false).build();
+                                            bigTextStyle.bigText(context.getResources().getString(R.string.recebendo_dados_recomendado) + " - Parte " + (pageNumber + 1) + "/" + totalPages + " - " + i + "/" + listaProdutoRecomendadoRetorno.size());
+                                            mBuilder.setStyle(bigTextStyle)
+                                                    .setProgress(listaProdutoRecomendadoRetorno.size(), i, false);
+                                            notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                             // Checo se o texto de status foi passado pro parametro
                                             if (textStatus != null) {
@@ -9038,8 +10823,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                         todosSucesso = produtoRecomendadoSql.insertList(listaDadosRecomendado);
                                     }
                                     // Atualiza a notificacao
-                                    mLoad.bigTextStyle(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
-                                    mLoad.progress().value(0, 0, true).build();
+                                    bigTextStyle.bigText(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
+                                    mBuilder.setStyle(bigTextStyle)
+                                            .setProgress(0, 0, true);
+                                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                     // Checo se o texto de status foi passado pro parametro
                                     if (textStatus != null) {
@@ -9057,33 +10844,26 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                         });
                                     }
                                 } else {
-                                    // Cria uma notificacao para ser manipulado
-                                    Load mLoad = PugNotification.with(context).load()
-                                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
-                                            .smallIcon(R.mipmap.ic_launcher)
-                                            .largeIcon(R.mipmap.ic_launcher)
-                                            .title(R.string.recebendo_dados)
-                                            .bigTextStyle(context.getResources().getString(R.string.nao_chegou_dados_servidor_empresa) + "\n" + retornoWebservice.toString())
-                                            .flags(Notification.DEFAULT_LIGHTS);
-                                    mLoad.simple().build();
+                                    bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.recebendo_dados))
+                                            .bigText(context.getResources().getString(R.string.nao_chegou_dados_servidor_empresa) + "\n" + retornoWebservice.toString());
+                                    mBuilder.setStyle(bigTextStyle)
+                                            .setProgress(0, 0, false);
+                                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
                                 }
                                 // Incrementa o total de paginas
                                 pageNumber++;
                                 if (pageNumber < totalPages) {
-                                    retornoWebservice = gson.fromJson(webserviceSisInfo.executarSelectWebserviceJson(null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEAPRREC, WSSisinfoWebservice.METODO_GET, parametrosWebservice + "&pageNumber=" + pageNumber, null), JsonObject.class);
+                                    retornoWebservice = gson.fromJson(webserviceSisInfo.executarWebserviceJson(servidorAtivo, null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEAPRREC, WSSisinfoWebservice.METODO_GET, parametrosWebservice + "&pageNumber=" + pageNumber, null), JsonObject.class);
                                 }
                             } else {
                                 todosSucesso = false;
 
                                 // Cria uma notificacao para ser manipulado
-                                Load mLoad = PugNotification.with(context).load()
-                                        .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
-                                        .smallIcon(R.mipmap.ic_launcher)
-                                        .largeIcon(R.mipmap.ic_launcher)
-                                        .title(R.string.recebendo_dados)
-                                        .bigTextStyle(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString())
-                                        .flags(Notification.DEFAULT_LIGHTS);
-                                mLoad.simple().build();
+                                bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.recebendo_dados))
+                                        .bigText(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString());
+                                mBuilder.setStyle(bigTextStyle)
+                                        .setProgress(0, 0, false);
+                                notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
                             }
                         } // Fim for ia (page)
                         // Checa se todos foram inseridos/atualizados com sucesso
@@ -9093,28 +10873,1007 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                     }
                 } else {
                     // Cria uma notificacao para ser manipulado
-                    Load mLoad = PugNotification.with(context).load()
-                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
-                            .smallIcon(R.mipmap.ic_launcher)
-                            .largeIcon(R.mipmap.ic_launcher)
-                            .title(R.string.recebendo_dados)
-                            .bigTextStyle(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString())
-                            .flags(Notification.DEFAULT_LIGHTS);
-                    mLoad.simple().build();
+                    bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.recebendo_dados))
+                            .bigText(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString());
+                    mBuilder.setStyle(bigTextStyle)
+                            .setProgress(0, 0, false);
+                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
                 }
             }
-        } catch (Exception e) {
-            // Cria uma notificacao para ser manipulado
-            PugNotification.with(context)
-                    .load()
-                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + e.hashCode())
-                    .title(R.string.importar_dados_recebidos)
-                    .bigTextStyle("ImportaDadosProdutoRecomendado" + e.getMessage())
-                    .smallIcon(R.mipmap.ic_launcher)
-                    .largeIcon(R.mipmap.ic_launcher)
-                    .flags(Notification.DEFAULT_ALL)
-                    .simple()
-                    .build();
+        } catch (final Exception e) {
+            if (textStatusErro != null) {
+                ((Activity) context).runOnUiThread(new Runnable() {
+                    public void run() {
+                        textStatusErro.append("\n*" + context.getResources().getText(R.string.erro_inesperado) + " - Produto Recomendado : " + e.getMessage());
+                    }
+                });
+            }
+            bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.importar_dados_recebidos))
+                    .bigText("ImportaDadosProdutoRecomendado - " + e.getMessage());
+            mBuilder.setStyle(bigTextStyle)
+                    .setProgress(0, 0, false);
+            notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
+        }
+    }
+
+
+    private void importarDadosTabelaPromocao() {
+        JsonObject statuRetorno = null;
+
+        // Atualiza a notificacao
+        bigTextStyle.bigText(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa) + " Tabela de Promoção");
+        mBuilder.setStyle(bigTextStyle)
+                .setProgress(0, 0, true);
+        notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
+
+        // Checo se o texto de status foi passado pro parametro
+        if (textStatus != null) {
+            ((Activity) context).runOnUiThread(new Runnable() {
+                public void run() {
+                    textStatus.setText(context.getResources().getString(R.string.procurando_dados) + " Tabela de Promoção");
+                }
+            });
+        }
+        try {
+            // Pega quando foi a ultima data que recebeu dados
+            String ultimaData = pegaUltimaDataAtualizacao("AEATBPRO");
+            // Cria uma variavel para salvar todos os paramentros em json
+            //JsonArray parametros = new JsonArray();
+            String parametrosWebservice = "";
+            String filtroPromocao = "((DT_INICIO <= (SELECT CAST('NOW' AS DATE) FROM RDB$DATABASE)) AND (DT_FIM >= (SELECT CAST('NOW' AS DATE) FROM RDB$DATABASE)))";
+
+            Gson gson = new Gson();
+            if ((ultimaData != null) && (!ultimaData.isEmpty())) {
+                parametrosWebservice += "&where= (DT_ALT >= '" + ultimaData + "') AND " + filtroPromocao;
+            } else {
+                parametrosWebservice += "&where= " +  filtroPromocao;
+            }
+            WSSisinfoWebservice webserviceSisInfo = new WSSisinfoWebservice(context);
+            JsonObject retornoWebservice = gson.fromJson(webserviceSisInfo.executarWebserviceJson(servidorAtivo, null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEATBPRO, WSSisinfoWebservice.METODO_GET, parametrosWebservice, null), JsonObject.class);
+
+            if ((retornoWebservice != null) && (retornoWebservice.has(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO))) {
+                statuRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO);
+                // Verifica se retornou com sucesso
+                if (statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO).getAsInt() == HttpURLConnection.HTTP_OK) {
+                    boolean todosSucesso = true;
+
+                    JsonObject pageRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_PAGE_RETORNO);
+
+                    if ( (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0) ) {
+                        final int totalPages = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt();
+                        int pageNumber = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_PAGE_NUMBER_RETORNO).getAsInt();
+
+                        for (int ia = pageNumber; ia < totalPages; ia++) {
+
+                            statuRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO);
+
+                            // Verifica se retornou com sucesso
+                            if (statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO).getAsInt() == HttpURLConnection.HTTP_OK) {
+                                // Atualiza a notificacao
+                                bigTextStyle.bigText(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
+                                mBuilder.setStyle(bigTextStyle);
+                                notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
+
+                                // Checo se o texto de status foi passado pro parametro
+                                if (textStatus != null) {
+                                    ((Activity) context).runOnUiThread(new Runnable() {
+                                        public void run() {
+                                            textStatus.setText(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
+                                        }
+                                    });
+                                }
+                                // Checa se retornou alguma coisa
+                                if ((retornoWebservice.has(WSSisinfoWebservice.KEY_OBJECT_OBJECT_RETORNO))) {
+                                    final JsonArray listaTabelaPromocaoRetorno = retornoWebservice.getAsJsonArray(WSSisinfoWebservice.KEY_OBJECT_OBJECT_RETORNO);
+                                    // Checa se retornou algum dados na lista
+                                    if (listaTabelaPromocaoRetorno.size() > 0) {
+                                        // Atualiza a notificacao
+                                        bigTextStyle.bigText(context.getResources().getString(R.string.recebendo_dados_tabela_promocao));
+                                        mBuilder.setStyle(bigTextStyle)
+                                                .setProgress(listaTabelaPromocaoRetorno.size(), 0, false);
+                                        notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
+
+                                        // Checo se o texto de status foi passado pro parametro
+                                        if (textStatus != null) {
+                                            ((Activity) context).runOnUiThread(new Runnable() {
+                                                public void run() {
+                                                    textStatus.setText(context.getResources().getString(R.string.recebendo_dados_tabela_promocao));
+                                                }
+                                            });
+                                        }
+                                        if (progressBarStatus != null) {
+                                            ((Activity) context).runOnUiThread(new Runnable() {
+                                                public void run() {
+                                                    progressBarStatus.setIndeterminate(false);
+                                                    progressBarStatus.setMax(listaTabelaPromocaoRetorno.size());
+                                                }
+                                            });
+                                        }
+                                        List<ContentValues> listaTabelaPromocao = new ArrayList<ContentValues>();
+                                        for (int i = 0; i < listaTabelaPromocaoRetorno.size(); i++) {
+                                            // Atualiza a notificacao
+                                            bigTextStyle.bigText(context.getResources().getString(R.string.recebendo_dados_tabela_promocao) + " - Parte " + (pageNumber + 1) + "/" + totalPages + " - " + i + "/" + listaTabelaPromocaoRetorno.size());
+                                            mBuilder.setStyle(bigTextStyle)
+                                                    .setProgress(listaTabelaPromocaoRetorno.size(), i, false);
+                                            notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
+
+                                            // Checo se o texto de status foi passado pro parametro
+                                            if (textStatus != null) {
+                                                final int finalI1 = i;
+                                                final int finalPageNumber = pageNumber + 1;
+                                                ((Activity) context).runOnUiThread(new Runnable() {
+                                                    public void run() {
+                                                        textStatus.setText(context.getResources().getString(R.string.recebendo_dados_tabela_promocao) + " - Parte " + finalPageNumber + "/" + totalPages + " - " + finalI1 + "/" + listaTabelaPromocaoRetorno.size());
+                                                    }
+                                                });
+                                            }
+                                            if (progressBarStatus != null) {
+                                                final int finalI = i;
+                                                ((Activity) context).runOnUiThread(new Runnable() {
+                                                    public void run() {
+                                                        progressBarStatus.setProgress(finalI);
+                                                    }
+                                                });
+                                            }
+                                            JsonObject recomendadoRetorno = listaTabelaPromocaoRetorno.get(i).getAsJsonObject();
+                                            ContentValues dadosTabelaPromocao = new ContentValues();
+
+                                            dadosTabelaPromocao.put("ID_AEATBPRO", recomendadoRetorno.get("idAeatbpro").getAsInt());
+                                            dadosTabelaPromocao.put("GUID", recomendadoRetorno.get("guid").getAsString());
+                                            if (recomendadoRetorno.has("usCad")) {
+                                                dadosTabelaPromocao.put("US_CAD", recomendadoRetorno.get("usCad").getAsString());
+                                            }
+                                            if (recomendadoRetorno.has("dtCad")) {
+                                                dadosTabelaPromocao.put("DT_CAD", recomendadoRetorno.get("dtCad").getAsString());
+                                            }
+                                            if (recomendadoRetorno.has("dtAlt")) {
+                                                dadosTabelaPromocao.put("DT_ALT", recomendadoRetorno.get("dtAlt").getAsString());
+                                            }
+                                            if (recomendadoRetorno.has("ctInteg") && recomendadoRetorno.get("ctInteg").getAsInt() > 0) {
+                                                dadosTabelaPromocao.put("CT_INTEG", recomendadoRetorno.get("ctInteg").getAsInt());
+                                            }
+                                            dadosTabelaPromocao.put("CODIGO", recomendadoRetorno.get("codigo").getAsInt());
+                                            dadosTabelaPromocao.put("DESCRICAO", recomendadoRetorno.get("descricao").getAsString());
+
+                                            if (recomendadoRetorno.has("dtInicio")) {
+                                                dadosTabelaPromocao.put("DT_INICIO", recomendadoRetorno.get("dtInicio").getAsString());
+                                            }
+                                            if (recomendadoRetorno.has("dtFim")) {
+                                                dadosTabelaPromocao.put("DT_FIM", recomendadoRetorno.get("dtFim").getAsString());
+                                            }
+                                            if (recomendadoRetorno.has("dias")) {
+                                                dadosTabelaPromocao.put("DIAS", recomendadoRetorno.get("dias").getAsString());
+                                            }
+                                            if (recomendadoRetorno.has("ativo")) {
+                                                dadosTabelaPromocao.put("ATIVO", recomendadoRetorno.get("ativo").getAsString());
+                                            }
+                                            if (recomendadoRetorno.has("vistaPrazo")) {
+                                                dadosTabelaPromocao.put("VISTA_PRAZO", recomendadoRetorno.get("vistaPrazo").getAsString());
+                                            }
+                                            listaTabelaPromocao.add(dadosTabelaPromocao);
+                                        }
+                                        TabelaPromocaoSql tabelaPromocaoSql = new TabelaPromocaoSql(context);
+
+                                        tabelaPromocaoSql.delete(null);
+
+                                        todosSucesso = tabelaPromocaoSql.insertList(listaTabelaPromocao);
+                                    }
+                                    // Atualiza a notificacao
+                                    bigTextStyle.bigText(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
+                                    mBuilder.setStyle(bigTextStyle)
+                                            .setProgress(0, 0, true);
+                                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
+
+                                    // Checo se o texto de status foi passado pro parametro
+                                    if (textStatus != null) {
+                                        ((Activity) context).runOnUiThread(new Runnable() {
+                                            public void run() {
+                                                textStatus.setText(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
+                                            }
+                                        });
+                                    }
+                                    if (progressBarStatus != null) {
+                                        ((Activity) context).runOnUiThread(new Runnable() {
+                                            public void run() {
+                                                progressBarStatus.setIndeterminate(true);
+                                            }
+                                        });
+                                    }
+                                } else {
+                                    bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.recebendo_dados))
+                                            .bigText(context.getResources().getString(R.string.nao_chegou_dados_servidor_empresa) + "\n" + retornoWebservice.toString());
+                                    mBuilder.setStyle(bigTextStyle)
+                                            .setProgress(0, 0, false);
+                                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
+                                }
+                                // Incrementa o total de paginas
+                                pageNumber++;
+                                if (pageNumber < totalPages) {
+                                    retornoWebservice = gson.fromJson(webserviceSisInfo.executarWebserviceJson(servidorAtivo, null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEATBPRO, WSSisinfoWebservice.METODO_GET, parametrosWebservice + "&pageNumber=" + pageNumber, null), JsonObject.class);
+                                }
+                            } else {
+                                todosSucesso = false;
+
+                                // Cria uma notificacao para ser manipulado
+                                bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.recebendo_dados))
+                                        .bigText(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString());
+                                mBuilder.setStyle(bigTextStyle)
+                                        .setProgress(0, 0, false);
+                                notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
+                            }
+                        } // Fim for ia (page)
+                        // Checa se todos foram inseridos/atualizados com sucesso
+                        if (todosSucesso) {
+                            inserirUltimaAtualizacao("AEATBPRO");
+                        }
+                    }
+                } else {
+                    // Cria uma notificacao para ser manipulado
+                    bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.recebendo_dados))
+                            .bigText(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString());
+                    mBuilder.setStyle(bigTextStyle)
+                            .setProgress(0, 0, false);
+                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
+                }
+            }
+        } catch (final Exception e) {
+            if (textStatusErro != null) {
+                ((Activity) context).runOnUiThread(new Runnable() {
+                    public void run() {
+                        textStatusErro.append("\n*" + context.getResources().getText(R.string.erro_inesperado) + " - Tabela Promoção : " + e.getMessage());
+                    }
+                });
+            }
+            bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.importar_dados_recebidos))
+                    .bigText("ImportaDadosTabelaPromocao - " + e.getMessage());
+            mBuilder.setStyle(bigTextStyle)
+                    .setProgress(0, 0, false);
+            notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
+        }
+    }
+
+    private void importarDadosItemPromocao() {
+        JsonObject statuRetorno = null;
+
+        // Atualiza a notificacao
+        bigTextStyle.bigText(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa) + " Item de Promoção");
+        mBuilder.setStyle(bigTextStyle)
+                .setProgress(0, 0, true);
+        notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
+
+        // Checo se o texto de status foi passado pro parametro
+        if (textStatus != null) {
+            ((Activity) context).runOnUiThread(new Runnable() {
+                public void run() {
+                    textStatus.setText(context.getResources().getString(R.string.procurando_dados) + " Item de Promoção");
+                }
+            });
+        }
+        try {
+            // Pega quando foi a ultima data que recebeu dados
+            String ultimaData = pegaUltimaDataAtualizacao("AEAITTBP");
+            // Cria uma variavel para salvar todos os paramentros em json
+            //JsonArray parametros = new JsonArray();
+            String parametrosWebservice = "";
+            String filtroPromocao = "(ID_AEATBPRO IN (SELECT ID_AEATBPRO FROM AEATBPRO WHERE ((DT_INICIO <= (SELECT CAST('NOW' AS DATE) FROM RDB$DATABASE)) AND (DT_FIM >= (SELECT CAST('NOW' AS DATE) FROM RDB$DATABASE)))))";
+
+            Gson gson = new Gson();
+            if ((ultimaData != null) && (!ultimaData.isEmpty())) {
+                parametrosWebservice += "&where= (DT_ALT >= '" + ultimaData + "') AND " + filtroPromocao;
+            } else {
+                parametrosWebservice += "&where= " + filtroPromocao;
+            }
+            WSSisinfoWebservice webserviceSisInfo = new WSSisinfoWebservice(context);
+            JsonObject retornoWebservice = gson.fromJson(webserviceSisInfo.executarWebserviceJson(servidorAtivo, null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEAITTBP, WSSisinfoWebservice.METODO_GET, parametrosWebservice, null), JsonObject.class);
+
+            if ((retornoWebservice != null) && (retornoWebservice.has(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO))) {
+                statuRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO);
+                // Verifica se retornou com sucesso
+                if (statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO).getAsInt() == HttpURLConnection.HTTP_OK) {
+                    boolean todosSucesso = true;
+
+                    JsonObject pageRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_PAGE_RETORNO);
+
+                    if ( (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0) ) {
+                        final int totalPages = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt();
+                        int pageNumber = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_PAGE_NUMBER_RETORNO).getAsInt();
+
+                        for (int ia = pageNumber; ia < totalPages; ia++) {
+
+                            statuRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO);
+
+                            // Verifica se retornou com sucesso
+                            if (statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO).getAsInt() == HttpURLConnection.HTTP_OK) {
+                                // Atualiza a notificacao
+                                bigTextStyle.bigText(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
+                                mBuilder.setStyle(bigTextStyle);
+                                notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
+
+                                // Checo se o texto de status foi passado pro parametro
+                                if (textStatus != null) {
+                                    ((Activity) context).runOnUiThread(new Runnable() {
+                                        public void run() {
+                                            textStatus.setText(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
+                                        }
+                                    });
+                                }
+                                // Checa se retornou alguma coisa
+                                if ((retornoWebservice.has(WSSisinfoWebservice.KEY_OBJECT_OBJECT_RETORNO))) {
+                                    final JsonArray listaItemPromocaoRetorno = retornoWebservice.getAsJsonArray(WSSisinfoWebservice.KEY_OBJECT_OBJECT_RETORNO);
+                                    // Checa se retornou algum dados na lista
+                                    if (listaItemPromocaoRetorno.size() > 0) {
+                                        // Atualiza a notificacao
+                                        bigTextStyle.bigText(context.getResources().getString(R.string.recebendo_dados_tabela_promocao));
+                                        mBuilder.setStyle(bigTextStyle)
+                                                .setProgress(listaItemPromocaoRetorno.size(), 0, false);
+                                        notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
+
+                                        // Checo se o texto de status foi passado pro parametro
+                                        if (textStatus != null) {
+                                            ((Activity) context).runOnUiThread(new Runnable() {
+                                                public void run() {
+                                                    textStatus.setText(context.getResources().getString(R.string.recebendo_dados_item_promocao));
+                                                }
+                                            });
+                                        }
+                                        if (progressBarStatus != null) {
+                                            ((Activity) context).runOnUiThread(new Runnable() {
+                                                public void run() {
+                                                    progressBarStatus.setIndeterminate(false);
+                                                    progressBarStatus.setMax(listaItemPromocaoRetorno.size());
+                                                }
+                                            });
+                                        }
+                                        List<ContentValues> listaTabelaPromocao = new ArrayList<ContentValues>();
+                                        for (int i = 0; i < listaItemPromocaoRetorno.size(); i++) {
+                                            // Atualiza a notificacao
+                                            bigTextStyle.bigText(context.getResources().getString(R.string.recebendo_dados_item_promocao) + " - Parte " + (pageNumber + 1) + "/" + totalPages + " - " + i + "/" + listaItemPromocaoRetorno.size());
+                                            mBuilder.setStyle(bigTextStyle)
+                                                    .setProgress(listaItemPromocaoRetorno.size(), i, false);
+                                            notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
+
+                                            // Checo se o texto de status foi passado pro parametro
+                                            if (textStatus != null) {
+                                                final int finalI1 = i;
+                                                final int finalPageNumber = pageNumber + 1;
+                                                ((Activity) context).runOnUiThread(new Runnable() {
+                                                    public void run() {
+                                                        textStatus.setText(context.getResources().getString(R.string.recebendo_dados_item_promocao) + " - Parte " + finalPageNumber + "/" + totalPages + " - " + finalI1 + "/" + listaItemPromocaoRetorno.size());
+                                                    }
+                                                });
+                                            }
+                                            if (progressBarStatus != null) {
+                                                final int finalI = i;
+                                                ((Activity) context).runOnUiThread(new Runnable() {
+                                                    public void run() {
+                                                        progressBarStatus.setProgress(finalI);
+                                                    }
+                                                });
+                                            }
+                                            JsonObject itemPromocaoRetorno = listaItemPromocaoRetorno.get(i).getAsJsonObject();
+                                            ContentValues dadosItemPromocao = new ContentValues();
+
+                                            dadosItemPromocao.put("ID_AEAITTBP", itemPromocaoRetorno.get("idAeaittbp").getAsInt());
+                                            dadosItemPromocao.put("ID_AEATBPRO", itemPromocaoRetorno.get("idAeatbpro").getAsInt());
+                                            if (itemPromocaoRetorno.has("idAeaagppr") && itemPromocaoRetorno.get("idAeaagppr").getAsInt() > 0) {
+                                                dadosItemPromocao.put("ID_AEAAGPPR", itemPromocaoRetorno.get("idAeaagppr").getAsInt());
+                                            }
+                                            if (itemPromocaoRetorno.has("idAeamarca") && itemPromocaoRetorno.get("idAeamarca").getAsInt() > 0) {
+                                                dadosItemPromocao.put("ID_AEAMARCA", itemPromocaoRetorno.get("idAeamarca").getAsInt());
+                                            }
+                                            if (itemPromocaoRetorno.has("idAeafamil") && itemPromocaoRetorno.get("idAeafamil").getAsInt() > 0) {
+                                                dadosItemPromocao.put("ID_AEAFAMIL", itemPromocaoRetorno.get("idAeafamil").getAsInt());
+                                            }
+                                            if (itemPromocaoRetorno.has("idAeaclase") && itemPromocaoRetorno.get("idAeaclase").getAsInt() > 0) {
+                                                dadosItemPromocao.put("ID_AEACLASE", itemPromocaoRetorno.get("idAeaclase").getAsInt());
+                                            }
+                                            if (itemPromocaoRetorno.has("idAeagrupo") && itemPromocaoRetorno.get("idAeagrupo").getAsInt() > 0) {
+                                                dadosItemPromocao.put("ID_AEAGRUPO", itemPromocaoRetorno.get("idAeagrupo").getAsInt());
+                                            }
+                                            if (itemPromocaoRetorno.has("idAeasgrup") && itemPromocaoRetorno.get("idAeasgrup").getAsInt() > 0) {
+                                                dadosItemPromocao.put("ID_AEASGRUP", itemPromocaoRetorno.get("idAeasgrup").getAsInt());
+                                            }
+                                            if (itemPromocaoRetorno.has("idAeaprodu") && itemPromocaoRetorno.get("idAeaprodu").getAsInt() > 0) {
+                                                dadosItemPromocao.put("ID_AEAPRODU", itemPromocaoRetorno.get("idAeaprodu").getAsInt());
+                                            }
+                                            dadosItemPromocao.put("GUID", itemPromocaoRetorno.get("guid").getAsString());
+                                            if (itemPromocaoRetorno.has("usCad")) {
+                                                dadosItemPromocao.put("US_CAD", itemPromocaoRetorno.get("usCad").getAsString());
+                                            }
+                                            if (itemPromocaoRetorno.has("dtCad")) {
+                                                dadosItemPromocao.put("DT_CAD", itemPromocaoRetorno.get("dtCad").getAsString());
+                                            }
+                                            if (itemPromocaoRetorno.has("dtAlt")) {
+                                                dadosItemPromocao.put("DT_ALT", itemPromocaoRetorno.get("dtAlt").getAsString());
+                                            }
+                                            if (itemPromocaoRetorno.has("ctInteg") && itemPromocaoRetorno.get("ctInteg").getAsInt() > 0) {
+                                                dadosItemPromocao.put("CT_INTEG", itemPromocaoRetorno.get("ctInteg").getAsInt());
+                                            }
+                                            dadosItemPromocao.put("DESC_MERC_VISTA_VARE", itemPromocaoRetorno.get("descMercVistaVare").getAsDouble());
+                                            dadosItemPromocao.put("DESC_MERC_VISTA_ATAC", itemPromocaoRetorno.get("descMercVistaAtac").getAsDouble());
+                                            dadosItemPromocao.put("DESC_MERC_PRAZO_VARE", itemPromocaoRetorno.get("descMercPrazoVare").getAsDouble());
+                                            dadosItemPromocao.put("DESC_MERC_PRAZO_ATAC", itemPromocaoRetorno.get("descMercPrazoAtac").getAsDouble());
+                                            dadosItemPromocao.put("DESC_SERV_VISTA", itemPromocaoRetorno.get("descServVista").getAsDouble());
+                                            dadosItemPromocao.put("DESC_SERV_PRAZO", itemPromocaoRetorno.get("descServPrazo").getAsDouble());
+                                            dadosItemPromocao.put("COM_MERC_VISTA_VARE", itemPromocaoRetorno.get("comMercVistaVare").getAsDouble());
+                                            dadosItemPromocao.put("COM_MERC_VISTA_ATAC", itemPromocaoRetorno.get("comMercVistaAtac").getAsDouble());
+                                            dadosItemPromocao.put("COM_MERC_PRAZO_VARE", itemPromocaoRetorno.get("comMercPrazoVare").getAsDouble());
+                                            dadosItemPromocao.put("COM_MERC_PRAZO_ATAC", itemPromocaoRetorno.get("comMercPrazoAtac").getAsDouble());
+                                            dadosItemPromocao.put("COM_SERV_VISTA", itemPromocaoRetorno.get("comServVista").getAsDouble());
+                                            dadosItemPromocao.put("COM_SERV_PRAZO", itemPromocaoRetorno.get("comServPrazo").getAsDouble());
+                                            dadosItemPromocao.put("COM_EXT_MERC_VISTA_VARE", itemPromocaoRetorno.get("comExtMercVistaVare").getAsDouble());
+                                            dadosItemPromocao.put("COM_EXT_MERC_VISTA_ATAC", itemPromocaoRetorno.get("comExtMercVistaAtac").getAsDouble());
+                                            dadosItemPromocao.put("COM_EXT_MERC_PRAZO_VARE", itemPromocaoRetorno.get("comExtMercPrazoVare").getAsDouble());
+                                            dadosItemPromocao.put("COM_EXT_MERC_PRAZO_ATAC", itemPromocaoRetorno.get("comExtMercPrazoAtac").getAsDouble());
+                                            dadosItemPromocao.put("COM_EXT_SERV_VISTA", itemPromocaoRetorno.get("comExtServVista").getAsDouble());
+                                            dadosItemPromocao.put("COM_EXT_SERV_Prazo", itemPromocaoRetorno.get("comExtServPrazo").getAsDouble());
+                                            dadosItemPromocao.put("PRECO_VISTA_VARE", itemPromocaoRetorno.get("precoVistaVare").getAsDouble());
+                                            dadosItemPromocao.put("PRECO_VISTA_ATAC", itemPromocaoRetorno.get("precoVistaAtac").getAsDouble());
+                                            dadosItemPromocao.put("PRECO_PRAZO_VARE", itemPromocaoRetorno.get("precoPrazoVare").getAsDouble());
+                                            dadosItemPromocao.put("PRECO_PRAZO_ATAC", itemPromocaoRetorno.get("precoPrazoAtac").getAsDouble());
+                                            dadosItemPromocao.put("PRECO_VISTA_SERV", itemPromocaoRetorno.get("precoVistaServ").getAsDouble());
+                                            dadosItemPromocao.put("PRECO_PRAZO_SERV", itemPromocaoRetorno.get("precoPrazoServ").getAsDouble());
+                                            dadosItemPromocao.put("DESC_MAX_MERC_VISTA_VARE", itemPromocaoRetorno.get("descMaxMercVistaVare").getAsDouble());
+                                            dadosItemPromocao.put("DESC_MAX_MERC_VISTA_ATAC", itemPromocaoRetorno.get("descMaxMercVistaAtac").getAsDouble());
+                                            dadosItemPromocao.put("DESC_MAX_MERC_PRAZO_VARE", itemPromocaoRetorno.get("descMaxMercPrazoVare").getAsDouble());
+                                            dadosItemPromocao.put("DESC_MAX_MERC_PRAZO_ATAC", itemPromocaoRetorno.get("descMaxMercPrazoAtac").getAsDouble());
+                                            dadosItemPromocao.put("DESC_MAX_SERV_VISTA", itemPromocaoRetorno.get("descMaxServVista").getAsDouble());
+                                            dadosItemPromocao.put("DESC_MAX_SERV_PRAZO", itemPromocaoRetorno.get("descMaxServPrazo").getAsDouble());
+
+                                            listaTabelaPromocao.add(dadosItemPromocao);
+                                        }
+                                        ItemPromocaoSql itemPromocaoSql = new ItemPromocaoSql(context);
+
+                                        itemPromocaoSql.delete(null);
+
+                                        todosSucesso = itemPromocaoSql.insertList(listaTabelaPromocao);
+                                    }
+                                    // Atualiza a notificacao
+                                    bigTextStyle.bigText(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
+                                    mBuilder.setStyle(bigTextStyle)
+                                            .setProgress(0, 0, true);
+                                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
+
+                                    // Checo se o texto de status foi passado pro parametro
+                                    if (textStatus != null) {
+                                        ((Activity) context).runOnUiThread(new Runnable() {
+                                            public void run() {
+                                                textStatus.setText(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
+                                            }
+                                        });
+                                    }
+                                    if (progressBarStatus != null) {
+                                        ((Activity) context).runOnUiThread(new Runnable() {
+                                            public void run() {
+                                                progressBarStatus.setIndeterminate(true);
+                                            }
+                                        });
+                                    }
+                                } else {
+                                    bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.recebendo_dados))
+                                            .bigText(context.getResources().getString(R.string.nao_chegou_dados_servidor_empresa) + "\n" + retornoWebservice.toString());
+                                    mBuilder.setStyle(bigTextStyle)
+                                            .setProgress(0, 0, false);
+                                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
+                                }
+                                // Incrementa o total de paginas
+                                pageNumber++;
+                                if (pageNumber < totalPages) {
+                                    retornoWebservice = gson.fromJson(webserviceSisInfo.executarWebserviceJson(servidorAtivo, null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEAITTBP, WSSisinfoWebservice.METODO_GET, parametrosWebservice + "&pageNumber=" + pageNumber, null), JsonObject.class);
+                                }
+                            } else {
+                                todosSucesso = false;
+
+                                // Cria uma notificacao para ser manipulado
+                                bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.recebendo_dados))
+                                        .bigText(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString());
+                                mBuilder.setStyle(bigTextStyle)
+                                        .setProgress(0, 0, false);
+                                notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
+                            }
+                        } // Fim for ia (page)
+                        // Checa se todos foram inseridos/atualizados com sucesso
+                        if (todosSucesso) {
+                            inserirUltimaAtualizacao("AEAITTBP");
+                        }
+                    }
+                } else {
+                    // Cria uma notificacao para ser manipulado
+                    bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.recebendo_dados))
+                            .bigText(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString());
+                    mBuilder.setStyle(bigTextStyle)
+                            .setProgress(0, 0, false);
+                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
+                }
+            }
+        } catch (final Exception e) {
+            if (textStatusErro != null) {
+                ((Activity) context).runOnUiThread(new Runnable() {
+                    public void run() {
+                        textStatusErro.append("\n*" + context.getResources().getText(R.string.erro_inesperado) + " - Item Promoção : " + e.getMessage());
+                    }
+                });
+            }
+            bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.importar_dados_recebidos))
+                    .bigText("ImportaDadosItemPromocao - " + e.getMessage());
+            mBuilder.setStyle(bigTextStyle)
+                    .setProgress(0, 0, false);
+            notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
+        }
+    }
+
+
+    private void importarDadosExcaoPromocao() {
+        JsonObject statuRetorno = null;
+
+        // Atualiza a notificacao
+        bigTextStyle.bigText(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa) + " Exceção de Promoção");
+        mBuilder.setStyle(bigTextStyle)
+                .setProgress(0, 0, true);
+        notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
+
+        // Checo se o texto de status foi passado pro parametro
+        if (textStatus != null) {
+            ((Activity) context).runOnUiThread(new Runnable() {
+                public void run() {
+                    textStatus.setText(context.getResources().getString(R.string.procurando_dados) + " Exceção de Promoção");
+                }
+            });
+        }
+        try {
+            // Pega quando foi a ultima data que recebeu dados
+            String ultimaData = pegaUltimaDataAtualizacao("AEAEXTBP");
+            // Cria uma variavel para salvar todos os paramentros em json
+            //JsonArray parametros = new JsonArray();
+            String parametrosWebservice = "";
+            String filtroPromocao = "(ID_AEAITTBP IN (SELECT ID_AEAITTBP FROM AEAITTBP WHERE ID_AEATBPRO IN (SELECT ID_AEATBPRO FROM AEATBPRO WHERE " +
+                                    "((DT_INICIO <= (SELECT CAST('NOW' AS DATE) FROM RDB$DATABASE)) AND (DT_FIM >= (SELECT CAST('NOW' AS DATE) FROM RDB$DATABASE))))))";
+
+            Gson gson = new Gson();
+            if ((ultimaData != null) && (!ultimaData.isEmpty())) {
+                parametrosWebservice += "&where= (DT_ALT >= '" + ultimaData + "') AND " + filtroPromocao;
+            } else {
+                parametrosWebservice += "&where= " + filtroPromocao;
+            }
+            WSSisinfoWebservice webserviceSisInfo = new WSSisinfoWebservice(context);
+            JsonObject retornoWebservice = gson.fromJson(webserviceSisInfo.executarWebserviceJson(servidorAtivo, null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEAEXTBP, WSSisinfoWebservice.METODO_GET, parametrosWebservice, null), JsonObject.class);
+
+            if ((retornoWebservice != null) && (retornoWebservice.has(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO))) {
+                statuRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO);
+                // Verifica se retornou com sucesso
+                if (statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO).getAsInt() == HttpURLConnection.HTTP_OK) {
+                    boolean todosSucesso = true;
+
+                    JsonObject pageRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_PAGE_RETORNO);
+
+                    if ( (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0) ) {
+                        final int totalPages = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt();
+                        int pageNumber = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_PAGE_NUMBER_RETORNO).getAsInt();
+
+                        for (int ia = pageNumber; ia < totalPages; ia++) {
+
+                            statuRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO);
+
+                            // Verifica se retornou com sucesso
+                            if (statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO).getAsInt() == HttpURLConnection.HTTP_OK) {
+                                // Atualiza a notificacao
+                                bigTextStyle.bigText(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
+                                mBuilder.setStyle(bigTextStyle);
+                                notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
+
+                                // Checo se o texto de status foi passado pro parametro
+                                if (textStatus != null) {
+                                    ((Activity) context).runOnUiThread(new Runnable() {
+                                        public void run() {
+                                            textStatus.setText(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
+                                        }
+                                    });
+                                }
+                                // Checa se retornou alguma coisa
+                                if ((retornoWebservice.has(WSSisinfoWebservice.KEY_OBJECT_OBJECT_RETORNO))) {
+                                    final JsonArray listaExcecaoPromocaoRetorno = retornoWebservice.getAsJsonArray(WSSisinfoWebservice.KEY_OBJECT_OBJECT_RETORNO);
+                                    // Checa se retornou algum dados na lista
+                                    if (listaExcecaoPromocaoRetorno.size() > 0) {
+                                        // Atualiza a notificacao
+                                        bigTextStyle.bigText(context.getResources().getString(R.string.recebendo_dados_tabela_promocao));
+                                        mBuilder.setStyle(bigTextStyle)
+                                                .setProgress(listaExcecaoPromocaoRetorno.size(), 0, false);
+                                        notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
+
+                                        // Checo se o texto de status foi passado pro parametro
+                                        if (textStatus != null) {
+                                            ((Activity) context).runOnUiThread(new Runnable() {
+                                                public void run() {
+                                                    textStatus.setText(context.getResources().getString(R.string.recebendo_dados_excao_promocao));
+                                                }
+                                            });
+                                        }
+                                        if (progressBarStatus != null) {
+                                            ((Activity) context).runOnUiThread(new Runnable() {
+                                                public void run() {
+                                                    progressBarStatus.setIndeterminate(false);
+                                                    progressBarStatus.setMax(listaExcecaoPromocaoRetorno.size());
+                                                }
+                                            });
+                                        }
+                                        List<ContentValues> listaExcecaoPromocao = new ArrayList<ContentValues>();
+                                        for (int i = 0; i < listaExcecaoPromocaoRetorno.size(); i++) {
+                                            // Atualiza a notificacao
+                                            bigTextStyle.bigText(context.getResources().getString(R.string.recebendo_dados_excao_promocao) + " - Parte " + (pageNumber + 1) + "/" + totalPages + " - " + i + "/" + listaExcecaoPromocaoRetorno.size());
+                                            mBuilder.setStyle(bigTextStyle)
+                                                    .setProgress(listaExcecaoPromocaoRetorno.size(), i, false);
+                                            notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
+
+                                            // Checo se o texto de status foi passado pro parametro
+                                            if (textStatus != null) {
+                                                final int finalI1 = i;
+                                                final int finalPageNumber = pageNumber + 1;
+                                                ((Activity) context).runOnUiThread(new Runnable() {
+                                                    public void run() {
+                                                        textStatus.setText(context.getResources().getString(R.string.recebendo_dados_excao_promocao) + " - Parte " + finalPageNumber + "/" + totalPages + " - " + finalI1 + "/" + listaExcecaoPromocaoRetorno.size());
+                                                    }
+                                                });
+                                            }
+                                            if (progressBarStatus != null) {
+                                                final int finalI = i;
+                                                ((Activity) context).runOnUiThread(new Runnable() {
+                                                    public void run() {
+                                                        progressBarStatus.setProgress(finalI);
+                                                    }
+                                                });
+                                            }
+                                            JsonObject excecaoPromocaoRetorno = listaExcecaoPromocaoRetorno.get(i).getAsJsonObject();
+                                            ContentValues dadosExcecaoPromocao = new ContentValues();
+
+                                            dadosExcecaoPromocao.put("ID_AEAEXTBP", excecaoPromocaoRetorno.get("idAeaextbp").getAsInt());
+                                            dadosExcecaoPromocao.put("ID_AEAITTBP", excecaoPromocaoRetorno.get("idAeaittbp").getAsInt());
+                                            if (excecaoPromocaoRetorno.has("idCfaareas") && excecaoPromocaoRetorno.get("idCfaareas").getAsInt() > 0) {
+                                                dadosExcecaoPromocao.put("ID_CFAAREAS", excecaoPromocaoRetorno.get("idCfaareas").getAsInt());
+                                            }
+                                            if (excecaoPromocaoRetorno.has("idCfatpcli") && excecaoPromocaoRetorno.get("idCfatpcli").getAsInt() > 0) {
+                                                dadosExcecaoPromocao.put("ID_CFATPCLI", excecaoPromocaoRetorno.get("idCfatpcli").getAsInt());
+                                            }
+                                            if (excecaoPromocaoRetorno.has("idCfastatu") && excecaoPromocaoRetorno.get("idCfastatu").getAsInt() > 0) {
+                                                dadosExcecaoPromocao.put("ID_CFASTATU", excecaoPromocaoRetorno.get("idCfastatu").getAsInt());
+                                            }
+                                            if (excecaoPromocaoRetorno.has("idCfaprofi") && excecaoPromocaoRetorno.get("idCfaprofi").getAsInt() > 0) {
+                                                dadosExcecaoPromocao.put("ID_CFAPROFI", excecaoPromocaoRetorno.get("idCfaprofi").getAsInt());
+                                            }
+                                            if (excecaoPromocaoRetorno.has("idCfaativi") && excecaoPromocaoRetorno.get("idCfaativi").getAsInt() > 0) {
+                                                dadosExcecaoPromocao.put("ID_CFAATIVI", excecaoPromocaoRetorno.get("idCfaativi").getAsInt());
+                                            }
+                                            dadosExcecaoPromocao.put("GUID", excecaoPromocaoRetorno.get("guid").getAsString());
+                                            if (excecaoPromocaoRetorno.has("usCad")) {
+                                                dadosExcecaoPromocao.put("US_CAD", excecaoPromocaoRetorno.get("usCad").getAsString());
+                                            }
+                                            if (excecaoPromocaoRetorno.has("dtCad")) {
+                                                dadosExcecaoPromocao.put("DT_CAD", excecaoPromocaoRetorno.get("dtCad").getAsString());
+                                            }
+                                            if (excecaoPromocaoRetorno.has("dtAlt")) {
+                                                dadosExcecaoPromocao.put("DT_ALT", excecaoPromocaoRetorno.get("dtAlt").getAsString());
+                                            }
+                                            if (excecaoPromocaoRetorno.has("ctInteg") && excecaoPromocaoRetorno.get("ctInteg").getAsInt() > 0) {
+                                                dadosExcecaoPromocao.put("CT_INTEG", excecaoPromocaoRetorno.get("ctInteg").getAsInt());
+                                            }
+                                            dadosExcecaoPromocao.put("DESC_MERC_VISTA_VARE", excecaoPromocaoRetorno.get("descMercVistaVare").getAsDouble());
+                                            dadosExcecaoPromocao.put("DESC_MERC_VISTA_ATAC", excecaoPromocaoRetorno.get("descMercVistaAtac").getAsDouble());
+                                            dadosExcecaoPromocao.put("DESC_MERC_PRAZO_VARE", excecaoPromocaoRetorno.get("descMercPrazoVare").getAsDouble());
+                                            dadosExcecaoPromocao.put("DESC_MERC_PRAZO_ATAC", excecaoPromocaoRetorno.get("descMercPrazoAtac").getAsDouble());
+                                            dadosExcecaoPromocao.put("DESC_SERV_VISTA", excecaoPromocaoRetorno.get("descServVista").getAsDouble());
+                                            dadosExcecaoPromocao.put("DESC_SERV_PRAZO", excecaoPromocaoRetorno.get("descServPrazo").getAsDouble());
+                                            dadosExcecaoPromocao.put("COM_MERC_VISTA_VARE", excecaoPromocaoRetorno.get("comMercVistaVare").getAsDouble());
+                                            dadosExcecaoPromocao.put("COM_MERC_VISTA_ATAC", excecaoPromocaoRetorno.get("comMercVistaAtac").getAsDouble());
+                                            dadosExcecaoPromocao.put("COM_MERC_PRAZO_VARE", excecaoPromocaoRetorno.get("comMercPrazoVare").getAsDouble());
+                                            dadosExcecaoPromocao.put("COM_MERC_PRAZO_ATAC", excecaoPromocaoRetorno.get("comMercPrazoAtac").getAsDouble());
+                                            dadosExcecaoPromocao.put("COM_SERV_VISTA", excecaoPromocaoRetorno.get("comServVista").getAsDouble());
+                                            dadosExcecaoPromocao.put("COM_SERV_PRAZO", excecaoPromocaoRetorno.get("comServPrazo").getAsDouble());
+                                            dadosExcecaoPromocao.put("COM_EXT_MERC_VISTA_VARE", excecaoPromocaoRetorno.get("comExtMercVistaVare").getAsDouble());
+                                            dadosExcecaoPromocao.put("COM_EXT_MERC_VISTA_ATAC", excecaoPromocaoRetorno.get("comExtMercVistaAtac").getAsDouble());
+                                            dadosExcecaoPromocao.put("COM_EXT_MERC_PRAZO_VARE", excecaoPromocaoRetorno.get("comExtMercPrazoVare").getAsDouble());
+                                            dadosExcecaoPromocao.put("COM_EXT_MERC_PRAZO_ATAC", excecaoPromocaoRetorno.get("comExtMercPrazoAtac").getAsDouble());
+                                            dadosExcecaoPromocao.put("COM_EXT_SERV_VISTA", excecaoPromocaoRetorno.get("comExtServVista").getAsDouble());
+                                            dadosExcecaoPromocao.put("COM_EXT_SERV_Prazo", excecaoPromocaoRetorno.get("comExtServPrazo").getAsDouble());
+
+                                            listaExcecaoPromocao.add(dadosExcecaoPromocao);
+                                        }
+                                        ItemExcaoPromocaoSql itemExcaoPromocaoSql = new ItemExcaoPromocaoSql(context);
+
+                                        itemExcaoPromocaoSql.delete(null);
+
+                                        todosSucesso = itemExcaoPromocaoSql.insertList(listaExcecaoPromocao);
+                                    }
+                                    // Atualiza a notificacao
+                                    bigTextStyle.bigText(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
+                                    mBuilder.setStyle(bigTextStyle)
+                                            .setProgress(0, 0, true);
+                                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
+
+                                    // Checo se o texto de status foi passado pro parametro
+                                    if (textStatus != null) {
+                                        ((Activity) context).runOnUiThread(new Runnable() {
+                                            public void run() {
+                                                textStatus.setText(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
+                                            }
+                                        });
+                                    }
+                                    if (progressBarStatus != null) {
+                                        ((Activity) context).runOnUiThread(new Runnable() {
+                                            public void run() {
+                                                progressBarStatus.setIndeterminate(true);
+                                            }
+                                        });
+                                    }
+                                } else {
+                                    bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.recebendo_dados))
+                                            .bigText(context.getResources().getString(R.string.nao_chegou_dados_servidor_empresa) + "\n" + retornoWebservice.toString());
+                                    mBuilder.setStyle(bigTextStyle)
+                                            .setProgress(0, 0, false);
+                                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
+                                }
+                                // Incrementa o total de paginas
+                                pageNumber++;
+                                if (pageNumber < totalPages) {
+                                    retornoWebservice = gson.fromJson(webserviceSisInfo.executarWebserviceJson(servidorAtivo, null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEAEXTBP, WSSisinfoWebservice.METODO_GET, parametrosWebservice + "&pageNumber=" + pageNumber, null), JsonObject.class);
+                                }
+                            } else {
+                                todosSucesso = false;
+
+                                // Cria uma notificacao para ser manipulado
+                                bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.recebendo_dados))
+                                        .bigText(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString());
+                                mBuilder.setStyle(bigTextStyle)
+                                        .setProgress(0, 0, false);
+                                notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
+                            }
+                        } // Fim for ia (page)
+                        // Checa se todos foram inseridos/atualizados com sucesso
+                        if (todosSucesso) {
+                            inserirUltimaAtualizacao("AEAEXTBP");
+                        }
+                    }
+                } else {
+                    // Cria uma notificacao para ser manipulado
+                    bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.recebendo_dados))
+                            .bigText(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString());
+                    mBuilder.setStyle(bigTextStyle)
+                            .setProgress(0, 0, false);
+                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
+                }
+            }
+        } catch (final Exception e) {
+            if (textStatusErro != null) {
+                ((Activity) context).runOnUiThread(new Runnable() {
+                    public void run() {
+                        textStatusErro.append("\n*" + context.getResources().getText(R.string.erro_inesperado) + " - Exceção Promoção : " + e.getMessage());
+                    }
+                });
+            }
+            bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.importar_dados_recebidos))
+                    .bigText("ImportaDadosExcecaoPromocao - " + e.getMessage());
+            mBuilder.setStyle(bigTextStyle)
+                    .setProgress(0, 0, false);
+            notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
+        }
+    }
+
+
+    private void importarDadosTabelaItemPromocao() {
+        JsonObject statuRetorno = null;
+
+        // Atualiza a notificacao
+        bigTextStyle.bigText(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa) + " Relacionamento da Promoção");
+        mBuilder.setStyle(bigTextStyle)
+                .setProgress(0, 0, true);
+        notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
+
+        // Checo se o texto de status foi passado pro parametro
+        if (textStatus != null) {
+            ((Activity) context).runOnUiThread(new Runnable() {
+                public void run() {
+                    textStatus.setText(context.getResources().getString(R.string.procurando_dados) + " Relacionamento da Promoção");
+                }
+            });
+        }
+        try {
+            // Pega quando foi a ultima data que recebeu dados
+            String ultimaData = pegaUltimaDataAtualizacao("AEAEMTBP");
+            // Cria uma variavel para salvar todos os paramentros em json
+            //JsonArray parametros = new JsonArray();
+            String parametrosWebservice = "";
+            String filtroPromocao = "(ID_AEATBPRO IN (SELECT ID_AEATBPRO FROM AEATBPRO WHERE ((DT_INICIO <= (SELECT CAST('NOW' AS DATE) FROM RDB$DATABASE)) AND (DT_FIM >= (SELECT CAST('NOW' AS DATE) FROM RDB$DATABASE)))))";
+
+            Gson gson = new Gson();
+            if ((ultimaData != null) && (!ultimaData.isEmpty())) {
+                parametrosWebservice += "&where= (DT_ALT >= '" + ultimaData + "') AND " + filtroPromocao;
+            } else {
+                parametrosWebservice += "&where= " + filtroPromocao;
+            }
+            WSSisinfoWebservice webserviceSisInfo = new WSSisinfoWebservice(context);
+            JsonObject retornoWebservice = gson.fromJson(webserviceSisInfo.executarWebserviceJson(servidorAtivo, null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEAEMTBP, WSSisinfoWebservice.METODO_GET, parametrosWebservice, null), JsonObject.class);
+
+            if ((retornoWebservice != null) && (retornoWebservice.has(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO))) {
+                statuRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO);
+                // Verifica se retornou com sucesso
+                if (statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO).getAsInt() == HttpURLConnection.HTTP_OK) {
+                    boolean todosSucesso = true;
+
+                    JsonObject pageRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_PAGE_RETORNO);
+
+                    if ( (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0) ) {
+                        final int totalPages = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt();
+                        int pageNumber = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_PAGE_NUMBER_RETORNO).getAsInt();
+
+                        for (int ia = pageNumber; ia < totalPages; ia++) {
+
+                            statuRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO);
+
+                            // Verifica se retornou com sucesso
+                            if (statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO).getAsInt() == HttpURLConnection.HTTP_OK) {
+                                // Atualiza a notificacao
+                                bigTextStyle.bigText(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
+                                mBuilder.setStyle(bigTextStyle);
+                                notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
+
+                                // Checo se o texto de status foi passado pro parametro
+                                if (textStatus != null) {
+                                    ((Activity) context).runOnUiThread(new Runnable() {
+                                        public void run() {
+                                            textStatus.setText(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
+                                        }
+                                    });
+                                }
+                                // Checa se retornou alguma coisa
+                                if ((retornoWebservice.has(WSSisinfoWebservice.KEY_OBJECT_OBJECT_RETORNO))) {
+                                    final JsonArray listaRelacaoPromocaoRetorno = retornoWebservice.getAsJsonArray(WSSisinfoWebservice.KEY_OBJECT_OBJECT_RETORNO);
+                                    // Checa se retornou algum dados na lista
+                                    if (listaRelacaoPromocaoRetorno.size() > 0) {
+                                        // Atualiza a notificacao
+                                        bigTextStyle.bigText(context.getResources().getString(R.string.recebendo_dados_tabela_promocao));
+                                        mBuilder.setStyle(bigTextStyle)
+                                                .setProgress(listaRelacaoPromocaoRetorno.size(), 0, false);
+                                        notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
+
+                                        // Checo se o texto de status foi passado pro parametro
+                                        if (textStatus != null) {
+                                            ((Activity) context).runOnUiThread(new Runnable() {
+                                                public void run() {
+                                                    textStatus.setText(context.getResources().getString(R.string.recebendo_dados_relacao_promocao));
+                                                }
+                                            });
+                                        }
+                                        if (progressBarStatus != null) {
+                                            ((Activity) context).runOnUiThread(new Runnable() {
+                                                public void run() {
+                                                    progressBarStatus.setIndeterminate(false);
+                                                    progressBarStatus.setMax(listaRelacaoPromocaoRetorno.size());
+                                                }
+                                            });
+                                        }
+                                        List<ContentValues> listaRelacaoPromocao = new ArrayList<ContentValues>();
+                                        for (int i = 0; i < listaRelacaoPromocaoRetorno.size(); i++) {
+                                            // Atualiza a notificacao
+                                            bigTextStyle.bigText(context.getResources().getString(R.string.recebendo_dados_relacao_promocao) + " - Parte " + (pageNumber + 1) + "/" + totalPages + " - " + i + "/" + listaRelacaoPromocaoRetorno.size());
+                                            mBuilder.setStyle(bigTextStyle)
+                                                    .setProgress(listaRelacaoPromocaoRetorno.size(), i, false);
+                                            notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
+
+                                            // Checo se o texto de status foi passado pro parametro
+                                            if (textStatus != null) {
+                                                final int finalI1 = i;
+                                                final int finalPageNumber = pageNumber + 1;
+                                                ((Activity) context).runOnUiThread(new Runnable() {
+                                                    public void run() {
+                                                        textStatus.setText(context.getResources().getString(R.string.recebendo_dados_relacao_promocao) + " - Parte " + finalPageNumber + "/" + totalPages + " - " + finalI1 + "/" + listaRelacaoPromocaoRetorno.size());
+                                                    }
+                                                });
+                                            }
+                                            if (progressBarStatus != null) {
+                                                final int finalI = i;
+                                                ((Activity) context).runOnUiThread(new Runnable() {
+                                                    public void run() {
+                                                        progressBarStatus.setProgress(finalI);
+                                                    }
+                                                });
+                                            }
+                                            JsonObject relacaoPromocaoRetorno = listaRelacaoPromocaoRetorno.get(i).getAsJsonObject();
+                                            ContentValues dadosRelacaoPromocao = new ContentValues();
+
+                                            dadosRelacaoPromocao.put("ID_AEAEMTBP", relacaoPromocaoRetorno.get("idAeaemtbp").getAsInt());
+                                            dadosRelacaoPromocao.put("ID_AEATBPRO", relacaoPromocaoRetorno.get("idAeatbpro").getAsInt());
+                                            dadosRelacaoPromocao.put("ID_SMAEMPRE", relacaoPromocaoRetorno.get("idSmaempre").getAsInt());
+                                            dadosRelacaoPromocao.put("GUID", relacaoPromocaoRetorno.get("guid").getAsString());
+                                            if (relacaoPromocaoRetorno.has("usCad")) {
+                                                dadosRelacaoPromocao.put("US_CAD", relacaoPromocaoRetorno.get("usCad").getAsString());
+                                            }
+                                            if (relacaoPromocaoRetorno.has("dtCad")) {
+                                                dadosRelacaoPromocao.put("DT_CAD", relacaoPromocaoRetorno.get("dtCad").getAsString());
+                                            }
+                                            if (relacaoPromocaoRetorno.has("dtAlt")) {
+                                                dadosRelacaoPromocao.put("DT_ALT", relacaoPromocaoRetorno.get("dtAlt").getAsString());
+                                            }
+                                            if (relacaoPromocaoRetorno.has("ctInteg") && relacaoPromocaoRetorno.get("ctInteg").getAsInt() > 0) {
+                                                dadosRelacaoPromocao.put("CT_INTEG", relacaoPromocaoRetorno.get("ctInteg").getAsInt());
+                                            }
+
+                                            listaRelacaoPromocao.add(dadosRelacaoPromocao);
+                                        }
+                                        TabelaItemPromocaoSql tabelaItemPromocaoSql = new TabelaItemPromocaoSql(context);
+
+                                        tabelaItemPromocaoSql.delete(null);
+
+                                        todosSucesso = tabelaItemPromocaoSql.insertList(listaRelacaoPromocao);
+                                    }
+                                    // Atualiza a notificacao
+                                    bigTextStyle.bigText(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
+                                    mBuilder.setStyle(bigTextStyle)
+                                            .setProgress(0, 0, true);
+                                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
+
+                                    // Checo se o texto de status foi passado pro parametro
+                                    if (textStatus != null) {
+                                        ((Activity) context).runOnUiThread(new Runnable() {
+                                            public void run() {
+                                                textStatus.setText(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
+                                            }
+                                        });
+                                    }
+                                    if (progressBarStatus != null) {
+                                        ((Activity) context).runOnUiThread(new Runnable() {
+                                            public void run() {
+                                                progressBarStatus.setIndeterminate(true);
+                                            }
+                                        });
+                                    }
+                                } else {
+                                    bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.recebendo_dados))
+                                            .bigText(context.getResources().getString(R.string.nao_chegou_dados_servidor_empresa) + "\n" + retornoWebservice.toString());
+                                    mBuilder.setStyle(bigTextStyle)
+                                            .setProgress(0, 0, false);
+                                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
+                                }
+                                // Incrementa o total de paginas
+                                pageNumber++;
+                                if (pageNumber < totalPages) {
+                                    retornoWebservice = gson.fromJson(webserviceSisInfo.executarWebserviceJson(servidorAtivo, null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEAEMTBP, WSSisinfoWebservice.METODO_GET, parametrosWebservice + "&pageNumber=" + pageNumber, null), JsonObject.class);
+                                }
+                            } else {
+                                todosSucesso = false;
+
+                                // Cria uma notificacao para ser manipulado
+                                bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.recebendo_dados))
+                                        .bigText(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString());
+                                mBuilder.setStyle(bigTextStyle)
+                                        .setProgress(0, 0, false);
+                                notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
+                            }
+                        } // Fim for ia (page)
+                        // Checa se todos foram inseridos/atualizados com sucesso
+                        if (todosSucesso) {
+                            inserirUltimaAtualizacao("AEAEMTBP");
+                        }
+                    }
+                } else {
+                    // Cria uma notificacao para ser manipulado
+                    bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.recebendo_dados))
+                            .bigText(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString());
+                    mBuilder.setStyle(bigTextStyle)
+                            .setProgress(0, 0, false);
+                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
+                }
+            }
+        } catch (final Exception e) {
+            if (textStatusErro != null) {
+                ((Activity) context).runOnUiThread(new Runnable() {
+                    public void run() {
+                        textStatusErro.append("\n*" + context.getResources().getText(R.string.erro_inesperado) + " - Tabela por Item da Promoção : " + e.getMessage());
+                    }
+                });
+            }
+            bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.importar_dados_recebidos))
+                    .bigText("ImportaDadosRelacaoPromocao - " + e.getMessage());
+            mBuilder.setStyle(bigTextStyle)
+                    .setProgress(0, 0, false);
+            notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
         }
     }
 
@@ -9123,8 +11882,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
         JsonObject statuRetorno = null;
 
         // Atualiza a notificacao
-        mLoad.bigTextStyle(context.getResources().getString(R.string.procurando_dados) + " Títulos à Receber/Pagar");
-        mLoad.progress().value(0, 0, true).build();
+        bigTextStyle.bigText(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa) + " Títulos à Receber/Pagar");
+        mBuilder.setStyle(bigTextStyle)
+                .setProgress(0, 0, true);
+        notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
         // Checo se o texto de status foi passado pro parametro
         if (textStatus != null) {
@@ -9154,7 +11915,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 parametrosWebservice += "&where= " + filtraParcela + " AND (RPAPARCE.DT_BAIXA IS NULL)";
             }
             WSSisinfoWebservice webserviceSisInfo = new WSSisinfoWebservice(context);
-            JsonObject retornoWebservice = gson.fromJson(webserviceSisInfo.executarSelectWebserviceJson(null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_RPAPARCE, WSSisinfoWebservice.METODO_GET, parametrosWebservice, null), JsonObject.class);
+            JsonObject retornoWebservice = gson.fromJson(webserviceSisInfo.executarWebserviceJson(servidorAtivo, null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_RPAPARCE, WSSisinfoWebservice.METODO_GET, parametrosWebservice, null), JsonObject.class);
 
             if ((retornoWebservice != null) && (retornoWebservice.has(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO))) {
 
@@ -9166,7 +11927,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                     JsonObject pageRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_PAGE_RETORNO);
 
-                    if (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) {
+                    if ( (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0) ) {
                         final int totalPages = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt();
                         int pageNumber = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_PAGE_NUMBER_RETORNO).getAsInt();
 
@@ -9177,8 +11938,9 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                             // Verifica se retornou com sucesso
                             if (statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO).getAsInt() == HttpURLConnection.HTTP_OK) {
                                 // Atualiza a notificacao
-                                mLoad.bigTextStyle(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
-                                mLoad.progress().value(0, 0, true).build();
+                                bigTextStyle.bigText(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
+                                mBuilder.setStyle(bigTextStyle);
+                                notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                 // Checo se o texto de status foi passado pro parametro
                                 if (textStatus != null) {
@@ -9194,8 +11956,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                     // Checa se retornou algum dados na lista
                                     if (listaParcelaRetorno.size() > 0) {
                                         // Atualiza a notificacao
-                                        mLoad.bigTextStyle(context.getResources().getString(R.string.recebendo_dados_parcela));
-                                        mLoad.progress().value(0, listaParcelaRetorno.size(), false).build();
+                                        bigTextStyle.bigText(context.getResources().getString(R.string.recebendo_dados_parcela));
+                                        mBuilder.setStyle(bigTextStyle)
+                                                .setProgress(listaParcelaRetorno.size(), 0, false);
+                                        notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                         // Checo se o texto de status foi passado pro parametro
                                         if (textStatus != null) {
@@ -9216,8 +11980,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                         List<ContentValues> listaDadosParcela = new ArrayList<ContentValues>();
                                         for (int i = 0; i < listaParcelaRetorno.size(); i++) {
                                             // Atualiza a notificacao
-                                            mLoad.bigTextStyle(context.getResources().getString(R.string.recebendo_dados_parcela) + " - Parte " + (pageNumber + 1) + "/" + totalPages + " - " + i + "/" + listaParcelaRetorno.size());
-                                            mLoad.progress().update(0, i, listaParcelaRetorno.size(), false).build();
+                                            bigTextStyle.bigText(context.getResources().getString(R.string.recebendo_dados_parcela) + " - Parte " + (pageNumber + 1) + "/" + totalPages + " - " + i + "/" + listaParcelaRetorno.size());
+                                            mBuilder.setStyle(bigTextStyle)
+                                                    .setProgress(listaParcelaRetorno.size(), i, false);
+                                            notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                             // Checo se o texto de status foi passado pro parametro
                                             if (textStatus != null) {
@@ -9259,10 +12025,16 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                             if (parcelaRetorno.has("idCfaporta") && parcelaRetorno.get("idCfaporta").getAsInt() > 0) {
                                                 dadosParcela.put("ID_CFAPORTA", parcelaRetorno.get("idCfaporta").getAsInt());
                                             }
+                                            if (parcelaRetorno.has("idCfaccred") && parcelaRetorno.get("idCfaccred").getAsInt() > 0) {
+                                                dadosParcela.put("ID_CFACCRED", parcelaRetorno.get("idCfaccred").getAsInt());
+                                            }
                                             dadosParcela.put("DT_ALT", parcelaRetorno.get("dtAlt").getAsString());
                                             dadosParcela.put("TIPO", (parcelaRetorno.has("tipo") && parcelaRetorno.get("tipo") != null) ? parcelaRetorno.get("tipo").getAsString() : null);
                                             dadosParcela.put("DT_EMISSAO", (parcelaRetorno.has("tipo") && parcelaRetorno.get("tipo") != null) ? parcelaRetorno.get("dtEmissao").getAsString() : null);
                                             dadosParcela.put("DT_VENCIMENTO", (parcelaRetorno.has("tipo") && parcelaRetorno.get("tipo") != null) ? parcelaRetorno.get("dtVencimento").getAsString() : null);
+                                            if (parcelaRetorno.has("dtPagamento")) {
+                                                dadosParcela.put("DT_PAGAMENTO", parcelaRetorno.get("dtPagamento").getAsString());
+                                            }
                                             if (parcelaRetorno.has("dtBaixa")) {
                                                 dadosParcela.put("DT_BAIXA", parcelaRetorno.get("dtBaixa").getAsString());
                                             }
@@ -9270,14 +12042,23 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                                 dadosParcela.put("PARCELA", parcelaRetorno.get("parcela").getAsInt());
                                             }
                                             dadosParcela.put("VL_PARCELA", parcelaRetorno.get("vlParcela").getAsDouble());
+                                            dadosParcela.put("VL_JUROS_PRORROG", parcelaRetorno.get("vlJurosProrrog").getAsDouble());
                                             if (parcelaRetorno.has("fcVlTotalPago")) {
                                                 dadosParcela.put("FC_VL_TOTAL_PAGO", parcelaRetorno.get("fcVlTotalPago").getAsDouble());
                                             }
                                             if (parcelaRetorno.has("fcVlRestante")) {
                                                 dadosParcela.put("FC_VL_RESTANTE", parcelaRetorno.get("fcVlRestante").getAsDouble());
                                             }
-                                            if (parcelaRetorno.has("vlJurosDiario")) {
-                                                dadosParcela.put("VL_JUROS_DIARIO", parcelaRetorno.get("vlJurosDiario").getAsDouble());
+                                            if (parcelaRetorno.has("fcVlRestanteSemProrrog")) {
+                                                dadosParcela.put("FC_VL_RESTANTE_SEM_PRORROG", parcelaRetorno.get("fcVlRestanteSemProrrog").getAsDouble());
+                                            }
+                                            dadosParcela.put("VL_JUROS_DIARIO", parcelaRetorno.get("vlJurosDiario").getAsDouble());
+                                            dadosParcela.put("TAXA_DIARIA", parcelaRetorno.get("taxaDiaria").getAsDouble());
+                                            if (parcelaRetorno.has("capitaliza")) {
+                                                dadosParcela.put("CAPITALIZA", parcelaRetorno.get("capitaliza").getAsString());
+                                            }
+                                            if (parcelaRetorno.has("prorrogado")) {
+                                                dadosParcela.put("PRORROGADO", parcelaRetorno.get("prorrogado").getAsString());
                                             }
                                             if (parcelaRetorno.has("percDesconto")) {
                                                 dadosParcela.put("PERC_DESCONTO", parcelaRetorno.get("percDesconto").getAsDouble());
@@ -9296,8 +12077,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                         todosSucesso = parcelaSql.insertList(listaDadosParcela);
                                     }
                                     // Atualiza a notificacao
-                                    mLoad.bigTextStyle(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
-                                    mLoad.progress().value(0, 0, true).build();
+                                    bigTextStyle.bigText(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
+                                    mBuilder.setStyle(bigTextStyle)
+                                            .setProgress(0, 0, true);
+                                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                     // Checo se o texto de status foi passado pro parametro
                                     if (textStatus != null) {
@@ -9317,32 +12100,35 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                                 } else {
                                     // Cria uma notificacao para ser manipulado
-                                    Load mLoad = PugNotification.with(context).load()
-                                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
+                                    /*Load mLoad = PugNotification.with(context).load()
+                                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                                             .smallIcon(R.mipmap.ic_launcher)
                                             .largeIcon(R.mipmap.ic_launcher)
                                             .title(R.string.recebendo_dados_parcela)
                                             .bigTextStyle(context.getResources().getString(R.string.nao_chegou_dados_servidor_empresa) + "\n" + retornoWebservice.toString())
                                             .flags(Notification.DEFAULT_LIGHTS);
-                                    mLoad.simple().build();
+                                    mLoad.simple().build();*/
+
+                                    bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.recebendo_dados_parcela))
+                                            .bigText(context.getResources().getString(R.string.nao_chegou_dados_servidor_empresa) + "\n" + retornoWebservice.toString());
+                                    mBuilder.setStyle(bigTextStyle)
+                                            .setProgress(0, 0, false);
+                                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
                                 }
                                 // Incrementa o total de paginas
                                 pageNumber++;
                                 if (pageNumber < totalPages) {
-                                    retornoWebservice = gson.fromJson(webserviceSisInfo.executarSelectWebserviceJson(null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_RPAPARCE, WSSisinfoWebservice.METODO_GET, parametrosWebservice + "&pageNumber=" + pageNumber, null), JsonObject.class);
+                                    retornoWebservice = gson.fromJson(webserviceSisInfo.executarWebserviceJson(servidorAtivo, null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_RPAPARCE, WSSisinfoWebservice.METODO_GET, parametrosWebservice + "&pageNumber=" + pageNumber, null), JsonObject.class);
                                 }
                             } else {
                                 todosSucesso = false;
 
                                 // Cria uma notificacao para ser manipulado
-                                Load mLoad = PugNotification.with(context).load()
-                                        .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
-                                        .smallIcon(R.mipmap.ic_launcher)
-                                        .largeIcon(R.mipmap.ic_launcher)
-                                        .title(R.string.recebendo_dados)
-                                        .bigTextStyle(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString())
-                                        .flags(Notification.DEFAULT_LIGHTS);
-                                mLoad.simple().build();
+                                bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.recebendo_dados))
+                                        .bigText(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString());
+                                mBuilder.setStyle(bigTextStyle)
+                                        .setProgress(0, 0, false);
+                                notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
                             }
                         } // Fim for page
                         // Checa se todos foram inseridos/atualizados com sucesso
@@ -9352,33 +12138,544 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                     }
                 } else {
                     // Cria uma notificacao para ser manipulado
-                    Load mLoad = PugNotification.with(context).load()
-                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + context.hashCode())
-                            .smallIcon(R.mipmap.ic_launcher)
-                            .largeIcon(R.mipmap.ic_launcher)
-                            .title(R.string.recebendo_dados)
-                            .bigTextStyle(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString())
-                            .flags(Notification.DEFAULT_LIGHTS);
-                    mLoad.simple().build();
+                    bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.recebendo_dados))
+                            .bigText(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString());
+                    mBuilder.setStyle(bigTextStyle)
+                            .setProgress(0, 0, false);
+                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
                 }
             }
-        } catch (Exception e) {
-            // Cria uma notificacao para ser manipulado
-            PugNotification.with(context)
-                    .load()
-                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + e.hashCode())
-                    .title(R.string.importar_dados_recebidos)
-                    .bigTextStyle("ImportaDadosParcela - " + e.getMessage())
-                    .smallIcon(R.mipmap.ic_launcher)
-                    .largeIcon(R.mipmap.ic_launcher)
-                    .flags(Notification.DEFAULT_ALL)
-                    .simple()
-                    .build();
+        } catch (final Exception e) {
+            if (textStatusErro != null) {
+                ((Activity) context).runOnUiThread(new Runnable() {
+                    public void run() {
+                        textStatusErro.append("\n*" + context.getResources().getText(R.string.erro_inesperado) + " - Parcela : " + e.getMessage());
+                    }
+                });
+            }
+            bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.importar_dados_recebidos))
+                    .bigText("ImportaDadosParcela - " + e.getMessage());
+            mBuilder.setStyle(bigTextStyle)
+                    .setProgress(0, 0, false);
+            notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
+        }
+    }
+
+
+    private void importarDadosLancamentoParcela() {
+        JsonObject statuRetorno = null;
+
+        // Atualiza a notificacao
+        bigTextStyle.bigText(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa) + " Laçamento de Títulos");
+        mBuilder.setStyle(bigTextStyle)
+                .setProgress(0, 0, true);
+        notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
+
+        // Checo se o texto de status foi passado pro parametro
+        if (textStatus != null) {
+            ((Activity) context).runOnUiThread(new Runnable() {
+                public void run() {
+                    textStatus.setText(context.getResources().getString(R.string.procurando_dados) + " Laçamento de Títulos");
+                }
+            });
+        }
+        try {
+            FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
+
+            // Pega quando foi a ultima data que recebeu dados
+            String ultimaData = pegaUltimaDataAtualizacao("RPALCPAR");
+            String ultimaDataParcela = pegaUltimaDataAtualizacao("RPAPARCE");
+            // Cria uma variavel para salvar todos os paramentros em json
+            //String parametrosWebservice = "";
+            StringBuilder filtroParcela = new StringBuilder();
+            filtroParcela.append("SELECT RPAPARCE.ID_RPAPARCE FROM RPAPARCE WHERE (RPAPARCE.ID_CFACLIFO IN (SELECT CFACLIFO.ID_CFACLIFO FROM CFACLIFO WHERE CFACLIFO.ID_CFACLIFO IN \n");
+            filtroParcela.append("(SELECT CFAPARAM.ID_CFACLIFO FROM CFAPARAM WHERE CFAPARAM.ID_CFACLIFO_VENDE = \n" );
+            filtroParcela.append("(SELECT CLIFO_VENDE.ID_CFACLIFO FROM CFACLIFO CLIFO_VENDE WHERE CLIFO_VENDE.CODIGO_FUN = " + funcoes.getValorXml("CodigoUsuario") + "))))");
+
+            if ((ultimaDataParcela != null) && (!ultimaDataParcela.isEmpty())){
+                filtroParcela.append(" AND (RPAPARCE.DT_ALT >= '").append(ultimaDataParcela).append("')");
+            } else {
+                filtroParcela.append(" AND (RPAPARCE.DT_BAIXA IS NULL)");
+            }
+            StringBuilder filtroLancamento = new StringBuilder();
+            filtroLancamento.append("&where= ");
+            filtroLancamento.append("RPALCPAR.ID_RPAPARCE IN (").append(filtroParcela.toString()).append(")");
+
+            if ((ultimaData != null) && (!ultimaData.isEmpty())) {
+
+                filtroLancamento.append(" AND (RPALCPAR.DT_ALT >= '").append(ultimaData).append("')");
+            }
+            Gson gson = new Gson();
+            WSSisinfoWebservice webserviceSisInfo = new WSSisinfoWebservice(context);
+            JsonObject retornoWebservice = gson.fromJson(webserviceSisInfo.executarWebserviceJson(servidorAtivo, null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_RPALCPAR, WSSisinfoWebservice.METODO_GET, filtroLancamento.toString(), null), JsonObject.class);
+
+            if ((retornoWebservice != null) && (retornoWebservice.has(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO))) {
+
+                statuRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO);
+
+                // Verifica se retornou com sucesso
+                if (statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO).getAsInt() == HttpURLConnection.HTTP_OK) {
+                    boolean todosSucesso = true;
+
+                    JsonObject pageRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_PAGE_RETORNO);
+
+                    if ( (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0) ) {
+                        final int totalPages = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt();
+                        int pageNumber = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_PAGE_NUMBER_RETORNO).getAsInt();
+
+                        for (int ia = pageNumber; ia < totalPages; ia++) {
+
+                            statuRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO);
+
+                            // Verifica se retornou com sucesso
+                            if (statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO).getAsInt() == HttpURLConnection.HTTP_OK) {
+                                // Atualiza a notificacao
+                                bigTextStyle.bigText(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
+                                mBuilder.setStyle(bigTextStyle);
+                                notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
+
+                                // Checo se o texto de status foi passado pro parametro
+                                if (textStatus != null) {
+                                    ((Activity) context).runOnUiThread(new Runnable() {
+                                        public void run() {
+                                            textStatus.setText(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
+                                        }
+                                    });
+                                }
+                                // Checa se retornou alguma coisa
+                                if ((retornoWebservice.has(WSSisinfoWebservice.KEY_OBJECT_OBJECT_RETORNO))) {
+                                    final JsonArray listaLancamentoRetorno = retornoWebservice.getAsJsonArray(WSSisinfoWebservice.KEY_OBJECT_OBJECT_RETORNO);
+                                    // Checa se retornou algum dados na lista
+                                    if (listaLancamentoRetorno.size() > 0) {
+                                        // Atualiza a notificacao
+                                        bigTextStyle.bigText(context.getResources().getString(R.string.recebendo_dados_lacamento_parcela));
+                                        mBuilder.setStyle(bigTextStyle)
+                                                .setProgress(listaLancamentoRetorno.size(), 0, false);
+                                        notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
+
+                                        // Checo se o texto de status foi passado pro parametro
+                                        if (textStatus != null) {
+                                            ((Activity) context).runOnUiThread(new Runnable() {
+                                                public void run() {
+                                                    textStatus.setText(context.getResources().getString(R.string.recebendo_dados_lacamento_parcela));
+                                                }
+                                            });
+                                        }
+                                        if (progressBarStatus != null) {
+                                            ((Activity) context).runOnUiThread(new Runnable() {
+                                                public void run() {
+                                                    progressBarStatus.setIndeterminate(false);
+                                                    progressBarStatus.setMax(listaLancamentoRetorno.size());
+                                                }
+                                            });
+                                        }
+                                        List<ContentValues> listaDadosParcela = new ArrayList<ContentValues>();
+                                        for (int i = 0; i < listaLancamentoRetorno.size(); i++) {
+                                            // Atualiza a notificacao
+                                            bigTextStyle.bigText(context.getResources().getString(R.string.recebendo_dados_lacamento_parcela) + " - Parte " + (pageNumber + 1) + "/" + totalPages + " - " + i + "/" + listaLancamentoRetorno.size());
+                                            mBuilder.setStyle(bigTextStyle)
+                                                    .setProgress(listaLancamentoRetorno.size(), i, false);
+                                            notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
+
+                                            // Checo se o texto de status foi passado pro parametro
+                                            if (textStatus != null) {
+                                                final int finalI1 = i;
+                                                final int finalPageNumber = pageNumber + 1;
+                                                ((Activity) context).runOnUiThread(new Runnable() {
+                                                    public void run() {
+                                                        textStatus.setText(context.getResources().getString(R.string.recebendo_dados_lacamento_parcela) + " - Parte " + finalPageNumber + "/" + totalPages + " - " + finalI1 + "/" + listaLancamentoRetorno.size());
+                                                    }
+                                                });
+                                            }
+                                            if (progressBarStatus != null) {
+                                                final int finalI = i;
+                                                ((Activity) context).runOnUiThread(new Runnable() {
+                                                    public void run() {
+                                                        progressBarStatus.setProgress(finalI);
+                                                    }
+                                                });
+                                            }
+                                            JsonObject parcelaRetorno = listaLancamentoRetorno.get(i).getAsJsonObject();
+                                            ContentValues dadosParcela = new ContentValues();
+
+                                            dadosParcela.put("ID_RPALCPAR", parcelaRetorno.get("idRpalcpar").getAsInt());
+                                            dadosParcela.put("ID_RPAPARCE", parcelaRetorno.get("idRpaparce").getAsInt());
+                                            if (parcelaRetorno.has("idCbaitmov") && parcelaRetorno.get("idCbaitmov").getAsInt() > 0) {
+                                                dadosParcela.put("ID_CBAITMOV", parcelaRetorno.get("idCbaitmov").getAsInt());
+                                            }
+                                            if (parcelaRetorno.has("idCbaplcta") && parcelaRetorno.get("idCbaplcta").getAsInt() > 0) {
+                                                dadosParcela.put("ID_CBAPLCTA", parcelaRetorno.get("idCbaplcta").getAsInt());
+                                            }
+                                            if (parcelaRetorno.has("idCfatpdocAnt") && parcelaRetorno.get("idCfatpdocAnt").getAsInt() > 0) {
+                                                dadosParcela.put("ID_CFATPDOC_ANT", parcelaRetorno.get("idCfatpdocAnt").getAsInt());
+                                            }
+                                            dadosParcela.put("GUID", parcelaRetorno.get("guid").getAsString());
+                                            dadosParcela.put("US_CAD", parcelaRetorno.get("usCad").getAsString());
+                                            dadosParcela.put("DT_CAD", parcelaRetorno.get("dtCad").getAsString());
+                                            dadosParcela.put("DT_ALT", parcelaRetorno.get("dtAlt").getAsString());
+                                            dadosParcela.put("TIPO", (parcelaRetorno.has("tipo") && parcelaRetorno.get("tipo") != null) ? parcelaRetorno.get("tipo").getAsString() : null);
+                                            if (parcelaRetorno.has("dtImportacao")) {
+                                                dadosParcela.put("DT_IMPORTACAO", parcelaRetorno.get("dtImportacao").getAsString());
+                                            }
+                                            if (parcelaRetorno.has("dtMovimento")) {
+                                                dadosParcela.put("DT_MOVIMENTO", parcelaRetorno.get("dtMovimento").getAsString());
+                                            }
+                                            dadosParcela.put("SEQUENCIA", parcelaRetorno.get("sequencia").getAsInt());
+                                            if (parcelaRetorno.has("dC")) {
+                                                dadosParcela.put("D_C", parcelaRetorno.get("dC").getAsString());
+                                            }
+                                            dadosParcela.put("VL_PAGO", parcelaRetorno.get("vlPago").getAsDouble());
+                                            dadosParcela.put("VL_JUROS_PRORROG", parcelaRetorno.get("vlJurosProrrog").getAsDouble());
+                                            dadosParcela.put("VL_JUROS", parcelaRetorno.get("vlJuros").getAsDouble());
+                                            dadosParcela.put("VL_DESCONTO", parcelaRetorno.get("vlDesconto").getAsDouble());
+                                            if (parcelaRetorno.has("fcVlPagoTotal")) {
+                                                dadosParcela.put("FC_VL_PAGO_TOTAL", parcelaRetorno.get("fcVlPagoTotal").getAsDouble());
+                                            }
+                                            if (parcelaRetorno.has("obs")) {
+                                                dadosParcela.put("OBS", parcelaRetorno.get("obs").getAsString());
+                                            }
+
+                                            listaDadosParcela.add(dadosParcela);
+                                        }
+                                        LancamentoParcelaSql parcelaSql = new LancamentoParcelaSql(context);
+
+                                        todosSucesso = parcelaSql.insertList(listaDadosParcela);
+                                    }
+                                    // Atualiza a notificacao
+                                    bigTextStyle.bigText(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
+                                    mBuilder.setStyle(bigTextStyle)
+                                            .setProgress(0, 0, true);
+                                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
+
+                                    // Checo se o texto de status foi passado pro parametro
+                                    if (textStatus != null) {
+                                        ((Activity) context).runOnUiThread(new Runnable() {
+                                            public void run() {
+                                                textStatus.setText(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
+                                            }
+                                        });
+                                    }
+                                    if (progressBarStatus != null) {
+                                        ((Activity) context).runOnUiThread(new Runnable() {
+                                            public void run() {
+                                                progressBarStatus.setIndeterminate(true);
+                                            }
+                                        });
+                                    }
+
+                                } else {
+                                    bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.recebendo_dados_lacamento_parcela))
+                                            .bigText(context.getResources().getString(R.string.nao_chegou_dados_servidor_empresa) + "\n" + retornoWebservice.toString());
+                                    mBuilder.setStyle(bigTextStyle)
+                                            .setProgress(0, 0, false);
+                                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
+                                }
+                                // Incrementa o total de paginas
+                                pageNumber++;
+                                if (pageNumber < totalPages) {
+                                    retornoWebservice = gson.fromJson(webserviceSisInfo.executarWebserviceJson(servidorAtivo, null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_RPALCPAR, WSSisinfoWebservice.METODO_GET, filtroLancamento.toString()+ "&pageNumber=" + pageNumber, null), JsonObject.class);
+                                }
+                            } else {
+                                todosSucesso = false;
+
+                                // Cria uma notificacao para ser manipulado
+                                bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.recebendo_dados))
+                                        .bigText(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString());
+                                mBuilder.setStyle(bigTextStyle)
+                                        .setProgress(0, 0, false);
+                                notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
+                            }
+                        } // Fim for page
+                        // Checa se todos foram inseridos/atualizados com sucesso
+                        if (todosSucesso) {
+                            inserirUltimaAtualizacao("RPALCPAR");
+                        }
+                    }
+                } else {
+                    // Cria uma notificacao para ser manipulado
+                    bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.recebendo_dados))
+                            .bigText(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString());
+                    mBuilder.setStyle(bigTextStyle)
+                            .setProgress(0, 0, false);
+                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
+                }
+            }
+        } catch (final Exception e) {
+            if (textStatusErro != null) {
+                ((Activity) context).runOnUiThread(new Runnable() {
+                    public void run() {
+                        textStatusErro.append("\n*" + context.getResources().getText(R.string.erro_inesperado) + " - Lancamento de Parcela : " + e.getMessage());
+                    }
+                });
+            }
+            bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.importar_dados_recebidos))
+                    .bigText("ImportaDadosLancamentoParcela - " + e.getMessage());
+            mBuilder.setStyle(bigTextStyle)
+                    .setProgress(0, 0, false);
+            notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
+        }
+    }
+
+
+    private void importarNovaVersao() {
+        JsonObject statuRetorno = null;
+
+        // Atualiza a notificacao
+        bigTextStyle.bigText(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa) + " Nova Versão");
+        mBuilder.setStyle(bigTextStyle)
+                .setProgress(0, 0, true);
+        notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
+
+        // Checo se o texto de status foi passado pro parametro
+        if (textStatus != null) {
+            ((Activity) context).runOnUiThread(new Runnable() {
+                public void run() {
+                    textStatus.setText(context.getResources().getString(R.string.procurando_dados) + " Nova Versão");
+                }
+            });
+        }
+        try {
+            FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
+
+            // Pega quando foi a ultima data que recebeu dados
+            String ultimaData = pegaUltimaDataAtualizacao("SMAVERPR");
+            // Cria uma variavel para salvar todos os paramentros em json
+            String parametrosWebservice = "";
+            //String filtraVersao = "";
+            Gson gson = new Gson();
+            /*if ((ultimaData != null) && (!ultimaData.isEmpty())) {
+
+                parametrosWebservice += "&where= (DT_ALT >= '" + ultimaData + "') ";
+            } else {
+                parametrosWebservice += "&where= " + filtraVersao + " AND (RPAPARCE.DT_BAIXA IS NULL)";
+            }*/
+            ServidoresBeans servidorCentral = new ServidoresBeans();
+            servidorCentral.setIpServidor(ServicosWeb.IP_SERVIDOR_WEBSERVICE);
+            servidorCentral.setPorta(Integer.parseInt(ServicosWeb.PORTA_JSON));
+
+            WSSisinfoWebservice webserviceSisInfo = new WSSisinfoWebservice(context);
+            JsonObject retornoWebservice = gson.fromJson(webserviceSisInfo.executarWebserviceJson(servidorCentral, null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_SMAVERPR, WSSisinfoWebservice.METODO_GET, parametrosWebservice, null), JsonObject.class);
+
+            if ((retornoWebservice != null) && (retornoWebservice.has(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO))) {
+
+                statuRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO);
+
+                // Verifica se retornou com sucesso
+                if (statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO).getAsInt() == HttpURLConnection.HTTP_OK) {
+                    boolean todosSucesso = true;
+
+                    JsonObject pageRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_PAGE_RETORNO);
+
+                    if ( (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0) ) {
+                        final int totalPages = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt();
+                        int pageNumber = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_PAGE_NUMBER_RETORNO).getAsInt();
+
+                        for (int ia = pageNumber; ia < totalPages; ia++) {
+
+                            statuRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO);
+
+                            // Verifica se retornou com sucesso
+                            if (statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO).getAsInt() == HttpURLConnection.HTTP_OK) {
+                                // Atualiza a notificacao
+                                bigTextStyle.bigText(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
+                                mBuilder.setStyle(bigTextStyle);
+                                notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
+
+                                // Checo se o texto de status foi passado pro parametro
+                                if (textStatus != null) {
+                                    ((Activity) context).runOnUiThread(new Runnable() {
+                                        public void run() {
+                                            textStatus.setText(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
+                                        }
+                                    });
+                                }
+                                // Checa se retornou alguma coisa
+                                if ((retornoWebservice.has(WSSisinfoWebservice.KEY_OBJECT_OBJECT_RETORNO))) {
+                                    final JsonArray listaVersaoRetorno = retornoWebservice.getAsJsonArray(WSSisinfoWebservice.KEY_OBJECT_OBJECT_RETORNO);
+                                    // Checa se retornou algum dados na lista
+                                    if (listaVersaoRetorno.size() > 0) {
+                                        // Atualiza a notificacao
+                                        bigTextStyle.bigText(context.getResources().getString(R.string.recebendo_dados_versao));
+                                        mBuilder.setStyle(bigTextStyle)
+                                                .setProgress(listaVersaoRetorno.size(), 0, false);
+                                        notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
+
+                                        // Checo se o texto de status foi passado pro parametro
+                                        if (textStatus != null) {
+                                            ((Activity) context).runOnUiThread(new Runnable() {
+                                                public void run() {
+                                                    textStatus.setText(context.getResources().getString(R.string.recebendo_dados_versao));
+                                                }
+                                            });
+                                        }
+                                        if (progressBarStatus != null) {
+                                            ((Activity) context).runOnUiThread(new Runnable() {
+                                                public void run() {
+                                                    progressBarStatus.setIndeterminate(false);
+                                                    progressBarStatus.setMax(listaVersaoRetorno.size());
+                                                }
+                                            });
+                                        }
+                                        for (int i = 0; i < listaVersaoRetorno.size(); i++) {
+                                            // Atualiza a notificacao
+                                            bigTextStyle.bigText(context.getResources().getString(R.string.recebendo_dados_versao) + " - Parte " + (pageNumber + 1) + "/" + totalPages + " - " + i + "/" + listaVersaoRetorno.size());
+                                            mBuilder.setStyle(bigTextStyle)
+                                                    .setProgress(listaVersaoRetorno.size(), i, false);
+                                            notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
+
+                                            // Checo se o texto de status foi passado pro parametro
+                                            if (textStatus != null) {
+                                                final int finalI1 = i;
+                                                final int finalPageNumber = pageNumber + 1;
+                                                ((Activity) context).runOnUiThread(new Runnable() {
+                                                    public void run() {
+                                                        textStatus.setText(context.getResources().getString(R.string.recebendo_dados_versao) + " - Parte " + finalPageNumber + "/" + totalPages + " - " + finalI1 + "/" + listaVersaoRetorno.size());
+                                                    }
+                                                });
+                                            }
+                                            if (progressBarStatus != null) {
+                                                final int finalI = i;
+                                                ((Activity) context).runOnUiThread(new Runnable() {
+                                                    public void run() {
+                                                        progressBarStatus.setProgress(finalI);
+                                                    }
+                                                });
+                                            }
+                                            JsonObject versaoRetorno = listaVersaoRetorno.get(i).getAsJsonObject();
+                                            ContentValues dadosVersao = new ContentValues();
+
+                                            dadosVersao.put("ID_RPAPARCE", versaoRetorno.get("idRpaparce").getAsInt());
+                                            if (versaoRetorno.has("numeroVersao") && versaoRetorno.get("numeroVersao").getAsInt() > 0) {
+                                                // Checa se tem alguma versao nova
+                                                if (versaoRetorno.get("numeroVersao").getAsInt() > funcoes.getNumeroVersaoAplicacao() ){
+
+                                                    //String destination = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS) + "/";
+                                                    File pastaTemp = new File(Environment.getExternalStorageDirectory() + "/SAVARE/TEMP");
+                                                    String nomeArquivo = "";
+
+                                                    if (versaoRetorno.has("programa")){
+                                                        nomeArquivo += versaoRetorno.get("programa").getAsString().replaceAll("[^a-zA-Z0-9]+","");
+                                                    }else {
+                                                        nomeArquivo += "SAVARE";
+                                                    }
+                                                    nomeArquivo += versaoRetorno.get("numeroVersao").getAsInt();
+
+                                                    if(!pastaTemp.exists()){
+                                                        pastaTemp.mkdirs();
+                                                    }
+                                                    URL url = new URL(versaoRetorno.get("urlArquivo").getAsString());
+                                                    HttpURLConnection conection = (HttpURLConnection) url.openConnection();
+                                                    conection.setRequestMethod("GET");
+                                                    conection.connect();
+
+                                                    File outputFile = new File(pastaTemp, nomeArquivo + ".apk");
+
+                                                    if (!outputFile.exists()) {
+                                                        outputFile.createNewFile();
+                                                    }
+                                                    FileOutputStream fos = new FileOutputStream(outputFile);//Get OutputStream for NewFile Location
+
+                                                    InputStream is = conection.getInputStream();//Get InputStream for connection
+
+                                                    byte[] buffer = new byte[1024];//Set buffer type
+                                                    int len1 = 0;//init length
+                                                    while ((len1 = is.read(buffer)) != -1) {
+                                                        fos.write(buffer, 0, len1);//Write new file
+                                                    }
+                                                    //Close all connection after doing task
+                                                    fos.close();
+                                                    is.close();
+                                                }
+                                            }
+                                        }
+                                    }
+                                    // Atualiza a notificacao
+                                    bigTextStyle.bigText(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
+                                    mBuilder.setStyle(bigTextStyle)
+                                            .setProgress(0, 0, true);
+                                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
+
+                                    // Checo se o texto de status foi passado pro parametro
+                                    if (textStatus != null) {
+                                        ((Activity) context).runOnUiThread(new Runnable() {
+                                            public void run() {
+                                                textStatus.setText(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
+                                            }
+                                        });
+                                    }
+                                    if (progressBarStatus != null) {
+                                        ((Activity) context).runOnUiThread(new Runnable() {
+                                            public void run() {
+                                                progressBarStatus.setIndeterminate(true);
+                                            }
+                                        });
+                                    }
+
+                                } else {
+                                    // Cria uma notificacao para ser manipulado
+                                    /*Load mLoad = PugNotification.with(context).load()
+                                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
+                                            .smallIcon(R.mipmap.ic_launcher)
+                                            .largeIcon(R.mipmap.ic_launcher)
+                                            .title(R.string.recebendo_dados_parcela)
+                                            .bigTextStyle(context.getResources().getString(R.string.nao_chegou_dados_servidor_empresa) + "\n" + retornoWebservice.toString())
+                                            .flags(Notification.DEFAULT_LIGHTS);
+                                    mLoad.simple().build();*/
+
+                                    bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.recebendo_dados_parcela))
+                                            .bigText(context.getResources().getString(R.string.nao_chegou_dados_servidor_empresa) + "\n" + retornoWebservice.toString());
+                                    mBuilder.setStyle(bigTextStyle)
+                                            .setProgress(0, 0, false);
+                                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
+                                }
+                                // Incrementa o total de paginas
+                                pageNumber++;
+                                if (pageNumber < totalPages) {
+                                    retornoWebservice = gson.fromJson(webserviceSisInfo.executarWebserviceJson(servidorAtivo, null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_SMAVERPR, WSSisinfoWebservice.METODO_GET, parametrosWebservice + "&pageNumber=" + pageNumber, null), JsonObject.class);
+                                }
+                            } else {
+                                todosSucesso = false;
+
+                                // Cria uma notificacao para ser manipulado
+                                bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.recebendo_dados))
+                                        .bigText(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString());
+                                mBuilder.setStyle(bigTextStyle)
+                                        .setProgress(0, 0, false);
+                                notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
+                            }
+                        } // Fim for page
+                        // Checa se todos foram inseridos/atualizados com sucesso
+                        if (todosSucesso) {
+                            inserirUltimaAtualizacao("SMAVERPR");
+                        }
+                    }
+                } else {
+                    // Cria uma notificacao para ser manipulado
+                    bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.recebendo_dados))
+                            .bigText(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString());
+                    mBuilder.setStyle(bigTextStyle)
+                            .setProgress(0, 0, false);
+                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
+                }
+            }
+        } catch (final Exception e) {
+            if (textStatusErro != null) {
+                ((Activity) context).runOnUiThread(new Runnable() {
+                    public void run() {
+                        textStatusErro.append("\n*" + context.getResources().getText(R.string.erro_inesperado) + " - Nova Versão : " + e.getMessage());
+                    }
+                });
+            }
+            bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.importar_dados_recebidos))
+                    .bigText("ImportaDadosVersao - " + e.getMessage());
+            mBuilder.setStyle(bigTextStyle)
+                    .setProgress(0, 0, false);
+            notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
         }
     }
 
     private void inserirUltimaAtualizacao(String tabela) {
-        TelephonyManager telephonyManager = (TelephonyManager) context.getSystemService(context.TELEPHONY_SERVICE);
+        //TelephonyManager telephonyManager = (TelephonyManager) context.getSystemService(context.TELEPHONY_SERVICE);
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
@@ -9387,7 +12684,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
         Calendar dtAlt = Calendar.getInstance();
 
         ContentValues dataAtualizacao = new ContentValues();
-        dataAtualizacao.put("ID_DISPOSITIVO", telephonyManager.getDeviceId());
+        //dataAtualizacao.put("ID_DISPOSITIVO", telephonyManager.getDeviceId());
         dataAtualizacao.put("TABELA", tabela);
         dataAtualizacao.put("DT_ALT", sdf.format(dtAlt.getTime()));
         dataAtualizacao.put("DATA_ULTIMA_ATUALIZACAO", dataInicioAtualizacao);

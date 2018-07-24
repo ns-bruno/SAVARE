@@ -11,6 +11,7 @@ import android.widget.ProgressBar;
 
 import com.savare.R;
 import com.savare.banco.funcoesSql.ParcelaSql;
+import com.savare.banco.storedProcedure.CalculaJurosSP;
 import com.savare.beans.ParcelaBeans;
 import com.savare.beans.TitulosListaBeans;
 import com.savare.funcoes.FuncoesPersonalizadas;
@@ -40,10 +41,11 @@ public class ParcelaRotinas extends Rotinas {
 		
 		FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
 		try{
-			String sql = "SELECT CFACLIFO.NOME_RAZAO, CFACLIFO.NOME_FANTASIA, RPAPARCE.ID_CFACLIFO, RPAPARCE.DT_EMISSAO, RPAPARCE.DT_VENCIMENTO, "
+			String sql = "SELECT RPAPARCE.ID_RPAPARCE, CFACLIFO.NOME_RAZAO, CFACLIFO.NOME_FANTASIA, RPAPARCE.ID_CFACLIFO, RPAPARCE.DT_EMISSAO, RPAPARCE.DT_VENCIMENTO, "
 					   + "RPAPARCE.DT_BAIXA, RPAPARCE.VL_PARCELA, RPAPARCE.FC_VL_RESTANTE, RPAPARCE.PARCELA, RPAPARCE.SEQUENCIAL, "
 					   + "RPAPARCE.NUMERO, CFATPDOC.DESCRICAO AS DESCRICAO_TPDOC, CFAPORTA.DESCRICAO AS DESCRICAO_PORTA, CFASTATU.DESCRICAO AS DESCRICAO_STATU, "
-					   + "round(julianday('NOW', 'localtime') - julianday(RPAPARCE.DT_VENCIMENTO)) AS ATRAZADO "
+					   + "round(julianday('NOW', 'localtime') - julianday(RPAPARCE.DT_VENCIMENTO)) AS ATRAZADO, "
+					   + "DATE('NOW') AS PREVISAO "
 					   + "FROM RPAPARCE "
 					   + "LEFT OUTER JOIN CFACLIFO CFACLIFO "
 					   + "ON(RPAPARCE.ID_CFACLIFO = CFACLIFO.ID_CFACLIFO) "
@@ -91,7 +93,7 @@ public class ParcelaRotinas extends Rotinas {
 					}
 			 		
 			 		TitulosListaBeans titulos = new TitulosListaBeans();
-			 		
+
 			 		titulos.setIdPessoa(cursor.getInt(cursor.getColumnIndex("ID_CFACLIFO")));
 					titulos.setNomeRazao(cursor.getString(cursor.getColumnIndex("NOME_RAZAO")));
 					titulos.setNomeFantasia(cursor.getString(cursor.getColumnIndex("NOME_FANTASIA")));
@@ -99,6 +101,7 @@ public class ParcelaRotinas extends Rotinas {
 					titulos.setPortadorBanco(cursor.getString(cursor.getColumnIndex("DESCRICAO_PORTA")));
 					titulos.setStatus(cursor.getString(cursor.getColumnIndex("DESCRICAO_STATU")));
 					titulos.setValorRestante(cursor.getDouble(cursor.getColumnIndex("FC_VL_RESTANTE")));
+					titulos.setTotalAReceber(cursor.getDouble(cursor.getColumnIndex("FC_VL_RESTANTE")));
 					titulos.setVencimento(funcoes.formataData(cursor.getString(cursor.getColumnIndex("DT_VENCIMENTO"))));
 					if(cursor.getInt(cursor.getColumnIndex("ATRAZADO")) > 0){
 						titulos.setAtrazado(true);
@@ -106,12 +109,22 @@ public class ParcelaRotinas extends Rotinas {
 						titulos.setAtrazado(false);
 					}
 					ParcelaBeans parcela = new ParcelaBeans();
+					parcela.setIdParcela(cursor.getInt(cursor.getColumnIndex("ID_RPAPARCE")));
 					parcela.setDataEmissao(funcoes.formataData(cursor.getString(cursor.getColumnIndex("DT_EMISSAO"))));
 					parcela.setDataBaixa(funcoes.formataData(cursor.getString(cursor.getColumnIndex("DT_BAIXA"))));
 					parcela.setValorParcela(cursor.getDouble(cursor.getColumnIndex("VL_PARCELA")));
 					parcela.setParcela(cursor.getInt(cursor.getColumnIndex("PARCELA")));
 					parcela.setSequencial(cursor.getString(cursor.getColumnIndex("SEQUENCIAL")));
 					parcela.setNumero(cursor.getString(cursor.getColumnIndex("NUMERO")));
+
+					CalculaJurosSP calculaJurosSP = new CalculaJurosSP(context, null, null);
+					ContentValues retorno = calculaJurosSP.execute(parcela.getIdParcela(), 0, 0, null, cursor.getString(cursor.getColumnIndex("PREVISAO")));
+
+					if ((retorno != null) && (retorno.containsKey(CalculaJurosSP.KEY_JUROS)) && (retorno.containsKey(CalculaJurosSP.KEY_TOTAL))){
+						parcela.setTotalJuros(retorno.getAsDouble(CalculaJurosSP.KEY_JUROS));
+						parcela.setTotalRestante(retorno.getAsDouble(CalculaJurosSP.KEY_TOTAL));
+						titulos.setTotalAReceber(retorno.getAsDouble(CalculaJurosSP.KEY_TOTAL));
+					}
 
 					List<ParcelaBeans> listaParcela = new ArrayList<ParcelaBeans>();
 					listaParcela.add(parcela);

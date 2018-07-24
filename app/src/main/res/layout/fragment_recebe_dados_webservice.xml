@@ -15,7 +15,7 @@
         android:text="@string/aguarde_buscando_primeiros_dados"
         android:id="@+id/fragment_recebe_dados_webservice_text_status"
         android:textAppearance="@style/TextAppearance.AppCompat.Headline"
-        android:textColor="@color/white" />
+        android:textColor="@color/md_white_1000" />
 
     <ProgressBar
         style="?android:attr/progressBarStyleHorizontal"

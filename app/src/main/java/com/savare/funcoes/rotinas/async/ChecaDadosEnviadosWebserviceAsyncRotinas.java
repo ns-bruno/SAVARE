@@ -2,9 +2,13 @@ package com.savare.funcoes.rotinas.async;
 
 import android.app.Activity;
 import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.ContentValues;
 import android.content.Context;
 import android.os.AsyncTask;
+import android.os.Build;
+import android.support.v4.app.NotificationCompat;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -12,7 +16,6 @@ import android.widget.TextView;
 import com.savare.R;
 import com.savare.banco.funcoesSql.ItemOrcamentoSql;
 import com.savare.banco.funcoesSql.OrcamentoSql;
-import com.savare.beans.ItemOrcamentoBeans;
 import com.savare.beans.OrcamentoBeans;
 import com.savare.configuracao.ConfiguracoesInternas;
 import com.savare.funcoes.FuncoesPersonalizadas;
@@ -23,13 +26,10 @@ import org.ksoap2.serialization.PropertyInfo;
 import org.ksoap2.serialization.SoapObject;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 import java.util.Scanner;
 import java.util.Vector;
 
-import br.com.goncalves.pugnotification.notification.Load;
-import br.com.goncalves.pugnotification.notification.PugNotification;
 
 /**
  * Created by Bruno on 10/10/2016.
@@ -352,14 +352,30 @@ public class ChecaDadosEnviadosWebserviceAsyncRotinas extends AsyncTask<Void, Vo
             }
         } catch (Exception e){
             // Cria uma notificacao para ser manipulado
-            Load mLoad = PugNotification.with(context).load()
+            /*Load mLoad = PugNotification.with(context).load()
                     .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO)
                     .smallIcon(R.mipmap.ic_launcher)
                     .largeIcon(R.mipmap.ic_launcher)
                     .title(R.string.importar_dados_recebidos)
                     .message(e.getMessage())
                     .flags(Notification.DEFAULT_SOUND);
-            mLoad.simple().build();
+            mLoad.simple().build();*/
+
+            NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context)
+                    .setSmallIcon(R.mipmap.ic_launcher_smallicon)
+                    .setContentTitle(context.getResources().getString(R.string.importar_dados_recebidos))
+                    .setStyle(new NotificationCompat.BigTextStyle()
+                            .bigText(context.getResources().getString(R.string.msg_error) + "\n" + e.getMessage()))
+                    .setPriority(NotificationCompat.PRIORITY_DEFAULT);
+            String name = "FileNotification";
+            NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+                NotificationChannel mChannel = new NotificationChannel(name, name, NotificationManager.IMPORTANCE_MIN);
+                mChannel.setDescription(context.getResources().getString(R.string.importar_dados_recebidos));
+                mChannel.enableLights(true);
+                notificationManager.createNotificationChannel(mChannel);
+            }
+            notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO, mBuilder.build());
         }
     }
 }

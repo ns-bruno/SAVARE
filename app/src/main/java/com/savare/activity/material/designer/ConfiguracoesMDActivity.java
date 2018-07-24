@@ -154,7 +154,7 @@ public class ConfiguracoesMDActivity extends AppCompatActivity {
                     funcoesP.setValorXml("EnviarAutomatico", "N");
                 }
 
-                funcoesP.criarAlarmeEnviarReceberDadosAutomatico(true, true);
+                funcoesP.criarAlarmeEnviarAutomatico(checkEnviarAutomatico.isChecked());
             }
         });
 
@@ -173,7 +173,7 @@ public class ConfiguracoesMDActivity extends AppCompatActivity {
                     funcoesP.setValorXml("ReceberAutomatico", "N");
                 }
 
-                funcoesP.criarAlarmeEnviarReceberDadosAutomatico(true, true);
+                funcoesP.criarAlarmeReceberAutomatico(checkReceberAutomatico.isChecked());
             }
         });
 

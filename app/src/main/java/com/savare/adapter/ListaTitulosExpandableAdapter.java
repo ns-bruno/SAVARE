@@ -103,8 +103,8 @@ public class ListaTitulosExpandableAdapter extends BaseExpandableListAdapter {
 		FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
 		
 		textDescricao.setText(listaTitulosParent.get(groupPosition).getNomeRazao());
-		textAbaixoDescricaoEsqueda.setText("Vencimento: " + listaTitulosParent.get(groupPosition).getVencimento());
-		textAbaixoDescricaoDireita.setText("Vl. Rest. " + funcoes.arredondarValor(listaTitulosParent.get(groupPosition).getValorRestante()));
+		textAbaixoDescricaoEsqueda.setText("Venci.: " + listaTitulosParent.get(groupPosition).getVencimento());
+		textAbaixoDescricaoDireita.setText("Total. " + funcoes.arredondarValor(listaTitulosParent.get(groupPosition).getTotalAReceber()));
 		textBottonEsquerdo.setText(listaTitulosParent.get(groupPosition).getDocumento() + " / " + listaTitulosParent.get(groupPosition).getPortadorBanco());
 		
 		textBottonEsquerdoDois.setVisibility(View.GONE);
@@ -146,10 +146,10 @@ public class ListaTitulosExpandableAdapter extends BaseExpandableListAdapter {
 		ParcelaBeans parcela = listaTitulosParent.get(groupPosition).getListaParcela().get(childPosition);
 		
 		FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
-		
-		textDescricao.setText("Sequencial: " + parcela.getSequencial());
-		textAbaixoDescricaoEsqueda.setText("Emissão: " + parcela.getDataEmissao());
-		textAbaixoDescricaoDireita.setText("Vl. Parcela: " + funcoes.arredondarValor(parcela.getValorParcela()));
+
+		textDescricao.setText("Sequencial: " + parcela.getSequencial() + " - Emissão: " + parcela.getDataEmissao());
+		textAbaixoDescricaoEsqueda.setText("Vl.Parcela: " + funcoes.arredondarValor(parcela.getValorParcela()));
+		textAbaixoDescricaoDireita.setText("Vl.Pago/Juros: " + funcoes.arredondarValor(parcela.getTotalPago()) + "/" + funcoes.arredondarValor(parcela.getTotalJuros()));
 		textBottonEsquerdo.setText("Parcela: " + parcela.getParcela());
 		textBottonDireito.setText("Nosso N.: " +  ((parcela.getNumero() != null) ? parcela.getNumero() : ""));
 		
