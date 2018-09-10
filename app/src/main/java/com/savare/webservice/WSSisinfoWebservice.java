@@ -442,10 +442,13 @@ public class WSSisinfoWebservice {
             String enderecoWebService = "http://" + servidor.getIpServidor() + ":" + servidor.getPorta() + "/" + ServicosWeb.WS_ENDERECO_SISINFOWEB + funcao;
 
             Gson gson = new Gson();
-
+            if (    (funcoes.getValorXml(funcoes.TAG_UUID_DISPOSITIVO).equalsIgnoreCase(funcoes.NAO_ENCONTRADO)) ||
+                    (funcoes.getValorXml(funcoes.TAG_DESCRICAO_DISPOSITIVO).equalsIgnoreCase(funcoes.TAG_DESCRICAO_DISPOSITIVO)) ){
+                funcoes.setUuidDispositivo();
+            }
             smadispoBeans = new SmadispoBeans();
-            smadispoBeans.setIdentificacao(funcoes.getValorXml("UuidDispositivo"));
-            smadispoBeans.setDescricao(funcoes.getValorXml("DescricaoDispositivo"));
+            smadispoBeans.setIdentificacao(funcoes.getValorXml(funcoes.TAG_UUID_DISPOSITIVO));
+            smadispoBeans.setDescricao(funcoes.getValorXml(funcoes.TAG_DESCRICAO_DISPOSITIVO));
 
             // Adiciona o dipositivo em formado json e codificado
             enderecoWebService += "?dispositivo=" + URLEncoder.encode(gson.toJson(smadispoBeans), "UTF-8");

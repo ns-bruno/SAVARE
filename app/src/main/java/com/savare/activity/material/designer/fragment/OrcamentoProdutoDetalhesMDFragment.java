@@ -336,22 +336,6 @@ public class OrcamentoProdutoDetalhesMDFragment extends Fragment {
                                     + "Favor, entrar em contato com a TI.")
                             .positiveText(R.string.button_ok)
                             .show();
-
-                    // Instancia a classe da mensagem
-                    /*FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(getContext());
-                    // Dados da mensagem
-                    ContentValues mensagem = new ContentValues();
-                    mensagem.put("comando", 0);
-                    mensagem.put("tela", "OrcamentoProdutoDetalhesActivity");
-                    mensagem.put("mensagem", "Erro no campo valor de desconto (addTextChangedListener editValorUnitarioDesconto). \n"
-                            + e.getMessage() +"\n"
-                            + "Favor, entrar em contato com a TI.");
-                    mensagem.put("dados", e.getMessage());
-                    mensagem.put("usuario", funcoes.getValorXml("Usuario"));
-                    mensagem.put("empresa", funcoes.getValorXml("ChaveEmpresa"));
-                    mensagem.put("email", funcoes.getValorXml("Email"));
-
-                    funcoes.menssagem(mensagem);*/
                 }
 
             }
@@ -1058,7 +1042,7 @@ public class OrcamentoProdutoDetalhesMDFragment extends Fragment {
                     new MaterialDialog.Builder(getContext())
                             .title("OrcamentoProdutoDetalhesActivity")
                             .content("Não tem estoque selecionado."
-                                   + "\n Favor, entrar em contato com o administrador de TI da empresa para que possa enviar os dados corretos do produto.")
+                                   + "\n Favor, entrar em contato com o administrador de TI da sua empresa para que possa enviar os dados corretos do produto.")
                             .positiveText(R.string.button_ok)
                             .show();
                 }
@@ -1072,7 +1056,7 @@ public class OrcamentoProdutoDetalhesMDFragment extends Fragment {
             mensagem.put("comando", 1);
             mensagem.put("tela", "OrcamentoProdutoDetalhesActivity");
             mensagem.put("mensagem", "Não existe plano de pagamento. \n"
-                       + "Favor, entrar em contato com o administrador de TI da empresa para que possa enviar os dados corretos do produto.");
+                       + "Favor, entrar em contato com o administrador de TI da sua empresa para que possa enviar os dados corretos do produto.");
 
             final FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(getContext());
             ((Activity) getContext()).runOnUiThread(new Runnable() {

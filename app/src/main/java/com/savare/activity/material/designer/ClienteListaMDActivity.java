@@ -16,7 +16,9 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
+import android.widget.TextView;
 
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.github.clans.fab.FloatingActionButton;
 import com.savare.R;
 import com.savare.activity.fragment.ClienteCadastroFragment;
@@ -36,13 +38,14 @@ import java.util.List;
  */
 public class ClienteListaMDActivity extends AppCompatActivity {
 
+    private TextView textViewStatus;
     private ListView listViewPessoa;
     private FloatingActionButton itemMenuNovoCliente;
     private Spinner spinnerListaCidade;
     private ProgressBar progressBarStatus;
     private List<PessoaBeans> listaPessoas;
-    private String telaChamou,
-            idOrcamento;
+    private String  telaChamou,
+                    idOrcamento;
     private Toolbar toolbarCabecalho;
     private boolean pesquisando = false;
 
@@ -297,6 +300,7 @@ public class ClienteListaMDActivity extends AppCompatActivity {
     }
 
     private void recuperaCampo() {
+        textViewStatus = (TextView) findViewById(R.id.activity_cliente_lista_md_textViewStatus);
         listViewPessoa = (ListView) findViewById(R.id.activity_cliente_lista_md_list_pessoa);
         itemMenuNovoCliente = (FloatingActionButton) findViewById(R.id.activity_cliente_lista_md_novo_cliente);
         spinnerListaCidade = (Spinner) findViewById(R.id.activity_cliente_lista_md_spinner_cidades);
@@ -379,19 +383,12 @@ public class ClienteListaMDActivity extends AppCompatActivity {
 
                 }
             } catch (Exception e) {
-                // Armazena as informacoes para para serem exibidas e enviadas
-                ContentValues contentValues = new ContentValues();
-                contentValues.put("comando", 0);
-                contentValues.put("tela", "ProdutoListaMDFragment");
-                contentValues.put("mensagem", getResources().getString(R.string.nao_consegimos_carregar_imagem_produtos) + " \n" + e.getMessage());
-                contentValues.put("dados", e.toString());
-                // Pega os dados do usuario
-                FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
-                contentValues.put("usuario", funcoes.getValorXml("Usuario"));
-                contentValues.put("empresa", funcoes.getValorXml("ChaveEmpresa"));
-                contentValues.put("email", funcoes.getValorXml("Email"));
-                // Exibe a mensagem
-                funcoes.menssagem(contentValues);
+
+                new MaterialDialog.Builder(context)
+                        .title("ClienteListaMDActivity")
+                        .content(context.getResources().getString(R.string.nao_conseguimos_lista_clientes) + "\n" + e.getMessage())
+                        .positiveText(R.string.button_ok)
+                        .show();
             }
             return null;
         }
@@ -406,8 +403,10 @@ public class ClienteListaMDActivity extends AppCompatActivity {
             if ( (adapterPessoa != null) && (adapterPessoa.getCount() > 0) ){
                 // Seta o listView com o novo adapter que ja esta com a nova lista
                 listViewPessoa.setAdapter(adapterPessoa);
+                textViewStatus.setText(adapterPessoa.getCount() + " :Clientes ");
+            } else {
+                textViewStatus.setText("0 :Clientes ");
             }
-
         }
     }
 

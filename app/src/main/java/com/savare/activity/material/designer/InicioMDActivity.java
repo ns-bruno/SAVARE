@@ -123,7 +123,7 @@ public class InicioMDActivity extends AppCompatActivity {
             salvaPedidoPdf = true;
         }
         if(!funcoes.getValorXml(funcoes.TAG_CODIGO_USUARIO).equalsIgnoreCase(funcoes.NAO_ENCONTRADO)) {
-            PessoaRotinas pessoaRotinas = new PessoaRotinas(getApplicationContext());
+            PessoaRotinas pessoaRotinas = new PessoaRotinas(InicioMDActivity.this);
             // Pega os dados do usuario
             List<PessoaBeans> dadosUsuario = pessoaRotinas.listaPessoaResumido("CODIGO_FUN = " + funcoes.getValorXml(funcoes.TAG_CODIGO_USUARIO), PessoaRotinas.KEY_TIPO_FUNCIONARIO, null);
 
@@ -188,7 +188,7 @@ public class InicioMDActivity extends AppCompatActivity {
                         new PrimaryDrawerItem().withName(R.string.logs).withIcon(R.drawable.ic_sim_alert),
                         new SwitchDrawerItem().withName(R.string.enviar_automatico).withIcon(R.mipmap.ic_upload).withChecked(enviaAutomatico).withOnCheckedChangeListener(mOnCheckedChangeListener).withTag(KEY_ENVIA_AUTOMATICO),
                         switchEnviaInstantaneo,
-                        new SwitchDrawerItem().withName(R.string.receber_automatico).withIcon(R.mipmap.ic_download).withChecked(recebeAutomatico).withOnCheckedChangeListener(mOnCheckedChangeListener).withTag(KEY_RECEBE_AUTOMATICO).withSelectable(false).withSwitchEnabled(false),
+                        //new SwitchDrawerItem().withName(R.string.receber_automatico).withIcon(R.mipmap.ic_download).withChecked(recebeAutomatico).withOnCheckedChangeListener(mOnCheckedChangeListener).withTag(KEY_RECEBE_AUTOMATICO).withSelectable(false).withSwitchEnabled(false),
                         new SwitchDrawerItem().withName(R.string.imagem_produto).withIcon(R.mipmap.ic_image_dark).withChecked(imagemProduto).withOnCheckedChangeListener(mOnCheckedChangeListener).withTag(KEY_IMAGEM_PRODUTO),
                         new SwitchDrawerItem().withName(R.string.salva_pedido_pdf).withIcon(R.mipmap.ic_file_pdf).withChecked(salvaPedidoPdf).withOnCheckedChangeListener(mOnCheckedChangeListener).withTag(KEY_SALVA_PEDIDO_PDF),
                         new SectionDrawerItem().withName(getResources().getString(R.string.versao_aplicacao) + " " + funcoes.getNomeVersaoAplicacao()),

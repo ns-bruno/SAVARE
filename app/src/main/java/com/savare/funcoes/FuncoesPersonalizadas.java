@@ -29,6 +29,7 @@ import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
@@ -104,6 +105,7 @@ public class FuncoesPersonalizadas {
 							   TAG_CODIGO_EMPRESA = "CodigoEmpresa",
 							   TAG_CHAVE_FUNCIONARIO = "ChaveFuncionario",
 							   TAG_SALVA_PEDIDO_PDF = "SalvaPedidoPdf",
+							   TAG_DESCRICAO_DISPOSITIVO = "DescricaoDispositivo",
 							   TAG_UUID_DISPOSITIVO = "UuidDispositivo";
 	public static final String SIM = "S", NAO = "N";
 	public static final String ENVIAR_ORCAMENTO_SAVARE = "ENVIAR_ORCAMENTO_SAVARE";
@@ -1246,7 +1248,6 @@ public class FuncoesPersonalizadas {
                 .setSound(null, 0)
                 .setVibrate(new long[0])
                 .setOnlyAlertOnce(true);
-
 		try {
 			EmpresaRotinas empresaRotinas = new EmpresaRotinas(context);
 
@@ -1336,8 +1337,8 @@ public class FuncoesPersonalizadas {
 		UUID deviceUuid = new UUID(androidId.hashCode(), ((long) tm.getDeviceId().hashCode() << 32) | tm.getSimSerialNumber().hashCode());
 		String descricao = (Build.VERSION.RELEASE + " - "+ Build.MODEL).toUpperCase();
 
-		setValorXml("UuidDispositivo", deviceUuid.toString().toUpperCase());
-		setValorXml("DescricaoDispositivo", (descricao.length() > 40 ? descricao.substring(0, 39) : descricao));
+		setValorXml(TAG_UUID_DISPOSITIVO, deviceUuid.toString().toUpperCase());
+		setValorXml(TAG_DESCRICAO_DISPOSITIVO, (descricao.length() > 40 ? descricao.substring(0, 39) : descricao));
 	}
 
 	public void setPermission(){
@@ -1406,5 +1407,14 @@ public class FuncoesPersonalizadas {
         }
         return 0;
     }
+
+	public boolean hasPermissions(@NonNull String... permissions) {
+		if (Build.VERSION.SDK_INT > 22) {
+			for (String permission : permissions)
+				if (PackageManager.PERMISSION_GRANTED != context.checkSelfPermission(permission))
+					return false;
+		}
+		return true;
+	}
 
 } // Fecha classe

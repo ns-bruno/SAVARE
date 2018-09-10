@@ -108,7 +108,6 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
     private TextView textStatusErro = null;
     private OnTaskCompleted listenerTaskCompleted;
     private Calendar calendario;
-    private String[] idOrcamentoSelecionado = null;
     private List<String> listaGuidOrcamento = null;
     private ServidoresBeans servidorAtivo;
     // Cria uma notificacao para ser manipulado
@@ -815,18 +814,6 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             listenerTaskCompleted.onTaskCompleted();
         }
 
-        // Cria uma notificacao para ser manipulado
-        /*PugNotification.with(context)
-                .load()
-                .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR)
-                .title(R.string.importar_dados_recebidos)
-                .message(context.getResources().getString(R.string.terminamos_atualizacao))
-                //.bigTextStyle(context.getResources().getString(R.string.atualizado_sucesso))
-                .smallIcon(R.mipmap.ic_launcher)
-                .largeIcon(R.mipmap.ic_launcher)
-                .flags(Notification.DEFAULT_LIGHTS)
-                .simple()
-                .build();*/
         bigTextStyle.bigText(context.getResources().getString(R.string.terminamos_atualizacao))
                 .setBigContentTitle(context.getResources().getString(R.string.importar_dados_recebidos));
         mBuilder.setStyle(bigTextStyle)
@@ -910,10 +897,6 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
         this.textStatusErro = textStatusErro;
     }
 
-    public void setIdOrcamento(String[] idOrcamentoSelecionado) {
-        this.idOrcamentoSelecionado = idOrcamentoSelecionado;
-    }
-
     public List<String> getListaGuidOrcamento() {
         return listaGuidOrcamento;
     }
@@ -954,39 +937,20 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                 if ((ultimaData != null) && (!ultimaData.isEmpty())) {
 
-                    parametrosWebservice += "&where= (DT_ALT >= '" + ultimaData + "') AND (ID_CFACLIFO = (SELECT SMADISPO.ID_CFACLIFO_FUN FROM SMADISPO WHERE SMADISPO.IDENTIFICACAO = '" + uuidDispositivo + "') )";
+                    parametrosWebservice += "&where= (DT_ALT >= '" + ultimaData + "') AND (ID_CFACLIFO = (SELECT SMADISPO.ID_CFACLIFO_FUNC FROM SMADISPO WHERE SMADISPO.IDENTIFICACAO = '" + uuidDispositivo + "') )";
                 } else {
-                    parametrosWebservice += "&where= (ID_CFACLIFO = (SELECT SMADISPO.ID_CFACLIFO_FUN FROM SMADISPO WHERE SMADISPO.IDENTIFICACAO = '" + uuidDispositivo + "') )";
+                    parametrosWebservice += "&where= (ID_CFACLIFO = (SELECT SMADISPO.ID_CFACLIFO_FUNC FROM SMADISPO WHERE SMADISPO.IDENTIFICACAO = '" + uuidDispositivo + "') )";
                 }
-            }
-            WSSisinfoWebservice webserviceSisInfo = new WSSisinfoWebservice(context);
-            JsonObject retornoWebservice = new Gson().fromJson(webserviceSisInfo.executarWebserviceJson(servidorAtivo, null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_CFACLIFO, WSSisinfoWebservice.METODO_GET, parametrosWebservice, null), JsonObject.class);
+                WSSisinfoWebservice webserviceSisInfo = new WSSisinfoWebservice(context);
+                JsonObject retornoWebservice = new Gson().fromJson(webserviceSisInfo.executarWebserviceJson(servidorAtivo, null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_CFACLIFO, WSSisinfoWebservice.METODO_GET, parametrosWebservice, null), JsonObject.class);
 
-            if ((retornoWebservice != null) && (retornoWebservice.has(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO))) {
-                statuRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO);
-                // Verifica se retornou com sucesso
-                if (statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO).getAsInt() == HttpURLConnection.HTTP_OK) {
-
-                    // Atualiza a notificacao
-                    bigTextStyle.bigText(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
-                    mBuilder.setStyle(bigTextStyle);
-                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
-
-                    // Checo se o texto de status foi passado pro parametro
-                    if (textStatus != null) {
-                        ((Activity) context).runOnUiThread(new Runnable() {
-                            public void run() {
-                                textStatus.setText(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
-                            }
-                        });
-                    }
-                    // Checa se retornou alguma coisa
-                    if ((retornoWebservice.has(WSSisinfoWebservice.KEY_OBJECT_OBJECT_RETORNO))) {
-                        final JsonArray listaUsuarioRetorno = retornoWebservice.getAsJsonArray(WSSisinfoWebservice.KEY_OBJECT_OBJECT_RETORNO);
-                        boolean todosSucesso = true;
+                if ((retornoWebservice != null) && (retornoWebservice.has(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO))) {
+                    statuRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO);
+                    // Verifica se retornou com sucesso
+                    if (statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO).getAsInt() == HttpURLConnection.HTTP_OK) {
 
                         // Atualiza a notificacao
-                        bigTextStyle.bigText(context.getResources().getString(R.string.recebendo_dados_usuario));
+                        bigTextStyle.bigText(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
                         mBuilder.setStyle(bigTextStyle);
                         notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
@@ -994,26 +958,17 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                         if (textStatus != null) {
                             ((Activity) context).runOnUiThread(new Runnable() {
                                 public void run() {
-                                    textStatus.setText(context.getResources().getString(R.string.recebendo_dados_usuario));
+                                    textStatus.setText(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
                                 }
                             });
                         }
-                        if (progressBarStatus != null) {
-                            ((Activity) context).runOnUiThread(new Runnable() {
-                                public void run() {
-                                    progressBarStatus.setIndeterminate(true);
-                                    //progressBarStatus.setMax(listaUsuarioRetorno.size());
-                                }
-                            });
-                        }
-
-                        List<ContentValues> listaDadosUsuario = new ArrayList<ContentValues>();
-                        for (int i = 0; i < listaUsuarioRetorno.size(); i++) {
-
-                            final JsonObject usuarioRetorno = listaUsuarioRetorno.get(i).getAsJsonObject();
+                        // Checa se retornou alguma coisa
+                        if ((retornoWebservice.has(WSSisinfoWebservice.KEY_OBJECT_OBJECT_RETORNO))) {
+                            final JsonArray listaUsuarioRetorno = retornoWebservice.getAsJsonArray(WSSisinfoWebservice.KEY_OBJECT_OBJECT_RETORNO);
+                            boolean todosSucesso = true;
 
                             // Atualiza a notificacao
-                            bigTextStyle.bigText(context.getResources().getString(R.string.achamos_usuario_servidor_nuvem) + " - Funcionário: " + usuarioRetorno.get("nomeRazao").toString());
+                            bigTextStyle.bigText(context.getResources().getString(R.string.recebendo_dados_usuario));
                             mBuilder.setStyle(bigTextStyle);
                             notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
@@ -1021,16 +976,152 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                             if (textStatus != null) {
                                 ((Activity) context).runOnUiThread(new Runnable() {
                                     public void run() {
-                                        textStatus.setText(context.getResources().getString(R.string.achamos_usuario_servidor_nuvem) + " - Funcionário: " + usuarioRetorno.get("nomeRazao").toString());
+                                        textStatus.setText(context.getResources().getString(R.string.recebendo_dados_usuario));
                                     }
                                 });
                             }
-                            if (textStatusErro != null) {
+                            if (progressBarStatus != null) {
                                 ((Activity) context).runOnUiThread(new Runnable() {
                                     public void run() {
-                                        textStatusErro.append("\n*" +
-                                                        context.getResources().getString(R.string.recebendo_dados_usuario) +
-                                                        " - Funcionário: " + usuarioRetorno.get("nomeRazao").toString());
+                                        progressBarStatus.setIndeterminate(true);
+                                        //progressBarStatus.setMax(listaUsuarioRetorno.size());
+                                    }
+                                });
+                            }
+
+                            List<ContentValues> listaDadosUsuario = new ArrayList<ContentValues>();
+                            for (int i = 0; i < listaUsuarioRetorno.size(); i++) {
+
+                                final JsonObject usuarioRetorno = listaUsuarioRetorno.get(i).getAsJsonObject();
+
+                                // Atualiza a notificacao
+                                bigTextStyle.bigText(context.getResources().getString(R.string.achamos_usuario_servidor_nuvem) + " - Funcionário: " + usuarioRetorno.get("nomeRazao").toString());
+                                mBuilder.setStyle(bigTextStyle);
+                                notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
+
+                                // Checo se o texto de status foi passado pro parametro
+                                if (textStatus != null) {
+                                    ((Activity) context).runOnUiThread(new Runnable() {
+                                        public void run() {
+                                            textStatus.setText(context.getResources().getString(R.string.achamos_usuario_servidor_nuvem) + " - Funcionário: " + usuarioRetorno.get("nomeRazao").toString());
+                                        }
+                                    });
+                                }
+                                if (textStatusErro != null) {
+                                    ((Activity) context).runOnUiThread(new Runnable() {
+                                        public void run() {
+                                            textStatusErro.append("\n*" +
+                                                    context.getResources().getString(R.string.recebendo_dados_usuario) +
+                                                    " - Funcionário: " + usuarioRetorno.get("nomeRazao").toString());
+                                        }
+                                    });
+                                }
+                                if (progressBarStatus != null) {
+                                    ((Activity) context).runOnUiThread(new Runnable() {
+                                        public void run() {
+                                            progressBarStatus.setIndeterminate(true);
+                                        }
+                                    });
+                                }
+                                final ContentValues dadosUsuario = new ContentValues();
+                                dadosUsuario.put("ID_CFACLIFO", usuarioRetorno.get("idCfaclifo").getAsInt());
+                                dadosUsuario.put("ID_CFAPROFI", (usuarioRetorno.has("idCfaprofi")) ? usuarioRetorno.get("idCfaprofi").getAsInt() : null);
+                                dadosUsuario.put("ID_CFAATIVI", (usuarioRetorno.has("idCfaativi")) ? usuarioRetorno.get("idCfaativi").getAsInt() : null);
+                                dadosUsuario.put("ID_CFAAREAS", (usuarioRetorno.has("idCfaareas")) ? usuarioRetorno.get("idCfaareas").getAsInt() : null);
+                                dadosUsuario.put("ID_CFATPCLI", (usuarioRetorno.has("idCfatpcli")) ? usuarioRetorno.get("idCfatpcli").getAsInt() : null);
+                                dadosUsuario.put("ID_CFASTATU", (usuarioRetorno.has("idCfastatu")) ? usuarioRetorno.get("idCfastatu").getAsInt() : null);
+                                dadosUsuario.put("ID_SMAEMPRE", (usuarioRetorno.has("idSmaempre")) ? usuarioRetorno.get("idSmaempre").getAsInt() : null);
+                                dadosUsuario.put("DT_ALT", (usuarioRetorno.has("dtAlt")) ? usuarioRetorno.get("dtAlt").getAsString() : null);
+                                dadosUsuario.put("GUID", usuarioRetorno.get("guid").getAsString());
+                                dadosUsuario.put("CPF_CNPJ", (usuarioRetorno.has("cpfCgc")) ? usuarioRetorno.get("cpfCgc").getAsString() : null);
+                                dadosUsuario.put("IE_RG", (usuarioRetorno.has("ieRg")) ? usuarioRetorno.get("ieRg").getAsString() : null);
+                                dadosUsuario.put("NOME_RAZAO", (usuarioRetorno.has("nomeRazao")) ? usuarioRetorno.get("nomeRazao").getAsString() : null);
+                                dadosUsuario.put("NOME_FANTASIA", (usuarioRetorno.has("nomeFantasia")) ? usuarioRetorno.get("nomeFantasia").getAsString() : "");
+                                dadosUsuario.put("DT_NASCIMENTO", (usuarioRetorno.has("dtNascimento")) ? usuarioRetorno.get("dtNascimento").getAsString() : "");
+                                dadosUsuario.put("CODIGO_CLI", (usuarioRetorno.has("codigoCli")) ? usuarioRetorno.get("codigoCli").getAsInt() : null);
+                                dadosUsuario.put("CODIGO_FUN", (usuarioRetorno.has("codigoFun")) ? usuarioRetorno.get("codigoFun").getAsInt() : null);
+                                dadosUsuario.put("CODIGO_USU", (usuarioRetorno.has("codigoUsu")) ? usuarioRetorno.get("codigoUsu").getAsInt() : null);
+                                dadosUsuario.put("CODIGO_TRA", (usuarioRetorno.has("codigoTra")) ? usuarioRetorno.get("codigoTra").getAsInt() : null);
+                                dadosUsuario.put("CLIENTE", (usuarioRetorno.has("cliente")) ? usuarioRetorno.get("cliente").getAsString() : "");
+                                dadosUsuario.put("FUNCIONARIO", (usuarioRetorno.has("funcionario")) ? usuarioRetorno.get("funcionario").getAsString() : "");
+                                dadosUsuario.put("USUARIO", (usuarioRetorno.has("usuario")) ? usuarioRetorno.get("usuario").getAsString() : "");
+                                dadosUsuario.put("TRANSPORTADORA", (usuarioRetorno.has("transportadora")) ? usuarioRetorno.get("transportadora").getAsString() : "");
+                                dadosUsuario.put("SEXO", (usuarioRetorno.has("sexo")) ? usuarioRetorno.get("sexo").getAsString() : "");
+                                dadosUsuario.put("INSC_JUNTA", (usuarioRetorno.has("inscJunta")) ? usuarioRetorno.get("inscJunta").getAsString() : "");
+                                dadosUsuario.put("INSC_SUFRAMA", (usuarioRetorno.has("inscSuframa")) ? usuarioRetorno.get("inscSuframa").getAsString() : "");
+                                dadosUsuario.put("INSC_MUNICIPAL", (usuarioRetorno.has("inscMunicipal")) ? usuarioRetorno.get("inscMunicipal").getAsString() : "");
+                                dadosUsuario.put("INSC_PRODUTOR", (usuarioRetorno.has("inscProdutor")) ? usuarioRetorno.get("inscProdutor").getAsString() : "");
+                                dadosUsuario.put("ATIVO", (usuarioRetorno.has("ativo")) ? usuarioRetorno.get("ativo").getAsString() : null);
+
+                                salvarDadosXml(dadosUsuario);
+
+                                listaDadosUsuario.add(dadosUsuario);
+
+                                // Checa se o usuario esta ativo
+                                if (usuarioRetorno.get("ativo").toString().equalsIgnoreCase("0")) {
+
+                                    final ContentValues contentValues = new ContentValues();
+                                    contentValues.put("comando", 0);
+                                    contentValues.put("tela", "ReceberDadosWebserviceAsyncRotinas");
+                                    contentValues.put("mensagem", "O funcionário dessa chave esta inativo, não podemos baixar os dados dele. Entre em contato com a empresa ou com o suporte SAVARE.");
+                                    contentValues.put("dados", "");
+
+
+                                    ((Activity) context).runOnUiThread(new Runnable() {
+                                        public void run() {
+                                            funcoes.menssagem(contentValues);
+                                        }
+                                    });
+                                    return false;
+                                }
+                            } // Fim for listaUsuarioRetorno
+
+                            final PessoaSql pessoaSql = new PessoaSql(context);
+
+                            todosSucesso = pessoaSql.insertList(listaDadosUsuario);
+
+                            // Checa se todos foram inseridos/atualizados com sucesso
+                            if (todosSucesso) {
+                                inserirUltimaAtualizacao("CFACLIFO_FUN");
+                            } else {
+                                bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.importar_dados_recebidos))
+                                        .bigText(context.getResources().getString(R.string.nao_conseguimos_atualizar_usuario));
+                                mBuilder.setStyle(bigTextStyle)
+                                        .setProgress(0, 0, false);
+                                notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
+
+                                // Checa se o texto de status foi passado pro parametro
+                                if (textStatus != null) {
+
+                                    ((Activity) context).runOnUiThread(new Runnable() {
+                                        public void run() {
+                                            textStatus.setText(context.getResources().getString(R.string.nao_conseguimos_atualizar_usuario));
+                                        }
+                                    });
+                                }
+
+                                if (textStatusErro != null) {
+                                    final JsonObject finalStatuRetorno = statuRetorno;
+                                    ((Activity) context).runOnUiThread(new Runnable() {
+                                        public void run() {
+                                            textStatusErro.append("\n*" +
+                                                    context.getResources().getString(R.string.nao_conseguimos_atualizar_usuario));
+                                        }
+                                    });
+                                }
+                            }
+
+                            // Atualiza a notificacao
+                            bigTextStyle.bigText(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
+                            mBuilder.setStyle(bigTextStyle)
+                                    .setProgress(0, 0, true);
+                            notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
+
+                            // Checo se o texto de status foi passado pro parametro
+                            if (textStatus != null) {
+                                ((Activity) context).runOnUiThread(new Runnable() {
+                                    public void run() {
+                                        textStatus.setText(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
                                     }
                                 });
                             }
@@ -1041,131 +1132,29 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                     }
                                 });
                             }
-                            final ContentValues dadosUsuario = new ContentValues();
-                            dadosUsuario.put("ID_CFACLIFO", usuarioRetorno.get("idCfaclifo").getAsInt());
-                            dadosUsuario.put("ID_CFAPROFI", (usuarioRetorno.has("idCfaprofi")) ? usuarioRetorno.get("idCfaprofi").getAsInt() : null);
-                            dadosUsuario.put("ID_CFAATIVI", (usuarioRetorno.has("idCfaativi")) ? usuarioRetorno.get("idCfaativi").getAsInt() : null);
-                            dadosUsuario.put("ID_CFAAREAS", (usuarioRetorno.has("idCfaareas")) ? usuarioRetorno.get("idCfaareas").getAsInt() : null);
-                            dadosUsuario.put("ID_CFATPCLI", (usuarioRetorno.has("idCfatpcli")) ? usuarioRetorno.get("idCfatpcli").getAsInt() : null);
-                            dadosUsuario.put("ID_CFASTATU", (usuarioRetorno.has("idCfastatu")) ? usuarioRetorno.get("idCfastatu").getAsInt() : null);
-                            dadosUsuario.put("ID_SMAEMPRE", (usuarioRetorno.has("idSmaempre")) ? usuarioRetorno.get("idSmaempre").getAsInt() : null);
-                            dadosUsuario.put("DT_ALT", (usuarioRetorno.has("dtAlt")) ? usuarioRetorno.get("dtAlt").getAsString() : null);
-                            dadosUsuario.put("GUID", usuarioRetorno.get("guid").getAsString());
-                            dadosUsuario.put("CPF_CNPJ", (usuarioRetorno.has("cpfCgc")) ? usuarioRetorno.get("cpfCgc").getAsString() : null);
-                            dadosUsuario.put("IE_RG", (usuarioRetorno.has("ieRg")) ? usuarioRetorno.get("ieRg").getAsString() : null);
-                            dadosUsuario.put("NOME_RAZAO", (usuarioRetorno.has("nomeRazao")) ? usuarioRetorno.get("nomeRazao").getAsString() : null);
-                            dadosUsuario.put("NOME_FANTASIA", (usuarioRetorno.has("nomeFantasia")) ? usuarioRetorno.get("nomeFantasia").getAsString() : "");
-                            dadosUsuario.put("DT_NASCIMENTO", (usuarioRetorno.has("dtNascimento")) ? usuarioRetorno.get("dtNascimento").getAsString() : "");
-                            dadosUsuario.put("CODIGO_CLI", (usuarioRetorno.has("codigoCli")) ? usuarioRetorno.get("codigoCli").getAsInt() : null);
-                            dadosUsuario.put("CODIGO_FUN", (usuarioRetorno.has("codigoFun")) ? usuarioRetorno.get("codigoFun").getAsInt() : null);
-                            dadosUsuario.put("CODIGO_USU", (usuarioRetorno.has("codigoUsu")) ? usuarioRetorno.get("codigoUsu").getAsInt() : null);
-                            dadosUsuario.put("CODIGO_TRA", (usuarioRetorno.has("codigoTra")) ? usuarioRetorno.get("codigoTra").getAsInt() : null);
-                            dadosUsuario.put("CLIENTE", (usuarioRetorno.has("cliente")) ? usuarioRetorno.get("cliente").getAsString() : "");
-                            dadosUsuario.put("FUNCIONARIO", (usuarioRetorno.has("funcionario")) ? usuarioRetorno.get("funcionario").getAsString() : "");
-                            dadosUsuario.put("USUARIO", (usuarioRetorno.has("usuario")) ? usuarioRetorno.get("usuario").getAsString() : "");
-                            dadosUsuario.put("TRANSPORTADORA", (usuarioRetorno.has("transportadora")) ? usuarioRetorno.get("transportadora").getAsString() : "");
-                            dadosUsuario.put("SEXO", (usuarioRetorno.has("sexo")) ? usuarioRetorno.get("sexo").getAsString() : "");
-                            dadosUsuario.put("INSC_JUNTA", (usuarioRetorno.has("inscJunta")) ? usuarioRetorno.get("inscJunta").getAsString() : "");
-                            dadosUsuario.put("INSC_SUFRAMA", (usuarioRetorno.has("inscSuframa")) ? usuarioRetorno.get("inscSuframa").getAsString() : "");
-                            dadosUsuario.put("INSC_MUNICIPAL", (usuarioRetorno.has("inscMunicipal")) ? usuarioRetorno.get("inscMunicipal").getAsString() : "");
-                            dadosUsuario.put("INSC_PRODUTOR", (usuarioRetorno.has("inscProdutor")) ? usuarioRetorno.get("inscProdutor").getAsString() : "");
-                            dadosUsuario.put("ATIVO", (usuarioRetorno.has("ativo")) ? usuarioRetorno.get("ativo").getAsString() : null);
-
-                            salvarDadosXml(dadosUsuario);
-
-                            listaDadosUsuario.add(dadosUsuario);
-
-                            // Checa se o usuario esta ativo
-                            if (usuarioRetorno.get("ativo").toString().equalsIgnoreCase("0")) {
-
-                                final ContentValues contentValues = new ContentValues();
-                                contentValues.put("comando", 0);
-                                contentValues.put("tela", "ReceberDadosWebserviceAsyncRotinas");
-                                contentValues.put("mensagem", "O funcionário dessa chave esta inativo, não podemos baixar os dados dele. Entre em contato com a empresa ou com o suporte SAVARE.");
-                                contentValues.put("dados", "");
-
-
-                                ((Activity) context).runOnUiThread(new Runnable() {
-                                    public void run() {
-                                        funcoes.menssagem(contentValues);
-                                    }
-                                });
-                                return false;
-                            }
-                        } // Fim for listaUsuarioRetorno
-
-                        final PessoaSql pessoaSql = new PessoaSql(context);
-
-                        todosSucesso = pessoaSql.insertList(listaDadosUsuario);
-
-                        // Checa se todos foram inseridos/atualizados com sucesso
-                        if (todosSucesso) {
-                            inserirUltimaAtualizacao("CFACLIFO_FUN");
-                        } else {
-                            /*PugNotification.with(context)
-                                    .load()
-                                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR)
-                                    .title(R.string.importar_dados_recebidos)
-                                    //.message(context.getResources().getString(R.string.nao_conseguimos_atualizar_usuario))
-                                    .bigTextStyle(context.getResources().getString(R.string.nao_conseguimos_atualizar_usuario))
-                                    .smallIcon(R.mipmap.ic_launcher)
-                                    .largeIcon(R.mipmap.ic_launcher)
-                                    .flags(Notification.DEFAULT_LIGHTS)
-                                    .simple()
-                                    .build();*/
-
-                            bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.importar_dados_recebidos))
-                                        .bigText(context.getResources().getString(R.string.nao_conseguimos_atualizar_usuario));
-                            mBuilder.setStyle(bigTextStyle)
-                                    .setProgress(0, 0, false);
-                            notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
-
-                            // Checa se o texto de status foi passado pro parametro
-                            if (textStatus != null) {
-
-                                ((Activity) context).runOnUiThread(new Runnable() {
-                                    public void run() {
-                                        textStatus.setText(context.getResources().getString(R.string.nao_conseguimos_atualizar_usuario));
-                                    }
-                                });
-                            }
                         }
-
-                        // Atualiza a notificacao
-                        bigTextStyle.bigText(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
+                    } else {
+                        bigTextStyle.bigText(context.getResources().getString(R.string.nao_chegou_dados_servidor_empresa) + "\n" + retornoWebservice.toString())
+                                .setBigContentTitle(context.getResources().getString(R.string.recebendo_dados_usuario));
                         mBuilder.setStyle(bigTextStyle)
-                            .setProgress(0, 0, true);
-                        notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
+                                .setProgress(0, 0, false);
+                        notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
 
-                        // Checo se o texto de status foi passado pro parametro
-                        if (textStatus != null) {
+                        if (textStatusErro != null) {
+                            final JsonObject finalStatuRetorno = statuRetorno;
                             ((Activity) context).runOnUiThread(new Runnable() {
                                 public void run() {
-                                    textStatus.setText(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
-                                }
-                            });
-                        }
-                        if (progressBarStatus != null) {
-                            ((Activity) context).runOnUiThread(new Runnable() {
-                                public void run() {
-                                    progressBarStatus.setIndeterminate(true);
+                                    textStatusErro.append("\n*" +
+                                            context.getResources().getString(R.string.nao_chegou_dados_servidor_empresa) + " \n" +
+                                            finalStatuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO) + " \n" +
+                                            finalStatuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_MENSAGEM_RETORNO));
                                 }
                             });
                         }
                     }
                 } else {
-                    // Cria uma notificacao para ser manipulado
-                    /*Load mLoad = PugNotification.with(context).load()
-                            .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
-                            .smallIcon(R.mipmap.ic_launcher)
-                            .largeIcon(R.mipmap.ic_launcher)
-                            .title(R.string.recebendo_dados_usuario)
-                            .bigTextStyle(context.getResources().getString(R.string.nao_chegou_dados_servidor_empresa) + "\n" + retornoWebservice.toString())
-                            .flags(Notification.DEFAULT_LIGHTS);
-                    mLoad.simple().build();*/
-
-                    bigTextStyle.bigText(context.getResources().getString(R.string.nao_chegou_dados_servidor_empresa) + "\n" + retornoWebservice.toString())
-                        .setBigContentTitle(context.getResources().getString(R.string.recebendo_dados_usuario));
+                    bigTextStyle.bigText(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.get(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO))
+                            .setBigContentTitle(context.getResources().getString(R.string.recebendo_dados));
                     mBuilder.setStyle(bigTextStyle)
                             .setProgress(0, 0, false);
                     notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
@@ -1175,29 +1164,27 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                         ((Activity) context).runOnUiThread(new Runnable() {
                             public void run() {
                                 textStatusErro.append("\n*" +
-                                        context.getResources().getString(R.string.nao_chegou_dados_servidor_empresa) + " \n" +
-                                        finalStatuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO) + " \n" +
-                                        finalStatuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_MENSAGEM_RETORNO));
+                                        context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice));
                             }
                         });
                     }
                 }
             } else {
-                // Cria uma notificacao para ser manipulado
-                /*Load mLoad = PugNotification.with(context).load()
-                        .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
-                        .smallIcon(R.mipmap.ic_launcher)
-                        .largeIcon(R.mipmap.ic_launcher)
-                        .title(R.string.recebendo_dados)
-                        .bigTextStyle(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.get(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO))
-                        .flags(Notification.DEFAULT_LIGHTS);
-                mLoad.simple().build();*/
-
-                bigTextStyle.bigText(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.get(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO))
+                bigTextStyle.bigText(context.getResources().getString(R.string.nao_achamos_chave_dispositivo))
                         .setBigContentTitle(context.getResources().getString(R.string.recebendo_dados));
                 mBuilder.setStyle(bigTextStyle)
                         .setProgress(0, 0, false);
                 notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
+
+                if (textStatusErro != null) {
+                    final JsonObject finalStatuRetorno = statuRetorno;
+                    ((Activity) context).runOnUiThread(new Runnable() {
+                        public void run() {
+                            textStatusErro.append("\n*" +
+                                    context.getResources().getString(R.string.nao_achamos_chave_dispositivo));
+                        }
+                    });
+                }
             }
         } catch (Exception e) {
             // Cria uma notificacao
@@ -1935,243 +1922,317 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             Gson gson = new Gson();
             FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
 
-            if ((ultimaData != null) && (!ultimaData.isEmpty())) {
-                parametrosWebservice += "&where= (DT_ALT >= '" + ultimaData + "') AND (ID_SMAEMPRE = (SELECT CFACLIFO.ID_SMAEMPRE FROM CFACLIFO WHERE CFACLIFO.GUID = '" + funcoes.getValorXml(funcoes.TAG_CHAVE_FUNCIONARIO) + "'))";
+            // Verifica se conseguiu pegar o guid do usuario
+            if (funcoes.getValorXml(funcoes.TAG_CHAVE_FUNCIONARIO).equalsIgnoreCase(funcoes.NAO_ENCONTRADO)){
+                bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.msg_error))
+                        .bigText("ImportarDadosEmpresa - " + context.getResources().getString(R.string.nao_tem_numero_identificacao_funcionario));
+                mBuilder.setStyle(bigTextStyle)
+                        .setProgress(0, 0, false);
+                notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
+
+                if (textStatusErro != null) {
+                    final JsonObject finalStatuRetorno = statuRetorno;
+                    ((Activity) context).runOnUiThread(new Runnable() {
+                        public void run() {
+                            textStatusErro.append("\n*" +"ImportarDadosEmpresa- " + context.getResources().getString(R.string.nao_tem_numero_identificacao_funcionario));
+                        }
+                    });
+                }
             } else {
-                parametrosWebservice += "&where= (ID_SMAEMPRE = (SELECT CFACLIFO.ID_SMAEMPRE FROM CFACLIFO WHERE CFACLIFO.GUID = '" + funcoes.getValorXml(funcoes.TAG_CHAVE_FUNCIONARIO) + "'))";
-            }
-            WSSisinfoWebservice webserviceSisInfo = new WSSisinfoWebservice(context);
+                if ((ultimaData != null) && (!ultimaData.isEmpty())) {
+                    parametrosWebservice += "&where= (DT_ALT >= '" + ultimaData + "') AND (ID_SMAEMPRE = (SELECT CFACLIFO.ID_SMAEMPRE FROM CFACLIFO WHERE CFACLIFO.GUID = '" + funcoes.getValorXml(funcoes.TAG_CHAVE_FUNCIONARIO) + "'))";
+                } else {
+                    parametrosWebservice += "&where= (ID_SMAEMPRE = (SELECT CFACLIFO.ID_SMAEMPRE FROM CFACLIFO WHERE CFACLIFO.GUID = '" + funcoes.getValorXml(funcoes.TAG_CHAVE_FUNCIONARIO) + "'))";
+                }
+                WSSisinfoWebservice webserviceSisInfo = new WSSisinfoWebservice(context);
 
-            //JsonObject retornoWebservice = gson.fromJson(webserviceSisInfo.executarWebserviceJson(servidorAtivo, null, WSSisinfoWebservice.FUNCTION_JSON_SELECT_SMAEMPRE, WSSisinfoWebservice.METODO_GET, objectparametros.toString()), JsonObject.class);
-            JsonObject retornoWebservice = gson.fromJson(webserviceSisInfo.executarWebserviceJson(servidorAtivo, null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_SMAEMPRE, WSSisinfoWebservice.METODO_GET, parametrosWebservice, null), JsonObject.class);
+                //JsonObject retornoWebservice = gson.fromJson(webserviceSisInfo.executarWebserviceJson(servidorAtivo, null, WSSisinfoWebservice.FUNCTION_JSON_SELECT_SMAEMPRE, WSSisinfoWebservice.METODO_GET, objectparametros.toString()), JsonObject.class);
+                JsonObject retornoWebservice = gson.fromJson(webserviceSisInfo.executarWebserviceJson(servidorAtivo, null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_SMAEMPRE, WSSisinfoWebservice.METODO_GET, parametrosWebservice, null), JsonObject.class);
 
-            if ((retornoWebservice != null) && (retornoWebservice.has(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO))) {
-                statuRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO);
-                // Verifica se retornou com sucesso
-                if (statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO).getAsInt() == HttpURLConnection.HTTP_OK) {
-                    boolean todosSucesso = true;
+                if ((retornoWebservice != null) && (retornoWebservice.has(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO))) {
+                    statuRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO);
+                    // Verifica se retornou com sucesso
+                    if (statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO).getAsInt() == HttpURLConnection.HTTP_OK) {
+                        boolean todosSucesso = true;
 
-                    JsonObject pageRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_PAGE_RETORNO);
+                        JsonObject pageRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_PAGE_RETORNO);
 
-                    if ( (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0) ) {
-                        final int totalPages = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt();
-                        int pageNumber = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_PAGE_NUMBER_RETORNO).getAsInt();
+                        if ((pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0)) {
+                            final int totalPages = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt();
+                            int pageNumber = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_PAGE_NUMBER_RETORNO).getAsInt();
 
-                        for (int ia = pageNumber; ia < totalPages; ia++) {
+                            for (int ia = pageNumber; ia < totalPages; ia++) {
 
-                            statuRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO);
-                            // Verifica se retornou com sucesso
-                            if (statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO).getAsInt() == HttpURLConnection.HTTP_OK) {
-                                // Atualiza a notificacao
-                                bigTextStyle.bigText(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
-                                mBuilder.setStyle(bigTextStyle);
-                                notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
-
-                                // Checo se o texto de status foi passado pro parametro
-                                if (textStatus != null) {
-                                    ((Activity) context).runOnUiThread(new Runnable() {
-                                        public void run() {
-                                            textStatus.setText(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
-                                        }
-                                    });
-                                }
-                                // Checa se retornou alguma coisa
-                                if ((retornoWebservice.has(WSSisinfoWebservice.KEY_OBJECT_OBJECT_RETORNO))) {
-                                    final JsonArray listaEmpresaRetorno = retornoWebservice.getAsJsonArray(WSSisinfoWebservice.KEY_OBJECT_OBJECT_RETORNO);
-                                    // Checa se retornou algum dados na lista
-                                    if (listaEmpresaRetorno.size() > 0) {
-                                        final List<ContentValues> listaDadosEmpresa = new ArrayList<ContentValues>();
-
-                                        for (int i = 0; i < listaEmpresaRetorno.size(); i++) {
-
-                                            // Atualiza a notificacao
-                                            bigTextStyle.bigText(context.getResources().getString(R.string.recebendo_dados_empresa) + " - Parte " + (pageNumber + 1) + "/" + totalPages + " - " + i + "/" + listaEmpresaRetorno.size());
-                                            mBuilder.setStyle(bigTextStyle)
-                                                .setProgress(listaEmpresaRetorno.size(), i, false);
-                                            notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
-
-                                            // Checo se o texto de status foi passado pro parametro
-                                            if (textStatus != null) {
-                                                final int finalI = i;
-                                                final int finalPageNumber = pageNumber + 1;
-                                                ((Activity) context).runOnUiThread(new Runnable() {
-                                                    public void run() {
-                                                        textStatus.setText(context.getResources().getString(R.string.recebendo_dados_empresa) + " - Parte " + finalPageNumber + "/" + totalPages + " - " + finalI + "/" + listaEmpresaRetorno.size());
-                                                    }
-                                                });
-                                            }
-                                            if (progressBarStatus != null) {
-                                                final int finalI1 = i;
-                                                ((Activity) context).runOnUiThread(new Runnable() {
-                                                    public void run() {
-                                                        progressBarStatus.setProgress(finalI1);
-                                                    }
-                                                });
-                                            }
-                                            JsonObject empresaRetorno = listaEmpresaRetorno.get(i).getAsJsonObject();
-                                            ContentValues dadosEmpresa = new ContentValues();
-
-                                            // Inseri os valores
-                                            dadosEmpresa.put("ID_SMAEMPRE", empresaRetorno.get("idSmaempre").getAsInt());
-                                            if (empresaRetorno.has("idAeaplpgtVare")) {
-                                                dadosEmpresa.put("ID_AEAPLPGT_VARE", empresaRetorno.get("idAeaplpgtVare").getAsInt());
-                                            }
-                                            if ( (empresaRetorno.has("idAeaplpgtAtac")) && (empresaRetorno.get("idAeaplpgtAtac").getAsInt() > 0) ) {
-                                                dadosEmpresa.put("ID_AEAPLPGT_ATAC", empresaRetorno.get("idAeaplpgtAtac").getAsInt());
-                                            }
-                                            dadosEmpresa.put("ID_AEAPLPGT_VARE_VISTA", (empresaRetorno.has("idAeaplpgtVareVista") ? empresaRetorno.get("idAeaplpgtVareVista").getAsInt() : null));
-                                            dadosEmpresa.put("ID_AEAPLPGT_ATAC_VISTA", (empresaRetorno.has("idAeaplpgtAtacVista") ? empresaRetorno.get("idAeaplpgtAtacVista").getAsInt() : null));
-                                            if ( (empresaRetorno.has("idCfastatu")) && (empresaRetorno.get("idCfastatu").getAsInt() > 0) ) {dadosEmpresa.put("ID_CFASTATU", empresaRetorno.get("idCfastatu").getAsInt());}
-                                            if ( (empresaRetorno.has("idCfaativi")) && (empresaRetorno.get("idCfaativi").getAsInt() > 0) ) {dadosEmpresa.put("ID_CFAATIVI", empresaRetorno.get("idCfaativi").getAsInt());}
-                                            if ( (empresaRetorno.has("guid")) && (empresaRetorno.get("guid").getAsString().length() > 0) ) {dadosEmpresa.put("GUID", empresaRetorno.get("guid").getAsString());}
-                                            if ( (empresaRetorno.has("usCad")) && (empresaRetorno.get("usCad").getAsString().length() > 0) ) {dadosEmpresa.put("US_CAD", empresaRetorno.get("usCad").getAsString());}
-                                            if ( (empresaRetorno.has("codigo")) && (empresaRetorno.get("codigo").getAsInt() > 0) ) {dadosEmpresa.put("CODIGO", empresaRetorno.get("codigo").getAsInt());}
-                                            dadosEmpresa.put("DT_ALT", empresaRetorno.get("dtAlt").getAsString());
-                                            dadosEmpresa.put("NOME_RAZAO", empresaRetorno.get("nomeRazao").getAsString());
-                                            dadosEmpresa.put("NOME_FANTASIA", empresaRetorno.has("nomeFantasia") ? empresaRetorno.get("nomeFantasia").getAsString() : "");
-                                            dadosEmpresa.put("CPF_CGC", empresaRetorno.has("cpfCgc") ? empresaRetorno.get("cpfCgc").getAsString() : "");
-                                            if ( (empresaRetorno.has("curvaAFis")) ) {dadosEmpresa.put("CURVA_A_FIS", empresaRetorno.get("curvaAFis").getAsDouble());}
-                                            if ( (empresaRetorno.has("curvaBFis")) ) {dadosEmpresa.put("CURVA_B_FIS", empresaRetorno.get("curvaBFis").getAsDouble());}
-                                            if ( (empresaRetorno.has("curvaCFis")) ) {dadosEmpresa.put("CURVA_C_FIS", empresaRetorno.get("curvaCFis").getAsDouble());}
-                                            if ( (empresaRetorno.has("curvaAFin")) ) {dadosEmpresa.put("CURVA_A_FIN", empresaRetorno.get("curvaAFin").getAsDouble());}
-                                            if ( (empresaRetorno.has("curvaBFin")) ) {dadosEmpresa.put("CURVA_B_FIN", empresaRetorno.get("curvaBFin").getAsDouble());}
-                                            if ( (empresaRetorno.has("curvaCFin")) ) {dadosEmpresa.put("CURVA_C_FIN", empresaRetorno.get("curvaCFin").getAsDouble());}
-                                            if ( (empresaRetorno.has("atacVarejo")) && (empresaRetorno.get("atacVarejo").getAsString().length() > 0) ) {dadosEmpresa.put("ATAC_VAREJO", empresaRetorno.get("atacVarejo").getAsString());}
-                                            if ( (empresaRetorno.has("vendeAtacVare")) && (empresaRetorno.get("vendeAtacVare").getAsString().length() > 0) ) {dadosEmpresa.put("VENDE_ATAC_VARE", empresaRetorno.get("vendeAtacVare").getAsString());}
-                                            dadosEmpresa.put("ORC_SEM_ESTOQUE", empresaRetorno.get("orcSemEstoque").getAsString());
-                                            if ( (empresaRetorno.has("pedSemEstoque")) && (empresaRetorno.get("pedSemEstoque").getAsString().length() > 0) ) {dadosEmpresa.put("PED_SEM_ESTOQUE", empresaRetorno.get("pedSemEstoque").getAsString());}
-                                            if ( (empresaRetorno.has("centavos")) && (empresaRetorno.get("centavos").getAsString().length() > 0) ) {dadosEmpresa.put("CENTAVOS", empresaRetorno.get("centavos").getAsString());}
-                                            if ( (empresaRetorno.has("valMarkupAtac1")) ) {dadosEmpresa.put("VAL_MARKUP_ATAC1", empresaRetorno.get("valMarkupAtac1").getAsDouble());}
-                                            if ( (empresaRetorno.has("valMarkupAtac2")) ) {dadosEmpresa.put("VAL_MARKUP_ATAC2", empresaRetorno.get("valMarkupAtac2").getAsDouble());}
-                                            if ( (empresaRetorno.has("valMarkupAtac3")) ) {dadosEmpresa.put("VAL_MARKUP_ATAC3", empresaRetorno.get("valMarkupAtac3").getAsDouble());}
-                                            if ( (empresaRetorno.has("valMarkupVare1")) ) {dadosEmpresa.put("VAL_MARKUP_VARE1", empresaRetorno.get("valMarkupVare1").getAsDouble());}
-                                            if ( (empresaRetorno.has("valMarkupVare2")) ) {dadosEmpresa.put("VAL_MARKUP_VARE2", empresaRetorno.get("valMarkupVare2").getAsDouble());}
-                                            if ( (empresaRetorno.has("valMarkupVare3")) ) {dadosEmpresa.put("VAL_MARKUP_VARE3", empresaRetorno.get("valMarkupVare3").getAsDouble());}
-                                            if ( (empresaRetorno.has("markupAtac1")) ) {dadosEmpresa.put("MARKUP_ATAC1", empresaRetorno.get("markupAtac1").getAsDouble());}
-                                            if ( (empresaRetorno.has("markupAtac2")) ) {dadosEmpresa.put("MARKUP_ATAC2", empresaRetorno.get("markupAtac2").getAsDouble());}
-                                            if ( (empresaRetorno.has("markupAtac3")) ) {dadosEmpresa.put("MARKUP_ATAC3", empresaRetorno.get("markupAtac3").getAsDouble());}
-                                            if ( (empresaRetorno.has("markupVare1")) ) {dadosEmpresa.put("MARKUP_VARE1", empresaRetorno.get("markupVare1").getAsDouble());}
-                                            if ( (empresaRetorno.has("markupVare2")) ) {dadosEmpresa.put("MARKUP_VARE2", empresaRetorno.get("markupVare2").getAsDouble());}
-                                            if ( (empresaRetorno.has("markupVare3")) ) {dadosEmpresa.put("MARKUP_VARE3", empresaRetorno.get("markupVare3").getAsDouble());}
-                                            dadosEmpresa.put("DIAS_ATRAZO", empresaRetorno.get("diasAtrazo").getAsInt());
-                                            dadosEmpresa.put("SEM_MOVIMENTO", empresaRetorno.get("semMovimento").getAsInt());
-                                            dadosEmpresa.put("JUROS_DIARIO", empresaRetorno.get("jurosDiario").getAsDouble());
-                                            if ( (empresaRetorno.has("capitaliza")) && (empresaRetorno.get("capitaliza").getAsString().length() > 0) ) { dadosEmpresa.put("CAPITALIZA", empresaRetorno.get("capitaliza").getAsString()); }
-                                            if ( (empresaRetorno.has("indexa")) && (empresaRetorno.get("indexa").getAsString().length() > 0) ) { dadosEmpresa.put("INDEXA", empresaRetorno.get("indexa").getAsString()); }
-                                            if ( (empresaRetorno.has("indiceValor")) && (empresaRetorno.get("indiceValor").getAsString().length() > 0) ) { dadosEmpresa.put("INDICE_VALOR", empresaRetorno.get("indiceValor").getAsString()); }
-                                            dadosEmpresa.put("VENDE_BLOQUEADO_ORC", empresaRetorno.has("vendeBloqueadoOrc") ? empresaRetorno.get("vendeBloqueadoOrc").getAsString() : "");
-                                            dadosEmpresa.put("VENDE_BLOQUEADO_PED", empresaRetorno.has("vendeBloqueadoPed") ? empresaRetorno.get("vendeBloqueadoPed").getAsString() : "");
-                                            dadosEmpresa.put("VALIDADE_FICHA_CLIENTE", empresaRetorno.get("validadeFichaCliente").getAsInt());
-                                            if ( (empresaRetorno.has("percJrVencParcMaior")) ) { dadosEmpresa.put("PERC_JR_VENC_PARC_MAIOR", empresaRetorno.get("percJrVencParcMaior").getAsDouble()); }
-                                                if ( (empresaRetorno.has("percJurosDiaRefat")) ) { dadosEmpresa.put("PERC_JUROS_DIA_REFAT", empresaRetorno.get("percJurosDiaRefat").getAsDouble()); }
-                                            if ( (empresaRetorno.has("percMulta")) ) { dadosEmpresa.put("PERC_MULTA", empresaRetorno.get("percMulta").getAsDouble()); };
-                                            dadosEmpresa.put("VL_MIN_PRAZO_VAREJO", empresaRetorno.get("vlMinPrazoVarejo").getAsDouble());
-                                            dadosEmpresa.put("VL_MIN_PRAZO_ATACADO", empresaRetorno.get("vlMinPrazoAtacado").getAsDouble());
-                                            dadosEmpresa.put("VL_MIN_VISTA_VAREJO", empresaRetorno.get("vlMinVistaVarejo").getAsDouble());
-                                            dadosEmpresa.put("VL_MIN_VISTA_ATACADO", empresaRetorno.get("vlMinVistaAtacado").getAsDouble());
-                                            dadosEmpresa.put("MULTIPLOS_PLANOS", empresaRetorno.has("multiplosPlanos") ? empresaRetorno.get("multiplosPlanos").getAsString() : "");
-                                            dadosEmpresa.put("QTD_DIAS_DESTACA_PRODUTO", empresaRetorno.get("qtdDiasDestacaProduto").getAsInt());
-                                            dadosEmpresa.put("QTD_CASAS_DECIMAIS", empresaRetorno.has("qtdCasasDecimais") ? empresaRetorno.get("qtdCasasDecimais").getAsInt() : 3);
-                                            dadosEmpresa.put("FECHA_VENDA_CREDITO_NEGATIVO_ATACADO", empresaRetorno.has("fechaVendaCredNegAtac") ? empresaRetorno.get("fechaVendaCredNegAtac").getAsString() : "");
-                                            dadosEmpresa.put("FECHA_VENDA_CREDITO_NEGATIVO_VAREJO", empresaRetorno.has("fechaVendaCredNegVare") ? empresaRetorno.get("fechaVendaCredNegVare").getAsString() : "");
-                                            dadosEmpresa.put("TIPO_ACUMULO_CREDITO_ATACADO", empresaRetorno.has("titpoAcumuloCredAtac") ? empresaRetorno.get("titpoAcumuloCredAtac").getAsString() : "");
-                                            dadosEmpresa.put("TIPO_ACUMULO_CREDITO_VAREJO", empresaRetorno.has("titpoAcumuloCredVare") ? empresaRetorno.get("titpoAcumuloCredVare").getAsString() : "");
-                                            dadosEmpresa.put("PERIODO_CREDITO_ATACADO", empresaRetorno.has("periodoCrcedAtac") ? empresaRetorno.get("periodoCrcedAtac").getAsString() : "");
-                                            dadosEmpresa.put("PERIODO_CREDITO_VAREJO", empresaRetorno.has("periodoCrcedVare") ? empresaRetorno.get("periodoCrcedVare").getAsString() : "");
-                                            dadosEmpresa.put("VERSAO_SAVARE", empresaRetorno.has("versaoSavare") ? empresaRetorno.get("versaoSavare").getAsString() : "");
-
-                                            salvarDadosXml(dadosEmpresa);
-                                            listaDadosEmpresa.add(dadosEmpresa);
-                                        }
-                                        EmpresaSql empresaSql = new EmpresaSql(context);
-
-                                        todosSucesso = empresaSql.insertList(listaDadosEmpresa);
-                                    }
+                                statuRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO);
+                                // Verifica se retornou com sucesso
+                                if (statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO).getAsInt() == HttpURLConnection.HTTP_OK) {
                                     // Atualiza a notificacao
-                                    bigTextStyle.bigText(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
-                                    mBuilder.setStyle(bigTextStyle)
-                                            .setProgress(0, 0, true);
+                                    bigTextStyle.bigText(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
+                                    mBuilder.setStyle(bigTextStyle);
                                     notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
 
                                     // Checo se o texto de status foi passado pro parametro
                                     if (textStatus != null) {
                                         ((Activity) context).runOnUiThread(new Runnable() {
                                             public void run() {
-                                                textStatus.setText(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
+                                                textStatus.setText(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
                                             }
                                         });
                                     }
-                                    if (progressBarStatus != null) {
+                                    // Checa se retornou alguma coisa
+                                    if ((retornoWebservice.has(WSSisinfoWebservice.KEY_OBJECT_OBJECT_RETORNO))) {
+                                        final JsonArray listaEmpresaRetorno = retornoWebservice.getAsJsonArray(WSSisinfoWebservice.KEY_OBJECT_OBJECT_RETORNO);
+                                        // Checa se retornou algum dados na lista
+                                        if (listaEmpresaRetorno.size() > 0) {
+                                            final List<ContentValues> listaDadosEmpresa = new ArrayList<ContentValues>();
+
+                                            for (int i = 0; i < listaEmpresaRetorno.size(); i++) {
+
+                                                // Atualiza a notificacao
+                                                bigTextStyle.bigText(context.getResources().getString(R.string.recebendo_dados_empresa) + " - Parte " + (pageNumber + 1) + "/" + totalPages + " - " + i + "/" + listaEmpresaRetorno.size());
+                                                mBuilder.setStyle(bigTextStyle)
+                                                        .setProgress(listaEmpresaRetorno.size(), i, false);
+                                                notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
+
+                                                // Checo se o texto de status foi passado pro parametro
+                                                if (textStatus != null) {
+                                                    final int finalI = i;
+                                                    final int finalPageNumber = pageNumber + 1;
+                                                    ((Activity) context).runOnUiThread(new Runnable() {
+                                                        public void run() {
+                                                            textStatus.setText(context.getResources().getString(R.string.recebendo_dados_empresa) + " - Parte " + finalPageNumber + "/" + totalPages + " - " + finalI + "/" + listaEmpresaRetorno.size());
+                                                        }
+                                                    });
+                                                }
+                                                if (progressBarStatus != null) {
+                                                    final int finalI1 = i;
+                                                    ((Activity) context).runOnUiThread(new Runnable() {
+                                                        public void run() {
+                                                            progressBarStatus.setProgress(finalI1);
+                                                        }
+                                                    });
+                                                }
+                                                JsonObject empresaRetorno = listaEmpresaRetorno.get(i).getAsJsonObject();
+                                                ContentValues dadosEmpresa = new ContentValues();
+
+                                                // Inseri os valores
+                                                dadosEmpresa.put("ID_SMAEMPRE", empresaRetorno.get("idSmaempre").getAsInt());
+                                                if (empresaRetorno.has("idAeaplpgtVare")) {
+                                                    dadosEmpresa.put("ID_AEAPLPGT_VARE", empresaRetorno.get("idAeaplpgtVare").getAsInt());
+                                                }
+                                                if ((empresaRetorno.has("idAeaplpgtAtac")) && (empresaRetorno.get("idAeaplpgtAtac").getAsInt() > 0)) {
+                                                    dadosEmpresa.put("ID_AEAPLPGT_ATAC", empresaRetorno.get("idAeaplpgtAtac").getAsInt());
+                                                }
+                                                dadosEmpresa.put("ID_AEAPLPGT_VARE_VISTA", (empresaRetorno.has("idAeaplpgtVareVista") ? empresaRetorno.get("idAeaplpgtVareVista").getAsInt() : null));
+                                                dadosEmpresa.put("ID_AEAPLPGT_ATAC_VISTA", (empresaRetorno.has("idAeaplpgtAtacVista") ? empresaRetorno.get("idAeaplpgtAtacVista").getAsInt() : null));
+                                                if ((empresaRetorno.has("idCfastatu")) && (empresaRetorno.get("idCfastatu").getAsInt() > 0)) {
+                                                    dadosEmpresa.put("ID_CFASTATU", empresaRetorno.get("idCfastatu").getAsInt());
+                                                }
+                                                if ((empresaRetorno.has("idCfaativi")) && (empresaRetorno.get("idCfaativi").getAsInt() > 0)) {
+                                                    dadosEmpresa.put("ID_CFAATIVI", empresaRetorno.get("idCfaativi").getAsInt());
+                                                }
+                                                if ((empresaRetorno.has("guid")) && (empresaRetorno.get("guid").getAsString().length() > 0)) {
+                                                    dadosEmpresa.put("GUID", empresaRetorno.get("guid").getAsString());
+                                                }
+                                                if ((empresaRetorno.has("usCad")) && (empresaRetorno.get("usCad").getAsString().length() > 0)) {
+                                                    dadosEmpresa.put("US_CAD", empresaRetorno.get("usCad").getAsString());
+                                                }
+                                                if ((empresaRetorno.has("codigo")) && (empresaRetorno.get("codigo").getAsInt() > 0)) {
+                                                    dadosEmpresa.put("CODIGO", empresaRetorno.get("codigo").getAsInt());
+                                                }
+                                                dadosEmpresa.put("DT_ALT", empresaRetorno.get("dtAlt").getAsString());
+                                                dadosEmpresa.put("NOME_RAZAO", empresaRetorno.get("nomeRazao").getAsString());
+                                                dadosEmpresa.put("NOME_FANTASIA", empresaRetorno.has("nomeFantasia") ? empresaRetorno.get("nomeFantasia").getAsString() : "");
+                                                dadosEmpresa.put("CPF_CGC", empresaRetorno.has("cpfCgc") ? empresaRetorno.get("cpfCgc").getAsString() : "");
+                                                if ((empresaRetorno.has("curvaAFis"))) {
+                                                    dadosEmpresa.put("CURVA_A_FIS", empresaRetorno.get("curvaAFis").getAsDouble());
+                                                }
+                                                if ((empresaRetorno.has("curvaBFis"))) {
+                                                    dadosEmpresa.put("CURVA_B_FIS", empresaRetorno.get("curvaBFis").getAsDouble());
+                                                }
+                                                if ((empresaRetorno.has("curvaCFis"))) {
+                                                    dadosEmpresa.put("CURVA_C_FIS", empresaRetorno.get("curvaCFis").getAsDouble());
+                                                }
+                                                if ((empresaRetorno.has("curvaAFin"))) {
+                                                    dadosEmpresa.put("CURVA_A_FIN", empresaRetorno.get("curvaAFin").getAsDouble());
+                                                }
+                                                if ((empresaRetorno.has("curvaBFin"))) {
+                                                    dadosEmpresa.put("CURVA_B_FIN", empresaRetorno.get("curvaBFin").getAsDouble());
+                                                }
+                                                if ((empresaRetorno.has("curvaCFin"))) {
+                                                    dadosEmpresa.put("CURVA_C_FIN", empresaRetorno.get("curvaCFin").getAsDouble());
+                                                }
+                                                if ((empresaRetorno.has("atacVarejo")) && (empresaRetorno.get("atacVarejo").getAsString().length() > 0)) {
+                                                    dadosEmpresa.put("ATAC_VAREJO", empresaRetorno.get("atacVarejo").getAsString());
+                                                }
+                                                if ((empresaRetorno.has("vendeAtacVare")) && (empresaRetorno.get("vendeAtacVare").getAsString().length() > 0)) {
+                                                    dadosEmpresa.put("VENDE_ATAC_VARE", empresaRetorno.get("vendeAtacVare").getAsString());
+                                                }
+                                                dadosEmpresa.put("ORC_SEM_ESTOQUE", empresaRetorno.get("orcSemEstoque").getAsString());
+                                                if ((empresaRetorno.has("pedSemEstoque")) && (empresaRetorno.get("pedSemEstoque").getAsString().length() > 0)) {
+                                                    dadosEmpresa.put("PED_SEM_ESTOQUE", empresaRetorno.get("pedSemEstoque").getAsString());
+                                                }
+                                                if ((empresaRetorno.has("centavos")) && (empresaRetorno.get("centavos").getAsString().length() > 0)) {
+                                                    dadosEmpresa.put("CENTAVOS", empresaRetorno.get("centavos").getAsString());
+                                                }
+                                                if ((empresaRetorno.has("valMarkupAtac1"))) {
+                                                    dadosEmpresa.put("VAL_MARKUP_ATAC1", empresaRetorno.get("valMarkupAtac1").getAsDouble());
+                                                }
+                                                if ((empresaRetorno.has("valMarkupAtac2"))) {
+                                                    dadosEmpresa.put("VAL_MARKUP_ATAC2", empresaRetorno.get("valMarkupAtac2").getAsDouble());
+                                                }
+                                                if ((empresaRetorno.has("valMarkupAtac3"))) {
+                                                    dadosEmpresa.put("VAL_MARKUP_ATAC3", empresaRetorno.get("valMarkupAtac3").getAsDouble());
+                                                }
+                                                if ((empresaRetorno.has("valMarkupVare1"))) {
+                                                    dadosEmpresa.put("VAL_MARKUP_VARE1", empresaRetorno.get("valMarkupVare1").getAsDouble());
+                                                }
+                                                if ((empresaRetorno.has("valMarkupVare2"))) {
+                                                    dadosEmpresa.put("VAL_MARKUP_VARE2", empresaRetorno.get("valMarkupVare2").getAsDouble());
+                                                }
+                                                if ((empresaRetorno.has("valMarkupVare3"))) {
+                                                    dadosEmpresa.put("VAL_MARKUP_VARE3", empresaRetorno.get("valMarkupVare3").getAsDouble());
+                                                }
+                                                if ((empresaRetorno.has("markupAtac1"))) {
+                                                    dadosEmpresa.put("MARKUP_ATAC1", empresaRetorno.get("markupAtac1").getAsDouble());
+                                                }
+                                                if ((empresaRetorno.has("markupAtac2"))) {
+                                                    dadosEmpresa.put("MARKUP_ATAC2", empresaRetorno.get("markupAtac2").getAsDouble());
+                                                }
+                                                if ((empresaRetorno.has("markupAtac3"))) {
+                                                    dadosEmpresa.put("MARKUP_ATAC3", empresaRetorno.get("markupAtac3").getAsDouble());
+                                                }
+                                                if ((empresaRetorno.has("markupVare1"))) {
+                                                    dadosEmpresa.put("MARKUP_VARE1", empresaRetorno.get("markupVare1").getAsDouble());
+                                                }
+                                                if ((empresaRetorno.has("markupVare2"))) {
+                                                    dadosEmpresa.put("MARKUP_VARE2", empresaRetorno.get("markupVare2").getAsDouble());
+                                                }
+                                                if ((empresaRetorno.has("markupVare3"))) {
+                                                    dadosEmpresa.put("MARKUP_VARE3", empresaRetorno.get("markupVare3").getAsDouble());
+                                                }
+                                                dadosEmpresa.put("DIAS_ATRAZO", empresaRetorno.get("diasAtrazo").getAsInt());
+                                                dadosEmpresa.put("SEM_MOVIMENTO", empresaRetorno.get("semMovimento").getAsInt());
+                                                dadosEmpresa.put("JUROS_DIARIO", empresaRetorno.get("jurosDiario").getAsDouble());
+                                                if ((empresaRetorno.has("capitaliza")) && (empresaRetorno.get("capitaliza").getAsString().length() > 0)) {
+                                                    dadosEmpresa.put("CAPITALIZA", empresaRetorno.get("capitaliza").getAsString());
+                                                }
+                                                if ((empresaRetorno.has("indexa")) && (empresaRetorno.get("indexa").getAsString().length() > 0)) {
+                                                    dadosEmpresa.put("INDEXA", empresaRetorno.get("indexa").getAsString());
+                                                }
+                                                if ((empresaRetorno.has("indiceValor")) && (empresaRetorno.get("indiceValor").getAsString().length() > 0)) {
+                                                    dadosEmpresa.put("INDICE_VALOR", empresaRetorno.get("indiceValor").getAsString());
+                                                }
+                                                dadosEmpresa.put("VENDE_BLOQUEADO_ORC", empresaRetorno.has("vendeBloqueadoOrc") ? empresaRetorno.get("vendeBloqueadoOrc").getAsString() : "");
+                                                dadosEmpresa.put("VENDE_BLOQUEADO_PED", empresaRetorno.has("vendeBloqueadoPed") ? empresaRetorno.get("vendeBloqueadoPed").getAsString() : "");
+                                                dadosEmpresa.put("VALIDADE_FICHA_CLIENTE", empresaRetorno.get("validadeFichaCliente").getAsInt());
+                                                if ((empresaRetorno.has("percJrVencParcMaior"))) {
+                                                    dadosEmpresa.put("PERC_JR_VENC_PARC_MAIOR", empresaRetorno.get("percJrVencParcMaior").getAsDouble());
+                                                }
+                                                if ((empresaRetorno.has("percJurosDiaRefat"))) {
+                                                    dadosEmpresa.put("PERC_JUROS_DIA_REFAT", empresaRetorno.get("percJurosDiaRefat").getAsDouble());
+                                                }
+                                                if ((empresaRetorno.has("percMulta"))) {
+                                                    dadosEmpresa.put("PERC_MULTA", empresaRetorno.get("percMulta").getAsDouble());
+                                                }
+                                                ;
+                                                dadosEmpresa.put("VL_MIN_PRAZO_VAREJO", empresaRetorno.get("vlMinPrazoVarejo").getAsDouble());
+                                                dadosEmpresa.put("VL_MIN_PRAZO_ATACADO", empresaRetorno.get("vlMinPrazoAtacado").getAsDouble());
+                                                dadosEmpresa.put("VL_MIN_VISTA_VAREJO", empresaRetorno.get("vlMinVistaVarejo").getAsDouble());
+                                                dadosEmpresa.put("VL_MIN_VISTA_ATACADO", empresaRetorno.get("vlMinVistaAtacado").getAsDouble());
+                                                dadosEmpresa.put("MULTIPLOS_PLANOS", empresaRetorno.has("multiplosPlanos") ? empresaRetorno.get("multiplosPlanos").getAsString() : "");
+                                                dadosEmpresa.put("QTD_DIAS_DESTACA_PRODUTO", empresaRetorno.get("qtdDiasDestacaProduto").getAsInt());
+                                                dadosEmpresa.put("QTD_CASAS_DECIMAIS", empresaRetorno.has("qtdCasasDecimais") ? empresaRetorno.get("qtdCasasDecimais").getAsInt() : 3);
+                                                dadosEmpresa.put("FECHA_VENDA_CREDITO_NEGATIVO_ATACADO", empresaRetorno.has("fechaVendaCredNegAtac") ? empresaRetorno.get("fechaVendaCredNegAtac").getAsString() : "");
+                                                dadosEmpresa.put("FECHA_VENDA_CREDITO_NEGATIVO_VAREJO", empresaRetorno.has("fechaVendaCredNegVare") ? empresaRetorno.get("fechaVendaCredNegVare").getAsString() : "");
+                                                dadosEmpresa.put("TIPO_ACUMULO_CREDITO_ATACADO", empresaRetorno.has("titpoAcumuloCredAtac") ? empresaRetorno.get("titpoAcumuloCredAtac").getAsString() : "");
+                                                dadosEmpresa.put("TIPO_ACUMULO_CREDITO_VAREJO", empresaRetorno.has("titpoAcumuloCredVare") ? empresaRetorno.get("titpoAcumuloCredVare").getAsString() : "");
+                                                dadosEmpresa.put("PERIODO_CREDITO_ATACADO", empresaRetorno.has("periodoCrcedAtac") ? empresaRetorno.get("periodoCrcedAtac").getAsString() : "");
+                                                dadosEmpresa.put("PERIODO_CREDITO_VAREJO", empresaRetorno.has("periodoCrcedVare") ? empresaRetorno.get("periodoCrcedVare").getAsString() : "");
+                                                dadosEmpresa.put("VERSAO_SAVARE", empresaRetorno.has("versaoSavare") ? empresaRetorno.get("versaoSavare").getAsString() : "");
+
+                                                salvarDadosXml(dadosEmpresa);
+                                                listaDadosEmpresa.add(dadosEmpresa);
+                                            }
+                                            EmpresaSql empresaSql = new EmpresaSql(context);
+
+                                            todosSucesso = empresaSql.insertList(listaDadosEmpresa);
+                                        }
+                                        // Atualiza a notificacao
+                                        bigTextStyle.bigText(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
+                                        mBuilder.setStyle(bigTextStyle)
+                                                .setProgress(0, 0, true);
+                                        notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
+
+                                        // Checo se o texto de status foi passado pro parametro
+                                        if (textStatus != null) {
+                                            ((Activity) context).runOnUiThread(new Runnable() {
+                                                public void run() {
+                                                    textStatus.setText(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
+                                                }
+                                            });
+                                        }
+                                        if (progressBarStatus != null) {
+                                            ((Activity) context).runOnUiThread(new Runnable() {
+                                                public void run() {
+                                                    progressBarStatus.setIndeterminate(true);
+                                                }
+                                            });
+                                        }
+                                    } else {
+                                        final JsonObject finalRetornoWebservice = retornoWebservice;
                                         ((Activity) context).runOnUiThread(new Runnable() {
                                             public void run() {
-                                                progressBarStatus.setIndeterminate(true);
+                                                textStatusErro.append("\n*" +
+                                                        context.getResources().getString(R.string.nao_chegou_dados_servidor_empresa) + "\n" +
+                                                        finalRetornoWebservice.toString() + "\n" +
+                                                        "O retorno do webservice chegou vazio com os dados da empresa.");
+                                            }
+                                        });
+                                        bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.recebendo_dados_empresa))
+                                                .bigText(context.getResources().getString(R.string.nao_chegou_dados_servidor_empresa) + "\n" + retornoWebservice.toString());
+                                        mBuilder.setStyle(bigTextStyle)
+                                                .setProgress(0, 0, false);
+                                        notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
+                                    }
+                                    // Incrementa o total de paginas
+                                    pageNumber++;
+                                    if (pageNumber < totalPages) {
+                                        retornoWebservice = gson.fromJson(webserviceSisInfo.executarWebserviceJson(servidorAtivo, null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_SMAEMPRE, WSSisinfoWebservice.METODO_GET, parametrosWebservice + "&pageNumber=" + pageNumber, null), JsonObject.class);
+                                    }
+                                } else {
+                                    todosSucesso = false;
+
+                                    if (textStatusErro != null) {
+                                        final JsonObject finalStatuRetorno = statuRetorno;
+                                        ((Activity) context).runOnUiThread(new Runnable() {
+                                            public void run() {
+                                                textStatusErro.append("\n*" +
+                                                        context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa) + "\n" +
+                                                        "Código: " + finalStatuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO) + "\n" +
+                                                        "Mensagem: " + finalStatuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_MENSAGEM_RETORNO));
                                             }
                                         });
                                     }
-                                } else {
-                                    final JsonObject finalRetornoWebservice = retornoWebservice;
-                                    ((Activity) context).runOnUiThread(new Runnable() {
-                                        public void run() {
-                                            textStatusErro.append("\n*" +
-                                                    context.getResources().getString(R.string.nao_chegou_dados_servidor_empresa) + "\n" +
-                                                            finalRetornoWebservice.toString() + "\n" +
-                                                            "O retorno do webservice chegou vazio com os dados da empresa.");
-                                        }
-                                    });
-                                    bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.recebendo_dados_empresa))
-                                                .bigText(context.getResources().getString(R.string.nao_chegou_dados_servidor_empresa) + "\n" + retornoWebservice.toString());
+                                    bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.recebendo_dados))
+                                            .bigText(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString());
                                     mBuilder.setStyle(bigTextStyle)
                                             .setProgress(0, 0, false);
                                     notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
                                 }
-                                // Incrementa o total de paginas
-                                pageNumber++;
-                                if (pageNumber < totalPages) {
-                                    retornoWebservice = gson.fromJson(webserviceSisInfo.executarWebserviceJson(servidorAtivo, null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_SMAEMPRE, WSSisinfoWebservice.METODO_GET, parametrosWebservice + "&pageNumber=" + pageNumber, null), JsonObject.class);
-                                }
-                            } else {
-                                todosSucesso = false;
-
-                                if (textStatusErro != null) {
-                                    final JsonObject finalStatuRetorno = statuRetorno;
-                                    ((Activity) context).runOnUiThread(new Runnable() {
-                                        public void run() {
-                                            textStatusErro.append("\n*" +
-                                                            context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa) + "\n" +
-                                                            "Código: " + finalStatuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO) + "\n" +
-                                                            "Mensagem: " + finalStatuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_MENSAGEM_RETORNO));
-                                        }
-                                    });
-                                }
-
-                                // Cria uma notificacao para ser manipulado
-                                /*Load mLoad = PugNotification.with(context).load()
-                                        .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
-                                        .smallIcon(R.mipmap.ic_launcher)
-                                        .largeIcon(R.mipmap.ic_launcher)
-                                        .title(R.string.recebendo_dados)
-                                        .bigTextStyle(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString())
-                                        .flags(Notification.DEFAULT_LIGHTS);
-                                mLoad.simple().build();*/
-
-                                bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.recebendo_dados))
-                                            .bigText(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString());
-                                mBuilder.setStyle(bigTextStyle)
-                                        .setProgress(0, 0, false);
-                                notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
+                            }// Fim do for ia (page)
+                            // Checa se todos foram inseridos/atualizados com sucesso
+                            if (todosSucesso) {
+                                inserirUltimaAtualizacao("SMAEMPRE");
                             }
-                        }// Fim do for ia (page)
-                        // Checa se todos foram inseridos/atualizados com sucesso
-                        if (todosSucesso) {
-                            inserirUltimaAtualizacao("SMAEMPRE");
                         }
+                    } else {
+                        bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.msg_error))
+                                .bigText(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.get(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO));
+                        mBuilder.setStyle(bigTextStyle)
+                                .setProgress(0, 0, false);
+                        notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
                     }
-                } else {
-                    bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.msg_error))
-                            .bigText(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.get(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO));
-                    mBuilder.setStyle(bigTextStyle)
-                            .setProgress(0, 0, false);
-                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
                 }
             }
         } catch (final Exception e) {
@@ -4766,7 +4827,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                     "((CFACLIFO.ID_CFACLIFO IN \n" +
                             "(" + filtraClientePorParametro + " ) " +
                             ") \n" +
-                            "OR ( (CFACLIFO.NOME_RAZAO LIKE '%CONSUMIDOR%FINAL%') " + ((ultimaData != null && !ultimaData.isEmpty()) ? " AND (CFACLIFO.DT_ALT >= '" + ultimaData + "')" : "") + " ))";
+                            "OR ( (CFACLIFO.NOME_RAZAO LIKE '%CONSUM%FIN%') " + ((ultimaData != null && !ultimaData.isEmpty()) ? " AND (CFACLIFO.DT_ALT >= '" + ultimaData + "')" : "") + " ))";
 
             String parametrosWebservice = "";
             if ((ultimaData != null) && (!ultimaData.isEmpty())) {
@@ -5155,7 +5216,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                     "((CFACLIFO.ID_CFACLIFO IN \n" +
                             "(" + filtraClientePorParametro + " ) " +
                             ") \n" +
-                            "OR (CFACLIFO.NOME_RAZAO LIKE '%CONSUMIDOR%FINAL%'))";
+                            "OR (CFACLIFO.NOME_RAZAO LIKE '%CONSUM%FIN%'))";
 
             parametrosWebservice += "&where= " + filtraClientePorVendedor;
 
@@ -6171,6 +6232,13 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             // Checa se a configuracao eh para busca as imagens
             if (funcoes.getValorXml("ImagemProduto").equalsIgnoreCase("S")) {
 
+                if (textStatusErro != null) {
+                    ((Activity) context).runOnUiThread(new Runnable() {
+                        public void run() {
+                            textStatusErro.append("\n*" +context.getResources().getString(R.string.demorar_baixar_fotos));
+                        }
+                    });
+                }
                 // Pega quando foi a ultima data que recebeu dados
                 String ultimaData = pegaUltimaDataAtualizacao("CFAFOTOS");
                 // Cria uma variavel para salvar todos os paramentros em json
@@ -6289,11 +6357,13 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                                     if (fotosRetorno.has("idAeaprodu") && fotosRetorno.get("idAeaprodu").getAsInt() > 0) {
                                                         dadosFotos.put("ID_AEAPRODU", fotosRetorno.get("idAeaprodu").getAsInt());
                                                     }
-                                                    byte[] tmp = new byte[fotosRetorno.getAsJsonArray("foto").size()];
-                                                    for(int j = 0; j < fotosRetorno.getAsJsonArray("foto").size(); j++){
-                                                        tmp[j]=(byte)(((int)fotosRetorno.getAsJsonArray("foto").get(j).getAsInt()) & 0xFF);
+                                                    if (fotosRetorno.has("foto")) {
+                                                        byte[] tmp = new byte[fotosRetorno.getAsJsonArray("foto").size()];
+                                                        for (int j = 0; j < fotosRetorno.getAsJsonArray("foto").size(); j++) {
+                                                            tmp[j] = (byte) (((int) fotosRetorno.getAsJsonArray("foto").get(j).getAsInt()) & 0xFF);
+                                                        }
+                                                        dadosFotos.put("FOTO", tmp);
                                                     }
-                                                    dadosFotos.put("FOTO", tmp);
                                                     //listaDadosFotos.add(dadosFotos);
 
                                                     if (fotosSql.insertOrReplace(dadosFotos) < 1){

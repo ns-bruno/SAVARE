@@ -106,8 +106,8 @@ public class LoginFragment extends SlideFragment {
                                                         @Override
                                                         public void onTaskCompleted() {
                                                             // Verfifica se a marcacao AbriuAppPriveiraVez esta como Nao pra saber se foi cadastrado o dispositivo com sucesso
-                                                            if ((!funcoes.getValorXml("AbriuAppPriveiraVez").equalsIgnoreCase(funcoes.NAO_ENCONTRADO)) &&
-                                                                    funcoes.getValorXml("AbriuAppPriveiraVez").equalsIgnoreCase("N")) {
+                                                            if ((!funcoes.getValorXml(funcoes.TAG_ABRIU_PRIMEIRA_VEZ).equalsIgnoreCase(funcoes.NAO_ENCONTRADO)) &&
+                                                                    funcoes.getValorXml(funcoes.TAG_ABRIU_PRIMEIRA_VEZ).equalsIgnoreCase(funcoes.NAO)) {
 
                                                                 //SuperActivityToast.create(getActivity(), getResources().getString(R.string.usuario_cadastrado_sucesso), SuperToast.Duration.LONG, Style.getStyle(Style.GREEN, SuperToast.Animations.POPUP)).show();
 

@@ -32,15 +32,24 @@ public class FuncoesSql {
 			{"", " OR ROLLBACK ", " OR ABORT ", " OR FAIL ", " OR IGNORE ", " OR REPLACE "};
 
 	
-	public FuncoesSql(Context context, String tabela) {
+	public FuncoesSql(final Context context, String tabela) {
 		super();
 		this.context = context;
 		this.tabela = tabela;
 		try {
 			//int vAtual =  VersionUtils.getVersionCode(context);
 			conexaoBanco = new ConexaoBancoDeDados(context, VersionUtils.getVersionCode(context));
-		} catch (PackageManager.NameNotFoundException e) {
-			e.printStackTrace();
+		} catch (final PackageManager.NameNotFoundException e) {
+			((Activity) context).runOnUiThread(new Runnable() {
+				public void run() {
+					//funcoes.menssagem(contentValues);
+					new MaterialDialog.Builder(context)
+							.title("FuncoesSql")
+							.content(funcoes.tratamentoErroBancoDados(e.getMessage()))
+							.positiveText(R.string.button_ok)
+							.show();
+				}
+			});
 		}
 	}
 

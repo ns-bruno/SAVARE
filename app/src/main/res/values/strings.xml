@@ -258,6 +258,7 @@
 <string name="orientacao_registrar_usuario">Se você adquiriu uma licença para usar o SAVARE clique no botão \"DIGITAR CNPJ\".</string>
     <string name="terminamos_primeiros_passos">Terminamos os primeiros passos</string>
     <string name="terminamos">Terminamos</string>
+    <string name="demorar_baixar_fotos">O recebimento de fotos pode demorar bastante, pois depende do tamanhos das imagens e quantidade.</string>
     <string name="terminamos_enviar_dados">Terminamos de enviar os dados. Pode atualizar a tela, por favor.</string>
     <string name="pronto_para_iniciar_savare">Pronto, agora vamos iniciar o SAVARE e aguardar a empresa associar o seu dispositivo a um funcionário para que você possa receber os dados. Verifique com o responvável da sua empresa para providênciar essa ligação do seu dispositivo com o funcionário cadastrado.</string>
     <string name="escanear_codigo_barras">Escanear código de barras</string>
@@ -272,6 +273,7 @@
     <string name="empresa_usuario_inativo">Empresa ou/e Usuário inativo.</string>
     <string name="atualizado_sucesso">Atualizado com Sucesso.</string>
     <string name="terminamos_atualizacao">Terminamos a atualização.</string>
+    <string name="terminamos_upgrade_banco_dados">Terminamos o upgrade do banco de dados.</string>
     <string name="nao_conseguimos_atualizar_usuario">Não conseguimos atualizar o usuário, tente novamente, se persistir entre em contato com o suporte SAVARE.</string>
     <string name="nome_login_invalido">Nome de login inválido, tente outro sem espaço e sem caracteres especiais.</string>
     <string name="tamanho_cnpj_cpf_nao_permitido">Tamanho da CNPJ/CPF não é permitida</string>
@@ -364,6 +366,7 @@
     <string name="nao_achamos_cnpj">Não achamaos o CNPJ, volter e tente inserir novamente o CNPJ da empresa.</string>
     <string name="nao_salvou_parametros_banco">Não conseguimos salvar os parâmetros no banco de dados. Tente novamente.</string>
     <string name="dispositivo_registrado">Dispositivo registrado com sucesso. Entre em contato com a sua empresa para associar o dispositivo ao seu cadastro.</string>
+    <string name="nao_achamos_chave_dispositivo">Não achamdo a chave desse dispositivo, favor, limpar os dados e as datas de sincronização e refazer o cadastro desse dispositivo.</string>
     <string name="zerado_sucesso">Apagado com sucesso.</string>
     <string name="nao_autorizado">Não autorizado</string>
     <string name="porta_webservice">Porta Webservice</string>
@@ -381,7 +384,16 @@
     <string name="nao_conseguimos_pegar_embalagem_produto">Não conseguimos pegar as embalagens do produto. Favor, voltar e selecione novamente um produto.</string>
     <string name="nao_conseguimos_pegar_plano_pagamento">Não conseguimos listar os planos de pagamentos. Favor, voltar e selecione novamente um produto.</string>
     <string name="nao_conseguimos_pegar_lista_estoque">Não conseguimos listar as locações do estoque do produto. Favor, voltar e selecione novamente um produto.</string>
-
+    <string name="nao_tem_numero_identificacao_funcionario">Não tem o número de identificação do funcionario, provavelmente este dispositivo não foi ligado com um vendedor na empresa.</string>
+    <string name="upgrade_banco_dados">Upgrade Banco Dados</string>
+    <string name="aguarde_atualizando_banco_dados">Por favor aguarde, vamos atualizar o banco de dados.</string>
+    <string name="nao_conseguimor_abrir_banco_dados">Não conseguimos abrir o banco de dados.</string>
+    <string name="nao_conseguimor_pegar_table">Não conseguimos selecionar as tabelas.</string>
+    <string name="salvando_dados">Estamos salvando os dados da tabela </string>
+    <string name="criando_tabelas">Aguarde, agora estamos criando as tabelas do banco de dados.</string>
+    <string name="finalizando">Já estamos finalizando.</string>
+    <string name="nao_conseguimos_lista_clientes">Não conseguimos listar os clientes</string>
+    <string name="verificando_tem_backup_tabelas">Estamos verificando se tem algum backup das tabelas já feito.</string>
 
     <string-array name="tab_produto_md">
         <item>Produtos</item>

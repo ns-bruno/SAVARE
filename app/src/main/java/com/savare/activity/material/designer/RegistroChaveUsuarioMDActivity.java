@@ -2,8 +2,9 @@ package com.savare.activity.material.designer;
 
 import android.content.Intent;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
-import android.view.View;
+import android.support.v4.app.ActivityCompat;
 
 import com.github.clans.fab.FloatingActionButton;
 import com.github.johnpersano.supertoasts.library.Style;
@@ -16,11 +17,7 @@ import com.savare.R;
 import com.savare.activity.material.designer.fragment.ChaveUsuarioFragment;
 import com.savare.activity.material.designer.fragment.ListaServidoresWebserviceMDFragment;
 import com.savare.activity.material.designer.fragment.LoginFragment;
-import com.savare.activity.material.designer.fragment.RecebeDadosWebserviceFragment;
-import com.savare.configuracao.ConfiguracoesInternas;
 import com.savare.funcoes.FuncoesPersonalizadas;
-
-import java.util.List;
 
 import me.sudar.zxingorient.ZxingOrient;
 import me.sudar.zxingorient.ZxingOrientResult;
@@ -106,6 +103,13 @@ public class RegistroChaveUsuarioMDActivity extends IntroActivity {
                 .backgroundDark(R.color.md_purple_A400)
                 .scrollable(scrollable)
                 .build());
+
+        // Verifica se esta liberados as permicoes necessarias
+        if (!funcoes.hasPermissions(LoginMDActivity.REQUIRED_PERMISSIONS)){
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                ActivityCompat.requestPermissions(RegistroChaveUsuarioMDActivity.this, LoginMDActivity.REQUIRED_PERMISSIONS, LoginMDActivity.REQUEST_APP_SETTINGS);
+            }
+        }
 
     } // Fim onCreate
 

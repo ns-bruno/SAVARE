@@ -7,6 +7,17 @@
     android:orientation="vertical">
 
     <TextView
+        android:id="@+id/fragment_lista_servidores_webservice_md_textView_nome_tela"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:text="Lista de Servidores"
+        android:textAlignment="center"
+        android:textSize="30dp"
+        android:textColor="@color/md_white_1000" />
+
+
+    <TextView
         android:id="@+id/fragment_lista_servidores_webservice_md_textView_cnpj_empresa"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
