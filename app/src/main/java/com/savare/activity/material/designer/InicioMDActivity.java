@@ -369,8 +369,8 @@ public class InicioMDActivity extends AppCompatActivity {
             // Desavia o recebimento automatico
             funcoes.criarAlarmeEnviarReceberDadosAutomatico(enviaAutomatico, recebeAutomatico);
 
-            ReceberDadosFtpAsyncRotinas receberDadosFtpAsync = new ReceberDadosFtpAsyncRotinas(InicioMDActivity.this, ReceberDadosFtpAsyncRotinas.TELA_INICIO);
-            receberDadosFtpAsync.execute();
+            //ReceberDadosFtpAsyncRotinas receberDadosFtpAsync = new ReceberDadosFtpAsyncRotinas(InicioMDActivity.this, ReceberDadosFtpAsyncRotinas.TELA_INICIO);
+            //receberDadosFtpAsync.execute();
 
             Log.i("SAVARE", "Executou a rotina para receber os dados. - InicioActivity");
         }

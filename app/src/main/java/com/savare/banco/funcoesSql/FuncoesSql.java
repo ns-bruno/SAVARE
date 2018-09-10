@@ -10,12 +10,14 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
 import android.util.Log;
 
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.github.johnpersano.supertoasts.SuperToast;
 import com.github.johnpersano.supertoasts.util.Style;
 import com.savare.R;
 import com.savare.banco.local.ConexaoBancoDeDados;
 import com.savare.funcoes.VersionUtils;
 import com.savare.funcoes.FuncoesPersonalizadas;
+import com.savare.webservice.WSSisinfoWebservice;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -324,11 +326,11 @@ public class FuncoesSql {
 
 			Log.e("SAVARE", e.getMessage());
 
-			final ContentValues contentValues = new ContentValues();
-			contentValues.put("comando", 0);
-			contentValues.put("tela", "FuncoesSql");
-			contentValues.put("mensagem", e.toString());
-			contentValues.put("dados", e.toString());
+			//final ContentValues contentValues = new ContentValues();
+			//contentValues.put("comando", 0);
+			//contentValues.put("tela", "FuncoesSql");
+			//contentValues.put("mensagem", e.toString());
+			//contentValues.put("dados", e.toString());
 			// Pega os dados do usuario
 			//contentValues.put("usuario", funcoes.getValorXml("Usuario"));
 			//contentValues.put("empresa", funcoes.getValorXml("ChaveEmpresa"));
@@ -336,7 +338,12 @@ public class FuncoesSql {
 
 			((Activity) context).runOnUiThread(new Runnable() {
 				public void run() {
-					funcoes.menssagem(contentValues);
+
+					new MaterialDialog.Builder(context)
+							.title("FuncoesSql")
+							.content(e.toString())
+							.positiveText(R.string.button_ok)
+							.show();
 				}
 			});
 
@@ -344,19 +351,14 @@ public class FuncoesSql {
 
 			Log.e("SAVARE", e.getMessage());
 
-			final ContentValues contentValues = new ContentValues();
-			contentValues.put("comando", 0);
-			contentValues.put("tela", "FuncoesSql");
-			contentValues.put("mensagem", e.toString());
-			contentValues.put("dados", e.toString());
-			// Pega os dados do usuario
-			//contentValues.put("usuario", funcoes.getValorXml("Usuario"));
-			//contentValues.put("empresa", funcoes.getValorXml("ChaveEmpresa"));
-			//contentValues.put("email", funcoes.getValorXml("Email"));
-
 			((Activity) context).runOnUiThread(new Runnable() {
 				public void run() {
-					funcoes.menssagem(contentValues);
+
+					new MaterialDialog.Builder(context)
+							.title("FuncoesSql")
+							.content(e.toString())
+							.positiveText(R.string.button_ok)
+							.show();
 				}
 			});
 

@@ -22,6 +22,7 @@ public class ParcelaBeans {
 	private double valorParcela,
 				   totalPago,
 				   totalRestante,
+				   totalJuros,
 				   jurosDiario,
 				   percentualDesconto;
 	/**
@@ -288,7 +289,12 @@ public class ParcelaBeans {
 	public void setPercentualDesconto(double percentualDesconto) {
 		this.percentualDesconto = percentualDesconto;
 	}
-				
 
-	
+	public double getTotalJuros() {
+		return totalJuros;
+	}
+
+	public void setTotalJuros(double totalJuros) {
+		this.totalJuros = totalJuros;
+	}
 }

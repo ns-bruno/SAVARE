@@ -1103,17 +1103,18 @@ public class OrcamentoProdutoDetalhesMDFragment extends Fragment {
                 produto.put("QUANTIDADE", quantidade);
                 produto.put("VL_CUSTO", funcoes.desformatarValor(funcoes.arredondarValor(vlCusto)));
                 produto.put("VL_BRUTO", funcoes.desformatarValor(funcoes.arredondarValor(vlBruto)));
+                produto.put("VL_DESCONTO", funcoes.desformatarValor(funcoes.arredondarValor(vlDesconto)));
+                produto.put("COMPLEMENTO", editObservacao.getText().toString());
+                produto.put("TIPO_PRODUTO", String.valueOf(this.produto.getProduto().getTipoProduto()));
+
                 produto.put("VL_TABELA", funcoes.desformatarValor(funcoes.arredondarValor(vlTabela * quantidade)));
                 produto.put("VL_TABELA_UN", funcoes.desformatarValor(funcoes.arredondarValor(vlTabela)));
-                produto.put("VL_DESCONTO", funcoes.desformatarValor(funcoes.arredondarValor(vlDesconto)));
                 produto.put("FC_DESCONTO_UN", funcoes.desformatarValor(funcoes.arredondarValor((vlDesconto / quantidade))));
                 produto.put("FC_CUSTO_UN", funcoes.desformatarValor(funcoes.arredondarValor(fcCustoUn)));
                 produto.put("FC_BRUTO_UN", funcoes.desformatarValor(funcoes.arredondarValor(fcBrutoUn)));
                 produto.put("FC_DESCONTO_UN", funcoes.desformatarValor(funcoes.arredondarValor(fcDescontoUn)));
                 produto.put("FC_LIQUIDO", funcoes.desformatarValor(funcoes.arredondarValor(fcLiquido)));
                 produto.put("FC_LIQUIDO_UN", funcoes.desformatarValor(funcoes.arredondarValor((fcLiquido / quantidade))));
-                produto.put("COMPLEMENTO", editObservacao.getText().toString());
-                produto.put("TIPO_PRODUTO", String.valueOf(this.produto.getProduto().getTipoProduto()));
                 // Instancia classe para manipular o orcamento
                 OrcamentoRotinas orcamentoRotinas = new OrcamentoRotinas(getContext());
 

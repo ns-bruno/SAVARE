@@ -341,6 +341,7 @@
     <string name="sem_razao_social">Sem razão social.</string>
     <string name="nao_achamos_cnpj">Não achamaos o CNPJ, volter e tente inserir novamente o CNPJ da empresa.</string>
     <string name="dispositivo_registrado">Dispositivo registrado com sucesso. Entre em contato com a sua empresa para associar o dispositivo ao seu cadastro.</string>
+    <string name="nao_achamos_chave_dispositivo">Não achamdo a chave desse dispositivo, favor, limpar os dados e as datas de sincronização e refazer o cadastro desse dispositivo.</string>
     <string name="zerado_sucesso">Apagado com sucesso.</string>
     <string name="nao_autorizado">Não autorizado</string>
     <string name="nao_tem_produtos_orcamento_pedido">Não tem produtos dentro do orçamento/pedido</string>

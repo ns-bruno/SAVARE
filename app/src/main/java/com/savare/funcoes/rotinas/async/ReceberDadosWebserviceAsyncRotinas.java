@@ -766,68 +766,41 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 } else {
                     parametrosWebservice += "&where= (ID_CFACLIFO = (SELECT SMADISPO.ID_CFACLIFO_FUN FROM SMADISPO WHERE SMADISPO.IDENTIFICACAO = '" + funcoes.getValorXml("UuidDispositivo") + "') )";
                 }
-            }
-            WSSisinfoWebservice webserviceSisInfo = new WSSisinfoWebservice(context);
-            JsonObject retornoWebservice = new Gson().fromJson(webserviceSisInfo.executarSelectWebserviceJson(null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_CFACLIFO, WSSisinfoWebservice.METODO_GET, parametrosWebservice, null), JsonObject.class);
 
-            if ((retornoWebservice != null) && (retornoWebservice.has(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO))) {
-                statuRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO);
-                // Verifica se retornou com sucesso
-                if (statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO).getAsInt() == HttpURLConnection.HTTP_OK) {
+                WSSisinfoWebservice webserviceSisInfo = new WSSisinfoWebservice(context);
+                JsonObject retornoWebservice = new Gson().fromJson(webserviceSisInfo.executarSelectWebserviceJson(null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_CFACLIFO, WSSisinfoWebservice.METODO_GET, parametrosWebservice, null), JsonObject.class);
 
-                    // Atualiza a notificacao
-                    mLoad.bigTextStyle(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
-                    mLoad.progress().value(0, 0, true).build();
-
-                    // Checo se o texto de status foi passado pro parametro
-                    if (textStatus != null) {
-                        ((Activity) context).runOnUiThread(new Runnable() {
-                            public void run() {
-                                textStatus.setText(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
-                            }
-                        });
-                    }
-                    // Checa se retornou alguma coisa
-                    if ((retornoWebservice.has(WSSisinfoWebservice.KEY_OBJECT_OBJECT_RETORNO))) {
-                        final JsonArray listaUsuarioRetorno = retornoWebservice.getAsJsonArray(WSSisinfoWebservice.KEY_OBJECT_OBJECT_RETORNO);
-                        boolean todosSucesso = true;
+                if ((retornoWebservice != null) && (retornoWebservice.has(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO))) {
+                    statuRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO);
+                    // Verifica se retornou com sucesso
+                    if (statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO).getAsInt() == HttpURLConnection.HTTP_OK) {
 
                         // Atualiza a notificacao
-                        mLoad.bigTextStyle(context.getResources().getString(R.string.recebendo_dados_usuario));
+                        mLoad.bigTextStyle(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
                         mLoad.progress().value(0, 0, true).build();
 
                         // Checo se o texto de status foi passado pro parametro
                         if (textStatus != null) {
                             ((Activity) context).runOnUiThread(new Runnable() {
                                 public void run() {
-                                    textStatus.setText(context.getResources().getString(R.string.recebendo_dados_usuario));
+                                    textStatus.setText(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
                                 }
                             });
                         }
-                        if (progressBarStatus != null) {
-                            ((Activity) context).runOnUiThread(new Runnable() {
-                                public void run() {
-                                    progressBarStatus.setIndeterminate(true);
-                                    //progressBarStatus.setMax(listaUsuarioRetorno.size());
-                                }
-                            });
-                        }
-
-                        List<ContentValues> listaDadosUsuario = new ArrayList<ContentValues>();
-                        for (int i = 0; i < listaUsuarioRetorno.size(); i++) {
-
-                            final JsonObject usuarioRetorno = listaUsuarioRetorno.get(i).getAsJsonObject();
+                        // Checa se retornou alguma coisa
+                        if ((retornoWebservice.has(WSSisinfoWebservice.KEY_OBJECT_OBJECT_RETORNO))) {
+                            final JsonArray listaUsuarioRetorno = retornoWebservice.getAsJsonArray(WSSisinfoWebservice.KEY_OBJECT_OBJECT_RETORNO);
+                            boolean todosSucesso = true;
 
                             // Atualiza a notificacao
-                            mLoad.bigTextStyle(context.getResources().getString(R.string.achamos_usuario_servidor_nuvem) + " - Funcionário: " + usuarioRetorno.get("nomeRazao").toString());
-                            //mLoad.progress().update(0, i, listaUsuarioRetorno.size(), false).build();
+                            mLoad.bigTextStyle(context.getResources().getString(R.string.recebendo_dados_usuario));
                             mLoad.progress().value(0, 0, true).build();
 
                             // Checo se o texto de status foi passado pro parametro
                             if (textStatus != null) {
                                 ((Activity) context).runOnUiThread(new Runnable() {
                                     public void run() {
-                                        textStatus.setText(context.getResources().getString(R.string.achamos_usuario_servidor_nuvem) + " - Funcionário: " + usuarioRetorno.get("nomeRazao").toString());
+                                        textStatus.setText(context.getResources().getString(R.string.recebendo_dados_usuario));
                                     }
                                 });
                             }
@@ -835,35 +808,36 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                 ((Activity) context).runOnUiThread(new Runnable() {
                                     public void run() {
                                         progressBarStatus.setIndeterminate(true);
+                                        //progressBarStatus.setMax(listaUsuarioRetorno.size());
                                     }
                                 });
                             }
-                            // Checa se o usuario esta ativo
-                            if (usuarioRetorno.get("ativo").toString().equalsIgnoreCase("0")) {
 
-                                ContentValues dadosInativo = new ContentValues();
-                                dadosInativo.put("ATIVO_USUA", "0");
+                            List<ContentValues> listaDadosUsuario = new ArrayList<ContentValues>();
+                            for (int i = 0; i < listaUsuarioRetorno.size(); i++) {
 
-                                UsuarioSQL usuarioSQL = new UsuarioSQL(context);
-                                usuarioSQL.update(dadosInativo, "LOGIN_USUA = '" + funcoes.getValorXml("Usuario") + "'");
+                                final JsonObject usuarioRetorno = listaUsuarioRetorno.get(i).getAsJsonObject();
 
-                                final ContentValues contentValues = new ContentValues();
-                                contentValues.put("comando", 0);
-                                contentValues.put("tela", "ReceberDadosWebserviceAsyncRotinas");
-                                contentValues.put("mensagem", "O funcionário dessa chave esta inativo, não podemos baixar os dados dele. Entre em contato com a empresa ou com o suporte SAVARE.");
-                                contentValues.put("dados", "");
-                                // Pega os dados do usuario
-                                contentValues.put("usuario", funcoes.getValorXml("Usuario"));
-                                contentValues.put("empresa", funcoes.getValorXml("ChaveFuncionario"));
-                                contentValues.put("email", funcoes.getValorXml("Email"));
+                                // Atualiza a notificacao
+                                mLoad.bigTextStyle(context.getResources().getString(R.string.achamos_usuario_servidor_nuvem) + " - Funcionário: " + usuarioRetorno.get("nomeRazao").toString());
+                                //mLoad.progress().update(0, i, listaUsuarioRetorno.size(), false).build();
+                                mLoad.progress().value(0, 0, true).build();
 
-                                ((Activity) context).runOnUiThread(new Runnable() {
-                                    public void run() {
-                                        funcoes.menssagem(contentValues);
-                                    }
-                                });
-                                return false;
-                            } else {
+                                // Checo se o texto de status foi passado pro parametro
+                                if (textStatus != null) {
+                                    ((Activity) context).runOnUiThread(new Runnable() {
+                                        public void run() {
+                                            textStatus.setText(context.getResources().getString(R.string.achamos_usuario_servidor_nuvem) + " - Funcionário: " + usuarioRetorno.get("nomeRazao").toString());
+                                        }
+                                    });
+                                }
+                                if (progressBarStatus != null) {
+                                    ((Activity) context).runOnUiThread(new Runnable() {
+                                        public void run() {
+                                            progressBarStatus.setIndeterminate(true);
+                                        }
+                                    });
+                                }
                                 final ContentValues dadosUsuario = new ContentValues();
                                 dadosUsuario.put("ID_CFACLIFO", usuarioRetorno.get("idCfaclifo").getAsInt());
                                 dadosUsuario.put("ID_CFAPROFI", (usuarioRetorno.has("idCfaprofi")) ? usuarioRetorno.get("idCfaprofi").getAsInt() : null);
@@ -872,11 +846,11 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                 dadosUsuario.put("ID_CFATPCLI", (usuarioRetorno.has("idCfatpcli")) ? usuarioRetorno.get("idCfatpcli").getAsInt() : null);
                                 dadosUsuario.put("ID_CFASTATU", (usuarioRetorno.has("idCfastatu")) ? usuarioRetorno.get("idCfastatu").getAsInt() : null);
                                 dadosUsuario.put("ID_SMAEMPRE", (usuarioRetorno.has("idSmaempre")) ? usuarioRetorno.get("idSmaempre").getAsInt() : null);
-                                dadosUsuario.put("DT_ALT", (usuarioRetorno.has("dtAlt")) ?  usuarioRetorno.get("dtAlt").getAsString() : null);
+                                dadosUsuario.put("DT_ALT", (usuarioRetorno.has("dtAlt")) ? usuarioRetorno.get("dtAlt").getAsString() : null);
                                 dadosUsuario.put("GUID", usuarioRetorno.get("guid").getAsString());
                                 dadosUsuario.put("CPF_CNPJ", (usuarioRetorno.has("cpfCgc")) ? usuarioRetorno.get("cpfCgc").getAsString() : null);
-                                dadosUsuario.put("IE_RG", (usuarioRetorno.has("ieRg")) ?  usuarioRetorno.get("ieRg").getAsString() : null);
-                                dadosUsuario.put("NOME_RAZAO", (usuarioRetorno.has("nomeRazao")) ?  usuarioRetorno.get("nomeRazao").getAsString() : null);
+                                dadosUsuario.put("IE_RG", (usuarioRetorno.has("ieRg")) ? usuarioRetorno.get("ieRg").getAsString() : null);
+                                dadosUsuario.put("NOME_RAZAO", (usuarioRetorno.has("nomeRazao")) ? usuarioRetorno.get("nomeRazao").getAsString() : null);
                                 dadosUsuario.put("NOME_FANTASIA", (usuarioRetorno.has("nomeFantasia")) ? usuarioRetorno.get("nomeFantasia").getAsString() : "");
                                 dadosUsuario.put("DT_NASCIMENTO", (usuarioRetorno.has("dtNascimento")) ? usuarioRetorno.get("dtNascimento").getAsString() : "");
                                 dadosUsuario.put("CODIGO_CLI", (usuarioRetorno.has("codigoCli")) ? usuarioRetorno.get("codigoCli").getAsInt() : null);
@@ -892,70 +866,97 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                 dadosUsuario.put("INSC_SUFRAMA", (usuarioRetorno.has("inscSuframa")) ? usuarioRetorno.get("inscSuframa").getAsString() : "");
                                 dadosUsuario.put("INSC_MUNICIPAL", (usuarioRetorno.has("inscMunicipal")) ? usuarioRetorno.get("inscMunicipal").getAsString() : "");
                                 dadosUsuario.put("INSC_PRODUTOR", (usuarioRetorno.has("inscProdutor")) ? usuarioRetorno.get("inscProdutor").getAsString() : "");
-                                dadosUsuario.put("ATIVO", (usuarioRetorno.has("ativo")) ?  usuarioRetorno.get("ativo").getAsString() : null);
+                                dadosUsuario.put("ATIVO", (usuarioRetorno.has("ativo")) ? usuarioRetorno.get("ativo").getAsString() : null);
 
                                 salvarDadosXml(dadosUsuario);
 
                                 listaDadosUsuario.add(dadosUsuario);
 
                                 ContentValues dadosInativo = new ContentValues();
-                                dadosInativo.put("ATIVO_USUA", "1");
+                                dadosInativo.put("ATIVO_USUA", usuarioRetorno.get("ativo").toString().replace("\"", ""));
 
                                 UsuarioSQL usuarioSQL = new UsuarioSQL(context);
                                 usuarioSQL.update(dadosInativo, "LOGIN_USUA = '" + funcoes.getValorXml("Usuario") + "'");
+
+                                // Checa se o usuario esta ativo
+                                if (usuarioRetorno.get("ativo").toString().equalsIgnoreCase("0")) {
+
+                                    final ContentValues contentValues = new ContentValues();
+                                    contentValues.put("comando", 0);
+                                    contentValues.put("tela", "ReceberDadosWebserviceAsyncRotinas");
+                                    contentValues.put("mensagem", "O funcionário dessa chave esta inativo, não podemos baixar os dados dele. Entre em contato com a sua empresa ou com o suporte SAVARE.");
+                                    contentValues.put("dados", "");
+
+                                    ((Activity) context).runOnUiThread(new Runnable() {
+                                        public void run() {
+                                            funcoes.menssagem(contentValues);
+                                        }
+                                    });
+                                    return false;
+                                }
                             }
-                        }
 
-                        final PessoaSql pessoaSql = new PessoaSql(context);
+                            final PessoaSql pessoaSql = new PessoaSql(context);
 
-                        todosSucesso = pessoaSql.insertList(listaDadosUsuario);
+                            todosSucesso = pessoaSql.insertList(listaDadosUsuario);
 
-                        // Checa se todos foram inseridos/atualizados com sucesso
-                        if (todosSucesso) {
-                            inserirUltimaAtualizacao("CFACLIFO_FUN");
-                        } else {
-                            PugNotification.with(context)
-                                    .load()
-                                    .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR)
-                                    .title(R.string.importar_dados_recebidos)
-                                    //.message(context.getResources().getString(R.string.nao_conseguimos_atualizar_usuario))
-                                    .bigTextStyle(context.getResources().getString(R.string.nao_conseguimos_atualizar_usuario))
-                                    .smallIcon(R.mipmap.ic_launcher)
-                                    .largeIcon(R.mipmap.ic_launcher)
-                                    .flags(Notification.DEFAULT_LIGHTS)
-                                    .simple()
-                                    .build();
+                            // Checa se todos foram inseridos/atualizados com sucesso
+                            if (todosSucesso) {
+                                inserirUltimaAtualizacao("CFACLIFO_FUN");
+                            } else {
+                                PugNotification.with(context)
+                                        .load()
+                                        .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR)
+                                        .title(R.string.importar_dados_recebidos)
+                                        //.message(context.getResources().getString(R.string.nao_conseguimos_atualizar_usuario))
+                                        .bigTextStyle(context.getResources().getString(R.string.nao_conseguimos_atualizar_usuario))
+                                        .smallIcon(R.mipmap.ic_launcher)
+                                        .largeIcon(R.mipmap.ic_launcher)
+                                        .flags(Notification.DEFAULT_LIGHTS)
+                                        .simple()
+                                        .build();
 
-                            // Checa se o texto de status foi passado pro parametro
+                                // Checa se o texto de status foi passado pro parametro
+                                if (textStatus != null) {
+
+                                    ((Activity) context).runOnUiThread(new Runnable() {
+                                        public void run() {
+                                            textStatus.setText(context.getResources().getString(R.string.nao_conseguimos_atualizar_usuario));
+                                        }
+                                    });
+                                }
+                            }
+
+                            // Atualiza a notificacao
+                            mLoad.bigTextStyle(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
+                            mLoad.progress().value(0, 0, true).build();
+
+                            // Checo se o texto de status foi passado pro parametro
                             if (textStatus != null) {
-
                                 ((Activity) context).runOnUiThread(new Runnable() {
                                     public void run() {
-                                        textStatus.setText(context.getResources().getString(R.string.nao_conseguimos_atualizar_usuario));
+                                        textStatus.setText(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
+                                    }
+                                });
+                            }
+                            if (progressBarStatus != null) {
+                                ((Activity) context).runOnUiThread(new Runnable() {
+                                    public void run() {
+                                        progressBarStatus.setIndeterminate(true);
                                     }
                                 });
                             }
                         }
-
-                        // Atualiza a notificacao
-                        mLoad.bigTextStyle(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
-                        mLoad.progress().value(0, 0, true).build();
-
-                        // Checo se o texto de status foi passado pro parametro
-                        if (textStatus != null) {
-                            ((Activity) context).runOnUiThread(new Runnable() {
-                                public void run() {
-                                    textStatus.setText(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
-                                }
-                            });
-                        }
-                        if (progressBarStatus != null) {
-                            ((Activity) context).runOnUiThread(new Runnable() {
-                                public void run() {
-                                    progressBarStatus.setIndeterminate(true);
-                                }
-                            });
-                        }
+                    } else {
+                        // Cria uma notificacao para ser manipulado
+                        Load mLoad = PugNotification.with(context).load()
+                                .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
+                                .smallIcon(R.mipmap.ic_launcher)
+                                .largeIcon(R.mipmap.ic_launcher)
+                                .title(R.string.recebendo_dados_usuario)
+                                .bigTextStyle(context.getResources().getString(R.string.nao_chegou_dados_servidor_empresa) + "\n" + retornoWebservice.toString())
+                                .flags(Notification.DEFAULT_LIGHTS);
+                        mLoad.simple().build();
                     }
                 } else {
                     // Cria uma notificacao para ser manipulado
@@ -963,8 +964,8 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                             .identifier(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100))
                             .smallIcon(R.mipmap.ic_launcher)
                             .largeIcon(R.mipmap.ic_launcher)
-                            .title(R.string.recebendo_dados_usuario)
-                            .bigTextStyle(context.getResources().getString(R.string.nao_chegou_dados_servidor_empresa) + "\n" + retornoWebservice.toString())
+                            .title(R.string.recebendo_dados)
+                            .bigTextStyle(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.get(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO))
                             .flags(Notification.DEFAULT_LIGHTS);
                     mLoad.simple().build();
                 }
@@ -975,7 +976,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                         .smallIcon(R.mipmap.ic_launcher)
                         .largeIcon(R.mipmap.ic_launcher)
                         .title(R.string.recebendo_dados)
-                        .bigTextStyle(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.get(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO))
+                        .bigTextStyle(context.getResources().getString(R.string.nao_achamos_chave_dispositivo))
                         .flags(Notification.DEFAULT_LIGHTS);
                 mLoad.simple().build();
             }
@@ -2595,9 +2596,54 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                             ContentValues dadosCartao = new ContentValues();
 
                                             dadosCartao.put("ID_CFACCRED", cartaoRetorno.get("idCfaccred").getAsInt());
+                                            if (cartaoRetorno.has("idCbaplctaTaxa") && cartaoRetorno.get("idCbaplctaTaxa").getAsInt() > 0) {
+                                                dadosCartao.put("ID_CBAPLCTA_TAXA", cartaoRetorno.get("idCbaplctaTaxa").getAsInt());
+                                            }
+                                            if (cartaoRetorno.has("idCfaporta") && cartaoRetorno.get("idCfaporta").getAsInt() > 0) {
+                                                dadosCartao.put("ID_CFAPORTA", cartaoRetorno.get("idCfaporta").getAsInt());
+                                            }
+                                            dadosCartao.put("GUID", cartaoRetorno.get("guid").getAsString());
+                                            dadosCartao.put("US_CAD", cartaoRetorno.get("usCad").getAsString());
+                                            dadosCartao.put("DT_CAD", cartaoRetorno.get("dtCad").getAsString());
                                             dadosCartao.put("DT_ALT", cartaoRetorno.get("dtAlt").getAsString());
                                             dadosCartao.put("CODIGO", cartaoRetorno.get("codigo").getAsInt());
                                             dadosCartao.put("DESCRICAO", cartaoRetorno.get("descricao").getAsString());
+                                            if (cartaoRetorno.has("parcelaFim1") && cartaoRetorno.get("parcelaFim1").getAsInt() > 0) {
+                                                dadosCartao.put("PARCELA_FIM1", cartaoRetorno.get("parcelaFim1").getAsInt());
+                                            }
+                                            if (cartaoRetorno.has("parcelaFim2") && cartaoRetorno.get("parcelaFim2").getAsInt() > 0) {
+                                                dadosCartao.put("PARCELA_FIM2", cartaoRetorno.get("parcelaFim2").getAsInt());
+                                            }
+                                            if (cartaoRetorno.has("parcelaFim3") && cartaoRetorno.get("parcelaFim3").getAsInt() > 0) {
+                                                dadosCartao.put("PARCELA_FIM3", cartaoRetorno.get("parcelaFim3").getAsInt());
+                                            }
+                                            if (cartaoRetorno.has("taxa1")  && cartaoRetorno.get("taxa1").getAsDouble() > 0) {
+                                                dadosCartao.put("TAXA1", cartaoRetorno.get("taxa1").getAsDouble());
+                                            }
+                                            if (cartaoRetorno.has("taxa2")  && cartaoRetorno.get("taxa2").getAsDouble() > 0) {
+                                                dadosCartao.put("TAXA2", cartaoRetorno.get("taxa2").getAsDouble());
+                                            }
+                                            if (cartaoRetorno.has("taxa3")  && cartaoRetorno.get("taxa3").getAsDouble() > 0) {
+                                                dadosCartao.put("TAXA3", cartaoRetorno.get("taxa3").getAsDouble());
+                                            }
+                                            if (cartaoRetorno.has("taxaDeb")  && cartaoRetorno.get("taxaDeb").getAsDouble() > 0) {
+                                                dadosCartao.put("TAXA_DEB", cartaoRetorno.get("taxaDeb").getAsDouble());
+                                            }
+                                            if (cartaoRetorno.has("diasDeb")  && cartaoRetorno.get("diasDeb").getAsInt() > 0) {
+                                                dadosCartao.put("DIAS_DEB", cartaoRetorno.get("diasDeb").getAsInt());
+                                            }
+                                            if (cartaoRetorno.has("diasCre")  && cartaoRetorno.get("diasCre").getAsInt() > 0) {
+                                                dadosCartao.put("DIAS_CRE", cartaoRetorno.get("diasCre").getAsInt());
+                                            }
+                                            if (cartaoRetorno.has("antecipa")) {
+                                                dadosCartao.put("ANTECIPA", cartaoRetorno.get("antecipa").getAsString());
+                                            }
+                                            if (cartaoRetorno.has("tarifaPorTransacao")) {
+                                                dadosCartao.put("TARIFA_POR_TRANSACAO", cartaoRetorno.get("tarifaPorTransacao").getAsDouble());
+                                            }
+                                            if (cartaoRetorno.has("taxaIntermediacao")) {
+                                                dadosCartao.put("TAXA_INTERMEDIACAO", cartaoRetorno.get("taxaIntermediacao").getAsDouble());
+                                            }
 
                                             listaDadosCartao.add(dadosCartao);
                                         }
@@ -4068,7 +4114,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                     "((CFACLIFO.ID_CFACLIFO IN \n" +
                             "(" + filtraClientePorParametro + " ) " +
                             ") \n" +
-                            "OR ( (CFACLIFO.NOME_RAZAO LIKE '%CONSUMIDOR%FINAL%') " + ((ultimaData != null && !ultimaData.isEmpty()) ? " AND (CFACLIFO.DT_ALT >= '" + ultimaData + "')" : "") + " ))";
+                            "OR ( (CFACLIFO.NOME_RAZAO LIKE '%CONSUM%FIN%') " + ((ultimaData != null && !ultimaData.isEmpty()) ? " AND (CFACLIFO.DT_ALT >= '" + ultimaData + "')" : "") + " ))";
 
             // Cria uma variavel para salvar todos os paramentros em json
             String parametrosWebservice = "";
@@ -4455,7 +4501,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                     "((CFACLIFO.ID_CFACLIFO IN \n" +
                             "(" + filtraClientePorParametro + " ) " +
                             ") \n" +
-                            "OR (CFACLIFO.NOME_RAZAO LIKE '%CONSUMIDOR%FINAL%'))";
+                            "OR (CFACLIFO.NOME_RAZAO LIKE '%CONSUM%FIN%'))";
 
             parametrosWebservice += "&where= " + filtraClientePorVendedor;
 
@@ -10002,10 +10048,16 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                             if (parcelaRetorno.has("idCfaporta") && parcelaRetorno.get("idCfaporta").getAsInt() > 0) {
                                                 dadosParcela.put("ID_CFAPORTA", parcelaRetorno.get("idCfaporta").getAsInt());
                                             }
+                                            if (parcelaRetorno.has("idCfaccred") && parcelaRetorno.get("idCfaccred").getAsInt() > 0) {
+                                                dadosParcela.put("ID_CFACCRED", parcelaRetorno.get("idCfaccred").getAsInt());
+                                            }
                                             dadosParcela.put("DT_ALT", parcelaRetorno.get("dtAlt").getAsString());
                                             dadosParcela.put("TIPO", (parcelaRetorno.has("tipo") && parcelaRetorno.get("tipo") != null) ? parcelaRetorno.get("tipo").getAsString() : null);
                                             dadosParcela.put("DT_EMISSAO", (parcelaRetorno.has("tipo") && parcelaRetorno.get("tipo") != null) ? parcelaRetorno.get("dtEmissao").getAsString() : null);
                                             dadosParcela.put("DT_VENCIMENTO", (parcelaRetorno.has("tipo") && parcelaRetorno.get("tipo") != null) ? parcelaRetorno.get("dtVencimento").getAsString() : null);
+                                            if (parcelaRetorno.has("dtPagamento")) {
+                                                dadosParcela.put("DT_PAGAMENTO", parcelaRetorno.get("dtPagamento").getAsString());
+                                            }
                                             if (parcelaRetorno.has("dtBaixa")) {
                                                 dadosParcela.put("DT_BAIXA", parcelaRetorno.get("dtBaixa").getAsString());
                                             }
@@ -10013,14 +10065,23 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                                 dadosParcela.put("PARCELA", parcelaRetorno.get("parcela").getAsInt());
                                             }
                                             dadosParcela.put("VL_PARCELA", parcelaRetorno.get("vlParcela").getAsDouble());
+                                            dadosParcela.put("VL_JUROS_PRORROG", parcelaRetorno.get("vlJurosProrrog").getAsDouble());
                                             if (parcelaRetorno.has("fcVlTotalPago")) {
                                                 dadosParcela.put("FC_VL_TOTAL_PAGO", parcelaRetorno.get("fcVlTotalPago").getAsDouble());
                                             }
                                             if (parcelaRetorno.has("fcVlRestante")) {
                                                 dadosParcela.put("FC_VL_RESTANTE", parcelaRetorno.get("fcVlRestante").getAsDouble());
                                             }
-                                            if (parcelaRetorno.has("vlJurosDiario")) {
-                                                dadosParcela.put("VL_JUROS_DIARIO", parcelaRetorno.get("vlJurosDiario").getAsDouble());
+                                            if (parcelaRetorno.has("fcVlRestanteSemProrrog")) {
+                                                dadosParcela.put("FC_VL_RESTANTE_SEM_PRORROG", parcelaRetorno.get("fcVlRestanteSemProrrog").getAsDouble());
+                                            }
+                                            dadosParcela.put("VL_JUROS_DIARIO", parcelaRetorno.get("vlJurosDiario").getAsDouble());
+                                            dadosParcela.put("TAXA_DIARIA", parcelaRetorno.get("taxaDiaria").getAsDouble());
+                                            if (parcelaRetorno.has("capitaliza")) {
+                                                dadosParcela.put("CAPITALIZA", parcelaRetorno.get("capitaliza").getAsString());
+                                            }
+                                            if (parcelaRetorno.has("prorrogado")) {
+                                                dadosParcela.put("PRORROGADO", parcelaRetorno.get("prorrogado").getAsString());
                                             }
                                             if (parcelaRetorno.has("percDesconto")) {
                                                 dadosParcela.put("PERC_DESCONTO", parcelaRetorno.get("percDesconto").getAsDouble());
