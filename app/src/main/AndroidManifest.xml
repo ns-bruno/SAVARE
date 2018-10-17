@@ -47,7 +47,6 @@
         </activity>
         <activity android:name=".activity.CadastroUsuarioActivity" />
         <activity android:name=".activity.LogActivity" />
-        <activity android:name=".activity.fragment.ClienteCadastroFragment" />
         <activity android:name=".activity.material.designer.InicioMDActivity"
                   android:theme="@style/AppBaseTheme"/>
         <activity android:name=".activity.material.designer.ProdutoDetalhesMDActivity"
@@ -134,6 +133,16 @@
         <activity
             android:name=".activity.material.designer.ListaServidoresWebserviceMDActivity"
             android:theme="@style/AppBaseTheme">
+        </activity>
+
+        <activity
+            android:name=".activity.material.designer.LegendaProdutoListaMDActivity"
+            android:theme="@style/AppBaseTheme" >
+        </activity>
+
+        <activity
+            android:name=".activity.material.designer.ClienteCadastroTabFragmentMDActivity"
+            android:theme="@style/AppBaseTheme" >
         </activity>
 
 

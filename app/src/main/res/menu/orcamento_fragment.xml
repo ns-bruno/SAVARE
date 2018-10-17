@@ -1,21 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android" >
 
      <!-- Search Widget -->
     <item
         android:id="@+id/menu_orcamento_fragment_pesquisa"
-        android:actionViewClass="android.widget.SearchView"
         android:icon="@drawable/ic_action_search"
-        android:showAsAction="always"
         android:orderInCategory="0"
-        android:title="@string/pesquisar"/>
+        android:title="@string/pesquisar"
+        app:showAsAction="always"
+        app:actionViewClass="android.widget.SearchView" />
     
     <item
         android:id="@+id/menu_orcamento_fragment_adicionar"
         android:orderInCategory="1"
         android:title="@string/adicionar_produto"
         android:icon="@drawable/ic_action_new"
-        android:showAsAction="always">
+        app:showAsAction="always">
     </item>
     
     <item
@@ -23,7 +24,7 @@
         android:orderInCategory="2"
         android:title="@string/atualizar"
         android:icon="@drawable/ic_action_refresh"
-        android:showAsAction="always">
+        app:showAsAction="always">
     </item>
 
     <item
@@ -31,7 +32,7 @@
         android:orderInCategory="3"
         android:title="@string/enviar_email"
         android:icon="@drawable/ic_share_variant"
-        android:showAsAction="always">
+        app:showAsAction="always">
     </item>
     
     <item
@@ -39,7 +40,7 @@
         android:orderInCategory="4"
         android:title="@string/salvar"
         android:icon="@drawable/ic_action_save"
-        android:showAsAction="always">
+        app:showAsAction="always">
     </item>
 
     
@@ -48,32 +49,28 @@
         android:id="@+id/menu_orcamento_fragment_rateio_preco"
         android:orderInCategory="101"
         android:title="@string/rateio_preco"
-        android:showAsAction="never">
+        app:showAsAction="never">
     </item>
-    
-
-
-    
     
     <item
         android:id="@+id/menu_orcamento_fragment_transformar_pedido"
         android:orderInCategory="104"
         android:title="@string/transformar_pedido"
-        android:showAsAction="never">
+        app:showAsAction="never">
     </item>
     
     <item
         android:id="@+id/menu_orcamento_fragment_trocar_cliente"
         android:orderInCategory="105"
         android:title="@string/trocar_cliente"
-        android:showAsAction="never">
+        app:showAsAction="never">
     </item>
     
     <item
         android:id="@+id/menu_orcamento_fragment_visualizar_logs"
         android:orderInCategory="999"
         android:title="@string/visualizar_logs"
-        android:showAsAction="never">
+        app:showAsAction="never">
     </item>
     
 </menu>

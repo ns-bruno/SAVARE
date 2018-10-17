@@ -92,6 +92,8 @@ public class InicioMDActivity extends AppCompatActivity {
         menuFloatOpcoes = (FloatingActionMenu) findViewById(R.id.activity_inicio_md_menu_float);
         FloatingActionButton itemMenuNovoOrcamento = (FloatingActionButton) findViewById(R.id.activity_inicio_md_menu_item_novo_orcamento);
         FloatingActionButton itemMenuNovoCliente = (FloatingActionButton) findViewById(R.id.activity_inicio_md_menu_item_novo_cliente);
+        // Tira a opção de novo cliente
+        itemMenuNovoCliente.setVisibility(View.GONE);
 
         FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(InicioMDActivity.this);
 
@@ -368,7 +370,7 @@ public class InicioMDActivity extends AppCompatActivity {
                 menuFloatOpcoes.close(true);
 
                 // Abre a tela inicial do sistema
-                Intent intentNovo = new Intent(InicioMDActivity.this, ClienteCadastroFragment.class);
+                Intent intentNovo = new Intent(InicioMDActivity.this, ClienteCadastroTabFragmentMDActivity.class);
                 startActivity(intentNovo);
             }
         });

@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
@@ -17,6 +18,7 @@ import com.github.clans.fab.FloatingActionMenu;
 import com.savare.R;
 import com.savare.adapter.ItemUniversalAdapter;
 import com.savare.beans.ServidoresBeans;
+import com.savare.funcoes.FuncoesPersonalizadas;
 import com.savare.funcoes.rotinas.ServidoresRotinas;
 
 import java.util.ArrayList;
@@ -31,6 +33,7 @@ public class ListaServidoresWebserviceMDActivity extends AppCompatActivity {
     private Toolbar toolbarCabecalho;
     private ListView listViewListaServidores;
     private TextView textStatus;
+    private TextView textViewCnpjEmpresa;
     private FloatingActionMenu menuFloatingButton;
     private FloatingActionButton itemMenuNovoServidor;
     private ProgressBar progressBarStatus;
@@ -48,6 +51,12 @@ public class ListaServidoresWebserviceMDActivity extends AppCompatActivity {
         setContentView(R.layout.activity_lista_servidores_webservice_md);
 
         recuperaCampo();
+
+        if (!new FuncoesPersonalizadas(this).getValorXml(FuncoesPersonalizadas.TAG_CNPJ_EMPRESA).equals(FuncoesPersonalizadas.NAO_ENCONTRADO)){
+            textViewCnpjEmpresa.setText(new FuncoesPersonalizadas(this).getValorXml(FuncoesPersonalizadas.TAG_CNPJ_EMPRESA));
+        } else {
+            textViewCnpjEmpresa.setVisibility(View.INVISIBLE);
+        }
 
         listViewListaServidores.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -108,21 +117,43 @@ public class ListaServidoresWebserviceMDActivity extends AppCompatActivity {
         carregarListaServidores();
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        switch (item.getItemId()){
+            case android.R.id.home:
+                finish();
+                break;
+
+            default:
+                break;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
     private void recuperaCampo(){
         toolbarCabecalho = (Toolbar) findViewById(R.id.activity_lista_servidores_webservice_toolbar_cabecalho);
         listViewListaServidores = (ListView) findViewById(R.id.activity_lista_servidores_webservice_md_list_servidores);
         textStatus = (TextView) findViewById(R.id.activity_lista_servidores_webservice_md_text_status);
+        textViewCnpjEmpresa = (TextView) findViewById(R.id.activity_lista_servidores_webservice_md_textView_cnpj_empresa);
         menuFloatingButton = (FloatingActionMenu) findViewById(R.id.activity_lista_servidores_webservice_md_menu_float);
         itemMenuNovoServidor = (FloatingActionButton) findViewById(R.id.activity_lista_servidores_webservice_md_menu_float_novo_servidor);
         progressBarStatus = (ProgressBar) findViewById(R.id.activity_lista_servidores_webservice_md_progressBar_status);
+        toolbarCabecalho.setTitleTextColor(getResources().getColor(R.color.branco));
+        toolbarCabecalho.setTitle(this.getResources().getString(R.string.lista_servidor));
+        // Seta uma toolBar para esta activiy(tela)
+        setSupportActionBar(toolbarCabecalho);
+        // Adiciona o botao voltar no toolbar
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
     private void carregarListaServidores(){
-        ServidoresRotinas servidoresRotinas = new ServidoresRotinas(getApplicationContext());
+        ServidoresRotinas servidoresRotinas = new ServidoresRotinas(ListaServidoresWebserviceMDActivity.this);
 
         List<ServidoresBeans> listaServidores = new ArrayList<ServidoresBeans>();
 
-        listaServidores = servidoresRotinas.listaServidores(null, "ID_SERVIDORES ASC", progressBarStatus);
+        listaServidores = servidoresRotinas.listaServidores(null, "ID_SERVIDORES ASC", null);
 
         if ((listaServidores != null) && (listaServidores.size() > 0)){
             adapterServidores = new ItemUniversalAdapter(ListaServidoresWebserviceMDActivity.this, ItemUniversalAdapter.SERVIDORES);

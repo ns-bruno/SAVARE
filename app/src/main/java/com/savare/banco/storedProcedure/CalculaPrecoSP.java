@@ -28,6 +28,8 @@ public class CalculaPrecoSP extends StoredProcedure {
     private double  precoAtacado = 0,
                     precoVarejo = 0,
                     precoServico = 0,
+                    vendaVarejoPreco = 0,
+                    vendaAtacadoPreco = 0,
                     precoPromocaoVistaVarejo,
                     precoPromocaoVistaAtacado,
                     precoPromocaoVistaServico,
@@ -113,7 +115,8 @@ public class CalculaPrecoSP extends StoredProcedure {
                     descontoPromocao,
                     vistaPrazo,
                     origemValor,
-                    usaJurosMedioLocal;
+                    usaJurosMedioLocal,
+                    calculaJuros;
 
     public CalculaPrecoSP(Context context, ProgressBar progressBarStatus, TextView textStatus) {
         super(context, progressBarStatus, textStatus);
@@ -222,32 +225,97 @@ public class CalculaPrecoSP extends StoredProcedure {
                 dados = null;
 
                 sql.setLength(0);
-                sql.append("SELECT VENDA_VARE, VENDA_ATAC FROM AEAPRECO WHERE (ID_AEAPRODU = " + idProduto + ") AND (ID_AEAPLPGT = " + idPlanoPgto + ")");
+                sql.append("SELECT FORMA, CALCULA_JUROS, VENDA_VARE, VENDA_ATAC FROM AEAPRECO WHERE (ID_AEAPRODU = " + idProduto + ") AND (ID_AEAPLPGT = " + idPlanoPgto + ")");
 
                 dados = bancoDados.rawQuery(sql.toString(), null);
 
                 if ((dados != null) && (dados.getCount() > 0)){
                     dados.moveToFirst();
-
-                    precoVarejo = dados.getDouble(dados.getColumnIndex("VENDA_VARE"));
-                    precoAtacado = dados.getDouble(dados.getColumnIndex("VENDA_ATAC"));
+                    vistaPrazo = dados.getString(dados.getColumnIndex("FORMA"));
+                    calculaJuros = dados.getString(dados.getColumnIndex("CALCULA_JUROS"));
+                    vendaVarejoPreco = dados.getDouble(dados.getColumnIndex("VENDA_VARE"));
+                    vendaAtacadoPreco = dados.getDouble(dados.getColumnIndex("VENDA_ATAC"));
                 }
                 // Limpa a memoria
                 dados = null;
 
                 sql.setLength(0);
-                sql.append("SELECT VENDA_VARE, VENDA_ATAC FROM AEAPRECO WHERE (ID_AEAPRODU = " + idProduto + ") AND (ID_CFACLIFO = " + idCliente + ")");
+                sql.append("SELECT FORMA, CALCULA_JUROS, VENDA_VARE, VENDA_ATAC FROM AEAPRECO WHERE (ID_AEAPRODU = " + idProduto + ") AND (ID_CFACLIFO = " + idCliente + ")");
 
                 dados = bancoDados.rawQuery(sql.toString(), null);
 
                 if ((dados != null) && (dados.getCount() > 0)){
                     dados.moveToFirst();
-
-                    precoVarejo = dados.getDouble(dados.getColumnIndex("VENDA_VARE"));
-                    precoAtacado = dados.getDouble(dados.getColumnIndex("VENDA_ATAC"));
+                    vistaPrazo = dados.getString(dados.getColumnIndex("FORMA"));
+                    calculaJuros = dados.getString(dados.getColumnIndex("CALCULA_JUROS"));
+                    vendaVarejoPreco = dados.getDouble(dados.getColumnIndex("VENDA_VARE"));
+                    vendaAtacadoPreco = dados.getDouble(dados.getColumnIndex("VENDA_ATAC"));
                 }
                 // Limpa a memoria
                 dados = null;
+
+                sql.setLength(0);
+                sql.append("SELECT FORMA, CALCULA_JUROS, VENDA_VARE, VENDA_ATAC FROM AEAPRECO WHERE (ID_AEAPRODU = " + idProduto + ") AND (ID_AEAPLPGT = " + idPlanoPgto + ") AND (ID_CFACLIFO = " + idCliente + ")");
+
+                dados = bancoDados.rawQuery(sql.toString(), null);
+
+                if ((dados != null) && (dados.getCount() > 0)){
+                    dados.moveToFirst();
+                    vistaPrazo = dados.getString(dados.getColumnIndex("FORMA"));
+                    calculaJuros = dados.getString(dados.getColumnIndex("CALCULA_JUROS"));
+                    vendaVarejoPreco = dados.getDouble(dados.getColumnIndex("VENDA_VARE"));
+                    vendaAtacadoPreco = dados.getDouble(dados.getColumnIndex("VENDA_ATAC"));
+                }
+                // Limpa a memoria
+                dados = null;
+
+                if (vistaPrazo == null){
+                    vistaPrazo = "";
+                }
+                String vistaPrazoPlanoEquivalente = "";
+
+                if ( (vistaPrazo != "") && !vistaPrazo.isEmpty()){
+                    sql.setLength(0);
+                    sql.append("SELECT ID_AEAPLPGT_EQUIVALENTE, VISTA_PRAZO FROM AEAPLPGT WHERE ID_AEAPLPGT = " + idPlanoPgto);
+
+                    dados = bancoDados.rawQuery(sql.toString(), null);
+
+                    if ((dados != null) && (dados.getCount() > 0)){
+                        dados.moveToFirst();
+                        idPlanoPgtoEquivalente = dados.getInt(dados.getColumnIndex("ID_AEAPLPGT_EQUIVALENTE"));
+                        vistaPrazoPlanoEquivalente = dados.getString(dados.getColumnIndex("VISTA_PRAZO"));
+                    }
+                    dados = null;
+
+                    if ((idPlanoPgtoEquivalente != null) && (idPlanoPgtoEquivalente != 0) ){
+                        sql.setLength(0);
+                        sql.append("SELECT VISTA_PRAZO FROM AEAPLPGT WHERE ID_AEAPLPGT = " + idPlanoPgtoEquivalente);
+
+                        dados = bancoDados.rawQuery(sql.toString(), null);
+
+                        if ((dados != null) && (dados.getCount() > 0)) {
+                            dados.moveToFirst();
+
+                            vistaPrazoPlanoEquivalente = dados.getString(dados.getColumnIndex("VISTA_PRAZO"));
+                        }
+                        dados = null;
+                    }
+                }
+                if ( (vistaPrazo != "") && (vistaPrazoPlanoEquivalente != "") && (vistaPrazo == vistaPrazoPlanoEquivalente) && (vendaVarejoPreco != 0) ){ precoVarejo = vendaVarejoPreco; }
+                if ( (vendaAtacadoPreco != 0) && (!vistaPrazo.isEmpty()) && (!vistaPrazoPlanoEquivalente.isEmpty()) && (vistaPrazo == vistaPrazoPlanoEquivalente)){ precoAtacado = vendaAtacadoPreco; }
+
+                if ( (calculaJuros != null) && (calculaJuros.equalsIgnoreCase("0")) ){
+                    if (retorno == null){
+                        retorno = new ContentValues();
+                    }
+                    retorno.put(KEY_PRECO_VAREJO, precoVarejo);
+                    retorno.put(KEY_PRECO_ATACADO, precoAtacado);
+                    retorno.put(KEY_PRECO_SERVICO, precoServico);
+                    retorno.put(KEY_PRODUTO_PROMOCAO_ATACADO, produtoEmPromocaoAtacado);
+                    retorno.put(KEY_PRODUTO_PROMOCAO_VAREJO, produtoEmPromocaoVarejo);
+                    retorno.put(KEY_PRODUTO_PROMOCAO_SERVICO, produtoEmPromocaoServico);
+                    return retorno;
+                }
 
                 sql.setLength(0);
                 sql.append("SELECT FATOR_CONVERSAO, FATOR_PRECO FROM AEAEMBAL WHERE ID_AEAEMBAL = " + idEmbalagem);
@@ -288,6 +356,54 @@ public class CalculaPrecoSP extends StoredProcedure {
                 dados = null;
                 // Checa se o tipo de produto eh conjunto
                 if (tipoProduto.equalsIgnoreCase("2")){
+                    int controle = 0;
+
+                    sql.setLength(0);
+                    sql.append("SELECT QUANTIDADE, ID_AEAPRODU_ITEM FROM AEACONJT WHERE AEACONJT.ID_AEAPRODU = " + idProduto);
+
+                    dados = bancoDados.rawQuery(sql.toString(), null);
+
+                    if ((dados != null) && (dados.getCount() > 0)){
+
+                        while(dados.moveToNext()) {
+
+                            int idProdutoItem = dados.getInt(dados.getColumnIndex("ID_AEAPRODU_ITEM"));
+                            double quantidadeItemCj = dados.getDouble(dados.getColumnIndex("QUANTIDADE"));
+                            int idAeaplojaItemCj = 0;
+
+                            sql.setLength(0);
+                            sql.append("SELECT ID_AEAPLOJA FROM AEAPLOJA WHERE (ID_AEAPRODU = " + idProdutoItem + ") AND (ID_SMAEMPRE = " + idEmpresa + ")");
+
+                            Cursor dadosConjunto = bancoDados.rawQuery(sql.toString(), null);
+
+                            if ((dadosConjunto != null) && (dadosConjunto.getCount() > 0)) {
+                                dadosConjunto.moveToFirst();
+
+                                idAeaplojaItemCj = dadosConjunto.getInt(dadosConjunto.getColumnIndex("ID_AEAPLOJA"));
+
+                                ContentValues retornoItemConj = execute(idAeaplojaItemCj, idEmbalagem, idPlanoPgto, idCliente, codigoVendedor, dataVenda, 0, 0);
+
+                                if ((retornoItemConj != null) && (retornoItemConj.size() > 0)){
+                                    precoVarejo = precoVarejo + (retornoItemConj.getAsDouble(KEY_PRECO_VAREJO) * quantidadeItemCj);
+                                    precoAtacado = precoAtacado + (retornoItemConj.getAsDouble(KEY_PRECO_ATACADO) * quantidadeItemCj);
+                                    precoServico = precoServico + (retornoItemConj.getAsDouble(KEY_PRECO_SERVICO) * quantidadeItemCj);
+                                }
+                            }
+                        } // Fim while
+                    }
+                    // Libera memoria
+                    dados = null;
+
+                    if (retorno == null){
+                        retorno = new ContentValues();
+                    }
+                    retorno.put(KEY_PRECO_VAREJO, precoVarejo);
+                    retorno.put(KEY_PRECO_ATACADO, precoAtacado);
+                    retorno.put(KEY_PRECO_SERVICO, precoServico);
+                    retorno.put(KEY_PRODUTO_PROMOCAO_ATACADO, produtoEmPromocaoAtacado);
+                    retorno.put(KEY_PRODUTO_PROMOCAO_VAREJO, produtoEmPromocaoVarejo);
+                    retorno.put(KEY_PRODUTO_PROMOCAO_SERVICO, produtoEmPromocaoServico);
+                    return retorno;
 
                 // Checa se o tipo de produto eh servico
                 } else if (tipoProduto.equalsIgnoreCase("1")) {

@@ -178,8 +178,8 @@ public class LoginMDActivity extends AppCompatActivity {
 
             case R.id.menu_login_cadastro_usuario:
                 // Cria uma intent para salvar o local que eh para ser aberto
-                Intent intent = new Intent(LoginMDActivity.this, CadastroUsuarioActivity.class);
-                intent.putExtra("RECADASTRAR", true);
+                Intent intent = new Intent(LoginMDActivity.this, ListaServidoresWebserviceMDActivity.class);
+                //intent.putExtra("RECADASTRAR", true);
                 startActivity(intent);
                 break;
 

@@ -80,17 +80,15 @@ public class FuncoesSql {
 			//id = bancoDados.insert(tabela, null, values);
 			
 			if (id <= 0){
-				((Activity) context.getApplicationContext()).runOnUiThread(new Runnable() {
+				/*((Activity) context.getApplicationContext()).runOnUiThread(new Runnable() {
 					public void run() {
-						//SuperActivityToast.create(((Activity)context), context.getResources().getString(R.string.cadastro_sucesso), SuperToast.Duration.VERY_SHORT, Style.getStyle(Style.GREEN, SuperToast.Animations.POPUP)).show();
-
 						SuperActivityToast.create(context, context.getResources().getString(R.string.cadastro_sucesso), Style.DURATION_VERY_SHORT)
 								.setTextColor(Color.WHITE)
 								.setColor(Color.GREEN)
 								.setAnimations(Style.ANIMATIONS_POP)
 								.show();
 					}
-				});
+				});*/
 				new MaterialDialog.Builder(context)
 						.title("FuncoesSql")
 						.content(context.getResources().getString(R.string.nao_foi_possivel_cadastrar))

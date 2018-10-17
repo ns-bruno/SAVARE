@@ -6,7 +6,7 @@
     <item
         android:id="@+id/menu_login_cadastro_usuario"
         app:showAsAction="never"
-        android:title="@string/cadastro_usuario"/>
+        android:title="@string/configuracoes_servidores"/>
 
 
 </menu>

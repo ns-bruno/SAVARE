@@ -20,6 +20,7 @@ import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.github.clans.fab.FloatingActionButton;
+import com.github.clans.fab.FloatingActionMenu;
 import com.savare.R;
 import com.savare.activity.fragment.ClienteCadastroFragment;
 import com.savare.adapter.ItemUniversalAdapter;
@@ -41,6 +42,7 @@ public class ClienteListaMDActivity extends AppCompatActivity {
     private TextView textViewStatus;
     private ListView listViewPessoa;
     private FloatingActionButton itemMenuNovoCliente;
+    private FloatingActionMenu menuFloating;
     private Spinner spinnerListaCidade;
     private ProgressBar progressBarStatus;
     private List<PessoaBeans> listaPessoas;
@@ -68,6 +70,7 @@ public class ClienteListaMDActivity extends AppCompatActivity {
             }
         }
 
+        menuFloating.setVisibility(View.GONE);
         itemMenuNovoCliente.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -303,6 +306,7 @@ public class ClienteListaMDActivity extends AppCompatActivity {
         textViewStatus = (TextView) findViewById(R.id.activity_cliente_lista_md_textViewStatus);
         listViewPessoa = (ListView) findViewById(R.id.activity_cliente_lista_md_list_pessoa);
         itemMenuNovoCliente = (FloatingActionButton) findViewById(R.id.activity_cliente_lista_md_novo_cliente);
+        menuFloating = (FloatingActionMenu) findViewById(R.id.activity_cliente_lista_md_menu_float);
         spinnerListaCidade = (Spinner) findViewById(R.id.activity_cliente_lista_md_spinner_cidades);
         progressBarStatus = (ProgressBar) findViewById(R.id.activity_cliente_lista_md_progressBar_status);
 

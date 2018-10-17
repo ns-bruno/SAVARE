@@ -19,6 +19,7 @@ import com.savare.banco.local.ConexaoBancoDeDados;
 import com.savare.funcoes.FuncoesPersonalizadas;
 import com.savare.funcoes.VersionUtils;
 
+@Deprecated
 public class CadastroUsuarioActivity extends Activity {
 	
 	private static String TAG = "SAVARE";

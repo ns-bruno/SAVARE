@@ -236,7 +236,7 @@ public class CalculaJurosSP extends StoredProcedure {
                     dtBase = dtPagamento;
                 }
                 // :PREVISAO - :vd_dt_base
-                dias = Integer.parseInt(funcoes.diferencaEntreData(funcoes.DIAS, dtBase, previsao));
+                dias = (Integer.parseInt(funcoes.diferencaEntreData(funcoes.DIAS, dtBase, previsao)) - 1); // Tira um dia
 
                 if ( (tipoPagarReceber != null) && (tipoPagarReceber.equalsIgnoreCase("0"))){
                     sql.setLength(0);
@@ -264,7 +264,8 @@ public class CalculaJurosSP extends StoredProcedure {
                     percMulta = auxDouble;
                 }
                 multa = valorRestante * (percMulta / 100);
-                auxDouble = 0;
+                //auxDouble = 0;
+                int diasCarenciaParam = 0;
 
                 sql.setLength(0);
                 sql.append("SELECT DIAS_CARENCIA, JUROS_DIARIO, CAPITALIZA ");
@@ -274,11 +275,13 @@ public class CalculaJurosSP extends StoredProcedure {
                 dados = bancoDados.rawQuery(sql.toString(), null);
                 if ((dados != null) && (dados.getCount() > 0)) {
                     dados.moveToFirst();
-                    auxDouble = dados.getDouble(dados.getColumnIndex("DIAS_CARENCIA"));
+
+                    diasCarenciaParam = dados.getInt(dados.getColumnIndex("DIAS_CARENCIA"));
                     jurosDiarioParam = dados.getDouble(dados.getColumnIndex("JUROS_DIARIO"));
                     capitalizaParam = dados.getString(dados.getColumnIndex("CAPITALIZA"));
                 }
                 dados = null;
+                if (diasCarenciaParam > 0){ diasCarencia = diasCarenciaParam; }
 
                 if (percentualJuros != 0){
                     taxaDiaria = percentualJuros;
@@ -306,7 +309,7 @@ public class CalculaJurosSP extends StoredProcedure {
                 prorrogado = (prorrogado == null ? "" : prorrogado);
 
                 double vn_aux1 = 0;
-                //PREVISAO < :vd_dt_vencimento) And (:vd_dt_pagamento Is Null) And (iif(:vs_prorrogado Is Null, '', :vs_prorrogado) <> '1'))
+                //(PREVISAO < :vd_dt_vencimento) And (:vd_dt_pagamento Is Null) And (iif(:vs_prorrogado Is Null, '', :vs_prorrogado) <> '1'))
                 if ( (Integer.parseInt(funcoes.diferencaEntreData(funcoes.DIAS, dtVencimento, previsao)) < 0) && (dtPagamento == null) && (prorrogado != "1") ){
                     desconto = valorRestante - (valorRestante * (1 - (percDescPromDia / 100.00)));
                     vn_aux1 = ((valorRestante - desconto) * (percDescDia / 100.00));

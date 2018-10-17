@@ -90,7 +90,9 @@ public class ConexaoBancoDeDados extends SQLiteOpenHelper {
 					}
 				}
 			}*/
+			//Verifica se eh uma nova versao
 			if (versaoNova > versaoAntiga){
+				// Executa uma classe pra atualizar o banco de dados
                 UpgradeBancoDadosAsyncRotinas upgradeBancoDadosAsyncRotinas = new UpgradeBancoDadosAsyncRotinas(context, null);
                 upgradeBancoDadosAsyncRotinas.execute();
             }

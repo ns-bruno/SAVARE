@@ -72,6 +72,7 @@ public class WSSisinfoWebservice {
     public static final String FUNCTION_SISINFOWEB_JSON_SELECT_CFAFOTOS = "/Cfafotos";
     public static final String FUNCTION_SISINFOWEB_JSON_SELECT_AEAPLPGT = "/Aeaplpgt";
     public static final String FUNCTION_SISINFOWEB_JSON_SELECT_AEACLASE = "/Aeaclase";
+    public static final String FUNCTION_SISINFOWEB_JSON_SELECT_AEACONJT = "/Aeaconjt";
     public static final String FUNCTION_SISINFOWEB_JSON_SELECT_AEAUNVEN = "/Aeaunven";
     public static final String FUNCTION_SISINFOWEB_JSON_SELECT_AEAGRADE = "/Aeagrade";
     public static final String FUNCTION_SISINFOWEB_JSON_SELECT_AEAMARCA = "/Aeamarca";
@@ -97,6 +98,7 @@ public class WSSisinfoWebservice {
     public static final String FUNCTION_SISINFOWEB_JSON_SELECT_SMAVERPR = "/Smaverpr";
     public static final String FUNCTION_INSERT_AEAORCAM = "insertOrcamento";
     public static final String FUNCTION_SISINFOWEB_JSON_INSERT_AEAORCAM = "/Aeaorcam";
+    public static final String FUNCTION_SISINFOWEB_JSON_INSERT_CFACLIFO = "/Cfaclifo";
     public static final String FUNCTION_INSERT_AEAITORC = "insertItemOrcamento";
     public static final String FUNCTION_UPDATE_STATUS_AEAORCAM = "updateStatusOrcamento";
     public static final String FUNCTION_CHECK_SEND_AEAORCAM = "checkSendOrcamento";
@@ -118,6 +120,7 @@ public class WSSisinfoWebservice {
     }
 
 
+    @Deprecated
     public Vector<SoapObject> executarSelectWebservice(String sql, String funcao, List<PropertyInfo> listaPropriedadesExtra){
 
         Vector<SoapObject> retorno = null;
@@ -569,15 +572,6 @@ public class WSSisinfoWebservice {
                 }
             });
         } catch (final IOException e){
-            /*final FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
-
-            // Armazena as informacoes para para serem exibidas e enviadas
-            final ContentValues contentValues = new ContentValues();
-            contentValues.put("comando", 0);
-            contentValues.put("tela", "WSSisInfoWebservice");
-            contentValues.put("mensagem", funcoes.tratamentoErroBancoDados(e.toString()));
-            contentValues.put("dados", e.toString());*/
-
             ((Activity) context).runOnUiThread(new Runnable() {
                 public void run() {
                     //funcoes.menssagem(contentValues);

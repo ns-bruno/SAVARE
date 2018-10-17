@@ -1,8 +1,7 @@
-package com.savare.activity.fragment;
+package com.savare.activity.material.designer.fragment;
 
-import java.util.ArrayList;
-import java.util.List;
 import android.content.ContentValues;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.TextWatcher;
@@ -14,10 +13,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.TextView;
+
+import com.github.johnpersano.supertoasts.library.Style;
+import com.github.johnpersano.supertoasts.library.SuperActivityToast;
 import com.savare.R;
 import com.savare.adapter.ItemUniversalAdapter;
 import com.savare.banco.funcoesSql.EnderecoSql;
@@ -42,9 +45,13 @@ import com.savare.funcoes.rotinas.RamoAtividadeRotinas;
 import com.savare.funcoes.rotinas.StatusRotinas;
 import com.savare.funcoes.rotinas.TipoClienteRotinas;
 import com.savare.funcoes.rotinas.TipoDocumentoRotinas;
-import com.savare.funcoes.rotinas.async.EnviarCadastroClienteFtpAsyncRotinas;
+import com.savare.funcoes.rotinas.async.EnviarDadosWebserviceAsyncRotinas;
+import com.savare.webservice.WSSisinfoWebservice;
 
-public class ClienteCadastroDadosFragment extends Fragment {
+import java.util.ArrayList;
+import java.util.List;
+
+public class ClienteCadastroDadosMDFragment extends Fragment {
 
 	View viewDados;
 	private TextView textCodigoPessoa,
@@ -86,13 +93,15 @@ public class ClienteCadastroDadosFragment extends Fragment {
 						radioButtonJuridica;
 	private TextWatcher cpfMask;
     private TextWatcher cnpjMask;
-	private String idPessoaTemporario;
+	private String idPessoaTemporario,
+				   cadastradoSucesso = "N";
+	private ProgressBar progressBarStatus;
 
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		
-		viewDados = inflater.inflate(R.layout.fragment_cliente_cadastro_dados_basico, container, false);
+		viewDados = inflater.inflate(R.layout.fragment_cliente_cadastro_dados_basico_md, container, false);
 
 		/**
 		 * Pega valores passados por parametro de outra Activity
@@ -100,8 +109,11 @@ public class ClienteCadastroDadosFragment extends Fragment {
 		Bundle parametro = getArguments();
 
 		if(parametro != null){
-			idPessoaTemporario = parametro.getString(ClienteCadastroTelefoneFragment.KEY_ID_PESSOA);
+			idPessoaTemporario = parametro.getString(ClienteCadastroTelefoneMDFragment.KEY_ID_PESSOA);
 		}
+
+		// Ativa a opcao de menus para este fragment
+		setHasOptionsMenu(true);
 
 		recuperarCamposTela();
 		
@@ -173,17 +185,19 @@ public class ClienteCadastroDadosFragment extends Fragment {
 			break;
 
 			case R.id.menu_cliente_cadastro_dados_fragemnt_enviar:
-				String where = "";
-				// Checa se foi passado algum parametro
-				if (idPessoaTemporario != null){
-					// Especifica uma pessoa
-					where += " (CFACLIFO.ID_CFACLIFO = " + idPessoaTemporario + ")";
-				} else {
-					// Pega todos os cadastro temporarios
-					where += " (CFACLIFO.ID_CFACLIFO < 0) AND (CFACLIFO.STATUS_CADASTRO_NOVO = N) ";
-				}
 
-				PessoaRotinas pessoaRotinas = new PessoaRotinas(getActivity());
+				EnviarDadosWebserviceAsyncRotinas enviarDados = new EnviarDadosWebserviceAsyncRotinas(getContext());
+				enviarDados.setTabelaEnviarDados(new String[]{WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_INSERT_CFACLIFO});
+				enviarDados.setProgressBarStatus(progressBarStatus);
+				enviarDados.setTextStatus(textStatus);
+				// Checa se foi passado algum parametro
+				if ( (cadastradoSucesso.equalsIgnoreCase("S")) && (idPessoaTemporario != null) ){
+					// Especifica uma pessoa
+					enviarDados.setIdPessoaTemporario(idPessoaTemporario);
+				}
+				enviarDados.execute();
+
+				/*PessoaRotinas pessoaRotinas = new PessoaRotinas(getActivity());
 
 				List<PessoaBeans> listaPessoasCadastro = new ArrayList<PessoaBeans>();
 				// Pega a lista de pessoa a serem enviadas os dados
@@ -197,12 +211,12 @@ public class ClienteCadastroDadosFragment extends Fragment {
 					// Dados da mensagem
 					ContentValues mensagem = new ContentValues();
 					mensagem.put("comando", 0);
-					mensagem.put("tela", "ClienteCadastroDadosFragment");
+					mensagem.put("tela", "ClienteCadastroDadosMDFragment");
 					mensagem.put("mensagem", "Não achamos nenhum cadastro.");
 					// Instancia a classe  de funcoes para mostra a mensagem
 					FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(getActivity());
 					funcoes.menssagem(mensagem);
-				}
+				}*/
 
 				break;
 
@@ -213,35 +227,36 @@ public class ClienteCadastroDadosFragment extends Fragment {
 	}
 	
 	private void recuperarCamposTela(){
-		textCodigoPessoa = (TextView) viewDados.findViewById(R.id.fragment_cliente_cadastro_dados_basico_text_codigo_pessoa);
-		textStatus = (TextView) viewDados.findViewById(R.id.fragment_cliente_cadastro_dados_basico_text_status);
-		editRazaoSocial = (EditText) viewDados.findViewById(R.id.fragment_cliente_cadastro_dados_basico_text_razao);
-		editFantasia = (EditText) viewDados.findViewById(R.id.fragment_cliente_cadastro_dados_basico_text_fantasia);
-		editCnpjCpf = (EditText) viewDados.findViewById(R.id.fragment_cliente_cadastro_dados_basico_text_cnpj_cpf);
-		editInscricaoEstadual = (EditText) viewDados.findViewById(R.id.fragment_cliente_cadastro_dados_basico_text_inscricao_estadual);
-		spinnerEstado = (Spinner) viewDados.findViewById(R.id.fragment_cliente_cadastro_dados_basico_spinner_estado);
-		spinnerCidade = (Spinner) viewDados.findViewById(R.id.fragment_cliente_cadastro_dados_basico_spinner_cidade);
-		editCep = (EditText) viewDados.findViewById(R.id.fragment_cliente_cadastro_dados_basico_text_cep);
-		editBairro = (EditText) viewDados.findViewById(R.id.fragment_cliente_cadastro_dados_basico_text_bairro);
-		editEndereco = (EditText) viewDados.findViewById(R.id.fragment_cliente_cadastro_dados_basico_text_endereco);
-		editNumero = (EditText) viewDados.findViewById(R.id.fragment_cliente_cadastro_dados_basico_text_numero);
-		editComplemento = (EditText) viewDados.findViewById(R.id.fragment_cliente_cadastro_dados_basico_text_complemento);
-		editEmail = (EditText) viewDados.findViewById(R.id.fragment_cliente_cadastro_dados_basico_text_email);
-		spinnerRamoAtividade = (Spinner) viewDados.findViewById(R.id.fragment_cliente_cadastro_dados_basico_spinner_ramo_atividade);
-		spinnerTipoCliente = (Spinner) viewDados.findViewById(R.id.fragment_cliente_cadastro_dados_basico_spinner_tipo_cliente);
-		spinnerStatus = (Spinner) viewDados.findViewById(R.id.fragment_cliente_cadastro_dados_basico_spinner_status);
-		spinnerTipoDocumento = (Spinner) viewDados.findViewById(R.id.fragment_cliente_cadastro_dados_basico_spinner_tipo_documento);
-		spinnerPortadorBanco = (Spinner) viewDados.findViewById(R.id.fragment_cliente_cadastro_dados_basico_spinner_portador_banco);
-		spinnerPlanoPagamento = (Spinner) viewDados.findViewById(R.id.fragment_cliente_cadastro_dados_basico_spinner_plano_pagamento);
-		editCapitalSocial = (EditText) viewDados.findViewById(R.id.fragment_cliente_cadastro_dados_basico_editText_capital_social);
-		editLimiteCompra = (EditText) viewDados.findViewById(R.id.fragment_cliente_cadastro_dados_basico_editText_limite_compras);
-		editDescontoAtacadoVista = (EditText) viewDados.findViewById(R.id.fragment_cliente_cadastro_dados_basico_editText_desconto_atacado_vista);
-		editDescontoAtacadoPrazo = (EditText) viewDados.findViewById(R.id.fragment_cliente_cadastro_dados_basico_editText_desconto_atacado_prazo);
-		editDescontoVarejoVista = (EditText) viewDados.findViewById(R.id.fragment_cliente_cadastro_dados_basico_editText_desconto_varejo_vista);
-		editDescontoVarejoPrazo = (EditText) viewDados.findViewById(R.id.fragment_cliente_cadastro_dados_basico_editText_desconto_varejo_prazo);
-		radioGroupFisicaJuridica = (RadioGroup) viewDados.findViewById(R.id.fragment_cliente_cadastro_dados_basico_radioGroup_fisica_juridica);
-		radioButtonFisica = (RadioButton) viewDados.findViewById(R.id.fragment_cliente_cadastro_dados_basico_radioButton_fisica);
-		radioButtonJuridica = (RadioButton) viewDados.findViewById(R.id.fragment_cliente_cadastro_dados_basico_radioButton_juridica);
+		textCodigoPessoa = (TextView) viewDados.findViewById(R.id.fragment_cliente_cadastro_dados_basico_md_text_codigo_pessoa);
+		textStatus = (TextView) viewDados.findViewById(R.id.fragment_cliente_cadastro_dados_basico_md_text_status);
+		editRazaoSocial = (EditText) viewDados.findViewById(R.id.fragment_cliente_cadastro_dados_basico_md_text_razao);
+		editFantasia = (EditText) viewDados.findViewById(R.id.fragment_cliente_cadastro_dados_basico_md_text_fantasia);
+		editCnpjCpf = (EditText) viewDados.findViewById(R.id.fragment_cliente_cadastro_dados_basico_md_text_cnpj_cpf);
+		editInscricaoEstadual = (EditText) viewDados.findViewById(R.id.fragment_cliente_cadastro_dados_basico_md_text_inscricao_estadual);
+		spinnerEstado = (Spinner) viewDados.findViewById(R.id.fragment_cliente_cadastro_dados_basico_md_spinner_estado);
+		spinnerCidade = (Spinner) viewDados.findViewById(R.id.fragment_cliente_cadastro_dados_basico_md_spinner_cidade);
+		editCep = (EditText) viewDados.findViewById(R.id.fragment_cliente_cadastro_dados_basico_md_text_cep);
+		editBairro = (EditText) viewDados.findViewById(R.id.fragment_cliente_cadastro_dados_basico_md_text_bairro);
+		editEndereco = (EditText) viewDados.findViewById(R.id.fragment_cliente_cadastro_dados_basico_md_text_endereco);
+		editNumero = (EditText) viewDados.findViewById(R.id.fragment_cliente_cadastro_dados_basico_md_text_numero);
+		editComplemento = (EditText) viewDados.findViewById(R.id.fragment_cliente_cadastro_dados_basico_md_text_complemento);
+		editEmail = (EditText) viewDados.findViewById(R.id.fragment_cliente_cadastro_dados_basico_md_text_email);
+		spinnerRamoAtividade = (Spinner) viewDados.findViewById(R.id.fragment_cliente_cadastro_dados_basico_md_spinner_ramo_atividade);
+		spinnerTipoCliente = (Spinner) viewDados.findViewById(R.id.fragment_cliente_cadastro_dados_basico_md_spinner_tipo_cliente);
+		spinnerStatus = (Spinner) viewDados.findViewById(R.id.fragment_cliente_cadastro_dados_basico_md_spinner_status);
+		spinnerTipoDocumento = (Spinner) viewDados.findViewById(R.id.fragment_cliente_cadastro_dados_basico_md_spinner_tipo_documento);
+		spinnerPortadorBanco = (Spinner) viewDados.findViewById(R.id.fragment_cliente_cadastro_dados_basico_md_spinner_portador_banco);
+		spinnerPlanoPagamento = (Spinner) viewDados.findViewById(R.id.fragment_cliente_cadastro_dados_basico_md_spinner_plano_pagamento);
+		editCapitalSocial = (EditText) viewDados.findViewById(R.id.fragment_cliente_cadastro_dados_basico_md_editText_capital_social);
+		editLimiteCompra = (EditText) viewDados.findViewById(R.id.fragment_cliente_cadastro_dados_basico_md_editText_limite_compras);
+		editDescontoAtacadoVista = (EditText) viewDados.findViewById(R.id.fragment_cliente_cadastro_dados_basico_md_editText_desconto_atacado_vista);
+		editDescontoAtacadoPrazo = (EditText) viewDados.findViewById(R.id.fragment_cliente_cadastro_dados_basico_md_editText_desconto_atacado_prazo);
+		editDescontoVarejoVista = (EditText) viewDados.findViewById(R.id.fragment_cliente_cadastro_dados_basico_md_editText_desconto_varejo_vista);
+		editDescontoVarejoPrazo = (EditText) viewDados.findViewById(R.id.fragment_cliente_cadastro_dados_basico_md_editText_desconto_varejo_prazo);
+		radioGroupFisicaJuridica = (RadioGroup) viewDados.findViewById(R.id.fragment_cliente_cadastro_dados_basico_md_radioGroup_fisica_juridica);
+		radioButtonFisica = (RadioButton) viewDados.findViewById(R.id.fragment_cliente_cadastro_dados_basico_md_radioButton_fisica);
+		radioButtonJuridica = (RadioButton) viewDados.findViewById(R.id.fragment_cliente_cadastro_dados_basico_md_radioButton_juridica);
+		progressBarStatus = (ProgressBar) viewDados.findViewById(R.id.fragment_cliente_cadastro_dados_basico_md_progressBar_status);
 	}
 	
 	private void carregarDadosListas(){
@@ -337,7 +352,7 @@ public class ClienteCadastroDadosFragment extends Fragment {
 			// Dados da mensagem
 			ContentValues mensagem = new ContentValues();
 			mensagem.put("comando", 0);
-			mensagem.put("tela", "ClienteCadastroDadosFragment");
+			mensagem.put("tela", "ClienteCadastroDadosMDFragment");
 			mensagem.put("mensagem", "Não foi possível carregar os dados necessários. \n" + e.getMessage());
 			// Instancia a classe  de funcoes para mostra a mensagem
 			FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(getActivity());
@@ -348,6 +363,7 @@ public class ClienteCadastroDadosFragment extends Fragment {
 	} // Fim da funcao carregarDadosPessoa
 
 	private void salvar(){
+		boolean insertsSucesso = true;
 		// Valida os dados
 		if (validarDados()) {
 
@@ -383,15 +399,15 @@ public class ClienteCadastroDadosFragment extends Fragment {
 			}
 
 			PessoaSql pessoaSql = new PessoaSql(getActivity());
-			long idPessoa = pessoaSql.insert(dadosCliente);
+			long idPessoa = pessoaSql.insertOrReplace(dadosCliente);
 
-			if (idPessoa > 0) {
+			if (idPessoa < 0) {
 
 				textCodigoPessoa.setText("" + idPessoaTemporario);
 				ContentValues dadosEndereco = new ContentValues();
 				dadosEndereco.put("ID_CFAENDER", idPessoaTemporario);
 				dadosEndereco.put("ID_CFACLIFO", idPessoaTemporario);
-				dadosEndereco.put("ID_SMAEMPRE", funcoes.getValorXml("CodigoEmpresa"));
+				dadosEndereco.put("ID_SMAEMPRE", funcoes.getValorXml(FuncoesPersonalizadas.TAG_CODIGO_EMPRESA));
 				dadosEndereco.put("ID_CFAESTAD", estado.getIdEstado());
 				dadosEndereco.put("ID_CFACIDAD", cidade.getIdCidade());
 				if (radioButtonJuridica.isChecked()) {
@@ -407,13 +423,15 @@ public class ClienteCadastroDadosFragment extends Fragment {
 				dadosEndereco.put("EMAIL", editEmail.getText().toString());
 
 				EnderecoSql enderecoSql = new EnderecoSql(getActivity());
-				enderecoSql.insert(dadosEndereco);
+				if (enderecoSql.insertOrReplace(dadosEndereco) >= -1){
+					insertsSucesso = false;
+				}
 				// Instancia a classe para pegar os dados do usuario
 				PessoaRotinas pessoaRotinas = new PessoaRotinas(getActivity());
 
 				// Pega os dados do usuario
 				List<PessoaBeans> listaPessoas = new ArrayList<PessoaBeans>();
-				listaPessoas = pessoaRotinas.listaPessoaResumido("CFACLIFO.CODIGO_USU = " + funcoes.getValorXml("CodigoUsuario"), PessoaRotinas.KEY_TIPO_USUARIO, null);
+				listaPessoas = pessoaRotinas.listaPessoaResumido("CFACLIFO.CODIGO_FUN = " + funcoes.getValorXml(FuncoesPersonalizadas.TAG_CODIGO_USUARIO), PessoaRotinas.KEY_TIPO_FUNCIONARIO, null);
 
 				PessoaBeans dadosUsuario = null;
 
@@ -436,7 +454,26 @@ public class ClienteCadastroDadosFragment extends Fragment {
 				dadosParametro.put("DESC_VARE_PRAZO", editDescontoVarejoPrazo.getText().toString());
 
 				ParametrosSql parametrosSql = new ParametrosSql(getActivity());
-				parametrosSql.insert(dadosParametro);
+				if (parametrosSql.insertOrReplace(dadosParametro) >= -1 ){
+					insertsSucesso = false;
+				}
+			} else {
+				insertsSucesso = false;
+			}
+			if (insertsSucesso){
+				cadastradoSucesso = "S";
+
+				SuperActivityToast.create(getContext(), getContext().getResources().getString(R.string.cadastro_sucesso), Style.DURATION_VERY_SHORT)
+						.setTextColor(Color.WHITE)
+						.setColor(Color.GREEN)
+						.setAnimations(Style.ANIMATIONS_POP)
+						.show();
+			} else {
+				SuperActivityToast.create(getContext(), getContext().getResources().getString(R.string.nao_foi_possivel_cadastrar), Style.DURATION_VERY_SHORT)
+						.setTextColor(Color.WHITE)
+						.setColor(Color.RED)
+						.setAnimations(Style.ANIMATIONS_POP)
+						.show();
 			}
 		}
 	} // Fim salvar
@@ -453,7 +490,7 @@ public class ClienteCadastroDadosFragment extends Fragment {
 				// Cria uma variavem para inserir as propriedades da mensagem
 				ContentValues mensagem = new ContentValues();
 				mensagem.put("comando", 2);
-				mensagem.put("tela", "ClienteCadastroDadosFragment");
+				mensagem.put("tela", "ClienteCadastroDadosMDFragment");
 				mensagem.put("mensagem", "CNPJ Inválido.");
 
 				// Executa a mensagem passando por parametro as propriedades
@@ -468,7 +505,7 @@ public class ClienteCadastroDadosFragment extends Fragment {
 				// Cria uma variavem para inserir as propriedades da mensagem
 				ContentValues mensagem = new ContentValues();
 				mensagem.put("comando", 2);
-				mensagem.put("tela", "ClienteCadastroDadosFragment");
+				mensagem.put("tela", "ClienteCadastroDadosMDFragment");
 				mensagem.put("mensagem", "CPF Inválido.");
 
 				// Executa a mensagem passando por parametro as propriedades

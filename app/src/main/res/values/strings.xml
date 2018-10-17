@@ -80,6 +80,7 @@
     <string name="configuracao">Configuração</string>
     <string name="configuracoes">Configurações</string>
     <string name="cadastro_usuario">Cadastro Usuário</string>
+    <string name="configuracoes_servidores">Configuração dos Servidor</string>
     <string name="cadastro_sucesso">Cadastro Sucesso</string>
     <string name="login_progress_signing_in">Signing in&#8230;</string>
     <string name="pesquisar">Pesquisar</string>
@@ -118,7 +119,7 @@
     <string name="compartilhar">Compartilhar</string>
     <string name="abrir_pdf">Abrir PDF</string>
     <string name="visualizar_logs">Visualizar logs</string>
-    <string name="enviar_pedido_nuvem">Enviar Pedido para Nuvem</string>
+    <string name="enviar_dados_nuvem">Enviar dados para Nuvem</string>
     <string name="enviar_todos_pedidos_nuvem">Enviar Todos os Pedidos para Nuvem</string>
     <string name="observacao">Observação</string>
     <string name="total">Total</string>
@@ -190,6 +191,7 @@
     <string name="titulos">Títulos à Receber/Pagar</string>
     <string name="pedidos_a_enviar">Pedidos à Enviar</string>
     <string name="pedidos_enviados">Todos os Pedidos Enviados</string>
+    <string name="cliente_novo_enviados">Todos os cliente novos forma enviados</string>
     <string name="lixeira">Lixeira</string>
     <string name="sincronizacao">Sincronização</string>
     <string name="logs">Logs</string>
@@ -218,6 +220,7 @@
     <string name="vendas_realizadas_mensal">Vendas Realizadas Mensal</string>
     <string name="enviando_pedidos">Enviando o(s) Pedido(s)</string>
     <string name="enviando_pedidos_confirmando">Enviando e confirmando o(s) Pedido(s)</string>
+    <string name="enviando_cliente_novo">Enviando cliente novo. </string>
     <string name="nao">Não</string>
     <string name="sim">Sim</string>
     <string name="tem_certeza_que_deseja_excluir_pedido">Tem certeza que deseja excluir o(s) pedido(s)?</string>
@@ -250,12 +253,22 @@
     <string name="digitar_cpj">Digitar CNPJ</string>
     <string name="nao_tenho_chave">Não tenho nenhuma chave de licença</string>
     <string name="primeiro_passo">Antes de iniciar a aplicação precisamos configurar algumas coisas.</string>
+    <string name="produto_promocao">Produto em Promoção/Oferta</string>
+    <string name="legenda_promocao">Os dois indicadores circulados em vermelho significa que o produto esta em promoção/oferta.</string>
+    <string name="produto_adicionado_orcamento">Produto Adicionado no Orçamento/Pedido</string>
+    <string name="legenda_produto_adicionado_orcamento">Quando a descrição do produto esta na cor verde, significa que este produto já esta no orçamento/pedido.</string>
+    <string name="sem_estoque_contabil">Produto sem Estoque Contábil</string>
+    <string name="legenda_produto_sem_estoque_contabil">Quando o icone em vermelho que esta circulado na imagem esta em vermelho significa que o produto não tem estoque contabil.</string>
+    <string name="produto_novo">Produto Novo</string>
+    <string name="legenda_produto_novo">Quando o fundo da descrição do produto estiver na cor azul claro, então siginifica que o produto é novo.</string>
+    <string name="produto_sem_estoque">Produto sem Estoque</string>
+    <string name="legenda_produto_sem_estoque">Quando o campo do estoque estiver na cor vermelha, significa que o produto não tem estoque, ou seja, o estoque é menor ou igual a 0 (zero).</string>
     <string name="tenho_cnpj">Tenho CNPJ</string>
     <string name="aguarde_buscando_primeiros_dados">Aguarde por favor, vamos baixar os primeiros dados.</string>
     <string name="finalizar">Finalizar</string>
     <string name="primeiros_passos_iniciar_savare">Primeiros passos para iniciar o SAVARE</string>
     <string name="registrar_voce_como_usuario">Precisamos registrar você como usuário</string>
-<string name="orientacao_registrar_usuario">Se você adquiriu uma licença para usar o SAVARE clique no botão \"DIGITAR CNPJ\".</string>
+    <string name="orientacao_registrar_usuario">Se você adquiriu uma licença para usar o SAVARE clique no botão \"DIGITAR CNPJ\".</string>
     <string name="terminamos_primeiros_passos">Terminamos os primeiros passos</string>
     <string name="terminamos">Terminamos</string>
     <string name="demorar_baixar_fotos">O recebimento de fotos pode demorar bastante, pois depende do tamanhos das imagens e quantidade.</string>
@@ -264,6 +277,7 @@
     <string name="escanear_codigo_barras">Escanear código de barras</string>
     <string name="cancelado">Cancelado</string>
     <string name="registrar">Registrar</string>
+    <string name="lista_servidor">Lista de Servidor</string>
     <string name="servidor_nuvem_retornou_alguma_coisa">O servidor em nuvem retornou alguns dados, vamos checar agora, aguarde por favor...</string>
     <string name="salvando_critica_retorno">Salvando a crítica do retorno.</string>
     <string name="achamos_usuario_servidor_nuvem">Achamos um usuário no servidor em nuvem. </string>
@@ -305,6 +319,7 @@
     <string name="recebendo_dados_situacao_tributaria">Recebendo os dados da(s) Situação(ões) Tributária(s)...</string>
     <string name="recebendo_dados_produto">Recebendo os dados do(s) Produto(s)...</string>
     <string name="recebendo_dados_preco">Recebendo os dados do(s) Preço(s)...</string>
+    <string name="recebendo_dados_conjunto">Recebendo os dados do(s) Conjunto(s)...</string>
     <string name="recebendo_dados_embalagem">Recebendo as Embalagens...</string>
     <string name="recebendo_dados_produto_loja">Recebendo os dados do(s) Produto(s) por Loja(s)...</string>
     <string name="recebendo_dados_local_estoque">Recebendo os dados do(s) Local(is) do(s) Estoque(s)...</string>
@@ -323,6 +338,7 @@
     <string name="recebendo_dados_versao">Recebendo os dados da Versão do App...</string>
     <string name="aguarde_mais_um_pouco_proxima_etapa">Aguarde mais um pouco, vamos para próxima etapa ...</string>
     <string name="vamos_checar_cliente">Aguarde vamos checar os clientes ...</string>
+    <string name="vamos_checar_promocao">Aguarde vamos checar os a(s) promoção (ões) ...</string>
     <string name="nao_tem_pedido_listar">Não tem pedido para pegar dados no dispositivo.</string>
     <string name="nao_conseguimos_validar_versao">Não conseguimos validar a versão do SAVARE, por favor, entre em contato com o suporte SAVARE.</string>
     <string name="terminamos_receber_dados">Terminamos de receber os primeiros dados, pode ir em frente e usar o SAVARE.</string>
@@ -340,6 +356,7 @@
     <string name="atacado">Atacado</string>
     <string name="varejo">Varejo</string>
     <string name="apenas_produtos_novos">Apenas Produtos Novos</string>
+    <string name="legenda">Legenda</string>
     <string name="aguarde_distribuir_desconto_item_orcamento">Aguarde, vamor distribuir o desconto no(s) item(ns) do oçamento...</string>
     <string name="aparentemente_servidor_webservice_offline">Aparentemente o Servidor Webservice está offline, pedimos que tente novamente, mas se não der certo entre em contato com o suporte da empresa ou do SAVARE.</string>
     <string name="servidor_webservice_offline">Servidor Webservice está offline.</string>
@@ -349,14 +366,16 @@
     <string name="verifique_campos_obrigatorios">Verifique se todos os campos obrigatórios estão preenchidos.</string>
     <string name="marcando_item_enviado_sucesso">Estamos marcando que o item foi enviado com sucesso.</string>
     <string name="marcando_pedido_enviado_sucesso">Estamos marcando que o pedido foi enviado com sucesso.</string>
+    <string name="marcando_cliente_novo_enviado_sucesso">Estamos marcando que o novo cadastro de cliente foi enviado com sucesso.</string>
     <string name="numero_vensao_savare_nao_chegou">Não chegou o número da versão do SAVARE, tente novamente. Se persistir entre em contato com o suporte SAVARE.</string>
     <string name="nao_retornou_dados_suficiente_para_continuar_comunicao_webservice">Não recebemos os dados primários pra checar a versão e continuar a se comunicar com servidor em nuvem (Webservice).</string>
     <string name="nao_retornou_dados_fotos">Não recebemos os dados das imagens para continuar a se comunicar com servidor em nuvem (Webservice).</string>
     <string name="nem_todos_pedidos_foram_enviados_tente_novamente">Nem todos os pedidos foram enviados. Atualize a lista e tente enviar novamente.</string>
+    <string name="nem_todos_clientes_novos_foram_enviados_tente_novamente">Nem todos os clientes novos foram enviados. Atualize a lista e tente enviar novamente.</string>
     <string name="nao_conseguimos_verificar_titulos">Não conseguimos verificar os títulos a receber.</string>
     <string name="produto_nao_esta_orcamento">Não achamos este produto no orçamento</string>
     <string name="excluido_sucesso">Excluido com sucesso.</string>
-    <string name="nao_chegou_dados_servidor_empresa">Não chegou os dados do servidor da emrpesa</string>
+    <string name="nao_chegou_dados_servidor_empresa">Não chegou os dados que precisamos do servidor da emrpesa, o que chegou foi um erro.</string>
     <string name="sem_cidade">Sem Cidade</string>
     <string name="portador">Portador/Banco</string>
     <string name="calculando_preco_venda">Calculando Preço de Venda</string>
@@ -393,6 +412,8 @@
     <string name="criando_tabelas">Aguarde, agora estamos criando as tabelas do banco de dados.</string>
     <string name="finalizando">Já estamos finalizando.</string>
     <string name="nao_conseguimos_lista_clientes">Não conseguimos listar os clientes</string>
+    <string name="listando_clientes_novos">Estamos listado o(s) cliente(s) novo(s).</string>
+    <string name="nao_achamos_clientes_novos">Não achamaos nenhum cliente novo.</string>
     <string name="verificando_tem_backup_tabelas">Estamos verificando se tem algum backup das tabelas já feito.</string>
 
     <string-array name="tab_produto_md">
@@ -429,7 +450,10 @@
         <item>Outros motivos</item>
     </string-array>
 
-
+    <string-array name="tab_cliente_cadastro_md">
+        <item>Dados</item>
+        <item>Telefone</item>
+    </string-array>
 
 
 </resources>

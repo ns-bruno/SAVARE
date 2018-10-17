@@ -30,9 +30,12 @@ import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.savare.R;
+import com.savare.activity.material.designer.LegendaProdutoListaMDActivity;
 import com.savare.activity.material.designer.ListaOrcamentoPedidoMDActivity;
+import com.savare.activity.material.designer.LoginMDActivity;
 import com.savare.activity.material.designer.OrcamentoProdutoDetalhesTabFragmentMDActivity;
 import com.savare.activity.material.designer.ProdutoListaMDActivity;
+import com.savare.activity.material.designer.RegistroChaveUsuarioMDActivity;
 import com.savare.adapter.ItemUniversalAdapter;
 import com.savare.banco.funcoesSql.ProdutoRecomendadoSql;
 import com.savare.beans.AreaBeans;
@@ -322,6 +325,9 @@ public class ProdutoListaMDFragment extends Fragment {
                 }
                 loaderProdutosAsync.execute();
             }
+        } else if (item.getItemId() == R.id.menu_produto_lista_tab_md_legenda){
+            Intent intent = new Intent(getContext(), LegendaProdutoListaMDActivity.class);
+            startActivity(intent);
         }
 
         return super.onOptionsItemSelected(item);

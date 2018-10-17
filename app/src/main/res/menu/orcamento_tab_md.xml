@@ -31,12 +31,7 @@
         android:title="@string/compartilhar"
         app:showAsAction="always" />
 
-    <item
-        android:id="@+id/menu_orcamento_tab_md_abrir_pdf"
-        android:orderInCategory="4"
-        android:icon="@mipmap/ic_file_pdf_dark"
-        android:title="@string/abrir_pdf"
-        app:showAsAction="always" />
+
 
     <item
         android:id="@+id/menu_orcamento_tab_md_rateio_preco"
@@ -50,20 +45,27 @@
         android:orderInCategory="102"
         android:icon="@mipmap/ic_file_document_box_dark"
         android:title="@string/transformar_pedido"
-        app:showAsAction="ifRoom" />
+        app:showAsAction="never" />
 
     <item
         android:id="@+id/menu_orcamento_tab_md_trocar_cliente"
         android:orderInCategory="103"
         android:icon="@mipmap/ic_find_replace_dark"
         android:title="@string/trocar_cliente"
-        app:showAsAction="ifRoom" />
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/menu_orcamento_tab_md_abrir_pdf"
+        android:orderInCategory="104"
+        android:icon="@mipmap/ic_file_pdf_dark"
+        android:title="@string/abrir_pdf"
+        app:showAsAction="never" />
 
     <item
         android:id="@+id/menu_orcamento_tab_md_visualizar_logs"
         android:orderInCategory="999"
         android:icon="@mipmap/ic_exclamation_dark"
         android:title="@string/visualizar_logs"
-        app:showAsAction="ifRoom" />
+        app:showAsAction="never" />
 
 </menu>

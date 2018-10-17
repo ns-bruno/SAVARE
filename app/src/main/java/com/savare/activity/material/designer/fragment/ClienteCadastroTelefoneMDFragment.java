@@ -1,4 +1,4 @@
-package com.savare.activity.fragment;
+package com.savare.activity.material.designer.fragment;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +21,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 
-public class ClienteCadastroTelefoneFragment extends Fragment {
+public class ClienteCadastroTelefoneMDFragment extends Fragment {
 	
 	private View viewDados;
 	private ListView listViewTelefones;
@@ -37,7 +37,7 @@ public class ClienteCadastroTelefoneFragment extends Fragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		
-		viewDados = inflater.inflate(R.layout.fragment_cliente_cadastro_telefone, container, false);
+		viewDados = inflater.inflate(R.layout.fragment_cliente_cadastro_telefone_md, container, false);
 		
 		/**
 		 * Pega valores passados por parametro de outra Activity
@@ -68,7 +68,7 @@ public class ClienteCadastroTelefoneFragment extends Fragment {
 					telefone.put("FONE", editTelefone.getText().toString());
 
 					TelefoneSql telefoneSql = new TelefoneSql(getActivity());
-					if (telefoneSql.insert(telefone) > 0) {
+					if (telefoneSql.insertOrReplace(telefone) > 0) {
 
 						carragaListaTelefones();
 
@@ -79,14 +79,14 @@ public class ClienteCadastroTelefoneFragment extends Fragment {
 					// Armazena as informacoes para para serem exibidas e enviadas
 					ContentValues contentValues = new ContentValues();
 					contentValues.put("comando", 0);
-					contentValues.put("tela", "ClienteCadastroTelefoneFragment");
+					contentValues.put("tela", "ClienteCadastroTelefoneMDFragment");
 					contentValues.put("mensagem", "Por Favor, primeiro salve os dados do cliente para depois salvar o telefone.");
 					contentValues.put("dados", "Por Favor, primeiro salve os dados do cliente para depois salvar o telefone.");
 					// Pega os dados do usuario
 					FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(getActivity());
-					contentValues.put("usuario", funcoes.getValorXml("Usuario"));
-					contentValues.put("empresa", funcoes.getValorXml("ChaveEmpresa"));
-					contentValues.put("email", funcoes.getValorXml("Email"));
+					//contentValues.put("usuario", funcoes.getValorXml("Usuario"));
+					//contentValues.put("empresa", funcoes.getValorXml("ChaveEmpresa"));
+					//contentValues.put("email", funcoes.getValorXml("Email"));
 
 					funcoes.menssagem(contentValues);
 				}
@@ -98,10 +98,10 @@ public class ClienteCadastroTelefoneFragment extends Fragment {
 	
 	
 	private void recuperarCamposTela(){
-		listViewTelefones = (ListView) viewDados.findViewById(R.id.fragment_cliente_cadastro_telefone_listView_lista_telefone);
-		editTelefone = (EditText) viewDados.findViewById(R.id.fragment_cliente_cadastro_telefone_edit_telefone);
-		editDdd = (EditText) viewDados.findViewById(R.id.fragment_cliente_cadastro_telefone_edit_ddd);
-		buttonAdicionar = (Button) viewDados.findViewById(R.id.fragment_cliente_cadastro_telefone_button_adicionar);
+		listViewTelefones = (ListView) viewDados.findViewById(R.id.fragment_cliente_cadastro_telefone_md_listView_lista_telefone);
+		editTelefone = (EditText) viewDados.findViewById(R.id.fragment_cliente_cadastro_telefone_md_edit_telefone);
+		editDdd = (EditText) viewDados.findViewById(R.id.fragment_cliente_cadastro_telefone_md_edit_ddd);
+		buttonAdicionar = (Button) viewDados.findViewById(R.id.fragment_cliente_cadastro_telefone_md_button_adicionar);
 	}
 	
 	

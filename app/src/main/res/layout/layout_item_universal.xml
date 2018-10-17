@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="5dp">
@@ -105,4 +106,58 @@
         android:adjustViewBounds="true"
         android:scaleType="fitCenter"
         android:layout_alignTop="@+id/layout_item_universal_text_descricao" />
+
+    <LinearLayout
+        android:id="@+id/layout_item_universal_linearLayout_icones"
+        android:layout_width="match_parent"
+        android:layout_height="25dp"
+        android:layout_alignLeft="@+id/layout_item_universal_text_descricao"
+        android:layout_alignStart="@+id/layout_item_universal_text_descricao"
+        android:layout_below="@+id/layout_item_universal_text_botton_esquerdo"
+        android:orientation="horizontal"
+        android:padding="2dp"
+        android:visibility="gone">
+
+
+        <ImageView
+            android:id="@+id/layout_item_universal_imageView_icone1"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_marginLeft="5dp"
+            app:srcCompat="@mipmap/ic_new_box"
+            android:visibility="gone" />
+
+        <ImageView
+            android:id="@+id/layout_item_universal_imageView_icone2"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_marginLeft="5dp"
+            app:srcCompat="@mipmap/ic_new_box"
+            android:visibility="gone" />
+
+        <ImageView
+            android:id="@+id/layout_item_universal_imageView_icone3"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_marginLeft="5dp"
+            app:srcCompat="@mipmap/ic_new_box"
+            android:visibility="gone" />
+
+        <ImageView
+            android:id="@+id/layout_item_universal_imageView_icone4"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_marginLeft="5dp"
+            app:srcCompat="@mipmap/ic_new_box"
+            android:visibility="gone" />
+
+        <ImageView
+            android:id="@+id/layout_item_universal_imageView_icone5"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_marginLeft="5dp"
+            app:srcCompat="@mipmap/ic_new_box"
+            android:visibility="gone" />
+
+    </LinearLayout>
 </RelativeLayout>

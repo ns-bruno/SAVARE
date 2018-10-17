@@ -16,6 +16,7 @@ import android.widget.BaseAdapter;
 import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 
@@ -716,19 +717,17 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 		
 		View view = convertView;
 		
-		/*if (view == null) {*/
-			/*
-			 * Recupera o servico LayoutInflater que eh o servidor que ira
-			 * transformar o nosso layout layout_pessoa em uma View
-			 */
-			LayoutInflater inflater = (LayoutInflater) this.context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-			/*
-			 * Converte nosso layout em uma view
-			 */
-			view = inflater.inflate(R.layout.layout_item_universal, null);
-			
-		//} // Fim do if (view == null)
-		
+		/*
+		 * Recupera o servico LayoutInflater que eh o servidor que ira
+		 * transformar o nosso layout layout_pessoa em uma View
+		 */
+		LayoutInflater inflater = (LayoutInflater) this.context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		/*
+		 * Converte nosso layout em uma view
+		 */
+		view = inflater.inflate(R.layout.layout_item_universal, null);
+
+
 		/**
 		 * Recupero os compoentes que estao dentro do layout_item_universal
 		 */
@@ -740,6 +739,12 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 		TextView textBottonDireito = (TextView) view.findViewById(R.id.layout_item_universal_text_botton_direito);
 		View viewTopo = (View) view.findViewById(R.id.layout_item_universal_view_topo);
 		View viewRodape = (View) view.findViewById(R.id.layout_item_universal_view_rodape);
+		LinearLayout linearLayoutIcons = (LinearLayout) view.findViewById(R.id.layout_item_universal_linearLayout_icones);
+		ImageView viewIcone1 = (ImageView) view.findViewById(R.id.layout_item_universal_imageView_icone1);
+		ImageView viewIcone2 = (ImageView) view.findViewById(R.id.layout_item_universal_imageView_icone2);
+		ImageView viewIcone3 = (ImageView) view.findViewById(R.id.layout_item_universal_imageView_icone3);
+		ImageView viewIcone4 = (ImageView) view.findViewById(R.id.layout_item_universal_imageView_icone4);
+		ImageView viewIcone5 = (ImageView) view.findViewById(R.id.layout_item_universal_imageView_icone5);
 		ImageView imageOpcao = (ImageView) view.findViewById(R.id.layout_item_universal_imageView_opcao);
 		CircleImageView imageCirclePrincipal = (CircleImageView) view.findViewById(R.id.layout_item_universal_profile_image);
 		
@@ -826,7 +831,13 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 		} else if(this.tipoItem == PRODUTO){
 			/**
 			 * Recupera dentro da lista de produtos, um produto especifico de acordo com a
-			 * posicao passada no parametro do getView
+			 * posicao passada no parametro do getView.
+			 *
+			 * @viewIcon1 = Produto em Promoção
+			 * @viewIcon2 =
+			 * @viewIcon3 = Produto sem Estoque Contabil
+			 * @viewIcon4 =
+			 * @viewIcon5 =
 			 */
 			ProdutoListaBeans produto = listaProduto.get(position);
 			
@@ -854,7 +865,7 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 			if(atacadoVarejo.equalsIgnoreCase(ATACADO)){
 				// Verifica se o produto esta na promocao
 				//if(produto.getValorPromocaoAtacadoVista() + produto.getValorPromocaoAtacadoPrazo() > 0){
-				if(produto.getProdutoPromocaoAtacado().equalsIgnoreCase("1")){
+				if( (produto.getProdutoPromocaoAtacado() != null) && (produto.getProdutoPromocaoAtacado().equalsIgnoreCase("1")) ){
 
 					/*if (vistaPrazo.equalsIgnoreCase("0")) {
 						// Seta o preco da promocao atacado
@@ -864,6 +875,9 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 					}*/
 					// Muda a cor da view para amarelo
 					viewTopo.setBackgroundColor(context.getResources().getColor(R.color.amarelo));
+					linearLayoutIcons.setVisibility(View.VISIBLE);
+					viewIcone1.setVisibility(View.VISIBLE);
+					viewIcone1.setImageResource(R.mipmap.sale_amarelo);
 				}else{
 					// Torna a vivew Invisivel, mas ocupa o mesmo espaco
 					viewTopo.setVisibility(View.INVISIBLE);
@@ -873,7 +887,7 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 
 			}else{
 				// Verifica se o produto esta na promocao
-				if(produto.getProdutoPromocaoVarejo().equalsIgnoreCase("1")){
+				if( (produto.getProdutoPromocaoVarejo() != null) && (produto.getProdutoPromocaoVarejo().equalsIgnoreCase("1")) ){
 
 					/*if (vistaPrazo.equalsIgnoreCase("0")) {
 						// Seta o preco de promocao varejo
@@ -883,6 +897,9 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 					}*/
 					// Muda a cor da view para amarelo (promocao)
 					viewTopo.setBackgroundColor(context.getResources().getColor(R.color.amarelo));
+					linearLayoutIcons.setVisibility(View.VISIBLE);
+					viewIcone1.setVisibility(View.VISIBLE);
+					viewIcone1.setImageResource(R.mipmap.sale_amarelo);
 				} else {
 					// Torna a vivew Invisivel, mas ocupa o mesmo espaco
 					viewTopo.setVisibility(View.INVISIBLE);
@@ -893,6 +910,10 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 			if(produto.getEstoqueContabil() < 1){
 				viewRodape.setBackgroundColor(context.getResources().getColor(R.color.vermelho_escuro));
 				viewRodape.setTag(produto.getEstoqueContabil());
+				// Adiciona o icone de estoque contabil negativo
+				linearLayoutIcons.setVisibility(View.VISIBLE);
+				viewIcone3.setVisibility(View.VISIBLE);
+				viewIcone3.setImageResource(R.mipmap.arrow_down_bold_box_vermelho_escuro);
 			}else{
 				viewRodape.setVisibility(View.INVISIBLE);
 			}
@@ -901,12 +922,12 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 			// Muda a cor do texto da listView se o produto ja estiver no orcamento
 			if(produto.getEstaNoOrcamento() == '1'){
 				// muda a cor dos texto do produto
-				textDescricao.setTextColor(this.context.getResources().getColor(R.color.verde));
-				textAbaixoDescricaoDireita.setTextColor(this.context.getResources().getColor(R.color.verde));
-				textAbaixoDescricaoEsqueda.setTextColor(this.context.getResources().getColor(R.color.verde));
-				textBottonDireito.setTextColor(this.context.getResources().getColor(R.color.verde));
-				textBottonEsquerdo.setTextColor(this.context.getResources().getColor(R.color.verde));
-				textBottonEsquerdoDois.setTextColor(this.context.getResources().getColor(R.color.verde));
+				textDescricao.setTextColor(this.context.getResources().getColor(R.color.verde_escuro));
+				textAbaixoDescricaoDireita.setTextColor(this.context.getResources().getColor(R.color.verde_escuro));
+				textAbaixoDescricaoEsqueda.setTextColor(this.context.getResources().getColor(R.color.verde_escuro));
+				textBottonDireito.setTextColor(this.context.getResources().getColor(R.color.verde_escuro));
+				textBottonEsquerdo.setTextColor(this.context.getResources().getColor(R.color.verde_escuro));
+				textBottonEsquerdoDois.setTextColor(this.context.getResources().getColor(R.color.verde_escuro));
 			}
 			
 
@@ -919,7 +940,7 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 			// Checa se eh um produto novo
 			if(produto.isProdutoNovo()){
 				// Muda o fundo do view
-				view.setBackgroundColor(context.getResources().getColor(R.color.azul_medio_200));
+				view.setBackgroundColor(context.getResources().getColor(R.color.azul_medio_500));
 
 				if (produto.getEstaNoOrcamento() != '1') {
 					// muda a cor dos texto do produto
@@ -938,6 +959,8 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 				textBottonDireito.setTypeface(null, Typeface.BOLD);
 				textBottonEsquerdo.setTypeface(null, Typeface.BOLD);
 				textBottonEsquerdoDois.setTypeface(null, Typeface.BOLD);
+
+
 			}
 			// Visualiza o botão de opcao
 
@@ -1597,7 +1620,7 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 			PessoaBeans pessoa = listaPessoa.get(position);
 
 			textDescricao.setText(pessoa.getCodigoCliente() + " - " + pessoa.getNomeRazao());
-			textDescricao.setTextColor(context.getResources().getColor(R.color.verde));
+			textDescricao.setTextColor(context.getResources().getColor(R.color.verde_escuro));
 			textAbaixoDescricaoEsqueda.setText(pessoa.getNomeFantasia());
 			textAbaixoDescricaoEsqueda.setTextColor(context.getResources().getColor(R.color.azul_medio_200));
 

@@ -1,20 +1,25 @@
 package com.savare.adapter;
 
+import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 
-import com.savare.activity.fragment.ClienteCadastroDadosFragment;
-import com.savare.activity.fragment.ClienteCadastroFragment;
-import com.savare.activity.fragment.ClienteCadastroTelefoneFragment;
+import com.savare.R;
+import com.savare.activity.material.designer.fragment.ClienteCadastroTelefoneMDFragment;
+import com.savare.activity.material.designer.fragment.ClienteCadastroDadosMDFragment;
 
 public class ClienteCadastroFragmentAdapter extends FragmentStatePagerAdapter {
 
-	Bundle paramentros;
-	
-	public ClienteCadastroFragmentAdapter(FragmentManager fm) {
+	private Bundle paramentros;
+	private Context context;
+
+	public ClienteCadastroFragmentAdapter(FragmentManager fm, Context context, Bundle paramentros) {
 		super(fm);
+		this.context = context;
+		this.paramentros = paramentros;
 	}
 
 	@Override
@@ -23,26 +28,33 @@ public class ClienteCadastroFragmentAdapter extends FragmentStatePagerAdapter {
 		
 		switch (i) {
 		
-		case ClienteCadastroFragment.DADOS_CLIENTE:
-			fragment = new ClienteCadastroDadosFragment();
-			fragment.setArguments(paramentros);
+		case 0:
+			fragment = new ClienteCadastroDadosMDFragment();
 			break;
 			
-		case ClienteCadastroFragment.TELEFONE:
-			fragment = new ClienteCadastroTelefoneFragment();
-			fragment.setArguments(paramentros);
+		case 1:
+			fragment = new ClienteCadastroTelefoneMDFragment();
 			break;
 		}
-		
+		if (fragment != null) {
+			fragment.setArguments(paramentros);
+		}
 		return fragment;
 	}
 
 	@Override
 	public int getCount() {
-		// TODO Auto-generated method stub
-		return ClienteCadastroFragment.TOTAL_ABAS;
+
+		return context.getResources().getStringArray(R.array.tab_cliente_cadastro_md).length;
 	}
 
+	@Nullable
+	@Override
+	public CharSequence getPageTitle(int position) {
+		String[] titulos = context.getResources().getStringArray(R.array.tab_cliente_cadastro_md);
+
+		return titulos[position];
+	}
 
 	/**
 	 * @return the paramentros

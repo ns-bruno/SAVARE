@@ -11,7 +11,7 @@
     <item
         android:id="@+id/menu_lista_pedido_context_enviar_pedido_nuvem"
         android:orderInCategory="101"
-        android:title="@string/enviar_pedido_nuvem"
+        android:title="@string/enviar_dados_nuvem"
         android:showAsAction="never">
     </item>
 

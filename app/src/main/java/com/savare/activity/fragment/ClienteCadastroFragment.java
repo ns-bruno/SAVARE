@@ -1,6 +1,7 @@
 package com.savare.activity.fragment;
 
 import com.savare.R;
+import com.savare.activity.material.designer.fragment.ClienteCadastroTelefoneMDFragment;
 import com.savare.adapter.ClienteCadastroFragmentAdapter;
 import com.savare.funcoes.FuncoesPersonalizadas;
 import com.savare.funcoes.rotinas.AuxiliarRotinas;
@@ -31,7 +32,6 @@ public class ClienteCadastroFragment extends FragmentActivity {
 		// Ativa a action bar com o simbolo de voltar
 		getActionBar().setDisplayHomeAsUpEnabled(true);
 		
-		adapterClienteCadastro = new ClienteCadastroFragmentAdapter(getSupportFragmentManager());
 
 		AuxiliarRotinas auxiliarRotinas = new AuxiliarRotinas(ClienteCadastroFragment.this);
 		// Pega um id negativo temporario para fazer o cadastro do cliente
@@ -41,8 +41,9 @@ public class ClienteCadastroFragment extends FragmentActivity {
 
 		// Cria a variavel para salvar o id temporario
 		Bundle clienteBundle = new Bundle();
-		clienteBundle.putString(ClienteCadastroTelefoneFragment.KEY_ID_PESSOA, ""+idClifo);
+		clienteBundle.putString(ClienteCadastroTelefoneMDFragment.KEY_ID_PESSOA, ""+idClifo);
 		clienteBundle.putString("CADASTRO_NOVO", "S");
+		adapterClienteCadastro = new ClienteCadastroFragmentAdapter(getSupportFragmentManager(), getApplicationContext(), clienteBundle);
 		// Passa por parametro o id temporario
 		adapterClienteCadastro.setParamentros(clienteBundle);
 		

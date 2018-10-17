@@ -494,7 +494,7 @@ public class OrcamentoRotinas extends Rotinas {
                     orcamento.setPessoaCliente(cursor.getString(cursor.getColumnIndex("PESSOA_CLIENTE")));
                     orcamento.setRgIe(cursor.getString(cursor.getColumnIndex("IE_RG_CLIENTE")));
                     orcamento.setCpfCnpj(cursor.getString(cursor.getColumnIndex("CPF_CGC_CLIENTE")));
-                    orcamento.setEnderecoCliente(cursor.getString(cursor.getColumnIndex("ENDERECO_CLIENTE")));
+                    if ( cursor.getString(cursor.getColumnIndex("ENDERECO_CLIENTE")) != null ) { orcamento.setEnderecoCliente(cursor.getString(cursor.getColumnIndex("ENDERECO_CLIENTE"))); }
                     orcamento.setBairroCliente(cursor.getString(cursor.getColumnIndex("BAIRRO_CLIENTE")));
                     orcamento.setCepCliente(cursor.getString(cursor.getColumnIndex("CEP_CLIENTE")));
                     orcamento.setObservacao(cursor.getString(cursor.getColumnIndex("OBS")));
