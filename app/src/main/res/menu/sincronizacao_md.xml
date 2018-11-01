@@ -21,5 +21,11 @@
         android:title="@string/zerar_datas_sincronizacao"
         app:showAsAction="never" />
 
+    <item
+        android:id="@+id/menu_sincronizacao_md_cadastro_servidor"
+        android:orderInCategory="102"
+        app:showAsAction="never"
+        android:title="@string/configuracoes_servidores"/>
+
 
 </menu>

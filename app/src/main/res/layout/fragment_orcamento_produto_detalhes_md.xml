@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
@@ -44,6 +45,14 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentTop="true"
                 android:layout_centerHorizontal="true"
+                android:text="@string/estoque" />
+
+            <TextView
+                android:id="@+id/textView4"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_toStartOf="@+id/activity_orcamento_produto_detalhes_md_text_estoque"
                 android:text="@string/estoque" />
         </RelativeLayout>
 
@@ -150,15 +159,14 @@
                 android:layout_gravity="bottom"
                 android:layout_weight="1"
                 android:digits="0123456789,-"
+                android:editable="false"
                 android:ems="10"
+                android:enabled="true"
+                android:focusable="false"
                 android:gravity="right"
                 android:hint="@string/valor_unitario"
                 android:inputType="none"
-                android:selectAllOnFocus="true"
-                android:enabled="true"
-                android:focusable="false"
-                android:editable="false">
-            </EditText>
+                android:selectAllOnFocus="true"></EditText>
         </LinearLayout>
 
         <LinearLayout

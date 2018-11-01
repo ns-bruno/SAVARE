@@ -16,6 +16,7 @@ import com.savare.adapter.ItemUniversalAdapter;
 import com.savare.banco.funcoesSql.OrcamentoSql;
 import com.savare.beans.ProdutoListaBeans;
 import com.savare.funcoes.FuncoesPersonalizadas;
+import com.savare.funcoes.Rotinas;
 import com.savare.funcoes.rotinas.ProdutoRotinas;
 
 import java.util.ArrayList;
@@ -129,10 +130,10 @@ public class PesquisaListaProdutoAsyncRotinas extends AsyncTask<String, String, 
             if( (codigoOrcamento != null) && (codigoOrcamento.length() > 0) ){
 
                 // Cria a lista de produto e verifica se os produto existe no orcamento
-                listaProdutos = produtoRotinas.listaProduto(where, group, codigoOrcamento, progressBar, textProcessoPesquisa, produtoRotinas.SIM, 0);
+                listaProdutos = produtoRotinas.listaProduto(where, group, codigoOrcamento, progressBar, textProcessoPesquisa, produtoRotinas.SIM, 0, Rotinas.NAO);
             }else {
                 // Cria a lista de produto sem verificar se o produto existe no orcamento
-                listaProdutos = produtoRotinas.listaProduto(where, group, null, progressBar, textProcessoPesquisa, produtoRotinas.SIM, 0);
+                listaProdutos = produtoRotinas.listaProduto(where, group, null, progressBar, textProcessoPesquisa, produtoRotinas.SIM, 0, Rotinas.NAO);
             }
 
             // Lista todos os produtos, para o Campo de Pesquisa(actionBar)

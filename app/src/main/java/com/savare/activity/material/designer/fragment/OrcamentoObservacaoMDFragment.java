@@ -81,7 +81,7 @@ public class OrcamentoObservacaoMDFragment extends Fragment {
                     case R.id.menu_orcamento_observacao_fragment_md_salvar:
 
                         // Checa se eh um orcamento
-                        if (tipoOrcamentoPedido.equals("O")){
+                        if ( (tipoOrcamentoPedido.equalsIgnoreCase("O")) || (tipoOrcamentoPedido.equalsIgnoreCase("P")) ){
                             // Preenche os dados para salvar no banco de dados
                             ContentValues dadosObservacao = new ContentValues();
                             dadosObservacao.put("OBS", editObservacao.getText().toString());

@@ -254,7 +254,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                         if (textStatusErro != null) {
                             ((Activity) context).runOnUiThread(new Runnable() {
                                 public void run() {
-                                    textStatusErro.append("\n*" +context.getResources().getText(R.string.servidor_webservice_offline) + " - " + servidor.getNomeServidor());
+                                    textStatusErro.append("\n*" +context.getResources().getText(R.string.servidor_webservice_offline) + " - " + servidor.getIdServidores() + " - " + servidor.getNomeServidor());
                                 }
                             });
                         }
@@ -272,7 +272,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                     if (textStatusErro != null) {
                         ((Activity) context).runOnUiThread(new Runnable() {
                             public void run() {
-                                textStatusErro.append("\n*" +context.getResources().getText(R.string.estamos_conectanto_servidor_webservice) + " - " + servidorAtivo.getNomeServidor());
+                                textStatusErro.append("\n*" +context.getResources().getText(R.string.estamos_conectanto_servidor_webservice) + " - " + servidorAtivo.getIdServidores() + " - " + servidorAtivo.getNomeServidor());
                             }
                         });
                     }
@@ -1175,7 +1175,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                         }
                     }
                 } else {
-                    bigTextStyle.bigText(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.get(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO))
+                    bigTextStyle.bigText(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) )
                             .setBigContentTitle(context.getResources().getString(R.string.recebendo_dados));
                     mBuilder.setStyle(bigTextStyle)
                             .setProgress(0, 0, false);
@@ -1828,7 +1828,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                     }
                 } else {
                     bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.msg_error))
-                            .bigText(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.get(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO));
+                            .bigText(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) );
                     mBuilder.setStyle(bigTextStyle)
                             .setProgress(0, 0, false);
                     notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());

@@ -469,7 +469,7 @@ public class ProdutoRotinas extends Rotinas {
 	}
 
 
-	public List<ProdutoListaBeans> listaProduto(String where, String group, String idOrcamento, final ProgressBar progresso, final TextView textProgresso, String todasEmbalagens, Integer idPlPgto){
+	public List<ProdutoListaBeans> listaProduto(String where, String group, String idOrcamento, final ProgressBar progresso, final TextView textProgresso, String todasEmbalagens, Integer idPlPgto, String calculaPreco){
 
 		FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
 
@@ -748,22 +748,101 @@ public class ProdutoRotinas extends Rotinas {
 					// Adiciona o produto a lista
 					produtoLista.setProduto(produto);
 
-					CalculaPrecoSP calculaPrecoSP = new CalculaPrecoSP(context, null, null);
-					ContentValues retornoPreco = calculaPrecoSP.execute(produtoLista.getIdPLoja(),
-							produtoLista.getProduto().getListaEmbalagem().get(0).getIdEmbalagem(),
-							idPlPgto,
-							Integer.parseInt(idCliente),
-							Integer.parseInt(codigoVendedor),
-							dataAtual,
-							produtoLista.getValorTabelaAtacado(),
-							produtoLista.getValorTabelaVarejo());
+                    // Verifica se eh pra executar a procedure calcula preco
+                    if( (calculaPreco != null) && (calculaPreco.equalsIgnoreCase(SIM)) ) {
 
-					if (retornoPreco != null) {
-						produtoLista.setValorUnitarioAtacado(retornoPreco.getAsDouble(CalculaPrecoSP.KEY_PRECO_ATACADO));
-						produtoLista.setValorUnitarioVarejo(retornoPreco.getAsDouble(CalculaPrecoSP.KEY_PRECO_VAREJO));
-						produtoLista.setProdutoPromocaoAtacado(retornoPreco.getAsString(CalculaPrecoSP.KEY_PRODUTO_PROMOCAO_ATACADO));
-						produtoLista.setProdutoPromocaoVarejo(retornoPreco.getAsString(CalculaPrecoSP.KEY_PRODUTO_PROMOCAO_VAREJO));
-						produtoLista.setProdutoPromocaoServico(retornoPreco.getAsString(CalculaPrecoSP.KEY_PRODUTO_PROMOCAO_SERVICO));
+                    	CalculaPrecoSP calculaPrecoSP = new CalculaPrecoSP(context, null, null);
+						ContentValues retornoPreco = calculaPrecoSP.execute(produtoLista.getIdPLoja(),
+								produtoLista.getProduto().getListaEmbalagem().get(0).getIdEmbalagem(),
+								idPlPgto,
+								Integer.parseInt(idCliente),
+								Integer.parseInt(codigoVendedor),
+								dataAtual,
+								produtoLista.getValorTabelaAtacado(),
+								produtoLista.getValorTabelaVarejo());
+
+						if (retornoPreco != null) {
+							produtoLista.setValorUnitarioAtacado(retornoPreco.getAsDouble(CalculaPrecoSP.KEY_PRECO_ATACADO));
+							produtoLista.setValorUnitarioVarejo(retornoPreco.getAsDouble(CalculaPrecoSP.KEY_PRECO_VAREJO));
+							produtoLista.setProdutoPromocaoAtacado(retornoPreco.getAsString(CalculaPrecoSP.KEY_PRODUTO_PROMOCAO_ATACADO));
+							produtoLista.setProdutoPromocaoVarejo(retornoPreco.getAsString(CalculaPrecoSP.KEY_PRODUTO_PROMOCAO_VAREJO));
+							produtoLista.setProdutoPromocaoServico(retornoPreco.getAsString(CalculaPrecoSP.KEY_PRODUTO_PROMOCAO_SERVICO));
+						}
+					} else {
+						produtoLista.setValorUnitarioAtacado(produtoLista.getValorTabelaAtacado());
+						produtoLista.setValorUnitarioVarejo(produtoLista.getValorTabelaVarejo());
+						produtoLista.setProdutoPromocaoAtacado("0");
+						produtoLista.setProdutoPromocaoVarejo("0");
+						produtoLista.setProdutoPromocaoServico("0");
+
+						StringBuilder sqlTemp = new StringBuilder();
+						sqlTemp.append( "SELECT TIPO, ID_AEACLASE, ID_AEAGRUPO, ID_AEASGRUP, ID_AEAFAMIL, ID_AEAMARCA FROM AEAPRODU WHERE ID_AEAPRODU = " + produtoLista.getProduto().getIdProduto());
+
+						Cursor dados = produtoSql.sqlSelect(sqlTemp.toString());
+
+						if ((dados != null) && (dados.getCount() > 0)){
+							dados.moveToFirst();
+
+							String tipoProduto = dados.getString(dados.getColumnIndex("TIPO"));
+							Integer idClasse = dados.getInt(dados.getColumnIndex("ID_AEACLASE"));
+							Integer idGrupo = dados.getInt(dados.getColumnIndex("ID_AEAGRUPO"));
+							Integer idSubGrupo = dados.getInt(dados.getColumnIndex("ID_AEASGRUP"));
+							Integer idFamilia = dados.getInt(dados.getColumnIndex("ID_AEAFAMIL"));
+							Integer idMarca = dados.getInt(dados.getColumnIndex("ID_AEAMARCA"));
+
+							StringBuilder sqlTbpro = new StringBuilder();
+							sqlTbpro.append( "(SELECT ID_AEATBPRO \n" +
+									"FROM AEATBPRO \n" +
+									"WHERE (ATIVO = '1') \n" +
+									"AND (DT_INICIO <= '" + dataAtual + "') AND (DT_FIM >= '" + dataAtual + "') \n" +
+									"AND ((DIAS = '') OR (DIAS IS NULL) OR (DIAS LIKE '%' || (STRFTIME('%w', '" + dataAtual + "')) || '%')) \n" +
+									"AND (" + idEmpresa + " IN (SELECT ID_SMAEMPRE FROM AEAEMTBP WHERE AEAEMTBP.ID_AEATBPRO = AEATBPRO.ID_AEATBPRO AND AEAEMTBP.ID_SMAEMPRE = " + idEmpresa + ")) )");
+
+							sqlTemp.setLength(0);
+							sqlTemp.append( "SELECT ID_AEAITTBP, DESC_MERC_VISTA_ATAC, DESC_MERC_VISTA_VARE, DESC_MERC_PRAZO_ATAC, DESC_MERC_PRAZO_VARE, \n" +
+									"DESC_SERV_VISTA, DESC_SERV_PRAZO, PRECO_VISTA_VARE, PRECO_VISTA_ATAC, PRECO_PRAZO_VARE, \n" +
+									"PRECO_PRAZO_ATAC, PRECO_VISTA_SERV, PRECO_PRAZO_SERV \n" +
+									"FROM AEAITTBP \n" +
+									"WHERE (ID_AEATBPRO IN (" + sqlTbpro.toString() + ") ) AND \n" +
+									"((" + produtoLista.getProduto().getIdProduto() + " = ID_AEAPRODU) OR (" + idMarca + " = ID_AEAMARCA) \n" +
+									"OR (" + idSubGrupo + " = ID_AEASGRUP) OR (" + idGrupo + " = ID_AEAGRUPO) OR (" + idClasse + " = ID_AEACLASE) \n" +
+									"OR (" + idFamilia + " = ID_AEAFAMIL) \n" +
+									"OR ((ID_AEAAGPPR IS NOT NULL) AND (ID_AEAAGPPR IN " +
+									"(SELECT ID_AEAAGPPR \n" +
+									"FROM AEAITGPR \n" +
+									"WHERE (" + produtoLista.getProduto().getIdProduto() + " = AEAITGPR.ID_AEAPRODU) OR (" + idMarca + " = AEAITGPR.ID_AEAMARCA) \n" +
+									"OR (" + idSubGrupo + " = AEAITGPR.ID_AEASGRUP) OR (" + idGrupo + " = AEAITGPR.ID_AEAGRUPO) OR (" + idClasse + " = AEAITGPR.ID_AEACLASE) \n" +
+									"OR (" + idFamilia + " = AEAITGPR.ID_AEAFAMIL))))) \n" +
+									"ORDER BY COALESCE(ID_AEAPRODU, ID_AEASGRUP, ID_AEAGRUPO, ID_AEACLASE, ID_AEAFAMIL, ID_AEAMARCA, ID_AEAAGPPR) LIMIT 1 ");
+
+							Cursor dadosItemPromo = produtoSql.sqlSelect(sqlTemp.toString());
+							if ((dadosItemPromo != null) && (dadosItemPromo.getCount() > 0)) {
+								dadosItemPromo.moveToFirst();
+
+								double somaAtacado = 0;
+								double somaVarejo = 0;
+								double somaServico = 0;
+
+								somaAtacado = dadosItemPromo.getDouble(dadosItemPromo.getColumnIndex("DESC_MERC_VISTA_ATAC")) + dadosItemPromo.getDouble(dadosItemPromo.getColumnIndex("DESC_MERC_PRAZO_ATAC")) +
+											  dadosItemPromo.getDouble(dadosItemPromo.getColumnIndex("PRECO_VISTA_ATAC")) + dadosItemPromo.getDouble(dadosItemPromo.getColumnIndex("PRECO_PRAZO_ATAC"));
+
+								somaVarejo = dadosItemPromo.getDouble(dadosItemPromo.getColumnIndex("DESC_MERC_VISTA_VARE")) + dadosItemPromo.getDouble(dadosItemPromo.getColumnIndex("DESC_MERC_PRAZO_VARE")) +
+											 dadosItemPromo.getDouble(dadosItemPromo.getColumnIndex("PRECO_VISTA_VARE")) + dadosItemPromo.getDouble(dadosItemPromo.getColumnIndex("PRECO_PRAZO_VARE"));
+
+								somaServico = dadosItemPromo.getDouble(dadosItemPromo.getColumnIndex("DESC_SERV_VISTA")) + dadosItemPromo.getDouble(dadosItemPromo.getColumnIndex("DESC_SERV_PRAZO")) +
+											  dadosItemPromo.getDouble(dadosItemPromo.getColumnIndex("PRECO_VISTA_SERV")) + dadosItemPromo.getDouble(dadosItemPromo.getColumnIndex("PRECO_PRAZO_SERV"));
+
+								if (somaAtacado != 0){
+									produtoLista.setProdutoPromocaoAtacado("1");
+								}
+								if (somaVarejo != 0){
+									produtoLista.setProdutoPromocaoVarejo("1");
+								}
+								if (somaServico != 0){
+									produtoLista.setProdutoPromocaoServico("1");
+								}
+							}
+						}
 					}
 					listaProduto.add(produtoLista);
 				} // Fim primeiro while

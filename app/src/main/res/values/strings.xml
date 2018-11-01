@@ -368,7 +368,7 @@
     <string name="marcando_pedido_enviado_sucesso">Estamos marcando que o pedido foi enviado com sucesso.</string>
     <string name="marcando_cliente_novo_enviado_sucesso">Estamos marcando que o novo cadastro de cliente foi enviado com sucesso.</string>
     <string name="numero_vensao_savare_nao_chegou">Não chegou o número da versão do SAVARE, tente novamente. Se persistir entre em contato com o suporte SAVARE.</string>
-    <string name="nao_retornou_dados_suficiente_para_continuar_comunicao_webservice">Não recebemos os dados primários pra checar a versão e continuar a se comunicar com servidor em nuvem (Webservice).</string>
+    <string name="nao_retornou_dados_suficiente_para_continuar_comunicao_webservice">Não recebemos os dados primários pra checar a versão e continuar a se comunicar com servidor em nuvem (Webservice). Provavelmente não retornou nenhuma informação.</string>
     <string name="nao_retornou_dados_fotos">Não recebemos os dados das imagens para continuar a se comunicar com servidor em nuvem (Webservice).</string>
     <string name="nem_todos_pedidos_foram_enviados_tente_novamente">Nem todos os pedidos foram enviados. Atualize a lista e tente enviar novamente.</string>
     <string name="nem_todos_clientes_novos_foram_enviados_tente_novamente">Nem todos os clientes novos foram enviados. Atualize a lista e tente enviar novamente.</string>

@@ -823,7 +823,9 @@ public class CalculaPrecoSP extends StoredProcedure {
                         }
                         dadosItemPromo = null;
 
+                        // Verifica se retornou nulo
                         idItemTabelaPromocao = ((idItemTabelaPromocao == null) ? 0 : idItemTabelaPromocao);
+
                         if (idItemTabelaPromocao != 0){
                             sqlTemp.setLength(0);
                             sqlTemp.append( "SELECT ID_AEAEXTBP, ID_CFATPCLI, ID_CFAPROFI, ID_CFAAREAS, ID_CFASTATU, ID_CFAATIVI \n" +

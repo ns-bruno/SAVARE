@@ -1,5 +1,6 @@
 package com.savare.activity.material.designer;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -184,6 +185,12 @@ public class SincronizacaoMDActivity extends AppCompatActivity {
                             .setAnimations(Style.ANIMATIONS_POP)
                             .show();
                 }
+                break;
+            case R.id.menu_sincronizacao_md_cadastro_servidor:
+                // Cria uma intent para salvar o local que eh para ser aberto
+                Intent intent = new Intent(SincronizacaoMDActivity.this, ListaServidoresWebserviceMDActivity.class);
+                startActivity(intent);
+                break;
 
             default:
                 break;

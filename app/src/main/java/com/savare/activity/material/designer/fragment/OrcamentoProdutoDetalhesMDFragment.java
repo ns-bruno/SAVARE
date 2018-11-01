@@ -646,8 +646,9 @@ public class OrcamentoProdutoDetalhesMDFragment extends Fragment {
                                                             String.valueOf(idOrcamento),
                                                             null,
                                                             null,
-                            Rotinas.NAO,
-                                                            adapterPlanoPagamentoPreco.getListaPlanoPagamento().get(posicaoPlanoPgto).getIdPlanoPagamento()).get(0);
+                                                            Rotinas.NAO,
+                                                            adapterPlanoPagamentoPreco.getListaPlanoPagamento().get(posicaoPlanoPgto).getIdPlanoPagamento(),
+                                                            Rotinas.SIM).get(0);
 
                     orcamento = new OrcamentoBeans();
 
@@ -675,8 +676,9 @@ public class OrcamentoProdutoDetalhesMDFragment extends Fragment {
                                                             null,
                                                             null,
                                                             null,
-                            Rotinas.NAO,
-                                                            adapterPlanoPagamentoPreco.getListaPlanoPagamento().get(posicaoPlanoPgto).getIdPlanoPagamento()).get(0);
+                                                             Rotinas.NAO,
+                                                             adapterPlanoPagamentoPreco.getListaPlanoPagamento().get(posicaoPlanoPgto).getIdPlanoPagamento(),
+                                                             Rotinas.SIM).get(0);
                 }
                 // Pega se a venda eh no atacado ou varejo
                 produto.setAtacadoVarejo(atacadoVarejo.charAt(0));
@@ -771,12 +773,23 @@ public class OrcamentoProdutoDetalhesMDFragment extends Fragment {
             editUnitarioLiquidoVenda.setText(funcoes.arredondarValor(valorUnitarioVendaAux));
             editValorTabela.setText(funcoes.arredondarValor(valorUnitarioVendaAux));
 
+            // Verifica se o produto esta na promocao
+            if ( (produtoVenda.getProdutoPromocaoAtacado() != null) && (produtoVenda.getProdutoPromocaoAtacado().equalsIgnoreCase("1")) ){
+                editValorTabela.setTextColor(getResources().getColor(R.color.laranja_escuro));
+            }
+
             // Verifica se a venda eh do varejo
         } else if(String.valueOf(produtoVenda.getAtacadoVarejo()).equals("1")){
             valorUnitarioVendaAux = produtoVenda.getValorUnitarioVarejo();
             // Preence o campo com o valor do produto
             editUnitarioLiquidoVenda.setText(funcoes.arredondarValor(valorUnitarioVendaAux));
             editValorTabela.setText(funcoes.arredondarValor(valorUnitarioVendaAux));
+
+            // Verifica se o produto esta na promocao
+            if ( ((produtoVenda.getProdutoPromocaoVarejo() != null) && (produtoVenda.getProdutoPromocaoVarejo().equalsIgnoreCase("1"))) ||
+                 ((produtoVenda.getProdutoPromocaoServico() != null) && (produtoVenda.getProdutoPromocaoServico().equalsIgnoreCase("1")))  ){
+                editValorTabela.setTextColor(getResources().getColor(R.color.laranja_escuro));
+            }
         } // Fim do if do varejo
         // Verfica se o produto ja esta no orcamento
         if(produtoVenda.getEstaNoOrcamento() == '1'){

@@ -44,6 +44,7 @@ import com.savare.beans.FotosBeans;
 import com.savare.beans.OrcamentoBeans;
 import com.savare.beans.ProdutoListaBeans;
 import com.savare.funcoes.FuncoesPersonalizadas;
+import com.savare.funcoes.Rotinas;
 import com.savare.funcoes.rotinas.FotoRotinas;
 import com.savare.funcoes.rotinas.OrcamentoRotinas;
 import com.savare.funcoes.rotinas.ProdutoRotinas;
@@ -561,11 +562,11 @@ public class ProdutoListaMDFragment extends Fragment {
                     if ((idOrcamento != null) && (idOrcamento.length() > 0)) {
 
                         // Cria a lista de produto e verifica se os produto existe no orcamento
-                        listaProdutos = produtoRotinas.listaProduto(where, null, idOrcamento, progressBarListaProdutos, null, produtoRotinas.NAO, 0);
+                        listaProdutos = produtoRotinas.listaProduto(where, null, idOrcamento, progressBarListaProdutos, null, produtoRotinas.NAO, 0, Rotinas.NAO);
 
                     } else {
                         // Cria a lista de produto sem verificar se o produto existe no orcamento
-                        listaProdutos = produtoRotinas.listaProduto(where, null, null, progressBarListaProdutos, null, produtoRotinas.NAO, 0);
+                        listaProdutos = produtoRotinas.listaProduto(where, null, null, progressBarListaProdutos, null, produtoRotinas.NAO, 0, Rotinas.NAO);
                     }
                 // Checa a tela que esta chamando esta funcao (Mais Vendidos por area)
                 } else if (tipoTela == TELA_MAIS_VENDIDOS_AREA) {
