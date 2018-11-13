@@ -692,7 +692,7 @@ public class FuncoesSql {
 	 * 
 	 */
 	public Cursor sqlSelect(String sql){
-		Log.i("SAVARE", sql);
+		//Log.i("SAVARE", sql);
 		Cursor cursor = null;
 		bancoDados = conexaoBanco.abrirBanco();
 		try {

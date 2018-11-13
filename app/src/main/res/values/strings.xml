@@ -111,6 +111,7 @@
     <string name="todos_pedidos">Todos os Pedidos</string>
     <string name="ordem_crescente">Ordem Crescente</string>
     <string name="deletar">Deletar</string>
+    <string name="duplicar">Duplicar</string>
     <string name="detalhes_produto">Detalhes Produto</string>
     <string name="transformar_pedido">Transformar em Pedido</string>
     <string name="trocar_cliente">Trocar Cliente</string>
@@ -133,7 +134,7 @@
     <string name="valor_unitario">Valor Unitário</string>
     <string name="sequencial">Sequêncial</string>
     <string name="codigo_unico">Código Único</string>
-    <string name="estoque">Estoque</string>
+    <string name="estoque">Estoque </string>
     <string name="tabela_preco">Tabela de Preço</string>
     <string name="quantidade">Quantidade</string>
     <string name="quantidade_invalida">Quantidade invalida</string>
@@ -415,6 +416,8 @@
     <string name="listando_clientes_novos">Estamos listado o(s) cliente(s) novo(s).</string>
     <string name="nao_achamos_clientes_novos">Não achamaos nenhum cliente novo.</string>
     <string name="verificando_tem_backup_tabelas">Estamos verificando se tem algum backup das tabelas já feito.</string>
+    <string name="erro_duplicar">Não conseguimos duplicar orçamento/pedido.</string>
+    <string name="duplicado_sucesso">Orçamento/Pedido duplicado com sucesso.</string>
 
     <string-array name="tab_produto_md">
         <item>Produtos</item>

@@ -71,7 +71,7 @@ public class ServidoresRotinas extends Rotinas {
                     incrementoProgresso ++;
                 }
             }
-        }catch (Exception e){
+        } catch (Exception e){
             new MaterialDialog.Builder(context)
                     .title("ServidoresRotinas")
                     .content(e.getMessage())

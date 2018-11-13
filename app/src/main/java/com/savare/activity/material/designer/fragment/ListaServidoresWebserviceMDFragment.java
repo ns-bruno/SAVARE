@@ -124,7 +124,7 @@ public class ListaServidoresWebserviceMDFragment extends SlideFragment {
     }
 
     private void carregarListaServidores(){
-        ServidoresRotinas servidoresRotinas = new ServidoresRotinas(getActivity().getApplicationContext());
+        ServidoresRotinas servidoresRotinas = new ServidoresRotinas(getActivity());
 
         List<ServidoresBeans> listaServidores = new ArrayList<ServidoresBeans>();
 

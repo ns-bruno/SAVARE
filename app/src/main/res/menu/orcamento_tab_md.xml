@@ -62,6 +62,12 @@
         app:showAsAction="never" />
 
     <item
+        android:id="@+id/menu_orcamento_tab_md_duplicar"
+        android:orderInCategory="105"
+        android:title="@string/duplicar"
+        app:showAsAction="never" />
+
+    <item
         android:id="@+id/menu_orcamento_tab_md_visualizar_logs"
         android:orderInCategory="999"
         android:icon="@mipmap/ic_exclamation_dark"

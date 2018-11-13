@@ -5,23 +5,29 @@
 
     <item
         android:id="@+id/menu_lista_orcamento_context_md_transformar_pedido"
-        android:orderInCategory="0"
+        android:orderInCategory="100"
         android:icon="@mipmap/ic_transfer_dark"
         android:title="@string/transformar_pedido"
         android:showAsAction="never"/>
 
     <item
         android:id="@+id/menu_lista_orcamento_context_md_deletar"
-        android:orderInCategory="1"
+        android:orderInCategory="101"
         android:icon="@mipmap/ic_delete_dark"
         android:title="@string/deletar"
         android:showAsAction="never"/>
 
     <item
         android:id="@+id/menu_lista_orcamento_context_md_enviar_email"
-        android:orderInCategory="100"
+        android:orderInCategory="102"
         android:icon="@mipmap/ic_email_dark"
         android:title="@string/enviar_email"
+        android:showAsAction="never"/>
+
+    <item
+        android:id="@+id/menu_lista_orcamento_context_md_duplicar"
+        android:orderInCategory="103"
+        android:title="@string/duplicar"
         android:showAsAction="never"/>
 
 

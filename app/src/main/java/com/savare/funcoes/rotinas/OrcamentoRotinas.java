@@ -1,7 +1,9 @@
 package com.savare.funcoes.rotinas;
 
+import java.sql.SQLInput;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import android.app.Activity;
 import android.content.ContentValues;
@@ -10,6 +12,7 @@ import android.database.Cursor;
 import android.util.Log;
 import android.widget.ProgressBar;
 
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.savare.R;
 import com.savare.banco.funcoesSql.ItemOrcamentoSql;
 import com.savare.banco.funcoesSql.OrcamentoSql;
@@ -1482,6 +1485,73 @@ public class OrcamentoRotinas extends Rotinas {
 		}
 		
 		return data;
+	}
+
+	public Boolean duplicaOrcamentoPedido(String idOrcamentoPeiddo){
+		try {
+
+			List<OrcamentoBeans> listaOrcamento = listaOrcamentoPedido(null, "ID_AEAORCAM = " + idOrcamentoPeiddo, null);
+
+			if ((listaOrcamento != null) && (listaOrcamento.size() > 0)) {
+				// Instancia a classe para manipular a tabela no banco de dados
+				OrcamentoSql orcamentoSql = new OrcamentoSql(context);
+				ContentValues dadosNovoOrcamento = new ContentValues();
+
+				OrcamentoBeans orcamentoPedido = listaOrcamento.get(0);
+				dadosNovoOrcamento.put("ID_SMAEMPRE", orcamentoPedido.getIdEmpresa());
+				dadosNovoOrcamento.put("ID_CFACLIFO", orcamentoPedido.getIdPessoa());
+				dadosNovoOrcamento.put("ID_CFAESTAD", orcamentoPedido.getIdEstado());
+				dadosNovoOrcamento.put("ID_CFACIDAD", orcamentoPedido.getIdCidade());
+				dadosNovoOrcamento.put("ID_CFATPDOC", orcamentoPedido.getIdTipoDocumento());
+				dadosNovoOrcamento.put("GUID", UUID.randomUUID().toString().replace("-", "").toUpperCase().substring(0, 16));
+				dadosNovoOrcamento.put("VL_FRETE", orcamentoPedido.getTotalFrete());
+				dadosNovoOrcamento.put("VL_SEGURO", orcamentoPedido.getTotalSeguro());
+				dadosNovoOrcamento.put("VL_OUTROS", orcamentoPedido.getTotalOutros());
+				dadosNovoOrcamento.put("VL_ENCARGOS_FINANCEIROS", orcamentoPedido.getTotalEncargosFinanceiros());
+				dadosNovoOrcamento.put("VL_TABELA", orcamentoPedido.getTotalTabela());
+				dadosNovoOrcamento.put("ATAC_VAREJO", orcamentoPedido.getTipoVenda());
+				dadosNovoOrcamento.put("PESSOA_CLIENTE", orcamentoPedido.getPessoaCliente());
+				dadosNovoOrcamento.put("NOME_CLIENTE", orcamentoPedido.getNomeRazao());
+				dadosNovoOrcamento.put("IE_RG_CLIENTE", orcamentoPedido.getRgIe());
+				dadosNovoOrcamento.put("CPF_CGC_CLIENTE", orcamentoPedido.getCpfCnpj());
+				dadosNovoOrcamento.put("ENDERECO_CLIENTE", orcamentoPedido.getEnderecoCliente());
+				dadosNovoOrcamento.put("BAIRRO_CLIENTE", orcamentoPedido.getBairroCliente());
+				dadosNovoOrcamento.put("CEP_CLIENTE", orcamentoPedido.getCepCliente());
+				dadosNovoOrcamento.put("OBS", orcamentoPedido.getObservacao());
+				dadosNovoOrcamento.put("STATUS", "O");
+				dadosNovoOrcamento.put("TIPO_ENTREGA", orcamentoPedido.getTipoEntrega());
+
+				long idOrcamentoNovo = orcamentoSql.insert(dadosNovoOrcamento);
+
+				if (idOrcamentoNovo > 0) {
+					List<ItemOrcamentoBeans> listaItem = listaItemOrcamentoResumida(null, idOrcamentoPeiddo, null, null);
+
+					if ((listaItem != null) && (listaItem.size() > 0)) {
+						// Passa por todos os itens do pedido
+						for (ItemOrcamentoBeans item : listaItem) {
+
+							StringBuilder sqlInsert = new StringBuilder();
+							sqlInsert.append("INSERT INTO AEAITORC (ID_AEAORCAM, ID_AEAESTOQ, ID_AEAPRODU, ID_AEAPLPGT, ID_AEAUNVEN, ID_CFACLIFO_VENDEDOR, GUID, SEQUENCIA, QUANTIDADE, VL_CUSTO, VL_BRUTO, VL_DESCONTO, VL_TABELA, VL_TABELA_UN, FC_CUSTO_UN, FC_BRUTO_UN, FC_DESCONTO_UN, FC_LIQUIDO, FC_LIQUIDO_UN, PROMOCAO, TIPO_PRODUTO, COMPLEMENTO, SEQ_DESCONTO, PESO_LIQUIDO, PESO_BRUTO, STATUS) ");
+							sqlInsert.append("SELECT " + idOrcamentoNovo + ", ID_AEAESTOQ, ID_AEAPRODU, ID_AEAPLPGT, ID_AEAUNVEN, ID_CFACLIFO_VENDEDOR, '" + (UUID.randomUUID().toString().replace("-", "").toUpperCase().substring(0, 16)) + "', SEQUENCIA, QUANTIDADE, VL_CUSTO, VL_BRUTO, VL_DESCONTO, VL_TABELA, VL_TABELA_UN, FC_CUSTO_UN, FC_BRUTO_UN, FC_DESCONTO_UN, FC_LIQUIDO, FC_LIQUIDO_UN, PROMOCAO, TIPO_PRODUTO, COMPLEMENTO, SEQ_DESCONTO, PESO_LIQUIDO, PESO_BRUTO, 'O' ");
+							sqlInsert.append("FROM AEAITORC WHERE AEAITORC.ID_AEAITORC = " + item.getIdItemOrcamento());
+
+							orcamentoSql.execSQL(sqlInsert.toString());
+						}
+					}
+				} else {
+					return false;
+				}
+			} else {
+				return false;
+			}
+		} catch (Exception e){
+			new MaterialDialog.Builder(context)
+					.title("OrcamentoRotinas")
+					.content(context.getResources().getString(R.string.erro_duplicar) + " - " + e.getMessage())
+					.positiveText(R.string.button_ok)
+					.show();
+		}
+		return true;
 	}
 
 } // Fim da classe

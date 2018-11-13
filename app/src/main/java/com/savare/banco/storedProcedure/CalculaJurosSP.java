@@ -334,7 +334,7 @@ public class CalculaJurosSP extends StoredProcedure {
                             this.capitaliza = capitalizaEmpre;
                         }
                     }
-                    if (this.capitaliza.equalsIgnoreCase("1")){ // Diario
+                    if (this.capitaliza != null && this.capitaliza.equalsIgnoreCase("1")){ // Diario
                         while (dias > 0){
                             juros = juros + round(valorJurosDiario, 2);
                             if (taxaDiaria != 0){
@@ -343,7 +343,7 @@ public class CalculaJurosSP extends StoredProcedure {
                             dias = dias - 1;
                             juros = round(juros, 2);
                         }
-                    } else if (this.capitaliza.equalsIgnoreCase("2")) { // Mensal
+                    } else if (this.capitaliza != null && this.capitaliza.equalsIgnoreCase("2")) { // Mensal
                         meses = dias / 30;
                         dias = dias - (meses * 30);
                         while (meses > 0){

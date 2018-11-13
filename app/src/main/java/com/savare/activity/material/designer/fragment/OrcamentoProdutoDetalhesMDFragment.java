@@ -123,7 +123,7 @@ public class OrcamentoProdutoDetalhesMDFragment extends Fragment {
                 CarregarDadosOrcamentoProduto carregarDadosOrcamentoProduto = new CarregarDadosOrcamentoProduto();
                 carregarDadosOrcamentoProduto.execute();
 
-            }  catch(Exception e){
+            } catch(Exception e){
                 new MaterialDialog.Builder(getContext())
                         .title("OrcamentoProdutoDetalhesActivity")
                         .content("Erro ao pegar os dados(parâmetros) do produto da outra tela (activity). \n"

@@ -549,6 +549,31 @@ public class ListaOrcamentoPedidoMDActivity extends AppCompatActivity{
 
                         break;
 
+                    case R.id.menu_lista_orcamento_context_md_duplicar:
+                    case R.id.menu_lista_lixeira_context_md_duplicar:
+                    case R.id.menu_lista_pedido_context_md_duplicar:
+                        OrcamentoRotinas orcamentoRotinas = new OrcamentoRotinas(ListaOrcamentoPedidoMDActivity.this);
+
+                        String numeroDuplicadoSucesso = "";
+                        String numeroDuplicadoErro = "";
+                        for (Integer positionOrcamentoSelecionado: listaItemOrcamentoSelecionado) {
+                            //if (orcamentoRotinas.duplicaOrcamentoPedido(String.valueOf(idOrcamentoSelecionado))){
+                            if (orcamentoRotinas.duplicaOrcamentoPedido(String.valueOf(adapterListaOrcamentoPedido.getListaOrcamentoPediso().get(positionOrcamentoSelecionado).getIdOrcamento()))){
+                                numeroDuplicadoSucesso += " " + adapterListaOrcamentoPedido.getListaOrcamentoPediso().get(positionOrcamentoSelecionado).getIdOrcamento() + " - ";
+                            } else {
+                                numeroDuplicadoErro +=  " " + adapterListaOrcamentoPedido.getListaOrcamentoPediso().get(positionOrcamentoSelecionado).getIdOrcamento() + " - ";
+                            }
+                        }
+                        new MaterialDialog.Builder(ListaOrcamentoPedidoMDActivity.this)
+                                .title("ListaOrcamentoPedidoMDActivity")
+                                .content( ( (!numeroDuplicadoSucesso.isEmpty()) ? "Número(s): " + numeroDuplicadoSucesso + getResources().getString(R.string.duplicado_sucesso) + "\n" : "") +
+                                        ( (!numeroDuplicadoErro.isEmpty()) ? "Número(s): " + numeroDuplicadoErro + getResources().getString(R.string.erro_duplicar) : ""))
+                                .positiveText(R.string.button_ok)
+                                .show();
+                        mode.finish();
+                        onResume();
+                        break;
+
                     case R.id.menu_lista_lixeira_context_md_enviar_email:
 
                         enviarEmail();
