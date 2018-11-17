@@ -84,6 +84,7 @@ public class WSSisinfoWebservice {
     public static final String FUNCTION_SISINFOWEB_JSON_SELECT_AEALOCES = "/Aealoces";
     public static final String FUNCTION_SISINFOWEB_JSON_SELECT_AEAESTOQ = "/Aeaestoq";
     public static final String FUNCTION_SISINFOWEB_JSON_SELECT_AEAORCAM = "/Aeaorcam";
+    public static final String FUNCTION_SISINFOWEB_JSON_SELECT_AEAITGPR = "/Aeaitgpr";
     public static final String FUNCTION_SISINFOWEB_JSON_SELECT_AEAITORC = "/Aeaitorc";
     public static final String FUNCTION_SISINFOWEB_JSON_SELECT_AEASAIDA = "/Aeasaida";
     public static final String FUNCTION_SISINFOWEB_JSON_SELECT_AEAPERCE = "/Aeaperce";

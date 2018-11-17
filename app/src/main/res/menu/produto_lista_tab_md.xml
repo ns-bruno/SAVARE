@@ -26,6 +26,13 @@
         app:showAsAction="never" />
 
     <item
+        android:id="@+id/menu_produto_lista_tab_md_produtos_promocao"
+        android:orderInCategory="104"
+        android:icon="@mipmap/ic_sale"
+        android:title="@string/produtos_promocao"
+        app:showAsAction="never" />
+
+    <item
         android:id="@+id/menu_produto_lista_tab_md_legenda"
         android:orderInCategory="900"
         android:icon="@mipmap/ic_map_legend"

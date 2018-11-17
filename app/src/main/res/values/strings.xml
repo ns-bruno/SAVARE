@@ -325,6 +325,7 @@
     <string name="recebendo_dados_produto_loja">Recebendo os dados do(s) Produto(s) por Loja(s)...</string>
     <string name="recebendo_dados_local_estoque">Recebendo os dados do(s) Local(is) do(s) Estoque(s)...</string>
     <string name="recebendo_dados_estoque">Recebendo os dados do(s) Estoque(s)...</string>
+    <string name="recebendo_dados_item_agrupamento">Recebendo os dados do(s) Item(ns) de Agrupamento de Produto(s)...</string>
     <string name="recebendo_dados_orcamento">Recebendo os dados do(s) Pedido/Oçamento(s)...</string>
     <string name="recebendo_dados_item_orcamento">Recebendo os dados do(s) Item(ns) Pedido/Oçamento(s)...</string>
     <string name="recebendo_dados_percentual">Recebendo os dados do(s) Percentual(is)...</string>
@@ -357,6 +358,7 @@
     <string name="atacado">Atacado</string>
     <string name="varejo">Varejo</string>
     <string name="apenas_produtos_novos">Apenas Produtos Novos</string>
+    <string name="produtos_promocao">Produtos Em Promoção</string>
     <string name="legenda">Legenda</string>
     <string name="aguarde_distribuir_desconto_item_orcamento">Aguarde, vamor distribuir o desconto no(s) item(ns) do oçamento...</string>
     <string name="aparentemente_servidor_webservice_offline">Aparentemente o Servidor Webservice está offline, pedimos que tente novamente, mas se não der certo entre em contato com o suporte da empresa ou do SAVARE.</string>

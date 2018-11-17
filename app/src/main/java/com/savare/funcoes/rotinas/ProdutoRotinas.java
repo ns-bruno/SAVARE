@@ -37,6 +37,8 @@ import java.util.List;
 
 public class ProdutoRotinas extends Rotinas {
 
+	public static final String APENAS_PRODUTO_PROMOCAO = "APP";
+
 	public ProdutoRotinas(Context context) {
 		super(context);
 	}
@@ -472,6 +474,8 @@ public class ProdutoRotinas extends Rotinas {
 	public List<ProdutoListaBeans> listaProduto(String where, String group, String idOrcamento, final ProgressBar progresso, final TextView textProgresso, String todasEmbalagens, Integer idPlPgto, String calculaPreco){
 
 		FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
+		// Instancia a classe para manipular o banco de dados
+		ProdutoSql produtoSql = new ProdutoSql(context);
 
 		String idEmpresa = funcoes.getValorXml("CodigoEmpresa");
 		idEmpresa = (idEmpresa.equalsIgnoreCase(funcoes.NAO_ENCONTRADO) ? "0" : idEmpresa);
@@ -529,17 +533,195 @@ public class ProdutoRotinas extends Rotinas {
 			sql.append(" AND ( " + where +" ) ");
 		}
 
+		if ((calculaPreco != null) && (calculaPreco.equalsIgnoreCase(APENAS_PRODUTO_PROMOCAO))){
+
+			StringBuilder sqlTbpro = new StringBuilder();
+			sqlTbpro.append( "(SELECT AEATBPRO.ID_AEATBPRO \n" +
+					"FROM AEATBPRO \n" +
+					"WHERE (AEATBPRO.ATIVO = '1') \n" +
+					"AND (AEATBPRO.DT_INICIO <= DATE('NOW') ) AND (AEATBPRO.DT_FIM >= DATE('NOW') ) \n" +
+					"AND ((AEATBPRO.DIAS = '') OR (AEATBPRO.DIAS IS NULL) OR (AEATBPRO.DIAS LIKE '%' || (STRFTIME('%w', DATE('NOW') )) || '%')) \n" +
+					"AND (" + idEmpresa + " IN (SELECT ID_SMAEMPRE FROM AEAEMTBP WHERE AEAEMTBP.ID_AEATBPRO = AEATBPRO.ID_AEATBPRO AND AEAEMTBP.ID_SMAEMPRE = " + idEmpresa + ")) )");
+
+			StringBuilder sqlIttbp = new StringBuilder();
+			sqlIttbp.append("SELECT ID_AEAPRODU, ID_AEAAGPPR, ID_AEAMARCA, ID_AEAFAMIL, ID_AEACLASE, ID_AEAGRUPO, ID_AEASGRUP \n");
+			sqlIttbp.append("FROM AEAITTBP \n");
+			sqlIttbp.append("WHERE (ID_AEATBPRO IN (" + sqlTbpro.toString() + ") ) ");
+
+			Cursor cursorIttbp = produtoSql.sqlSelect(sqlIttbp.toString());
+
+			if ((cursorIttbp != null) && (cursorIttbp.getCount() > 0)){
+				// Cria variaveis temporarias para salvar os id's que estao na promocao
+				StringBuilder idProdu = new StringBuilder();
+				idProdu.append(" AEAPRODU.ID_AEAPRODU IN (");
+				int countIdProdu = 0;
+				StringBuilder idMarca = new StringBuilder();
+				idMarca.append(" AEAPRODU.ID_AEAMARCA IN (");
+				int countIdMarca = 0;
+				StringBuilder idFamil = new StringBuilder();
+				idFamil.append(" AEAPRODU.ID_AEAFAMIL IN (");
+				int countIdFamil = 0;
+				StringBuilder idClase = new StringBuilder();
+				idClase.append(" AEAPRODU.ID_AEACLASE IN (");
+				int countIdClase = 0;
+				StringBuilder idGrupo = new StringBuilder();
+				idGrupo.append(" AEAPRODU.ID_AEAGRUPO IN (");
+				int countIdGrupo = 0;
+				StringBuilder idSGrupo = new StringBuilder();
+				idSGrupo.append(" AEAPRODU.ID_AEASGRUP IN (");
+				int countIdSGrupo = 0;
+				StringBuilder idAgrupProd = new StringBuilder();
+				idAgrupProd.append(" (");
+				int countIdAgrupProd = 0;
+
+				while (cursorIttbp.moveToNext()){
+					// Verifica se tem algum produto na promocao valida
+					if ( (!cursorIttbp.isNull(cursorIttbp.getColumnIndex("ID_AEAPRODU"))) && (cursorIttbp.getInt(cursorIttbp.getColumnIndex("ID_AEAPRODU")) > 0) ){
+						idProdu.append( ((countIdProdu > 0) ? ", " : "" ) );
+						idProdu.append(cursorIttbp.getInt(cursorIttbp.getColumnIndex("ID_AEAPRODU")));
+
+						countIdProdu ++;
+					}
+					if ( (!cursorIttbp.isNull(cursorIttbp.getColumnIndex("ID_AEAAGPPR"))) && (cursorIttbp.getInt(cursorIttbp.getColumnIndex("ID_AEAAGPPR")) > 0) ){
+						idAgrupProd.append( ((countIdAgrupProd > 0) ? ", " : "" ) );
+						idAgrupProd.append(cursorIttbp.getInt(cursorIttbp.getColumnIndex("ID_AEAAGPPR")));
+
+						countIdAgrupProd ++;
+					}
+					if ( (!cursorIttbp.isNull(cursorIttbp.getColumnIndex("ID_AEAMARCA"))) && (cursorIttbp.getInt(cursorIttbp.getColumnIndex("ID_AEAMARCA")) > 0) ){
+						idMarca.append( ((countIdMarca > 0) ? ", " : "" ) );
+						idMarca.append(cursorIttbp.getInt(cursorIttbp.getColumnIndex("ID_AEAMARCA")));
+
+						countIdMarca ++;
+					}
+					if ( (!cursorIttbp.isNull(cursorIttbp.getColumnIndex("ID_AEAFAMIL"))) && (cursorIttbp.getInt(cursorIttbp.getColumnIndex("ID_AEAFAMIL")) > 0) ){
+						idFamil.append( ((countIdFamil > 0) ? ", " : "" ) );
+						idFamil.append(cursorIttbp.getInt(cursorIttbp.getColumnIndex("ID_AEAFAMIL")));
+
+						countIdFamil ++;
+					}
+					if ( (!cursorIttbp.isNull(cursorIttbp.getColumnIndex("ID_AEACLASE"))) && (cursorIttbp.getInt(cursorIttbp.getColumnIndex("ID_AEACLASE")) > 0) ){
+						idClase.append( ((countIdClase > 0) ? ", " : "" ) );
+						idClase.append(cursorIttbp.getInt(cursorIttbp.getColumnIndex("ID_AEACLASE")));
+
+						countIdClase ++;
+					}
+					if ( (!cursorIttbp.isNull(cursorIttbp.getColumnIndex("ID_AEAGRUPO"))) && (cursorIttbp.getInt(cursorIttbp.getColumnIndex("ID_AEAGRUPO")) > 0) ){
+						idGrupo.append( ((countIdGrupo > 0) ? ", " : "" ) );
+						idGrupo.append(cursorIttbp.getInt(cursorIttbp.getColumnIndex("ID_AEAGRUPO")));
+
+						countIdGrupo ++;
+					}
+					if ( (!cursorIttbp.isNull(cursorIttbp.getColumnIndex("ID_AEASGRUP"))) && (cursorIttbp.getInt(cursorIttbp.getColumnIndex("ID_AEASGRUP")) > 0) ){
+						idSGrupo.append( ((countIdSGrupo > 0) ? ", " : "" ) );
+						idSGrupo.append(cursorIttbp.getInt(cursorIttbp.getColumnIndex("ID_AEASGRUP")));
+
+						countIdSGrupo ++;
+					}
+				}
+				idAgrupProd.append(")");
+
+				if ( (countIdAgrupProd > 0) && (idAgrupProd.length() > 0) ){
+					Cursor cursorAgruProd = produtoSql.sqlSelect("SELECT * FROM AEAITGPR WHERE AEAITGPR.ID_AEAAGPPR IN " + idAgrupProd.toString());
+
+					if ((cursorAgruProd != null) && (cursorAgruProd.getCount() > 0)){
+
+						while (cursorAgruProd.moveToNext()) {
+							// Verifica se tem algum produto na promocao valida
+							if ((!cursorAgruProd.isNull(cursorAgruProd.getColumnIndex("ID_AEAPRODU"))) && (cursorAgruProd.getInt(cursorAgruProd.getColumnIndex("ID_AEAPRODU")) > 0)) {
+								idProdu.append(((countIdProdu > 0) ? ", " : ""));
+								idProdu.append(cursorAgruProd.getInt(cursorAgruProd.getColumnIndex("ID_AEAPRODU")));
+
+								countIdProdu++;
+							}
+							if ((!cursorAgruProd.isNull(cursorAgruProd.getColumnIndex("ID_AEAMARCA"))) && (cursorAgruProd.getInt(cursorAgruProd.getColumnIndex("ID_AEAMARCA")) > 0)) {
+								idMarca.append(((countIdMarca > 0) ? ", " : ""));
+								idMarca.append(cursorAgruProd.getInt(cursorAgruProd.getColumnIndex("ID_AEAMARCA")));
+
+								countIdMarca++;
+							}
+							if ((!cursorAgruProd.isNull(cursorAgruProd.getColumnIndex("ID_AEAFAMIL"))) && (cursorAgruProd.getInt(cursorAgruProd.getColumnIndex("ID_AEAFAMIL")) > 0)) {
+								idFamil.append(((countIdFamil > 0) ? ", " : ""));
+								idFamil.append(cursorAgruProd.getInt(cursorAgruProd.getColumnIndex("ID_AEAFAMIL")));
+
+								countIdFamil++;
+							}
+							if ((!cursorAgruProd.isNull(cursorAgruProd.getColumnIndex("ID_AEACLASE"))) && (cursorAgruProd.getInt(cursorAgruProd.getColumnIndex("ID_AEACLASE")) > 0)) {
+								idClase.append(((countIdClase > 0) ? ", " : ""));
+								idClase.append(cursorAgruProd.getInt(cursorAgruProd.getColumnIndex("ID_AEACLASE")));
+
+								countIdClase++;
+							}
+							if ((!cursorAgruProd.isNull(cursorAgruProd.getColumnIndex("ID_AEAGRUPO"))) && (cursorAgruProd.getInt(cursorAgruProd.getColumnIndex("ID_AEAGRUPO")) > 0)) {
+								idGrupo.append(((countIdGrupo > 0) ? ", " : ""));
+								idGrupo.append(cursorAgruProd.getInt(cursorAgruProd.getColumnIndex("ID_AEAGRUPO")));
+
+								countIdGrupo++;
+							}
+							if ((!cursorAgruProd.isNull(cursorAgruProd.getColumnIndex("ID_AEASGRUP"))) && (cursorAgruProd.getInt(cursorAgruProd.getColumnIndex("ID_AEASGRUP")) > 0)) {
+								idSGrupo.append(((countIdSGrupo > 0) ? ", " : ""));
+								idSGrupo.append(cursorAgruProd.getInt(cursorAgruProd.getColumnIndex("ID_AEASGRUP")));
+
+								countIdSGrupo++;
+							}
+						}
+					}
+				}
+				idProdu.append(")");
+				idMarca.append(")");
+				idFamil.append(")");
+				idClase.append(")");
+				idGrupo.append(")");
+				idSGrupo.append(")");
+
+				if ( (countIdProdu + countIdMarca + countIdFamil + countIdClase + countIdGrupo + countIdSGrupo) > 0) {
+					int i = 0;
+					// Adiciona o where no sql principal
+					sql.append(" AND ( ");
+
+					if ((idProdu.length() > 0) && (countIdProdu > 0)){
+						sql.append(" ( ").append(idProdu.toString()).append(" ) ");
+						i++;
+					}
+					if ((idMarca.length() > 0) && (countIdMarca > 0)){
+						sql.append((i > 0) ? " OR " : "");
+						sql.append(" ( ").append(idMarca.toString()).append(" ) ");
+						i++;
+					}
+					if ((idFamil.length() > 0) && (countIdFamil > 0)){
+						sql.append((i > 0) ? " OR " : "");
+						sql.append(" ( ").append(idFamil.toString()).append(" ) ");
+						i++;
+					}
+					if ((idClase.length() > 0) && (countIdClase > 0)){
+						sql.append((i > 0) ? " OR " : "");
+						sql.append(" ( ").append(idClase.toString()).append(" ) ");
+						i++;
+					}
+					if ((idGrupo.length() > 0) && (countIdGrupo > 0)){
+						sql.append((i > 0) ? " OR " : "");
+						sql.append(" ( ").append(idGrupo.toString()).append(" ) ");
+						i++;
+					}
+					if ((idSGrupo.length() > 0) && (countIdSGrupo > 0)){
+						sql.append((i > 0) ? " OR " : "");
+						sql.append(" ( ").append(idSGrupo.toString()).append(" ) ");
+						i++;
+					}
+
+					sql.append(" ) ");
+				}
+			}
+
+		}
 		if (group != null){
-			sql.append(" " + group + " ");
+			sql.append(" ").append(group).append(" ");
 		}
 		// Adiciona a ordem no sql
 		sql.append(" ORDER BY AEAPRODU.DESCRICAO, AEAUNVEN.SIGLA, AEAMARCA.DESCRICAO ");
 
 		// Cria uma lista para armazenar todas os produtos retornados do banco
 		List<ProdutoListaBeans> listaProduto = new ArrayList<ProdutoListaBeans>();
-
-		// Instancia a classe para manipular o banco de dados
-		ProdutoSql produtoSql = new ProdutoSql(context);
 
 		final Cursor cursor = produtoSql.sqlSelect(sql.toString());
 
@@ -768,6 +950,14 @@ public class ProdutoRotinas extends Rotinas {
 							produtoLista.setProdutoPromocaoVarejo(retornoPreco.getAsString(CalculaPrecoSP.KEY_PRODUTO_PROMOCAO_VAREJO));
 							produtoLista.setProdutoPromocaoServico(retornoPreco.getAsString(CalculaPrecoSP.KEY_PRODUTO_PROMOCAO_SERVICO));
 						}
+					} else if ((calculaPreco != null) && (calculaPreco.equalsIgnoreCase(APENAS_PRODUTO_PROMOCAO)) ){
+
+                    	produtoLista.setValorUnitarioAtacado(produtoLista.getValorTabelaAtacado());
+						produtoLista.setValorUnitarioVarejo(produtoLista.getValorTabelaVarejo());
+						produtoLista.setProdutoPromocaoAtacado("1");
+						produtoLista.setProdutoPromocaoVarejo("1");
+						produtoLista.setProdutoPromocaoServico("1");
+
 					} else {
 						produtoLista.setValorUnitarioAtacado(produtoLista.getValorTabelaAtacado());
 						produtoLista.setValorUnitarioVarejo(produtoLista.getValorTabelaVarejo());

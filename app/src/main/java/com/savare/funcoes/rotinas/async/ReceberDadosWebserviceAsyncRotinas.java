@@ -41,6 +41,7 @@ import com.savare.banco.funcoesSql.EstoqueSql;
 import com.savare.banco.funcoesSql.FatorSql;
 import com.savare.banco.funcoesSql.FotosSql;
 import com.savare.banco.funcoesSql.GradeSql;
+import com.savare.banco.funcoesSql.ItemAgrupamentoProduto;
 import com.savare.banco.funcoesSql.ItemExcaoPromocaoSql;
 import com.savare.banco.funcoesSql.ItemOrcamentoSql;
 import com.savare.banco.funcoesSql.ItemPromocaoSql;
@@ -508,7 +509,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                 importarDadosUnidadeVenda();
                             }
 
-                            // Recebe os dados da tabela AEAUNVEN
+                            // Recebe os dados da tabela AEAGRADE
                             if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEAGRADE))) ||
                                     (tabelaRecebeDados == null)) {
 
@@ -578,6 +579,14 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                                 // Importa os dados
                                 importarDadosEstoque();
+                            }
+
+                            // Recebe os dados da tabela AEAITGPR
+                            if (((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEAITGPR))) ||
+                                    (tabelaRecebeDados == null)) {
+
+                                // Importa os dados
+                                importarDadosItemAgrupamentoProduto();
                             }
 
                             // Recebe os dados da tabela AEAORCAM
@@ -9429,6 +9438,231 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             }
             bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.importar_dados_recebidos))
                     .bigText("ImportaDadosEstoque - " + e.getMessage());
+            mBuilder.setStyle(bigTextStyle)
+                    .setProgress(0, 0, false);
+            notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
+        }
+    }
+
+    private void importarDadosItemAgrupamentoProduto() {
+        JsonObject statuRetorno = null;
+
+        // Atualiza a notificacao
+        bigTextStyle.bigText(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa) + " Item de Agrupamento de Produto");
+        mBuilder.setStyle(bigTextStyle)
+                .setProgress(0, 0, true);
+        notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
+
+        // Checo se o texto de status foi passado pro parametro
+        if (textStatus != null) {
+            ((Activity) context).runOnUiThread(new Runnable() {
+                public void run() {
+                    textStatus.setText(context.getResources().getString(R.string.procurando_dados) + " Item de Agrupamento de Produto");
+                }
+            });
+        }
+        try {
+            FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
+            // Pega quando foi a ultima data que recebeu dados
+            String ultimaData = pegaUltimaDataAtualizacao("AEAITGPR");
+            // Cria uma variavel para salvar todos os paramentros em json
+            String parametrosWebservice = "";
+
+            if ((ultimaData != null) && (!ultimaData.isEmpty())) {
+
+                parametrosWebservice += "&where= (DT_ALT >= '" + ultimaData + "') ";
+            }
+            Gson gson = new Gson();
+            WSSisinfoWebservice webserviceSisInfo = new WSSisinfoWebservice(context);
+            JsonObject retornoWebservice = gson.fromJson(webserviceSisInfo.executarWebserviceJson(servidorAtivo, null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEAITGPR, WSSisinfoWebservice.METODO_GET, parametrosWebservice, null), JsonObject.class);
+
+            if ((retornoWebservice != null) && (retornoWebservice.has(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO))) {
+                statuRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO);
+                // Verifica se retornou com sucesso
+                if (statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO).getAsInt() == HttpURLConnection.HTTP_OK) {
+                    boolean todosSucesso = true;
+
+                    JsonObject pageRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_PAGE_RETORNO);
+
+                    if ( (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0) ) {
+                        final int totalPages = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt();
+                        int pageNumber = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_PAGE_NUMBER_RETORNO).getAsInt();
+
+                        for (int ia = pageNumber; ia < totalPages; ia++) {
+
+                            statuRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO);
+
+                            // Verifica se retornou com sucesso
+                            if (statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO).getAsInt() == HttpURLConnection.HTTP_OK) {
+                                // Atualiza a notificacao
+                                bigTextStyle.bigText(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
+                                mBuilder.setStyle(bigTextStyle);
+                                notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
+
+                                // Checo se o texto de status foi passado pro parametro
+                                if (textStatus != null) {
+                                    ((Activity) context).runOnUiThread(new Runnable() {
+                                        public void run() {
+                                            textStatus.setText(context.getResources().getString(R.string.servidor_nuvem_retornou_alguma_coisa));
+                                        }
+                                    });
+                                }
+                                // Checa se retornou alguma coisa
+                                if ((retornoWebservice.has(WSSisinfoWebservice.KEY_OBJECT_OBJECT_RETORNO))) {
+                                    final JsonArray listaItemAgrupamentoRetorno = retornoWebservice.getAsJsonArray(WSSisinfoWebservice.KEY_OBJECT_OBJECT_RETORNO);
+                                    // Checa se retornou algum dados na lista
+                                    if (listaItemAgrupamentoRetorno.size() > 0) {
+                                        // Atualiza a notificacao
+                                        bigTextStyle.bigText(context.getResources().getString(R.string.recebendo_dados_estoque));
+                                        mBuilder.setStyle(bigTextStyle)
+                                                .setProgress(listaItemAgrupamentoRetorno.size(), 0, false);
+                                        notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
+
+                                        // Checo se o texto de status foi passado pro parametro
+                                        if (textStatus != null) {
+                                            ((Activity) context).runOnUiThread(new Runnable() {
+                                                public void run() {
+                                                    textStatus.setText(context.getResources().getString(R.string.recebendo_dados_item_agrupamento));
+                                                }
+                                            });
+                                        }
+                                        if (progressBarStatus != null) {
+                                            ((Activity) context).runOnUiThread(new Runnable() {
+                                                public void run() {
+                                                    progressBarStatus.setIndeterminate(false);
+                                                    progressBarStatus.setMax(listaItemAgrupamentoRetorno.size());
+                                                }
+                                            });
+                                        }
+                                        List<ContentValues> listaDadosEstoque = new ArrayList<ContentValues>();
+                                        for (int i = 0; i < listaItemAgrupamentoRetorno.size(); i++) {
+                                            // Atualiza a notificacao
+                                            bigTextStyle.bigText(context.getResources().getString(R.string.recebendo_dados_item_agrupamento) + " - Parte " + (pageNumber + 1) + "/" + totalPages + " - " + i + "/" + listaItemAgrupamentoRetorno.size());
+                                            mBuilder.setStyle(bigTextStyle)
+                                                    .setProgress(listaItemAgrupamentoRetorno.size(), i, false);
+                                            notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
+
+                                            // Checo se o texto de status foi passado pro parametro
+                                            if (textStatus != null) {
+                                                final int finalI1 = i;
+                                                final int finalPageNumber = pageNumber + 1;
+                                                ((Activity) context).runOnUiThread(new Runnable() {
+                                                    public void run() {
+                                                        textStatus.setText(context.getResources().getString(R.string.recebendo_dados_item_agrupamento) + " - Parte " + finalPageNumber + "/" + totalPages + " - " + finalI1 + "/" + listaItemAgrupamentoRetorno.size());
+                                                    }
+                                                });
+                                            }
+                                            if (progressBarStatus != null) {
+                                                final int finalI = i;
+                                                ((Activity) context).runOnUiThread(new Runnable() {
+                                                    public void run() {
+                                                        progressBarStatus.setProgress(finalI);
+                                                    }
+                                                });
+                                            }
+                                            JsonObject itemAgrupamentoRetorno = listaItemAgrupamentoRetorno.get(i).getAsJsonObject();
+                                            ContentValues dadosItem = new ContentValues();
+
+                                            dadosItem.put("ID_AEAITGPR", itemAgrupamentoRetorno.get("idAeaitgpr").getAsInt());
+                                            dadosItem.put("ID_AEAAGPPR", itemAgrupamentoRetorno.get("idAeaagppr").getAsInt());
+                                            if (itemAgrupamentoRetorno.has("idAeamarca") && itemAgrupamentoRetorno.get("idAeamarca").getAsInt() > 0) {
+                                                dadosItem.put("ID_AEAMARCA", itemAgrupamentoRetorno.get("idAeamarca").getAsInt());
+                                            }
+                                            if (itemAgrupamentoRetorno.has("idAeafamil") && itemAgrupamentoRetorno.get("idAeafamil").getAsInt() > 0) {
+                                                dadosItem.put("ID_AEAFAMIL", itemAgrupamentoRetorno.get("idAeafamil").getAsInt());
+                                            }
+                                            if (itemAgrupamentoRetorno.has("idAeaclase") && itemAgrupamentoRetorno.get("idAeaclase").getAsInt() > 0) {
+                                                dadosItem.put("ID_AEACLASE", itemAgrupamentoRetorno.get("idAeaclase").getAsInt());
+                                            }
+                                            if (itemAgrupamentoRetorno.has("idAeagrupo") && itemAgrupamentoRetorno.get("idAeagrupo").getAsInt() > 0) {
+                                                dadosItem.put("ID_AEAGRUPO", itemAgrupamentoRetorno.get("idAeagrupo").getAsInt());
+                                            }
+                                            if (itemAgrupamentoRetorno.has("idAeasgrup") && itemAgrupamentoRetorno.get("idAeasgrup").getAsInt() > 0) {
+                                                dadosItem.put("ID_AEASGRUP", itemAgrupamentoRetorno.get("idAeasgrup").getAsInt());
+                                            }
+                                            if (itemAgrupamentoRetorno.has("idAeaprodu") && itemAgrupamentoRetorno.get("idAeaprodu").getAsInt() > 0) {
+                                                dadosItem.put("ID_AEAPRODU", itemAgrupamentoRetorno.get("idAeaprodu").getAsInt());
+                                            }
+                                            if (itemAgrupamentoRetorno.has("sequencia") && itemAgrupamentoRetorno.get("sequencia").getAsInt() > 0) {
+                                                dadosItem.put("SEQUENCIA", itemAgrupamentoRetorno.get("sequencia").getAsInt());
+                                            }
+                                            dadosItem.put("DT_ALT", itemAgrupamentoRetorno.get("dtAlt").getAsString());
+
+                                            listaDadosEstoque.add(dadosItem);
+                                        }
+                                        ItemAgrupamentoProduto itemAgrupamentoProduto = new ItemAgrupamentoProduto(context);
+
+                                        todosSucesso = itemAgrupamentoProduto.insertList(listaDadosEstoque);
+                                    }
+                                    // Atualiza a notificacao
+                                    bigTextStyle.bigText(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
+                                    mBuilder.setStyle(bigTextStyle)
+                                            .setProgress(0, 0, true);
+                                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
+
+                                    // Checo se o texto de status foi passado pro parametro
+                                    if (textStatus != null) {
+                                        ((Activity) context).runOnUiThread(new Runnable() {
+                                            public void run() {
+                                                textStatus.setText(context.getResources().getString(R.string.aguarde_mais_um_pouco_proxima_etapa));
+                                            }
+                                        });
+                                    }
+                                    if (progressBarStatus != null) {
+                                        ((Activity) context).runOnUiThread(new Runnable() {
+                                            public void run() {
+                                                progressBarStatus.setIndeterminate(true);
+                                            }
+                                        });
+                                    }
+                                } else {
+                                    // Cria uma notificacao para ser manipulado
+                                    bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.versao_savare_desatualizada))
+                                            .bigText(context.getResources().getString(R.string.nao_chegou_dados_servidor_empresa) + "\n" + retornoWebservice.toString());
+                                    mBuilder.setStyle(bigTextStyle)
+                                            .setProgress(0, 0, false);
+                                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
+                                }
+                                // Incrementa o total de paginas
+                                pageNumber++;
+                                if (pageNumber < totalPages) {
+                                    retornoWebservice = gson.fromJson(webserviceSisInfo.executarWebserviceJson(servidorAtivo, null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEAITGPR, WSSisinfoWebservice.METODO_GET, parametrosWebservice + "&pageNumber=" + pageNumber, null), JsonObject.class);
+                                }
+                            } else {
+                                todosSucesso = false;
+
+                                // Cria uma notificacao para ser manipulado
+                                bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.recebendo_dados))
+                                        .bigText(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString());
+                                mBuilder.setStyle(bigTextStyle)
+                                        .setProgress(0, 0, false);
+                                notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
+                            }
+                        } // Fim do for ia (page)
+                        // Checa se todos foram inseridos/atualizados com sucesso
+                        if (todosSucesso) {
+                            inserirUltimaAtualizacao("AEAITGPR");
+                        }
+                    }
+                } else {
+                    // Cria uma notificacao para ser manipulado
+                    bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.recebendo_dados))
+                            .bigText(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) + "\n" + statuRetorno.toString());
+                    mBuilder.setStyle(bigTextStyle)
+                            .setProgress(0, 0, false);
+                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
+                }
+            }
+        } catch (final Exception e) {
+            if (textStatusErro != null) {
+                ((Activity) context).runOnUiThread(new Runnable() {
+                    public void run() {
+                        textStatusErro.append("\n*" + context.getResources().getText(R.string.erro_inesperado) + " - Item Agrupamento de Produto : " + e.getMessage());
+                    }
+                });
+            }
+            bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.importar_dados_recebidos))
+                    .bigText("ImportaDadosItemAgrupmaentoProduto - " + e.getMessage());
             mBuilder.setStyle(bigTextStyle)
                     .setProgress(0, 0, false);
             notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());

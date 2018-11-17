@@ -131,7 +131,7 @@ public class ProdutoListaMDFragment extends Fragment {
                     // Limpa o listView
                     listViewProdutos.setAdapter(null);
                     // Executa
-                    LoaderProdutos loaderProdutosAsync = new LoaderProdutos(null, spinnerFiltro);
+                    LoaderProdutos loaderProdutosAsync = new LoaderProdutos(null, spinnerFiltro, null);
                     loaderProdutosAsync.execute();
 
                 } else if (tipoTela == TELA_MAIS_VENDIDOS_AREA) {
@@ -139,7 +139,7 @@ public class ProdutoListaMDFragment extends Fragment {
                     // Limpa o listView
                     listViewProdutos.setAdapter(null);
                     // Executa
-                    LoaderProdutos loaderProdutosAsync = new LoaderProdutos(null, spinnerFiltro);
+                    LoaderProdutos loaderProdutosAsync = new LoaderProdutos(null, spinnerFiltro, null);
                     loaderProdutosAsync.execute();
                 }
             }
@@ -255,7 +255,7 @@ public class ProdutoListaMDFragment extends Fragment {
                             // Limpa o listView
                             listViewProdutos.setAdapter(null);
                             // Executa
-                            LoaderProdutos loaderProdutosAsync = new LoaderProdutos(where, spinnerFiltro);
+                            LoaderProdutos loaderProdutosAsync = new LoaderProdutos(where, spinnerFiltro, null);
                             if ((loaderProdutosAsync.getStatus() == AsyncTask.Status.RUNNING)){
                                 loaderProdutosAsync.cancel(true);
                             }
@@ -265,7 +265,7 @@ public class ProdutoListaMDFragment extends Fragment {
                             // Limpa o listView
                             listViewProdutos.setAdapter(null);
                             // Executa
-                            LoaderProdutos loaderProdutosAsync = new LoaderProdutos(where, null);
+                            LoaderProdutos loaderProdutosAsync = new LoaderProdutos(where, null, null);
                             if ((loaderProdutosAsync.getStatus() == AsyncTask.Status.RUNNING)){
                                 loaderProdutosAsync.cancel(true);
                             }
@@ -310,7 +310,7 @@ public class ProdutoListaMDFragment extends Fragment {
                 // Limpa o listView
                 listViewProdutos.setAdapter(null);
                 // Executa
-                LoaderProdutos loaderProdutosAsync = new LoaderProdutos(where, spinnerFiltro);
+                LoaderProdutos loaderProdutosAsync = new LoaderProdutos(where, spinnerFiltro, null);
                 if ((loaderProdutosAsync.getStatus() == AsyncTask.Status.RUNNING)){
                     loaderProdutosAsync.cancel(true);
                 }
@@ -320,12 +320,22 @@ public class ProdutoListaMDFragment extends Fragment {
                 // Limpa o listView
                 listViewProdutos.setAdapter(null);
                 // Executa
-                LoaderProdutos loaderProdutosAsync = new LoaderProdutos(where, null);
+                LoaderProdutos loaderProdutosAsync = new LoaderProdutos(where, null, null);
                 if ((loaderProdutosAsync.getStatus() == AsyncTask.Status.RUNNING)){
                     loaderProdutosAsync.cancel(true);
                 }
                 loaderProdutosAsync.execute();
             }
+        } else if (item.getItemId() == R.id.menu_produto_lista_tab_md_produtos_promocao){
+            // Limpa o listView
+            listViewProdutos.setAdapter(null);
+            // Executa
+            LoaderProdutos loaderProdutosAsync = new LoaderProdutos(null, null, ProdutoRotinas.APENAS_PRODUTO_PROMOCAO);
+            if ((loaderProdutosAsync.getStatus() == AsyncTask.Status.RUNNING)){
+                loaderProdutosAsync.cancel(true);
+            }
+            loaderProdutosAsync.execute();
+
         } else if (item.getItemId() == R.id.menu_produto_lista_tab_md_legenda){
             Intent intent = new Intent(getContext(), LegendaProdutoListaMDActivity.class);
             startActivity(intent);
@@ -516,11 +526,12 @@ public class ProdutoListaMDFragment extends Fragment {
     }
 
     public class LoaderProdutos extends AsyncTask<Void, Void, Void> {
-        String where = "";
+        String where = "",
+               apenasProdutoPromocao = null;
         AreaBeans area;
         CidadeBeans cidade;
 
-        public LoaderProdutos(String where, Spinner spinnerFiltro) {
+        public LoaderProdutos(String where, Spinner spinnerFiltro, String apenasProdutoPromocao) {
             this.where = where;
 
             if (spinnerFiltro != null && spinnerFiltro.getCount() > 0) {
@@ -541,6 +552,7 @@ public class ProdutoListaMDFragment extends Fragment {
                     }
                 }
             }
+            this.apenasProdutoPromocao = apenasProdutoPromocao;
         }
 
         // Aqui eh o que acontece antes da tarefa principal ser executado
@@ -562,11 +574,11 @@ public class ProdutoListaMDFragment extends Fragment {
                     if ((idOrcamento != null) && (idOrcamento.length() > 0)) {
 
                         // Cria a lista de produto e verifica se os produto existe no orcamento
-                        listaProdutos = produtoRotinas.listaProduto(where, null, idOrcamento, progressBarListaProdutos, null, produtoRotinas.NAO, 0, Rotinas.NAO);
+                        listaProdutos = produtoRotinas.listaProduto(where, null, idOrcamento, progressBarListaProdutos, null, produtoRotinas.NAO, 0, ((apenasProdutoPromocao != null && apenasProdutoPromocao.length() > 0) ? ProdutoRotinas.APENAS_PRODUTO_PROMOCAO : Rotinas.NAO) );
 
                     } else {
                         // Cria a lista de produto sem verificar se o produto existe no orcamento
-                        listaProdutos = produtoRotinas.listaProduto(where, null, null, progressBarListaProdutos, null, produtoRotinas.NAO, 0, Rotinas.NAO);
+                        listaProdutos = produtoRotinas.listaProduto(where, null, null, progressBarListaProdutos, null, produtoRotinas.NAO, 0, ((apenasProdutoPromocao != null && apenasProdutoPromocao.length() > 0) ? ProdutoRotinas.APENAS_PRODUTO_PROMOCAO : Rotinas.NAO) );
                     }
                 // Checa a tela que esta chamando esta funcao (Mais Vendidos por area)
                 } else if (tipoTela == TELA_MAIS_VENDIDOS_AREA) {
