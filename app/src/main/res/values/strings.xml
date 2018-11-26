@@ -214,6 +214,8 @@
     <string name="todos">Todos</string>
     <string name="imagem_produto">Imagem do Produto</string>
     <string name="salva_pedido_pdf">Salva Pedido em PDF</string>
+    <string name="pesquisar_produto_estoque">Pesq. Apenas Produto</string>
+    <string name="pesquisar_apenas_produto_estoque">Com Estoque</string>
     <string name="pdf_salvo_sucesso">PDF salvo com sucesso.</string>
     <string name="historico_valores_vendas_mensais">Histórico de Valores de Vendas Mensais.</string>
     <string name="mes_vendas">Mês de Vendas</string>
@@ -359,6 +361,7 @@
     <string name="varejo">Varejo</string>
     <string name="apenas_produtos_novos">Apenas Produtos Novos</string>
     <string name="produtos_promocao">Produtos Em Promoção</string>
+    <string name="produtos_sem_estoque">Inclui Produtos Sem Estoque</string>
     <string name="legenda">Legenda</string>
     <string name="aguarde_distribuir_desconto_item_orcamento">Aguarde, vamor distribuir o desconto no(s) item(ns) do oçamento...</string>
     <string name="aparentemente_servidor_webservice_offline">Aparentemente o Servidor Webservice está offline, pedimos que tente novamente, mas se não der certo entre em contato com o suporte da empresa ou do SAVARE.</string>

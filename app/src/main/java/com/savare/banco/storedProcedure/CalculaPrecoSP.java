@@ -274,7 +274,7 @@ public class CalculaPrecoSP extends StoredProcedure {
                 }
                 String vistaPrazoPlanoEquivalente = "";
 
-                if ( (vistaPrazo != "") && !vistaPrazo.isEmpty()){
+                if ( (vistaPrazo != null) && (vistaPrazo != "") && (!vistaPrazo.isEmpty()) ){
                     sql.setLength(0);
                     sql.append("SELECT ID_AEAPLPGT_EQUIVALENTE, VISTA_PRAZO FROM AEAPLPGT WHERE ID_AEAPLPGT = " + idPlanoPgto);
 
@@ -301,10 +301,12 @@ public class CalculaPrecoSP extends StoredProcedure {
                         dados = null;
                     }
                 }
-                if ( (vistaPrazo != "") && (vistaPrazoPlanoEquivalente != "") && (vistaPrazo == vistaPrazoPlanoEquivalente) && (vendaVarejoPreco != 0) ){ precoVarejo = vendaVarejoPreco; }
-                if ( (vendaAtacadoPreco != 0) && (!vistaPrazo.isEmpty()) && (!vistaPrazoPlanoEquivalente.isEmpty()) && (vistaPrazo == vistaPrazoPlanoEquivalente)){ precoAtacado = vendaAtacadoPreco; }
+                // if ((:vn_aux1<>0) And (:vs_v_p=:vs_dep)) then vn_preco_vare=:vn_aux1;
+                if ( (vendaVarejoPreco != 0) && (vistaPrazoPlanoEquivalente != "") && (vistaPrazo != "") && (vistaPrazo.equalsIgnoreCase(vistaPrazoPlanoEquivalente)) ){ precoVarejo = vendaVarejoPreco; }
+                // if ((:vn_aux2<>0) And (:vs_v_p=:vs_dep)) then vn_preco_atac=:vn_aux2;
+                if ( (vendaAtacadoPreco != 0) && ((!vistaPrazo.isEmpty()) && (!vistaPrazoPlanoEquivalente.isEmpty()) && (vistaPrazo.equalsIgnoreCase(vistaPrazoPlanoEquivalente))) ){ precoAtacado = vendaAtacadoPreco; }
 
-                if ( (calculaJuros != null) && (calculaJuros.equalsIgnoreCase("0")) ){
+                if ( (calculaJuros != null) && (calculaJuros.equalsIgnoreCase("0")) ) {
                     if (retorno == null){
                         retorno = new ContentValues();
                     }
@@ -1216,30 +1218,30 @@ public class CalculaPrecoSP extends StoredProcedure {
     private void ep_inc_desc_preco(){
         descontoPromocao = descontoPromocao == null ? "" : descontoPromocao;
         if (vistaPrazo.equalsIgnoreCase("0")){
-            if ( ((produtoEmPromocaoAtacado.equalsIgnoreCase("0")) && ((descontoMaximoPlanoAtacadoVista == 0) || (descontoMercadoriaVistaAtacado <= descontoMaximoPlanoAtacadoVista)) )
+            if ( ((produtoEmPromocaoAtacado.equalsIgnoreCase("0")) && ((descontoMaximoPlanoAtacadoVista == 0) || ((descontoMercadoriaVistaAtacado + percentualDescontoAtacado) <= descontoMaximoPlanoAtacadoVista)) )
                     || ((produtoEmPromocaoAtacado.equalsIgnoreCase("1")) && (descontoPromocao.equalsIgnoreCase("1")) ) ){
-                precoAtacado = precoAtacado * (1- ((descontoMercadoriaVistaAtacado + percentualDescontoAtacado) / 100));
+                precoAtacado = precoAtacado * (1- ((percentualDescontoAtacado) / 100));
             }
-            if ( ((produtoEmPromocaoVarejo.equalsIgnoreCase("0")) && ((descontoMaximoPlanoVarejoVista == 0) || (descontoMercadoriaVistaVarejo <= descontoMaximoPlanoVarejoVista)) )
+            if ( ((produtoEmPromocaoVarejo.equalsIgnoreCase("0")) && ((descontoMaximoPlanoVarejoVista == 0) || ((descontoMercadoriaVistaVarejo + percentualDescontoVarejo) <= descontoMaximoPlanoVarejoVista)) )
                     || ((produtoEmPromocaoVarejo.equalsIgnoreCase("1")) && (descontoPromocao.equalsIgnoreCase("1")) ) ){
-                precoVarejo = precoVarejo * (1- ((descontoMercadoriaVistaVarejo + percentualDescontoVarejo) / 100));
+                precoVarejo = precoVarejo * (1- ((percentualDescontoVarejo) / 100));
             }
-            if ( ((produtoEmPromocaoServico.equalsIgnoreCase("0")) && ((descontoMaximoPlanoServicoVista == 0) || (descontoMercadoriaVistaServico <= descontoMaximoPlanoServicoVista)) )
+            if ( ((produtoEmPromocaoServico.equalsIgnoreCase("0")) && ((descontoMaximoPlanoServicoVista == 0) || ((descontoMercadoriaVistaServico + percentualDescontoServico) <= descontoMaximoPlanoServicoVista)) )
                     || ((produtoEmPromocaoServico.equalsIgnoreCase("1")) && (descontoPromocao.equalsIgnoreCase("1")) ) ){
-                precoServico = precoServico * (1- ((descontoMercadoriaVistaServico + percentualDescontoServico ) / 100));
+                precoServico = precoServico * (1- ((percentualDescontoServico ) / 100));
             }
         } else {
-            if ( ((produtoEmPromocaoAtacado.equalsIgnoreCase("0")) && ((descontoMaximoPlanoAtacadoPrazo == 0) || (descontoMercadoriaPrazoAtacado <= descontoMaximoPlanoAtacadoPrazo)) )
+            if ( ((produtoEmPromocaoAtacado.equalsIgnoreCase("0")) && ((descontoMaximoPlanoAtacadoPrazo == 0) || ((descontoMercadoriaPrazoAtacado +percentualDescontoAtacado) <= descontoMaximoPlanoAtacadoPrazo)) )
                     || ((produtoEmPromocaoAtacado.equalsIgnoreCase("1")) && (descontoPromocao.equalsIgnoreCase("1")) ) ){
-                precoAtacado = precoAtacado * (1- ((descontoMercadoriaPrazoAtacado + percentualDescontoAtacado) / 100));
+                precoAtacado = precoAtacado * (1- ((percentualDescontoAtacado) / 100));
             }
-            if ( ((produtoEmPromocaoVarejo.equalsIgnoreCase("0")) && ((descontoMaximoPlanoVarejoPrazo == 0) || (descontoMercadoriaPrazoVarejo <= descontoMaximoPlanoVarejoPrazo)) )
+            if ( ((produtoEmPromocaoVarejo.equalsIgnoreCase("0")) && ((descontoMaximoPlanoVarejoPrazo == 0) || ((descontoMercadoriaPrazoVarejo + percentualDescontoVarejo) <= descontoMaximoPlanoVarejoPrazo)) )
                     || ((produtoEmPromocaoVarejo.equalsIgnoreCase("1")) && (descontoPromocao.equalsIgnoreCase("1")) ) ){
-                precoVarejo = precoVarejo * (1- ((descontoMercadoriaPrazoVarejo + percentualDescontoVarejo) / 100));
+                precoVarejo = precoVarejo * (1- ((percentualDescontoVarejo) / 100));
             }
-            if ( ((produtoEmPromocaoServico.equalsIgnoreCase("0")) && ((descontoMaximoPlanoServicoPrazo == 0) || (descontoMercadoriaPrazoServico <= descontoMaximoPlanoServicoPrazo)) )
+            if ( ((produtoEmPromocaoServico.equalsIgnoreCase("0")) && ((descontoMaximoPlanoServicoPrazo == 0) || ((descontoMercadoriaPrazoServico + percentualDescontoServico) <= descontoMaximoPlanoServicoPrazo)) )
                     || ((produtoEmPromocaoServico.equalsIgnoreCase("1")) && (descontoPromocao.equalsIgnoreCase("1")) ) ){
-                precoServico = precoServico * (1- ((descontoMercadoriaPrazoServico + percentualDescontoServico) / 100));
+                precoServico = precoServico * (1- ((percentualDescontoServico) / 100));
             }
         }
     }

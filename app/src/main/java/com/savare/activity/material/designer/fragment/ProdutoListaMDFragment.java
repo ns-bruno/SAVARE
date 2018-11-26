@@ -81,6 +81,7 @@ public class ProdutoListaMDFragment extends Fragment {
     public static final String KEY_TELA_PRODUTO_LISTA_ACTIVITY = "ProdutoListaActivity";
     private TextView textCodigoOrcamento, textCodigoPessoa, textNomeRazao, textAtacadoVarejo, textProcessoPesquisa;
     LinearLayout layoutFragmentRodape;
+    private boolean pequisarProdutoEstoque = false;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -92,7 +93,11 @@ public class ProdutoListaMDFragment extends Fragment {
 
         recuperarCampos();
 
+        FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(getContext());
 
+        if (funcoes.getValorXml(funcoes.TAG_PESQUISA_PRODUTO_ESTOQUE).equalsIgnoreCase("S")){
+            pequisarProdutoEstoque = true;
+        }
 
         /**
          * Pega valores passados por parametro de outra Activity
@@ -245,11 +250,15 @@ public class ProdutoListaMDFragment extends Fragment {
                         query = query.replaceAll(" ", "%");
 
                         // Monta a clausula where para buscar no banco de dados
-                        String where = "( (AEAPRODU.DESCRICAO LIKE '%" + query + "%') OR "
+                        String where = " (( (AEAPRODU.DESCRICAO LIKE '%" + query + "%') OR "
                                 + "(AEAPRODU.CODIGO_ESTRUTURAL LIKE '%" + query + "%') OR "
                                 + "(AEAPRODU.DESCRICAO_AUXILIAR LIKE '%" + query + "%') OR "
                                 + "(AEAPRODU.REFERENCIA LIKE '%" + query + "%') OR "
-                                + "(AEAMARCA.DESCRICAO LIKE '%" + query + "%') ) OR (AEAMARCA.DESCRICAO LIKE '%"+ query +"%')";
+                                + "(AEAMARCA.DESCRICAO LIKE '%" + query + "%') ) OR (AEAMARCA.DESCRICAO LIKE '%"+ query +"%')) ";
+
+                        if (pequisarProdutoEstoque){
+                            where += " AND (AEAPLOJA.ESTOQUE_F > 0)";
+                        }
 
                         if ((tipoTela == TELA_MAIS_VENDIDOS_AREA) || (tipoTela == TELA_MAIS_VENDIDOS_CIDADE)) {
                             // Limpa o listView
@@ -339,6 +348,11 @@ public class ProdutoListaMDFragment extends Fragment {
         } else if (item.getItemId() == R.id.menu_produto_lista_tab_md_legenda){
             Intent intent = new Intent(getContext(), LegendaProdutoListaMDActivity.class);
             startActivity(intent);
+
+        } else if (item.getItemId() == R.id.menu_produto_lista_tab_md_produtos_sem_estoque){
+            FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(getContext());
+            funcoes.setValorXml(funcoes.TAG_PESQUISA_PRODUTO_ESTOQUE, "N");
+            pequisarProdutoEstoque = false;
         }
 
         return super.onOptionsItemSelected(item);

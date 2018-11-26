@@ -53,6 +53,7 @@ import java.util.UUID;
 public class InicioMDActivity extends AppCompatActivity {
 
     public static String KEY_SALVA_PEDIDO_PDF = "salva_pedido_pdf";
+    public static String KEY_PESQUISAR_PRODUTO_ESTOQUE = "pesquisa_produto_estoque";
     public static String KEY_IMAGEM_PRODUTO = "imagem_produto";
     public static String KEY_RECEBE_AUTOMATICO = "receber";
     public static String KEY_ENVIA_AUTOMATICO = "enviar";
@@ -69,6 +70,7 @@ public class InicioMDActivity extends AppCompatActivity {
     boolean recebeAutomatico = false;
     boolean imagemProduto = false;
     boolean salvaPedidoPdf = false;
+    boolean pequisarProdutoEstoque = false;
     boolean enviaInstantaneamente = false;
 
     @TargetApi(Build.VERSION_CODES.M)
@@ -123,6 +125,9 @@ public class InicioMDActivity extends AppCompatActivity {
         }
         if (funcoes.getValorXml(funcoes.TAG_SALVA_PEDIDO_PDF).equalsIgnoreCase("S")){
             salvaPedidoPdf = true;
+        }
+        if (funcoes.getValorXml(funcoes.TAG_PESQUISA_PRODUTO_ESTOQUE).equalsIgnoreCase("S")){
+            pequisarProdutoEstoque = true;
         }
         if(!funcoes.getValorXml(funcoes.TAG_CODIGO_USUARIO).equalsIgnoreCase(funcoes.NAO_ENCONTRADO)) {
             PessoaRotinas pessoaRotinas = new PessoaRotinas(InicioMDActivity.this);
@@ -193,6 +198,7 @@ public class InicioMDActivity extends AppCompatActivity {
                         //new SwitchDrawerItem().withName(R.string.receber_automatico).withIcon(R.mipmap.ic_download).withChecked(recebeAutomatico).withOnCheckedChangeListener(mOnCheckedChangeListener).withTag(KEY_RECEBE_AUTOMATICO).withSelectable(false).withSwitchEnabled(false),
                         new SwitchDrawerItem().withName(R.string.imagem_produto).withIcon(R.mipmap.ic_image_dark).withChecked(imagemProduto).withOnCheckedChangeListener(mOnCheckedChangeListener).withTag(KEY_IMAGEM_PRODUTO),
                         new SwitchDrawerItem().withName(R.string.salva_pedido_pdf).withIcon(R.mipmap.ic_file_pdf).withChecked(salvaPedidoPdf).withOnCheckedChangeListener(mOnCheckedChangeListener).withTag(KEY_SALVA_PEDIDO_PDF),
+                        new SwitchDrawerItem().withName(R.string.pesquisar_produto_estoque).withIcon(R.mipmap.ic_feature_search).withDescription(R.string.pesquisar_apenas_produto_estoque).withChecked(pequisarProdutoEstoque).withOnCheckedChangeListener(mOnCheckedChangeListener).withTag(KEY_PESQUISAR_PRODUTO_ESTOQUE),
                         new SectionDrawerItem().withName(getResources().getString(R.string.versao_aplicacao) + " " + funcoes.getNomeVersaoAplicacao()),
                         new SectionDrawerItem().withName(funcoes.getValorXml(funcoes.TAG_UUID_DISPOSITIVO))
 
@@ -570,6 +576,16 @@ public class InicioMDActivity extends AppCompatActivity {
                     funcoesP.setValorXml(funcoesP.TAG_SALVA_PEDIDO_PDF, "N");
                 }
                 salvaPedidoPdf = b;
+            }
+            // Checa se a opcao seleciona eh para salvar os pedidos automaticamente em pdf
+            if (iDrawerItem.getTag().toString().contentEquals(KEY_PESQUISAR_PRODUTO_ESTOQUE)){
+                // Checa se foi escolhido verdadeiro ou false
+                if (b){
+                    funcoesP.setValorXml(funcoesP.TAG_PESQUISA_PRODUTO_ESTOQUE, "S");
+                } else {
+                    funcoesP.setValorXml(funcoesP.TAG_PESQUISA_PRODUTO_ESTOQUE, "N");
+                }
+                pequisarProdutoEstoque = b;
             }
             // Executa a funcao para criar os alarmes em background
             funcoesP.criarAlarmeEnviarAutomatico(enviaAutomatico);

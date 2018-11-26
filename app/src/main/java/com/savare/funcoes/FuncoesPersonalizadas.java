@@ -106,7 +106,8 @@ public class FuncoesPersonalizadas {
 							   TAG_CHAVE_FUNCIONARIO = "ChaveFuncionario",
 							   TAG_SALVA_PEDIDO_PDF = "SalvaPedidoPdf",
 							   TAG_DESCRICAO_DISPOSITIVO = "DescricaoDispositivo",
-							   TAG_UUID_DISPOSITIVO = "UuidDispositivo";
+							   TAG_UUID_DISPOSITIVO = "UuidDispositivo",
+							   TAG_PESQUISA_PRODUTO_ESTOQUE = "PesquisaProdutoComEstoque";
 	public static final String SIM = "S", NAO = "N";
 	public static final String ENVIAR_ORCAMENTO_SAVARE = "ENVIAR_ORCAMENTO_SAVARE";
 	public static final String RECEBER_DADOS_SAVARE = "RECEBER_DADOS_SAVARE";
