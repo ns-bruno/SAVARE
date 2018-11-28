@@ -191,7 +191,7 @@ public class InicioMDActivity extends AppCompatActivity {
                         new PrimaryDrawerItem().withName(R.string.lixeira).withIcon(R.drawable.ic_action_discard),
                         new PrimaryDrawerItem().withName(R.string.sincronizacao).withIcon(R.drawable.ic_action_cloud),
                         new PrimaryDrawerItem().withName(R.string.configuracoes).withIcon(R.drawable.ic_action_settings),
-                        new SectionDrawerItem().withName(R.string.monitoramento),
+                        new SectionDrawerItem().withName(R.string.configuracoes),
                         new PrimaryDrawerItem().withName(R.string.logs).withIcon(R.drawable.ic_sim_alert),
                         new SwitchDrawerItem().withName(R.string.enviar_automatico).withIcon(R.mipmap.ic_upload).withChecked(enviaAutomatico).withOnCheckedChangeListener(mOnCheckedChangeListener).withTag(KEY_ENVIA_AUTOMATICO),
                         switchEnviaInstantaneo,
