@@ -758,13 +758,13 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
             if ((uuidDispositivo != null) && (!uuidDispositivo.equalsIgnoreCase(funcoes.NAO_ENCONTRADO))) {
                 // Pega quando foi a ultima data que recebeu dados
-                ultimaData = pegaUltimaDataAtualizacao("CFACLIFO_FUN");
+                ultimaData = pegaUltimaDataAtualizacao("CFACLIFO_FUNC");
 
                 if ((ultimaData != null) && (!ultimaData.isEmpty())) {
 
-                    parametrosWebservice += "&where= (DT_ALT >= '" + ultimaData + "') AND (ID_CFACLIFO = (SELECT SMADISPO.ID_CFACLIFO_FUN FROM SMADISPO WHERE SMADISPO.IDENTIFICACAO = '" + funcoes.getValorXml("UuidDispositivo") + "') )";
+                    parametrosWebservice += "&where= (DT_ALT >= '" + ultimaData + "') AND (ID_CFACLIFO = (SELECT SMADISPO.ID_CFACLIFO_FUNC FROM SMADISPO WHERE SMADISPO.IDENTIFICACAO = '" + funcoes.getValorXml("UuidDispositivo") + "') )";
                 } else {
-                    parametrosWebservice += "&where= (ID_CFACLIFO = (SELECT SMADISPO.ID_CFACLIFO_FUN FROM SMADISPO WHERE SMADISPO.IDENTIFICACAO = '" + funcoes.getValorXml("UuidDispositivo") + "') )";
+                    parametrosWebservice += "&where= (ID_CFACLIFO = (SELECT SMADISPO.ID_CFACLIFO_FUNC FROM SMADISPO WHERE SMADISPO.IDENTIFICACAO = '" + funcoes.getValorXml("UuidDispositivo") + "') )";
                 }
 
                 WSSisinfoWebservice webserviceSisInfo = new WSSisinfoWebservice(context);
@@ -902,7 +902,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                             // Checa se todos foram inseridos/atualizados com sucesso
                             if (todosSucesso) {
-                                inserirUltimaAtualizacao("CFACLIFO_FUN");
+                                inserirUltimaAtualizacao("CFACLIFO_FUNC");
                             } else {
                                 PugNotification.with(context)
                                         .load()

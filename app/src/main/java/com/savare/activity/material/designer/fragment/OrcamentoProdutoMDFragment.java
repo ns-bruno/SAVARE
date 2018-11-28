@@ -578,6 +578,17 @@ public class OrcamentoProdutoMDFragment extends Fragment {
                     }
                     break;
 
+                case R.id.menu_orcamento_tab_md_duplicar:
+                    OrcamentoRotinas orcamentoRotinas = new OrcamentoRotinas(getContext());
+                    if (orcamentoRotinas.duplicaOrcamentoPedido(idOrcamento)){
+                        new MaterialDialog.Builder(getContext())
+                                .title("OrcamentoProdutoMDFFagment")
+                                .content(getResources().getString(R.string.duplicado_sucesso))
+                                .positiveText(R.string.button_ok)
+                                .show();
+                    }
+                    break;
+
                 case R.id.menu_orcamento_tab_md_visualizar_logs:
 
                     // Abre a tela inicial do sistema

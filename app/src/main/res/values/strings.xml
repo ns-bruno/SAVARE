@@ -112,6 +112,7 @@
     <string name="trocar_cliente">Trocar Cliente</string>
     <string name="plano_pagamento">Plano de Pagamento</string>
     <string name="enviar_email">Enviar e-Mail</string>
+    <string name="duplicar">Duplicar</string>
     <string name="abrir_pdf">Abrir PDF</string>
     <string name="visualizar_logs">Visualizar logs</string>
     <string name="enviar_pedido_nuvem">Enviar Pedido para Nuvem</string>
@@ -348,6 +349,8 @@
     <string name="digite_alguma_coisa_pesquisar">Digite alguma palavra para pesquisar</string>
     <string name="total_desconto">Total Desconto</string>
     <string name="valor_unitario_desconto">Vl. Unit. Desconto</string>
+    <string name="erro_duplicar">Não conseguimos duplicar orçamento/pedido.</string>
+    <string name="duplicado_sucesso">Orçamento/Pedido duplicado com sucesso.</string>
 
 
     <string-array name="tab_produto_md">
