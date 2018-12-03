@@ -599,11 +599,15 @@ public class OrcamentoProdutoDetalhesMDFragment extends Fragment {
                         adapterEmbalagem = new ItemUniversalAdapter(getContext(), ItemUniversalAdapter.EMBALAGEM);
                         adapterEmbalagem.setListaEmbalagem(listaEmbalagem);
                     } else {
-                        new MaterialDialog.Builder(getContext())
-                                .title("OrcamentoProdutoDetalhesActivity")
-                                .content(getResources().getString(R.string.nao_conseguimos_pegar_embalagem_produto))
-                                .positiveText(R.string.button_ok)
-                                .show();
+                        ((Activity) getContext()).runOnUiThread(new Runnable() {
+                            public void run() {
+                                new MaterialDialog.Builder(getContext())
+                                        .title("OrcamentoProdutoDetalhesActivity")
+                                        .content(getResources().getString(R.string.nao_conseguimos_pegar_embalagem_produto))
+                                        .positiveText(R.string.button_ok)
+                                        .show();
+                            }
+                        });
                     }
 
                     // Instancia a rotinas para buscar os dados
@@ -618,11 +622,15 @@ public class OrcamentoProdutoDetalhesMDFragment extends Fragment {
                         adapterPlanoPagamentoPreco.setListaPlanoPagamento(listaPlanoPagamentoPreco);
 
                     } else {
-                        new MaterialDialog.Builder(getContext())
-                                .title("OrcamentoProdutoDetalhesActivity")
-                                .content(getResources().getString(R.string.nao_conseguimos_pegar_plano_pagamento))
-                                .positiveText(R.string.button_ok)
-                                .show();
+                        ((Activity) getContext()).runOnUiThread(new Runnable() {
+                            public void run() {
+                                new MaterialDialog.Builder(getContext())
+                                        .title("OrcamentoProdutoDetalhesActivity")
+                                        .content(getResources().getString(R.string.nao_conseguimos_pegar_plano_pagamento))
+                                        .positiveText(R.string.button_ok)
+                                        .show();
+                            }
+                        });
                     }
 
                     // Instancia a classe de rotinas do estoque
@@ -634,11 +642,16 @@ public class OrcamentoProdutoDetalhesMDFragment extends Fragment {
                         // Inseri uma lista dentro do adapter
                         adapterEstoque.setListaEstoque(listaEstoque);
                     } else {
-                        new MaterialDialog.Builder(getContext())
-                                .title("OrcamentoProdutoDetalhesActivity")
-                                .content(getResources().getString(R.string.nao_conseguimos_pegar_lista_estoque))
-                                .positiveText(R.string.button_ok)
-                                .show();
+                        ((Activity) getContext()).runOnUiThread(new Runnable() {
+                            public void run() {
+                                //funcoes.menssagem(mensagem);
+                                new MaterialDialog.Builder(getContext())
+                                        .title("OrcamentoProdutoDetalhesActivity")
+                                        .content(getResources().getString(R.string.nao_conseguimos_pegar_lista_estoque))
+                                        .positiveText(R.string.button_ok)
+                                        .show();
+                            }
+                        });
                     }
 
                     produto = produtoRotinas.listaProduto(  "AEAPRODU.ID_AEAPRODU = " + idProduto,
@@ -1021,29 +1034,49 @@ public class OrcamentoProdutoDetalhesMDFragment extends Fragment {
         // Pega o id da embalagem
         int idEmbalagem =  adapterEmbalagem.getListaEmbalagem().get(spinnerEmbalagem.getSelectedItemPosition()).getIdEmbalagem();
         //int idEmbalagem =  produto.getProduto().getListaEmbalagem().get(spinnerEmbalagem.getSelectedItemPosition()).getIdEmbalagem();
+
         // Pega a quantidade de casas decimais no cadastro do produto
-        int casasDecimais = produtoRotinas.casasDecimaisProduto(""+idEmbalagem, ""+produto.getProduto().getIdProduto());
+        //int casasDecimais = produtoRotinas.casasDecimaisProduto(""+idEmbalagem, ""+produto.getProduto().getIdProduto());
+        int casasDecimais = 3;
 
         // Checa se existe ponto
-        if((!editQuantidade.getText().toString().isEmpty()) && (editQuantidade.getText().toString().indexOf(".") > 0)){
-            // Pega as casas decimais da quantidade digitada
-            String cdAux = editQuantidade.getText().toString().substring(editQuantidade.getText().toString().indexOf(".") + 1);
-            // Converte o valor pego apos a virgula
-            int decimal = Integer.parseInt(cdAux);
+        if( (!editQuantidade.getText().toString().isEmpty()) ){
 
-            if(decimal > 0){
-                // Checa se a quantidade de casas decimais esta liberado
-                if(cdAux.length() > casasDecimais){
-                    // Retorna falso para informar que os dados digitados nao sao validos
-                    dadosValidos = false;
+            if ( (editQuantidade.getText().toString().indexOf(".") > 0) ){
+                // Pega as casas decimais da quantidade digitada
+                String cdAux = editQuantidade.getText().toString().substring(editQuantidade.getText().toString().indexOf(".") + 1);
+                // Converte o valor pego apos a virgula
+                int decimal = Integer.parseInt(cdAux);
 
-                    new MaterialDialog.Builder(getContext())
-                            .title("OrcamentoProdutoDetalhesActivity")
-                            .content("Quatidade de digitos após a virgula permitido é igual a " + casasDecimais
-                                    + "\n Favor, voltar e digites uma nova quantidade.")
-                            .positiveText(R.string.button_ok)
-                            .show();
+                if(decimal > 0){
+                    // Checa se a quantidade de casas decimais esta liberado
+                    if(cdAux.length() > casasDecimais){
+                        // Retorna falso para informar que os dados digitados nao sao validos
+                        dadosValidos = false;
+
+                        new MaterialDialog.Builder(getContext())
+                                .title("OrcamentoProdutoDetalhesActivity")
+                                .content("Quatidade de digitos após a virgula permitido é igual a " + casasDecimais
+                                        + "\n Favor, voltar e digites uma nova quantidade.")
+                                .positiveText(R.string.button_ok)
+                                .show();
+                        dadosValidos = false;
+                    }
                 }
+            }
+
+            if (Double.parseDouble(editQuantidade.getText().toString()) <= 0){
+                ((Activity) getContext()).runOnUiThread(new Runnable() {
+                    public void run() {
+                        //funcoes.menssagem(mensagem);
+                        new MaterialDialog.Builder(getContext())
+                                .title("OrcamentoProdutoDetalhesActivity")
+                                .content("Quantidade do produto esta zerada ou menor que zero.")
+                                .positiveText(R.string.button_ok)
+                                .show();
+                    }
+                });
+                dadosValidos = false;
             }
         }
 
@@ -1065,32 +1098,45 @@ public class OrcamentoProdutoDetalhesMDFragment extends Fragment {
 
         if ((listaPlanoPagamentoPreco == null) || (listaPlanoPagamentoPreco.get(spinnerPlanoPagamentoPreco.getSelectedItemPosition()) == null)){
             // Dados da mensagem
-            final ContentValues mensagem = new ContentValues();
+            /*final ContentValues mensagem = new ContentValues();
             mensagem.put("comando", 1);
             mensagem.put("tela", "OrcamentoProdutoDetalhesActivity");
             mensagem.put("mensagem", "Não existe plano de pagamento. \n"
                        + "Favor, entrar em contato com o administrador de TI da sua empresa para que possa enviar os dados corretos do produto.");
+            final FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(getContext()); */
 
-            final FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(getContext());
             ((Activity) getContext()).runOnUiThread(new Runnable() {
                 public void run() {
-                    funcoes.menssagem(mensagem);
+                    //funcoes.menssagem(mensagem);
+                    new MaterialDialog.Builder(getContext())
+                            .title("OrcamentoProdutoDetalhesActivity")
+                            .content("Não existe plano de pagamento. \n"
+                                    + "Favor, entrar em contato com o administrador de TI da sua empresa para que possa enviar os dados corretos do produto.")
+                            .positiveText(R.string.button_ok)
+                            .show();
                 }
             });
 
             dadosValidos = false;
         } else if((listaPlanoPagamentoPreco != null) && (listaPlanoPagamentoPreco.get(spinnerPlanoPagamentoPreco.getSelectedItemPosition()).getIdPlanoPagamento() == 0)){
             // Dados da mensagem
-            final ContentValues mensagem = new ContentValues();
+            /*final ContentValues mensagem = new ContentValues();
             mensagem.put("comando", 1);
             mensagem.put("tela", "OrcamentoProdutoDetalhesActivity");
             mensagem.put("mensagem", "Não foi selecionado um plano de pagamento. \n"
                        + "Favor, Selecione um plano de pagamento.");
+            final FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(getContext());*/
 
-            final FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(getContext());
             ((Activity) getContext()).runOnUiThread(new Runnable() {
                 public void run() {
-                    funcoes.menssagem(mensagem);
+                    //funcoes.menssagem(mensagem);
+
+                    new MaterialDialog.Builder(getContext())
+                            .title("OrcamentoProdutoDetalhesActivity")
+                            .content("Não foi selecionado um plano de pagamento. \n"
+                                    + "Favor, Selecione um plano de pagamento.")
+                            .positiveText(R.string.button_ok)
+                            .show();
                 }
             });
 
@@ -1154,20 +1200,19 @@ public class OrcamentoProdutoDetalhesMDFragment extends Fragment {
                 // Instancia classe para manipular o orcamento
                 OrcamentoRotinas orcamentoRotinas = new OrcamentoRotinas(getContext());
 
-
                 // Verifica se o produto ja esta no orcamento
                 if(this.produto.getEstaNoOrcamento() == '1'){
 
                     // Verifica se atualizou com sucesso
-                    if(orcamentoRotinas.updateItemOrcamento(produto, String.valueOf(this.idItemOrcamento)) > 0){
-                        funcoes.desbloqueiaOrientacaoTela();
-                        // Fecha a tela de detalhes de produto
-                        getActivity().finish();
-                    }
+                    orcamentoRotinas.updateItemOrcamento(produto, String.valueOf(this.idItemOrcamento));
+                    //funcoes.desbloqueiaOrientacaoTela();
+                    // Fecha a tela de detalhes de produto
+                    //getActivity().finish();
                     // Envia os dados do produto para inserir no banco de dados
                 } else {
                     // Salva a proxima sequencia do item
-                    produto.put("SEQUENCIA", orcamentoRotinas.proximoSequencial(String.valueOf(this.orcamento.getIdOrcamento())));
+                    produto.put("SEQUENCIA", "(SELECT IFNULL((MAX(SEQUENCIA)), 0) + 1 AS SEQUENCIA FROM AEAITORC WHERE ID_AEAORCAM = " +(String.valueOf(this.orcamento.getIdOrcamento())) + ")");
+                    //produto.put("SEQUENCIA", orcamentoRotinas.proximoSequencial(String.valueOf(this.orcamento.getIdOrcamento())));
                     produto.put("GUID", orcamentoRotinas.gerarGuid());
 
                     if((this.idItemOrcamento = orcamentoRotinas.insertItemOrcamento(produto)) > 0){
@@ -1184,15 +1229,14 @@ public class OrcamentoProdutoDetalhesMDFragment extends Fragment {
                         } else {
                             getActivity().setResult(getActivity().RESULT_OK, returnIntent);
                         }
-                        funcoes.desbloqueiaOrientacaoTela();
-                        // Fecha a tela de detalhes de produto
-                        getActivity().finish();
                     }
                 }
+                funcoes.desbloqueiaOrientacaoTela();
+                // Fecha a tela de detalhes de produto
+                getActivity().finish();
             } else {
                 ((Activity) getContext()).runOnUiThread(new Runnable() {
                     public void run() {
-                        //SuperActivityToast.create(getActivity(), getContext().getResources().getString(R.string.verifique_campos_obrigatorios), SuperToast.Duration.SHORT, Style.getStyle(Style.RED, SuperToast.Animations.POPUP)).show();
                         SuperActivityToast.create(getActivity(), getContext().getResources().getString(R.string.verifique_campos_obrigatorios), Style.DURATION_SHORT)
                                 .setTextColor(Color.WHITE)
                                 .setColor(Color.RED)
@@ -1204,7 +1248,6 @@ public class OrcamentoProdutoDetalhesMDFragment extends Fragment {
         } else {
             ((Activity) getContext()).runOnUiThread(new Runnable() {
                 public void run() {
-                    //SuperActivityToast.create(getActivity(), getContext().getResources().getString(R.string.quantidade_invalida), SuperToast.Duration.SHORT, Style.getStyle(Style.RED, SuperToast.Animations.POPUP)).show();
                     SuperActivityToast.create(getActivity(), getContext().getResources().getString(R.string.quantidade_invalida), Style.DURATION_SHORT)
                             .setTextColor(Color.WHITE)
                             .setColor(Color.RED)

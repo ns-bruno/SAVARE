@@ -1508,7 +1508,7 @@ public class OrcamentoRotinas extends Rotinas {
 				dadosNovoOrcamento.put("VL_SEGURO", orcamentoPedido.getTotalSeguro());
 				dadosNovoOrcamento.put("VL_OUTROS", orcamentoPedido.getTotalOutros());
 				dadosNovoOrcamento.put("VL_ENCARGOS_FINANCEIROS", orcamentoPedido.getTotalEncargosFinanceiros());
-				dadosNovoOrcamento.put("VL_TABELA", orcamentoPedido.getTotalTabela());
+				//dadosNovoOrcamento.put("VL_TABELA", orcamentoPedido.getTotalTabela());
 				dadosNovoOrcamento.put("ATAC_VAREJO", orcamentoPedido.getTipoVenda());
 				dadosNovoOrcamento.put("PESSOA_CLIENTE", orcamentoPedido.getPessoaCliente());
 				dadosNovoOrcamento.put("NOME_CLIENTE", orcamentoPedido.getNomeRazao());

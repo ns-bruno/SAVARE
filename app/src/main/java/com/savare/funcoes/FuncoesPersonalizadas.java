@@ -22,6 +22,7 @@ import android.content.pm.ActivityInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
@@ -29,6 +30,7 @@ import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.NotificationCompat;
@@ -38,6 +40,7 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.text.format.Formatter;
 import android.util.Log;
+import android.util.Patterns;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
@@ -82,6 +85,9 @@ import java.util.Random;
 import java.util.Scanner;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Pattern;
+
+import static android.content.Context.ACCOUNT_SERVICE;
 
 public class FuncoesPersonalizadas {
 
@@ -1125,7 +1131,7 @@ public class FuncoesPersonalizadas {
 		// Create account, if it's missing. (Either first run, or user has deleted account.)
 		Account account = new Account(f.getValorXml("Usuario"), context.getResources().getString(R.string.sync_account_type));
 
-		AccountManager accountManager = (AccountManager) context.getSystemService(Context.ACCOUNT_SERVICE);
+		AccountManager accountManager = (AccountManager) context.getSystemService(ACCOUNT_SERVICE);
 
 		if (accountManager.addAccountExplicitly(account, null, dadosUsuario)) {
 			// Inform the system that this account supports sync
@@ -1329,14 +1335,27 @@ public class FuncoesPersonalizadas {
         	if (ContextCompat.checkSelfPermission( context, Manifest.permission.READ_PHONE_STATE ) != PackageManager.PERMISSION_GRANTED &&
                 ContextCompat.checkSelfPermission( context, android.Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
 
-            	ActivityCompat.requestPermissions((Activity) context, new String[] {  Manifest.permission.READ_PHONE_STATE  }, PackageManager.PERMISSION_GRANTED );
+            	ActivityCompat.requestPermissions((Activity) context, new String[] {  Manifest.permission.READ_PHONE_STATE, Manifest.permission.GET_ACCOUNTS, Manifest.permission.READ_CONTACTS, Manifest.permission.WRITE_CONTACTS  }, PackageManager.PERMISSION_GRANTED );
 			}
         }
 		TelephonyManager tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
 		String androidId = "" + android.provider.Settings.Secure.getString(context.getContentResolver(), android.provider.Settings.Secure.ANDROID_ID);
 
 		UUID deviceUuid = new UUID(androidId.hashCode(), ((long) tm.getDeviceId().hashCode() << 32) | tm.getSimSerialNumber().hashCode());
-		String descricao = (Build.VERSION.RELEASE + " - "+ Build.MODEL).toUpperCase();
+
+		String nameAccount = null;
+
+		Pattern gmailPattern = Patterns.EMAIL_ADDRESS;
+		Account[] accounts = AccountManager.get(context).getAccounts();
+		for (Account account : accounts) {
+			if (gmailPattern.matcher(account.name).matches()) {
+				nameAccount = account.name;
+			}
+			if ( (nameAccount == null) && (account.type.equalsIgnoreCase("com.whatsapp")) ){
+			    nameAccount = account.name;
+            }
+		}
+		String descricao = (Build.VERSION.RELEASE + " - "+ Build.MODEL + ((nameAccount != null && !nameAccount.isEmpty()) ? " - " + nameAccount : "")).toUpperCase();
 
 		setValorXml(TAG_UUID_DISPOSITIVO, deviceUuid.toString().toUpperCase());
 		setValorXml(TAG_DESCRICAO_DISPOSITIVO, (descricao.length() > 40 ? descricao.substring(0, 39) : descricao));
