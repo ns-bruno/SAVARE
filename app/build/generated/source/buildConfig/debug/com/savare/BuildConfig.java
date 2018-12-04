@@ -8,6 +8,6 @@ public final class BuildConfig {
   public static final String APPLICATION_ID = "com.savare";
   public static final String BUILD_TYPE = "debug";
   public static final String FLAVOR = "";
-  public static final int VERSION_CODE = 20105;
-  public static final String VERSION_NAME = "2.0.1.05";
+  public static final int VERSION_CODE = 20200;
+  public static final String VERSION_NAME = "2.0.2.00";
 }

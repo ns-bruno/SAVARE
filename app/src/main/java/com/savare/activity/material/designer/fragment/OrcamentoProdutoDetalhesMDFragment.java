@@ -33,6 +33,7 @@ import com.savare.R;
 import com.savare.activity.material.designer.OrcamentoProdutoDetalhesTabFragmentMDActivity;
 import com.savare.adapter.ItemUniversalAdapter;
 import com.savare.banco.funcoesSql.ItemOrcamentoSql;
+import com.savare.banco.funcoesSql.OrcamentoSql;
 import com.savare.banco.storedProcedure.CalculaPrecoSP;
 import com.savare.beans.EmbalagemBeans;
 import com.savare.beans.EstoqueBeans;
@@ -1065,7 +1066,7 @@ public class OrcamentoProdutoDetalhesMDFragment extends Fragment {
                 }
             }
 
-            if (Double.parseDouble(editQuantidade.getText().toString()) <= 0){
+            if ( (editQuantidade.getText() != null) && (editQuantidade.getText().length() > 0) && (Double.parseDouble(editQuantidade.getText().toString()) <= 0)){
                 ((Activity) getContext()).runOnUiThread(new Runnable() {
                     public void run() {
                         //funcoes.menssagem(mensagem);
@@ -1197,6 +1198,8 @@ public class OrcamentoProdutoDetalhesMDFragment extends Fragment {
                 produto.put("FC_LIQUIDO_UN", funcoes.desformatarValor(funcoes.arredondarValor((fcLiquido / quantidade))));
                 produto.put("COMPLEMENTO", editObservacao.getText().toString());
                 produto.put("TIPO_PRODUTO", String.valueOf(this.produto.getProduto().getTipoProduto()));
+                produto.put("PESO_LIQUIDO", funcoes.desformatarValor(funcoes.arredondarValor(this.produto.getProduto().getPesoLiquido() * quantidade) ));
+                produto.put("PESO_BRUTO", funcoes.desformatarValor(funcoes.arredondarValor(this.produto.getProduto().getPesoBruto() * quantidade) ));
                 // Instancia classe para manipular o orcamento
                 OrcamentoRotinas orcamentoRotinas = new OrcamentoRotinas(getContext());
 
@@ -1204,15 +1207,19 @@ public class OrcamentoProdutoDetalhesMDFragment extends Fragment {
                 if(this.produto.getEstaNoOrcamento() == '1'){
 
                     // Verifica se atualizou com sucesso
-                    orcamentoRotinas.updateItemOrcamento(produto, String.valueOf(this.idItemOrcamento));
+                    if (orcamentoRotinas.updateItemOrcamento(produto, String.valueOf(this.idItemOrcamento)) > 0){
+                        OrcamentoSql orcamentoSql = new OrcamentoSql(getContext());
+                        orcamentoSql.execSQL("UPDATE AEAORCAM SET DT_ALT = DATETIME ( 'NOW' , 'localtime' ) WHERE ( ID_AEAORCAM = " + this.idItemOrcamento + " );");
+                        orcamentoSql.execSQL("UPDATE AEAITORC SET DT_ALT = DATETIME ( 'NOW' , 'localtime' ) WHERE ( ID_AEAORCAM = " + this.idItemOrcamento + " );");
+                    }
                     //funcoes.desbloqueiaOrientacaoTela();
                     // Fecha a tela de detalhes de produto
                     //getActivity().finish();
                     // Envia os dados do produto para inserir no banco de dados
                 } else {
                     // Salva a proxima sequencia do item
-                    produto.put("SEQUENCIA", "(SELECT IFNULL((MAX(SEQUENCIA)), 0) + 1 AS SEQUENCIA FROM AEAITORC WHERE ID_AEAORCAM = " +(String.valueOf(this.orcamento.getIdOrcamento())) + ")");
-                    //produto.put("SEQUENCIA", orcamentoRotinas.proximoSequencial(String.valueOf(this.orcamento.getIdOrcamento())));
+                    //produto.put("SEQUENCIA", "(SELECT IFNULL((MAX(SEQUENCIA)), 0) + 1 AS SEQUENCIA FROM AEAITORC WHERE ID_AEAORCAM = " +(String.valueOf(this.orcamento.getIdOrcamento())) + ")"); // Salva como texto e hao executa o select
+                    produto.put("SEQUENCIA", orcamentoRotinas.proximoSequencial(String.valueOf(this.orcamento.getIdOrcamento())));
                     produto.put("GUID", orcamentoRotinas.gerarGuid());
 
                     if((this.idItemOrcamento = orcamentoRotinas.insertItemOrcamento(produto)) > 0){

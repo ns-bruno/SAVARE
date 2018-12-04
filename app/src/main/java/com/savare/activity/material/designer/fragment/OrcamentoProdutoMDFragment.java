@@ -491,6 +491,10 @@ public class OrcamentoProdutoMDFragment extends Fragment {
                                                 // Verifica se foi deletado algum registro
                                                 if (totalAtualizado > 0) {
 
+                                                    // Atualiza alguns campos apos transformar o orcamento em pedido
+                                                    orcamentoSql.execSQL("UPDATE AEAORCAM SET DT_CAD = DATETIME('NOW' , 'localtime') WHERE (AEAORCAM.ID_AEAORCAM = " + textCodigoOrcamento.getText() + ") AND (AEAORCAM.STATUS = 'P');");
+                                                    orcamentoSql.execSQL("UPDATE AEAITORC SET STATUS = 'P' WHERE (AEAITORC.ID_AEAORCAM = " + textCodigoOrcamento.getText() + ") AND (AEAITORC.STATUS = 'O');");
+
                                                     SuperActivityToast.create(getActivity(), totalAtualizado + " Orçamento(s) Transformado(s) em Pedido(s)", Style.DURATION_LONG)
                                                             .setTextColor(Color.WHITE)
                                                             .setColor(Color.GREEN)
@@ -586,7 +590,7 @@ public class OrcamentoProdutoMDFragment extends Fragment {
 
 
                     } else {
-                        SuperActivityToast.create(getActivity(), (getResources().getString(R.string.nao_orcamento) + " - " + tipoOrcamentoPedido), Style.DURATION_VERY_SHORT)
+                        SuperActivityToast.create(getActivity(), (getResources().getString(R.string.nao_orcamento) + " - " + tipoOrcamentoPedido), Style.DURATION_SHORT)
                                 .setTextColor(Color.WHITE)
                                 .setColor(Color.RED)
                                 .setAnimations(Style.ANIMATIONS_POP)

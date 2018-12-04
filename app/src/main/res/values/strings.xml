@@ -216,6 +216,7 @@
     <string name="salva_pedido_pdf">Salva Pedido em PDF</string>
     <string name="pesquisar_produto_estoque">Pesq. Apenas Produto</string>
     <string name="pesquisar_apenas_produto_estoque">Com Estoque</string>
+    <string name="produto_com_estoque">Só Produtos Com Estoque</string>
     <string name="pdf_salvo_sucesso">PDF salvo com sucesso.</string>
     <string name="historico_valores_vendas_mensais">Histórico de Valores de Vendas Mensais.</string>
     <string name="mes_vendas">Mês de Vendas</string>

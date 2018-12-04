@@ -298,6 +298,12 @@ public class ListaOrcamentoPedidoMDActivity extends AppCompatActivity{
 
                                                     totalAtualizado = totalAtualizado + orcamentoSql.update(dadosPedido, "AEAORCAM.ID_AEAORCAM = " +
                                                             adapterListaOrcamentoPedido.getListaOrcamentoPediso().get(listaItemOrcamentoSelecionado.get(i)).getIdOrcamento());
+
+                                                    if (totalAtualizado > 0) {
+                                                        // Atualiza alguns campos apos transformar o orcamento em pedido
+                                                        orcamentoSql.execSQL("UPDATE AEAORCAM SET DT_CAD = DATETIME('NOW' , 'localtime') WHERE (AEAORCAM.ID_AEAORCAM = " + adapterListaOrcamentoPedido.getListaOrcamentoPediso().get(listaItemOrcamentoSelecionado.get(i)).getIdOrcamento() + ") AND (AEAORCAM.STATUS = 'P');");
+                                                        orcamentoSql.execSQL("UPDATE AEAITORC SET STATUS = 'P' WHERE (AEAITORC.ID_AEAORCAM = " + adapterListaOrcamentoPedido.getListaOrcamentoPediso().get(listaItemOrcamentoSelecionado.get(i)).getIdOrcamento() + ") AND (AEAITORC.STATUS = 'O');");
+                                                    }
                                                 }
                                                 // Dados da mensagem
                                                 ContentValues mensagem = new ContentValues();
@@ -306,6 +312,7 @@ public class ListaOrcamentoPedidoMDActivity extends AppCompatActivity{
 
                                                 // Verifica se foi deletado algum registro
                                                 if (totalAtualizado > 0) {
+
                                                     //SuperToast.create(ListaOrcamentoPedidoMDActivity.this, totalAtualizado + " Transformado(s) em Pedido(s).", SuperToast.Duration.VERY_SHORT, Style.getStyle(Style.GREEN, SuperToast.Animations.FLYIN)).show();
                                                     SuperActivityToast.create(ListaOrcamentoPedidoMDActivity.this, totalAtualizado + " Transformado(s) em Pedido(s).", Style.DURATION_VERY_SHORT)
                                                             .setTextColor(Color.WHITE)

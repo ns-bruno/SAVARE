@@ -353,6 +353,11 @@ public class ProdutoListaMDFragment extends Fragment {
             FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(getContext());
             funcoes.setValorXml(funcoes.TAG_PESQUISA_PRODUTO_ESTOQUE, "N");
             pequisarProdutoEstoque = false;
+
+        } else if (item.getItemId() == R.id.menu_produto_lista_tab_md_produtos_com_estoque){
+            FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(getContext());
+            funcoes.setValorXml(funcoes.TAG_PESQUISA_PRODUTO_ESTOQUE, "S");
+            pequisarProdutoEstoque = true;
         }
 
         return super.onOptionsItemSelected(item);
