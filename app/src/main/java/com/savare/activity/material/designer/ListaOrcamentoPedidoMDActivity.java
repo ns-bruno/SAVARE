@@ -300,6 +300,12 @@ public class ListaOrcamentoPedidoMDActivity extends AppCompatActivity{
 
                                                 totalAtualizado = totalAtualizado + orcamentoSql.update(dadosPedido, "AEAORCAM.ID_AEAORCAM = " +
                                                         adapterListaOrcamentoPedido.getListaOrcamentoPediso().get(listaItemOrcamentoSelecionado.get(i)).getIdOrcamento());
+
+                                                if (totalAtualizado > 0) {
+                                                    // Atualiza alguns campos apos transformar o orcamento em pedido
+                                                    orcamentoSql.execSQL("UPDATE AEAORCAM SET DT_CAD = DATETIME('NOW' , 'localtime') WHERE (AEAORCAM.ID_AEAORCAM = " + adapterListaOrcamentoPedido.getListaOrcamentoPediso().get(listaItemOrcamentoSelecionado.get(i)).getIdOrcamento() + ") AND (AEAORCAM.STATUS = 'P');");
+                                                    orcamentoSql.execSQL("UPDATE AEAITORC SET STATUS = 'P' WHERE (AEAITORC.ID_AEAORCAM = " + adapterListaOrcamentoPedido.getListaOrcamentoPediso().get(listaItemOrcamentoSelecionado.get(i)).getIdOrcamento() + ") AND (AEAITORC.STATUS = 'O');");
+                                                }
                                             }
                                             // Dados da mensagem
                                             ContentValues mensagem = new ContentValues();

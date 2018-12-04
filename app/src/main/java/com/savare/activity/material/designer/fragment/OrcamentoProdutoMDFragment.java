@@ -489,7 +489,10 @@ public class OrcamentoProdutoMDFragment extends Fragment {
                                             // Verifica se foi deletado algum registro
                                             if (totalAtualizado > 0) {
                                                 SuperToast.create(getContext(), totalAtualizado + " Transformado(s) em Pedido(s)", SuperToast.Duration.SHORT, Style.getStyle(Style.GREEN, SuperToast.Animations.FLYIN)).show();
-                                                //mensagem.put("mensagem", totalAtualizado + " Transformado(s) em Pedido(s). \n");
+
+                                                // Atualiza alguns campos apos transformar o orcamento em pedido
+                                                orcamentoSql.execSQL("UPDATE AEAORCAM SET DT_CAD = DATETIME('NOW' , 'localtime') WHERE (AEAORCAM.ID_AEAORCAM = " + textCodigoOrcamento.getText() + ") AND (AEAORCAM.STATUS = 'P');");
+                                                orcamentoSql.execSQL("UPDATE AEAITORC SET STATUS = 'P' WHERE (AEAITORC.ID_AEAORCAM = " + textCodigoOrcamento.getText() + ") AND (AEAITORC.STATUS = 'O');");
 
                                                 tipoOrcamentoPedido = "P";
 

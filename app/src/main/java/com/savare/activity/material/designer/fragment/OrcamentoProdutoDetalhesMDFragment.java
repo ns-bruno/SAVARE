@@ -31,6 +31,7 @@ import com.savare.R;
 import com.savare.activity.material.designer.OrcamentoProdutoDetalhesTabFragmentMDActivity;
 import com.savare.adapter.ItemUniversalAdapter;
 import com.savare.banco.funcoesSql.ItemOrcamentoSql;
+import com.savare.banco.funcoesSql.OrcamentoSql;
 import com.savare.beans.ItemOrcamentoBeans;
 import com.savare.beans.OrcamentoBeans;
 import com.savare.beans.PlanoPagamentoBeans;
@@ -1115,6 +1116,8 @@ public class OrcamentoProdutoDetalhesMDFragment extends Fragment {
                 produto.put("FC_DESCONTO_UN", funcoes.desformatarValor(funcoes.arredondarValor(fcDescontoUn)));
                 produto.put("FC_LIQUIDO", funcoes.desformatarValor(funcoes.arredondarValor(fcLiquido)));
                 produto.put("FC_LIQUIDO_UN", funcoes.desformatarValor(funcoes.arredondarValor((fcLiquido / quantidade))));
+                produto.put("PESO_LIQUIDO", funcoes.desformatarValor(funcoes.arredondarValor(this.produto.getProduto().getPesoLiquido() * quantidade) ));
+                produto.put("PESO_BRUTO", funcoes.desformatarValor(funcoes.arredondarValor(this.produto.getProduto().getPesoBruto() * quantidade) ));
                 // Instancia classe para manipular o orcamento
                 OrcamentoRotinas orcamentoRotinas = new OrcamentoRotinas(getContext());
 
@@ -1124,12 +1127,12 @@ public class OrcamentoProdutoDetalhesMDFragment extends Fragment {
 
                     // Verifica se atualizou com sucesso
                     if(orcamentoRotinas.updateItemOrcamento(produto, String.valueOf(this.idItemOrcamento)) > 0){
-                        funcoes.desbloqueiaOrientacaoTela();
-                        // Fecha a tela de detalhes de produto
-                        getActivity().finish();
+                        OrcamentoSql orcamentoSql = new OrcamentoSql(getContext());
+                        orcamentoSql.execSQL("UPDATE AEAORCAM SET DT_ALT = DATETIME ( 'NOW' , 'localtime' ) WHERE ( ID_AEAORCAM = " + this.idItemOrcamento + " );");
+                        orcamentoSql.execSQL("UPDATE AEAITORC SET DT_ALT = DATETIME ( 'NOW' , 'localtime' ) WHERE ( ID_AEAORCAM = " + this.idItemOrcamento + " );");
                     }
                     // Envia os dados do produto para inserir no banco de dados
-                } else{
+                } else {
                     // Salva a proxima sequencia do item
                     produto.put("SEQUENCIA", orcamentoRotinas.proximoSequencial(String.valueOf(this.orcamento.getIdOrcamento())));
                     produto.put("GUID", orcamentoRotinas.gerarGuid());
@@ -1148,11 +1151,11 @@ public class OrcamentoProdutoDetalhesMDFragment extends Fragment {
                         } else {
                             getActivity().setResult(getActivity().RESULT_OK, returnIntent);
                         }
-                        funcoes.desbloqueiaOrientacaoTela();
-                        // Fecha a tela de detalhes de produto
-                        getActivity().finish();
                     }
                 }
+                funcoes.desbloqueiaOrientacaoTela();
+                // Fecha a tela de detalhes de produto
+                getActivity().finish();
             } else {
                 ((Activity) getContext()).runOnUiThread(new Runnable() {
                     public void run() {
