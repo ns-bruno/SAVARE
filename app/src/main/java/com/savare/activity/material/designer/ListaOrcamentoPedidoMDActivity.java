@@ -84,6 +84,7 @@ public class ListaOrcamentoPedidoMDActivity extends AppCompatActivity{
     private String idPessoa = null;
     private int totalItemSelecionado = 0;
     private String tipoOrdem = null;
+    private String atacadoVarejo = "0";
     double totalDiferenca;
     int anoInicialSelecinado = -1;
     int mesInicialSelecionado = -1;
@@ -106,7 +107,8 @@ public class ListaOrcamentoPedidoMDActivity extends AppCompatActivity{
     public static final String KEY_TELA_LISTA_ORCAMENTO_PEDIDO = "ListaOrcamentoPedidosActivity",
             KEY_TELA_CHAMADA = "TELA_CHAMADA",
             KEY_RETORNA_VALOR = "RETORNA_VALOR",
-            KEY_ORCAMENTO_PEDIDO = "ORCAMENTO_PEDIDO";
+            KEY_ORCAMENTO_PEDIDO = "ORCAMENTO_PEDIDO",
+            KEY_ATACADO_VAREJO = "ATACADO_VAREJO";
     public static final String TELA_LISTA_PRODUTOS = "LISTA_PRODUTOS";
     public static final int RETORNA_CLIENTE = 100;
     public static final int SOLICITA_CLIENTE = 1;
@@ -128,6 +130,7 @@ public class ListaOrcamentoPedidoMDActivity extends AppCompatActivity{
 
             this.tipoOrcamentoPedido = intentParametro.getString(KEY_ORCAMENTO_PEDIDO);
             this.retornaValor = intentParametro.getString(KEY_RETORNA_VALOR);
+            this.atacadoVarejo = intentParametro.getString(KEY_ATACADO_VAREJO);
             this.idPessoa = intentParametro.getString("ID_CFACLIFO");
 
             if (tipoOrcamentoPedido.equalsIgnoreCase(TIPO_PEDIDO_ENVIADO)){
@@ -184,12 +187,11 @@ public class ListaOrcamentoPedidoMDActivity extends AppCompatActivity{
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 // Fecha o menu floating
                 menuFloatingButton.close(true);
+                //Pega os dados da pessoa que foi clicado
+                OrcamentoBeans orcamento = (OrcamentoBeans) parent.getItemAtPosition(position);
 
                 // Checa se quem chamou essa tela eh para retornar
                 if ((retornaValor != null) && (retornaValor.equals(TELA_LISTA_PRODUTOS))) {
-
-                    //Pega os dados da pessoa que foi clicado
-                    OrcamentoBeans orcamento = (OrcamentoBeans) parent.getItemAtPosition(position);
 
                     Bundle bundle = new Bundle();
                     bundle.putParcelable("AEAORCAM", orcamento);
@@ -203,9 +205,6 @@ public class ListaOrcamentoPedidoMDActivity extends AppCompatActivity{
                     finish();
 
                 } else {
-                    //Pega os dados da pessoa que foi clicado
-                    OrcamentoBeans orcamento = (OrcamentoBeans) parent.getItemAtPosition(position);
-
                     Bundle bundle = new Bundle();
                     bundle.putString(OrcamentoTabFragmentMDActivity.KEY_ID_ORCAMENTO, String.valueOf(orcamento.getIdOrcamento()));
                     bundle.putString(OrcamentoTabFragmentMDActivity.KEY_NOME_RAZAO, orcamento.getNomeRazao());
@@ -1243,6 +1242,10 @@ public class ListaOrcamentoPedidoMDActivity extends AppCompatActivity{
 
                 if ((idPessoa != null) && (!idPessoa.isEmpty())){
                     where += " AND (AEAORCAM.ID_CFACLIFO = " + idPessoa + ")";
+                }
+
+                if ( (atacadoVarejo != null) && (!atacadoVarejo.isEmpty())){
+                    where += " AND (AEAORCAM.ATAC_VAREJO LIKE '%" + atacadoVarejo + "%')";
                 }
                 // Instancia a classe
                 listaOrcamentoPedido = new ArrayList<OrcamentoBeans>();

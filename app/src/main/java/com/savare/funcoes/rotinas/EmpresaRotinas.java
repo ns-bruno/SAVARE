@@ -35,6 +35,7 @@ public class EmpresaRotinas extends Rotinas {
 			empresa.setTitpoAcumuloCreditoAtacado(cursor.getString(cursor.getColumnIndex("TIPO_ACUMULO_CREDITO_ATACADO")));
 			empresa.setTitpoAcumuloCreditoVarejo(cursor.getString(cursor.getColumnIndex("TIPO_ACUMULO_CREDITO_VAREJO")));
 			empresa.setVersaoSavare(cursor.getInt(cursor.getColumnIndex("VERSAO_SAVARE")));
+			empresa.setQuantidadeDiasDestacaProduto(cursor.getInt(cursor.getColumnIndex("QTD_DIAS_DESTACA_PRODUTO")));
 
 		} else {
 			empresa = null;

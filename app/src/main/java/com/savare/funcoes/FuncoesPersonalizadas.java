@@ -1231,7 +1231,7 @@ public class FuncoesPersonalizadas {
 	}
 
 	public boolean checaVersao(){
-		boolean valido = false;
+		boolean valido = true;
         String name = "FileNotification";
 
         notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
@@ -1271,8 +1271,10 @@ public class FuncoesPersonalizadas {
                     mBuilder.setStyle(bigTextStyle);
                     notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR  + new Random().nextInt(100), mBuilder.build());
 
+                    valido = false;
+
 					// Checa se o SAVARE esta mais atualizado que o webservice
-				} else if (versaoLocal > empresaBeans.getVersaoSavare()) {
+				}/* else if (versaoLocal > empresaBeans.getVersaoSavare()) {
 					// Cria uma notificacao para ser manipulado
                     bigTextStyle.bigText(context.getResources().getString(R.string.savare_mais_atualizado_que_webservice));
                     mBuilder.setStyle(bigTextStyle);
@@ -1283,7 +1285,7 @@ public class FuncoesPersonalizadas {
 					// Checa se o SAVARE esta na mesma versao que o webservice
 				} else if (versaoLocal == empresaBeans.getVersaoSavare()) {
 					valido = true;
-				}
+				} */
 			} else {
                 bigTextStyle.bigText(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice));
                 mBuilder.setStyle(bigTextStyle);
@@ -1295,7 +1297,6 @@ public class FuncoesPersonalizadas {
             mBuilder.setStyle(bigTextStyle);
             notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
 		}
-
 		return valido;
 	}
 

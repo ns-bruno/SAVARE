@@ -10,6 +10,9 @@
      >
         <!-- submenu -->
         <menu>
+            <item android:id="@+id/menu_lista_todos_titulos"
+                android:title="@string/todos_titulos"
+                />
             <item android:id="@+id/menu_lista_titulos_aberto"
                   android:title="@string/titulos_aberto"
                   />

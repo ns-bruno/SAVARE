@@ -18,12 +18,18 @@ import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupMenu;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.savare.R;
 import com.savare.activity.material.designer.ListaOrcamentoPedidoMDActivity;
 import com.savare.activity.material.designer.ProdutoDetalhesMDActivity;
+import com.savare.beans.AeamarcaBeans;
+import com.savare.beans.AeaplojaBeans;
+import com.savare.beans.AeaproduBeans;
+import com.savare.beans.AeaunvenBeans;
 import com.savare.beans.AreaBeans;
+import com.savare.beans.CfafotosBeans;
 import com.savare.beans.CidadeBeans;
 import com.savare.beans.CriticaOrcamentoBeans;
 import com.savare.beans.DescricaoDublaBeans;
@@ -44,6 +50,8 @@ import com.savare.beans.TelefoneBeans;
 import com.savare.beans.TipoClienteBeans;
 import com.savare.beans.TipoDocumentoBeans;
 import com.savare.funcoes.FuncoesPersonalizadas;
+import com.savare.funcoes.rotinas.AeamarcaRotinas;
+import com.savare.funcoes.rotinas.AeaunvenRotinas;
 import com.savare.funcoes.rotinas.OrcamentoRotinas;
 import com.savare.funcoes.rotinas.ProdutoRotinas;
 
@@ -85,7 +93,7 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 	private int campoAtualProduto = -1;
 	private String atacadoVarejo, idOrcamento, ATACADO = "0", vistaPrazo = "0";
 	private List<ItemOrcamentoBeans> listaItemOrcamento; // Lista de produtos dentro do orcamento
-	private List<ProdutoListaBeans> listaProduto; // Lista de produtos para venda
+	private List<AeaplojaBeans> listAeaploja; // Lista de produtos para venda
 	private List<TipoDocumentoBeans> listaTipoDocumento;
 	private List<PlanoPagamentoBeans> listaPlanoPagamento;
 	private List<OrcamentoBeans> listaOrcamentoPedido;
@@ -207,15 +215,15 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 	/**
 	 * @return lista de produto geral para venda. Todos os produtos.
 	 */
-	public List<ProdutoListaBeans> getListaProduto() {
-		return listaProduto;
+	public List<AeaplojaBeans> getListAeaploja() {
+		return listAeaploja;
 	}
 
 	/**
-	 * @param listaProduto the listaProduto to set
+	 * @param listAeaploja the listAeaploja to set
 	 */
-	public void setListaProduto(List<ProdutoListaBeans> listaProduto) {
-		this.listaProduto = listaProduto;
+	public void setListAeaploja(List<AeaplojaBeans> listAeaploja) {
+		this.listAeaploja = listAeaploja;
 	}
 	
 	
@@ -461,7 +469,7 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 			
 		} else if(this.tipoItem == PRODUTO){
 			// Retorna a quantidade de produto da lista
-			return (listaProduto != null) ? listaProduto.size() : 0;
+			return (listAeaploja != null) ? listAeaploja.size() : 0;
 			
 		} else if(this.tipoItem == TIPO_DOCUMENTO){
 			// Retorna a quantidade de documentos da lista
@@ -548,7 +556,7 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 			
 		} else if(this.tipoItem == PRODUTO){
 			// Retorna um produto
-			return listaProduto.get(position);
+			return listAeaploja.get(position);
 			
 		} else if(this.tipoItem == TIPO_DOCUMENTO){
 			// Retorna um tipo de documento
@@ -635,7 +643,7 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 	public long getItemId(int position) {
 		
 		if(this.tipoItem == PRODUTO){
-			return this.listaProduto.get(position).getProduto().getIdProduto();
+			return this.listAeaploja.get(position).getIdAeaploja();
 		
 		}else if(this.tipoItem == TIPO_DOCUMENTO){
 			return this.listaTipoDocumento.get(position).getIdTipoDocumento();
@@ -739,6 +747,7 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 		TextView textBottonDireito = (TextView) view.findViewById(R.id.layout_item_universal_text_botton_direito);
 		View viewTopo = (View) view.findViewById(R.id.layout_item_universal_view_topo);
 		View viewRodape = (View) view.findViewById(R.id.layout_item_universal_view_rodape);
+		View viewDivider = (View) view.findViewById(R.id.layout_item_universal_view_divider);
 		LinearLayout linearLayoutIcons = (LinearLayout) view.findViewById(R.id.layout_item_universal_linearLayout_icones);
 		ImageView viewIcone1 = (ImageView) view.findViewById(R.id.layout_item_universal_imageView_icone1);
 		ImageView viewIcone2 = (ImageView) view.findViewById(R.id.layout_item_universal_imageView_icone2);
@@ -830,7 +839,7 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 			// Verifica se o tipo eH produto
 		} else if(this.tipoItem == PRODUTO){
 			/**
-			 * Recupera dentro da lista de produtos, um produto especifico de acordo com a
+			 * Recupera dentro da lista de produtos, um aeaploja especifico de acordo com a
 			 * posicao passada no parametro do getView.
 			 *
 			 * @viewIcon1 = Produto em Promoção
@@ -839,77 +848,52 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 			 * @viewIcon4 =
 			 * @viewIcon5 =
 			 */
-			ProdutoListaBeans produto = listaProduto.get(position);
-			
+			AeaplojaBeans aeaploja = listAeaploja.get(position);
+
 			this.funcoes = new FuncoesPersonalizadas(context);
 			
-			textDescricao.setText(produto.getProduto().getDescricaoProduto() + " - " + (((produto.getProduto().getDescricaoMarca() != null ) && (produto.getProduto().getDescricaoMarca().length() > 0) ) ? produto.getProduto().getDescricaoMarca() : ""));
-			textAbaixoDescricaoEsqueda.setText("Cód. " + produto.getProduto().getCodigoEstrutural());
-			textAbaixoDescricaoDireita.setText("Ref. " + ((produto.getProduto().getReferencia() != null) ? produto.getProduto().getReferencia() : ""));
-			textBottonEsquerdoDois.setText(produto.getProduto().getUnidadeVendaProduto().getSiglaUnidadeVenda());
-			textBottonDireito.setText("Est.: " + this.funcoes.arredondarValor(produto.getEstoqueFisico()));
-			// Checa se tem alguma imagem salva no produto
-			if ( (funcoes.getValorXml("ImagemProduto").equalsIgnoreCase("S")) && (produto.getProduto().getImagemProduto() != null) && (produto.getProduto().getImagemProduto().getFotos() != null)){
-				// Torna o campo da imagem do produto visivel
+			textDescricao.setText(aeaploja.getAeaprodu().getDescricao() + (((aeaploja.getAeaprodu().getAeamarca() != null ) && (aeaploja.getAeaprodu().getAeamarca().getDescricao() != null) &&
+								 (aeaploja.getAeaprodu().getAeamarca().getDescricao().length() > 0) ) ? " - " + aeaploja.getAeaprodu().getAeamarca().getDescricao() : ""));
+			textAbaixoDescricaoEsqueda.setText("Cód. " + aeaploja.getAeaprodu().getCodigoEstrutural());
+			textAbaixoDescricaoDireita.setText("Ref. " + ((aeaploja.getAeaprodu().getReferencia() != null) ? aeaploja.getAeaprodu().getReferencia() : ""));
+			textBottonEsquerdoDois.setText((aeaploja.getAeaprodu().getAeaunven() != null) ? aeaploja.getAeaprodu().getAeaunven().getSigla() : "S/N");
+			textBottonDireito.setText("Est.: " + this.funcoes.arredondarValor(aeaploja.getEstoqueF()));
+			// Checa se tem alguma imagem salva no aeaploja
+			if ( (funcoes.getValorXml(funcoes.TAG_IMAGEM_PRODUTO).equalsIgnoreCase(funcoes.SIM)) && (aeaploja.getAeaprodu().getCfafotos() != null) && (aeaploja.getAeaprodu().getCfafotos().getFoto() != null) ){
+				// Torna o campo da imagem do aeaploja visivel
 				imageCirclePrincipal.setVisibility(View.VISIBLE);
 				// Pega a imagem que esta no banco de dados
-				imageCirclePrincipal.setImageBitmap(produto.getProduto().getImagemProduto().getImagem());
+				imageCirclePrincipal.setImageBitmap(aeaploja.getAeaprodu().getCfafotos().getImagem());
 			}
 			// Verifica se o estoque eh menor ou igual a que zero
-			if(produto.getEstoqueFisico() < 1){
+			if(aeaploja.getEstoqueF() < 1){
 				textBottonDireito.setTextColor(context.getResources().getColor(R.color.vermelho));
-				textBottonDireito.setTag(produto.getEstoqueFisico());
+				textBottonDireito.setTag(aeaploja.getEstoqueF());
 			}
 			
 			// Verifica se o tipo da venda eh atacado ou varejo
 			if(atacadoVarejo.equalsIgnoreCase(ATACADO)){
-				// Verifica se o produto esta na promocao
-				//if(produto.getValorPromocaoAtacadoVista() + produto.getValorPromocaoAtacadoPrazo() > 0){
-				if( (produto.getProdutoPromocaoAtacado() != null) && (produto.getProdutoPromocaoAtacado().equalsIgnoreCase("1")) ){
+				textBottonEsquerdo.setText("R$ " + this.funcoes.arredondarValor(aeaploja.getVendaAtac()));
 
-					/*if (vistaPrazo.equalsIgnoreCase("0")) {
-						// Seta o preco da promocao atacado
-						textBottonEsquerdo.setText("R$ " + this.funcoes.arredondarValor(produto.getValorPromocaoAtacadoVista()));
-					} else {
-						textBottonEsquerdo.setText("R$ " + this.funcoes.arredondarValor(produto.getValorPromocaoAtacadoPrazo()));
-					}*/
-					// Muda a cor da view para amarelo
-					viewTopo.setBackgroundColor(context.getResources().getColor(R.color.amarelo));
-					linearLayoutIcons.setVisibility(View.VISIBLE);
-					viewIcone1.setVisibility(View.VISIBLE);
-					viewIcone1.setImageResource(R.mipmap.sale_amarelo);
-				}else{
-					// Torna a vivew Invisivel, mas ocupa o mesmo espaco
-					viewTopo.setVisibility(View.INVISIBLE);
-					//viewTopo.setBackgroundColor(context.getResources().getColor(R.color.branco));
-				}
-				textBottonEsquerdo.setText("R$ " + this.funcoes.arredondarValor(produto.getValorUnitarioAtacado()));
-
-			}else{
-				// Verifica se o produto esta na promocao
-				if( (produto.getProdutoPromocaoVarejo() != null) && (produto.getProdutoPromocaoVarejo().equalsIgnoreCase("1")) ){
-
-					/*if (vistaPrazo.equalsIgnoreCase("0")) {
-						// Seta o preco de promocao varejo
-						textBottonEsquerdo.setText("R$ " + this.funcoes.arredondarValor(String.valueOf(produto.getValorPromocaoVarejoVista())));
-					} else {
-						textBottonEsquerdo.setText("R$ " + this.funcoes.arredondarValor(String.valueOf(produto.getValorPromocaoVarejoPrazo())));
-					}*/
-					// Muda a cor da view para amarelo (promocao)
-					viewTopo.setBackgroundColor(context.getResources().getColor(R.color.amarelo));
-					linearLayoutIcons.setVisibility(View.VISIBLE);
-					viewIcone1.setVisibility(View.VISIBLE);
-					viewIcone1.setImageResource(R.mipmap.sale_amarelo);
-				} else {
-					// Torna a vivew Invisivel, mas ocupa o mesmo espaco
-					viewTopo.setVisibility(View.INVISIBLE);
-				}
-				textBottonEsquerdo.setText("R$ " + this.funcoes.arredondarValor(String.valueOf(produto.getValorUnitarioVarejo())));
+			} else {
+				textBottonEsquerdo.setText("R$ " + this.funcoes.arredondarValor(String.valueOf(aeaploja.getVendaVare())));
+			}
+			// Verifica se o aeaploja esta na promocao
+			if( ((aeaploja.getProdutoPromocaoAtacado() != null) && (aeaploja.getProdutoPromocaoAtacado().equalsIgnoreCase("1"))) ||
+				((aeaploja.getProdutoPromocaoVarejo() != null) && (aeaploja.getProdutoPromocaoVarejo().equalsIgnoreCase("1"))) ){
+				// Muda a cor da view para amarelo (promocao)
+				viewTopo.setBackgroundColor(context.getResources().getColor(R.color.amarelo));
+				linearLayoutIcons.setVisibility(View.VISIBLE);
+				viewIcone1.setVisibility(View.VISIBLE);
+				viewIcone1.setImageResource(R.mipmap.sale_amarelo);
+			} else {
+				// Torna a vivew Invisivel, mas ocupa o mesmo espaco
+				viewTopo.setVisibility(View.INVISIBLE);
 			}
 			// Verifica se tem estoque contabil
-			if(produto.getEstoqueContabil() < 1){
+			if(aeaploja.getEstoqueC() < 1){
 				viewRodape.setBackgroundColor(context.getResources().getColor(R.color.vermelho_escuro));
-				viewRodape.setTag(produto.getEstoqueContabil());
+				viewRodape.setTag(aeaploja.getEstoqueC());
 				// Adiciona o icone de estoque contabil negativo
 				linearLayoutIcons.setVisibility(View.VISIBLE);
 				viewIcone3.setVisibility(View.VISIBLE);
@@ -917,11 +901,9 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 			}else{
 				viewRodape.setVisibility(View.INVISIBLE);
 			}
-			
-			
-			// Muda a cor do texto da listView se o produto ja estiver no orcamento
-			if(produto.getEstaNoOrcamento() == '1'){
-				// muda a cor dos texto do produto
+			// Muda a cor do texto da listView se o aeaploja ja estiver no orcamento
+			if( (aeaploja.getEstaNoOrcamento() != null) && (aeaploja.getEstaNoOrcamento().equalsIgnoreCase("1")) ){
+				// muda a cor dos texto do aeaploja
 				textDescricao.setTextColor(this.context.getResources().getColor(R.color.verde_escuro));
 				textAbaixoDescricaoDireita.setTextColor(this.context.getResources().getColor(R.color.verde_escuro));
 				textAbaixoDescricaoEsqueda.setTextColor(this.context.getResources().getColor(R.color.verde_escuro));
@@ -929,29 +911,20 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 				textBottonEsquerdo.setTextColor(this.context.getResources().getColor(R.color.verde_escuro));
 				textBottonEsquerdoDois.setTextColor(this.context.getResources().getColor(R.color.verde_escuro));
 			}
-			
-
-			ProdutoRotinas produtoRotinas = new ProdutoRotinas(context);
-			
-			FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
-			
-			//diasProdutoNovo = produtoRotinas.diasProdutoNovo(funcoes.getValorXml("CodigoEmpresa"));
-			
-			// Checa se eh um produto novo
-			if(produto.isProdutoNovo()){
+			// Checa se eh um aeaploja novo
+			if( (aeaploja.getProdutoNovo() != null) && (aeaploja.getProdutoNovo().equalsIgnoreCase("1")) ){
 				// Muda o fundo do view
 				view.setBackgroundColor(context.getResources().getColor(R.color.azul_medio_500));
 
-				if (produto.getEstaNoOrcamento() != '1') {
-					// muda a cor dos texto do produto
-					textDescricao.setTextColor(this.context.getResources().getColor(R.color.branco));
-					textAbaixoDescricaoDireita.setTextColor(this.context.getResources().getColor(R.color.branco));
-					textAbaixoDescricaoEsqueda.setTextColor(this.context.getResources().getColor(R.color.branco));
-					textBottonDireito.setTextColor(this.context.getResources().getColor(R.color.branco));
-					textBottonEsquerdo.setTextColor(this.context.getResources().getColor(R.color.branco));
-					textBottonEsquerdoDois.setTextColor(this.context.getResources().getColor(R.color.branco));
+				if ( (aeaploja.getEstaNoOrcamento() != null) && (!aeaploja.getEstaNoOrcamento().equalsIgnoreCase("1")) ) {
+					// muda a cor dos texto do aeaploja
+					textDescricao.setTextColor(this.context.getResources().getColor(R.color.verde_claro));
+					textAbaixoDescricaoDireita.setTextColor(this.context.getResources().getColor(R.color.verde_claro));
+					textAbaixoDescricaoEsqueda.setTextColor(this.context.getResources().getColor(R.color.verde_claro));
+					textBottonDireito.setTextColor(this.context.getResources().getColor(R.color.verde_claro));
+					textBottonEsquerdo.setTextColor(this.context.getResources().getColor(R.color.verde_claro));
+					textBottonEsquerdoDois.setTextColor(this.context.getResources().getColor(R.color.verde_claro));
 				}
-				
 				// Deixa o texto em negrito
 				textDescricao.setTypeface(null, Typeface.BOLD);
 				textAbaixoDescricaoEsqueda.setTypeface(null, Typeface.BOLD);
@@ -959,8 +932,6 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 				textBottonDireito.setTypeface(null, Typeface.BOLD);
 				textBottonEsquerdo.setTypeface(null, Typeface.BOLD);
 				textBottonEsquerdoDois.setTypeface(null, Typeface.BOLD);
-
-
 			}
 			// Visualiza o botão de opcao
 
@@ -1041,6 +1012,10 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 			textBottonDireito.setVisibility(View.GONE);
 			textBottonEsquerdo.setVisibility(View.GONE);
 			textBottonEsquerdoDois.setVisibility(View.GONE);
+			RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) viewDivider.getLayoutParams();
+			params.addRule(RelativeLayout.BELOW, R.id.layout_item_universal_text_abaixo_descricao_esquerda);
+			viewDivider.setLayoutParams(params);
+			viewDivider.setVisibility(View.VISIBLE);
 			viewRodape.setVisibility(View.GONE);
 			viewTopo.setVisibility(View.GONE);
 		
@@ -1055,9 +1030,9 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 			textBottonEsquerdo.setText("Cod.: " + planoPagamento.getCodigoPlanoPagamento());
 			
 			if(planoPagamento.getVistaPrazo().equalsIgnoreCase("0")){
-				textBottonDireito.setText("A Vista");
+				textBottonDireito.setText("V");
 			} else if(planoPagamento.getVistaPrazo().equalsIgnoreCase("1")){
-				textBottonDireito.setText("A Prazo");
+				textBottonDireito.setText("P");
 			} else {
 				textBottonDireito.setText("");
 			}
@@ -1065,6 +1040,10 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 			textAbaixoDescricaoDireita.setVisibility(View.INVISIBLE);
 			textAbaixoDescricaoEsqueda.setVisibility(View.GONE);
 			textBottonEsquerdoDois.setVisibility(View.INVISIBLE);
+			RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) viewDivider.getLayoutParams();
+			params.addRule(RelativeLayout.BELOW, R.id.layout_item_universal_text_botton_esquerdo_dois);
+			viewDivider.setLayoutParams(params);
+			viewDivider.setVisibility(View.VISIBLE);
 			viewRodape.setVisibility(View.GONE);
 			viewTopo.setVisibility(View.GONE);
 			
@@ -1451,6 +1430,10 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 			textBottonDireito.setVisibility(View.GONE);
 			textBottonEsquerdo.setVisibility(View.GONE);
 			textBottonEsquerdoDois.setVisibility(View.GONE);
+			RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) viewDivider.getLayoutParams();
+			params.addRule(RelativeLayout.BELOW, R.id.layout_item_universal_text_abaixo_descricao_esquerda);
+			viewDivider.setLayoutParams(params);
+			viewDivider.setVisibility(View.VISIBLE);
 			viewTopo.setVisibility(View.GONE);
 			viewRodape.setVisibility(View.GONE);
 			
@@ -1732,7 +1715,7 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 				
 				case R.id.menu_produto_lista_context_detalhes_produto:
 					
-					long idProduto = getItemId(posicao);
+					long idProduto = listAeaploja.get(posicao).getAeaprodu().getIdAeaprodu();
 					
 					Intent intent = new Intent(context, ProdutoDetalhesMDActivity.class);
 					//intent.putExtra(ProdutoDetalhesActivity.KEY_ID_PRODUTO, String.valueOf(idProduto));
@@ -1769,7 +1752,7 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 			
 		// Checa se o tipo de adapter eh de lista de produto	
 		} else if(this.tipoItem == PRODUTO){
-			listaProduto.remove(posicao);
+			listAeaploja.remove(posicao);
 		}
 	}
 	
@@ -1793,8 +1776,8 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 					// Verifica se o filtro pertence a lista de produtos
 					if(tipoItem == PRODUTO){
 						// Se nao tiver nada para filtrar entao etorna a lista completa
-						filtroResultado.values = listaProduto;
-						filtroResultado.count = listaProduto.size();
+						filtroResultado.values = listAeaploja;
+						filtroResultado.count = listAeaploja.size();
 					}
 					
 					return filtroResultado;
@@ -1824,16 +1807,16 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 					// Verifica se o filtro pertence a lista de produtos
 					if(tipoItem == PRODUTO){
 						// Cria uma lista auxiliar para armazenar os itens filtrados
-						List<ProdutoListaBeans> auxIListaProduto = new ArrayList<ProdutoListaBeans>();
-						
-						for (ProdutoListaBeans p : listaProduto){
-							if(p.getProduto().getDescricaoProduto().toUpperCase().contains(constraint.toString().toUpperCase()) ||
-							   p.getProduto().getCodigoEstrutural().toUpperCase().contains(constraint.toString().toUpperCase()) || 
-							   p.getProduto().getReferencia().toUpperCase().contains(constraint.toString().toUpperCase()) || 
-							   String.valueOf(p.getValorUnitarioAtacado()).toUpperCase().contains(constraint.toString().toUpperCase()) ||
-							   String.valueOf(p.getValorUnitarioVarejo()).toUpperCase().contains(constraint.toString().toUpperCase()) ||
-							   p.getProduto().getDescricaoMarca().toUpperCase().contains(constraint.toString().toUpperCase()) ||
-							   p.getProduto().getUnidadeVendaProduto().getSiglaUnidadeVenda().toUpperCase().contains(constraint.toString().toUpperCase())){
+						List<AeaplojaBeans> auxIListaProduto = new ArrayList<AeaplojaBeans>();
+
+						for (AeaplojaBeans p : listAeaploja){
+							if(p.getAeaprodu().getDescricao().toUpperCase().contains(constraint.toString().toUpperCase()) ||
+									p.getAeaprodu().getCodigoEstrutural().toUpperCase().contains(constraint.toString().toUpperCase()) ||
+									p.getAeaprodu().getReferencia().toUpperCase().contains(constraint.toString().toUpperCase()) ||
+							   String.valueOf(p.getVendaAtac()).toUpperCase().contains(constraint.toString().toUpperCase()) ||
+							   String.valueOf(p.getVendaVare()).toUpperCase().contains(constraint.toString().toUpperCase()) ||
+								( (p.getAeaprodu().getAeamarca() != null) && (p.getAeaprodu().getAeamarca().getDescricao().toUpperCase().contains(constraint.toString().toUpperCase())) ) ||
+								( (p.getAeaprodu().getAeaunven() != null) && (p.getAeaprodu().getAeaunven().getSigla().toUpperCase().contains(constraint.toString().toUpperCase())) ) ){
 								//Adiciona a pessoa em uma nova lista
 								auxIListaProduto.add(p);
 							}
@@ -1868,7 +1851,7 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 					// Verifica o tipo de item universal que esta sendo chamado
 					if(tipoItem == PRODUTO){
 						// Preencho a lista(listaPessoas) do adapter com o novo valor
-						listaProduto = (List<ProdutoListaBeans>) resultadoFiltro.values;
+						listAeaploja = (List<AeaplojaBeans>) resultadoFiltro.values;
 					}
 			        
 			        //Notifica ovites apos a lista ter novos valores

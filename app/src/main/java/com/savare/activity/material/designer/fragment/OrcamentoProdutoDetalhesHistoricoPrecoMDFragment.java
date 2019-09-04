@@ -26,6 +26,7 @@ public class OrcamentoProdutoDetalhesHistoricoPrecoMDFragment extends Fragment {
 
     private View viewHistorico;
     private ListView listViewHistoricoPreco;
+    private List<ItemOrcamentoBeans> listaItemOrcamento;
     private ProgressBar progressStatus;
     private TextView textMensagem;
     private ItemUniversalAdapter listaHistoricoPrecoAdapter;
@@ -48,17 +49,31 @@ public class OrcamentoProdutoDetalhesHistoricoPrecoMDFragment extends Fragment {
         if (parametro != null){
             idProduto = parametro.getInt(OrcamentoProdutoDetalhesTabFragmentMDActivity.KEY_ID_AEAPRODU);
             idClifo = parametro.getInt(OrcamentoProdutoDetalhesTabFragmentMDActivity.KEY_ID_CFACLIFO);
+
+            // Checa se foi passado algum id de produto
+            if (idProduto > 0) {
+                OrcamentoRotinas orcamentoRotinas = new OrcamentoRotinas(getActivity());
+                // Pega todos os produtos do orcamento
+                listaItemOrcamento = orcamentoRotinas.listaItemOrcamentoResumida("(AEAPRODU.ID_AEAPRODU = " + idProduto+") AND (AEAORCAM.ID_CFACLIFO = " + idClifo +") AND (AEAORCAM.STATUS NOT IN('O', 'D'))",
+                        null,
+                        "AEAITORC.DT_CAD DESC",
+                        progressStatus);
+
+                // Verifica se existe algum dado na lista
+                if ((listaItemOrcamento != null) && (listaItemOrcamento.size() > 0)) {
+                    // Preenche o adapter com a lista de produtos do orcamento
+                    listaHistoricoPrecoAdapter = new ItemUniversalAdapter(getActivity(), ItemUniversalAdapter.HISTORICO_PRECO_ITEM_ORCAMENTO, listaItemOrcamento);
+                }
+            }
+
+            if ( (listaHistoricoPrecoAdapter != null) && (listaHistoricoPrecoAdapter.getListaItemOrcamento() != null) ){
+                listViewHistoricoPreco.setAdapter(listaHistoricoPrecoAdapter);
+            } else {
+                textMensagem.setVisibility(View.VISIBLE);
+            }
         }
 
         return viewHistorico;
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-
-        CarregarHistoricoProduto carregarHistoricoProduto = new CarregarHistoricoProduto();
-        carregarHistoricoProduto.execute();
     }
 
     private void recuperarCampos(){
@@ -68,9 +83,9 @@ public class OrcamentoProdutoDetalhesHistoricoPrecoMDFragment extends Fragment {
     }
 
 
-    public class CarregarHistoricoProduto extends AsyncTask<Void, Void, Void> {
+    /*public class CarregarHistoricoProduto extends AsyncTask<Void, Void, Void> {
 
-        private List<ItemOrcamentoBeans> listaItemOrcamento;
+//        private List<ItemOrcamentoBeans> listaItemOrcamento;
 
         @Override
         protected void onPreExecute() {
@@ -83,21 +98,21 @@ public class OrcamentoProdutoDetalhesHistoricoPrecoMDFragment extends Fragment {
         @Override
         protected Void doInBackground(Void... params) {
 
-            // Checa se foi passado algum id de produto
-            if (idProduto > 0) {
-                OrcamentoRotinas orcamentoRotinas = new OrcamentoRotinas(getActivity());
-                // Pega todos os produtos do orcamento
-                listaItemOrcamento = orcamentoRotinas.listaItemOrcamentoResumida("(AEAPRODU.ID_AEAPRODU = " + idProduto+") AND (AEAORCAM.ID_CFACLIFO = " + idClifo +") AND (AEAORCAM.STATUS NOT IN('O', 'D'))",
-                                                                                 null,
-                                                                                 "AEAITORC.DT_CAD DESC",
-                                                                                 progressStatus);
-
-                // Verifica se existe algum dado na lista
-                if ((listaItemOrcamento != null) && (listaItemOrcamento.size() > 0)) {
-                    // Preenche o adapter com a lista de produtos do orcamento
-                    listaHistoricoPrecoAdapter = new ItemUniversalAdapter(getActivity(), ItemUniversalAdapter.HISTORICO_PRECO_ITEM_ORCAMENTO, listaItemOrcamento);
-                }
-            }
+//            // Checa se foi passado algum id de produto
+//            if (idProduto > 0) {
+//                OrcamentoRotinas orcamentoRotinas = new OrcamentoRotinas(getActivity());
+//                // Pega todos os produtos do orcamento
+//                listaItemOrcamento = orcamentoRotinas.listaItemOrcamentoResumida("(AEAPRODU.ID_AEAPRODU = " + idProduto+") AND (AEAORCAM.ID_CFACLIFO = " + idClifo +") AND (AEAORCAM.STATUS NOT IN('O', 'D'))",
+//                                                                                 null,
+//                                                                                 "AEAITORC.DT_CAD DESC",
+//                                                                                 progressStatus);
+//
+//                // Verifica se existe algum dado na lista
+//                if ((listaItemOrcamento != null) && (listaItemOrcamento.size() > 0)) {
+//                    // Preenche o adapter com a lista de produtos do orcamento
+//                    listaHistoricoPrecoAdapter = new ItemUniversalAdapter(getActivity(), ItemUniversalAdapter.HISTORICO_PRECO_ITEM_ORCAMENTO, listaItemOrcamento);
+//                }
+//            }
             return null;
         }
 
@@ -113,5 +128,5 @@ public class OrcamentoProdutoDetalhesHistoricoPrecoMDFragment extends Fragment {
 
             progressStatus.setVisibility(View.GONE);
         }
-    }
+    }*/
 }

@@ -7,12 +7,12 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -33,11 +33,18 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
+import uk.co.deanwild.materialshowcaseview.MaterialShowcaseView;
+
 /**
  * Created by Bruno Nogueira Silva on 29/01/2016.
  */
 public class ListaTitulosMDActivity extends AppCompatActivity{
 
+    public static char  TITULOS_EM_ABERTO = '0',
+                        TITULOS_BAIXADO = '1',
+                        TITULOS_EM_ABERTO_VENCIDOS = '2',
+                        TIPO_RECEBER = '0',
+                        TIPO_PAGAR = '1';
     private ProgressBar progressBarStatus;
     private Toolbar toolbarInicio;
     private TextView textTotalAReceber,
@@ -58,6 +65,7 @@ public class ListaTitulosMDActivity extends AppCompatActivity{
     int anoFinalSelecinado = -1;
     int mesFinalSelecionado = -1;
     int diaFinalSelecionado = -1;
+    private static final String SHOWCASE_ID = "custom example";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,40 +83,28 @@ public class ListaTitulosMDActivity extends AppCompatActivity{
         if (intentParametro != null) {
             // Seta o campo codigo consumo total com o que foi passado por parametro
             idPessoa = intentParametro.getString("ID_CFACLIFO");
-
+           // Verifica se realmente foi passado por parametro o id do cliente
+            if ( (idPessoa != null) && (!idPessoa.isEmpty()) ) {
+                tipoListagem = TITULOS_EM_ABERTO_VENCIDOS;
+                pagarReceber = TIPO_RECEBER;
+                CarregarListaTitulos carregarListaTitulos = new CarregarListaTitulos();
+                carregarListaTitulos.execute();
+            }
         } else {
             idPessoa = "";
         }
-
-        CarregarListaTitulos carregarListaTitulos = new CarregarListaTitulos();
-        carregarListaTitulos.execute();
-
-        /*ParcelaRotinas parcelaRotinas = new ParcelaRotinas(ListaTitulosMDActivity.this);
-
-        listaTitulos = new ArrayList<TitulosListaBeans>();
-        listaTitulos = parcelaRotinas.listaTitulos(idPessoa, tipoListagem, pagarReceber, null);
-
-        adapterListaTitulos = new ListaTitulosExpandableAdapter(ListaTitulosMDActivity.this, listaTitulos);
-        expandagleListaTitulos.setAdapter(adapterListaTitulos);*/
-
     }  // fim onCreate
 
     @Override
     protected void onResume() {
         super.onResume();
 
-        /*ParcelaRotinas parcelaRotinas = new ParcelaRotinas(ListaTitulosMDActivity.this);
-
-        FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(ListaTitulosMDActivity.this);
-
-        textTotalAReceber.setText(funcoes.arredondarValor(parcelaRotinas.totalReceberPagarCliente(idPessoa, tipoListagem, '0', whereFiltroAuxiliar)));
-        textTotalCredito.setText(funcoes.arredondarValor(parcelaRotinas.totalReceberPagarCliente(idPessoa, tipoListagem, '1', whereFiltroAuxiliar)));*/
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         //super.onCreateOptionsMenu(menu);
-        MenuInflater inflater = getMenuInflater();
+        //MenuInflater inflater = getMenuInflater();
 
         getMenuInflater().inflate(R.menu.lista_titulos, menu);
 
@@ -172,13 +168,33 @@ public class ListaTitulosMDActivity extends AppCompatActivity{
             } // Fim do onQueryTextChange
         }); // Fim do setOnQueryTextListener
 
+        if ((idPessoa == null) || (idPessoa.isEmpty())) {
+            new Handler().post(new Runnable() {
+                @Override
+                public void run() {
+
+                    final View menuItemView = findViewById(R.id.menu_lista_titulos_filtro);
+                    // SOME OF YOUR TASK AFTER GETTING VIEW REFERENCE
+
+                    new MaterialShowcaseView.Builder(ListaTitulosMDActivity.this)
+                            .setTarget(menuItemView)
+                            //.setDismissText("OK")
+                            .setContentText("Selecione uma das opções do filtro.")
+                            //.setDelay(withDelay) // optional but starting animations immediately in onCreate can make them choppy
+                            //.singleUse(SHOWCASE_ID) // provide a unique ID used to ensure it is only shown once
+                            .setDismissOnTouch(true)
+                            .show();
+
+                }
+            });
+        }
         return super.onCreateOptionsMenu(menu);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
-        ParcelaRotinas parcelaRotinas = new ParcelaRotinas(ListaTitulosMDActivity.this);
+        CarregarListaTitulos carregarListaTitulos = new CarregarListaTitulos();
 
         switch (item.getItemId()) {
 
@@ -186,36 +202,38 @@ public class ListaTitulosMDActivity extends AppCompatActivity{
                 finish();
                 break;
 
+            case R.id.menu_lista_todos_titulos:
+                tipoListagem = TITULOS_EM_ABERTO;
+                pagarReceber = TIPO_RECEBER;
+                carregarListaTitulos.execute();
+                break;
+
             case R.id.menu_lista_titulos_vencidos:
 
-                listaTitulos = parcelaRotinas.listaTitulos(idPessoa, '2', pagarReceber, whereFiltroAuxiliar, progressBarStatus);
-                adapterListaTitulos.setListaPessoasParent(listaTitulos);
-                expandagleListaTitulos.setAdapter(adapterListaTitulos);
-                onResume();
+                tipoListagem = TITULOS_EM_ABERTO_VENCIDOS;
+                pagarReceber = TIPO_RECEBER;
+                carregarListaTitulos.execute();
                 break;
 
             case R.id.menu_lista_titulos_aberto:
 
-                listaTitulos = parcelaRotinas.listaTitulos(idPessoa, '0', pagarReceber, whereFiltroAuxiliar, progressBarStatus);
-                adapterListaTitulos.setListaPessoasParent(listaTitulos);
-                expandagleListaTitulos.setAdapter(adapterListaTitulos);
-                onResume();
+                tipoListagem = TITULOS_EM_ABERTO;
+                pagarReceber = TIPO_RECEBER;
+                carregarListaTitulos.execute();
                 break;
 
             case R.id.menu_lista_titulos_baixados:
 
-                listaTitulos = parcelaRotinas.listaTitulos(idPessoa, '1', '0', whereFiltroAuxiliar, progressBarStatus);
-                adapterListaTitulos.setListaPessoasParent(listaTitulos);
-                expandagleListaTitulos.setAdapter(adapterListaTitulos);
-                onResume();
+                tipoListagem = TITULOS_BAIXADO;
+                pagarReceber = TIPO_RECEBER;
+                carregarListaTitulos.execute();
                 break;
 
             case R.id.menu_lista_titulos_credito:
 
-                listaTitulos = parcelaRotinas.listaTitulos(idPessoa, '0', '1', whereFiltroAuxiliar, progressBarStatus);
-                adapterListaTitulos.setListaPessoasParent(listaTitulos);
-                expandagleListaTitulos.setAdapter(adapterListaTitulos);
-                onResume();
+                tipoListagem = TITULOS_EM_ABERTO;
+                pagarReceber = TIPO_PAGAR;
+                carregarListaTitulos.execute();
                 break;
 
             case R.id.menu_lista_titulos_filtrar_periodo:
@@ -322,6 +340,8 @@ public class ListaTitulosMDActivity extends AppCompatActivity{
                         mesFinalSelecionado = -1;
                         diaInicialSelecionado = -1;
 
+                        whereFiltroAuxiliar = "";
+
                         carregarListaTitulosPeriodo();
                     }
                 });
@@ -360,7 +380,7 @@ public class ListaTitulosMDActivity extends AppCompatActivity{
             ParcelaRotinas parcelaRotinas = new ParcelaRotinas(ListaTitulosMDActivity.this);
 
             listaTitulos = new ArrayList<TitulosListaBeans>();
-            listaTitulos = parcelaRotinas.listaTitulos(idPessoa, tipoListagem, pagarReceber, null, progressBarStatus);
+            listaTitulos = parcelaRotinas.listaTitulos(idPessoa, tipoListagem, pagarReceber, whereFiltroAuxiliar, progressBarStatus);
 
             adapterListaTitulos = new ListaTitulosExpandableAdapter(ListaTitulosMDActivity.this, listaTitulos);
 
@@ -374,9 +394,9 @@ public class ListaTitulosMDActivity extends AppCompatActivity{
 
             expandagleListaTitulos.setAdapter(adapterListaTitulos);
 
-            FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(ListaTitulosMDActivity.this);
-
             ParcelaRotinas parcelaRotinas = new ParcelaRotinas(ListaTitulosMDActivity.this);
+
+            FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(ListaTitulosMDActivity.this);
 
             textTotalAReceber.setText(funcoes.arredondarValor(parcelaRotinas.totalReceberPagarCliente(idPessoa, tipoListagem, '0', whereFiltroAuxiliar)));
             textTotalCredito.setText(funcoes.arredondarValor(parcelaRotinas.totalReceberPagarCliente(idPessoa, tipoListagem, '1', whereFiltroAuxiliar)));
@@ -447,7 +467,11 @@ public class ListaTitulosMDActivity extends AppCompatActivity{
      */
     private void carregarListaTitulosPeriodo(){
 
-        String wherePeriodo = wherePeriodoData();
+        whereFiltroAuxiliar = wherePeriodoData();
+        CarregarListaTitulos carregarListaTitulos = new CarregarListaTitulos();
+        carregarListaTitulos.execute();
+
+        /*String wherePeriodo = wherePeriodoData();
 
         ParcelaRotinas parcelaRotinas = new ParcelaRotinas(ListaTitulosMDActivity.this);
 
@@ -461,5 +485,6 @@ public class ListaTitulosMDActivity extends AppCompatActivity{
         // Calcula os campos totais
         textTotalAReceber.setText(funcoes.arredondarValor(parcelaRotinas.totalReceberPagarCliente(idPessoa, tipoListagem, '0', wherePeriodo)));
         textTotalCredito.setText(funcoes.arredondarValor(parcelaRotinas.totalReceberPagarCliente(idPessoa, tipoListagem, '1', wherePeriodo)));
+        */
     }
 }

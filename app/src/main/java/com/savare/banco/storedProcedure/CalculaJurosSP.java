@@ -235,14 +235,14 @@ public class CalculaJurosSP extends StoredProcedure {
                 if ((dtPagamento != null) && (Long.parseLong(funcoes.diferencaEntreData(funcoes.DIAS, dtPagamento, dtVencimento)) < 0) ){
                     dtBase = dtPagamento;
                 }
-                // :PREVISAO - :vd_dt_base
+                // vi_dias = :PREVISAO - :vd_dt_base;
                 dias = (Integer.parseInt(funcoes.diferencaEntreData(funcoes.DIAS, dtBase, previsao)) - 1); // Tira um dia
 
                 if ( (tipoPagarReceber != null) && (tipoPagarReceber.equalsIgnoreCase("0"))){
                     sql.setLength(0);
                     sql.append("SELECT PERC_DESC_PGTO_ANT, JUROS_DIARIO, CAPITALIZA, DIAS_CARENCIA, DIAS_VENDA_VISTA, PERC_MULTA \n");
                     sql.append("FROM SMAEMPRE \n");
-                    sql.append("WHERE ID_SMAEMPRE = ").append(idSmaempre);
+                    sql.append("WHERE ID_SMAEMPRE = ").append(funcoes.getValorXml(funcoes.TAG_CODIGO_EMPRESA));
 
                     dados = bancoDados.rawQuery(sql.toString(), null);
 
@@ -270,7 +270,7 @@ public class CalculaJurosSP extends StoredProcedure {
                 sql.setLength(0);
                 sql.append("SELECT DIAS_CARENCIA, JUROS_DIARIO, CAPITALIZA ");
                 sql.append("FROM CFAPARAM \n");
-                sql.append("WHERE ID_CFACLIFO = ").append(idCfaclifo).append(" AND ID_SMAEMPRE = ").append(idSmaempre);
+                sql.append("WHERE ID_CFACLIFO = ").append(idCfaclifo).append(" AND ID_SMAEMPRE = ").append(funcoes.getValorXml(funcoes.TAG_CODIGO_EMPRESA));
 
                 dados = bancoDados.rawQuery(sql.toString(), null);
                 if ((dados != null) && (dados.getCount() > 0)) {

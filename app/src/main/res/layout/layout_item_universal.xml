@@ -60,13 +60,22 @@
         android:gravity="left" />
 
     <View
+        android:id="@+id/layout_item_universal_view_divider"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_below="@+id/layout_item_universal_text_botton_esquerdo_dois"
+        android:layout_marginTop="3dp"
+        android:background="@color/cinza_platina"
+        android:visibility="gone" />
+
+    <View
         android:id="@+id/layout_item_universal_view_rodape"
         android:layout_width="5dp"
         android:layout_height="25dp"
-        android:background="@color/azul_escuro"
         android:layout_alignBottom="@+id/layout_item_universal_text_botton_esquerdo"
+        android:layout_toEndOf="@+id/layout_item_universal_profile_image"
         android:layout_toRightOf="@+id/layout_item_universal_profile_image"
-        android:layout_toEndOf="@+id/layout_item_universal_profile_image" />
+        android:background="@color/azul_escuro" />
 
     <View
         android:id="@+id/layout_item_universal_view_topo"

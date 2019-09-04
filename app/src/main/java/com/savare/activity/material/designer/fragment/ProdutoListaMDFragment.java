@@ -5,6 +5,8 @@ import android.app.SearchManager;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -20,7 +22,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
-import android.widget.BaseAdapter;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -29,22 +30,27 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.github.johnpersano.supertoasts.library.Style;
+import com.github.johnpersano.supertoasts.library.SuperActivityToast;
 import com.savare.R;
 import com.savare.activity.material.designer.LegendaProdutoListaMDActivity;
 import com.savare.activity.material.designer.ListaOrcamentoPedidoMDActivity;
-import com.savare.activity.material.designer.LoginMDActivity;
 import com.savare.activity.material.designer.OrcamentoProdutoDetalhesTabFragmentMDActivity;
 import com.savare.activity.material.designer.ProdutoListaMDActivity;
-import com.savare.activity.material.designer.RegistroChaveUsuarioMDActivity;
 import com.savare.adapter.ItemUniversalAdapter;
+import com.savare.banco.funcoesSql.EmpresaSql;
 import com.savare.banco.funcoesSql.ProdutoRecomendadoSql;
+import com.savare.banco.storedProcedure.CalculaPrecoSP;
+import com.savare.beans.AeaembalBeans;
+import com.savare.beans.AeaplojaBeans;
 import com.savare.beans.AreaBeans;
 import com.savare.beans.CidadeBeans;
-import com.savare.beans.FotosBeans;
+import com.savare.beans.CfafotosBeans;
+import com.savare.beans.EmpresaBeans;
 import com.savare.beans.OrcamentoBeans;
-import com.savare.beans.ProdutoListaBeans;
 import com.savare.funcoes.FuncoesPersonalizadas;
-import com.savare.funcoes.Rotinas;
+import com.savare.funcoes.rotinas.EmbalagemRotinas;
+import com.savare.funcoes.rotinas.EmpresaRotinas;
 import com.savare.funcoes.rotinas.FotoRotinas;
 import com.savare.funcoes.rotinas.OrcamentoRotinas;
 import com.savare.funcoes.rotinas.ProdutoRotinas;
@@ -66,7 +72,7 @@ public class ProdutoListaMDFragment extends Fragment {
     public static final String KEY_TIPO_TELA = "KEY_TIPO_TELA";
     private int tipoTela = -1;
     private ListView listViewProdutos;
-    private List<ProdutoListaBeans> listaProdutos;
+    private List<AeaplojaBeans> listAeaploja;
     private ItemUniversalAdapter adapterListaProdutos;
     private ItemUniversalAdapter adapterFiltroCidade;
     private ItemUniversalAdapter adapterFiltroArea;
@@ -76,12 +82,17 @@ public class ProdutoListaMDFragment extends Fragment {
     private String idOrcamento, idCliente, atacadoVarejo = "0", atacadoVarejoAuxiliar = "0", nomeRazao, vistaPrazo = "0";
     private ProgressBar progressBarListaProdutos;
     private Boolean pesquisando = false;
-    private ProdutoListaBeans produtoVendaClicado;
+    private AeaplojaBeans produtoVendaClicado;
     private long idItemOrcamento = 0;
     public static final String KEY_TELA_PRODUTO_LISTA_ACTIVITY = "ProdutoListaActivity";
     private TextView textCodigoOrcamento, textCodigoPessoa, textNomeRazao, textAtacadoVarejo, textProcessoPesquisa;
-    LinearLayout layoutFragmentRodape;
+    private LinearLayout layoutFragmentRodape;
     private boolean pequisarProdutoEstoque = false;
+    private LoaderProdutos loaderProdutosAsync;
+    private LoaderCalculaPrecoSP loaderCalculaPrecoSP;
+    private LoaderImagemProdutos loaderCarregarImagemProduto;
+    private LoaderChecaProdutoOrcamento loaderChecaProdutoOrcamento;
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -98,13 +109,12 @@ public class ProdutoListaMDFragment extends Fragment {
         if (funcoes.getValorXml(funcoes.TAG_PESQUISA_PRODUTO_ESTOQUE).equalsIgnoreCase("S")){
             pequisarProdutoEstoque = true;
         }
-
         /**
          * Pega valores passados por parametro de outra Activity
          */
         Bundle parametro = getArguments();
 
-        if(parametro != null){
+        if(parametro != null) {
             tipoTela = parametro.getInt(KEY_TIPO_TELA);
             idOrcamento = parametro.getString(ProdutoListaMDActivity.KEY_ID_ORCAMENTO);
             idCliente = parametro.getString(ProdutoListaMDActivity.KEY_ID_CLIENTE);
@@ -132,19 +142,16 @@ public class ProdutoListaMDFragment extends Fragment {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 // Checa qual eh o tipo da tela
-                if (tipoTela == TELA_MAIS_VENDIDOS_CIDADE){
+                if ( (tipoTela == TELA_MAIS_VENDIDOS_CIDADE) || (tipoTela == TELA_MAIS_VENDIDOS_AREA) ){
                     // Limpa o listView
                     listViewProdutos.setAdapter(null);
                     // Executa
-                    LoaderProdutos loaderProdutosAsync = new LoaderProdutos(null, spinnerFiltro, null);
-                    loaderProdutosAsync.execute();
-
-                } else if (tipoTela == TELA_MAIS_VENDIDOS_AREA) {
-
-                    // Limpa o listView
-                    listViewProdutos.setAdapter(null);
-                    // Executa
-                    LoaderProdutos loaderProdutosAsync = new LoaderProdutos(null, spinnerFiltro, null);
+                    if (loaderProdutosAsync == null) {
+                        loaderProdutosAsync = new LoaderProdutos();
+                    }
+                    if (loaderProdutosAsync.getStatus().equals(AsyncTask.Status.RUNNING)){
+                        loaderProdutosAsync.cancel(true);
+                    }
                     loaderProdutosAsync.execute();
                 }
             }
@@ -163,24 +170,13 @@ public class ProdutoListaMDFragment extends Fragment {
                 if ((idOrcamento != null) && (idOrcamento.length() > 0)) {
 
                     //Pega os dados da pessoa que foi clicado
-                    ProdutoListaBeans produtoVenda = (ProdutoListaBeans) parent.getItemAtPosition(position);
-                    produtoVenda.setAtacadoVarejo((atacadoVarejo != null) ? atacadoVarejo.charAt(0) : atacadoVarejoAuxiliar.charAt(0));
-
-                    //Bundle bundle = new Bundle();
-                    //bundle.putParcelable("AEAORCAM", preencheDadosOrcamento());
-                    //bundle.putString("ID_AEAPRODU", "" + produtoVenda.getProduto().getIdProduto());
-                    //bundle.putString("ATAC_VARE", (atacadoVarejo != null) ? atacadoVarejo : atacadoVarejoAuxiliar);
-                    //bundle.putInt("POSICAO", position);
-                    //bundle.putLong("ID_AEAITORC", idItemOrcamento);
-                    //bundle.putString("ID_AEAORCAM", idOrcamento);
-                    //bundle.putString("ID_CFACLIFO", idCliente);
-                    //bundle.putString("RAZAO_SOCIAL", nomeRazao);
-                    //intent.putExtras(bundle);
+                    AeaplojaBeans aeaploja = (AeaplojaBeans) parent.getItemAtPosition(position);
+                    //aeaploja.setAtacadoVarejo((atacadoVarejo != null) ? atacadoVarejo.charAt(0) : atacadoVarejoAuxiliar.charAt(0));
 
                     // Abre a tela de detalhes do produto
                     Intent intent = new Intent(getContext(), OrcamentoProdutoDetalhesTabFragmentMDActivity.class);
                     intent.putExtra(OrcamentoProdutoDetalhesTabFragmentMDActivity.KEY_ID_AEAORCAM, Integer.parseInt(idOrcamento));
-                    intent.putExtra(OrcamentoProdutoDetalhesTabFragmentMDActivity.KEY_ID_AEAPRODU, produtoVenda.getProduto().getIdProduto());
+                    intent.putExtra(OrcamentoProdutoDetalhesTabFragmentMDActivity.KEY_ID_AEAPRODU, aeaploja.getAeaprodu().getIdAeaprodu());
                     intent.putExtra(OrcamentoProdutoDetalhesTabFragmentMDActivity.KEY_ID_CFACLIFO, Integer.parseInt(idCliente));
                     intent.putExtra(OrcamentoProdutoDetalhesTabFragmentMDActivity.KEY_RAZAO_SOCIAL, nomeRazao);
                     intent.putExtra(OrcamentoProdutoDetalhesTabFragmentMDActivity.KEY_POSICAO, position);
@@ -191,13 +187,14 @@ public class ProdutoListaMDFragment extends Fragment {
 
                 } else {
                     // Pega os dados do produto clicado
-                    produtoVendaClicado = (ProdutoListaBeans) parent.getItemAtPosition(position);
-                    produtoVendaClicado.setAtacadoVarejo((atacadoVarejo != null) ? atacadoVarejo.charAt(0) : atacadoVarejoAuxiliar.charAt(0));
+                    produtoVendaClicado = (AeaplojaBeans) parent.getItemAtPosition(position);
+                    //produtoVendaClicado.setAtacadoVarejo((atacadoVarejo != null) ? atacadoVarejo.charAt(0) : atacadoVarejoAuxiliar.charAt(0));
 
                     // Abre a tela de detalhes do produto
                     Intent intent = new Intent(getContext(), ListaOrcamentoPedidoMDActivity.class);
                     intent.putExtra(ListaOrcamentoPedidoMDActivity.KEY_ORCAMENTO_PEDIDO, "O");
                     intent.putExtra(ListaOrcamentoPedidoMDActivity.KEY_RETORNA_VALOR, ListaOrcamentoPedidoMDActivity.TELA_LISTA_PRODUTOS);
+                    intent.putExtra(ListaOrcamentoPedidoMDActivity.KEY_ATACADO_VAREJO, (atacadoVarejo != null) ? atacadoVarejo : atacadoVarejoAuxiliar);
                     // Abre a activity aquardando uma resposta
                     startActivityForResult(intent, 1);
                 }
@@ -205,6 +202,17 @@ public class ProdutoListaMDFragment extends Fragment {
         });
 
         return viewOrcamento;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        // Forca o fechamento do teclado virtual
+        if (viewOrcamento != null) {
+            InputMethodManager imm = (InputMethodManager) viewOrcamento.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(viewOrcamento.getWindowToken(), 0);
+        }
     }
 
     @Override
@@ -228,7 +236,7 @@ public class ProdutoListaMDFragment extends Fragment {
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getActivity().getComponentName()));
 
         //SearchView searchView = (SearchView) findViewById(R.id.search);
-        EditText searchEditText = (EditText) searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text);
+        final EditText searchEditText = (EditText) searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text);
         searchEditText.setTextColor(getResources().getColor(R.color.branco));
         searchEditText.setHintTextColor(getResources().getColor(R.color.branco));
 
@@ -259,30 +267,14 @@ public class ProdutoListaMDFragment extends Fragment {
                         if (pequisarProdutoEstoque){
                             where += " AND (AEAPLOJA.ESTOQUE_F > 0)";
                         }
+                        // Limpa o listView
+                        listViewProdutos.setAdapter(null);
 
-                        if ((tipoTela == TELA_MAIS_VENDIDOS_AREA) || (tipoTela == TELA_MAIS_VENDIDOS_CIDADE)) {
-                            // Limpa o listView
-                            listViewProdutos.setAdapter(null);
-                            // Executa
-                            LoaderProdutos loaderProdutosAsync = new LoaderProdutos(where, spinnerFiltro, null);
-                            if ((loaderProdutosAsync.getStatus() == AsyncTask.Status.RUNNING)){
-                                loaderProdutosAsync.cancel(true);
-                            }
-                            loaderProdutosAsync.execute();
-
-                        } else {
-                            // Limpa o listView
-                            listViewProdutos.setAdapter(null);
-                            // Executa
-                            LoaderProdutos loaderProdutosAsync = new LoaderProdutos(where, null, null);
-                            if ((loaderProdutosAsync.getStatus() == AsyncTask.Status.RUNNING)){
-                                loaderProdutosAsync.cancel(true);
-                            }
-                            loaderProdutosAsync.execute();
-                            // Tira o foco da searchView e fecha o teclado virtual
-                            searchView.clearFocus();
-                            return true;
+                        if ( (loaderProdutosAsync == null) || (loaderProdutosAsync.getStatus().equals(AsyncTask.Status.FINISHED))) {
+                            loaderProdutosAsync = new LoaderProdutos();
                         }
+                        loaderProdutosAsync.where = where;
+                        loaderProdutosAsync.execute();
                         // Tira o foco da searchView e fecha o teclado virtual
                         searchView.clearFocus();
 
@@ -291,6 +283,15 @@ public class ProdutoListaMDFragment extends Fragment {
                             InputMethodManager imm = (InputMethodManager) viewOrcamento.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
                             imm.hideSoftInputFromWindow(viewOrcamento.getWindowToken(), 0);
                         }
+                        if (tipoTela == TELA_LISTA_PRODUTO) {
+                            return true;
+                        }
+                    } else {
+                        SuperActivityToast.create(getActivity(), getResources().getString(R.string.sem_descricao_para_pesquisar_produto), Style.DURATION_VERY_LONG)
+                                .setTextColor(Color.WHITE)
+                                .setColor(Color.RED)
+                                .setAnimations(Style.ANIMATIONS_POP)
+                                .show();
                     }
                 }
                 return false;
@@ -302,8 +303,6 @@ public class ProdutoListaMDFragment extends Fragment {
             }
         });
         searchView.setQueryHint(getResources().getString(R.string.pesquisar));
-
-
     }
 
     @Override
@@ -315,32 +314,26 @@ public class ProdutoListaMDFragment extends Fragment {
             // Monta a clausula where para buscar no banco de dados
             String where = "( (JULIANDAY(DATE('NOW', 'LOCALTIME')) - JULIANDAY(AEAPRODU.DT_CAD)) <= SMAEMPRE.QTD_DIAS_DESTACA_PRODUTO )";
 
-            if ((tipoTela == TELA_MAIS_VENDIDOS_AREA) || (tipoTela == TELA_MAIS_VENDIDOS_CIDADE)) {
-                // Limpa o listView
-                listViewProdutos.setAdapter(null);
-                // Executa
-                LoaderProdutos loaderProdutosAsync = new LoaderProdutos(where, spinnerFiltro, null);
-                if ((loaderProdutosAsync.getStatus() == AsyncTask.Status.RUNNING)){
-                    loaderProdutosAsync.cancel(true);
-                }
-                loaderProdutosAsync.execute();
+            // Limpa o listView
+            listViewProdutos.setAdapter(null);
 
-            } else {
-                // Limpa o listView
-                listViewProdutos.setAdapter(null);
-                // Executa
-                LoaderProdutos loaderProdutosAsync = new LoaderProdutos(where, null, null);
-                if ((loaderProdutosAsync.getStatus() == AsyncTask.Status.RUNNING)){
-                    loaderProdutosAsync.cancel(true);
-                }
-                loaderProdutosAsync.execute();
+            if (loaderProdutosAsync == null) {
+                loaderProdutosAsync = new LoaderProdutos();
             }
+            if (loaderProdutosAsync.getStatus().equals(AsyncTask.Status.RUNNING)){
+                loaderProdutosAsync.cancel(true);
+            }
+            loaderProdutosAsync.where = where;
+            loaderProdutosAsync.execute();
+
         } else if (item.getItemId() == R.id.menu_produto_lista_tab_md_produtos_promocao){
             // Limpa o listView
             listViewProdutos.setAdapter(null);
-            // Executa
-            LoaderProdutos loaderProdutosAsync = new LoaderProdutos(null, null, ProdutoRotinas.APENAS_PRODUTO_PROMOCAO);
-            if ((loaderProdutosAsync.getStatus() == AsyncTask.Status.RUNNING)){
+
+            if (loaderProdutosAsync == null) {
+                loaderProdutosAsync = new LoaderProdutos();
+            }
+            if ((loaderProdutosAsync.getStatus().equals(AsyncTask.Status.RUNNING))){
                 loaderProdutosAsync.cancel(true);
             }
             loaderProdutosAsync.execute();
@@ -372,11 +365,10 @@ public class ProdutoListaMDFragment extends Fragment {
                 int posicao = data.getExtras().getInt("POSICAO");
 
                 // Informa que o produto esta em um orcamento
-                listaProdutos.get(posicao).setEstaNoOrcamento(data.getExtras().getChar("RESULTADO"));
+                listAeaploja.get(posicao).setEstaNoOrcamento(data.getExtras().getString("RESULTADO"));
                 this.idItemOrcamento = data.getExtras().getLong("ID_AEAITORC");
 
-                ((BaseAdapter) listViewProdutos.getAdapter()).notifyDataSetChanged();
-
+                adapterListaProdutos.notifyDataSetChanged();
             } else if(resultCode == 100){
 
                 OrcamentoBeans orcamento = new OrcamentoBeans();
@@ -399,12 +391,12 @@ public class ProdutoListaMDFragment extends Fragment {
 
                     Intent dadosParametro = new Intent(getContext(), OrcamentoProdutoDetalhesTabFragmentMDActivity.class);
                     // Pega os dados para enviar para outra tela
-                    dadosParametro.putExtra(OrcamentoProdutoDetalhesTabFragmentMDActivity.KEY_ID_AEAPRODU, produtoVendaClicado.getProduto().getIdProduto());
+                    dadosParametro.putExtra(OrcamentoProdutoDetalhesTabFragmentMDActivity.KEY_ID_AEAPRODU, produtoVendaClicado.getAeaprodu().getIdAeaprodu());
                     dadosParametro.putExtra(OrcamentoProdutoDetalhesTabFragmentMDActivity.KEY_ID_AEAORCAM, orcamento.getIdOrcamento());
                     dadosParametro.putExtra(OrcamentoProdutoDetalhesTabFragmentMDActivity.KEY_ID_CFACLIFO, orcamento.getIdPessoa());
                     dadosParametro.putExtra(OrcamentoProdutoDetalhesTabFragmentMDActivity.KEY_RAZAO_SOCIAL, orcamento.getNomeRazao());
                     //dadosParametro.putExtra("POSICAO", position);
-                    dadosParametro.putExtra(OrcamentoProdutoDetalhesTabFragmentMDActivity.KEY_ID_AEAITORC, produtoVendaClicado.getProduto().getIdProduto());
+                    dadosParametro.putExtra(OrcamentoProdutoDetalhesTabFragmentMDActivity.KEY_ID_AEAITORC, produtoVendaClicado.getAeaprodu().getIdAeaprodu());
                     dadosParametro.putExtra(OrcamentoProdutoDetalhesTabFragmentMDActivity.KEY_ATACADO_VAREJO, atacadoVarejo);
                     dadosParametro.putExtra(OrcamentoProdutoMDFragment.KEY_TELA_CHAMADA, KEY_TELA_PRODUTO_LISTA_ACTIVITY);
 
@@ -545,15 +537,22 @@ public class ProdutoListaMDFragment extends Fragment {
     }
 
     public class LoaderProdutos extends AsyncTask<Void, Void, Void> {
-        String where = "",
-               apenasProdutoPromocao = null;
+        String where = "";
         AreaBeans area;
         CidadeBeans cidade;
 
-        public LoaderProdutos(String where, Spinner spinnerFiltro, String apenasProdutoPromocao) {
-            this.where = where;
 
-            if (spinnerFiltro != null && spinnerFiltro.getCount() > 0) {
+        public LoaderProdutos() {
+
+        }
+
+        // Aqui eh o que acontece antes da tarefa principal ser executado
+        @Override
+        protected void onPreExecute() {
+            // o progressBar agora eh setado como visivel
+            progressBarListaProdutos.setVisibility(View.VISIBLE);
+
+            if ( (spinnerFiltro != null) && (spinnerFiltro.getCount() > 0) && (spinnerFiltro.getAdapter() != null) ){
                 // Checa qual eh a tela que esta chamando
                 if (tipoTela == TELA_MAIS_VENDIDOS_AREA) {
                     // Pega a area selecionada
@@ -571,14 +570,6 @@ public class ProdutoListaMDFragment extends Fragment {
                     }
                 }
             }
-            this.apenasProdutoPromocao = apenasProdutoPromocao;
-        }
-
-        // Aqui eh o que acontece antes da tarefa principal ser executado
-        @Override
-        protected void onPreExecute() {
-            // o progressBar agora eh setado como visivel
-            progressBarListaProdutos.setVisibility(View.VISIBLE);
         }
 
         @Override
@@ -591,13 +582,11 @@ public class ProdutoListaMDFragment extends Fragment {
                 if (tipoTela == TELA_LISTA_PRODUTO) {
                     // Checa se tem algum orcamento vinculado na visualizacao
                     if ((idOrcamento != null) && (idOrcamento.length() > 0)) {
-
                         // Cria a lista de produto e verifica se os produto existe no orcamento
-                        listaProdutos = produtoRotinas.listaProduto(where, null, idOrcamento, progressBarListaProdutos, null, produtoRotinas.NAO, 0, ((apenasProdutoPromocao != null && apenasProdutoPromocao.length() > 0) ? ProdutoRotinas.APENAS_PRODUTO_PROMOCAO : Rotinas.NAO) );
-
+                        listAeaploja = produtoRotinas.listaProduto(where, idOrcamento, null, null, progressBarListaProdutos, null);
                     } else {
                         // Cria a lista de produto sem verificar se o produto existe no orcamento
-                        listaProdutos = produtoRotinas.listaProduto(where, null, null, progressBarListaProdutos, null, produtoRotinas.NAO, 0, ((apenasProdutoPromocao != null && apenasProdutoPromocao.length() > 0) ? ProdutoRotinas.APENAS_PRODUTO_PROMOCAO : Rotinas.NAO) );
+                        listAeaploja = produtoRotinas.listaProduto(where, null, null, null, progressBarListaProdutos, null);
                     }
                 // Checa a tela que esta chamando esta funcao (Mais Vendidos por area)
                 } else if (tipoTela == TELA_MAIS_VENDIDOS_AREA) {
@@ -607,15 +596,17 @@ public class ProdutoListaMDFragment extends Fragment {
                         if (area.getDescricaoArea().contains(getString(R.string.todos))){
 
                             // Pega a lista de produtos baseado na opcao selecionada
-                            listaProdutos = produtoRotinas.listaProdutoMaisVendido(TELA_MAIS_VENDIDOS_AREA, null, null, null, idOrcamento, progressBarListaProdutos, null);
+                            listAeaploja = produtoRotinas.listaProduto(where, idOrcamento, TELA_MAIS_VENDIDOS_AREA, null, progressBarListaProdutos, null);
 
-                        } else if ( (!area.getDescricaoArea().contains(getString(R.string.todos))) && (!area.getDescricaoArea().contains(getString(R.string.nenhuma_opcao_encontrada))) &&
-                                   (!area.getDescricaoArea().contains(getString(R.string.selecione_uma_opcao))) ){
+                        } else if ( (!area.getDescricaoArea().contains(getString(R.string.todos))) &&
+                                    (!area.getDescricaoArea().contains(getString(R.string.nenhuma_opcao_encontrada))) &&
+                                    (!area.getDescricaoArea().contains(getString(R.string.selecione_uma_opcao))) ){
 
                             ContentValues filtro = new ContentValues();
                             filtro.put(String.valueOf(TELA_MAIS_VENDIDOS_AREA), String.valueOf(area.getIdArea()));
                             // Pega a lista de produtos baseado na opcao selecionada
-                            listaProdutos = produtoRotinas.listaProdutoMaisVendido(TELA_MAIS_VENDIDOS_AREA, filtro, null, null, idOrcamento, progressBarListaProdutos, null);
+                            //listaProdutos = produtoRotinas.listaProdutoMaisVendido(TELA_MAIS_VENDIDOS_AREA, filtro, null, null, idOrcamento, progressBarListaProdutos, null);
+                            listAeaploja = produtoRotinas.listaProduto(where, idOrcamento, TELA_MAIS_VENDIDOS_AREA, filtro, progressBarListaProdutos, null);
                         }
                     }
                 } else if (tipoTela == TELA_MAIS_VENDIDOS_CIDADE){
@@ -624,7 +615,7 @@ public class ProdutoListaMDFragment extends Fragment {
                         if (cidade.getDescricao().contains(getString(R.string.todos))) {
 
                             // Pega a lista de produtos baseado na opcao selecionada
-                            listaProdutos = produtoRotinas.listaProdutoMaisVendido(TELA_MAIS_VENDIDOS_CIDADE, null, null, null, idOrcamento, progressBarListaProdutos, null);
+                            listAeaploja = produtoRotinas.listaProduto(where, idOrcamento, TELA_MAIS_VENDIDOS_CIDADE, null, progressBarListaProdutos, null);
 
                         } else if ( (!cidade.getDescricao().contains(getString(R.string.todos))) && (!cidade.getDescricao().contains(getString(R.string.nenhuma_opcao_encontrada))) &&
                                 (!cidade.getDescricao().contains(getString(R.string.selecione_uma_opcao))) ){
@@ -632,7 +623,7 @@ public class ProdutoListaMDFragment extends Fragment {
                             ContentValues filtro = new ContentValues();
                             filtro.put(String.valueOf(TELA_MAIS_VENDIDOS_CIDADE), String.valueOf(cidade.getIdCidade()));
                             // Pega a lista de produtos baseado na opcao selecionada
-                            listaProdutos = produtoRotinas.listaProdutoMaisVendido(TELA_MAIS_VENDIDOS_CIDADE, filtro, null, null, idOrcamento, progressBarListaProdutos, null);
+                            listAeaploja = produtoRotinas.listaProduto(where, idOrcamento, TELA_MAIS_VENDIDOS_CIDADE, filtro, progressBarListaProdutos, null);
                         }
                     }
                 } else if ((tipoTela == TELA_MAIS_VENDIDOS_EMPRESA) || (tipoTela == TELA_MAIS_VENDIDOS_VENDEDOR) || (tipoTela == TELA_MAIS_VENDIDOS_CORTES_CHEGARAM)){
@@ -655,21 +646,25 @@ public class ProdutoListaMDFragment extends Fragment {
                         filtro.put(String.valueOf(TELA_MAIS_VENDIDOS_CORTES_CHEGARAM), idCliente);
                     }
                     // Pega a lista de produtos baseado
-                    listaProdutos = produtoRotinas.listaProdutoMaisVendido(tipoTela, filtro, null, null, idOrcamento, progressBarListaProdutos, null);
-
+                    //listaProdutos = produtoRotinas.listaProdutoMaisVendido(tipoTela, filtro, null, null, idOrcamento, progressBarListaProdutos, null);
+                    listAeaploja = produtoRotinas.listaProduto(where, idOrcamento, tipoTela, filtro, progressBarListaProdutos, null);
                 }
                 // Checa se a lista de produtos nao esta vazia e nem nula
-                if ((listaProdutos != null) && (listaProdutos.size() > 0)){
+                if ((listAeaploja != null) && (listAeaploja.size() > 0)){
                     // Instancia o adapter e o seu tipo(produto)
                     adapterListaProdutos = new ItemUniversalAdapter(getContext(), ItemUniversalAdapter.PRODUTO);
                     // Seta a lista de produtos no adapter
-                    adapterListaProdutos.setListaProduto(listaProdutos);
+                    adapterListaProdutos.setListAeaploja(listAeaploja);
                     // Informa o tipo da venda (atacado ou varejo)
                     adapterListaProdutos.setAtacadoVarejo((atacadoVarejo != null) ? atacadoVarejo : atacadoVarejoAuxiliar);
 
                 } else {
+
                     ((Activity) getContext()).runOnUiThread(new Runnable() {
                         public void run() {
+                            //tirando o ProgressBar da nossa tela
+                            progressBarListaProdutos.setVisibility(View.GONE);
+
                             new MaterialDialog.Builder(getActivity())
                                     .title(R.string.produtos)
                                     .content(((tipoTela == TELA_LISTA_PRODUTO) || (tipoTela == TELA_MAIS_VENDIDOS_EMPRESA)
@@ -682,22 +677,19 @@ public class ProdutoListaMDFragment extends Fragment {
                         }
                     });
                 }
-            }catch (Exception e) {
-                // Armazena as informacoes para para serem exibidas e enviadas
-                final ContentValues contentValues = new ContentValues();
-                contentValues.put("comando", 0);
-                contentValues.put("tela", "ProdutoListaMDFragment");
-                contentValues.put("mensagem", "Erro ao carregar os dados do produto. \n" + e.getMessage());
-                contentValues.put("dados", e.toString());
-                // Pega os dados do usuario
-                final FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(getContext());
-                contentValues.put("usuario", funcoes.getValorXml("Usuario"));
-                contentValues.put("empresa", funcoes.getValorXml("ChaveEmpresa"));
-                contentValues.put("email", funcoes.getValorXml("Email"));
-                // Exibe a mensagem
+            } catch (final Exception e) {
+                //tirando o ProgressBar da nossa tela
+                progressBarListaProdutos.setVisibility(View.GONE);
+
                 ((Activity) getContext()).runOnUiThread(new Runnable() {
                     public void run() {
-                        funcoes.menssagem(contentValues);
+                        new MaterialDialog.Builder(getActivity())
+                                .title(R.string.produtos)
+                                .content("Erro ao carregar os dados do produto. \n" + e.getMessage())
+                                .positiveText(android.R.string.ok)
+                                //.negativeText(R.string.disagree)
+                                .autoDismiss(true)
+                                .show();
                     }
                 });
             }
@@ -707,21 +699,33 @@ public class ProdutoListaMDFragment extends Fragment {
         @Override
         protected void onPostExecute(Void result) {
 
-            if ((listaProdutos != null) && (listaProdutos.size() > 0)) {
+            if ( (listAeaploja != null) && (listAeaploja.size() > 0) ) {
                 // Preenche a listView com os produtos buscados
                 listViewProdutos.setAdapter(adapterListaProdutos);
 
-                LoaderImagemProdutos carregarImagemProduto = new LoaderImagemProdutos(getContext());
-                carregarImagemProduto.execute();
+                // Checa se tem alguma coisa na lista
+                if ((listAeaploja != null) && (listAeaploja.size() > 0)){
+                    loaderCalculaPrecoSP = new LoaderCalculaPrecoSP(getContext());
+                    loaderCalculaPrecoSP.execute();
+                }
             }
-            //tirando o ProgressBar da nossa tela
-            progressBarListaProdutos.setVisibility(View.GONE);
+            progressBarListaProdutos.setIndeterminate(true);
 
             pesquisando = false;
         }
 
-    } // Fim LoaderProdutos
+        @Override
+        protected void onCancelled() {
+            super.onCancelled();
+            //tirando o ProgressBar da nossa tela
+            progressBarListaProdutos.setVisibility(View.GONE);
 
+            // Chega se a Thread esta ativa pra poder cancela-la
+            if ( (loaderCalculaPrecoSP != null) && (loaderCalculaPrecoSP.getStatus().equals(AsyncTask.Status.RUNNING)) ){
+                loaderCalculaPrecoSP.cancel(true);
+            }
+        }
+    } // Fim LoaderProdutos
 
 
     public class LoaderImagemProdutos extends AsyncTask<Void, Void, Void> {
@@ -738,19 +742,18 @@ public class ProdutoListaMDFragment extends Fragment {
                 FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(this.context);
 
                 // Checa se pode mostrar a imagem do produto
-                if (funcoes.getValorXml("ImagemProduto").equalsIgnoreCase("S")){
+                if (funcoes.getValorXml(funcoes.TAG_IMAGEM_PRODUTO).equalsIgnoreCase("S")){
                     // Checa se tem alguma lista de produtos preenchida
-                    if (adapterListaProdutos.getListaProduto().size() > 0){
-
-                        for (int i = 0; i < adapterListaProdutos.getListaProduto().size(); i++){
+                    if ( (adapterListaProdutos.getListAeaploja() != null) && (adapterListaProdutos.getListAeaploja().size() > 0) ){
+                        // Passa por todos os produtos para pesquisar se tem imagem de cada produto
+                        for (int i = 0; i < adapterListaProdutos.getListAeaploja().size(); i++){
                             FotoRotinas fotoRotinas = new FotoRotinas(context);
 
-                            FotosBeans fotoProduto = fotoRotinas.fotoIdProtudo("" + adapterListaProdutos.getListaProduto().get(i).getProduto().getIdProduto());
+                            CfafotosBeans fotoProduto = fotoRotinas.fotoIdProtudo(String.valueOf(adapterListaProdutos.getListAeaploja().get(i).getAeaprodu().getIdAeaprodu()));
                             // Checa se tem alguma foto
-                            if ((fotoProduto != null) && (fotoProduto.getFotos().length > 0)){
+                            if ((fotoProduto != null) && (fotoProduto.getFoto().length > 0)){
                                 // Atualiza o adapte com a foto do produto
-                                adapterListaProdutos.getListaProduto().get(i).getProduto().setImagemProduto(fotoProduto);
-
+                                adapterListaProdutos.getListAeaploja().get(i).getAeaprodu().setCfafotos(fotoProduto);
                             }
                         }
                         // Envia um sinal para o adapter atualizar
@@ -761,22 +764,219 @@ public class ProdutoListaMDFragment extends Fragment {
                         });
                     }
                 }
-            } catch (Exception e){
-                // Armazena as informacoes para para serem exibidas e enviadas
-                ContentValues contentValues = new ContentValues();
-                contentValues.put("comando", 0);
-                contentValues.put("tela", "ProdutoListaMDFragment");
-                contentValues.put("mensagem", getResources().getString(R.string.nao_consegimos_carregar_imagem_produtos) + " \n" + e.getMessage());
-                contentValues.put("dados", e.toString());
-                // Pega os dados do usuario
-                FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(getContext());
-                contentValues.put("usuario", funcoes.getValorXml("Usuario"));
-                contentValues.put("empresa", funcoes.getValorXml("ChaveEmpresa"));
-                contentValues.put("email", funcoes.getValorXml("Email"));
-                // Exibe a mensagem
-                funcoes.menssagem(contentValues);
+            } catch (final Exception e){
+                ((Activity) getContext()).runOnUiThread(new Runnable() {
+                    public void run() {
+                        new MaterialDialog.Builder(context)
+                                .title("ProdutoListaMDFragmento")
+                                .content(getResources().getString(R.string.nao_consegimos_carregar_imagem_produtos) + " \n" + e.getMessage())
+                                .positiveText(android.R.string.ok)
+                                //.negativeText(R.string.disagree)
+                                .autoDismiss(true)
+                                .show();
+                    }
+                });
             }
             return null;
         }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            if ((listAeaploja != null) && (listAeaploja.size() > 0)) {
+                loaderChecaProdutoOrcamento = new LoaderChecaProdutoOrcamento(context);
+                loaderChecaProdutoOrcamento.execute();
+            }
+        }
+
+        @Override
+        protected void onCancelled() {
+            super.onCancelled();
+
+            // Chega se a Thread esta ativa pra poder cancela-la
+            if ( (loaderChecaProdutoOrcamento != null) && (loaderChecaProdutoOrcamento.getStatus().equals(AsyncTask.Status.RUNNING)) ){
+                loaderChecaProdutoOrcamento.cancel(true);
+            }
+        }
     } // Fim LoaderImagemProdutos
+
+
+    public class LoaderCalculaPrecoSP extends AsyncTask<Void, Void, Void> {
+        private Context context;
+
+        public LoaderCalculaPrecoSP(Context context) {
+            this.context = context;
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            try {
+                // Checa se tem alguma lista de produtos preenchida
+                if ( (adapterListaProdutos.getListAeaploja() != null) && (adapterListaProdutos.getListAeaploja().size() > 0) ){
+                    int idPlPgto = 0;
+                    CalculaPrecoSP calculaPrecoSP = new CalculaPrecoSP(context, null, null);
+                    FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
+
+                    EmpresaSql empresaSql = new EmpresaSql(context);
+                    Cursor dadosPlpgt = empresaSql.query("ID_SMAEMPRE = " + funcoes.getValorXml(funcoes.TAG_CODIGO_EMPRESA));
+
+                    // Checa se retornou algum dado da tabela SMAEMPRE
+                    if (dadosPlpgt != null && dadosPlpgt.getCount() > 0){
+                        dadosPlpgt.moveToFirst();
+                        // Checa se eh Atacado
+                        if (atacadoVarejo.equalsIgnoreCase("0")){
+                            idPlPgto = dadosPlpgt.getInt(dadosPlpgt.getColumnIndex("ID_AEAPLPGT_ATAC"));
+                            // Checa se eh Varejo
+                        } else if (atacadoVarejo.equalsIgnoreCase("1")){
+                            idPlPgto = dadosPlpgt.getInt(dadosPlpgt.getColumnIndex("ID_AEAPLPGT_VARE"));
+                        }
+                    }
+                    if (idPlPgto == 0){
+                        ((Activity) getContext()).runOnUiThread(new Runnable() {
+                            public void run() {
+                                new MaterialDialog.Builder(context)
+                                        .title("ProdutoListaMDFragment")
+                                        .content("Não tem plano de pagamento cadastrado na empresa para vendas no " + (atacadoVarejo.equalsIgnoreCase("0") ? "Atacado" : "Varejo") )
+                                        .positiveText(android.R.string.ok)
+                                        //.negativeText(R.string.disagree)
+                                        .autoDismiss(true)
+                                        .show();
+                            }
+                        });
+                    } else {
+                        // Passa por todos os produtos para calcular o preco do mesmo
+                        for (int i = 0; i < adapterListaProdutos.getListAeaploja().size(); i++) {
+                            AeaembalBeans aeaembal = new EmbalagemRotinas(context).selectAeaembal(0,
+                                    adapterListaProdutos.getListAeaploja().get(i).getAeaprodu().getIdAeaprodu(),
+                                    adapterListaProdutos.getListAeaploja().get(i).getAeaprodu().getAeaunven().getIdAeaunven());
+                            ContentValues retornoPreco = calculaPrecoSP.execute(
+                                    adapterListaProdutos.getListAeaploja().get(i).getIdAeaploja(),
+                                    ((aeaembal != null) ? aeaembal.getIdAeaembal() : 0),
+                                    idPlPgto,
+                                    ((idCliente != null && idCliente.length() > 0) ? Integer.parseInt(idCliente) : 0),
+                                    (!funcoes.getValorXml(funcoes.TAG_CODIGO_USUARIO).equalsIgnoreCase(funcoes.NAO_ENCONTRADO) ? Integer.parseInt(funcoes.getValorXml(funcoes.TAG_CODIGO_USUARIO)) : 0),
+                                    adapterListaProdutos.getListAeaploja().get(i).getDataAtual(),
+                                    adapterListaProdutos.getListAeaploja().get(i).getVendaAtac(),
+                                    adapterListaProdutos.getListAeaploja().get(i).getVendaVare());
+
+                            if (retornoPreco != null) {
+                                adapterListaProdutos.getListAeaploja().get(i).setVendaAtac(retornoPreco.getAsDouble(CalculaPrecoSP.KEY_PRECO_ATACADO));
+                                adapterListaProdutos.getListAeaploja().get(i).setVendaVare(retornoPreco.getAsDouble(CalculaPrecoSP.KEY_PRECO_VAREJO));
+                                adapterListaProdutos.getListAeaploja().get(i).setProdutoPromocaoAtacado(retornoPreco.getAsString(CalculaPrecoSP.KEY_PRODUTO_PROMOCAO_ATACADO));
+                                adapterListaProdutos.getListAeaploja().get(i).setProdutoPromocaoVarejo(retornoPreco.getAsString(CalculaPrecoSP.KEY_PRODUTO_PROMOCAO_VAREJO));
+                                adapterListaProdutos.getListAeaploja().get(i).setProdutoPromocaoServico(retornoPreco.getAsString(CalculaPrecoSP.KEY_PRODUTO_PROMOCAO_SERVICO));
+                            }
+                        }
+                        // Envia um sinal para o adapter atualizar
+                        ((Activity) getContext()).runOnUiThread(new Runnable() {
+                            public void run() {
+                                adapterListaProdutos.notifyDataSetChanged();
+                            }
+                        });
+                    }
+                }
+            } catch (final Exception e){
+                ((Activity) getContext()).runOnUiThread(new Runnable() {
+                    public void run() {
+                        new MaterialDialog.Builder(context)
+                                .title("ProdutoListaMDFragmento")
+                                .content(e.getMessage())
+                                .positiveText(android.R.string.ok)
+                                //.negativeText(R.string.disagree)
+                                .autoDismiss(true)
+                                .show();
+                    }
+                });
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            if ((listAeaploja != null) && (listAeaploja.size() > 0)){
+                loaderCarregarImagemProduto = new LoaderImagemProdutos(getContext());
+                loaderCarregarImagemProduto.execute();
+            }
+        }
+
+        @Override
+        protected void onCancelled() {
+            super.onCancelled();
+
+            // Chega se a Thread esta ativa pra poder cancela-la
+            if ( (loaderCarregarImagemProduto != null) && (loaderCarregarImagemProduto.getStatus().equals(AsyncTask.Status.RUNNING)) ){
+                loaderCarregarImagemProduto.cancel(true);
+            }
+        }
+    } // Fim LoaderCalculaPrecoSP
+
+    public class LoaderChecaProdutoOrcamento extends AsyncTask<Void, Void, Void> {
+        private Context context;
+
+        public LoaderChecaProdutoOrcamento(Context context) {
+            this.context = context;
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            try {
+                // Checa se tem alguma lista de produtos preenchida
+                if ( (adapterListaProdutos.getListAeaploja() != null) && (adapterListaProdutos.getListAeaploja().size() > 0) ){
+
+                    FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
+
+                    EmpresaRotinas empresaRotinas = new EmpresaRotinas(context);
+                    // Pega os dados da emrpesa
+                    EmpresaBeans empresa = empresaRotinas.empresa(funcoes.getValorXml(FuncoesPersonalizadas.TAG_CODIGO_EMPRESA));
+
+                    // Passa por todos os produtos para calcular o preco do mesmo
+                    for (int i = 0; i < adapterListaProdutos.getListAeaploja().size(); i++){
+                        OrcamentoRotinas orcamentoRotinas = new OrcamentoRotinas(context);
+                        // Checa se o produto esta dentro do orcamento
+                        if (orcamentoRotinas.selectItemOrcamento(idOrcamento, String.valueOf(adapterListaProdutos.getListAeaploja().get(i).getAeaprodu().getIdAeaprodu())) != null){
+                            adapterListaProdutos.getListAeaploja().get(i).setEstaNoOrcamento("1");
+                        }
+                        // Checa a diferenca de dadta para ver se eh um produto novo
+                        if ( (Integer.parseInt(funcoes.diferencaEntreData(funcoes.DIAS, adapterListaProdutos.getListAeaploja().get(i).getAeaprodu().getDtCad(), adapterListaProdutos.getListAeaploja().get(i).getDataAtual()))) <= empresa.getQuantidadeDiasDestacaProduto() ){
+                            adapterListaProdutos.getListAeaploja().get(i).setProdutoNovo("1");
+                        }
+
+                    }
+                    // Envia um sinal para o adapter atualizar
+                    ((Activity) getContext()).runOnUiThread(new Runnable() {
+                        public void run() {
+                            adapterListaProdutos.notifyDataSetChanged();
+                        }
+                    });
+                }
+            } catch (final Exception e){
+                ((Activity) getContext()).runOnUiThread(new Runnable() {
+                    public void run() {
+                        new MaterialDialog.Builder(context)
+                                .title("ProdutoListaMDFragmento")
+                                .content(e.getMessage())
+                                .positiveText(android.R.string.ok)
+                                //.negativeText(R.string.disagree)
+                                .autoDismiss(true)
+                                .show();
+                    }
+                });
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            //tirando o ProgressBar da nossa tela
+            progressBarListaProdutos.setVisibility(View.GONE);
+        }
+
+        @Override
+        protected void onCancelled() {
+            super.onCancelled();
+
+            //tirando o ProgressBar da nossa tela
+            progressBarListaProdutos.setVisibility(View.GONE);
+        }
+    }
 }

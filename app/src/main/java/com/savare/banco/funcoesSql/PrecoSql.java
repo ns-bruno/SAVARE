@@ -6,7 +6,7 @@ import android.content.Context;
  * Created by Bruno on 20/02/2017.
  */
 
-public class PrecoSql extends FuncoesSql {
+public class PrecoSql extends FuncoesSqlThread {
 
     public PrecoSql(Context context) {
         super(context, "AEAPRECO");

@@ -6,7 +6,7 @@ import android.content.Context;
  * Created by Bruno on 21/03/2018.
  */
 
-public class TabelaItemPromocaoSql extends FuncoesSql {
+public class TabelaItemPromocaoSql extends FuncoesSqlThread {
 
     public TabelaItemPromocaoSql(Context context) {
         super(context, "AEAEMTBP");

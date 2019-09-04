@@ -671,7 +671,7 @@ public class OrcamentoProdutoMDFragment extends Fragment {
                         .show();
 
             } else if ((adapterItemOrcamento == null) || (adapterItemOrcamento.getListaItemOrcamento() == null) || (adapterItemOrcamento.getListaItemOrcamento().size() < 1)){
-                SuperActivityToast.create(getActivity(), getResources().getString(R.string.nao_tem_produtos_orcamento_pedido), Style.DURATION_LONG)
+                SuperActivityToast.create(getActivity(), getResources().getString(R.string.nao_tem_produtos_orcamento_pedido), Style.DURATION_VERY_LONG)
                         .setTextColor(Color.WHITE)
                         .setColor(Color.RED)
                         .setAnimations(Style.ANIMATIONS_POP)
@@ -683,12 +683,6 @@ public class OrcamentoProdutoMDFragment extends Fragment {
                 // Seta o adapte com a nova lista, com ou sem o filtro
                 adapterItemOrcamento.setListaItemOrcamento(adapterItemOrcamento.getListaItemOrcamento());
             }
-
-            adapterItemOrcamento.getFilter().filter(query);
-
-            // Seta o adapte com a nova lista, com ou sem o filtro
-            adapterItemOrcamento.setListaItemOrcamento(adapterItemOrcamento.getListaItemOrcamento());
-
             return false;
         } // Fim do onQueryTextSubmit
 

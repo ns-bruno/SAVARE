@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Gradle: me.sudar:zxing-orient:2.1.1@aar">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/160a7761c08a1ca3890f54751c416b4a/jars/classes.jar!/" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/160a7761c08a1ca3890f54751c416b4a/res" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/160a7761c08a1ca3890f54751c416b4a/jars/libs/android-core-3.1.0.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/me.sudar/zxing-orient/2.1.1/d74c8511c04eeb02b59be438255a3d787a2e64b4/zxing-orient-2.1.1-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

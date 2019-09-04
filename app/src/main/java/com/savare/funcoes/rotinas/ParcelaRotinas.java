@@ -42,7 +42,7 @@ public class ParcelaRotinas extends Rotinas {
 		FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
 		try{
 			String sql = "SELECT RPAPARCE.ID_RPAPARCE, CFACLIFO.NOME_RAZAO, CFACLIFO.NOME_FANTASIA, RPAPARCE.ID_CFACLIFO, RPAPARCE.DT_EMISSAO, RPAPARCE.DT_VENCIMENTO, "
-					   + "RPAPARCE.DT_BAIXA, RPAPARCE.VL_PARCELA, RPAPARCE.FC_VL_RESTANTE, RPAPARCE.PARCELA, RPAPARCE.SEQUENCIAL, "
+					   + "RPAPARCE.DT_BAIXA, RPAPARCE.VL_PARCELA, RPAPARCE.FC_VL_TOTAL_PAGO, RPAPARCE.FC_VL_RESTANTE, RPAPARCE.PARCELA, RPAPARCE.SEQUENCIAL, "
 					   + "RPAPARCE.NUMERO, CFATPDOC.DESCRICAO AS DESCRICAO_TPDOC, CFAPORTA.DESCRICAO AS DESCRICAO_PORTA, CFASTATU.DESCRICAO AS DESCRICAO_STATU, "
 					   + "round(julianday('NOW', 'localtime') - julianday(RPAPARCE.DT_VENCIMENTO)) AS ATRAZADO, "
 					   + "DATE('NOW') AS PREVISAO "
@@ -52,7 +52,7 @@ public class ParcelaRotinas extends Rotinas {
 					   + "LEFT OUTER JOIN CFAENDER "
 					   + "ON (CFAENDER.ID_CFAENDER = (SELECT CFAENDER.ID_CFAENDER FROM CFAENDER WHERE (CFAENDER.ID_CFACLIFO = CFACLIFO.ID_CFACLIFO) LIMIT 1)) "
 					   + "LEFT OUTER JOIN CFATPDOC CFATPDOC "
-					   + "ON((RPAPARCE.ID_CFATPDOC = CFATPDOC.ID_CFATPDOC) AND (CFATPDOC.ID_SMAEMPRE = " + funcoes.getValorXml("CodigoEmpresa") + ")) "
+					   + "ON(RPAPARCE.ID_CFATPDOC = CFATPDOC.ID_CFATPDOC) "
 					   + "LEFT OUTER JOIN CFAPORTA CFAPORTA "
 					   + "ON(RPAPARCE.ID_CFAPORTA = CFAPORTA.ID_CFAPORTA) "
 					   + "LEFT OUTER JOIN CFASTATU CFASTATU "
@@ -113,6 +113,7 @@ public class ParcelaRotinas extends Rotinas {
 					parcela.setDataEmissao(funcoes.formataData(cursor.getString(cursor.getColumnIndex("DT_EMISSAO"))));
 					parcela.setDataBaixa(funcoes.formataData(cursor.getString(cursor.getColumnIndex("DT_BAIXA"))));
 					parcela.setValorParcela(cursor.getDouble(cursor.getColumnIndex("VL_PARCELA")));
+					parcela.setTotalPago(cursor.getDouble(cursor.getColumnIndex("FC_VL_TOTAL_PAGO")));
 					parcela.setParcela(cursor.getInt(cursor.getColumnIndex("PARCELA")));
 					parcela.setSequencial(cursor.getString(cursor.getColumnIndex("SEQUENCIAL")));
 					parcela.setNumero(cursor.getString(cursor.getColumnIndex("NUMERO")));

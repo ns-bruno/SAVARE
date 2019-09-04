@@ -99,7 +99,8 @@ public class ListaTitulosExpandableAdapter extends BaseExpandableListAdapter {
 		TextView textBottonDireito = (TextView) convertView.findViewById(R.id.layout_item_universal_text_botton_direito);
 		View viewTopo = (View) convertView.findViewById(R.id.layout_item_universal_view_topo);
 		View viewRodape = (View) convertView.findViewById(R.id.layout_item_universal_view_rodape);
-		
+		View viewDivider = (View) convertView.findViewById(R.id.layout_item_universal_view_divider);
+
 		FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
 		
 		textDescricao.setText(listaTitulosParent.get(groupPosition).getNomeRazao());

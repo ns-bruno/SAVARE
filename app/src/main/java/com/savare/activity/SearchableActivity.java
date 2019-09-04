@@ -58,7 +58,7 @@ public class SearchableActivity extends AppCompatActivity {
 
         /*adapterListaProduto = new ItemUniversalAdapter(getApplicationContext(), ItemUniversalAdapter.PRODUTO);
         // Seta a lista de produtos no adapter
-        adapterListaProduto.setListaProduto(listaProdutos);
+        adapterListaProduto.setListAeaploja(listaProdutos);
         // Informa o tipo da venda (atacado ou varejo)
         adapterListaProduto.setAtacadoVarejo(atacadoVarejo);
 

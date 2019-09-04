@@ -1,25 +1,20 @@
 package com.savare.activity.material.designer.fragment;
 
-import android.app.Activity;
 import android.content.ContentValues;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.savare.R;
-import com.savare.beans.FotosBeans;
+import com.savare.beans.CfafotosBeans;
 import com.savare.funcoes.FuncoesPersonalizadas;
 import com.savare.funcoes.rotinas.FotoRotinas;
-
-import java.io.IOException;
 
 /**
  * Created by Bruno Nogueira Silva on 13/01/2016.
@@ -57,13 +52,13 @@ public class ProdutoDetalhesMDFragment extends Fragment {
             // Inscancia a classe de rotinas das fotos/imagens
             FotoRotinas fotoRotinas = new FotoRotinas(getContext());
             // Pega a imagem especificada
-            FotosBeans imagemBanco = fotoRotinas.fotoIdFoto(idFoto);
+            CfafotosBeans imagemBanco = fotoRotinas.fotoIdFoto(idFoto);
 
             // Checa se retonou alguma coisa
-            if ((imagemBanco != null) && (imagemBanco.getFotos().length > 0)){
+            if ((imagemBanco != null) && (imagemBanco.getFoto().length > 0)){
                 try {
 
-                    final Bitmap imagem = BitmapFactory.decodeByteArray(imagemBanco.getFotos(), 0, imagemBanco.getFotos().length);
+                    final Bitmap imagem = BitmapFactory.decodeByteArray(imagemBanco.getFoto(), 0, imagemBanco.getFoto().length);
 
                     // Mostra a foto do produto
                     imageProduto.setImageBitmap(imagem);

@@ -7,7 +7,6 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
@@ -17,8 +16,9 @@ import com.dexafree.materialList.view.MaterialListView;
 import com.ogaclejapan.smarttablayout.SmartTabLayout;
 import com.savare.R;
 import com.savare.activity.material.designer.fragment.ProdutoDetalhesMDFragment;
+import com.savare.beans.AeaproduBeans;
 import com.savare.beans.DescricaoDublaBeans;
-import com.savare.beans.FotosBeans;
+import com.savare.beans.CfafotosBeans;
 import com.savare.beans.ProdutoBeans;
 import com.savare.funcoes.FuncoesPersonalizadas;
 import com.savare.funcoes.rotinas.FotoRotinas;
@@ -62,7 +62,7 @@ public class ProdutoDetalhesMDActivity extends AppCompatActivity{
         // Instancia a classe de rotinas de fotos
         FotoRotinas fotoRotinas = new FotoRotinas(getApplicationContext());
 
-        List<FotosBeans> listaFotoProduto = new ArrayList<FotosBeans>();
+        List<CfafotosBeans> listaFotoProduto = new ArrayList<CfafotosBeans>();
 
         // Pega a lista de fotos de um determinado produto
         listaFotoProduto = fotoRotinas.listaFotoProduto(idProduto);
@@ -94,9 +94,10 @@ public class ProdutoDetalhesMDActivity extends AppCompatActivity{
         ProdutoRotinas produtoRotinas = new ProdutoRotinas(ProdutoDetalhesMDActivity.this);
 
         // Pega os dados do produto
-        ProdutoBeans produto = produtoRotinas.detalhesProduto(idProduto);
+        //ProdutoBeans produto = produtoRotinas.detalhesProduto(idProduto);
+        AeaproduBeans aeaprodu = produtoRotinas.detalhesProduto(idProduto);
         // Atualiza o titulo do collapsing
-        collapsingToolbar.setTitle(produto.getDescricaoProduto());
+        collapsingToolbar.setTitle(aeaprodu.getDescricao());
         // Inseri um novo estilo de texto para quando o collapsing estiver expandido
         collapsingToolbar.setExpandedTitleTextAppearance(R.style.ExpandedAppBar);
 
@@ -164,9 +165,9 @@ public class ProdutoDetalhesMDActivity extends AppCompatActivity{
     public class ProdutoDetalheTabMDAdapter extends FragmentStatePagerAdapter {
 
         private int qtdPagina;
-        private List<FotosBeans> listaFotoProduto;
+        private List<CfafotosBeans> listaFotoProduto;
 
-        public ProdutoDetalheTabMDAdapter(FragmentManager fm, int qtdPagina, List<FotosBeans> listaFotoProduto) {
+        public ProdutoDetalheTabMDAdapter(FragmentManager fm, int qtdPagina, List<CfafotosBeans> listaFotoProduto) {
             super(fm);
             this.qtdPagina = qtdPagina;
             this.listaFotoProduto = listaFotoProduto;

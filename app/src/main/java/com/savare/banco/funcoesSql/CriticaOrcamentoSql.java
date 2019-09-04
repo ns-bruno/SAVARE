@@ -6,7 +6,7 @@ import android.content.Context;
  * Created by Bruno on 27/02/2017.
  */
 
-public class CriticaOrcamentoSql extends FuncoesSql {
+public class CriticaOrcamentoSql extends FuncoesSqlThread {
 
     public CriticaOrcamentoSql(Context context) {
         super(context, "AEACRORC");

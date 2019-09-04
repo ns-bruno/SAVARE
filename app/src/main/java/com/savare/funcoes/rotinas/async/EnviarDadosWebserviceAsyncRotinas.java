@@ -198,22 +198,20 @@ public class EnviarDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Voi
                     }
                     // Envia os orcamento CFACLIFO
                     if (((tabelaEnviarDados != null) && (tabelaEnviarDados.length > 0) &&
-                            ((Arrays.asList(tabelaEnviarDados).contains(WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_INSERT_CFACLIFO)) || (Arrays.asList(tabelaEnviarDados).contains(WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_INSERT_CFACLIFO)))) ||
-                            (tabelaEnviarDados == null)) {
+                            ((Arrays.asList(tabelaEnviarDados).contains(WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_INSERT_CFACLIFO)) || (Arrays.asList(tabelaEnviarDados).contains(WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_INSERT_CFACLIFO)))) ) {
 
                         // Envia os dados
                         enviaCadastroCliente();
                     }
                 }
-            } catch (Exception e) {
-                final ContentValues mensagem = new ContentValues();
-                mensagem.put("comando", 2);
-                mensagem.put("tela", "EnviarDadosWebServiceAsyncRotinas");
-                mensagem.put("mensagem", e.getMessage());
-
+            } catch (final Exception e) {
                 ((Activity) context).runOnUiThread(new Runnable() {
                     public void run() {
-                        funcoes.menssagem(mensagem);
+                        new MaterialDialog.Builder(context)
+                                .title("EnviarDadosWebServiceAsyncRotinas")
+                                .content(context.getResources().getString(R.string.erro_inesperado) + "\n" + e.getMessage())
+                                .positiveText(R.string.button_ok)
+                                .show();
                     }
                 });
             }
@@ -228,12 +226,15 @@ public class EnviarDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Voi
                     }
                 });
             }
-            ContentValues mensagem = new ContentValues();
-            mensagem.put("comando", 2);
-            mensagem.put("tela", "EnviarDadosWebServiceAsyncRotinas");
-            mensagem.put("mensagem", (context.getResources().getString((R.string.nao_existe_conexao_internet))));
-
-            funcoes.menssagem(mensagem);
+            ((Activity) context).runOnUiThread(new Runnable() {
+                public void run() {
+                    new MaterialDialog.Builder(context)
+                            .title("EnviarDadosWebServiceAsyncRotinas")
+                            .content(context.getResources().getString(R.string.nao_existe_conexao_internet))
+                            .positiveText(R.string.button_ok)
+                            .show();
+                }
+            });
         }
         return null;
     }
@@ -254,6 +255,7 @@ public class EnviarDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Voi
         mBuilder.setStyle(bigTextStyle)
                 .setProgress(0, 0, false);
         notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_ENVIAR_DADOS, mBuilder.build());
+        notificationManager.cancel(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_ENVIAR_DADOS);
 
         // Checo se o texto de status foi passado pro parametro
         if (textStatus != null) {
@@ -318,11 +320,20 @@ public class EnviarDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Voi
                         servidorAtivo = servidor;
                         break;
                     } else {
-                        new MaterialDialog.Builder(context)
-                                .title("EnviarDadosWebserviceAsyncRotinas")
-                                .content(context.getResources().getString(R.string.servidor_webservice_offline) + " - " + servidor.getNomeServidor())
-                                .positiveText(R.string.button_ok)
-                                .show();
+                        ((Activity) context).runOnUiThread(new Runnable() {
+                            public void run() {
+                                new MaterialDialog.Builder(context)
+                                        .title("EnviarDadosWebServiceAsyncRotinas")
+                                        .content(context.getResources().getString(R.string.servidor_webservice_offline) + " - " + servidor.getNomeServidor())
+                                        .positiveText(R.string.button_ok)
+                                        .show();
+                            }
+                        });
+//                        new MaterialDialog.Builder(context)
+//                                .title("EnviarDadosWebserviceAsyncRotinas")
+//                                .content(context.getResources().getString(R.string.servidor_webservice_offline) + " - " + servidor.getNomeServidor())
+//                                .positiveText(R.string.button_ok)
+//                                .show();
 
                         bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.enviar_dados_nuvem))
                                 .bigText(context.getResources().getString(R.string.servidor_webservice_offline) + " - " + servidor.getNomeServidor());
@@ -612,7 +623,7 @@ public class EnviarDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Voi
                                 .bigText(context.getResources().getString(R.string.pedidos_enviados));
                         mBuilder.setStyle(bigTextStyle)
                                 .setProgress(0, 0, false);
-                        notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_ENVIAR_DADOS + new Random().nextInt(100), mBuilder.build());
+                        notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_ENVIAR_DADOS, mBuilder.build());
 
                         // Checo se o texto de status foi passado pro parametro
                         if (textStatus != null) {
@@ -636,7 +647,7 @@ public class EnviarDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Voi
                                 .bigText(context.getResources().getString(R.string.nem_todos_pedidos_foram_enviados_tente_novamente));
                         mBuilder.setStyle(bigTextStyle)
                                 .setProgress(0, 0, false);
-                        notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_ENVIAR_DADOS + new Random().nextInt(100), mBuilder.build());
+                        notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_ENVIAR_DADOS, mBuilder.build());
 
                         // Checo se o texto de status foi passado pro parametro
                         if (textStatus != null) {
@@ -658,7 +669,7 @@ public class EnviarDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Voi
 
             } else {
                 bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.nao_achamos_servidores_cadastrados))
-                        .bigText(context.getResources().getString(R.string.nem_todos_pedidos_foram_enviados_tente_novamente));
+                        .bigText(context.getResources().getString(R.string.nao_achamos_servidores_cadastrados));
                 mBuilder.setStyle(bigTextStyle)
                         .setProgress(0, 0, false);
                 notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_ENVIAR_DADOS + new Random().nextInt(100), mBuilder.build());
@@ -667,7 +678,7 @@ public class EnviarDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Voi
                 if (textStatus != null) {
                     ((Activity) context).runOnUiThread(new Runnable() {
                         public void run() {
-                            textStatus.setText(context.getResources().getString(R.string.nem_todos_pedidos_foram_enviados_tente_novamente));
+                            textStatus.setText(context.getResources().getString(R.string.nao_achamos_servidores_cadastrados));
                         }
                     });
                 }

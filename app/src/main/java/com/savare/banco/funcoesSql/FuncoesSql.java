@@ -16,11 +16,13 @@ import com.github.johnpersano.supertoasts.library.Style;
 import com.github.johnpersano.supertoasts.library.SuperActivityToast;
 import com.savare.R;
 import com.savare.banco.local.ConexaoBancoDeDados;
+import com.savare.banco.local.DatabaseManager;
 import com.savare.funcoes.VersionUtils;
 import com.savare.funcoes.FuncoesPersonalizadas;
 
 import java.util.List;
 
+@Deprecated
 public class FuncoesSql {
 	
 	private ConexaoBancoDeDados conexaoBanco;
@@ -321,7 +323,7 @@ public class FuncoesSql {
 		}
         return totalSucesso;
 	} // Fim do insert
-	
+
 	public long insertIgnoreConflict(ContentValues values){
 		bancoDados = conexaoBanco.abrirBanco();
 		long id = 0;
@@ -753,7 +755,7 @@ public class FuncoesSql {
 		
 		return cursor;
 	} //Fim do sqlCustom
-	
+
 	/**
 	 * Funcao para deletar registro do banco de dados.
 	 * @param where

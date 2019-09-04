@@ -31,6 +31,7 @@ import com.savare.beans.ParametrosLocalBeans;
 import com.savare.funcoes.FuncoesPersonalizadas;
 import com.savare.funcoes.VersionUtils;
 import com.savare.funcoes.rotinas.ParametrosLocalRotina;
+import com.savare.funcoes.rotinas.async.UpgradeBancoDadosAsyncRotinas;
 
 import java.util.List;
 
@@ -123,13 +124,10 @@ public class LoginMDActivity extends AppCompatActivity {
                 textUsuario.setText(funcoes.getValorXml(funcoes.TAG_USUARIO));
             }
 
-            //boolean enviaAutomatico = (funcoes.getValorXml("EnviarAutomatico").equalsIgnoreCase("S") ? true : false);
-            //boolean receberAutomatico = (funcoes.getValorXml("ReceberAutomatico").equalsIgnoreCase("S") ? true : false);
-
-            // Cria o alarme se nao existir para enviar e receber dados
-            //funcoes.criarAlarmeEnviarReceberDadosAutomatico(enviaAutomatico, receberAutomatico);
-
-        }catch (Exception e){
+            // Executa uma classe pra atualizar o banco de dados
+            //UpgradeBancoDadosAsyncRotinas upgradeBancoDadosAsyncRotinas = new UpgradeBancoDadosAsyncRotinas(LoginMDActivity.this, null, UpgradeBancoDadosAsyncRotinas.APENAS_TABELA_TEMP);
+            //upgradeBancoDadosAsyncRotinas.execute();
+        } catch (Exception e){
 
             new MaterialDialog.Builder(LoginMDActivity.this)
                     .title("LoginMDActivity")

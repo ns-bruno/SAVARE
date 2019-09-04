@@ -2,7 +2,7 @@ package com.savare.banco.funcoesSql;
 
 import android.content.Context;
 
-public class PercentualSql extends FuncoesSql {
+public class PercentualSql extends FuncoesSqlThread {
 
 	public PercentualSql(Context context) {
 		super(context, "AEAPERCE");

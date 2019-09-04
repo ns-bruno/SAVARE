@@ -1,19 +1,14 @@
 package com.savare.funcoes.rotinas.async;
 
 import android.app.Activity;
-import android.app.ProgressDialog;
-import android.content.ContentValues;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.savare.adapter.ItemUniversalAdapter;
-import com.savare.banco.funcoesSql.OrcamentoSql;
 import com.savare.beans.ProdutoListaBeans;
 import com.savare.funcoes.FuncoesPersonalizadas;
 import com.savare.funcoes.Rotinas;
@@ -162,7 +157,7 @@ public class PesquisaListaProdutoAsyncRotinas extends AsyncTask<String, String, 
             // Instancia o adapter e o seu tipo(produto)
             adapterProduto = new ItemUniversalAdapter(context, ItemUniversalAdapter.PRODUTO);
             // Seta a lista de produtos no adapter
-            adapterProduto.setListaProduto(listaProdutos);
+            //adapterProduto.setListAeaploja(listaProdutos);
             // Informa o tipo da venda (atacado ou varejo)
             adapterProduto.setAtacadoVarejo(atacadoVarejo);
 

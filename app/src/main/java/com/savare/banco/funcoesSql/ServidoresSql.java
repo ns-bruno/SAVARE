@@ -6,7 +6,7 @@ import android.content.Context;
  * Created by Bruno on 16/11/2017.
  */
 
-public class ServidoresSql extends FuncoesSql {
+public class ServidoresSql extends FuncoesSqlThread {
 
     public ServidoresSql(Context context) {
         super(context, "SERVIDORES");

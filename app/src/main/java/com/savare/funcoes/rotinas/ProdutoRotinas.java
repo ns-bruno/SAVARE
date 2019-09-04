@@ -1,6 +1,7 @@
 package com.savare.funcoes.rotinas;
 
 import android.app.Activity;
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -16,10 +17,16 @@ import com.savare.banco.funcoesSql.EmbalagemSql;
 import com.savare.banco.funcoesSql.EmpresaSql;
 import com.savare.banco.funcoesSql.OrcamentoSql;
 import com.savare.banco.funcoesSql.PlanoPagamentoSql;
+import com.savare.banco.funcoesSql.ProdutoLojaSql;
 import com.savare.banco.funcoesSql.ProdutoRecomendadoSql;
 import com.savare.banco.funcoesSql.ProdutoSql;
 import com.savare.banco.funcoesSql.UnidadeVendaSql;
 import com.savare.banco.storedProcedure.CalculaPrecoSP;
+import com.savare.beans.AeaclaseBeans;
+import com.savare.beans.AeamarcaBeans;
+import com.savare.beans.AeaplojaBeans;
+import com.savare.beans.AeaproduBeans;
+import com.savare.beans.AeaunvenBeans;
 import com.savare.beans.AreaBeans;
 import com.savare.beans.CidadeBeans;
 import com.savare.beans.ClasseBeans;
@@ -199,6 +206,7 @@ public class ProdutoRotinas extends Rotinas {
 	 * @param idOrcamento
 	 * @return
 	 */
+	@Deprecated
 	public List<ProdutoListaBeans> listaProdutoMaisVendido(int tipoTela, ContentValues filtro, String where, String group, String idOrcamento, final ProgressBar progresso, TextView textProgresso){
 		FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
 
@@ -471,6 +479,178 @@ public class ProdutoRotinas extends Rotinas {
 	}
 
 
+	public List<AeaplojaBeans> listaProduto(String where, String idOrcamento, Integer tipoTela, ContentValues filtro, final ProgressBar progresso, final TextView textprogresso){
+		// Instancia a vareavel para salvar a lista com os dados
+		List<AeaplojaBeans> listAeaploja = new ArrayList<>();
+
+		try {
+			FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
+			String idEmpresa = (funcoes.getValorXml(funcoes.TAG_CODIGO_EMPRESA).equalsIgnoreCase(funcoes.NAO_ENCONTRADO) ? "0" : funcoes.getValorXml(funcoes.TAG_CODIGO_EMPRESA));
+
+			StringBuilder sql = new StringBuilder();
+			sql.append("SELECT AEAPLOJA.ID_AEAPLOJA, AEAPLOJA.ID_AEAPRODU, AEAPLOJA.ID_SMAEMPRE, AEAPLOJA.VENDA_ATAC, AEAPLOJA.VENDA_VARE, ");
+			sql.append("AEAPLOJA.CT_REPOSICAO_N, AEAPLOJA.CT_REAL_D, AEAPLOJA.CT_COMPLETO_N, ");
+			sql.append("AEAPLOJA.ESTOQUE_F, AEAPLOJA.ESTOQUE_C, DATE('NOW') AS DATA_ATUAL, ");
+
+			sql.append("AEAPRODU.ID_AEAPRODU, AEAPRODU.ID_AEAUNVEN, AEAPRODU.ID_AEACLASE, AEAPRODU.ID_AEAMARCA, ");
+			sql.append("AEAPRODU.DT_CAD AS DT_CAD_AEAPRODU, AEAPRODU.CODIGO_ESTRUTURAL, AEAPRODU.DESCRICAO AS DESCRICAO_AEAPRODU, AEAPRODU.DESCRICAO_AUXILIAR, AEAPRODU.REFERENCIA, ");
+			sql.append("AEAPRODU.CODIGO_BARRAS, AEAPRODU.PESO_LIQUIDO, AEAPRODU.PESO_BRUTO, AEAPRODU.TIPO, ");
+
+			sql.append("AEAMARCA.ID_AEAMARCA, AEAMARCA.DESCRICAO AS DESCRICAO_AEAMARCA, ");
+
+			sql.append("AEAUNVEN.ID_AEAUNVEN, AEAUNVEN.SIGLA, AEAUNVEN.DESCRICAO_SINGULAR, AEAUNVEN.DECIMAIS ");
+
+			sql.append("FROM AEAPLOJA AEAPLOJA \n");
+			sql.append("LEFT OUTER JOIN AEAPRODU AEAPRODU ON  (AEAPRODU.ID_AEAPRODU = AEAPLOJA.ID_AEAPRODU) \n");
+			sql.append("LEFT OUTER JOIN AEAUNVEN AEAUNVEN ON  (AEAUNVEN.ID_AEAUNVEN = AEAPRODU.ID_AEAUNVEN) \n");
+			sql.append("LEFT OUTER JOIN AEAMARCA AEAMARCA ON  (AEAMARCA.ID_AEAMARCA = AEAPRODU.ID_AEAMARCA) \n");
+			//sql.append("LEFT OUTER JOIN AEAEMBAL AEAEMBAL ON  (AEAEMBAL.ID_AEAPRODU = AEAPRODU.ID_AEAPRODU AND AEAEMBAL.ID_AEAUNVEN = AEAPRODU.ID_AEAUNVEN) \n");
+			sql.append("WHERE (AEAPLOJA.ATIVO = '1') AND (AEAPRODU.ATIVO = '1') AND (AEAPRODU.DESCRICAO IS NOT NULL) \n");
+			// Checa se tem o id do orcamento
+			if (idOrcamento != null && idOrcamento.length() > 0) {
+				sql.append(" AND (AEAPLOJA.ID_SMAEMPRE = (SELECT AEAORCAM.ID_SMAEMPRE FROM AEAORCAM WHERE AEAORCAM.ID_AEAORCAM = " + idOrcamento + ")) ");
+			} else {
+				sql.append(" AND (AEAPLOJA.ID_SMAEMPRE = " + idEmpresa + ")");
+			}
+			// Adiciona a clausula where passada por parametro no sql
+			if (where != null) {
+				sql.append(" AND ( " + where + " ) ");
+			}
+			// Checa se foi passado algum tipo de tela e o filtro
+			if ( (tipoTela != null) ) {
+				if (tipoTela == ProdutoListaMDFragment.TELA_MAIS_VENDIDOS_CIDADE) {
+
+					if ((filtro != null) && (filtro.containsKey(String.valueOf(ProdutoListaMDFragment.TELA_MAIS_VENDIDOS_CIDADE)))) {
+						sql.append(" AND ( AEAPRODU.ID_AEAPRODU IN(SELECT AEAPRREC.ID_AEAPRODU FROM AEAPRREC WHERE AEAPRREC.ID_CFACIDAD = ").append(filtro.getAsString(String.valueOf(ProdutoListaMDFragment.TELA_MAIS_VENDIDOS_CIDADE))).append(") ) ");
+					} else {
+						sql.append(" AND ( AEAPRODU.ID_AEAPRODU IN(SELECT AEAPRREC.ID_AEAPRODU FROM AEAPRREC WHERE AEAPRREC.ID_CFACIDAD IS NOT NULL )) ");
+					}
+				} else if (tipoTela == ProdutoListaMDFragment.TELA_MAIS_VENDIDOS_AREA) {
+					// Checa se foi enviado algum parametro
+					if ((filtro != null) && (filtro.containsKey(String.valueOf(ProdutoListaMDFragment.TELA_MAIS_VENDIDOS_AREA)))) {
+						sql.append(" AND ( AEAPRODU.ID_AEAPRODU IN(SELECT AEAPRREC.ID_AEAPRODU FROM AEAPRREC WHERE AEAPRREC.ID_CFAAREAS = ").append(filtro.getAsString(String.valueOf(ProdutoListaMDFragment.TELA_MAIS_VENDIDOS_AREA))).append(") ) ");
+					} else {
+						sql.append(" AND ( AEAPRODU.ID_AEAPRODU IN(SELECT AEAPRREC.ID_AEAPRODU FROM AEAPRREC WHERE AEAPRREC.ID_CFAAREAS IS NOT NULL )) ");
+					}
+				} else if (tipoTela == ProdutoListaMDFragment.TELA_MAIS_VENDIDOS_VENDEDOR) {
+					// Pega o codigo do vendedor salvo nos parametros do app
+					String codigoVendedor = (funcoes.getValorXml(funcoes.TAG_CODIGO_USUARIO).equalsIgnoreCase(funcoes.NAO_ENCONTRADO) ? "0" : funcoes.getValorXml(funcoes.TAG_CODIGO_USUARIO));
+					// Checa se realmente deu certo de pegar o codigo do vendedor
+					if ((codigoVendedor != null) && (codigoVendedor.length() > 0) && (!codigoVendedor.equalsIgnoreCase("0"))) {
+						sql.append(" AND ( AEAPRODU.ID_AEAPRODU IN(SELECT AEAPRREC.ID_AEAPRODU FROM AEAPRREC WHERE AEAPRREC.ID_CFACLIFO_VENDEDOR = ").append(codigoVendedor).append(") ) ");
+					} else {
+						sql.append(" AND ( AEAPRODU.ID_AEAPRODU IN(SELECT AEAPRREC.ID_AEAPRODU FROM AEAPRREC WHERE AEAPRREC.ID_CFACLIFO_VENDEDOR IS NOT NULL )) ");
+					}
+				} else if (tipoTela == ProdutoListaMDFragment.TELA_MAIS_VENDIDOS_EMPRESA) {
+					if ((idEmpresa != null) && (idEmpresa.length() > 0) && (!idEmpresa.equalsIgnoreCase("0"))) {
+						sql.append(" AND ( AEAPRODU.ID_AEAPRODU IN(SELECT AEAPRREC.ID_AEAPRODU FROM AEAPRREC WHERE AEAPRREC.ID_SMAEMPRE = ").append(idEmpresa).append(") ) ");
+					} else {
+						sql.append(" AND ( AEAPRODU.ID_AEAPRODU IN(SELECT AEAPRREC.ID_AEAPRODU FROM AEAPRREC WHERE AEAPRREC.ID_SMAEMPRE IS NOT NULL )) ");
+					}
+				} else if (tipoTela == ProdutoListaMDFragment.TELA_MAIS_VENDIDOS_CORTES_CHEGARAM) {
+					// Checa se foi passado por paramentro
+					if ((filtro != null) && (filtro.containsKey(String.valueOf(ProdutoListaMDFragment.TELA_MAIS_VENDIDOS_CORTES_CHEGARAM)))) {
+						sql.append(" AND ( AEAPRODU.ID_AEAPRODU IN(SELECT AEAPRREC.ID_AEAPRODU FROM AEAPRREC WHERE AEAPRREC.ID_CFACLIFO = ").append(filtro.getAsString(String.valueOf(ProdutoListaMDFragment.TELA_MAIS_VENDIDOS_CORTES_CHEGARAM))).append(") ) ");
+					} else {
+						sql.append(" AND ( AEAPRODU.ID_AEAPRODU IN(SELECT AEAPRREC.ID_AEAPRODU FROM AEAPRREC WHERE AEAPRREC.ID_CFACLIFO IS NOT NULL )) ");
+					}
+				}
+			}
+			// Adiciona a ordem no sql
+			sql.append(" ORDER BY AEAPRODU.DESCRICAO, AEAUNVEN.SIGLA, AEAMARCA.DESCRICAO ");
+
+			ProdutoLojaSql produtoLojaSql = new ProdutoLojaSql(context);
+
+			final Cursor cursorAeaploja = produtoLojaSql.sqlSelect(sql.toString());
+
+			if ((cursorAeaploja != null) && (cursorAeaploja.getCount() > 0)) {
+				// Checa se tem alguma barra de progresso
+				if (progresso != null) {
+					((Activity) context).runOnUiThread(new Runnable() {
+						public void run() {
+							progresso.setIndeterminate(false);
+							progresso.setProgress(0);
+							progresso.setMax(cursorAeaploja.getCount());
+						}
+					});
+				}
+				if (textprogresso != null){
+					((Activity) context).runOnUiThread(new Runnable() {
+						public void run() {
+							textprogresso.setText(R.string.achamos_alguma_coisa);
+						}
+					});
+				}
+				int incremento = 0;
+
+				while (cursorAeaploja.moveToNext()) {
+					// Verifica se tem algum progressbar de status
+					if (progresso != null) {
+						incremento++;
+						final int finalIncremento = incremento;
+						((Activity) context).runOnUiThread(new Runnable() {
+							public void run() {
+								progresso.setProgress(finalIncremento);
+							}
+						});
+					}
+					AeaplojaBeans aeaploja = new AeaplojaBeans();
+					aeaploja.setIdAeaploja(cursorAeaploja.getInt(cursorAeaploja.getColumnIndex("ID_AEAPLOJA")));
+					aeaploja.setDataAtual(cursorAeaploja.getString(cursorAeaploja.getColumnIndex("DATA_ATUAL")));
+
+					AeaproduBeans aeaprodu = new AeaproduBeans();
+					aeaprodu.setIdAeaprodu(cursorAeaploja.getInt(cursorAeaploja.getColumnIndex("ID_AEAPRODU")));
+					aeaprodu.setDtCad(cursorAeaploja.getString(cursorAeaploja.getColumnIndex("DT_CAD_AEAPRODU")));
+					aeaprodu.setCodigoEstrutural(cursorAeaploja.getString(cursorAeaploja.getColumnIndex("CODIGO_ESTRUTURAL")));
+					aeaprodu.setDescricao(cursorAeaploja.getString(cursorAeaploja.getColumnIndex("DESCRICAO_AEAPRODU")));
+					if (!cursorAeaploja.isNull(cursorAeaploja.getColumnIndex("DESCRICAO_AUXILIAR"))) aeaprodu.setDescricaoAuxiliar(cursorAeaploja.getString(cursorAeaploja.getColumnIndex("DESCRICAO_AUXILIAR")));
+					if (!cursorAeaploja.isNull(cursorAeaploja.getColumnIndex("REFERENCIA"))) aeaprodu.setReferencia(cursorAeaploja.getString(cursorAeaploja.getColumnIndex("REFERENCIA")));
+					if (!cursorAeaploja.isNull(cursorAeaploja.getColumnIndex("CODIGO_BARRAS"))) aeaprodu.setCodigoBarras(cursorAeaploja.getString(cursorAeaploja.getColumnIndex("CODIGO_BARRAS")));
+					if (!cursorAeaploja.isNull(cursorAeaploja.getColumnIndex("TIPO"))) aeaprodu.setTipo(cursorAeaploja.getString(cursorAeaploja.getColumnIndex("TIPO")));
+					aeaprodu.setPesoBruto(cursorAeaploja.getDouble(cursorAeaploja.getColumnIndex("PESO_BRUTO")));
+					aeaprodu.setPesoLiquido(cursorAeaploja.getDouble(cursorAeaploja.getColumnIndex("PESO_LIQUIDO")));
+
+					AeamarcaBeans aeamarca = new AeamarcaBeans();
+					aeamarca.setIdAeamarca(cursorAeaploja.getInt(cursorAeaploja.getColumnIndex("ID_AEAMARCA")));
+					aeamarca.setDescricao(cursorAeaploja.getString(cursorAeaploja.getColumnIndex("DESCRICAO_AEAMARCA")));
+					aeaprodu.setAeamarca(aeamarca);
+
+					AeaunvenBeans aeaunven = new AeaunvenBeans();
+					aeaunven.setIdAeaunven(cursorAeaploja.getInt(cursorAeaploja.getColumnIndex("ID_AEAUNVEN")));
+					aeaunven.setSigla(cursorAeaploja.getString(cursorAeaploja.getColumnIndex("SIGLA")));
+					aeaunven.setDescricaosingular(cursorAeaploja.getString(cursorAeaploja.getColumnIndex("DESCRICAO_SINGULAR")));
+					aeaprodu.setAeaunven(aeaunven);
+
+					aeaploja.setAeaprodu(aeaprodu);
+					aeaploja.setVendaAtac(cursorAeaploja.getDouble(cursorAeaploja.getColumnIndex("VENDA_ATAC")));
+					aeaploja.setVendaVare(cursorAeaploja.getDouble(cursorAeaploja.getColumnIndex("VENDA_VARE")));
+					aeaploja.setCtRealD(cursorAeaploja.getDouble(cursorAeaploja.getColumnIndex("CT_REAL_D")));
+					aeaploja.setCtReposicaoN(cursorAeaploja.getDouble(cursorAeaploja.getColumnIndex("CT_REPOSICAO_N")));
+					aeaploja.setCtCompletoN(cursorAeaploja.getDouble(cursorAeaploja.getColumnIndex("CT_COMPLETO_N")));
+					aeaploja.setEstoqueF(cursorAeaploja.getDouble(cursorAeaploja.getColumnIndex("ESTOQUE_F")));
+					aeaploja.setEstoqueC(cursorAeaploja.getDouble(cursorAeaploja.getColumnIndex("ESTOQUE_C")));
+
+					listAeaploja.add(aeaploja);
+				} // Fim do while
+			}
+
+
+		} catch (final Exception e){
+			((Activity) context).runOnUiThread(new Runnable() {
+				public void run() {
+					new MaterialDialog.Builder(context)
+							.title("ProdutoRotinas")
+							.content("Erro ao carregar os dados do produto por loja. \n" + e.getMessage())
+							.positiveText(R.string.button_ok)
+							.show();
+				}
+			});
+		}
+		return listAeaploja;
+	}
+
+
+	@Deprecated
 	public List<ProdutoListaBeans> listaProduto(String where, String group, String idOrcamento, final ProgressBar progresso, final TextView textProgresso, String todasEmbalagens, Integer idPlPgto, String calculaPreco){
 
 		FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
@@ -1057,6 +1237,7 @@ public class ProdutoRotinas extends Rotinas {
 
 
 
+	@Deprecated
 	public boolean marcaProdutoJaComprados(String idProduto, String idOrcamento){
 		// Vareavel para retornar se tem o produto no orcamento, sim ou nao
 		boolean retorno = false;
@@ -1119,66 +1300,66 @@ public class ProdutoRotinas extends Rotinas {
 
 	/**
 	 * Retorna os dados completos de um unico produtos,
-	 * de acordo com passado por parametro.
+	 * de acordo com o id passado por parametro.
 	 *
 	 * @param idProduto
 	 * @return
 	 */
-	public ProdutoBeans detalhesProduto(String idProduto){
-		String sql = "SELECT AEAPRODU.ID_AEAPRODU, AEAPRODU.CODIGO_ESTRUTURAL, AEAPRODU.DESCRICAO, AEAPRODU.DESCRICAO_AUXILIAR, AEAPRODU.REFERENCIA, "
-				   + "AEAPRODU.CODIGO_BARRAS, AEAPRODU.PESO_LIQUIDO, AEAPRODU.PESO_BRUTO, AEAPRODU.TIPO, "
-				   + "AEAMARCA.DESCRICAO AS DESCRICAO_MARCA, AEAUNVEN.ID_AEAUNVEN, AEAUNVEN.SIGLA, AEAUNVEN.DESCRICAO_SINGULAR, "
-				   + "AEACLASE.CODIGO AS CODIGO_CLASE, AEACLASE.DESCRICAO AS DESCRICAO_CLASE "
-				   + "FROM AEAPRODU "
-				   + "LEFT OUTER JOIN AEACLASE ON(AEAPRODU.ID_AEACLASE = AEACLASE.ID_AEACLASE) "
-				   + "LEFT OUTER JOIN AEAMARCA ON(AEAPRODU.ID_AEAMARCA = AEAMARCA.ID_AEAMARCA) "
-				   + "LEFT OUTER JOIN AEAUNVEN ON(AEAPRODU.ID_AEAUNVEN = AEAUNVEN.ID_AEAUNVEN) "
-				   + "WHERE AEAPRODU.ID_AEAPRODU = " + idProduto;
+	public AeaproduBeans detalhesProduto(String idProduto){
+
+		StringBuilder sql = new StringBuilder();
+		sql.append("SELECT AEAPRODU.ID_AEAPRODU, AEAPRODU.ID_AEAUNVEN, AEAPRODU.ID_AEACLASE, AEAPRODU.ID_AEAMARCA, ");
+		sql.append("AEAPRODU.CODIGO_ESTRUTURAL, AEAPRODU.DESCRICAO, AEAPRODU.DESCRICAO_AUXILIAR, AEAPRODU.REFERENCIA, ");
+		sql.append("AEAPRODU.CODIGO_BARRAS, AEAPRODU.PESO_LIQUIDO, AEAPRODU.PESO_BRUTO, AEAPRODU.TIPO ");
+		sql.append("FROM AEAPRODU ");
+		sql.append("WHERE AEAPRODU.ID_AEAPRODU = ").append(idProduto);
 
 		ProdutoSql produtoSql = new ProdutoSql(context);
 
-		Cursor dadosProduto = produtoSql.sqlSelect(sql);
+		Cursor dadosProduto = produtoSql.sqlSelect(sql.toString());
 
-		ProdutoBeans produto = new ProdutoBeans();
+		AeaproduBeans produto = null;
 
 		// Checa se retornou algum registro do banco de dados
 		if((dadosProduto != null) && (dadosProduto.getCount() > 0)){
 			// Move o cursor para o primeiro registro
 			dadosProduto.moveToFirst();
-
-			produto.setIdProduto(dadosProduto.getInt(dadosProduto.getColumnIndex("ID_AEAPRODU")));
-			produto.setCodigoEstrutural(dadosProduto.getString(dadosProduto.getColumnIndex("CODIGO_ESTRUTURAL")));
-			produto.setDescricaoProduto(dadosProduto.getString(dadosProduto.getColumnIndex("DESCRICAO")));
-			produto.setDescricaoAuxiliar(dadosProduto.getString(dadosProduto.getColumnIndex("DESCRICAO_AUXILIAR")));
-			produto.setReferencia(dadosProduto.getString(dadosProduto.getColumnIndex("REFERENCIA")));
-			produto.setCodigoBarras(dadosProduto.getString(dadosProduto.getColumnIndex("CODIGO_BARRAS")));
-			produto.setPesoLiquido(dadosProduto.getDouble(dadosProduto.getColumnIndex("PESO_LIQUIDO")));
-			produto.setPesoBruto(dadosProduto.getDouble(dadosProduto.getColumnIndex("PESO_BRUTO")));
-			if( (dadosProduto.getString(dadosProduto.getColumnIndex("TIPO")) != null) && (dadosProduto.getString(dadosProduto.getColumnIndex("TIPO")).length() > 0)){
-				produto.setTipoProduto(dadosProduto.getString(dadosProduto.getColumnIndex("TIPO")));
+			produto = new AeaproduBeans();
+			produto.setIdAeaprodu(dadosProduto.getInt(dadosProduto.getColumnIndex("ID_AEAPRODU")));
+			if (!dadosProduto.isNull(dadosProduto.getColumnIndex("ID_AEAMARCA"))) {
+				AeamarcaBeans aeamarca = new AeamarcaBeans();
+				aeamarca.setIdAeamarca(dadosProduto.getInt(dadosProduto.getColumnIndex("ID_AEAMARCA")));
+				produto.setAeamarca(aeamarca);
 			}
-			produto.setDescricaoMarca(dadosProduto.getString(dadosProduto.getColumnIndex("DESCRICAO_MARCA")));
-
-			UnidadeVendaBeans unidadeVenda = new UnidadeVendaBeans();
-			unidadeVenda.setIdUnidadeVenda(dadosProduto.getInt(dadosProduto.getColumnIndex("ID_AEAUNVEN")));
-			unidadeVenda.setSiglaUnidadeVenda(dadosProduto.getString(dadosProduto.getColumnIndex("SIGLA")));
-			unidadeVenda.setDescricaoUnidadeVenda(dadosProduto.getString(dadosProduto.getColumnIndex("DESCRICAO_SINGULAR")));
-			produto.setUnidadeVendaProduto(unidadeVenda);
-
-			// Pega a classe do produto
-			ClasseBeans classe = new ClasseBeans();
-			classe.setCodigoClasse(dadosProduto.getInt(dadosProduto.getColumnIndex("CODIGO_CLASE")));
-			classe.setDescricaoClasse(dadosProduto.getString(dadosProduto.getColumnIndex("DESCRICAO_CLASE")));
-			// Adiciona a classe no produto
-			produto.setClasseProduto(classe);
+			if (!dadosProduto.isNull(dadosProduto.getColumnIndex("ID_AEAUNVEN"))) {
+				AeaunvenBeans aeaunven = new AeaunvenBeans();
+				aeaunven.setIdAeaunven(dadosProduto.getInt(dadosProduto.getColumnIndex("ID_AEAUNVEN")));
+				produto.setAeaunven(aeaunven);
+			}
+			if (!dadosProduto.isNull(dadosProduto.getColumnIndex("ID_AEACLASE"))) {
+				AeaclaseBeans aeaclase = new AeaclaseBeans();
+				aeaclase.setIdAeaclase(dadosProduto.getInt(dadosProduto.getColumnIndex("ID_AEACLASE")));
+				produto.setAeaclase(aeaclase);
+			}
+			if (!dadosProduto.isNull(dadosProduto.getColumnIndex("CODIGO_ESTRUTURAL"))) produto.setCodigoEstrutural(dadosProduto.getString(dadosProduto.getColumnIndex("CODIGO_ESTRUTURAL")));
+			produto.setDescricao(dadosProduto.getString(dadosProduto.getColumnIndex("DESCRICAO")));
+			if (!dadosProduto.isNull(dadosProduto.getColumnIndex("DESCRICAO_AUXILIAR"))) produto.setDescricaoAuxiliar(dadosProduto.getString(dadosProduto.getColumnIndex("DESCRICAO_AUXILIAR")));
+			if (!dadosProduto.isNull(dadosProduto.getColumnIndex("REFERENCIA"))) produto.setReferencia(dadosProduto.getString(dadosProduto.getColumnIndex("REFERENCIA")));
+			if (!dadosProduto.isNull(dadosProduto.getColumnIndex("CODIGO_BARRAS"))) produto.setCodigoBarras(dadosProduto.getString(dadosProduto.getColumnIndex("CODIGO_BARRAS")));
+			if (!dadosProduto.isNull(dadosProduto.getColumnIndex("PESO_LIQUIDO"))) produto.setPesoLiquido(dadosProduto.getDouble(dadosProduto.getColumnIndex("PESO_LIQUIDO")));
+			if (!dadosProduto.isNull(dadosProduto.getColumnIndex("PESO_BRUTO"))) produto.setPesoBruto(dadosProduto.getDouble(dadosProduto.getColumnIndex("PESO_BRUTO")));
+			if( (dadosProduto.getString(dadosProduto.getColumnIndex("TIPO")) != null) && (dadosProduto.getString(dadosProduto.getColumnIndex("TIPO")).length() > 0)){
+				produto.setTipo(dadosProduto.getString(dadosProduto.getColumnIndex("TIPO")));
+			}
 		}
 		return produto;
 	}// Fim detalhesProduto
 
+
 	public List<DescricaoDublaBeans> listaDetalhesProduto(String idProduto){
 		List<DescricaoDublaBeans> listaDetalhes = new ArrayList<DescricaoDublaBeans>();
 
-		ProdutoBeans produtoBeans = detalhesProduto(idProduto);
+		AeaproduBeans produtoBeans = detalhesProduto(idProduto);
 
 		DescricaoDublaBeans descricaoDupla = new DescricaoDublaBeans();
 		descricaoDupla.setTextoPrincipal(produtoBeans.getCodigoEstrutural());
@@ -1221,41 +1402,54 @@ public class ProdutoRotinas extends Rotinas {
 		descricaoDupla = new DescricaoDublaBeans();
 		//descricaoDupla.setTextoPrincipal(produtoBeans.getCodigoEstrutural());
 		descricaoDupla.setTextoSecundario("Tipo");
-		if(String.valueOf(produtoBeans.getTipoProduto()) != null){
+		if(String.valueOf(produtoBeans.getTipo()) != null){
 
-			if(produtoBeans.getTipoProduto() == "0"){
+			if(produtoBeans.getTipo() == "0"){
 				descricaoDupla.setTextoPrincipal("Produto");
 
-			} else if(produtoBeans.getTipoProduto() == "1"){
+			} else if(produtoBeans.getTipo() == "1"){
 				descricaoDupla.setTextoPrincipal("Serviço");
 
-			} else if(produtoBeans.getTipoProduto() == "2"){
+			} else if(produtoBeans.getTipo() == "2"){
 				descricaoDupla.setTextoPrincipal("Conjunto");
 
-			} else if(produtoBeans.getTipoProduto() == "3"){
+			} else if(produtoBeans.getTipo() == "3"){
 				descricaoDupla.setTextoPrincipal("Grade");
 			}
 		}
 		// Adiciona a lista
 		listaDetalhes.add(descricaoDupla);
-		
-		descricaoDupla = new DescricaoDublaBeans();
-		descricaoDupla.setTextoPrincipal(produtoBeans.getDescricaoMarca());
-		descricaoDupla.setTextoSecundario("Marca");
-		// Adiciona a lista
-		listaDetalhes.add(descricaoDupla);
-		
-		descricaoDupla = new DescricaoDublaBeans();
-		descricaoDupla.setTextoPrincipal(produtoBeans.getUnidadeVendaProduto().getSiglaUnidadeVenda() + " - " + produtoBeans.getUnidadeVendaProduto().getDescricaoUnidadeVenda());
-		descricaoDupla.setTextoSecundario("Unidade de Venda");
-		// Adiciona a lista
-		listaDetalhes.add(descricaoDupla);
-		
-		descricaoDupla = new DescricaoDublaBeans();
-		descricaoDupla.setTextoPrincipal(produtoBeans.getClasseProduto().getDescricaoClasse());
-		descricaoDupla.setTextoSecundario("Classe/Grupo");
-		// Adiciona a lista
-		listaDetalhes.add(descricaoDupla);
+
+		AeamarcaRotinas aeamarcaRotinas = new AeamarcaRotinas(context);
+		AeamarcaBeans aeamarca = aeamarcaRotinas.selectMarca(produtoBeans.getAeamarca().getIdAeamarca());
+		if (aeamarca != null) {
+			descricaoDupla = new DescricaoDublaBeans();
+			descricaoDupla.setTextoPrincipal(aeamarca.getDescricao());
+			descricaoDupla.setTextoSecundario("Marca");
+			// Adiciona a lista
+			listaDetalhes.add(descricaoDupla);
+		}
+
+		AeaunvenRotinas aeaunvenRotinas = new AeaunvenRotinas(context);
+		AeaunvenBeans aeaunven = aeaunvenRotinas.selectUnidadeVenda(produtoBeans.getAeaunven().getIdAeaunven());
+		if (aeaunven != null){
+			descricaoDupla = new DescricaoDublaBeans();
+			descricaoDupla.setTextoPrincipal(aeaunven.getSigla() + " - " + aeaunven.getDescricaosingular());
+			descricaoDupla.setTextoSecundario("Unidade de Venda");
+			// Adiciona a lista
+			listaDetalhes.add(descricaoDupla);
+		}
+
+		AeaclaseRotinas aeaclaseRotinas = new AeaclaseRotinas(context);
+		AeaclaseBeans aeaclase = aeaclaseRotinas.selectClasse(produtoBeans.getAeaclase().getIdAeaclase());
+		if (aeaclase != null){
+			descricaoDupla = new DescricaoDublaBeans();
+			descricaoDupla.setTextoPrincipal(aeaclase.getDescricao());
+			descricaoDupla.setTextoSecundario("Classe/Grupo");
+			// Adiciona a lista
+			listaDetalhes.add(descricaoDupla);
+		}
+
 
 		EmbalagemRotinas embalagemRotinas = new EmbalagemRotinas(context);
 		// Pega todas as embalagens do produto

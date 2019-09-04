@@ -122,19 +122,19 @@ public class CalculaPrecoSP extends StoredProcedure {
         super(context, progressBarStatus, textStatus);
     }
 
-    public double getPrecoAtacado() {
-        return precoAtacado;
-    }
-
-    public double getPrecoVarejo() {
-        return precoVarejo;
-    }
-
-    public double getPrecoServico() {
-        return precoServico;
-    }
-
-    public ContentValues execute(int idProdutoLoja,
+    /**
+     *
+     * @param idProdutoLoja
+     * @param idEmbalagem
+     * @param idPlanoPgto
+     * @param idCliente
+     * @param codigoVendedor - é o mesmo CODIGO_FUN da tabela CFACLIFO
+     * @param dataVenda
+     * @param precoVendaAtacado
+     * @param precoVendaVarejo
+     * @return
+     */
+    public ContentValues execute(final int idProdutoLoja,
                                  int idEmbalagem,
                                  int idPlanoPgto,
                                  int idCliente,
@@ -748,7 +748,7 @@ public class CalculaPrecoSP extends StoredProcedure {
 
                 if (percentualEntrada != 0){diasTemp = diasEntrada;}
                 diasMultiplicadoTemp = percentualEntrada * diasEntrada;
-                if ((qtdeParcelas1 + qtdeParcelas2 + qtdeParcelas3) > 0){percentualEntrada = ((100 - percentualEntrada) / (qtdeParcelas1 + qtdeParcelas2 + qtdeParcelas1));}
+                if ((qtdeParcelas1 + qtdeParcelas2 + qtdeParcelas3) > 0){percentualEntrada = ((100 - percentualEntrada) / (qtdeParcelas1 + qtdeParcelas2 + qtdeParcelas3));}
 
                 diasSomados = diasTemp;
                 while (qtdeParcelas1 > 0){
@@ -1173,9 +1173,9 @@ public class CalculaPrecoSP extends StoredProcedure {
                 if (precoVarejo < valorMarkupVarejo1){precoVarejo = markupEmpresaVarejo1;}
                 if (precoVarejo < valorMarkupVarejo2){precoVarejo = markupEmpresaVarejo2;}
                 if (precoVarejo < valorMarkupVarejo3){precoVarejo = markupEmpresaVarejo3;}
-                if (precoAtacado < valorMarkupAtacado1){precoVarejo = markupEmpresaAtacado1;}
-                if (precoAtacado < valorMarkupAtacado2){precoVarejo = markupEmpresaAtacado2;}
-                if (precoAtacado < valorMarkupAtacado3){precoVarejo = markupEmpresaAtacado3;}
+                if (precoAtacado < valorMarkupAtacado1){precoAtacado = markupEmpresaAtacado1;}
+                if (precoAtacado < valorMarkupAtacado2){precoAtacado = markupEmpresaAtacado2;}
+                if (precoAtacado < valorMarkupAtacado3){precoAtacado = markupEmpresaAtacado3;}
 
                 if (tipoProduto.equalsIgnoreCase("1")){
                     precoVarejo = 0;
@@ -1202,7 +1202,7 @@ public class CalculaPrecoSP extends StoredProcedure {
                     public void run() {
                         new MaterialDialog.Builder(context)
                                 .title("CalculaPrecoSP")
-                                .content(context.getResources().getString(R.string.msg_error) + "\n" + e.getMessage())
+                                .content(context.getResources().getString(R.string.msg_error) + "\n" + e.getMessage() + "\n idAeaploja" + idProdutoLoja)
                                 .positiveText(R.string.button_ok)
                                 .show();
                     }

@@ -37,12 +37,12 @@ import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 import com.savare.R;
 import com.savare.activity.LogActivity;
-import com.savare.activity.fragment.ClienteCadastroFragment;
 import com.savare.beans.PessoaBeans;
 import com.savare.funcoes.FuncoesPersonalizadas;
 import com.savare.funcoes.rotinas.OrcamentoRotinas;
 import com.savare.funcoes.rotinas.PessoaRotinas;
 import com.savare.funcoes.rotinas.UltimaAtualizacaoRotinas;
+import com.savare.funcoes.rotinas.async.UpgradeBancoDadosAsyncRotinas;
 
 import java.util.List;
 import java.util.UUID;
@@ -63,7 +63,6 @@ public class InicioMDActivity extends AppCompatActivity {
     private AccountHeader cabecalhoDrawer;
     private MaterialListView mListView;
     private int cliqueVoltar = 0;
-    private int mPreviousVisibleItem;
     FloatingActionMenu menuFloatOpcoes;
     private SwitchDrawerItem switchEnviaInstantaneo;
     boolean enviaAutomatico = false;
@@ -106,7 +105,7 @@ public class InicioMDActivity extends AppCompatActivity {
 
         // Pega o nome de login do usuario
         String nomeCompletoUsua = funcoes.getValorXml("Usuario");
-        String email = "nao encontrado";
+        String email = funcoes.getValorXml("Email");
 
         if (funcoes.getValorXml(funcoes.TAG_ENVIAR_AUTOMATICO).equalsIgnoreCase("S")){
             enviaAutomatico = true;
@@ -180,7 +179,7 @@ public class InicioMDActivity extends AppCompatActivity {
         //Instancia o drawer
         navegacaoDrawerEsquerdo = new DrawerBuilder()
                 .withActivity(this)
-            .withToolbar(toolbarInicio)
+                .withToolbar(toolbarInicio)
                 .addDrawerItems(
                         new PrimaryDrawerItem().withName(R.string.clientes).withIcon(R.drawable.ic_action_person),
                         new PrimaryDrawerItem().withName(R.string.orcamentos).withIcon(R.drawable.ic_action_view_as_list),
@@ -199,8 +198,8 @@ public class InicioMDActivity extends AppCompatActivity {
                         new SwitchDrawerItem().withName(R.string.imagem_produto).withIcon(R.mipmap.ic_image_dark).withChecked(imagemProduto).withOnCheckedChangeListener(mOnCheckedChangeListener).withTag(KEY_IMAGEM_PRODUTO),
                         new SwitchDrawerItem().withName(R.string.salva_pedido_pdf).withIcon(R.mipmap.ic_file_pdf).withChecked(salvaPedidoPdf).withOnCheckedChangeListener(mOnCheckedChangeListener).withTag(KEY_SALVA_PEDIDO_PDF),
                         new SwitchDrawerItem().withName(R.string.pesquisar_produto_estoque).withIcon(R.mipmap.ic_feature_search).withDescription(R.string.pesquisar_apenas_produto_estoque).withChecked(pequisarProdutoEstoque).withOnCheckedChangeListener(mOnCheckedChangeListener).withTag(KEY_PESQUISAR_PRODUTO_ESTOQUE),
-                        new SectionDrawerItem().withName(getResources().getString(R.string.versao_aplicacao) + " " + funcoes.getNomeVersaoAplicacao()),
-                        new SectionDrawerItem().withName(funcoes.getValorXml(funcoes.TAG_UUID_DISPOSITIVO))
+                        new PrimaryDrawerItem().withName(getResources().getString(R.string.versao_aplicacao) + " " + funcoes.getNomeVersaoAplicacao()),
+                        new PrimaryDrawerItem().withName(funcoes.getValorXml(funcoes.TAG_UUID_DISPOSITIVO))
 
                 )
             .withDisplayBelowStatusBar(true)
@@ -314,6 +313,13 @@ public class InicioMDActivity extends AppCompatActivity {
                             Intent intentLogs = new Intent(InicioMDActivity.this, LogActivity.class);
                             // Abre outra tela
                             startActivity(intentLogs);
+                            return true;
+
+                        case 17: case 18:
+                            // Tela de sincronização
+                            Intent intentSobreSavare = new Intent(InicioMDActivity.this, SobreSavareMDActivity.class);
+                            // Abre outra tela
+                            startActivity(intentSobreSavare);
                             return true;
 
                         default:

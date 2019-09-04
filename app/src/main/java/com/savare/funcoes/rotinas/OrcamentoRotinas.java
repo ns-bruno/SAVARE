@@ -221,16 +221,16 @@ public class OrcamentoRotinas extends Rotinas {
 			// Executa a mensagem passando por parametro as propriedades
 			funcoes.menssagem(mensagem);
 		}*/
-        }catch (Exception e){
-            FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
-            // Cria uma variavem para inserir as propriedades da mensagem
-            ContentValues mensagem = new ContentValues();
-            mensagem.put("comando", 2);
-            mensagem.put("tela", "OrcamentoRotinas");
-            mensagem.put("mensagem", "Não existe registros cadastrados" + e.getMessage());
-
-            // Executa a mensagem passando por parametro as propriedades
-            funcoes.menssagem(mensagem);
+        }catch (final Exception e){
+			((Activity) context).runOnUiThread(new Runnable() {
+				public void run() {
+					new MaterialDialog.Builder(context)
+							.title("OrcamentoRotinas")
+							.content("Não existe registros cadastrados" + e.getMessage())
+							.positiveText(R.string.button_ok)
+							.show();
+				}
+			});
         }
 		return listaItemOrcamento;
 	} // Fim da funcao listaItemOrcamentoResumida
@@ -673,63 +673,6 @@ public class OrcamentoRotinas extends Rotinas {
 		return listaTotalMensal;
 	}
 	
-	/**
-	 * Retorna uma lista de cidades dos orcamentos ou pedidos que
-	 * estao no banco de dados.
-	 * 
-	 * @param tipo - 'O' = ORCAMENTO, 'P' = PEDIDO, 'E' = EXCLUIDO, 'N' = ENVIADOS
-	 * @param where
-	 * @return
-	 */
-//	public List<DescricaoSimplesBeans> listaCidadeOrcamentoPedido(String tipo, String where){
-//		// Cria uma lista para retornar as cidades
-//		List<DescricaoSimplesBeans> lista = new ArrayList<DescricaoSimplesBeans>();
-//
-//
-//		String sql = "SELECT CFAESTAD.UF, CFACIDAD.DESCRICAO "
-//				   + "FROM AEAORCAM "
-//				   + "LEFT OUTER JOIN CFAESTAD CFAESTAD ON(AEAORCAM.ID_CFAESTAD = CFAESTAD.ID_CFAESTAD) "
-//				   + "LEFT OUTER JOIN CFACIDAD CFACIDAD ON(AEAORCAM.ID_CFACIDAD = CFACIDAD.ID_CFACIDAD) "
-//				   + "WHERE (AEAORCAM.STATUS = '" + tipo + "') ";
-//
-//		/*// Checa se eh para listar todos os pedidos
-//		if(tipo.equalsIgnoreCase("TP")){
-//			sql += "WHERE (AEAORCAM.STATUS = 'P') OR (AEAORCAM.STATUS = 'N')";
-//		} else {
-//			sql += "WHERE (AEAORCAM.STATUS = '" + tipo + "') ";
-//		}*/
-//
-//		// Adiciona a clausula where
-//		if(where != null){
-//			sql = sql + " AND ( " + where + " )";
-//		}
-//		// Adiciona um ordem no sql
-//		sql = sql + " GROUP BY CFAESTAD.UF, CFACIDAD.DESCRICAO ORDER BY CFAESTAD.UF, CFACIDAD.DESCRICAO ";
-//
-//		OrcamentoSql orcamentoSql = new OrcamentoSql(context);
-//		// Executa o sql e armazena os registro em um Cursor
-//		Cursor cursor = orcamentoSql.sqlSelect(sql);
-//
-//		if((cursor != null) && (cursor.getCount() > 0)){
-//
-//			while (cursor.moveToNext()) {
-//				// Instancia a classe para salvar o nome da cidade
-//				DescricaoSimplesBeans cidade = new DescricaoSimplesBeans();
-//				// Seta o texto principal com o nome da cidade
-//				cidade.setTextoPrincipal(cursor.getString(cursor.getColumnIndex("UF")) + " - " + cursor.getString(cursor.getColumnIndex("DESCRICAO")));
-//				// Adiciona a cidade em uma lista
-//				lista.add(cidade);
-//			}
-//
-//		} else {
-//			lista.add(new DescricaoSimplesBeans("Nenhum valor encontrado"));
-//		}
-//
-//		// Adiciona um valor padrao para selecionar todas as cidades
-//		lista.add(new DescricaoSimplesBeans("Todas as Cidades"));
-//
-//		return lista;
-//	} // Fim listaCidadePessoa
 
 	/**
 	 * Retorna uma lista de cidades dos orcamentos ou pedidos que
@@ -955,34 +898,36 @@ public class OrcamentoRotinas extends Rotinas {
 		ItemOrcamentoSql itemOrcamentoSql = new ItemOrcamentoSql(context);
 		
 		Cursor cursor = itemOrcamentoSql.query("ID_AEAORCAM = " + idOrcamento + " AND ID_AEAPRODU = " + idProduto);
-		
+
+		ItemOrcamentoBeans itemOrcamentoBeans = null;
+
 		// Move o cursor para o primeiro registro
-		cursor.moveToFirst();
-		
-		ItemOrcamentoBeans itemOrcamentoBeans = new ItemOrcamentoBeans();
-		// Preenche os dados recuperados do banco de dados
-		itemOrcamentoBeans.setComplemento(cursor.getString(cursor.getColumnIndex("COMPLEMENTO")));
-		itemOrcamentoBeans.setIdOrcamento(cursor.getInt(cursor.getColumnIndex("ID_AEAORCAM")));
-		itemOrcamentoBeans.setIdItemOrcamento(cursor.getInt(cursor.getColumnIndex("ID_AEAITORC")));
-		if(cursor.getString(cursor.getColumnIndex("PROMOCAO")) != null){
-			itemOrcamentoBeans.setPromocao(cursor.getString(cursor.getColumnIndex("PROMOCAO")));
+		if ( (cursor != null) && (cursor.moveToFirst()) ) {
+
+			itemOrcamentoBeans = new ItemOrcamentoBeans();
+			// Preenche os dados recuperados do banco de dados
+			itemOrcamentoBeans.setComplemento(cursor.getString(cursor.getColumnIndex("COMPLEMENTO")));
+			itemOrcamentoBeans.setIdOrcamento(cursor.getInt(cursor.getColumnIndex("ID_AEAORCAM")));
+			itemOrcamentoBeans.setIdItemOrcamento(cursor.getInt(cursor.getColumnIndex("ID_AEAITORC")));
+			if (cursor.getString(cursor.getColumnIndex("PROMOCAO")) != null) {
+				itemOrcamentoBeans.setPromocao(cursor.getString(cursor.getColumnIndex("PROMOCAO")));
+			}
+			itemOrcamentoBeans.setQuantidade(cursor.getDouble(cursor.getColumnIndex("QUANTIDADE")));
+			itemOrcamentoBeans.setSequencia(cursor.getInt(cursor.getColumnIndex("SEQUENCIA")));
+			itemOrcamentoBeans.setGuid(cursor.getString(cursor.getColumnIndex("GUID")));
+			itemOrcamentoBeans.setValorLiquido(cursor.getDouble(cursor.getColumnIndex("FC_LIQUIDO")));
+			itemOrcamentoBeans.setValorBruto(cursor.getDouble(cursor.getColumnIndex("VL_BRUTO")));
+			itemOrcamentoBeans.setValorTabela(cursor.getDouble(cursor.getColumnIndex("VL_TABELA")));
+			itemOrcamentoBeans.setValorDesconto(cursor.getDouble(cursor.getColumnIndex("VL_DESCONTO")));
+			// Instancia a classe de rotinas de embalagem
+			EmbalagemRotinas embalagemRotinas = new EmbalagemRotinas(context);
+			// Instancia a classe de produto para salvar a embalagem dentro do produto
+			ProdutoBeans produto = new ProdutoBeans();
+			// Adiciona uma lista de embalagem a variavel produto
+			produto.setListaEmbalagem(embalagemRotinas.selectEmbalagensProduto(idProduto));
+			// Adiciona o produto ao item de orcamento
+			itemOrcamentoBeans.setProduto(produto);
 		}
-		itemOrcamentoBeans.setQuantidade(cursor.getDouble(cursor.getColumnIndex("QUANTIDADE")));
-		itemOrcamentoBeans.setSequencia(cursor.getInt(cursor.getColumnIndex("SEQUENCIA")));
-		itemOrcamentoBeans.setGuid(cursor.getString(cursor.getColumnIndex("GUID")));
-		itemOrcamentoBeans.setValorLiquido(cursor.getDouble(cursor.getColumnIndex("FC_LIQUIDO")));
-		itemOrcamentoBeans.setValorBruto(cursor.getDouble(cursor.getColumnIndex("VL_BRUTO")));
-		itemOrcamentoBeans.setValorTabela(cursor.getDouble(cursor.getColumnIndex("VL_TABELA")));
-		itemOrcamentoBeans.setValorDesconto(cursor.getDouble(cursor.getColumnIndex("VL_DESCONTO")));
-		// Instancia a classe de rotinas de embalagem
-		EmbalagemRotinas embalagemRotinas = new EmbalagemRotinas(context);
-		// Instancia a classe de produto para salvar a embalagem dentro do produto
-		ProdutoBeans produto = new ProdutoBeans();
-		// Adiciona uma lista de embalagem a variavel produto
-		produto.setListaEmbalagem(embalagemRotinas.selectEmbalagensProduto(idProduto));
-		// Adiciona o produto ao item de orcamento
-		itemOrcamentoBeans.setProduto(produto);
-		
 		return itemOrcamentoBeans;
 	} // Fim selectItemOrcamento
 	
@@ -1005,85 +950,6 @@ public class OrcamentoRotinas extends Rotinas {
 		return retorno;
 	} // Fim selectObservacaoOrcamento
 	
-	
-	
-	public PessoaBeans selectDadosClienteOrcamento(String idOrcamento){
-		Cursor dadosRetorno = null;
-		// Instancia a classe para manipular a tabela no banco de dados
-		OrcamentoSql orcamentoSql = new OrcamentoSql(context);
-		
-		String sql = "SELECT AEAORCAM.ID_AEAORCAM, CFACLIFO.CODIGO_CLI, CFACLIFO.NOME_RAZAO, CFACLIFO.NOME_FANTASIA, "
-				   + "CFAENDER.LOGRADOURO, CFAENDER.NUMERO, CFAENDER.BAIRRO, CFAENDER.CEP, CFAENDER.COMPLEMENTO, "
-				   + "CFAESTAD.UF, CFACIDAD.DESCRICAO AS DESCRICAO_CIDADE"
-				   + "FROM AEAORCAM "
-				   + "LEFT OUTER JOIN CFACLIFO CFACLIFO "
-				   + "ON(AEAORCAM.ID_CFACLIFO = CFACLIFO.ID_CFACLIFO) "
-				   + "LEFT OUTER JOIN CFAENDER CFAENDER "
-				   + "ON(CFAENDER.ID_CFACLIFO = CFACLIFO.ID_CFACLIFO) "
-				   + "LEFT OUTER JOIN CFACIDAD CFACIDAD "
-				   + "ON(CFAENDER.ID_CFACIDAD = CFACIDAD.ID_CFACIDAD) "
-				   + "LEFT OUTER JOIN CFAESTAD CFAESTAD "
-				   + "ON(CFACIDAD.ID_CFAESTAD = CFAESTAD.ID_CFAESTAD) "
-				   + "WHERE (CFACLIFO.ID_CFACLIFO) AND (AEAORCAM.ID_AEAORCAM = " + idOrcamento + " )";
-		
-		dadosRetorno = orcamentoSql.query(sql);
-		PessoaBeans pessoa = new PessoaBeans();
-		// Checa se retornou algum registro
-		if(dadosRetorno != null && dadosRetorno.getCount() > 0){
-			
-			pessoa.setCodigoCliente(dadosRetorno.getInt(dadosRetorno.getColumnIndex("CODIGO_CLI")));
-			pessoa.setNomeRazao(dadosRetorno.getString(dadosRetorno.getColumnIndex("NOME_RAZAO")));
-			pessoa.setNomeFantasia(dadosRetorno.getString(dadosRetorno.getColumnIndex("NOME_FATASIA")));
-			
-			EnderecoBeans endereco = new EnderecoBeans();
-			endereco.setLogradouro(dadosRetorno.getString(dadosRetorno.getColumnIndex("LOGRADOURO")));
-			endereco.setNumero(dadosRetorno.getString(dadosRetorno.getColumnIndex("NUMERO")));
-			endereco.setBairro(dadosRetorno.getString(dadosRetorno.getColumnIndex("BAIRRO")));
-			endereco.setCep(dadosRetorno.getString(dadosRetorno.getColumnIndex("CEP")));
-			endereco.setComplemento(dadosRetorno.getString(dadosRetorno.getColumnIndex("COMPLEMENTO")));
-			
-			pessoa.setEnderecoPessoa(endereco);
-			
-			CidadeBeans cidade = new CidadeBeans();
-			cidade.setDescricao(dadosRetorno.getString(dadosRetorno.getColumnIndex("DESCRICAO_CIDADE")));
-			
-			pessoa.setCidadePessoa(cidade);
-			
-		}
-		
-		return pessoa;
-	} // Fim selectDadosClienteOrcamento
-
-	
-	/**
-	 * Retorna todos os itens de um orcamento.
-	 * 
-	 * @param idOrcamento
-	 * @return
-	 */
-	public Cursor selectItensOrcamento(String idOrcamento){
-		Cursor dadosRetorno = null;
-		// Instancia a classe para manipular a tabela no banco de dados
-		OrcamentoSql orcamentoSql = new OrcamentoSql(context);
-		// Criar o sql para pegar os dados do banco
-		String sql = "SELCET AEAPRODU.CODIGO_ESTRUTURAL, AEAPRODU.DESCRICAO AS DESCRICAO_PRODU, AEAMARCA.DESCRICAO AS DESCRICAO_MARCA, "
-				   + "AEAUNVEN.SIGLA, AEAEMBAL.DESCRICAO AS DESCRICAO_EMBAL, AEAITORC.QUANTIDADE, AEAITORC.FC_LIQUIDO_UN, AEAITORC.FC_LIQUIDO "
-				   + "FROM AEAITORC "
-				   + "LEFT OUTER JOIN AEAPRODU AEAPRODU "
-				   + "ON(AEAITORC.ID_AEAPRODU = AEAPRODU.ID_AEAPRODU) "
-				   + "LEFT OUTER JOIN AEAMARCA AEAMARCA "
-				   + "ON(AEAPRODU.ID_AEAMARCA = AEAMARCA.ID_AEAMARCA) "
-				   + "LEFT OUTER JOIN AEAUNVEN AEAUNVEN "
-				   + "ON(AEAPRODU.ID_AEAUNVEN = AEAUNVEN.ID_AEAUNVEN) "
-				   + "LEFT OUTER JOIN AEAEMBAL AEAEMBAL "
-				   + "ON(AEAEMBAL.ID_AEAPRODU = AEAPRODU.ID_AEAPRODU) "
-				   + "WHERE (AEAITORC.ID_AEAORCAM = " + idOrcamento + " ) ";
-		
-		dadosRetorno = orcamentoSql.query(sql);
-		
-		return dadosRetorno;
-	} // Fim selectDadosClienteOrcamento
-
 	
 	
 	public String totalOrcamentoLiquido(String idOrcamento){

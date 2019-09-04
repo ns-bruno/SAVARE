@@ -15,6 +15,7 @@
     <string name="enviar_dados_cliente">Enviar Dados Cliente</string>
     <string name="adicionar_produto">Adicionar Produtos</string>
     <string name="adicionar_servidor">Adicionar Servidor</string>
+    <string name="sobre_savare">Sobre o SAVARE</string>
     <string name="atualizar">Atualizar</string>
     <string name="voltar">Voltar</string>
     <string name="chave_empresa">Chave da Empresa</string>
@@ -98,6 +99,7 @@
     <string name="filtro">Filtro</string>
     <string name="lista_creditos">Lista de Creditos</string>
     <string name="titulos_baixados">Títulos Baixados</string>
+    <string name="todos_titulos">Todos os Títulos</string>
     <string name="titulos_aberto">Títulos Em Aberto</string>
     <string name="titulos_vencidos">Títulos Vencidos</string>
     <string name="titulos_cliente">Títulos do Cliente</string>
@@ -275,7 +277,7 @@
     <string name="orientacao_registrar_usuario">Se você adquiriu uma licença para usar o SAVARE clique no botão \"DIGITAR CNPJ\".</string>
     <string name="terminamos_primeiros_passos">Terminamos os primeiros passos</string>
     <string name="terminamos">Terminamos</string>
-    <string name="demorar_baixar_fotos">O recebimento de fotos pode demorar bastante, pois depende do tamanhos das imagens e quantidade.</string>
+    <string name="demorar_baixar_fotos">O recebimento de foto pode demorar bastante, pois depende do tamanhos das imagens e quantidade.</string>
     <string name="terminamos_enviar_dados">Terminamos de enviar os dados. Pode atualizar a tela, por favor.</string>
     <string name="pronto_para_iniciar_savare">Pronto, agora vamos iniciar o SAVARE e aguardar a empresa associar o seu dispositivo a um funcionário para que você possa receber os dados. Verifique com o responvável da sua empresa para providênciar essa ligação do seu dispositivo com o funcionário cadastrado.</string>
     <string name="escanear_codigo_barras">Escanear código de barras</string>
@@ -401,9 +403,11 @@
     <string name="erro_inesperado">Erro inesperado. </string>
     <string name="para_cadastrar_dispositivo_precisa_internet">Para cadastrar o dispositivo precisamos de internet.</string>
     <string name="nao_tem_produtos_orcamento_pedido">Não tem produtos dentro do orçamento/pedido</string>
+    <string name="sem_descricao_para_pesquisar_produto">Não foi digitado nenhum texto para pesquisar.</string>
     <string name="digite_alguma_coisa_pesquisar">Digite alguma palavra para pesquisar</string>
     <string name="aguarde_vamos_enviar_dados">Aguarde, vamor enviar os dados. Primeiro vamos ver se tem internet...</string>
     <string name="versao_aplicacao">Versão: </string>
+    <string name="dispositivo">Dispositivo: </string>
     <string name="chave">Chave: </string>
     <string name="valor_desconto_unitario">Vl. Desc. Unitário</string>
     <string name="nao_conseguimos_inserir_foto">Não conseguimos inserir a foto.</string>

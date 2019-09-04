@@ -18,6 +18,8 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.github.johnpersano.supertoasts.library.Style;
+import com.github.johnpersano.supertoasts.library.SuperActivityToast;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
@@ -237,13 +239,12 @@ public class ClienteDetalhesDadosMDFragment extends Fragment {
 
         if(pessoa.getTotalVencido() > 0){
             editTotalVencido.setTextColor(Color.RED);
-            // Dados da mensagem
-            ContentValues mensagem = new ContentValues();
-            mensagem.put("comando", 2);
-            mensagem.put("tela", "CleinteDetalhesActivity");
-            mensagem.put("mensagem", "Existe titulos vencidos.");
-
-            funcoes.menssagem(mensagem);
+            // Mensagem para avisar ao usuario que existe titulo vencido
+            SuperActivityToast.create(getActivity(), getResources().getString(R.string.existe_titulos_vencidos), Style.DURATION_LONG)
+                    .setTextColor(Color.WHITE)
+                    .setColor(Color.RED)
+                    .setAnimations(Style.ANIMATIONS_POP)
+                    .show();
         }
 
         // Checa se retornou algum valor

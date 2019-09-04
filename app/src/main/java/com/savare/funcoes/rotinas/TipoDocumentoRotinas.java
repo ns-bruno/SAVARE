@@ -32,11 +32,10 @@ public class TipoDocumentoRotinas extends Rotinas {
 		FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
 		
 		if(where != null){
-			where = " (" + where + ") AND (ID_SMAEMPRE = " + funcoes.getValorXml("CodigoEmpresa") + ") ";
+			where = " (" + where + ") AND (ID_SMAEMPRE = " + funcoes.getValorXml(funcoes.TAG_CODIGO_EMPRESA) + ") ";
 		} else {
-			where = "(ID_SMAEMPRE = " + funcoes.getValorXml("CodigoEmpresa") + ") ";
+			where = "(ID_SMAEMPRE = " + funcoes.getValorXml(funcoes.TAG_CODIGO_EMPRESA) + ") ";
 		}
-		
 		// Instancia a classe para manipular os dados do banco de dados
 		TipoDocumentoSql tipoDocumentoSql = new TipoDocumentoSql(context);
 		// Executa o sql e armazena os dados recuperados em um Cursor

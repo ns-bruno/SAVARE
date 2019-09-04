@@ -1,9 +1,6 @@
 package com.savare.banco.local;
 
 import android.Manifest;
-import android.app.Activity;
-import android.app.ProgressDialog;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.database.SQLException;
@@ -16,10 +13,6 @@ import android.util.Log;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.savare.R;
-import com.savare.banco.AssetUtils;
-import com.savare.beans.DispositivoBeans;
-import com.savare.configuracao.ConfiguracoesInternas;
-import com.savare.funcoes.FuncoesPersonalizadas;
 import com.savare.funcoes.rotinas.async.UpgradeBancoDadosAsyncRotinas;
 
 import java.io.File;
@@ -93,7 +86,7 @@ public class ConexaoBancoDeDados extends SQLiteOpenHelper {
 			//Verifica se eh uma nova versao
 			if (versaoNova > versaoAntiga){
 				// Executa uma classe pra atualizar o banco de dados
-                UpgradeBancoDadosAsyncRotinas upgradeBancoDadosAsyncRotinas = new UpgradeBancoDadosAsyncRotinas(context, null);
+                UpgradeBancoDadosAsyncRotinas upgradeBancoDadosAsyncRotinas = new UpgradeBancoDadosAsyncRotinas(context, null, null);
                 upgradeBancoDadosAsyncRotinas.execute();
             }
 		} catch (Exception exception) {
@@ -133,7 +126,6 @@ public class ConexaoBancoDeDados extends SQLiteOpenHelper {
 			bancoSavare = getWritableDatabase();
 			//bancoSavare = SQLiteDatabase.openDatabase(bancoDados, null, SQLiteDatabase.OPEN_READWRITE);
 		}
-
 		return bancoSavare;
 	}
 
