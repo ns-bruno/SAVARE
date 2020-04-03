@@ -1,18 +1,28 @@
 package com.savare.banco.storedProcedure;
 
 import android.app.Activity;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.graphics.Color;
+import android.os.Build;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.content.ContextCompat;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.savare.R;
+import com.savare.configuracao.ConfiguracoesInternas;
+import com.savare.funcoes.FuncoesPersonalizadas;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.Random;
 
 /**
  * Created by Bruno Nogueira Silva on 06/09/2016.
@@ -117,9 +127,36 @@ public class CalculaPrecoSP extends StoredProcedure {
                     origemValor,
                     usaJurosMedioLocal,
                     calculaJuros;
+    private NotificationManager notificationManager;
+    private NotificationCompat.BigTextStyle bigTextStyle;
+    private NotificationCompat.Builder mBuilder;
 
     public CalculaPrecoSP(Context context, ProgressBar progressBarStatus, TextView textStatus) {
         super(context, progressBarStatus, textStatus);
+        notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+
+            NotificationChannel mChannel = new NotificationChannel(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_CHANNEL, FuncoesPersonalizadas.NOTIFICATION_FILE, NotificationManager.IMPORTANCE_MIN);
+            mChannel.setDescription(context.getResources().getString(R.string.calculando_preco_venda));
+            mChannel.enableLights(true);
+            mChannel.setLightColor(Color.BLUE);
+            notificationManager.createNotificationChannel(mChannel);
+        }
+
+        // Create a BigTextStyle object.
+        bigTextStyle = new NotificationCompat.BigTextStyle();
+
+        mBuilder = new NotificationCompat.Builder(context, ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_CHANNEL)
+                .setSmallIcon(R.mipmap.ic_launcher_smallicon)
+                .setColor(ContextCompat.getColor(context, R.color.primary))
+                .setContentTitle(context.getResources().getString(R.string.calculando_preco_venda))
+                //.setContentText(mActivity.getResources().getString(R.string.app_name))
+                .setStyle(bigTextStyle)
+                .setDefaults(Notification.DEFAULT_LIGHTS)
+                .setPriority(NotificationManager.IMPORTANCE_MIN)
+                .setSound(null, 0)
+                .setVibrate(new long[0])
+                .setOnlyAlertOnce(true);
     }
 
     /**
@@ -136,7 +173,7 @@ public class CalculaPrecoSP extends StoredProcedure {
      */
     public ContentValues execute(final int idProdutoLoja,
                                  int idEmbalagem,
-                                 int idPlanoPgto,
+                                 final int idPlanoPgto,
                                  int idCliente,
                                  int codigoVendedor,
                                  String dataVenda,
@@ -746,6 +783,24 @@ public class CalculaPrecoSP extends StoredProcedure {
                 Integer diasTemp = 0, diasSomados;
                 Double diasMultiplicadoTemp;
 
+                if (diasEntrada == null){
+                    // Cria uma notificacao para ser manipulado
+                    bigTextStyle.bigText(context.getResources().getString(R.string.falta_marcar_plano_pagamento) + "\n ID_AEAPLPGT = " + idPlanoPgto);
+                    mBuilder.setStyle(bigTextStyle);
+                    notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_CALCULA_PRECO_SP, mBuilder.build());
+
+                    if (retorno == null){
+                        retorno = new ContentValues();
+                    }
+                    retorno.put(KEY_PRECO_VAREJO, precoVarejo);
+                    retorno.put(KEY_PRECO_ATACADO, precoAtacado);
+                    retorno.put(KEY_PRECO_SERVICO, precoServico);
+                    retorno.put(KEY_PRODUTO_PROMOCAO_ATACADO, produtoEmPromocaoAtacado);
+                    retorno.put(KEY_PRODUTO_PROMOCAO_VAREJO, produtoEmPromocaoVarejo);
+                    retorno.put(KEY_PRODUTO_PROMOCAO_SERVICO, produtoEmPromocaoServico);
+                    return retorno;
+                }
+
                 if (percentualEntrada != 0){diasTemp = diasEntrada;}
                 diasMultiplicadoTemp = percentualEntrada * diasEntrada;
                 if ((qtdeParcelas1 + qtdeParcelas2 + qtdeParcelas3) > 0){percentualEntrada = ((100 - percentualEntrada) / (qtdeParcelas1 + qtdeParcelas2 + qtdeParcelas3));}
@@ -1147,9 +1202,9 @@ public class CalculaPrecoSP extends StoredProcedure {
                     jurosMedioFatorVarejo = 0;
                     jurosMedioFatorServico = 0;
                 }
-                if (usaJurosMedioLocal != null && usaJurosMedioLocal.contentEquals("0")){jurosMedioFatorAtacado =  jurosMedioPlPgtAtacado;}
-                if (usaJurosMedioLocal != null && usaJurosMedioLocal.contentEquals("1")){jurosMedioFatorVarejo =  jurosMedioPlPgtVarejo;}
-                if (usaJurosMedioLocal != null && usaJurosMedioLocal.contentEquals("2")){jurosMedioFatorServico =  jurosMedioPlPgtServico;}
+                if (usaJurosMedioLocal != null && usaJurosMedioLocal.contains("0")){jurosMedioFatorAtacado =  jurosMedioPlPgtAtacado;}
+                if (usaJurosMedioLocal != null && usaJurosMedioLocal.contains("1")){jurosMedioFatorVarejo =  jurosMedioPlPgtVarejo;}
+                if (usaJurosMedioLocal != null && usaJurosMedioLocal.contains("2")){jurosMedioFatorServico =  jurosMedioPlPgtServico;}
 
                 // Verifica se retornou o tipo de bonus do banco pois o campo nao eh obrigatorio
                 if ((tipoBonusFator != null) && (!tipoBonusFator.isEmpty())) {

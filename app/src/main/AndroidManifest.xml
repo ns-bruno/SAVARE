@@ -154,6 +154,16 @@
             android:theme="@style/AppBaseTheme" >
         </activity>
 
+        <activity
+            android:name=".activity.material.designer.ClientePositivacaoMDActivity"
+            android:theme="@style/AppBaseTheme" >
+        </activity>
+
+        <activity
+            android:name=".activity.material.designer.UltimaAtualizacaoActivity"
+            android:theme="@style/AppBaseTheme" >
+        </activity>
+
 
         <provider
             android:name=".sincronizacao.EnviarProvider"
@@ -164,6 +174,16 @@
         <provider
             android:authorities="com.savare.provider.SearchableProvider"
             android:name="com.savare.provider.SearchableProvider" />
+
+        <provider
+            android:name="android.support.v4.content.FileProvider"
+            android:authorities="com.savare.fileprovider"
+            android:grantUriPermissions="true"
+            android:exported="false">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/filepaths" />
+        </provider>
 
         <!-- Servico de sincronizacao -->
         <service

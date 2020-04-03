@@ -10,6 +10,7 @@ public class ConfiguracoesInternas {
     public static final int IDENTIFICACAO_NOTIFICACAO = 900;
     public static final int IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR = 1;
     public static final int IDENTIFICACAO_NOTIFICACAO_ENVIAR_DADOS = 2;
+    public static final int IDENTIFICACAO_NOTIFICACAO_CALCULA_PRECO_SP = 3;
     public static final String IDENTIFICACAO_NOTIFICACAO_CHANNEL = "savare.com.channel";
     public static final String CHAVE_USUARIO_PUBLICO_WEBSERVICE = "7dea1dbe-5366-11e6-a8d5-0a0027000004";
     public static final String NOME_USUARIO_PUBLICO_WEBSERVICE = "Usuário Público";

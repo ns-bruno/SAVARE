@@ -10,6 +10,7 @@ import java.util.List;
 import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.os.Environment;
 
 import com.itextpdf.text.BadElementException;
@@ -24,6 +25,7 @@ import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 import com.savare.R;
+import com.savare.banco.funcoesSql.PessoaSql;
 import com.savare.beans.EmpresaBeans;
 import com.savare.beans.ItemOrcamentoBeans;
 import com.savare.beans.OrcamentoBeans;
@@ -126,7 +128,7 @@ public class GerarPdfRotinas {
 	          if(camihnoDocumento.exists()){
 	        	  localDocumento = camihnoDocumento.toString();
 	          }
-	      }catch (Exception e){
+	      } catch (Exception e){
             final FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
 
             // Armazena as informacoes para para serem exibidas e enviadas
@@ -161,7 +163,7 @@ public class GerarPdfRotinas {
 		
 		//Dados do produtos
 		 if(tipoTabela == 1){
-             // Adiciona o tamanho de cada coluna
+            // Adiciona o tamanho de cada coluna
 			tabela = new PdfPTable(new float[] {0.08f, 0.11f, 0.42f, 0.15f, 0.1f, 0.1f, 0.15f, 0.2f });
 			// Percentagem da largura da pagina
 			tabela.setWidthPercentage(100);
@@ -236,16 +238,22 @@ public class GerarPdfRotinas {
 			// Pega os dados da emrpesa
 			EmpresaBeans empresa = empresaRotinas.empresa(funcoes.getValorXml("CodigoEmpresa"));
 
-             if (empresa != null) {
-                 // Nome da empresa
-                 PdfPCell c1 = new PdfPCell(new Phrase(empresa.getNomeFantasia(), empresaFont));
-                 c1.setHorizontalAlignment(Element.ALIGN_CENTER);
-                 tabela.addCell(c1);
-                 tabela.setHeaderRows(1);
-             }
-		 	//tabela.addCell(empresa.getNomeFantasia());
-		 	tabela.addCell("Vendedor: " + funcoes.getValorXml("Usuario"));
-			
+			if (empresa != null) {
+				// Nome da empresa
+				PdfPCell c1 = new PdfPCell(new Phrase(empresa.getNomeFantasia(), empresaFont));
+				c1.setHorizontalAlignment(Element.ALIGN_CENTER);
+				tabela.addCell(c1);
+				tabela.setHeaderRows(1);
+			}
+
+			PessoaSql pessoaSql = new PessoaSql(context);
+			Cursor dadosVendedor = pessoaSql.sqlSelect("SELECT CFACLIFO.NOME_RAZAO FROM CFACLIFO WHERE CFACLIFO.CODIGO_FUN = " + funcoes.getValorXml(funcoes.TAG_CODIGO_USUARIO));
+			if (dadosVendedor != null && dadosVendedor.moveToFirst()){
+			 	tabela.addCell("Vendedor: " + dadosVendedor.getString(dadosVendedor.getColumnIndex("NOME_RAZAO")));
+			} else {
+				//tabela.addCell(empresa.getNomeFantasia());
+			 	tabela.addCell("Vendedor: " + funcoes.getValorXml("Usuario"));
+			}
 			// Dados do orcamento
 		 } else if(tipoTabela == 2){
 			// Instancia a tabela e a quantidade de colunas
@@ -274,15 +282,16 @@ public class GerarPdfRotinas {
 
 			// Preenche as celulas em asequencia
 			tabela.addCell("Orçamento/Pedido N.: " + orcamento.getIdOrcamento());
-			tabela.addCell("Data Cadastro: " + orcamento.getDataCadastro());
+			tabela.addCell("Data Cadastro: " + funcoes.formataDataHora(orcamento.getDataCadastro()));
 			tabela.addCell("Razão Social: " + pessoa.getNomeRazao());
-			tabela.addCell("Fantasia: " + pessoa.getNomeFantasia());
+			tabela.addCell("Fantasia: " + (pessoa.getNomeFantasia() != null ? pessoa.getNomeFantasia() : "") );
 			tabela.addCell("CPF/CNPJ: " + pessoa.getCpfCnpj());
-			tabela.addCell("I.E.: " + pessoa.getIeRg());
-			tabela.addCell("Endereço: " + pessoa.getEnderecoPessoa().getLogradouro() + ", Nº " + pessoa.getEnderecoPessoa().getNumero());
-			tabela.addCell("Bairro: " + pessoa.getEnderecoPessoa().getBairro());
-			tabela.addCell("Cidade: " + pessoa.getCidadePessoa().getDescricao());
-			tabela.addCell("Estado: " + pessoa.getEstadoPessoa().getSiglaEstado());
+			tabela.addCell("I.E.: " + pessoa.getIeRg() != null ? pessoa.getIeRg() : "");
+			tabela.addCell("Endereço: " + pessoa.getEnderecoPessoa().getLogradouro() != null ? pessoa.getEnderecoPessoa().getLogradouro() : "" +
+							", Nº " + pessoa.getEnderecoPessoa().getNumero() != null ? pessoa.getEnderecoPessoa().getNumero() : "");
+			tabela.addCell("Bairro: " + pessoa.getEnderecoPessoa().getBairro() != null ? pessoa.getEnderecoPessoa().getBairro() : "");
+			tabela.addCell("Cidade: " + pessoa.getCidadePessoa().getDescricao() != null ? pessoa.getCidadePessoa().getDescricao() : "");
+			tabela.addCell("Estado: " + pessoa.getEstadoPessoa().getSiglaEstado() != null ? pessoa.getEstadoPessoa().getSiglaEstado() : "");
 			tabela.addCell("Documento: " + (documentoVenda != null ? documentoVenda.getDescricaoTipoDocumento() : context.getResources().getString(R.string.selecione_tipo_documento)));
 			tabela.addCell("Plano Pagamento: " + (planoPagamento != null ? planoPagamento.getDescricaoPlanoPagamento() : context.getResources().getString(R.string.plano_pagamento)));
 

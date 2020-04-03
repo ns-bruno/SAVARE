@@ -423,7 +423,7 @@ public class FuncoesSqlThread {
      * @return - Retorna um Cursor com os dados recuperados.
      */
     public Cursor query(String where, String ordem){
-        Log.i("SAVARE", "FuncoesSql - " + where + " - " + ordem);
+        //Log.i("SAVARE", "FuncoesSql - " + where + " - " + ordem);
 
         Cursor cursor = null;
         bancoDados = databaseManager.openDatabase();

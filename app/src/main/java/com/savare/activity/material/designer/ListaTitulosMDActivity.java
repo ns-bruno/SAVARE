@@ -441,7 +441,6 @@ public class ListaTitulosMDActivity extends AppCompatActivity{
 
             where = " (DT_VENCIMENTO >= '" + dataFormatadaInicial.format(c.getTime()) + "')";
         }
-
         // Checa se existe data final para pesquisar
         if((anoFinalSelecinado > 0) && (mesFinalSelecionado > 0) && (diaFinalSelecionado > 0)){
             Calendar c = Calendar.getInstance();

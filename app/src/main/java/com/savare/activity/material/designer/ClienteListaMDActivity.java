@@ -4,6 +4,7 @@ import android.app.SearchManager;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -21,6 +22,8 @@ import android.widget.TextView;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.github.clans.fab.FloatingActionButton;
 import com.github.clans.fab.FloatingActionMenu;
+import com.github.johnpersano.supertoasts.library.Style;
+import com.github.johnpersano.supertoasts.library.SuperActivityToast;
 import com.savare.R;
 import com.savare.activity.fragment.ClienteCadastroFragment;
 import com.savare.adapter.ItemUniversalAdapter;
@@ -46,8 +49,8 @@ public class ClienteListaMDActivity extends AppCompatActivity {
     private Spinner spinnerListaCidade;
     private ProgressBar progressBarStatus;
     private List<PessoaBeans> listaPessoas;
-    private String  telaChamou,
-                    idOrcamento;
+    private String telaChamou,
+            idOrcamento;
     private Toolbar toolbarCabecalho;
     private boolean pesquisando = false;
 
@@ -85,10 +88,24 @@ public class ClienteListaMDActivity extends AppCompatActivity {
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
                 CidadeBeans cidadeBeans = (CidadeBeans) parent.getSelectedItem();
-                // Checa se tem alguma lista de cidade
-                if (!cidadeBeans.getDescricao().contains("Nenhum valor encontrado")) {
 
-                    LoaderPessoa carregarListaPessoa = new LoaderPessoa(ClienteListaMDActivity.this, cidadeBeans, null);
+                if (cidadeBeans.getDescricao().contains(PessoaRotinas.KEY_SELECIONE_CIDADE)){
+                    FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(ClienteListaMDActivity.this);
+                    String idClifoVista = funcoes.getValorXml(funcoes.TAG_ID_CFACLIFO_VISTA);
+
+                    StringBuilder where = new StringBuilder();
+                    // Checa se retornou o id de cliente a vista
+                    if ((idClifoVista != null) && (!idClifoVista.equalsIgnoreCase(funcoes.NAO_ENCONTRADO))){
+                        // Monta uma clausula para buscar o cliente
+                        where.append(" (CFACLIFO.ID_CFACLIFO = ").append(idClifoVista).append(") ");
+
+                        LoaderPessoa carregarListaPessoa = new LoaderPessoa(ClienteListaMDActivity.this, cidadeBeans, where.toString(), PessoaRotinas.NAO);
+                        carregarListaPessoa.execute();
+                    }
+                    // Checa se tem alguma lista de cidade
+                } else if ((!cidadeBeans.getDescricao().contains(PessoaRotinas.KEY_NENHUM_VALOR))) {
+
+                    LoaderPessoa carregarListaPessoa = new LoaderPessoa(ClienteListaMDActivity.this, cidadeBeans, null, PessoaRotinas.NAO);
                     carregarListaPessoa.execute();
                 }
             }
@@ -103,7 +120,7 @@ public class ClienteListaMDActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-                if((telaChamou != null) && (telaChamou.equals(ListaOrcamentoPedidoMDActivity.KEY_TELA_LISTA_ORCAMENTO_PEDIDO))){
+                if ((telaChamou != null) && (telaChamou.equals(ListaOrcamentoPedidoMDActivity.KEY_TELA_LISTA_ORCAMENTO_PEDIDO))) {
 
                     PessoaBeans pessoa = new PessoaBeans();
                     pessoa = (PessoaBeans) listViewPessoa.getAdapter().getItem(position);
@@ -127,14 +144,14 @@ public class ClienteListaMDActivity extends AppCompatActivity {
                     returnIntent.putExtra("ENDERECO_CLIENTE", pessoa.getEnderecoPessoa().getLogradouro() + ", " + pessoa.getEnderecoPessoa().getNumero());
                     returnIntent.putExtra("BAIRRO_CLIENTE", pessoa.getEnderecoPessoa().getBairro());
                     returnIntent.putExtra("CEP_CLIENTE", pessoa.getEnderecoPessoa().getCep());
-                    if (pessoa.isCadastroNovo()){
+                    if (pessoa.isCadastroNovo()) {
                         returnIntent.putExtra("CADASTRO_NOVO", "S");
                     }
                     setResult(ListaOrcamentoPedidoMDActivity.RETORNA_CLIENTE, returnIntent);
                     // Fecha a tela de detalhes de produto
                     finish();
 
-                } else if((telaChamou != null) && (telaChamou.equals(OrcamentoTabFragmentMDActivity.KEY_TELA_ORCAMENTO_FRAGMENTO))){
+                } else if ((telaChamou != null) && (telaChamou.equals(OrcamentoTabFragmentMDActivity.KEY_TELA_ORCAMENTO_FRAGMENTO))) {
 
                     PessoaBeans pessoa = new PessoaBeans();
                     pessoa = (PessoaBeans) listViewPessoa.getAdapter().getItem(position);
@@ -153,7 +170,7 @@ public class ClienteListaMDActivity extends AppCompatActivity {
                     dadosCliente.put("ENDERECO_CLIENTE", pessoa.getEnderecoPessoa().getLogradouro() + ", " + pessoa.getEnderecoPessoa().getNumero());
                     dadosCliente.put("BAIRRO_CLIENTE", pessoa.getEnderecoPessoa().getBairro());
                     dadosCliente.put("CEP_CLIENTE", pessoa.getEnderecoPessoa().getCep());
-                    if (pessoa.isCadastroNovo()){
+                    if (pessoa.isCadastroNovo()) {
                         dadosCliente.put("CADASTRO_NOVO", "S");
                     }
                     OrcamentoRotinas orcamentoRotinas = new OrcamentoRotinas(ClienteListaMDActivity.this);
@@ -161,7 +178,7 @@ public class ClienteListaMDActivity extends AppCompatActivity {
                     int qtdAlterado = orcamentoRotinas.updateOrcamento(dadosCliente, idOrcamento);
 
                     // Checa se atualizou algum orcamento
-                    if(qtdAlterado > 0){
+                    if (qtdAlterado > 0) {
 
                         Intent returnIntent = new Intent();
                         returnIntent.putExtra("NOME_CLIENTE", pessoa.getNomeRazao());
@@ -192,7 +209,7 @@ public class ClienteListaMDActivity extends AppCompatActivity {
                     intent.putExtra("CODIGO_USU", String.valueOf(pessoa.getCodigoUsuario()));
                     intent.putExtra("CODIGO_TRA", String.valueOf(pessoa.getCodigoTransportadora()));
                     intent.putExtra("CODIGO_FUN", String.valueOf(pessoa.getCodigoFuncionario()));
-                    if (pessoa.isCadastroNovo()){
+                    if (pessoa.isCadastroNovo()) {
                         intent.putExtra("CADASTRO_NOVO", "S");
                     }
                     startActivity(intent);
@@ -230,23 +247,62 @@ public class ClienteListaMDActivity extends AppCompatActivity {
              */
             @Override
             public boolean onQueryTextSubmit(String query) {
-                if (!pesquisando) {
+                // Checa se tem pelo menos 3 caracteres do para pesquisar ou apenas numero
+                if ( (query.length() > 3) || (query.matches("[-+]?\\d*\\.?\\d+")) ) {
+                    if (!pesquisando) {
 
-                    pesquisando = true;
+                        pesquisando = true;
+                        // Remove todos os caracteres que nao for numero
+                        String cpfCnpj = query.replaceAll("\\D", "");
+                        // Checa se eh um cpf
+                        if (cpfCnpj.length() == 11) {
+                            // Formata no modelo de cpf
+                            cpfCnpj = cpfCnpj.replaceAll("([0-9]{3})([0-9]{3})([0-9]{3})([0-9]{2})", "$1\\.$2\\.$3-$4");
+                        } else if (cpfCnpj.length() == 14) {
+                            // Formata no modelo de cnpj
+                            cpfCnpj = cpfCnpj.replaceAll("([0-9]{2})([0-9]{3})([0-9]{3})([0-9]{4})([0-9]{2})", "$1\\.$2\\.$3/$4-$5");
+                        } else {
+                            cpfCnpj = query;
+                        }
+                        String queryNumber = "";
+                        // Checa se eh apenas numero
+                        if (query.matches("[-+]?\\d*\\.?\\d+")){
+                            queryNumber = query;
+                        }
+                        query = query.toUpperCase();
+                        StringBuilder where = new StringBuilder();
+                        String tipoFuncionario = new FuncoesPersonalizadas(ClienteListaMDActivity.this).getValorXml(FuncoesPersonalizadas.TAG_TIPO_FUNCIONARIO);
+                        // Checa se eh um funcionario interno
+                        if ((!tipoFuncionario.equalsIgnoreCase(FuncoesPersonalizadas.NAO_ENCONTRADO)) && (tipoFuncionario.contains("2"))){
+                            where.append("CFACLIFO.NOME_RAZAO LIKE '%" + query + "%' OR ");
+                            where.append("CFACLIFO.NOME_FANTASIA LIKE '%" + query + "%' OR ");
+                            where.append("CFACLIFO.CPF_CGC LIKE '%" + cpfCnpj + "%' ");
+                            if (queryNumber.length() > 0) {
+                                where.append(" OR CFACLIFO.ID_CFACLIFO = " + queryNumber + " OR CFACLIFO.CODIGO_CLI = " + queryNumber);
+                            }
+                        } else {
+                            where.append("CFACLIFO.NOME_RAZAO LIKE '%" + query + "%' OR ");
+                            where.append("CFACLIFO.NOME_FANTASIA LIKE '%" + query + "%' OR ");
+                            where.append("CFACLIFO.CPF_CNPJ LIKE '%" + cpfCnpj + "%' OR ");
+                            where.append(queryNumber.length() > 0 ? "CFACLIFO.ID_CFACLIFO = " + queryNumber + " OR " : "");
+                            where.append(queryNumber.length() > 0 ? "CFACLIFO.CODIGO_CLI = " + queryNumber + " OR " : "");
+                            where.append("CFACIDAD.DESCRICAO LIKE '%" + query + "%' OR ");
+                            where.append("CFAENDER.BAIRRO LIKE '%" + query + "%' OR ");
+                            where.append("CFASTATU.DESCRICAO LIKE '%" + query + "%' ");
+                        }
+                        //PessoaRotinas pessoaRotinas = new PessoaRotinas(ClienteListaMDActivity.this);
 
-                    String where = "CFACLIFO.NOME_RAZAO LIKE '%" + query + "%' OR "
-                            + "CFACLIFO.NOME_FANTASIA LIKE '%" + query + "%' OR "
-                            + "CFACLIFO.CPF_CNPJ LIKE '%" + query + "%' OR "
-                            + "CFACIDAD.DESCRICAO LIKE '%" + query + "%' OR "
-                            + "CFAENDER.BAIRRO LIKE '%" + query + "%' OR "
-                            + "CFASTATU.DESCRICAO LIKE '%" + query + "%' ";
+                        CidadeBeans cidade = (CidadeBeans) spinnerListaCidade.getSelectedItem();
 
-                    //PessoaRotinas pessoaRotinas = new PessoaRotinas(ClienteListaMDActivity.this);
-
-                    CidadeBeans cidade = (CidadeBeans) spinnerListaCidade.getSelectedItem();
-
-                    LoaderPessoa carregaListaPessoa = new LoaderPessoa(ClienteListaMDActivity.this, cidade, where);
-                    carregaListaPessoa.execute();
+                        LoaderPessoa carregaListaPessoa = new LoaderPessoa(ClienteListaMDActivity.this, cidade, where.toString(), PessoaRotinas.SIM);
+                        carregaListaPessoa.execute();
+                    }
+                } else {
+                    SuperActivityToast.create(ClienteListaMDActivity.this, getResources().getString(R.string.digite_minimo_letras), Style.DURATION_LONG)
+                            .setTextColor(Color.WHITE)
+                            .setColor(Color.RED)
+                            .setAnimations(Style.ANIMATIONS_POP)
+                            .show();
                 }
                 return false;
             } // Fim do onQueryTextSubmit
@@ -273,7 +329,7 @@ public class ClienteListaMDActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
-        switch (item.getItemId()){
+        switch (item.getItemId()) {
 
             case android.R.id.home:
                 finish();
@@ -324,13 +380,14 @@ public class ClienteListaMDActivity extends AppCompatActivity {
 
         private Context context;
         private CidadeBeans cidade;
-        private String where;
+        private String where, usaWebservice;
         PessoaAdapter adapterPessoa;
 
-        public LoaderPessoa(Context context, CidadeBeans cidade, String where) {
+        public LoaderPessoa(Context context, CidadeBeans cidade, String where, String usaWebservice) {
             this.context = context;
             this.cidade = cidade;
             this.where = where;
+            this.usaWebservice = usaWebservice != null && usaWebservice.length() > 0 ? usaWebservice : PessoaRotinas.NAO;
         }
 
         @Override
@@ -338,6 +395,10 @@ public class ClienteListaMDActivity extends AppCompatActivity {
             super.onPreExecute();
 
             progressBarStatus.setVisibility(View.VISIBLE);
+            // Verifica se tem alguma coisa no listView
+            if ((listViewPessoa.getAdapter() != null) && (listViewPessoa.getAdapter().getCount() > 0)) {
+                listViewPessoa.setAdapter(null);
+            }
         }
 
         @Override
@@ -348,24 +409,33 @@ public class ClienteListaMDActivity extends AppCompatActivity {
 
                 PessoaRotinas pessoaRotinas = new PessoaRotinas(context);
 
-                if ((!cidade.getDescricao().equalsIgnoreCase("Nenhum valor encontrado")) &&
+                if (cidade.getDescricao().equalsIgnoreCase(PessoaRotinas.KEY_SELECIONE_CIDADE)) {
+                    FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
+                    String tipoFuncionario = funcoes.getValorXml(funcoes.TAG_TIPO_FUNCIONARIO);
+                    // Checa se o vendedor eh interno
+                    if ((!tipoFuncionario.equalsIgnoreCase(funcoes.NAO_ENCONTRADO)) && (tipoFuncionario.contains("2")) && (this.usaWebservice.equalsIgnoreCase(PessoaRotinas.SIM))) {
+                        listaPessoas = pessoaRotinas.listaPessaResumidoWebservice(where, PessoaRotinas.KEY_TIPO_CLIENTE, progressBarStatus);
+                    } else {
+                        listaPessoas = pessoaRotinas.listaPessoaResumido(where, PessoaRotinas.KEY_TIPO_CLIENTE, progressBarStatus);
+                    }
+                // Faz uma pesquisa no nome que foi digitado levando em consideracao a cidade selecionada
+                } else if ((!cidade.getDescricao().equalsIgnoreCase(PessoaRotinas.KEY_NENHUM_VALOR)) &&
                         (!cidade.getDescricao().equalsIgnoreCase("Todas as Cidades")) &&
                         (!cidade.getDescricao().equalsIgnoreCase(getResources().getString(R.string.sem_cidade)))) {
 
                     // Monta a clausula where do sql
-                    whereAux = "( CFACIDAD.DESCRICAO LIKE '%" + cidade.getDescricao().replace("'", "%") + "%' )";
-
-                    if ((where != null) && (where.length() > 1)){
-                        whereAux = where;
+                    whereAux = "( CFACIDAD.DESCRICAO LIKE '%" + cidade.getDescricao().replace("'", "%") + "%' ) ";
+                    if ((where != null) && (where.length() > 1)) {
+                        whereAux += " AND " + where;
                     }
 
                     // Cria a lista com as pessoas de acordo com a cidade selecionada
                     listaPessoas = pessoaRotinas.listaPessoaResumido(whereAux, PessoaRotinas.KEY_TIPO_CLIENTE, progressBarStatus);
 
-                } else if (cidade.getDescricao().equalsIgnoreCase(getResources().getString(R.string.sem_cidade))){
-                    whereAux = "( (CFACIDAD.DESCRICAO IS NULL) OR (CFACIDAD.DESCRICAO = '') )";
+                } else if (cidade.getDescricao().equalsIgnoreCase(getResources().getString(R.string.sem_cidade))) {
+                    whereAux = "( (CFACIDAD.DESCRICAO IS NULL) OR (CFACIDAD.DESCRICAO = '') ) ";
 
-                    if ((where != null) && (where.length() > 1)){
+                    if ((where != null) && (where.length() > 1)) {
                         whereAux = where;
                     }
 
@@ -373,7 +443,7 @@ public class ClienteListaMDActivity extends AppCompatActivity {
                     listaPessoas = pessoaRotinas.listaPessoaResumido(whereAux, PessoaRotinas.KEY_TIPO_CLIENTE, progressBarStatus);
                 } else if (cidade.getDescricao().equalsIgnoreCase("Todas as Cidades")) {
 
-                    if ((where != null) && (where.length() > 1)){
+                    if ((where != null) && (where.length() > 1)) {
                         // Preenche a lista de pessoas
                         listaPessoas = pessoaRotinas.listaPessoaResumido(where, PessoaRotinas.KEY_TIPO_CLIENTE, progressBarStatus);
                     } else {
@@ -381,7 +451,7 @@ public class ClienteListaMDActivity extends AppCompatActivity {
                         listaPessoas = pessoaRotinas.listaPessoaResumido(null, PessoaRotinas.KEY_TIPO_CLIENTE, progressBarStatus);
                     }
                 }
-                if ( (listaPessoas != null) && (listaPessoas.size() > 0) ) {
+                if ((listaPessoas != null) && (listaPessoas.size() > 0)) {
                     // Seta o adapter com a nova lista
                     adapterPessoa = new PessoaAdapter(context, listaPessoas, PessoaAdapter.KEY_CLIENTE);
 
@@ -404,7 +474,7 @@ public class ClienteListaMDActivity extends AppCompatActivity {
             progressBarStatus.setVisibility(View.GONE);
             pesquisando = false;
 
-            if ( (adapterPessoa != null) && (adapterPessoa.getCount() > 0) ){
+            if ((adapterPessoa != null) && (adapterPessoa.getCount() > 0)) {
                 // Seta o listView com o novo adapter que ja esta com a nova lista
                 listViewPessoa.setAdapter(adapterPessoa);
                 textViewStatus.setText(adapterPessoa.getCount() + " :Clientes ");

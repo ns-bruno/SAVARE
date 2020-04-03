@@ -35,9 +35,11 @@
     <string name="filtrar">Filtrar</string>
     <string name="idClifo">Código</string>
     <string name="codigo_empresa">Código da Empresa</string>
+    <string name="id_empresa">ID da Empresa: </string>
     <string name="referencia">Referência</string>
     <string name="usuario_servidor_sisinfo">Usuário do Servidor SisInfo</string>
     <string name="codigo_vendedor">Código do Vendedor</string>
+    <string name="tipo_funcionario">Tipo de Funcionário</string>
     <string name="drawer_open">Navegação drawer aberta</string>
     <string name="drawer_close">Navegação drawer fechada</string>
     <string name="action_websearch">Web search</string>
@@ -80,6 +82,7 @@
     <string name="esqueceu_senha">Esqueceu a senha</string>
     <string name="configuracao">Configuração</string>
     <string name="configuracoes">Configurações</string>
+    <string name="ultimas_atualizacoes">Últimas Atualizações</string>
     <string name="cadastro_usuario">Cadastro Usuário</string>
     <string name="configuracoes_servidores">Configuração dos Servidor</string>
     <string name="cadastro_sucesso">Cadastro Sucesso</string>
@@ -223,6 +226,7 @@
     <string name="historico_valores_vendas_mensais">Histórico de Valores de Vendas Mensais.</string>
     <string name="mes_vendas">Mês de Vendas</string>
     <string name="nao_achamos_nenhum_valor">Não Achamos Nenhum Valor.</string>
+    <string name="nao_achamos_nenhum_valor_para_carregar_relatorio">Não achamos nenhum valor para carregar o relatório e compartilhar.</string>
     <string name="vendas_realizadas_mensal">Vendas Realizadas Mensal</string>
     <string name="enviando_pedidos">Enviando o(s) Pedido(s)</string>
     <string name="enviando_pedidos_confirmando">Enviando e confirmando o(s) Pedido(s)</string>
@@ -239,6 +243,7 @@
     <string name="opcao_positivacao_nao_valida_para_esta_tela">Esta opção de positivação não é válida para esta tela.</string>
     <string name="positivar_cliente">Positivar Cliente</string>
     <string name="positivado_sucesso">Positivado com Sucesso.</string>
+    <string name="positivacao">Positivação de Clientes</string>
     <string name="nao_temos_historico_preco">Não temos histórico de preço</string>
     <string name="orcamento_pedido_numero">Orçamento/Pedido de Nº </string>
     <string name="nao_possivel_compartilhar_arquivo">Não é possível compartilhar o arquivo</string>
@@ -277,11 +282,12 @@
     <string name="orientacao_registrar_usuario">Se você adquiriu uma licença para usar o SAVARE clique no botão \"DIGITAR CNPJ\".</string>
     <string name="terminamos_primeiros_passos">Terminamos os primeiros passos</string>
     <string name="terminamos">Terminamos</string>
-    <string name="demorar_baixar_fotos">O recebimento de foto pode demorar bastante, pois depende do tamanhos das imagens e quantidade.</string>
+    <string name="demorar_baixar_fotos">O recebimento de foto pode demorar bastante, pois depende do tamanho das imagens e a quantidade.</string>
     <string name="terminamos_enviar_dados">Terminamos de enviar os dados. Pode atualizar a tela, por favor.</string>
     <string name="pronto_para_iniciar_savare">Pronto, agora vamos iniciar o SAVARE e aguardar a empresa associar o seu dispositivo a um funcionário para que você possa receber os dados. Verifique com o responvável da sua empresa para providênciar essa ligação do seu dispositivo com o funcionário cadastrado.</string>
     <string name="escanear_codigo_barras">Escanear código de barras</string>
     <string name="cancelado">Cancelado</string>
+    <string name="digite_minimo_letras">Digite pelo menos 4 letras para fazer a pesquisa</string>
     <string name="registrar">Registrar</string>
     <string name="lista_servidor">Lista de Servidor</string>
     <string name="servidor_nuvem_retornou_alguma_coisa">O servidor em nuvem retornou alguns dados, vamos checar agora, aguarde por favor...</string>
@@ -368,7 +374,8 @@
     <string name="legenda">Legenda</string>
     <string name="aguarde_distribuir_desconto_item_orcamento">Aguarde, vamor distribuir o desconto no(s) item(ns) do oçamento...</string>
     <string name="aparentemente_servidor_webservice_offline">Aparentemente o Servidor Webservice está offline, pedimos que tente novamente, mas se não der certo entre em contato com o suporte da empresa ou do SAVARE.</string>
-    <string name="servidor_webservice_offline">Servidor Webservice está offline.</string>
+    <string name="servidor_webservice_offline">Servidor Webservice está offline, ou sua conexão com a internet esta muito lenta.</string>
+    <string name="nao_localizado_dados_pessoa">Não conseguimos localizar os dados da pessoa para continuar.</string>
     <string name="estamos_checando_webservice_online">Estamos checando se o servidor Webservice está online, Aguarde...</string>
     <string name="checando_versao_savare">Estamos checando a versão do SAVARE, Aguarde...</string>
     <string name="servidor_online">O servidor respondeu o nosso sinal. Agora vamos para próxima etapa, Aguarde...</string>
@@ -428,6 +435,14 @@
     <string name="verificando_tem_backup_tabelas">Estamos verificando se tem algum backup das tabelas já feito.</string>
     <string name="erro_duplicar">Não conseguimos duplicar orçamento/pedido.</string>
     <string name="duplicado_sucesso">Orçamento/Pedido duplicado com sucesso.</string>
+    <string name="semana_atual">Semana Atual</string>
+    <string name="semana_anterior">Semana Anterior</string>
+    <string name="mes_atual">Mês Atual</string>
+    <string name="mes_anterior">Mês Anterior</string>
+    <string name="intervalo_personalizado">Intervalo Personalizado</string>
+    <string name="clientes_nao_positivados">Clientes Não Positivados</string>
+    <string name="apenas_clientes_positivados">Apenas Clientes Positivados</string>
+    <string name="falta_marcar_plano_pagamento">Não foi possível pegar os dados de plano de pagamento, possivelmente é porque o plano de pagamento não foi marcado como é para \"Enviar Palm\" no sistema interno.</string>
 
     <string-array name="tab_produto_md">
         <item>Produtos</item>

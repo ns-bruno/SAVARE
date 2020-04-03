@@ -11,6 +11,7 @@ import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Environment;
+import android.support.annotation.RequiresApi;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
@@ -96,6 +97,7 @@ import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Random;
@@ -108,7 +110,7 @@ import java.util.Vector;
 public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Void> {
 
     public static final String KEY_ORIGEM_CFACLIFO = "CFACLIFO",
-                               KEY_ORIGEM_SMAEMRPE = "SMAEMRPE";
+            KEY_ORIGEM_SMAEMRPE = "SMAEMRPE";
     private Context context;
     private String[] tabelaRecebeDados = null;
     private ProgressBar progressBarStatus = null;
@@ -158,7 +160,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
         String name = "FileDownload";
 
         notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 
             NotificationChannel mChannel = new NotificationChannel(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_CHANNEL, name, NotificationManager.IMPORTANCE_MIN);
             mChannel.setDescription(context.getResources().getString(R.string.importar_dados_recebidos));
@@ -223,7 +225,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
             List<ServidoresBeans> listaServidores = servidoresRotinas.listaServidores(null, "ID_SERVIDORES ASC", null);
             // Verifica se retornou alguma lista de servidores
-            if ( (listaServidores!= null) && (listaServidores.size() > 0)){
+            if ((listaServidores != null) && (listaServidores.size() > 0)) {
 
 
                 // Passa por todos os servidores para verficar qual eh o primeiro que esta online
@@ -250,7 +252,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                         });
                     }
                     // Pinga o IP da lista
-                    if (funcoes.pingHost(servidor.getIpServidor(), servidor.getPorta())){
+                    if (funcoes.pingHost(servidor.getIpServidor(), servidor.getPorta())) {
                         servidorAtivo = new ServidoresBeans();
                         servidorAtivo = servidor;
                         break;
@@ -258,14 +260,14 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                         if (textStatusErro != null) {
                             ((Activity) context).runOnUiThread(new Runnable() {
                                 public void run() {
-                                    textStatusErro.append("\n*" +context.getResources().getText(R.string.servidor_webservice_offline) + " - " + servidor.getIdServidores() + " - " + servidor.getNomeServidor());
+                                    textStatusErro.append("\n*" + context.getResources().getText(R.string.servidor_webservice_offline) + " - " + servidor.getIdServidores() + " - " + servidor.getNomeServidor());
                                 }
                             });
                         }
                     }
                 } // Fim for listaServidores
                 // Verifica se tem algum servidor ativo
-                if (servidorAtivo == null){
+                if (servidorAtivo == null) {
                     ((Activity) context).runOnUiThread(new Runnable() {
                         public void run() {
                             new MaterialDialog.Builder(context)
@@ -280,7 +282,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                     if (textStatusErro != null) {
                         ((Activity) context).runOnUiThread(new Runnable() {
                             public void run() {
-                                textStatusErro.append("\n*" +context.getResources().getText(R.string.estamos_conectanto_servidor_webservice) + " - " + servidorAtivo.getIdServidores() + " - " + servidorAtivo.getNomeServidor());
+                                textStatusErro.append("\n*" + context.getResources().getText(R.string.estamos_conectanto_servidor_webservice) + " - " + servidorAtivo.getIdServidores() + " - " + servidorAtivo.getNomeServidor());
                             }
                         });
                     }
@@ -310,9 +312,9 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 if ((funcoes.getValorXml(funcoes.TAG_ABRIU_PRIMEIRA_VEZ).equalsIgnoreCase(funcoes.SIM)) ||
                         (funcoes.getValorXml(funcoes.TAG_ABRIU_PRIMEIRA_VEZ).equalsIgnoreCase(funcoes.NAO_ENCONTRADO))) {
                     // Checa se tem internet
-                    if (funcoes.existeConexaoInternet()){
+                    if (funcoes.existeConexaoInternet()) {
                         // Cadastra o dispositivo no Webservice central (admin)
-                        if (cadastrarDispositivoWebserviceCentral()){
+                        if (cadastrarDispositivoWebserviceCentral()) {
                             // Cadastro o dispositivo no Webservice local da empresa
                             cadastrarDispositivo();
                         } else {
@@ -334,14 +336,15 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                     // Checa se a versao do savere eh compativel com o webservice
                     if ((checarEmpresaAdmin()) && (checaFuncionarioAtivo())) {
 
+                        // SMAEMPRE
                         importaDadosEmpresa();
 
                         if (funcoes.checaVersao()) {
                             if (textStatusErro != null) {
                                 ((Activity) context).runOnUiThread(new Runnable() {
                                     public void run() {
-                                        textStatusErro.append("\n*" +context.getResources().getText(R.string.versao_savare_valida));
-                                        textStatusErro.append("\n*" +context.getResources().getText(R.string.recebendo_dados));
+                                        textStatusErro.append("\n*" + context.getResources().getText(R.string.versao_savare_valida));
+                                        textStatusErro.append("\n*" + context.getResources().getText(R.string.recebendo_dados));
                                     }
                                 });
                             }
@@ -670,7 +673,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                 importarDadosFotos();
                             }
                             // Verifica se tem uma nova atualizacao e ja faz download pra atualizar
-                            if ((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_SMAVERPR)) ) {
+                            if ((tabelaRecebeDados != null) && (tabelaRecebeDados.length > 0) && (Arrays.asList(tabelaRecebeDados).contains(WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_SMAVERPR))) {
 
                                 // Importa os dados
                                 importarNovaVersao();
@@ -688,7 +691,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                             if (textStatusErro != null) {
                                 ((Activity) context).runOnUiThread(new Runnable() {
                                     public void run() {
-                                        textStatusErro.append("\n*" +context.getResources().getText(R.string.nao_conseguimos_validar_versao));
+                                        textStatusErro.append("\n*" + context.getResources().getText(R.string.nao_conseguimos_validar_versao));
                                     }
                                 });
                             }
@@ -715,7 +718,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                         if (textStatusErro != null) {
                             ((Activity) context).runOnUiThread(new Runnable() {
                                 public void run() {
-                                    textStatusErro.append("\n*" +context.getResources().getText(R.string.empresa_usuario_inativo));
+                                    textStatusErro.append("\n*" + context.getResources().getText(R.string.empresa_usuario_inativo));
                                 }
                             });
                         }
@@ -748,7 +751,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 if (textStatusErro != null) {
                     ((Activity) context).runOnUiThread(new Runnable() {
                         public void run() {
-                            textStatusErro.append("\n*" +context.getResources().getString(R.string.nao_achamos_servidores_cadastrados));
+                            textStatusErro.append("\n*" + context.getResources().getString(R.string.nao_achamos_servidores_cadastrados));
                         }
                     });
                 }
@@ -788,7 +791,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             if (textStatus != null) {
                 ((Activity) context).runOnUiThread(new Runnable() {
                     public void run() {
-                        textStatus.append("\n" +context.getResources().getString(R.string.msg_error) + e.getMessage());
+                        textStatus.append("\n" + context.getResources().getString(R.string.msg_error) + e.getMessage());
                     }
                 });
             }
@@ -847,7 +850,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
         if (textStatusErro != null) {
             ((Activity) context).runOnUiThread(new Runnable() {
                 public void run() {
-                    textStatusErro.append("\n*" +context.getResources().getString(R.string.terminamos));
+                    textStatusErro.append("\n*" + context.getResources().getString(R.string.terminamos));
                 }
             });
         }
@@ -862,18 +865,22 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
     }
 
     /**
-     *
      * @param usuario
      */
     private void salvarDadosXml(ContentValues usuario, String origem) {
         FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
         ContentValues parametros = new ContentValues();
 
-        if (origem.equalsIgnoreCase(KEY_ORIGEM_CFACLIFO)){
+        if (origem.equalsIgnoreCase(KEY_ORIGEM_CFACLIFO)) {
             if (usuario.containsKey("CODIGO_FUN")) {
                 funcoes.setValorXml(funcoes.TAG_CODIGO_USUARIO, usuario.getAsString("CODIGO_FUN"));
                 parametros.put("NOME_PARAM", funcoes.TAG_CODIGO_USUARIO);
                 parametros.put("VALOR_PARAM", funcoes.getValorXml(funcoes.TAG_CODIGO_USUARIO));
+            }
+            if (usuario.containsKey("TIPO_FUNCIONARIO")) {
+                funcoes.setValorXml(funcoes.TAG_TIPO_FUNCIONARIO, usuario.getAsString("TIPO_FUNCIONARIO"));
+                parametros.put("NOME_PARAM", funcoes.TAG_TIPO_FUNCIONARIO);
+                parametros.put("VALOR_PARAM", funcoes.getValorXml(funcoes.TAG_TIPO_FUNCIONARIO));
             }
             if (usuario.containsKey("GUID")) {
                 funcoes.setValorXml(funcoes.TAG_CHAVE_FUNCIONARIO, usuario.getAsString("GUID"));
@@ -881,11 +888,16 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 parametros.put("VALOR_PARAM", funcoes.getValorXml(funcoes.TAG_CHAVE_FUNCIONARIO));
             }
         }
-        if (origem.equalsIgnoreCase(KEY_ORIGEM_SMAEMRPE)){
+        if (origem.equalsIgnoreCase(KEY_ORIGEM_SMAEMRPE)) {
             if (usuario.containsKey("ID_SMAEMPRE")) {
                 funcoes.setValorXml(funcoes.TAG_CODIGO_EMPRESA, usuario.getAsString("ID_SMAEMPRE"));
                 parametros.put("NOME_PARAM", funcoes.TAG_CODIGO_EMPRESA);
                 parametros.put("VALOR_PARAM", funcoes.getValorXml(funcoes.TAG_CODIGO_EMPRESA));
+            }
+            if (usuario.containsKey("ID_CFACLIFO_VISTA")) {
+                funcoes.setValorXml(funcoes.TAG_ID_CFACLIFO_VISTA, usuario.getAsString("ID_CFACLIFO_VISTA"));
+                parametros.put("NOME_PARAM", funcoes.TAG_ID_CFACLIFO_VISTA);
+                parametros.put("VALOR_PARAM", funcoes.getValorXml(funcoes.TAG_ID_CFACLIFO_VISTA));
             }
         }
         if (usuario.containsKey("EMAIL")) {
@@ -1075,6 +1087,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                 dadosUsuario.put("INSC_MUNICIPAL", (usuarioRetorno.has("inscMunicipal")) ? usuarioRetorno.get("inscMunicipal").getAsString() : "");
                                 dadosUsuario.put("INSC_PRODUTOR", (usuarioRetorno.has("inscProdutor")) ? usuarioRetorno.get("inscProdutor").getAsString() : "");
                                 dadosUsuario.put("ATIVO", (usuarioRetorno.has("ativo")) ? usuarioRetorno.get("ativo").getAsString() : null);
+                                dadosUsuario.put("TIPO_FUNCIONARIO", (usuarioRetorno.has("tipoFuncionario")) ? usuarioRetorno.get("tipoFuncionario").getAsString() : null);
 
                                 salvarDadosXml(dadosUsuario, KEY_ORIGEM_CFACLIFO);
 
@@ -1176,7 +1189,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                         }
                     }
                 } else {
-                    bigTextStyle.bigText(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) )
+                    bigTextStyle.bigText(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice))
                             .setBigContentTitle(context.getResources().getString(R.string.recebendo_dados));
                     mBuilder.setStyle(bigTextStyle)
                             .setProgress(0, 0, false);
@@ -1211,7 +1224,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             }
         } catch (Exception e) {
             bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.importar_dados_recebidos))
-                        .bigText("ImportaDadosEmpresa- " + e.getMessage());
+                    .bigText("ImportaDadosEmpresa- " + e.getMessage());
             mBuilder.setStyle(bigTextStyle)
                     .setProgress(0, 0, false);
             notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
@@ -1273,7 +1286,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                             if (textStatusErro != null) {
                                 ((Activity) context).runOnUiThread(new Runnable() {
                                     public void run() {
-                                        textStatusErro.append("\n*" +context.getResources().getString(R.string.dispositivo_registrado));
+                                        textStatusErro.append("\n*" + context.getResources().getString(R.string.dispositivo_registrado));
                                     }
                                 });
                             }
@@ -1289,7 +1302,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                         } else {
                             bigTextStyle.bigText(context.getResources().getString(
                                     R.string.nao_chegou_dados_servidor_empresa) + "\n" +
-                                    "Codigo: " + statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO) + "\n"+
+                                    "Codigo: " + statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO) + "\n" +
                                     "Mensagem: " + statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_MENSAGEM_RETORNO))
                                     .setBigContentTitle(context.getResources().getString(R.string.recebendo_dados_usuario));
                             mBuilder.setStyle(bigTextStyle)
@@ -1302,7 +1315,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                     public void run() {
                                         textStatusErro.append("\n*" +
                                                 context.getResources().getString(R.string.nao_conseguimos_registrar_dispositivo) + "\n" +
-                                                "Codigo: " + finalStatuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO) + "\n"+
+                                                "Codigo: " + finalStatuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO) + "\n" +
                                                 "Mensagem: " + finalStatuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_MENSAGEM_RETORNO));
                                     }
                                 });
@@ -1323,9 +1336,9 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                     } else {
                         // Cria uma notificacao para ser manipulado
                         bigTextStyle.bigText(context.getResources().getString(R.string.nao_conseguimos_registrar_dispositivo) + "\n" +
-                                    "Codigo: " + statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO) + "\n" +
-                                    "Mensagem: " + statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_MENSAGEM_RETORNO))
-                                    .setBigContentTitle(context.getResources().getString(R.string.recebendo_dados));
+                                "Codigo: " + statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO) + "\n" +
+                                "Mensagem: " + statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_MENSAGEM_RETORNO))
+                                .setBigContentTitle(context.getResources().getString(R.string.recebendo_dados));
                         mBuilder.setStyle(bigTextStyle)
                                 .setProgress(0, 0, false);
                         notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
@@ -1334,7 +1347,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                             final JsonObject finalStatuRetorno = statuRetorno;
                             ((Activity) context).runOnUiThread(new Runnable() {
                                 public void run() {
-                                    textStatusErro.append("\n*" +context.getResources().getString(R.string.nao_conseguimos_registrar_dispositivo) + "\n" +
+                                    textStatusErro.append("\n*" + context.getResources().getString(R.string.nao_conseguimos_registrar_dispositivo) + "\n" +
                                             "Codigo: " + finalStatuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO) +
                                             "Mensagem: " + finalStatuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_MENSAGEM_RETORNO));
                                 }
@@ -1346,7 +1359,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             } else {
                 // Cria uma notificacao para ser manipulado
                 bigTextStyle.bigText(context.getResources().getString(R.string.nao_achamos_cnpj))
-                            .setBigContentTitle(context.getResources().getString(R.string.recebendo_dados_usuario));
+                        .setBigContentTitle(context.getResources().getString(R.string.recebendo_dados_usuario));
                 mBuilder.setStyle(bigTextStyle)
                         .setProgress(0, 0, false);
                 notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
@@ -1354,7 +1367,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 if (textStatusErro != null) {
                     ((Activity) context).runOnUiThread(new Runnable() {
                         public void run() {
-                            textStatusErro.append("\n*" +context.getResources().getString(R.string.nao_achamos_cnpj) );
+                            textStatusErro.append("\n*" + context.getResources().getString(R.string.nao_achamos_cnpj));
                         }
                     });
                 }
@@ -1369,7 +1382,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
         } catch (final Exception e) {
             bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.importar_dados_recebidos))
-                        .bigText("CadastrarDispositivo - " + e.getMessage());
+                    .bigText("CadastrarDispositivo - " + e.getMessage());
             mBuilder.setStyle(bigTextStyle)
                     .setProgress(0, 0, false);
             notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
@@ -1463,7 +1476,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                         if (textStatusErro != null) {
                             ((Activity) context).runOnUiThread(new Runnable() {
                                 public void run() {
-                                    textStatusErro.append("\n*" +context.getResources().getString(R.string.dispositivo_registrado));
+                                    textStatusErro.append("\n*" + context.getResources().getString(R.string.dispositivo_registrado));
                                 }
                             });
                         }
@@ -1479,9 +1492,9 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                     } else {
                         // Cria uma notificacao para ser manipulado
                         bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.msg_error))
-                                    .bigText(context.getResources().getString(R.string.nao_chegou_dados_servidor_empresa) + "\n" +
-                                    "Codigo: " + statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO) + "\n"+
-                                    "Mensagem: " + statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_MENSAGEM_RETORNO));
+                                .bigText(context.getResources().getString(R.string.nao_chegou_dados_servidor_empresa) + "\n" +
+                                        "Codigo: " + statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO) + "\n" +
+                                        "Mensagem: " + statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_MENSAGEM_RETORNO));
                         mBuilder.setStyle(bigTextStyle)
                                 .setProgress(0, 0, false);
                         notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
@@ -1492,7 +1505,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                 public void run() {
                                     textStatusErro.append("\n*" +
                                             context.getResources().getString(R.string.nao_conseguimos_registrar_dispositivo) + "\n" +
-                                            "Codigo: " + finalStatuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO) + "\n"+
+                                            "Codigo: " + finalStatuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO) + "\n" +
                                             "Mensagem: " + finalStatuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_MENSAGEM_RETORNO));
                                 }
                             });
@@ -1524,7 +1537,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                         final JsonObject finalStatuRetorno = statuRetorno;
                         ((Activity) context).runOnUiThread(new Runnable() {
                             public void run() {
-                                textStatusErro.append("\n*" +context.getResources().getString(R.string.nao_conseguimos_registrar_dispositivo) + "\n" +
+                                textStatusErro.append("\n*" + context.getResources().getString(R.string.nao_conseguimos_registrar_dispositivo) + "\n" +
                                         "Codigo: " + finalStatuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO) +
                                         "Mensagem: " + finalStatuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_MENSAGEM_RETORNO));
                             }
@@ -1543,7 +1556,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 if (textStatus != null) {
                     ((Activity) context).runOnUiThread(new Runnable() {
                         public void run() {
-                            textStatus.append(context.getResources().getString(R.string.nao_achamos_cnpj) );
+                            textStatus.append(context.getResources().getString(R.string.nao_achamos_cnpj));
                         }
                     });
                 }
@@ -1551,7 +1564,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 if (textStatusErro != null) {
                     ((Activity) context).runOnUiThread(new Runnable() {
                         public void run() {
-                            textStatusErro.append("\n*" +context.getResources().getString(R.string.nao_achamos_cnpj) );
+                            textStatusErro.append("\n*" + context.getResources().getString(R.string.nao_achamos_cnpj));
                         }
                     });
                 }
@@ -1573,7 +1586,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 //                    .build();
 
             bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.msg_error))
-                        .bigText("CadastrarDispositivo - " + e.getMessage());
+                    .bigText("CadastrarDispositivo - " + e.getMessage());
             mBuilder.setStyle(bigTextStyle)
                     .setProgress(0, 0, false);
             notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
@@ -1714,7 +1727,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                     if (textStatusErro != null) {
                                         ((Activity) context).runOnUiThread(new Runnable() {
                                             public void run() {
-                                                textStatusErro.append("\n*" +context.getResources().getString(R.string.achamos_alguma_coisa) + " - Empresa: " + usuarioRetorno.get("nomeRazao").toString());
+                                                textStatusErro.append("\n*" + context.getResources().getString(R.string.achamos_alguma_coisa) + " - Empresa: " + usuarioRetorno.get("nomeRazao").toString());
                                             }
                                         });
                                     }
@@ -1768,7 +1781,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                         if (textStatusErro != null) {
                             ((Activity) context).runOnUiThread(new Runnable() {
                                 public void run() {
-                                    textStatusErro.append("\n*" +"Empresa " + context.getResources().getString(R.string.nao_autorizado));
+                                    textStatusErro.append("\n*" + "Empresa " + context.getResources().getString(R.string.nao_autorizado));
                                 }
                             });
                         }
@@ -1786,7 +1799,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                             if (textStatusErro != null) {
                                 ((Activity) context).runOnUiThread(new Runnable() {
                                     public void run() {
-                                        textStatusErro.append("\n*" +mensagem.get("mensagemRetorno").getAsString());
+                                        textStatusErro.append("\n*" + mensagem.get("mensagemRetorno").getAsString());
                                     }
                                 });
                             }
@@ -1826,7 +1839,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                     }
                 } else {
                     bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.msg_error))
-                            .bigText(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) );
+                            .bigText(context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice));
                     mBuilder.setStyle(bigTextStyle)
                             .setProgress(0, 0, false);
                     notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
@@ -1842,15 +1855,15 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                         ((Activity) context).runOnUiThread(new Runnable() {
                             public void run() {
                                 textStatusErro.append("\n*" +
-                                                context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) +
-                                                " Servidor webservice não retornou os dados de licença da empresa");
+                                        context.getResources().getString(R.string.nao_retornou_dados_suficiente_para_continuar_comunicao_webservice) +
+                                        " Servidor webservice não retornou os dados de licença da empresa");
                             }
                         });
                     }
                 }
             }
 
-        } catch (final JsonIOException e){
+        } catch (final JsonIOException e) {
             // Cria uma notificacao
             bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.msg_error))
                     .bigText("ChecaEmpresaAdmin - " + e.getMessage());
@@ -1862,7 +1875,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 final JsonObject finalStatuRetorno = statuRetorno;
                 ((Activity) context).runOnUiThread(new Runnable() {
                     public void run() {
-                        textStatusErro.append("\n*" +"ChecaEmpresaAdmin- " + e.getMessage());
+                        textStatusErro.append("\n*" + "ChecaEmpresaAdmin- " + e.getMessage());
                     }
                 });
             }
@@ -1878,7 +1891,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 final JsonObject finalStatuRetorno = statuRetorno;
                 ((Activity) context).runOnUiThread(new Runnable() {
                     public void run() {
-                        textStatusErro.append("\n*" +"ChecaEmpresaAdmin - " + e.getMessage());
+                        textStatusErro.append("\n*" + "ChecaEmpresaAdmin - " + e.getMessage());
                     }
                 });
             }
@@ -1914,7 +1927,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
 
             // Verifica se conseguiu pegar o guid do usuario
-            if (funcoes.getValorXml(funcoes.TAG_CHAVE_FUNCIONARIO).equalsIgnoreCase(funcoes.NAO_ENCONTRADO)){
+            if (funcoes.getValorXml(funcoes.TAG_CHAVE_FUNCIONARIO).equalsIgnoreCase(funcoes.NAO_ENCONTRADO)) {
                 bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.msg_error))
                         .bigText("ImportarDadosEmpresa - " + context.getResources().getString(R.string.nao_tem_numero_identificacao_funcionario));
                 mBuilder.setStyle(bigTextStyle)
@@ -1925,7 +1938,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                     final JsonObject finalStatuRetorno = statuRetorno;
                     ((Activity) context).runOnUiThread(new Runnable() {
                         public void run() {
-                            textStatusErro.append("\n*" +"ImportarDadosEmpresa- " + context.getResources().getString(R.string.nao_tem_numero_identificacao_funcionario));
+                            textStatusErro.append("\n*" + "ImportarDadosEmpresa- " + context.getResources().getString(R.string.nao_tem_numero_identificacao_funcionario));
                         }
                     });
                 }
@@ -2021,6 +2034,9 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                                 }
                                                 if ((empresaRetorno.has("idCfaativi")) && (empresaRetorno.get("idCfaativi").getAsInt() > 0)) {
                                                     dadosEmpresa.put("ID_CFAATIVI", empresaRetorno.get("idCfaativi").getAsInt());
+                                                }
+                                                if ((empresaRetorno.has("idCfaclifoVista")) && (empresaRetorno.get("idCfaclifoVista").getAsInt() > 0)) {
+                                                    dadosEmpresa.put("ID_CFACLIFO_VISTA", empresaRetorno.get("idCfaclifoVista").getAsInt());
                                                 }
                                                 if ((empresaRetorno.has("guid")) && (empresaRetorno.get("guid").getAsString().length() > 0)) {
                                                     dadosEmpresa.put("GUID", empresaRetorno.get("guid").getAsString());
@@ -2247,7 +2263,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             }
         } catch (final Exception e) {
             bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.msg_error))
-                        .bigText("ImportaDadosEmpresa - " + e.getMessage());
+                    .bigText("ImportaDadosEmpresa - " + e.getMessage());
             mBuilder.setStyle(bigTextStyle)
                     .setProgress(0, 0, false);
             notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
@@ -2256,7 +2272,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 final JsonObject finalStatuRetorno = statuRetorno;
                 ((Activity) context).runOnUiThread(new Runnable() {
                     public void run() {
-                        textStatusErro.append("\n*" +"ImportaDadosEmpresa- " + e.getMessage());
+                        textStatusErro.append("\n*" + "ImportaDadosEmpresa- " + e.getMessage());
                     }
                 });
             }
@@ -2301,7 +2317,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                     JsonObject pageRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_PAGE_RETORNO);
 
-                    if ( (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0) ) {
+                    if ((pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0)) {
                         final int totalPages = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt();
                         int pageNumber = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_PAGE_NUMBER_RETORNO).getAsInt();
 
@@ -2542,7 +2558,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                     JsonObject pageRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_PAGE_RETORNO);
 
-                    if ( (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0) ) {
+                    if ((pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0)) {
                         final int totalPages = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt();
                         int pageNumber = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_PAGE_NUMBER_RETORNO).getAsInt();
 
@@ -2757,7 +2773,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                     JsonObject pageRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_PAGE_RETORNO);
 
-                    if ( (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0) ) {
+                    if ((pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0)) {
                         final int totalPages = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt();
                         int pageNumber = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_PAGE_NUMBER_RETORNO).getAsInt();
 
@@ -2994,7 +3010,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                     JsonObject pageRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_PAGE_RETORNO);
 
-                    if( (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0) ) {
+                    if ((pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0)) {
                         final int totalPages = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt();
                         int pageNumber = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_PAGE_NUMBER_RETORNO).getAsInt();
 
@@ -3133,7 +3149,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                 mLoad.simple().build();*/
 
                                 bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.msg_error))
-                                            .bigText(context.getResources().getString(R.string.nao_chegou_dados_servidor_empresa) + "\n" + retornoWebservice.toString());
+                                        .bigText(context.getResources().getString(R.string.nao_chegou_dados_servidor_empresa) + "\n" + retornoWebservice.toString());
                                 mBuilder.setStyle(bigTextStyle)
                                         .setProgress(0, 0, false);
                                 notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
@@ -3215,7 +3231,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                     JsonObject pageRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_PAGE_RETORNO);
 
-                    if ( (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0) ) {
+                    if ((pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0)) {
                         final int totalPages = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt();
                         int pageNumber = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_PAGE_NUMBER_RETORNO).getAsInt();
 
@@ -3469,7 +3485,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                     JsonObject pageRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_PAGE_RETORNO);
 
-                    if ( (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0) ) {
+                    if ((pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0)) {
                         final int totalPages = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt();
                         int pageNumber = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_PAGE_NUMBER_RETORNO).getAsInt();
 
@@ -3685,7 +3701,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                     JsonObject pageRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_PAGE_RETORNO);
 
-                    if ( (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0) ) {
+                    if ((pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0)) {
                         final int totalPages = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt();
                         int pageNumber = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_PAGE_NUMBER_RETORNO).getAsInt();
 
@@ -3912,7 +3928,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                     JsonObject pageRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_PAGE_RETORNO);
 
-                    if ( (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0) ) {
+                    if ((pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0)) {
                         final int totalPages = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt();
                         int pageNumber = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_PAGE_NUMBER_RETORNO).getAsInt();
 
@@ -4129,7 +4145,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                     JsonObject pageRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_PAGE_RETORNO);
 
-                    if ( (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0) ) {
+                    if ((pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0)) {
                         final int totalPages = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt();
                         int pageNumber = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_PAGE_NUMBER_RETORNO).getAsInt();
 
@@ -4327,46 +4343,13 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
             // Pega quando foi a ultima data que recebeu dados
             String ultimaData = pegaUltimaDataAtualizacao("CFAESTAD");
-            String ultimaDataParam = pegaUltimaDataAtualizacao("CFAPARAM");
-            String ultimaDataEnder = pegaUltimaDataAtualizacao("CFAENDER");
             // Cria uma variavel para salvar todos os paramentros em json
             String parametrosWebservice = "";
-            String filtraEstadoPorFuncionario =
-                    "(CFAESTAD.ID_CFAESTAD IN " +
-                            "(SELECT DISTINCT CFAENDER.ID_CFAESTAD FROM CFAENDER WHERE CFAENDER.ID_CFACLIFO IN (SELECT CFAPARAM.ID_CFACLIFO FROM CFAPARAM WHERE (CFAPARAM.ID_SMAEMPRE = " + funcoes.getValorXml("CodigoEmpresa") + ") \n" +
-                            "AND (CFAPARAM.ID_CFACLIFO_VENDE = (SELECT CLIFO_VENDE.ID_CFACLIFO FROM CFACLIFO CLIFO_VENDE WHERE CLIFO_VENDE.CODIGO_FUN = " + funcoes.getValorXml("CodigoUsuario") + ")))))";
-
             Gson gson = new Gson();
-            String whereDatas = "";
+            // Checa se teve alguma outra data que foi feito uma busca dos dados
+            if ((ultimaData != null) && (!ultimaData.isEmpty())) {
 
-            /*if ((ultimaData != null) && (!ultimaData.isEmpty())) {
-                whereDatas += "(DT_ALT >= '" + ultimaData + "') ";
-            }
-            // CHECA SE TEVE ALGUMA ALTERACAO NA TABELA PARAM
-            if ((ultimaDataParam != null) && (!ultimaDataParam.isEmpty())) {
-                if ((!whereDatas.isEmpty()) && (whereDatas.length() > 5)){
-                    whereDatas += " OR ";
-                }
-                whereDatas += "((SELECT CFAPARAM.DT_ALT FROM CFAPARAM WHERE (CFAPARAM.ID_SMAEMPRE = " + funcoes.getValorXml("CodigoEmpresa") + ") \n" +
-                        " AND (CFAPARAM.ID_CFACLIFO_VENDE = (SELECT CLIFO_VENDE.ID_CFACLIFO FROM CFACLIFO CLIFO_VENDE WHERE \n" +
-                        " CLIFO_VENDE.CODIGO_FUN = " + funcoes.getValorXml("CodigoUsuario") + "))) >= '" + ultimaDataParam + "')";
-            }
-            // CHECA SE TEVE ALGUMA ALTERACAO NA TABELA ENDERECO DA LISTA DE CLIENTES DO VENDEDOR
-            if ((ultimaDataEnder != null) && (!ultimaDataEnder.isEmpty())) {
-                if ((!whereDatas.isEmpty()) && (whereDatas.length() > 5)){
-                    whereDatas += " OR ";
-                }
-                whereDatas += "( (SELECT CFAENDER.DT_ALT FROM CFAENDER WHERE \n" +
-                        " CFAENDER.ID_CFACLIFO IN (SELECT CFAPARAM.ID_CFACLIFO FROM CFAPARAM WHERE (CFAPARAM.ID_SMAEMPRE = " + funcoes.getValorXml("CodigoEmpresa") + ") \n" +
-                        " AND (CFAPARAM.ID_CFACLIFO_VENDE = (SELECT CLIFO_VENDE.ID_CFACLIFO FROM CFACLIFO CLIFO_VENDE WHERE \n" +
-                        " CLIFO_VENDE.CODIGO_FUN = " + funcoes.getValorXml("CodigoUsuario") + ")))) >= '" + ultimaDataEnder + "')";
-            }*/
-
-            if ((whereDatas != null) && (!whereDatas.isEmpty())) {
-
-                parametrosWebservice += "&where= (DT_ALT >= '" + ultimaData + "') AND " + filtraEstadoPorFuncionario;
-            } else {
-                parametrosWebservice += "&where= " + filtraEstadoPorFuncionario;
+                parametrosWebservice += "&where= (DT_ALT >= '" + ultimaData + "') ";
             }
             WSSisinfoWebservice webserviceSisInfo = new WSSisinfoWebservice(context);
             JsonObject retornoWebservice = gson.fromJson(webserviceSisInfo.executarWebserviceJson(servidorAtivo, null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_CFAESTAD, WSSisinfoWebservice.METODO_GET, parametrosWebservice, null), JsonObject.class);
@@ -4379,7 +4362,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                     JsonObject pageRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_PAGE_RETORNO);
 
-                    if ( (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0) ) {
+                    if ((pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0)) {
                         final int totalPages = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt();
                         int pageNumber = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_PAGE_NUMBER_RETORNO).getAsInt();
 
@@ -4580,10 +4563,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             String ultimaDataEstad = pegaUltimaDataAtualizacao("CFAESTAD");
             // Cria uma variavel para salvar todos os paramentros em json
             String parametrosWebservice = "";
-            String filtraCidadePorFuncionario =
-                    "(CFACIDAD.ID_CFAESTAD IN " +
-                            "(SELECT DISTINCT CFAENDER.ID_CFAESTAD FROM CFAENDER WHERE CFAENDER.ID_CFACLIFO IN (SELECT CFAPARAM.ID_CFACLIFO FROM CFAPARAM WHERE (CFAPARAM.ID_SMAEMPRE = " + funcoes.getValorXml("CodigoEmpresa") + ") \n" +
-                            "AND (CFAPARAM.ID_CFACLIFO_VENDE = (SELECT CLIFO_VENDE.ID_CFACLIFO FROM CFACLIFO CLIFO_VENDE WHERE CLIFO_VENDE.CODIGO_FUN = " + funcoes.getValorXml("CodigoUsuario") + ")))))";
+            //String tipoFuncionario = funcoes.getValorXml(funcoes.TAG_TIPO_FUNCIONARIO);
 
             String sqlQuery =
                     "SELECT  DISTINCT CFACIDAD.ID_CFACIDAD, CFACIDAD.ID_CFAESTAD, CFACIDAD.GUID, CFACIDAD.US_CAD, \n" +
@@ -4591,17 +4571,21 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                             "CFACIDAD.DDD, CFACIDAD.COD_IBGE FROM CFAENDER \n" +
                             "LEFT OUTER JOIN CFACIDAD ON (CFAENDER.ID_CFACIDAD = CFACIDAD.ID_CFACIDAD) \n" +
                             "LEFT OUTER JOIN CFAESTAD ON (CFAENDER.ID_CFAESTAD = CFAESTAD.ID_CFAESTAD) \n" +
-                            "LEFT OUTER JOIN CFACLIFO ON (CFAENDER.ID_CFACLIFO = CFACLIFO.ID_CFACLIFO) \n" +
-                            "LEFT OUTER JOIN CFAPARAM ON (CFACLIFO.ID_CFACLIFO = CFAPARAM.ID_CFACLIFO) \n" +
-                            "WHERE (CFAENDER.ID_CFACIDAD IS NOT NULL) \n" +
-                            " AND (CFAPARAM.ID_CFACLIFO_VENDE = (SELECT CFACLIFO_VEND_CIDADE.ID_CFACLIFO FROM CFACLIFO CFACLIFO_VEND_CIDADE WHERE CFACLIFO_VEND_CIDADE.CODIGO_FUN = " + funcoes.getValorXml("CodigoUsuario") + "))";
+                            "LEFT OUTER JOIN CFACLIFO ON (CFAENDER.ID_CFACLIFO = CFACLIFO.ID_CFACLIFO) \n";
+
+            // Checa se o tipo de funcionario eh vendedor interno, se sim entao as cidades de todo os clientes do vendedor
+            /*if ((!tipoFuncionario.equalsIgnoreCase(funcoes.NAO_ENCONTRADO)) && (tipoFuncionario.contains("2"))) {
+                sqlQuery += "WHERE (CFAENDER.ID_CFACIDAD IS NOT NULL) AND  (CFACLIFO.CLIENTE = '1') AND (CFACLIFO.CODIGO_CLI IS NOT NULL) \n";
+            } else {*/
+            sqlQuery +=
+                    "LEFT OUTER JOIN CFAPARAM ON (CFACLIFO.ID_CFACLIFO = CFAPARAM.ID_CFACLIFO) \n" +
+                    "WHERE (CFAENDER.ID_CFACIDAD IS NOT NULL) AND (CFAPARAM.ID_CFACLIFO_VENDE = (SELECT CFACLIFO_VEND_CIDADE.ID_CFACLIFO FROM CFACLIFO CFACLIFO_VEND_CIDADE WHERE CFACLIFO_VEND_CIDADE.CODIGO_FUN = " + funcoes.getValorXml("CodigoUsuario") + ")) \n";
             Gson gson = new Gson();
             String whereDatas = "";
 
             if ((ultimaData != null) && (!ultimaData.isEmpty())) {
                 whereDatas += "(CFACIDAD.DT_ALT >= '" + ultimaData + "') ";
 
-                // CHECA SE TEVE ALGUMA ALTERACAO NA TABELA PARAM
                 if ((ultimaDataParam != null) && (!ultimaDataParam.isEmpty())) {
                     if ((!whereDatas.isEmpty()) && (whereDatas.length() > 5)) {
                         whereDatas += " OR ";
@@ -4641,7 +4625,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                     JsonObject pageRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_PAGE_RETORNO);
 
-                    if ( (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0) ) {
+                    if ((pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0)) {
                         final int totalPages = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt();
                         int pageNumber = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_PAGE_NUMBER_RETORNO).getAsInt();
 
@@ -4732,7 +4716,8 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                                 dadosCidade.put("DESCRICAO", cidadeRetorno.get("descricao").getAsString());
 
 
-                                            if (dadosCidade.size() > 0) listaDadosStatus.add(dadosCidade);
+                                            if (dadosCidade.size() > 0)
+                                                listaDadosStatus.add(dadosCidade);
                                         }
                                         CidadeSql cidadeSql = new CidadeSql(context);
 
@@ -4838,7 +4823,21 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             // Pega quando foi a ultima data que recebeu dados
             String ultimaData = pegaUltimaDataAtualizacao("CFACLIFO");
             String ultimaDataParam = pegaUltimaDataAtualizacao("CFAPARAM");
+            String idClifoVista = funcoes.getValorXml(funcoes.TAG_ID_CFACLIFO_VISTA);
 
+            //String tipoFuncionario = funcoes.getValorXml(funcoes.TAG_TIPO_FUNCIONARIO);
+
+            String parametrosWebservice = "";
+
+            // Checa se o tipo de funcionario eh vendedor interno, se sim entao pega todos os clientes
+            /*if ( (!tipoFuncionario.equalsIgnoreCase(funcoes.NAO_ENCONTRADO)) && (tipoFuncionario.contains("2")) ){
+
+                parametrosWebservice += "&where= (CFACLIFO.CLIENTE = '1' AND CFACLIFO.CODIGO_CLI IS NOT NULL) ";
+                // Checa se ja foi feito um busca dos dados
+                if ((ultimaData != null) && (!ultimaData.isEmpty())) {
+                    parametrosWebservice += " AND (DT_ALT >= '" + ultimaData + "')";
+                }
+            }*/
             String filtraClientePorParametro =
                     "SELECT CFAPARAM.ID_CFACLIFO FROM CFAPARAM WHERE (CFAPARAM.ID_SMAEMPRE = " + funcoes.getValorXml(funcoes.TAG_CODIGO_EMPRESA) + ") AND \n" +
                             "(CFAPARAM.ID_CFACLIFO_VENDE = (SELECT CLIFO_VENDE.ID_CFACLIFO FROM CFACLIFO CLIFO_VENDE WHERE CLIFO_VENDE.CODIGO_FUN = " + funcoes.getValorXml(funcoes.TAG_CODIGO_USUARIO) + "))  \n";
@@ -4854,9 +4853,11 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                     "((CFACLIFO.ID_CFACLIFO IN \n" +
                             "(" + filtraClientePorParametro + " ) " +
                             ") \n" +
-                            "OR ( (CFACLIFO.NOME_RAZAO LIKE '%CONS%FIN%') " + ((ultimaData != null && !ultimaData.isEmpty()) ? " AND (CFACLIFO.DT_ALT >= '" + ultimaData + "')" : "") + " ))";
+                            "OR ( (CFACLIFO.NOME_RAZAO LIKE '%CONS%FIN%') " +
+                            ((idClifoVista != null) && (!idClifoVista.equalsIgnoreCase(funcoes.NAO_ENCONTRADO)) ? "OR (CFACLIFO.ID_CFACLIFO = " + idClifoVista + ")" : "") +
+                            ((ultimaData != null && !ultimaData.isEmpty()) ? " AND (CFACLIFO.DT_ALT >= '" + ultimaData + "')" : "") + " ))";
 
-            String parametrosWebservice = "";
+
             if ((ultimaData != null) && (!ultimaData.isEmpty())) {
 
                 parametrosWebservice += "&where= (DT_ALT >= '" + ultimaData + "') AND " + filtraClientePorVendedor;
@@ -4875,7 +4876,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                     JsonObject pageRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_PAGE_RETORNO);
 
-                    if ( (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0) ) {
+                    if ((pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0)) {
                         final int totalPages = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt();
                         int pageNumber = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_PAGE_NUMBER_RETORNO).getAsInt();
 
@@ -4898,7 +4899,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                         }
                                     });
                                 }
-                                // Checa se retornou alguma coisab
+                                // Checa se retornou alguma coisa
                                 if ((retornoWebservice.has(WSSisinfoWebservice.KEY_OBJECT_OBJECT_RETORNO))) {
                                     final JsonArray listaClienteRetorno = retornoWebservice.getAsJsonArray(WSSisinfoWebservice.KEY_OBJECT_OBJECT_RETORNO);
                                     // Checa se retornou algum dados na lista
@@ -4955,14 +4956,24 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                             ContentValues dadosClifo = new ContentValues();
 
                                             dadosClifo.put("ID_CFACLIFO", clienteRetorno.get("idCfaclifo").getAsInt());
-                                            dadosClifo.put("ID_SMAEMPRE", clienteRetorno.get("idSmaempre").getAsInt());
-                                            dadosClifo.put("GUID", clienteRetorno.get("guid").getAsString());
-                                            dadosClifo.put("DT_ALT", clienteRetorno.get("dtAlt").getAsString());
-                                            dadosClifo.put("CPF_CNPJ", clienteRetorno.has("cpfCgc") ? clienteRetorno.get("cpfCgc").getAsString() : "");
+                                            if (clienteRetorno.has("idSmaempre")) {
+                                                dadosClifo.put("ID_SMAEMPRE", clienteRetorno.get("idSmaempre").getAsInt());
+                                            }
+                                            if (clienteRetorno.has("guid")) {
+                                                dadosClifo.put("GUID", clienteRetorno.get("guid").getAsString());
+                                            }
+                                            if (clienteRetorno.has("dtAlt")) {
+                                                dadosClifo.put("DT_ALT", clienteRetorno.get("dtAlt").getAsString());
+                                            }
+                                            if (clienteRetorno.has("cpfCgc")) {
+                                                dadosClifo.put("CPF_CNPJ", clienteRetorno.get("cpfCgc").getAsString());
+                                            }
                                             if (clienteRetorno.has("ieRg")) {
                                                 dadosClifo.put("IE_RG", clienteRetorno.get("ieRg").getAsString());
                                             }
-                                            dadosClifo.put("NOME_RAZAO", clienteRetorno.get("nomeRazao").getAsString());
+                                            if (clienteRetorno.has("nomeRazao")) {
+                                                dadosClifo.put("NOME_RAZAO", clienteRetorno.get("nomeRazao").getAsString());
+                                            }
                                             if (clienteRetorno.has("nomeFantasia")) {
                                                 dadosClifo.put("NOME_FANTASIA", clienteRetorno.get("nomeFantasia").getAsString());
                                             }
@@ -5053,15 +5064,15 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                             if (clienteRetorno.has("outrasRendas")) {
                                                 dadosClifo.put("OUTRAS_RENDAS", clienteRetorno.get("outrasRendas").getAsDouble());
                                             }
-                                            if (clienteRetorno.has("numeroDependenteMaior")) {
-                                                dadosClifo.put("NUM_DEP_MAIOR", clienteRetorno.get("numeroDependenteMaior").getAsInt());
+                                            if (clienteRetorno.has("numDepMaior")) {
+                                                dadosClifo.put("NUM_DEP_MAIOR", clienteRetorno.get("numDepMaior").getAsInt());
                                             }
                                             if (clienteRetorno.has("numDepMenor")) {
                                                 dadosClifo.put("NUM_DEP_MENOR", clienteRetorno.get("numDepMenor").getAsInt());
                                             }
-                                            if (clienteRetorno.has("complementoCargoConj")) {
-                                                dadosClifo.put("COMPLEMENTO_CARGO_CONJ", clienteRetorno.get("complementoCargoConj").getAsString());
-                                            }
+                                            //if (clienteRetorno.has("complementoCargoConj")) {
+                                            //dadosClifo.put("COMPLEMENTO_CARGO_CONJ", clienteRetorno.get("complementoCargoConj"));
+                                            //}
                                             if (clienteRetorno.has("rgConjuge")) {
                                                 dadosClifo.put("RG_CONJUGE", clienteRetorno.get("rgConjuge").getAsString());
                                             }
@@ -5096,19 +5107,15 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                                 dadosClifo.put("DT_RENOVACAO", clienteRetorno.get("dtRenovacao").getAsString());
                                             }
                                             if (clienteRetorno.has("idCfastatu")) {
-                                                //JsonObject status = clienteRetorno.getAsJsonObject("statusPessoa");
                                                 dadosClifo.put("ID_CFASTATU", clienteRetorno.get("idCfastatu").getAsInt());
                                             }
                                             if (clienteRetorno.has("idCfaativi")) {
-                                                //JsonObject ramoAtividade = clienteRetorno.getAsJsonObject("ramoAtividade");
                                                 dadosClifo.put("ID_CFAATIVI", clienteRetorno.get("idCfaativi").getAsInt());
                                             }
                                             if (clienteRetorno.has("idCfatpcli")) {
-                                                //JsonObject tipoClientePessoa = clienteRetorno.getAsJsonObject("tipoClientePessoa");
                                                 dadosClifo.put("ID_CFATPCLI", clienteRetorno.get("idCfatpcli").getAsInt());
                                             }
                                             if (clienteRetorno.has("idCfaprofi")) {
-                                                //JsonObject tipoClientePessoa = clienteRetorno.getAsJsonObject("profissaoPessoa");
                                                 dadosClifo.put("ID_CFAPROFI", clienteRetorno.get("idCfaprofi").getAsInt());
                                             }
                                             if (clienteRetorno.has("idCfaareas")) {
@@ -5233,6 +5240,11 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
         try {
             FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
 
+            //String tipoFuncionario = funcoes.getValorXml(funcoes.TAG_TIPO_FUNCIONARIO);
+
+            // Checa se o tipo de funcionario nao eh vendedor interno, ou seja, eh vendedor externo, entao checa se precisa remover algum cliente
+            //if ( (!tipoFuncionario.equalsIgnoreCase(funcoes.NAO_ENCONTRADO)) && (!tipoFuncionario.contains("2")) ) {
+
             // Cria uma variavel para salvar todos os paramentros em json
             String parametrosWebservice = "";
 
@@ -5260,7 +5272,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                     JsonObject pageRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_PAGE_RETORNO);
 
-                    if ( (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0) ) {
+                    if ((pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0)) {
                         final int totalPages = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt();
                         int pageNumber = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_PAGE_NUMBER_RETORNO).getAsInt();
 
@@ -5380,7 +5392,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                 // Incrementa o total de paginas
                                 pageNumber++;
                                 if (pageNumber < totalPages) {
-                                    retornoWebservice = gson.fromJson(webserviceSisInfo.executarWebserviceJson(servidorAtivo,null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_CFACLIFO, WSSisinfoWebservice.METODO_GET, parametrosWebservice + "&pageNumber=" + pageNumber, null), JsonObject.class);
+                                    retornoWebservice = gson.fromJson(webserviceSisInfo.executarWebserviceJson(servidorAtivo, null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_CFACLIFO, WSSisinfoWebservice.METODO_GET, parametrosWebservice + "&pageNumber=" + pageNumber, null), JsonObject.class);
                                 }
                             } else {
                                 // Cria uma notificacao para ser manipulado
@@ -5391,13 +5403,13 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                 notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
                             }
                         } // Fim do for ia (page)
-                        if ((listaTodosClifo != null) && (listaTodosClifo.size() > 0) ){
+                        if ((listaTodosClifo != null) && (listaTodosClifo.size() > 0)) {
                             PessoaSql pessoaSql = new PessoaSql(context);
 
                             //Cursor listaClifoApp = pessoaSql.query("CLIENTE = '1' AND CODIGO_CLI IS NOT NULL");
                             Cursor listaClifoApp = pessoaSql.query(filtraClientePorVendedor);
 
-                            if ((listaClifoApp != null) & (listaClifoApp.getCount() > 0)){
+                            if ((listaClifoApp != null) & (listaClifoApp.getCount() > 0)) {
 
                                 if (listaTodosClifo.size() != listaClifoApp.getCount()) {
 
@@ -5517,7 +5529,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                     JsonObject pageRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_PAGE_RETORNO);
 
-                    if ( (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0) ) {
+                    if ((pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0)) {
                         final int totalPages = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt();
                         int pageNumber = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_PAGE_NUMBER_RETORNO).getAsInt();
 
@@ -5713,12 +5725,19 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             String ultimaData = pegaUltimaDataAtualizacao("CFAENDER");
             // Cria uma variavel para salvar todos os paramentros em json
             String parametrosWebservice = "";
-            String filtraEnder =
+
+            //String tipoFuncionario = funcoes.getValorXml(funcoes.TAG_TIPO_FUNCIONARIO);
+            String filtraEnder = "";
+
+            // Checa se o tipo de funcionario eh vendedor interno, se sim entao pega todos os clientes
+            /*if ((!tipoFuncionario.equalsIgnoreCase(funcoes.NAO_ENCONTRADO)) && (tipoFuncionario.contains("2"))) {
+                filtraEnder += "(CFAENDER.ID_CFACLIFO IN (SELECT CFACLIFO.ID_CFACLIFO FROM CFACLIFO WHERE CFACLIFO.CLIENTE = '1' AND CFACLIFO.CODIGO_CLI IS NOT NULL)) ";
+            } else {*/
+            filtraEnder =
                     "(CFAENDER.ID_CFACLIFO IN " +
                             "(SELECT CFAPARAM.ID_CFACLIFO FROM CFAPARAM WHERE (CFAPARAM.ID_SMAEMPRE = " + funcoes.getValorXml("CodigoEmpresa") + ")\n" +
                             "AND (CFAPARAM.ID_CFACLIFO_VENDE = " +
                             "(SELECT CLIFO_VENDE.ID_CFACLIFO FROM CFACLIFO CLIFO_VENDE WHERE CLIFO_VENDE.CODIGO_FUN = " + funcoes.getValorXml("CodigoUsuario") + "))))";
-
             Gson gson = new Gson();
             if ((ultimaData != null) && (!ultimaData.isEmpty())) {
 
@@ -5737,7 +5756,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                     JsonObject pageRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_PAGE_RETORNO);
 
-                    if ( (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0) ) {
+                    if ((pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0)) {
                         final int totalPages = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt();
                         int pageNumber = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_PAGE_NUMBER_RETORNO).getAsInt();
 
@@ -5818,7 +5837,9 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                                             dadosEndereco.put("ID_CFAENDER", enderecoRetorno.get("idCfaender").getAsInt());
                                             dadosEndereco.put("DT_ALT", enderecoRetorno.get("dtAlt").getAsString());
-                                            dadosEndereco.put("TIPO", enderecoRetorno.get("tipo").getAsString());
+                                            if (enderecoRetorno.has("tipo")) {
+                                                dadosEndereco.put("TIPO", enderecoRetorno.get("tipo").getAsString());
+                                            }
                                             if (enderecoRetorno.has("idCfaclifo") && enderecoRetorno.get("idCfaclifo").getAsInt() > 0) {
                                                 dadosEndereco.put("ID_CFACLIFO", enderecoRetorno.get("idCfaclifo").getAsInt());
                                             }
@@ -5826,11 +5847,9 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                                 dadosEndereco.put("ID_SMAEMPRE", enderecoRetorno.get("idSmaempre").getAsInt());
                                             }
                                             if (enderecoRetorno.has("idCfaestad")) {
-                                                //JsonObject estado = enderecoRetorno.getAsJsonObject("estadoEndereco");
                                                 dadosEndereco.put("ID_CFAESTAD", enderecoRetorno.get("idCfaestad").getAsInt());
                                             }
                                             if (enderecoRetorno.has("idCfacidad")) {
-                                                //JsonObject cidade = enderecoRetorno.getAsJsonObject("cidadeEndereco");
                                                 dadosEndereco.put("ID_CFACIDAD", enderecoRetorno.get("idCfacidad").getAsInt());
                                             }
                                             if (enderecoRetorno.has("cep")) {
@@ -5973,11 +5992,15 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             String ultimaData = pegaUltimaDataAtualizacao("CFAPARAM");
             // Cria uma variavel para salvar todos os paramentros em json
             String parametrosWebservice = "";
-            String filtraParam =
-                    "(CFAPARAM.ID_SMAEMPRE = " + funcoes.getValorXml(funcoes.TAG_CODIGO_EMPRESA) + ")\n" +
-                            "AND (CFAPARAM.ID_CFACLIFO_VENDE = " +
-                            "(SELECT CLIFO_VENDE.ID_CFACLIFO FROM CFACLIFO CLIFO_VENDE WHERE CLIFO_VENDE.CODIGO_FUN = " + funcoes.getValorXml(funcoes.TAG_CODIGO_USUARIO) + "))";
+            //String tipoFuncionario = funcoes.getValorXml(funcoes.TAG_TIPO_FUNCIONARIO);
+            String filtraParam = "(CFAPARAM.ID_SMAEMPRE = " + funcoes.getValorXml(funcoes.TAG_CODIGO_EMPRESA) + ") \n";
 
+            // Checa se o tipo de funcionario eh vendedor interno, se sim entao pega todos os clientes
+            /*if ((!tipoFuncionario.equalsIgnoreCase(funcoes.NAO_ENCONTRADO)) && (tipoFuncionario.contains("2"))) {
+                filtraParam += "AND (CFAPARAM.ID_CFACLIFO IN (SELECT CFACLIFO.ID_CFACLIFO FROM CFACLIFO WHERE CFACLIFO.CLIENTE = '1' AND CFACLIFO.CODIGO_CLI IS NOT NULL))";
+            } else {*/
+            filtraParam += "AND (CFAPARAM.ID_CFACLIFO_VENDE = " +
+                    "(SELECT CLIFO_VENDE.ID_CFACLIFO FROM CFACLIFO CLIFO_VENDE WHERE CLIFO_VENDE.CODIGO_FUN = " + funcoes.getValorXml(funcoes.TAG_CODIGO_USUARIO) + "))";
             Gson gson = new Gson();
             if ((ultimaData != null) && (!ultimaData.isEmpty())) {
 
@@ -5996,7 +6019,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                     JsonObject pageRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_PAGE_RETORNO);
 
-                    if ( (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0) ) {
+                    if ((pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0)) {
                         final int totalPages = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt();
                         int pageNumber = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_PAGE_NUMBER_RETORNO).getAsInt();
 
@@ -6104,6 +6127,9 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                             if (parametroRetorno.has("frequencia")) {
                                                 dadosParametros.put("FREQUENCIA", parametroRetorno.get("frequencia").getAsString());
                                             }
+                                            if (parametroRetorno.has("posicaoRoteiro")) {
+                                                dadosParametros.put("POSICAO_ROTEIRO", parametroRetorno.get("posicaoRoteiro").getAsString());
+                                            }
                                             if (parametroRetorno.has("diasAtrazo")) {
                                                 dadosParametros.put("DIAS_ATRAZO", parametroRetorno.get("diasAtrazo").getAsString());
                                             }
@@ -6140,7 +6166,9 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                             if (parametroRetorno.has("parcelaEmAberto")) {
                                                 dadosParametros.put("PARCELA_EM_ABERTO", parametroRetorno.get("parcelaEmAberto").getAsString());
                                             }
-                                            if (parametroRetorno.has("capitaliza")) { dadosParametros.put("CAPITALIZA", parametroRetorno.get("capitaliza").getAsString()); }
+                                            if (parametroRetorno.has("capitaliza")) {
+                                                dadosParametros.put("CAPITALIZA", parametroRetorno.get("capitaliza").getAsString());
+                                            }
                                             if (parametroRetorno.has("limite")) {
                                                 dadosParametros.put("LIMITE", parametroRetorno.get("limite").getAsDouble());
                                             }
@@ -6269,7 +6297,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 if (textStatusErro != null) {
                     ((Activity) context).runOnUiThread(new Runnable() {
                         public void run() {
-                            textStatusErro.append("\n*" +context.getResources().getString(R.string.demorar_baixar_fotos));
+                            textStatusErro.append("\n*" + context.getResources().getString(R.string.demorar_baixar_fotos));
                         }
                     });
                 }
@@ -6288,14 +6316,14 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                     int i = 0;
                     for (CfafotosBeans foto : listaFotos) {
 
-                        listaIdFotoNoBanco += ( (i > 0) ? ", " : "");
+                        listaIdFotoNoBanco += ((i > 0) ? ", " : "");
                         listaIdFotoNoBanco += foto.getIdFotos();
                         i++;
                     }
                 }
                 String filtraFotos = "(CFAFOTOS.FOTO IS NOT NULL) AND (CFAFOTOS.ID_AEAPRODU IN (SELECT AEAPRODU.ID_AEAPRODU FROM AEAPRODU WHERE AEAPRODU.ATIVO = '1'))";
                 // Checa se foi lista algum foto ja inserida no banco de dados
-                if ( (listaIdFotoNoBanco != null) && (!listaIdFotoNoBanco.isEmpty()) ){
+                if ((listaIdFotoNoBanco != null) && (!listaIdFotoNoBanco.isEmpty())) {
                     listaIdFotoNoBanco = "(CFAFOTOS.ID_CFAFOTOS NOT IN (" + listaIdFotoNoBanco + "))";
                 }
 
@@ -6303,13 +6331,13 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                     parametrosWebservice += "&where= ((DT_ALT >= '" + ultimaData + "') AND " + filtraFotos + ") ";
 
-                    if ( (listaIdFotoNoBanco != null) && (!listaIdFotoNoBanco.isEmpty()) ){
+                    if ((listaIdFotoNoBanco != null) && (!listaIdFotoNoBanco.isEmpty())) {
                         parametrosWebservice += " OR (" + filtraFotos + " AND " + listaIdFotoNoBanco + ")";
                     }
                 } else {
                     parametrosWebservice += "&where= " + filtraFotos;
 
-                    if ( (listaIdFotoNoBanco != null) && (!listaIdFotoNoBanco.isEmpty()) ){
+                    if ((listaIdFotoNoBanco != null) && (!listaIdFotoNoBanco.isEmpty())) {
                         parametrosWebservice += " AND " + listaIdFotoNoBanco;
                     }
                 }
@@ -6327,10 +6355,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                         JsonObject pageRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_PAGE_RETORNO);
 
-                        if ( (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0) ) {
+                        if ((pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0)) {
                             final int totalPages = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt();
                             int pageNumber = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_PAGE_NUMBER_RETORNO).getAsInt();
-                            if (pageNumber == 15){
+                            if (pageNumber == 15) {
                                 Integer valueInt = pageNumber;
                             }
                             for (int ia = pageNumber; ia < totalPages; ia++) {
@@ -6437,7 +6465,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                                     }
                                                     //listaDadosFotos.add(dadosFotos);
 
-                                                    if (fotosSql.insertOrReplace(dadosFotos) < 1){
+                                                    if (fotosSql.insertOrReplace(dadosFotos) < 1) {
                                                         if (textStatusErro != null) {
                                                             ((Activity) context).runOnUiThread(new Runnable() {
                                                                 public void run() {
@@ -6527,7 +6555,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 });
             }
             bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.importar_dados_recebidos))
-                        .bigText("ImportarDadosFotos - " + e.getMessage());
+                    .bigText("ImportarDadosFotos - " + e.getMessage());
             mBuilder.setStyle(bigTextStyle)
                     .setProgress(0, 0, false);
             notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
@@ -6575,7 +6603,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             // Cria uma variavel para salvar todos os paramentros em json
             String parametrosWebservice = "";
             String filtraPlanoPagamento =
-                    "(AEAPLPGT.ID_SMAEMPRE = " + funcoes.getValorXml(funcoes.TAG_CODIGO_EMPRESA) +") AND (AEAPLPGT.ATIVO = '1') AND (AEAPLPGT.ENVIA_PALM = '1')";
+                    "(AEAPLPGT.ID_SMAEMPRE = " + funcoes.getValorXml(funcoes.TAG_CODIGO_EMPRESA) + ") AND (AEAPLPGT.ATIVO = '1') AND (AEAPLPGT.ENVIA_PALM = '1')";
 
             Gson gson = new Gson();
             if ((ultimaData != null) && (!ultimaData.isEmpty())) {
@@ -6595,7 +6623,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                     JsonObject pageRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_PAGE_RETORNO);
 
-                    if ( (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0) ) {
+                    if ((pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0)) {
                         final int totalPages = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt();
                         int pageNumber = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_PAGE_NUMBER_RETORNO).getAsInt();
 
@@ -6859,7 +6887,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                     JsonObject pageRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_PAGE_RETORNO);
 
-                    if ( (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0) ) {
+                    if ((pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0)) {
                         final int totalPages = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt();
                         int pageNumber = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_PAGE_NUMBER_RETORNO).getAsInt();
 
@@ -7068,7 +7096,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                     JsonObject pageRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_PAGE_RETORNO);
 
-                    if ( (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0) ) {
+                    if ((pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0)) {
                         final int totalPages = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt();
                         int pageNumber = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_PAGE_NUMBER_RETORNO).getAsInt();
 
@@ -7274,7 +7302,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                     JsonObject pageRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_PAGE_RETORNO);
 
-                    if ( (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0) ) {
+                    if ((pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0)) {
                         final int totalPages = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt();
                         int pageNumber = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_PAGE_NUMBER_RETORNO).getAsInt();
 
@@ -7478,7 +7506,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                     JsonObject pageRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_PAGE_RETORNO);
 
-                    if ( (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0) ) {
+                    if ((pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0)) {
                         final int totalPages = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt();
                         int pageNumber = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_PAGE_NUMBER_RETORNO).getAsInt();
 
@@ -7681,7 +7709,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                     JsonObject pageRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_PAGE_RETORNO);
 
-                    if ( (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0) ) {
+                    if ((pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0)) {
                         final int totalPages = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt();
                         int pageNumber = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_PAGE_NUMBER_RETORNO).getAsInt();
 
@@ -7887,7 +7915,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                     JsonObject pageRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_PAGE_RETORNO);
 
-                    if ( (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0) ) {
+                    if ((pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0)) {
                         final int totalPages = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt();
                         int pageNumber = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_PAGE_NUMBER_RETORNO).getAsInt();
 
@@ -8100,7 +8128,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                     JsonObject pageRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_PAGE_RETORNO);
 
-                    if ( (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0) ) {
+                    if ((pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0)) {
                         final int totalPages = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt();
                         int pageNumber = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_PAGE_NUMBER_RETORNO).getAsInt();
 
@@ -8204,6 +8232,9 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                             dadosProduto.put("DESCRICAO", produtoRetorno.get("descricao").getAsString());
                                             if (produtoRetorno.has("descricaoAuxiliar")) {
                                                 dadosProduto.put("DESCRICAO_AUXILIAR", produtoRetorno.get("descricaoAuxiliar").getAsString());
+                                            }
+                                            if (produtoRetorno.has("codigo")) {
+                                                dadosProduto.put("CODIGO", produtoRetorno.get("codigo").getAsInt());
                                             }
                                             dadosProduto.put("CODIGO_ESTRUTURAL", produtoRetorno.get("codigoEstrutural").getAsString());
                                             if (produtoRetorno.has("referencia")) {
@@ -8346,7 +8377,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                     JsonObject pageRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_PAGE_RETORNO);
 
-                    if ( (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0) ) {
+                    if ((pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0)) {
                         final int totalPages = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt();
                         int pageNumber = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_PAGE_NUMBER_RETORNO).getAsInt();
 
@@ -8578,7 +8609,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                     JsonObject pageRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_PAGE_RETORNO);
 
-                    if ( (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0) ) {
+                    if ((pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0)) {
                         final int totalPages = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt();
                         int pageNumber = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_PAGE_NUMBER_RETORNO).getAsInt();
 
@@ -8817,7 +8848,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                     JsonObject pageRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_PAGE_RETORNO);
 
-                    if ( (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0) ) {
+                    if ((pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0)) {
 
                         final int totalPages = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt();
                         int pageNumber = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_PAGE_NUMBER_RETORNO).getAsInt();
@@ -9092,7 +9123,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                     JsonObject pageRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_PAGE_RETORNO);
 
-                    if ( (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0) ) {
+                    if ((pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0)) {
                         final int totalPages = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt();
                         int pageNumber = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_PAGE_NUMBER_RETORNO).getAsInt();
 
@@ -9305,7 +9336,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                     JsonObject pageRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_PAGE_RETORNO);
 
-                    if ( (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0) ) {
+                    if ((pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0)) {
                         final int totalPages = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt();
                         int pageNumber = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_PAGE_NUMBER_RETORNO).getAsInt();
 
@@ -9515,7 +9546,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                     JsonObject pageRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_PAGE_RETORNO);
 
-                    if ( (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0) ) {
+                    if ((pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0)) {
                         final int totalPages = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt();
                         int pageNumber = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_PAGE_NUMBER_RETORNO).getAsInt();
 
@@ -9736,13 +9767,13 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             List<OrcamentoBeans> listaOrcamento = new ArrayList<OrcamentoBeans>();
 
             OrcamentoRotinas orcamentoRotinas = new OrcamentoRotinas(context);
-            String [] listaTipo = new String[]{ OrcamentoRotinas.PEDIDO_ENVIADO,
+            String[] listaTipo = new String[]{OrcamentoRotinas.PEDIDO_ENVIADO,
                     OrcamentoRotinas.PEDIDO_RETORNADO_BLOQUEADO,
                     OrcamentoRotinas.PEDIDO_RETORNADO_LIBERADO};
 
             listaOrcamento = orcamentoRotinas.listaOrcamentoPedido(listaTipo, null, OrcamentoRotinas.ORDEM_DECRESCENTE);
 
-            if ( (listaOrcamento != null) && (listaOrcamento.size() > 0) ) {
+            if ((listaOrcamento != null) && (listaOrcamento.size() > 0)) {
                 String whereGuidOrcamento = "(GUID IN (";
                 int controle = 0;
                 for (OrcamentoBeans orcamento : listaOrcamento) {
@@ -9761,7 +9792,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 }
                 Gson gson = new Gson();
                 WSSisinfoWebservice webserviceSisInfo = new WSSisinfoWebservice(context);
-                JsonObject retornoWebservice = gson.fromJson(webserviceSisInfo.executarWebserviceJson(servidorAtivo,null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEAORCAM, WSSisinfoWebservice.METODO_GET, parametrosWebservice, null), JsonObject.class);
+                JsonObject retornoWebservice = gson.fromJson(webserviceSisInfo.executarWebserviceJson(servidorAtivo, null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEAORCAM, WSSisinfoWebservice.METODO_GET, parametrosWebservice, null), JsonObject.class);
 
                 if ((retornoWebservice != null) && (retornoWebservice.has(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO))) {
                     statuRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO);
@@ -9771,7 +9802,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                         JsonObject pageRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_PAGE_RETORNO);
 
-                        if ( (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0) ) {
+                        if ((pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0)) {
                             final int totalPages = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt();
                             int pageNumber = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_PAGE_NUMBER_RETORNO).getAsInt();
 
@@ -9865,7 +9896,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                                 if (pedidoRetorno.has("idCfatpdoc") && pedidoRetorno.get("idCfatpdoc").getAsInt() > 0) {
                                                     dadosOrcamento.put("ID_CFATPDOC", pedidoRetorno.get("idCfatpdoc").getAsInt());
                                                 }
-                                                if ( (pedidoRetorno.has("numero")) && (pedidoRetorno.get("numero").getAsInt() > 0) ) {
+                                                if ((pedidoRetorno.has("numero")) && (pedidoRetorno.get("numero").getAsInt() > 0)) {
                                                     dadosOrcamento.put("NUMERO", pedidoRetorno.get("numero").getAsInt());
                                                 }
                                                 if (pedidoRetorno.has("vlFrete")) {
@@ -9971,7 +10002,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                                     }
                                                 }
                                                 for (int j = 0; j < listaOrcamento.size(); j++) {
-                                                    if (listaOrcamento.get(j).getGuid().equalsIgnoreCase(pedidoRetorno.get("guid").getAsString())){
+                                                    if (listaOrcamento.get(j).getGuid().equalsIgnoreCase(pedidoRetorno.get("guid").getAsString())) {
                                                         listaOrcamento.remove(j);
                                                         break;
                                                     }
@@ -10019,7 +10050,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                     // Incrementa o total de paginas
                                     pageNumber++;
                                     if (pageNumber < totalPages) {
-                                        retornoWebservice = gson.fromJson(webserviceSisInfo.executarWebserviceJson(servidorAtivo,null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEAORCAM, WSSisinfoWebservice.METODO_GET, parametrosWebservice + "&pageNumber=" + pageNumber, null), JsonObject.class);
+                                        retornoWebservice = gson.fromJson(webserviceSisInfo.executarWebserviceJson(servidorAtivo, null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEAORCAM, WSSisinfoWebservice.METODO_GET, parametrosWebservice + "&pageNumber=" + pageNumber, null), JsonObject.class);
                                     }
                                 } else {
                                     todosSucesso = false;
@@ -10079,7 +10110,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                     .build();*/
 
             bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.importar_dados_recebidos))
-                        .bigText("ImportaDadosOrcamento - " + e.getMessage());
+                    .bigText("ImportaDadosOrcamento - " + e.getMessage());
             mBuilder.setStyle(bigTextStyle)
                     .setProgress(0, 0, false);
             notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
@@ -10126,12 +10157,12 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
             List<OrcamentoBeans> listaOrcamento = new ArrayList<OrcamentoBeans>();
 
-            if ((listaPedidosDispositivo != null) && (listaPedidosDispositivo.size() > 0)){
+            if ((listaPedidosDispositivo != null) && (listaPedidosDispositivo.size() > 0)) {
                 listaOrcamento = listaPedidosDispositivo;
 
-            } else if(listaPedidosDispositivo == null) {
+            } else if (listaPedidosDispositivo == null) {
                 OrcamentoRotinas orcamentoRotinas = new OrcamentoRotinas(context);
-                String[] listaTipo = new String[]{  OrcamentoRotinas.PEDIDO_ENVIADO,
+                String[] listaTipo = new String[]{OrcamentoRotinas.PEDIDO_ENVIADO,
                         OrcamentoRotinas.PEDIDO_RETORNADO_BLOQUEADO,
                         OrcamentoRotinas.PEDIDO_RETORNADO_LIBERADO};
 
@@ -10140,7 +10171,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
             String whereGuidOrcamento = "";
 
-            if ( (listaOrcamento != null) && (listaOrcamento.size() > 0) ) {
+            if ((listaOrcamento != null) && (listaOrcamento.size() > 0)) {
                 whereGuidOrcamento = "( (SERIE_ORC = (SELECT AEASERIE.CODIGO FROM SMAEMPRE, AEASERIE WHERE (SMAEMPRE.ID_AEASERIE_ORC_PALM = AEASERIE.ID_AEASERIE) " +
                         "AND (SMAEMPRE.ID_SMAEMPRE = " + funcoes.getValorXml("CodigoEmpresa") + "))) AND " +
                         "(NUMERO_ORC IN (";
@@ -10158,9 +10189,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             if ((ultimaData != null) && (!ultimaData.isEmpty())) {
                 parametrosWebservice += "&where=  ( (DT_ALT >= '" + ultimaData + "' ) AND " +
                         "(AEASAIDA.ID_CFACLIFO_VENDEDOR_INI = (SELECT ID_CFACLIFO FROM CFACLIFO WHERE CFACLIFO.CODIGO_FUN = " + funcoes.getValorXml("CodigoUsuario") + ")) AND " +
-                        "(AEASAIDA.ID_CFACLIFO IS NOT NULL) AND (AEASAIDA.ID_CFACIDAD IS NOT NULL) ) \n";;
+                        "(AEASAIDA.ID_CFACLIFO IS NOT NULL) AND (AEASAIDA.ID_CFACIDAD IS NOT NULL) ) \n";
+                ;
 
-                if (!whereGuidOrcamento.isEmpty()){
+                if (!whereGuidOrcamento.isEmpty()) {
                     parametrosWebservice += " OR ( (DT_ALT >= '" + ultimaData + "') AND " + whereGuidOrcamento + ")";
                 }
             } else if (!whereGuidOrcamento.isEmpty()) {
@@ -10172,7 +10204,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             if (!parametrosWebservice.isEmpty()) {
                 Gson gson = new Gson();
                 WSSisinfoWebservice webserviceSisInfo = new WSSisinfoWebservice(context);
-                JsonObject retornoWebservice = gson.fromJson(webserviceSisInfo.executarWebserviceJson(servidorAtivo,null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEASAIDA, WSSisinfoWebservice.METODO_GET, parametrosWebservice, null), JsonObject.class);
+                JsonObject retornoWebservice = gson.fromJson(webserviceSisInfo.executarWebserviceJson(servidorAtivo, null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEASAIDA, WSSisinfoWebservice.METODO_GET, parametrosWebservice, null), JsonObject.class);
 
                 if ((retornoWebservice != null) && (retornoWebservice.has(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO))) {
                     statuRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO);
@@ -10182,7 +10214,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                         JsonObject pageRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_PAGE_RETORNO);
 
-                        if ( (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0) ) {
+                        if ((pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0)) {
                             final int totalPages = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt();
                             int pageNumber = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_PAGE_NUMBER_RETORNO).getAsInt();
 
@@ -10360,7 +10392,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                                 }
                                                 OrcamentoSql orcamentoSql = new OrcamentoSql(context);
 
-                                                if (orcamentoSql.updateFast(dadosOrcamento, "AEAORCAM.NUMERO = " + pedidoRetorno.get("numeroOrc") ) == 0) {
+                                                if (orcamentoSql.updateFast(dadosOrcamento, "AEAORCAM.NUMERO = " + pedidoRetorno.get("numeroOrc")) == 0) {
 
                                                     if (pedidoRetorno.has("vlMercTabela")) {
                                                         dadosOrcamento.put("VL_TABELA", pedidoRetorno.get("vlMercTabela").getAsDouble());
@@ -10417,7 +10449,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                     // Incrementa o total de paginas
                                     pageNumber++;
                                     if (pageNumber < totalPages) {
-                                        retornoWebservice = gson.fromJson(webserviceSisInfo.executarWebserviceJson(servidorAtivo,null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEASAIDA, WSSisinfoWebservice.METODO_GET, parametrosWebservice + "&pageNumber=" + pageNumber, null), JsonObject.class);
+                                        retornoWebservice = gson.fromJson(webserviceSisInfo.executarWebserviceJson(servidorAtivo, null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEASAIDA, WSSisinfoWebservice.METODO_GET, parametrosWebservice + "&pageNumber=" + pageNumber, null), JsonObject.class);
                                     }
                                 } else {
                                     todosSucesso = false;
@@ -10473,7 +10505,6 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
         }
     }
-
 
 
     private void importarDadosItemOrcamento() {
@@ -10771,7 +10802,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                     JsonObject pageRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_PAGE_RETORNO);
 
-                    if ( (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0) ) {
+                    if ((pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0)) {
                         final int totalPages = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt();
                         int pageNumber = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_PAGE_NUMBER_RETORNO).getAsInt();
 
@@ -11051,7 +11082,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                     JsonObject pageRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_PAGE_RETORNO);
 
-                    if ( (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0) ) {
+                    if ((pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0)) {
                         final int totalPages = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt();
                         int pageNumber = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_PAGE_NUMBER_RETORNO).getAsInt();
 
@@ -11285,7 +11316,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                     JsonObject pageRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_PAGE_RETORNO);
 
-                    if ( (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0) ) {
+                    if ((pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0)) {
                         final int totalPages = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt();
                         int pageNumber = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_PAGE_NUMBER_RETORNO).getAsInt();
 
@@ -11507,7 +11538,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             if ((ultimaData != null) && (!ultimaData.isEmpty())) {
                 parametrosWebservice += "&where= (DT_ALT >= '" + ultimaData + "') AND " + filtroPromocao;
             } else {
-                parametrosWebservice += "&where= " +  filtroPromocao;
+                parametrosWebservice += "&where= " + filtroPromocao;
             }
             WSSisinfoWebservice webserviceSisInfo = new WSSisinfoWebservice(context);
             JsonObject retornoWebservice = gson.fromJson(webserviceSisInfo.executarWebserviceJson(servidorAtivo, null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEATBPRO, WSSisinfoWebservice.METODO_GET, parametrosWebservice, null), JsonObject.class);
@@ -11520,7 +11551,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                     JsonObject pageRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_PAGE_RETORNO);
 
-                    if ( (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0) ) {
+                    if ((pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0)) {
                         final int totalPages = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt();
                         int pageNumber = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_PAGE_NUMBER_RETORNO).getAsInt();
 
@@ -11751,7 +11782,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                     JsonObject pageRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_PAGE_RETORNO);
 
-                    if ( (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0) ) {
+                    if ((pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0)) {
                         final int totalPages = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt();
                         int pageNumber = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_PAGE_NUMBER_RETORNO).getAsInt();
 
@@ -11869,7 +11900,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                 // Incrementa o total de paginas
                                 pageNumber++;
                                 if (pageNumber < totalPages) {
-                                    retornoWebservice = gson.fromJson(webserviceSisInfo.executarWebserviceJson(servidorAtivo,null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEATBPRO, WSSisinfoWebservice.METODO_GET, parametrosWebservice + "&pageNumber=" + pageNumber, null), JsonObject.class);
+                                    retornoWebservice = gson.fromJson(webserviceSisInfo.executarWebserviceJson(servidorAtivo, null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEATBPRO, WSSisinfoWebservice.METODO_GET, parametrosWebservice + "&pageNumber=" + pageNumber, null), JsonObject.class);
                                 }
                             } else {
                                 // Cria uma notificacao para ser manipulado
@@ -11880,13 +11911,13 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                 notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
                             }
                         } // Fim do for ia (page)
-                        if ((listaTodoTabelaPromocao != null) && (listaTodoTabelaPromocao.size() > 0) ){
+                        if ((listaTodoTabelaPromocao != null) && (listaTodoTabelaPromocao.size() > 0)) {
                             TabelaPromocaoSql tabelaPromocaoSql = new TabelaPromocaoSql(context);
 
                             String filtroPromocaoApp = "((DT_INICIO <= (SELECT DATE('NOW'))) AND (DT_FIM >= (SELECT DATE('NOW'))))";
                             Cursor listaTabelaPromocaoApp = tabelaPromocaoSql.query(filtroPromocaoApp);
 
-                            if ((listaTabelaPromocaoApp != null) & (listaTabelaPromocaoApp.getCount() > 0)){
+                            if ((listaTabelaPromocaoApp != null) & (listaTabelaPromocaoApp.getCount() > 0)) {
 
                                 if (listaTodoTabelaPromocao.size() != listaTabelaPromocaoApp.getCount()) {
 
@@ -11907,7 +11938,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                         }
                                     }
                                 }
-                                if (listaTodoTabelaPromocao.size() > listaTabelaPromocaoApp.getCount()){
+                                if (listaTodoTabelaPromocao.size() > listaTabelaPromocaoApp.getCount()) {
                                     // Deleta a ultima data de recebimento da tabela AEAITTBP
                                     UltimaAtualizacaoSql ultimaAtualizacaoSql = new UltimaAtualizacaoSql(context);
                                     ultimaAtualizacaoSql.delete("TABELA = 'AEATBPRO'");
@@ -12013,7 +12044,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                     JsonObject pageRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_PAGE_RETORNO);
 
-                    if ( (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0) ) {
+                    if ((pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0)) {
                         final int totalPages = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt();
                         int pageNumber = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_PAGE_NUMBER_RETORNO).getAsInt();
 
@@ -12280,7 +12311,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                     JsonObject pageRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_PAGE_RETORNO);
 
-                    if ( (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0) ) {
+                    if ((pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0)) {
                         final int totalPages = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt();
                         int pageNumber = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_PAGE_NUMBER_RETORNO).getAsInt();
 
@@ -12398,7 +12429,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                 // Incrementa o total de paginas
                                 pageNumber++;
                                 if (pageNumber < totalPages) {
-                                    retornoWebservice = gson.fromJson(webserviceSisInfo.executarWebserviceJson(servidorAtivo,null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEAITTBP, WSSisinfoWebservice.METODO_GET, parametrosWebservice + "&pageNumber=" + pageNumber, null), JsonObject.class);
+                                    retornoWebservice = gson.fromJson(webserviceSisInfo.executarWebserviceJson(servidorAtivo, null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_AEAITTBP, WSSisinfoWebservice.METODO_GET, parametrosWebservice + "&pageNumber=" + pageNumber, null), JsonObject.class);
                                 }
                             } else {
                                 // Cria uma notificacao para ser manipulado
@@ -12409,13 +12440,13 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                 notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
                             }
                         } // Fim do for ia (page)
-                        if ((listaTodoItemPromocao != null) && (listaTodoItemPromocao.size() > 0) ){
+                        if ((listaTodoItemPromocao != null) && (listaTodoItemPromocao.size() > 0)) {
                             ItemPromocaoSql itemPromocaoSql = new ItemPromocaoSql(context);
 
                             String filtroPromocaoApp = "(ID_AEATBPRO IN (SELECT ID_AEATBPRO FROM AEATBPRO WHERE ((DT_INICIO <= (SELECT DATE('NOW'))) AND (DT_FIM >= (SELECT DATE('NOW'))))))";
                             Cursor listaItemPromocaoApp = itemPromocaoSql.query(filtroPromocaoApp);
 
-                            if ((listaItemPromocaoApp != null) & (listaItemPromocaoApp.getCount() > 0)){
+                            if ((listaItemPromocaoApp != null) & (listaItemPromocaoApp.getCount() > 0)) {
 
                                 if (listaTodoItemPromocao.size() != listaItemPromocaoApp.getCount()) {
 
@@ -12436,7 +12467,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                         }
                                     }
                                 }
-                                if (listaTodoItemPromocao.size() > listaItemPromocaoApp.getCount()){
+                                if (listaTodoItemPromocao.size() > listaItemPromocaoApp.getCount()) {
                                     // Deleta a ultima data de recebimento da tabela AEAITTBP
                                     UltimaAtualizacaoSql ultimaAtualizacaoSql = new UltimaAtualizacaoSql(context);
                                     ultimaAtualizacaoSql.delete("TABELA = 'AEAITTBP'");
@@ -12524,7 +12555,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             //JsonArray parametros = new JsonArray();
             String parametrosWebservice = "";
             String filtroPromocao = "(ID_AEAITTBP IN (SELECT ID_AEAITTBP FROM AEAITTBP WHERE ID_AEATBPRO IN (SELECT ID_AEATBPRO FROM AEATBPRO WHERE " +
-                                    "((DT_INICIO <= (SELECT CAST('NOW' AS DATE) FROM RDB$DATABASE)) AND (DT_FIM >= (SELECT CAST('NOW' AS DATE) FROM RDB$DATABASE))))))";
+                    "((DT_INICIO <= (SELECT CAST('NOW' AS DATE) FROM RDB$DATABASE)) AND (DT_FIM >= (SELECT CAST('NOW' AS DATE) FROM RDB$DATABASE))))))";
 
             Gson gson = new Gson();
             if ((ultimaData != null) && (!ultimaData.isEmpty())) {
@@ -12543,7 +12574,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                     JsonObject pageRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_PAGE_RETORNO);
 
-                    if ( (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0) ) {
+                    if ((pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0)) {
                         final int totalPages = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt();
                         int pageNumber = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_PAGE_NUMBER_RETORNO).getAsInt();
 
@@ -12796,7 +12827,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                     JsonObject pageRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_PAGE_RETORNO);
 
-                    if ( (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0) ) {
+                    if ((pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0)) {
                         final int totalPages = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt();
                         int pageNumber = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_PAGE_NUMBER_RETORNO).getAsInt();
 
@@ -13024,7 +13055,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                     JsonObject pageRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_PAGE_RETORNO);
 
-                    if ( (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0) ) {
+                    if ((pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0)) {
                         final int totalPages = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt();
                         int pageNumber = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_PAGE_NUMBER_RETORNO).getAsInt();
 
@@ -13286,10 +13317,10 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             //String parametrosWebservice = "";
             StringBuilder filtroParcela = new StringBuilder();
             filtroParcela.append("SELECT RPAPARCE.ID_RPAPARCE FROM RPAPARCE WHERE (RPAPARCE.ID_CFACLIFO IN (SELECT CFACLIFO.ID_CFACLIFO FROM CFACLIFO WHERE CFACLIFO.ID_CFACLIFO IN \n");
-            filtroParcela.append("(SELECT CFAPARAM.ID_CFACLIFO FROM CFAPARAM WHERE CFAPARAM.ID_CFACLIFO_VENDE = \n" );
+            filtroParcela.append("(SELECT CFAPARAM.ID_CFACLIFO FROM CFAPARAM WHERE CFAPARAM.ID_CFACLIFO_VENDE = \n");
             filtroParcela.append("(SELECT CLIFO_VENDE.ID_CFACLIFO FROM CFACLIFO CLIFO_VENDE WHERE CLIFO_VENDE.CODIGO_FUN = " + funcoes.getValorXml("CodigoUsuario") + "))))");
 
-            if ((ultimaDataParcela != null) && (!ultimaDataParcela.isEmpty())){
+            if ((ultimaDataParcela != null) && (!ultimaDataParcela.isEmpty())) {
                 filtroParcela.append(" AND (RPAPARCE.DT_ALT >= '").append(ultimaDataParcela).append("')");
             } else {
                 filtroParcela.append(" AND (RPAPARCE.DT_BAIXA IS NULL)");
@@ -13316,7 +13347,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                     JsonObject pageRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_PAGE_RETORNO);
 
-                    if ( (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0) ) {
+                    if ((pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0)) {
                         final int totalPages = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt();
                         int pageNumber = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_PAGE_NUMBER_RETORNO).getAsInt();
 
@@ -13470,7 +13501,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                 // Incrementa o total de paginas
                                 pageNumber++;
                                 if (pageNumber < totalPages) {
-                                    retornoWebservice = gson.fromJson(webserviceSisInfo.executarWebserviceJson(servidorAtivo, null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_RPALCPAR, WSSisinfoWebservice.METODO_GET, filtroLancamento.toString()+ "&pageNumber=" + pageNumber, null), JsonObject.class);
+                                    retornoWebservice = gson.fromJson(webserviceSisInfo.executarWebserviceJson(servidorAtivo, null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_RPALCPAR, WSSisinfoWebservice.METODO_GET, filtroLancamento.toString() + "&pageNumber=" + pageNumber, null), JsonObject.class);
                                 }
                             } else {
                                 todosSucesso = false;
@@ -13563,7 +13594,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
 
                     JsonObject pageRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_PAGE_RETORNO);
 
-                    if ( (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0) ) {
+                    if ((pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt() >= 0) && (pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_ELEMENTS).getAsInt() > 0)) {
                         final int totalPages = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_TOTAL_PAGES_RETORNO).getAsInt();
                         int pageNumber = pageRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_PAGE_NUMBER_RETORNO).getAsInt();
 
@@ -13644,20 +13675,20 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                             dadosVersao.put("ID_RPAPARCE", versaoRetorno.get("idRpaparce").getAsInt());
                                             if (versaoRetorno.has("numeroVersao") && versaoRetorno.get("numeroVersao").getAsInt() > 0) {
                                                 // Checa se tem alguma versao nova
-                                                if (versaoRetorno.get("numeroVersao").getAsInt() > funcoes.getNumeroVersaoAplicacao() ){
+                                                if (versaoRetorno.get("numeroVersao").getAsInt() > funcoes.getNumeroVersaoAplicacao()) {
 
                                                     //String destination = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS) + "/";
                                                     File pastaTemp = new File(Environment.getExternalStorageDirectory() + "/SAVARE/TEMP");
                                                     String nomeArquivo = "";
 
-                                                    if (versaoRetorno.has("programa")){
-                                                        nomeArquivo += versaoRetorno.get("programa").getAsString().replaceAll("[^a-zA-Z0-9]+","");
-                                                    }else {
+                                                    if (versaoRetorno.has("programa")) {
+                                                        nomeArquivo += versaoRetorno.get("programa").getAsString().replaceAll("[^a-zA-Z0-9]+", "");
+                                                    } else {
                                                         nomeArquivo += "SAVARE";
                                                     }
                                                     nomeArquivo += versaoRetorno.get("numeroVersao").getAsInt();
 
-                                                    if(!pastaTemp.exists()){
+                                                    if (!pastaTemp.exists()) {
                                                         pastaTemp.mkdirs();
                                                     }
                                                     URL url = new URL(versaoRetorno.get("urlArquivo").getAsString());

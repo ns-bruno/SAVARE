@@ -104,20 +104,20 @@ public class FuncoesPersonalizadas {
 							   TAG_IMAGEM_PRODUTO = "ImagemProduto",
 							   TAG_EMPRESA_ATIVA = "EmpresaAtiva",
 							   TAG_CODIGO_USUARIO = "CodigoUsuario",
+							   TAG_TIPO_FUNCIONARIO = "TipoFuncionario",
 							   TAG_USUARIO = "Usuario",
 							   TAG_SENHA_USUARIO = "SenhaUsuario",
 							   TAG_ABRIU_PRIMEIRA_VEZ = "AbriuAppPriveiraVez",
 							   TAG_CNPJ_EMPRESA = "CnpjEmpresa",
 							   TAG_CODIGO_EMPRESA = "CodigoEmpresa",
+							   TAG_ID_CFACLIFO_VISTA = "ID_CFACLIFO_VISTA",
 							   TAG_CHAVE_FUNCIONARIO = "ChaveFuncionario",
 							   TAG_SALVA_PEDIDO_PDF = "SalvaPedidoPdf",
 							   TAG_DESCRICAO_DISPOSITIVO = "DescricaoDispositivo",
 							   TAG_UUID_DISPOSITIVO = "UuidDispositivo",
 							   TAG_PESQUISA_PRODUTO_ESTOQUE = "PesquisaProdutoComEstoque";
 	public static final String SIM = "S", NAO = "N";
-	public static final String ENVIAR_ORCAMENTO_SAVARE = "ENVIAR_ORCAMENTO_SAVARE";
-	public static final String RECEBER_DADOS_SAVARE = "RECEBER_DADOS_SAVARE";
-	public static final String ENVIAR_OUTROS_DADOS_SAVARE = "ENVIAR_OUTROS_DADOS_SAVARE";
+	public static final String NOTIFICATION_FILE = "FileNotification";
 	public static final int MILISEGUNDOS = 0,
 							SEGUNDOS = 1,
 							MINUTOS = 2,
@@ -1232,12 +1232,11 @@ public class FuncoesPersonalizadas {
 
 	public boolean checaVersao(){
 		boolean valido = true;
-        String name = "FileNotification";
 
         notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
 
-            NotificationChannel mChannel = new NotificationChannel(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_CHANNEL, name, NotificationManager.IMPORTANCE_MIN);
+            NotificationChannel mChannel = new NotificationChannel(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_CHANNEL, NOTIFICATION_FILE, NotificationManager.IMPORTANCE_MIN);
             mChannel.setDescription(context.getResources().getString(R.string.importar_dados_recebidos));
             mChannel.enableLights(true);
             mChannel.setLightColor(Color.BLUE);

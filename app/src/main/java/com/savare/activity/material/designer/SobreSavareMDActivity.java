@@ -50,6 +50,26 @@ public class SobreSavareMDActivity extends AppCompatActivity {
         descricao.setTextoSecundario(getResources().getString(R.string.dispositivo));
         listaDetalhes.add(descricao);
 
+        descricao = new DescricaoDublaBeans();
+        descricao.setTextoPrincipal(funcoes.getValorXml(funcoes.TAG_CODIGO_EMPRESA));
+        descricao.setTextoSecundario(getResources().getString(R.string.codigo_empresa));
+        listaDetalhes.add(descricao);
+
+        descricao = new DescricaoDublaBeans();
+        descricao.setTextoPrincipal(funcoes.getValorXml(funcoes.TAG_CNPJ_EMPRESA));
+        descricao.setTextoSecundario(getResources().getString(R.string.cnpj_cpf));
+        listaDetalhes.add(descricao);
+
+        descricao = new DescricaoDublaBeans();
+        descricao.setTextoPrincipal(funcoes.getValorXml(funcoes.TAG_CODIGO_USUARIO));
+        descricao.setTextoSecundario(getResources().getString(R.string.codigo_vendedor));
+        listaDetalhes.add(descricao);
+
+        descricao = new DescricaoDublaBeans();
+        descricao.setTextoPrincipal(funcoes.getValorXml(funcoes.TAG_TIPO_FUNCIONARIO));
+        descricao.setTextoSecundario(getResources().getString(R.string.tipo_funcionario));
+        listaDetalhes.add(descricao);
+
         // Seta o adapter com a nova lista
         ItemUniversalAdapter adapterListaDetalhes = new ItemUniversalAdapter(getApplicationContext(), ItemUniversalAdapter.DETALHES_PRODUTOS);
         // Preenche o adapter com a lista de orcamento

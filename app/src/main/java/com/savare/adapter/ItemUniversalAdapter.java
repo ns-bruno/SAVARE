@@ -30,6 +30,7 @@ import com.savare.beans.AeaproduBeans;
 import com.savare.beans.AeaunvenBeans;
 import com.savare.beans.AreaBeans;
 import com.savare.beans.CfafotosBeans;
+import com.savare.beans.CfapositBeans;
 import com.savare.beans.CidadeBeans;
 import com.savare.beans.CriticaOrcamentoBeans;
 import com.savare.beans.DescricaoDublaBeans;
@@ -49,6 +50,7 @@ import com.savare.beans.StatusBeans;
 import com.savare.beans.TelefoneBeans;
 import com.savare.beans.TipoClienteBeans;
 import com.savare.beans.TipoDocumentoBeans;
+import com.savare.beans.UltimaAtualizacaoBeans;
 import com.savare.funcoes.FuncoesPersonalizadas;
 import com.savare.funcoes.rotinas.AeamarcaRotinas;
 import com.savare.funcoes.rotinas.AeaunvenRotinas;
@@ -87,7 +89,9 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 							CLIENTE = 22,
 							HISTORICO_PRECO_ITEM_ORCAMENTO = 23,
 							CRITICA_ORCAMENTO = 24,
-							SERVIDORES = 25;
+							SERVIDORES = 25,
+							POSITIVACAO = 26,
+							ULTIMA_ATUALIZACAO = 27;
 	private Context context;
 	private int tipoItem, diasProdutoNovo;
 	private int campoAtualProduto = -1;
@@ -113,6 +117,8 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 	private List<PessoaBeans> listaPessoa;
 	private List<CriticaOrcamentoBeans> listaCriticaOrcamento;
 	private List<ServidoresBeans> listaServidores;
+	private List<CfapositBeans> listaCfaposit;
+	private List<UltimaAtualizacaoBeans> listaUltimaAtualizacao;
 	private FuncoesPersonalizadas funcoes;
 	
 	/**
@@ -383,13 +389,6 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 	}
 	
 	/**
-	 * @return the listaEstado
-	 */
-	public List<EstadoBeans> getListaEstado() {
-		return listaEstado;
-	}
-
-	/**
 	 * @param listaEstado the listaEstado to set
 	 */
 	public void setListaEstado(List<EstadoBeans> listaEstado) {
@@ -411,44 +410,19 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 	}
 	
 	/**
-	 * @return the listaTelefone
-	 */
-	public List<TelefoneBeans> getListaTelefone() {
-		return listaTelefone;
-	}
-
-	/**
 	 * @param listaTelefone the listaTelefone to set
 	 */
 	public void setListaTelefone(List<TelefoneBeans> listaTelefone) {
 		this.listaTelefone = listaTelefone;
 	}
 
-	public List<StatusBeans> getListaStatus() {
-		return listaStatus;
-	}
-
 	public void setListaStatus(List<StatusBeans> listaStatus) {
 		this.listaStatus = listaStatus;
-	}
-
-	public List<AreaBeans> getListaArea() {
-		return listaArea;
 	}
 
 	public void setListaArea(List<AreaBeans> listaArea) {
 		this.listaArea = listaArea;
 	}
-
-	public List<PessoaBeans> getListaPessoa() {
-		return listaPessoa;
-	}
-
-	public void setListaPessoa(List<PessoaBeans> listaPessoa) {
-		this.listaPessoa = listaPessoa;
-	}
-
-	public List<CriticaOrcamentoBeans> getListaCriticaOrcamento() {return listaCriticaOrcamento; }
 
 	public void setListaCriticaOrcamento(List<CriticaOrcamentoBeans> listaCriticaOrcamento) {this.listaCriticaOrcamento = listaCriticaOrcamento;}
 
@@ -458,6 +432,14 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 
 	public void setListaServidores(List<ServidoresBeans> listaServidores) {
 		this.listaServidores = listaServidores;
+	}
+
+	public void setListaCfaposit(List<CfapositBeans> listaCfaposit) {
+		this.listaCfaposit = listaCfaposit;
+	}
+
+	public void setListaUltimaAtualizacao(List<UltimaAtualizacaoBeans> listaUltimaAtualizacao) {
+		this.listaUltimaAtualizacao = listaUltimaAtualizacao;
 	}
 
 	@Override
@@ -542,6 +524,12 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 		} else if (this.tipoItem == SERVIDORES){
 
 			return this.listaServidores.size();
+		} else if (this.tipoItem == POSITIVACAO){
+
+			return this.listaCfaposit.size();
+		} else if (this.tipoItem == ULTIMA_ATUALIZACAO){
+
+			return this.listaUltimaAtualizacao.size();
 		} else{
 			return 0;
 		}
@@ -634,6 +622,14 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 
 			return this.listaServidores.get(position);
 
+		} else if (this.tipoItem == POSITIVACAO){
+
+			return this.listaCfaposit.get(position);
+
+		} else if (this.tipoItem == ULTIMA_ATUALIZACAO){
+
+			return this.listaUltimaAtualizacao.get(position);
+
 		} else {
 			return null;
 		}
@@ -714,6 +710,12 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 		} else if (this.tipoItem == SERVIDORES){
 
 			return this.listaServidores.get(position).getIdServidores();
+		} else if (this.tipoItem == POSITIVACAO){
+
+			return this.listaCfaposit.get(position).getIdCfaposit();
+		} else if (this.tipoItem == ULTIMA_ATUALIZACAO){
+
+			return this.listaUltimaAtualizacao.get(position).getIdUltimaAtualizacao();
 		} else {
 			return position;
 		}
@@ -1674,6 +1676,46 @@ public class ItemUniversalAdapter extends BaseAdapter implements Filterable, OnI
 
 			textAbaixoDescricaoDireita.setVisibility(View.INVISIBLE);
 			textBottonEsquerdoDois.setVisibility(View.INVISIBLE);
+			viewTopo.setVisibility(View.INVISIBLE);
+			viewRodape.setVisibility(View.INVISIBLE);
+
+		} else if (this.tipoItem == POSITIVACAO){
+			CfapositBeans cfaposit = listaCfaposit.get(position);
+
+			textDescricao.setText(cfaposit.getPessoaBeans().getNomeRazao() + " (" + ( cfaposit.getPessoaBeans().getNomeFantasia() != null ? cfaposit.getPessoaBeans().getNomeFantasia() : " " ) + ")");
+			textAbaixoDescricaoEsqueda.setText("Cód. Cli.: " + cfaposit.getPessoaBeans().getCodigoCliente());
+			textAbaixoDescricaoDireita.setText(cfaposit.getPessoaBeans().getCpfCnpj());
+			textBottonEsquerdo.setText(funcoes.formataData(cfaposit.getDataVisita()) + " - ");
+			textBottonEsquerdoDois.setText(funcoes.arredondarValor(cfaposit.getValor()));
+
+			if (cfaposit.getStatus().equalsIgnoreCase("0")) {
+				textBottonDireito.setText("Visitou e Comprou");
+			} else if (cfaposit.getStatus().equalsIgnoreCase("1")) {
+				textBottonDireito.setText("Visitou, mas, Não Comprou");
+			} else if (cfaposit.getStatus().equalsIgnoreCase("2")) {
+				textBottonDireito.setText("Não Estava");
+			} else if (cfaposit.getStatus().equalsIgnoreCase("3")) {
+				textBottonDireito.setText("Pedido Feito Por Telefone");
+			} else if (cfaposit.getStatus().equalsIgnoreCase("4")) {
+				textBottonDireito.setText("Pedido Feito Pelo Balcao/Loja");
+			} else {
+				textBottonDireito.setText("SEM STATUS!");
+			}
+			viewTopo.setVisibility(View.INVISIBLE);
+			viewRodape.setVisibility(View.INVISIBLE);
+
+		} else if (this.tipoItem == ULTIMA_ATUALIZACAO){
+			UltimaAtualizacaoBeans ultimaAtualizacao = listaUltimaAtualizacao.get(position);
+
+			FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
+
+			textDescricao.setText(ultimaAtualizacao.getTabela());
+			textAbaixoDescricaoEsqueda.setText("Dt. Ault. Atua.: " + ultimaAtualizacao.getDataUltimaAtualizacao());
+			textAbaixoDescricaoDireita.setText("ID: " + ultimaAtualizacao.getIdUltimaAtualizacao());
+			textBottonEsquerdo.setText("Dt. Cad.:" + ultimaAtualizacao.getDataCad());
+			textBottonEsquerdoDois.setVisibility(View.INVISIBLE);
+			textBottonDireito.setText("Dt. Alt.:" + ultimaAtualizacao.getDataAlt());
+
 			viewTopo.setVisibility(View.INVISIBLE);
 			viewRodape.setVisibility(View.INVISIBLE);
 		}

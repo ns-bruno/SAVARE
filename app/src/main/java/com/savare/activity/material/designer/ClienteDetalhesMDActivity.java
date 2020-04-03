@@ -3,6 +3,7 @@ package com.savare.activity.material.designer;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
@@ -86,82 +87,106 @@ public class ClienteDetalhesMDActivity extends AppCompatActivity{
         SmartTabLayout tabLayout = (SmartTabLayout) findViewById(R.id.fragment_cliente_detalhes_tab_md_tab_layout);
         // Seta as paginas nas tabs
         tabLayout.setViewPager(viewPager);
+        Context context = ClienteDetalhesMDActivity.this;
+
+        String tipoFuncionario = new FuncoesPersonalizadas(context).getValorXml(FuncoesPersonalizadas.TAG_TIPO_FUNCIONARIO);
+        // Checa se eh um vendedor interno
+        if ( (tipoFuncionario != null) && (!tipoFuncionario.equalsIgnoreCase(FuncoesPersonalizadas.NAO_ENCONTRADO)) && (tipoFuncionario.equalsIgnoreCase("2"))){
+            // Instancia a classe de funcoes sql para pessoa
+            PessoaRotinas pessoaRotinas = new PessoaRotinas(context);
+
+            List<PessoaBeans> listaPessoa = null;
+            // Pega os dados de uma pessoa especifica
+            listaPessoa = pessoaRotinas.listaPessoaResumido("CODIGO_CLI = " + codigoCli, PessoaRotinas.KEY_TIPO_CLIENTE, null);
+
+            if ((listaPessoa == null) || (listaPessoa.size() == 0)){
+                floatingMenu.setVisibility(View.GONE);
+            }
+
+        }
 
         itemMenuNovoOrcamento.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // Instancia a classe de funcoes sql para pessoa
                 PessoaRotinas pessoaRotinas = new PessoaRotinas(getApplicationContext());
+
+                PessoaBeans pessoa = null;
+                String where = "CODIGO_CLI = " + codigoCli;
                 // Pega os dados de uma pessoa especifica
-                final PessoaBeans pessoa = pessoaRotinas.listaPessoaResumido("CODIGO_CLI = " + codigoCli, PessoaRotinas.KEY_TIPO_CLIENTE, null).get(0);
+                pessoa = pessoaRotinas.listaPessoaResumido(where, PessoaRotinas.KEY_TIPO_CLIENTE, null).get(0);
 
                 // Cria um dialog para selecionar atacado ou varejo
                 AlertDialog.Builder mensagemAtacadoVarejo = new AlertDialog.Builder(v.getContext());
                 // Atributo(variavel) para escolher o tipo da venda
                 final String[] opcao = {"Atacado", "Varejo"};
                 // Preenche o dialogo com o titulo e as opcoes
+                final PessoaBeans finalPessoa = pessoa;
                 mensagemAtacadoVarejo.setTitle("Atacado ou Varejo").setItems(opcao, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         try {
-                            // Instancia a classe de funcoes
-                            FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(getApplicationContext());
+                            if ((finalPessoa != null) && (finalPessoa.getIdPessoa() != 0) && (finalPessoa.getNomeRazao() != null)) {
+                                // Instancia a classe de funcoes
+                                FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(getApplicationContext());
 
-                            // Preenche o ContentValues com os dados da pessoa
-                            ContentValues dadosCliente = new ContentValues();
-                            dadosCliente.put("ID_CFACLIFO", pessoa.getIdPessoa());
-                            dadosCliente.put("ID_CFAESTAD", pessoa.getEstadoPessoa().getCodigoEstado());
-                            dadosCliente.put("ID_CFACIDAD", pessoa.getCidadePessoa().getIdCidade());
-                            dadosCliente.put("ID_SMAEMPRE", funcoes.getValorXml("CodigoEmpresa"));
-                            dadosCliente.put("GUID", UUID.randomUUID().toString().replace("-", "").toUpperCase().substring(0, 16));
-                            dadosCliente.put("ATAC_VAREJO", which);
-                            dadosCliente.put("PESSOA_CLIENTE", String.valueOf(pessoa.getPessoa()));
-                            dadosCliente.put("NOME_CLIENTE", pessoa.getNomeRazao());
-                            dadosCliente.put("IE_RG_CLIENTE", pessoa.getIeRg());
-                            dadosCliente.put("CPF_CGC_CLIENTE", pessoa.getCpfCnpj());
-                            dadosCliente.put("ENDERECO_CLIENTE", pessoa.getEnderecoPessoa().getLogradouro() + ", " + pessoa.getEnderecoPessoa().getNumero());
-                            dadosCliente.put("BAIRRO_CLIENTE", pessoa.getEnderecoPessoa().getBairro());
-                            dadosCliente.put("CEP_CLIENTE", pessoa.getEnderecoPessoa().getCep());
-					/*dadosCliente.put("LATITUDE", localizacao.getLatitude());
-					dadosCliente.put("LONGITUDE", localizacao.getLongitude());
-					dadosCliente.put("ALTITUDE", localizacao.getAltitude());
-					dadosCliente.put("HORARIO_LOCALIZACAO", localizacao.getHorarioLocalizacao());
-					dadosCliente.put("TIPO_LOCALIZACAO", localizacao.getTipoLocalizacao());
-					dadosCliente.put("PRECISAO", localizacao.getPrecisao());*/
+                                // Preenche o ContentValues com os dados da pessoa
+                                ContentValues dadosCliente = new ContentValues();
+                                dadosCliente.put("ID_CFACLIFO", finalPessoa.getIdPessoa());
+                                dadosCliente.put("ID_CFAESTAD", finalPessoa.getEstadoPessoa().getCodigoEstado());
+                                dadosCliente.put("ID_CFACIDAD", finalPessoa.getCidadePessoa().getIdCidade());
+                                dadosCliente.put("ID_SMAEMPRE", funcoes.getValorXml("CodigoEmpresa"));
+                                dadosCliente.put("GUID", UUID.randomUUID().toString().replace("-", "").toUpperCase().substring(0, 16));
+                                dadosCliente.put("ATAC_VAREJO", which);
+                                dadosCliente.put("PESSOA_CLIENTE", String.valueOf(finalPessoa.getPessoa()));
+                                dadosCliente.put("NOME_CLIENTE", finalPessoa.getNomeRazao());
+                                dadosCliente.put("IE_RG_CLIENTE", finalPessoa.getIeRg());
+                                dadosCliente.put("CPF_CGC_CLIENTE", finalPessoa.getCpfCnpj());
+                                dadosCliente.put("ENDERECO_CLIENTE", finalPessoa.getEnderecoPessoa().getLogradouro() + ", " + finalPessoa.getEnderecoPessoa().getNumero());
+                                dadosCliente.put("BAIRRO_CLIENTE", finalPessoa.getEnderecoPessoa().getBairro());
+                                dadosCliente.put("CEP_CLIENTE", finalPessoa.getEnderecoPessoa().getCep());
 
-                            OrcamentoRotinas orcamentoRotinas = new OrcamentoRotinas(getApplicationContext());
+                                OrcamentoRotinas orcamentoRotinas = new OrcamentoRotinas(getApplicationContext());
 
-                            // Cria um novo orcamento no banco de dados
-                            long numeroOracmento = orcamentoRotinas.insertOrcamento(dadosCliente);
+                                // Cria um novo orcamento no banco de dados
+                                long numeroOracmento = orcamentoRotinas.insertOrcamento(dadosCliente);
 
-                            // Verifica se retornou algum numero
-                            if (numeroOracmento > 0) {
+                                // Verifica se retornou algum numero
+                                if (numeroOracmento > 0) {
 
-                                Bundle bundle = new Bundle();
-                                bundle.putString(OrcamentoTabFragmentMDActivity.KEY_ID_ORCAMENTO, String.valueOf(numeroOracmento));
-                                bundle.putString(OrcamentoTabFragmentMDActivity.KEY_NOME_RAZAO, pessoa.getNomeRazao());
-                                bundle.putString(OrcamentoTabFragmentMDActivity.KEY_ID_PESSOA, String.valueOf(pessoa.getIdPessoa()));
-                                bundle.putString(OrcamentoTabFragmentMDActivity.KEY_ATACADO_VAREJO, String.valueOf(which));
-                                bundle.putString("AV", "0");
+                                    Bundle bundle = new Bundle();
+                                    bundle.putString(OrcamentoTabFragmentMDActivity.KEY_ID_ORCAMENTO, String.valueOf(numeroOracmento));
+                                    bundle.putString(OrcamentoTabFragmentMDActivity.KEY_NOME_RAZAO, finalPessoa.getNomeRazao());
+                                    bundle.putString(OrcamentoTabFragmentMDActivity.KEY_ID_PESSOA, String.valueOf(finalPessoa.getIdPessoa()));
+                                    bundle.putString(OrcamentoTabFragmentMDActivity.KEY_ATACADO_VAREJO, String.valueOf(which));
+                                    bundle.putString("AV", "0");
 
-                                Intent i = new Intent(getApplicationContext(), OrcamentoTabFragmentMDActivity.class);
-                                i.putExtras(bundle);
+                                    Intent i = new Intent(getApplicationContext(), OrcamentoTabFragmentMDActivity.class);
+                                    i.putExtras(bundle);
 
-                                // Fecha o floatMenu
-                                floatingMenu.close(true);
+                                    // Fecha o floatMenu
+                                    floatingMenu.close(true);
 
-                                // Abre outra tela
-                                startActivity(i);
+                                    // Abre outra tela
+                                    startActivity(i);
 
+                                } else {
+                                    // Dados da mensagem
+                                    ContentValues mensagem = new ContentValues();
+                                    mensagem.put("comando", 2);
+                                    mensagem.put("tela", "CleinteDetalhesActivity");
+                                    mensagem.put("mensagem", "Não foi possível criar orçamento");
+
+                                    //funcoes = new FuncoesPersonalizadas(getApplicationContext());
+                                    funcoes.menssagem(mensagem);
+                                }
                             } else {
-                                // Dados da mensagem
-                                ContentValues mensagem = new ContentValues();
-                                mensagem.put("comando", 2);
-                                mensagem.put("tela", "CleinteDetalhesActivity");
-                                mensagem.put("mensagem", "Não foi possível criar orçamento");
-
-                                //funcoes = new FuncoesPersonalizadas(getApplicationContext());
-                                funcoes.menssagem(mensagem);
+                                new MaterialDialog.Builder(getApplicationContext())
+                                        .title("ClienteDetalhesMDActivity")
+                                        .content(getResources().getString(R.string.nao_localizado_dados_pessoa) +
+                                                "\n Falta os dados principais para criar um orçamento.")
+                                        .positiveText(R.string.button_ok)
+                                        .show();
                             }
                         } catch (Exception e) {
                             // Dados da mensagem
@@ -228,7 +253,7 @@ public class ClienteDetalhesMDActivity extends AppCompatActivity{
                             @Override
                             public void onSelection(MaterialDialog dialog, View view, int which, CharSequence text) {
 
-                                // Valida a opcao selecionada 0 = Visitou e comprou | 3 = Pedido feito por telefone | 4 = Pedido feito pelo balcao/loja
+                                // Valida a opcao selecionada 0 = Visitou e comprou | 1 = Visitou, mas, não comprou | 2 = Não estava | 3 = Pedido feito por telefone | 4 = Pedido feito pelo balcao/loja
                                 if ((which != 0) && (which != 3) && (which != 4)) {
 
                                     // Pega os dados da positivacao

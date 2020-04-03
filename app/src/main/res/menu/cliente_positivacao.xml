@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:title="@string/data"
+        app:showAsAction="ifRoom">
+        <menu app:showAsAction="always">
+            <item
+                android:id="@+id/menu_cliente_positivacao_semana_atual"
+                android:title="@string/semana_atual" />
+            <item
+                android:id="@+id/menu_cliente_positivacao_semana_anterior"
+                android:title="@string/semana_anterior" />
+            <item
+                android:id="@+id/menu_cliente_positivacao_mes_atual"
+                android:title="@string/mes_atual" />
+            <item
+                android:id="@+id/menu_cliente_positivacao_mes_anterior"
+                android:title="@string/mes_anterior" />
+            <item
+                android:id="@+id/menu_cliente_positivacao_intervalo_personalizado"
+                android:title="@string/intervalo_personalizado" />
+        </menu>
+    </item>
+    <item
+        android:id="@+id/menu_cliente_positivacao_compartilhar"
+        android:icon="@drawable/ic_share_variant"
+        android:title="@string/compartilhar" />
+</menu>

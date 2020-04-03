@@ -156,29 +156,35 @@ public class PessoaAdapter extends BaseAdapter implements Filterable, OnItemClic
 		
 		// Seta os campos de acordo com o que esta na lista de pessoa
 		textFantasia.setText((pessoa.getNomeFantasia() != null) ? pessoa.getNomeFantasia() : "");
-		textCidade.setText((pessoa.getCidadePessoa().getDescricao() != null && pessoa.getEnderecoPessoa().getBairro() != null) ? (pessoa.getCidadePessoa().getDescricao() + " - " + pessoa.getEnderecoPessoa().getBairro()) : "");
-		textStatus.setText((pessoa.getStatusPessoa().getDescricao() != null) ? pessoa.getStatusPessoa().getDescricao() : "");
+		textCidade.setText(
+				(pessoa.getCidadePessoa() != null && pessoa.getCidadePessoa().getDescricao() != null &&
+				 pessoa.getEnderecoPessoa() != null && pessoa.getEnderecoPessoa().getBairro() != null)
+						? (pessoa.getCidadePessoa().getDescricao() + " - " + pessoa.getEnderecoPessoa().getBairro())
+						: "");
+		textStatus.setText((pessoa.getStatusPessoa() != null && pessoa.getStatusPessoa().getDescricao() != null) ? pessoa.getStatusPessoa().getDescricao() : "");
 		textUltimaVenda.setText(pessoa.getDataUltimaCompra());
 		textNumero.setText(pessoa.getCpfCnpj());
-		
-		// Verifica se o campo bloqueia eh NAO(0) e  o campo PARCELA EM ABERTO eh VENDE(1)
-		if(((pessoa.getStatusPessoa().getBloqueia() != null) && (pessoa.getStatusPessoa().getBloqueia().equalsIgnoreCase("0")) ) &&
-		  ((pessoa.getStatusPessoa().getParcelaEmAberto() != null) && (pessoa.getStatusPessoa().getParcelaEmAberto().equalsIgnoreCase("1"))) &&
-				(pessoa.getStatusPessoa().getVistaPrazo().equalsIgnoreCase("2"))){
-			// Muda a cor da View
-			viewStatus.setBackgroundColor(context.getResources().getColor(R.color.verde_escuro));
-			
-		// Verifica se o campo bloqueia eh SIM(1) e  o campo PARCELA EM ABERTO eh diferente de VENDE(1)
-		} else if(((pessoa.getStatusPessoa().getBloqueia() != null) && (pessoa.getStatusPessoa().getBloqueia().equalsIgnoreCase("1"))) &&
-                 ((pessoa.getStatusPessoa().getParcelaEmAberto() != null) && (!pessoa.getStatusPessoa().getParcelaEmAberto().equalsIgnoreCase("1")))){
-			// Muda a cor da View para vermelho
-			viewStatus.setBackgroundColor(context.getResources().getColor(R.color.vermelho_escuro));
-			textStatus.setTypeface(null, Typeface.BOLD_ITALIC);
 
-		} else {
-			// Muda a cor da View
-			viewStatus.setBackgroundColor(context.getResources().getColor(R.color.amarelo));
-			textStatus.setTypeface(null, Typeface.BOLD);
+		if (pessoa.getStatusPessoa() != null) {
+			// Verifica se o campo bloqueia eh NAO(0) e  o campo PARCELA EM ABERTO eh VENDE(1)
+			if (((pessoa.getStatusPessoa().getBloqueia() != null) && (pessoa.getStatusPessoa().getBloqueia().equalsIgnoreCase("0"))) &&
+					((pessoa.getStatusPessoa().getParcelaEmAberto() != null) && (pessoa.getStatusPessoa().getParcelaEmAberto().equalsIgnoreCase("1"))) &&
+					(pessoa.getStatusPessoa().getVistaPrazo().equalsIgnoreCase("2"))) {
+				// Muda a cor da View
+				viewStatus.setBackgroundColor(context.getResources().getColor(R.color.verde_escuro));
+
+				// Verifica se o campo bloqueia eh SIM(1) e  o campo PARCELA EM ABERTO eh diferente de VENDE(1)
+			} else if (((pessoa.getStatusPessoa().getBloqueia() != null) && (pessoa.getStatusPessoa().getBloqueia().equalsIgnoreCase("1"))) &&
+					((pessoa.getStatusPessoa().getParcelaEmAberto() != null) && (!pessoa.getStatusPessoa().getParcelaEmAberto().equalsIgnoreCase("1")))) {
+				// Muda a cor da View para vermelho
+				viewStatus.setBackgroundColor(context.getResources().getColor(R.color.vermelho_escuro));
+				textStatus.setTypeface(null, Typeface.BOLD_ITALIC);
+
+			} else {
+				// Muda a cor da View
+				viewStatus.setBackgroundColor(context.getResources().getColor(R.color.amarelo));
+				textStatus.setTypeface(null, Typeface.BOLD);
+			}
 		}
 		
 		// Retorna uma view personalizada

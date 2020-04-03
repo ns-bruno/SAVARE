@@ -13,6 +13,8 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.ShareCompat;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
@@ -36,6 +38,7 @@ import com.github.johnpersano.supertoasts.library.SuperActivityToast;
 import com.savare.R;
 import com.savare.activity.LogActivity;
 import com.savare.activity.material.designer.ClienteListaMDActivity;
+import com.savare.activity.material.designer.ClientePositivacaoMDActivity;
 import com.savare.activity.material.designer.ListaOrcamentoPedidoMDActivity;
 import com.savare.activity.material.designer.OrcamentoProdutoDetalhesTabFragmentMDActivity;
 import com.savare.activity.material.designer.OrcamentoTabFragmentMDActivity;
@@ -385,11 +388,24 @@ public class OrcamentoProdutoMDFragment extends Fragment {
                             String caminhoPdf = gerarPdfSalvar.execute("").get();
 
                             File file = new File(caminhoPdf);
-                            Intent target = new Intent(Intent.ACTION_VIEW);
-                            target.setDataAndType(Uri.fromFile(file), "application/pdf");
-                            target.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+//                            Intent target = new Intent(Intent.ACTION_VIEW);
+//                            target.setDataAndType(Uri.fromFile(file), "application/pdf");
+//                            target.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+//
+//                            Intent intent = Intent.createChooser(target, "Abrir PDF do Orçamento/Pedido");
+//                            startActivity(intent);
 
-                            Intent intent = Intent.createChooser(target, "Abrir PDF do Orçamento/Pedido");
+                            Uri pedido = FileProvider.getUriForFile(getContext(), "com.savare.fileprovider", file);
+                            ShareCompat.IntentBuilder intentBuilder = ShareCompat.IntentBuilder.from(getActivity()).addStream(pedido);
+
+                            Intent intent = ShareCompat.IntentBuilder.from(getActivity())
+                                    .setStream(pedido) // uri from FileProvider
+                                    .setType("text/html")
+                                    .getIntent()
+                                    .setAction(Intent.ACTION_VIEW) //Change if needed
+                                    .setDataAndType(pedido, "application/pdf")
+                                    .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
                             startActivity(intent);
                         }
 
@@ -471,7 +487,7 @@ public class OrcamentoProdutoMDFragment extends Fragment {
                                     @Override
                                     public void onSelection(MaterialDialog dialog, View view, int which, CharSequence text) {
 
-                                        // Valida a opcao selecionada 1 = Visitou, mas, não comprou e 2 = Não estava
+                                        // Valida a opcao selecionada 0 = Visitou e comprou | 1 = Visitou, mas, não comprou | 2 = Não estava | 3 = Pedido feito por telefone | 4 = Pedido feito pelo balcao/loja
                                         if ((which != 1) && (which != 2)) {
                                             try {
                                                 // Instancia a classe para manipular os orcamento no banco de dados
@@ -916,16 +932,30 @@ public class OrcamentoProdutoMDFragment extends Fragment {
 
                 PessoaRotinas pessoaRotinas = new PessoaRotinas(getActivity());
 
-                Intent dadosEmail = new Intent(Intent.ACTION_SEND);
-                //dadosEmail.setType("message/rfc822");
-                dadosEmail.setType("text/plain");
-                dadosEmail.putExtra(Intent.EXTRA_EMAIL, new String[]{pessoaRotinas.emailPessoa(idPessoa)});
-                dadosEmail.putExtra(Intent.EXTRA_SUBJECT, "Orçamento/Pedido # " + textCodigoOrcamento.getText());
-                dadosEmail.putExtra(Intent.EXTRA_STREAM, Uri.parse("file://" + arquivo));
-                dadosEmail.putExtra(Intent.EXTRA_TEXT, "E-Mail enviado pelo App SAVARE.");
-
+//                Intent dadosEmail = new Intent(Intent.ACTION_SEND);
+//                //dadosEmail.setType("message/rfc822");
+//                dadosEmail.setType("text/plain");
+//                dadosEmail.putExtra(Intent.EXTRA_EMAIL, new String[]{pessoaRotinas.emailPessoa(idPessoa)});
+//                dadosEmail.putExtra(Intent.EXTRA_SUBJECT, "Orçamento/Pedido # " + textCodigoOrcamento.getText());
+//                dadosEmail.putExtra(Intent.EXTRA_STREAM, Uri.parse("file://" + arquivo));
+//                dadosEmail.putExtra(Intent.EXTRA_TEXT, "E-Mail enviado pelo App SAVARE.");
+//                startActivity(Intent.createChooser(dadosEmail, "Enviar e-mail..."));
                 try {
-                    startActivity(Intent.createChooser(dadosEmail, "Enviar e-mail..."));
+                    Uri pedido = FileProvider.getUriForFile(getContext(), "com.savare.fileprovider", arquivo);
+                    ShareCompat.IntentBuilder intentBuilder = ShareCompat.IntentBuilder.from(getActivity()).addStream(pedido);
+
+                    Intent intent = ShareCompat.IntentBuilder.from(getActivity())
+                            .setStream(pedido) // uri from FileProvider
+                            .setType("text/html")
+                            .getIntent()
+                            .setAction(Intent.ACTION_SEND) //Change if needed
+                            .setDataAndType(pedido, "application/pdf")
+                            .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                    intent.putExtra(Intent.EXTRA_EMAIL, new String[]{pessoaRotinas.emailPessoa(idPessoa)});
+                    intent.putExtra(Intent.EXTRA_SUBJECT, "Orçamento/Pedido # " + textCodigoOrcamento.getText());
+                    intent.putExtra(Intent.EXTRA_TEXT, "E-Mail enviado pelo App SAVARE.");
+
+                    startActivity(intent);
 
                 } catch (android.content.ActivityNotFoundException ex) {
                     //SuperActivityToast.create(getActivity(), getResources().getString(R.string.nao_possivel_compartilhar_arquivo), SuperToast.Duration.LONG, Style.getStyle(Style.RED, SuperToast.Animations.FLYIN)).show();

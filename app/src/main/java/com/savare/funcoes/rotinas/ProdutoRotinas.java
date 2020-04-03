@@ -1421,13 +1421,15 @@ public class ProdutoRotinas extends Rotinas {
 		listaDetalhes.add(descricaoDupla);
 
 		AeamarcaRotinas aeamarcaRotinas = new AeamarcaRotinas(context);
-		AeamarcaBeans aeamarca = aeamarcaRotinas.selectMarca(produtoBeans.getAeamarca().getIdAeamarca());
-		if (aeamarca != null) {
-			descricaoDupla = new DescricaoDublaBeans();
-			descricaoDupla.setTextoPrincipal(aeamarca.getDescricao());
-			descricaoDupla.setTextoSecundario("Marca");
-			// Adiciona a lista
-			listaDetalhes.add(descricaoDupla);
+		if (produtoBeans.getAeamarca() != null) {
+			AeamarcaBeans aeamarca = aeamarcaRotinas.selectMarca(produtoBeans.getAeamarca().getIdAeamarca());
+			if (aeamarca != null) {
+				descricaoDupla = new DescricaoDublaBeans();
+				descricaoDupla.setTextoPrincipal(aeamarca.getDescricao());
+				descricaoDupla.setTextoSecundario("Marca");
+				// Adiciona a lista
+				listaDetalhes.add(descricaoDupla);
+			}
 		}
 
 		AeaunvenRotinas aeaunvenRotinas = new AeaunvenRotinas(context);
@@ -1441,13 +1443,15 @@ public class ProdutoRotinas extends Rotinas {
 		}
 
 		AeaclaseRotinas aeaclaseRotinas = new AeaclaseRotinas(context);
-		AeaclaseBeans aeaclase = aeaclaseRotinas.selectClasse(produtoBeans.getAeaclase().getIdAeaclase());
-		if (aeaclase != null){
-			descricaoDupla = new DescricaoDublaBeans();
-			descricaoDupla.setTextoPrincipal(aeaclase.getDescricao());
-			descricaoDupla.setTextoSecundario("Classe/Grupo");
-			// Adiciona a lista
-			listaDetalhes.add(descricaoDupla);
+		if (produtoBeans.getAeaclase() != null) {
+			AeaclaseBeans aeaclase = aeaclaseRotinas.selectClasse(produtoBeans.getAeaclase().getIdAeaclase());
+			if (aeaclase != null) {
+				descricaoDupla = new DescricaoDublaBeans();
+				descricaoDupla.setTextoPrincipal(aeaclase.getDescricao());
+				descricaoDupla.setTextoSecundario("Classe/Grupo");
+				// Adiciona a lista
+				listaDetalhes.add(descricaoDupla);
+			}
 		}
 
 

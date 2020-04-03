@@ -207,128 +207,130 @@ public class ClienteDetalhesDadosMDFragment extends Fragment {
 
         FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(getContext());
 
-        textRazaoSocial.setText(pessoa.getNomeRazao());
-        ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(pessoa.getNomeRazao());
-        textFantasia.setText(pessoa.getNomeFantasia());
-        textCnpjCpf.setText(pessoa.getCpfCnpj());
-        textInscricaoEstadual.setText(pessoa.getIeRg());
-        textStatus.setText(pessoa.getStatusPessoa().getDescricao());
-        textEstado.setText(pessoa.getEstadoPessoa().getSiglaEstado());
-        textCidade.setText(pessoa.getCidadePessoa().getDescricao());
-        textBairro.setText(pessoa.getEnderecoPessoa().getBairro());
-        textEndereco.setText(pessoa.getEnderecoPessoa().getLogradouro());
-        textNumero.setText(pessoa.getEnderecoPessoa().getNumero());
-        textComplemento.setText(pessoa.getEnderecoPessoa().getComplemento());
+        if ((pessoa != null) && (pessoa.getIdPessoa() != 0) && (pessoa.getNomeRazao() != null)) {
+            textRazaoSocial.setText(pessoa.getNomeRazao());
+            ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(pessoa.getNomeRazao());
+            textFantasia.setText(pessoa.getNomeFantasia());
+            textCnpjCpf.setText(pessoa.getCpfCnpj());
+            textInscricaoEstadual.setText(pessoa.getIeRg());
+            textStatus.setText(pessoa.getStatusPessoa().getDescricao());
+            textEstado.setText(pessoa.getEstadoPessoa().getSiglaEstado());
+            textCidade.setText(pessoa.getCidadePessoa().getDescricao());
+            textBairro.setText(pessoa.getEnderecoPessoa().getBairro());
+            textEndereco.setText(pessoa.getEnderecoPessoa().getLogradouro());
+            textNumero.setText(pessoa.getEnderecoPessoa().getNumero());
+            textComplemento.setText(pessoa.getEnderecoPessoa().getComplemento());
 
-        if((pessoa.getDataUltimaVisita() != null) && (pessoa.getDataUltimaVisita().length() < 1)){
-            editUltimaVisita.setText("Não Tem Visita");
-        } else {
-            editUltimaVisita.setText("" + pessoa.getDataUltimaVisita());
-        }
+            if ((pessoa.getDataUltimaVisita() != null) && (pessoa.getDataUltimaVisita().length() < 1)) {
+                editUltimaVisita.setText("Não Tem Visita");
+            } else {
+                editUltimaVisita.setText("" + pessoa.getDataUltimaVisita());
+            }
 
-        editLimiteCompra.setText(funcoes.arredondarValor(pessoa.getLimiteCompra()));
-        editDescontoAtacadoVista.setText(funcoes.arredondarValor(pessoa.getDescontoAtacadoVista()));
-        editDescontoAtacadoPrazo.setText(funcoes.arredondarValor(pessoa.getDescontoAtacadoPrazo()));
-        editDescontoVarejoVista.setText(funcoes.arredondarValor(pessoa.getDescontoVarejoVista()));
-        editDescontoVarejoPrazo.setText(funcoes.arredondarValor(pessoa.getDescontoVarejoPrazo()));
-        editCreditoAcumulado.setText(funcoes.arredondarValor(pessoa.getCreditoAcumulado()));
-        editTotalAPagar.setText(funcoes.arredondarValor(pessoa.getTotalAPagar()));
-        editCapitalSocial.setText(funcoes.arredondarValor(pessoa.getCapitalSocial()));
-        editTotalPago.setText(funcoes.arredondarValor(pessoa.getTotalPago()));
-        editTotalVencido.setText(funcoes.arredondarValor(pessoa.getTotalVencido()));
+            editLimiteCompra.setText(funcoes.arredondarValor(pessoa.getLimiteCompra()));
+            editDescontoAtacadoVista.setText(funcoes.arredondarValor(pessoa.getDescontoAtacadoVista()));
+            editDescontoAtacadoPrazo.setText(funcoes.arredondarValor(pessoa.getDescontoAtacadoPrazo()));
+            editDescontoVarejoVista.setText(funcoes.arredondarValor(pessoa.getDescontoVarejoVista()));
+            editDescontoVarejoPrazo.setText(funcoes.arredondarValor(pessoa.getDescontoVarejoPrazo()));
+            editCreditoAcumulado.setText(funcoes.arredondarValor(pessoa.getCreditoAcumulado()));
+            editTotalAPagar.setText(funcoes.arredondarValor(pessoa.getTotalAPagar()));
+            editCapitalSocial.setText(funcoes.arredondarValor(pessoa.getCapitalSocial()));
+            editTotalPago.setText(funcoes.arredondarValor(pessoa.getTotalPago()));
+            editTotalVencido.setText(funcoes.arredondarValor(pessoa.getTotalVencido()));
 
-        if(pessoa.getTotalVencido() > 0){
-            editTotalVencido.setTextColor(Color.RED);
-            // Mensagem para avisar ao usuario que existe titulo vencido
-            SuperActivityToast.create(getActivity(), getResources().getString(R.string.existe_titulos_vencidos), Style.DURATION_LONG)
-                    .setTextColor(Color.WHITE)
-                    .setColor(Color.RED)
-                    .setAnimations(Style.ANIMATIONS_POP)
-                    .show();
-        }
+            if (pessoa.getTotalVencido() > 0) {
+                editTotalVencido.setTextColor(Color.RED);
+                // Mensagem para avisar ao usuario que existe titulo vencido
+                SuperActivityToast.create(getActivity(), getResources().getString(R.string.existe_titulos_vencidos), Style.DURATION_LONG)
+                        .setTextColor(Color.WHITE)
+                        .setColor(Color.RED)
+                        .setAnimations(Style.ANIMATIONS_POP)
+                        .show();
+            }
 
-        // Checa se retornou algum valor
-        if( (pessoa.getRamoAtividade() == null) || (pessoa.getRamoAtividade().getIdRamoAtividade() < 1) ){
-            spinnerRamoAtividade.setVisibility(View.GONE);
+            // Checa se retornou algum valor
+            if ((pessoa.getRamoAtividade() == null) || (pessoa.getRamoAtividade().getIdRamoAtividade() < 1)) {
+                spinnerRamoAtividade.setVisibility(View.GONE);
 
-        } else {
-            List<RamoAtividadeBeans> listaRamoAtividade = new ArrayList<RamoAtividadeBeans>();
-            listaRamoAtividade.add(pessoa.getRamoAtividade());
-            // Intancia a classe do adapter
-            adapterRamoAtividade = new ItemUniversalAdapter(getContext(), 7);
-            // Preenche o adapter com uma lista de atividade
-            adapterRamoAtividade.setListaRamoAtividade(listaRamoAtividade);
-            spinnerRamoAtividade.setAdapter(adapterRamoAtividade);
-        }
+            } else {
+                List<RamoAtividadeBeans> listaRamoAtividade = new ArrayList<RamoAtividadeBeans>();
+                listaRamoAtividade.add(pessoa.getRamoAtividade());
+                // Intancia a classe do adapter
+                adapterRamoAtividade = new ItemUniversalAdapter(getContext(), 7);
+                // Preenche o adapter com uma lista de atividade
+                adapterRamoAtividade.setListaRamoAtividade(listaRamoAtividade);
+                spinnerRamoAtividade.setAdapter(adapterRamoAtividade);
+            }
 
-        // Checa se retornou algum valor
-        if( (pessoa.getTipoClientePessoa() == null) || (pessoa.getTipoClientePessoa().getIdTipoCliente() < 1) ){
-            spinnerTipoCliente.setVisibility(View.GONE);
-        } else {
-            List<TipoClienteBeans> listaTipoCliente = new ArrayList<TipoClienteBeans>();
-            listaTipoCliente.add(pessoa.getTipoClientePessoa());
-            // Intancia a classe do adapter
-            adapterTipoCliente = new ItemUniversalAdapter(getContext(), 8);
-            // Preenche o adapter com uma lista de tipos de cliente
-            adapterTipoCliente.setListaTipoCliente(listaTipoCliente);
-            spinnerTipoCliente.setAdapter(adapterTipoCliente);
-        }
+            // Checa se retornou algum valor
+            if ((pessoa.getTipoClientePessoa() == null) || (pessoa.getTipoClientePessoa().getIdTipoCliente() < 1)) {
+                spinnerTipoCliente.setVisibility(View.GONE);
+            } else {
+                List<TipoClienteBeans> listaTipoCliente = new ArrayList<TipoClienteBeans>();
+                listaTipoCliente.add(pessoa.getTipoClientePessoa());
+                // Intancia a classe do adapter
+                adapterTipoCliente = new ItemUniversalAdapter(getContext(), 8);
+                // Preenche o adapter com uma lista de tipos de cliente
+                adapterTipoCliente.setListaTipoCliente(listaTipoCliente);
+                spinnerTipoCliente.setAdapter(adapterTipoCliente);
+            }
 
-        // Checa se retornou algum valor
-        if( (pessoa.getTipoDocumentoPessoa() == null) || (pessoa.getTipoDocumentoPessoa().getIdTipoDocumento() < 1) ){
-            spinnerRamoAtividade.setVisibility(View.GONE);
+            // Checa se retornou algum valor
+            if ((pessoa.getTipoDocumentoPessoa() == null) || (pessoa.getTipoDocumentoPessoa().getIdTipoDocumento() < 1)) {
+                spinnerRamoAtividade.setVisibility(View.GONE);
 
-        } else {
-            List<TipoDocumentoBeans> listaTipoDocumentoBeans = new ArrayList<TipoDocumentoBeans>();
-            listaTipoDocumentoBeans.add(pessoa.getTipoDocumentoPessoa());
-            // Intancia a classe do adapter
-            adapterTipoDocumento = new ItemUniversalAdapter(getContext(), 3);
-            // Preenche o adapter com uma lista de documentos
-            adapterTipoDocumento.setListaTipoDocumento(listaTipoDocumentoBeans);
-            spinnerTipoDocumento.setAdapter(adapterTipoDocumento);
-        }
+            } else {
+                List<TipoDocumentoBeans> listaTipoDocumentoBeans = new ArrayList<TipoDocumentoBeans>();
+                listaTipoDocumentoBeans.add(pessoa.getTipoDocumentoPessoa());
+                // Intancia a classe do adapter
+                adapterTipoDocumento = new ItemUniversalAdapter(getContext(), 3);
+                // Preenche o adapter com uma lista de documentos
+                adapterTipoDocumento.setListaTipoDocumento(listaTipoDocumentoBeans);
+                spinnerTipoDocumento.setAdapter(adapterTipoDocumento);
+            }
 
-        // Checa se retornou algum valor
-        if( (pessoa.getPortadorBancoPessoa() == null) || (pessoa.getPortadorBancoPessoa().getIdPortadorBanco() < 1) ){
-            spinnerPortadorBanco.setVisibility(View.GONE);
+            // Checa se retornou algum valor
+            if ((pessoa.getPortadorBancoPessoa() == null) || (pessoa.getPortadorBancoPessoa().getIdPortadorBanco() < 1)) {
+                spinnerPortadorBanco.setVisibility(View.GONE);
 
-        } else {
-            List<PortadorBancoBeans> listaPortadorBanco = new ArrayList<PortadorBancoBeans>();
-            listaPortadorBanco.add(pessoa.getPortadorBancoPessoa());
-            // Instancia a classe do adapter
-            adapterPortadorBanco = new ItemUniversalAdapter(getContext(), 9);
-            // Preenche o adapter com uma lista portadores
-            adapterPortadorBanco.setListaPortadorBanco(listaPortadorBanco);
-            spinnerPortadorBanco.setAdapter(adapterPortadorBanco);
-        }
+            } else {
+                List<PortadorBancoBeans> listaPortadorBanco = new ArrayList<PortadorBancoBeans>();
+                listaPortadorBanco.add(pessoa.getPortadorBancoPessoa());
+                // Instancia a classe do adapter
+                adapterPortadorBanco = new ItemUniversalAdapter(getContext(), 9);
+                // Preenche o adapter com uma lista portadores
+                adapterPortadorBanco.setListaPortadorBanco(listaPortadorBanco);
+                spinnerPortadorBanco.setAdapter(adapterPortadorBanco);
+            }
 
-        // Checa se retornou algum valor
-        if( (pessoa.getPlanoPagamentoPessoa() == null) || (pessoa.getPlanoPagamentoPessoa().getIdPlanoPagamento() < 1) ){
-            spinnerPlanoPagamento.setVisibility(View.GONE);
+            // Checa se retornou algum valor
+            if ((pessoa.getPlanoPagamentoPessoa() == null) || (pessoa.getPlanoPagamentoPessoa().getIdPlanoPagamento() < 1)) {
+                spinnerPlanoPagamento.setVisibility(View.GONE);
 
-        }else {
-            List<PlanoPagamentoBeans> listaPlanoPagamento = new ArrayList<PlanoPagamentoBeans>();
-            listaPlanoPagamento.add(pessoa.getPlanoPagamentoPessoa());
-            // Intancia a classe do adapter
-            adapterPlanoPagamento = new ItemUniversalAdapter(getContext(), 4);
-            // Preenche o adapter com uma lista de planos de pagamento
-            adapterPlanoPagamento.setListaPlanoPagamento(listaPlanoPagamento);
-            spinnerPlanoPagamento.setAdapter(adapterPlanoPagamento);
-        }
+            } else {
+                List<PlanoPagamentoBeans> listaPlanoPagamento = new ArrayList<PlanoPagamentoBeans>();
+                listaPlanoPagamento.add(pessoa.getPlanoPagamentoPessoa());
+                // Intancia a classe do adapter
+                adapterPlanoPagamento = new ItemUniversalAdapter(getContext(), 4);
+                // Preenche o adapter com uma lista de planos de pagamento
+                adapterPlanoPagamento.setListaPlanoPagamento(listaPlanoPagamento);
+                spinnerPlanoPagamento.setAdapter(adapterPlanoPagamento);
+            }
 
-        // Verifica se o campo bloqueia eh NAO(0) e  o campo PARCELA EM ABERTO eh VENDE(1)
-        if((pessoa.getStatusPessoa().getBloqueia() == "0" ) && (pessoa.getStatusPessoa().getParcelaEmAberto() == "1")){
-            // Muda a cor da View
-            textStatus.setTextColor(getResources().getColor(R.color.verde_escuro));
+            // Verifica se o campo bloqueia eh NAO(0) e  o campo PARCELA EM ABERTO eh VENDE(1)
+            if ((pessoa.getStatusPessoa().getBloqueia() == "0") && (pessoa.getStatusPessoa().getParcelaEmAberto() == "1")) {
+                // Muda a cor da View
+                textStatus.setTextColor(getResources().getColor(R.color.verde_escuro));
 
-            // Verifica se o campo bloqueia eh SIM(1) e  o campo PARCELA EM ABERTO eh diferente de VENDE(1)
-        } else if((pessoa.getStatusPessoa().getBloqueia() == "1") && (pessoa.getStatusPessoa().getParcelaEmAberto() != "1")){
-            // Muda a cor da View para vermelho
-            textStatus.setTextColor(getResources().getColor(R.color.vermelho_escuro));
+                // Verifica se o campo bloqueia eh SIM(1) e  o campo PARCELA EM ABERTO eh diferente de VENDE(1)
+            } else if ((pessoa.getStatusPessoa().getBloqueia() == "1") && (pessoa.getStatusPessoa().getParcelaEmAberto() != "1")) {
+                // Muda a cor da View para vermelho
+                textStatus.setTextColor(getResources().getColor(R.color.vermelho_escuro));
 
-        } else {
-            // Muda a cor da View
-            textStatus.setTextColor(getResources().getColor(R.color.amarelo));
+            } else {
+                // Muda a cor da View
+                textStatus.setTextColor(getResources().getColor(R.color.amarelo));
+            }
         }
     } // Fim da funcao carregarDadosPessoa
 

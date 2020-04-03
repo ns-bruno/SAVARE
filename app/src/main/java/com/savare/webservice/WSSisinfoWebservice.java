@@ -475,8 +475,8 @@ public class WSSisinfoWebservice {
             conexaoHttp.setRequestMethod(metodo);
             conexaoHttp.setRequestProperty("Accept", "application/json");
             conexaoHttp.setRequestProperty("Content-Type", "application/json");
-            conexaoHttp.setConnectTimeout(100000);
-            conexaoHttp.setReadTimeout(100000);
+            conexaoHttp.setConnectTimeout(150000);
+            conexaoHttp.setReadTimeout(150000);
 
             if ((metodo.equalsIgnoreCase(METODO_POST)) && (parametros != null) && (!parametros.isEmpty())){
                 // Define que a conexão pode enviar informacoes e obte-las de volta

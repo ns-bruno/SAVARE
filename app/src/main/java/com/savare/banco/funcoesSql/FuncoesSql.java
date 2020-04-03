@@ -586,7 +586,7 @@ public class FuncoesSql {
 	 * @return - Retorna um Cursor com os dados recuperados.
 	 */
 	public Cursor query(String where, String ordem){
-		Log.i("SAVARE", "FuncoesSql - " + where + " - " + ordem);
+		//Log.i("SAVARE", "FuncoesSql - " + where + " - " + ordem);
 
 		Cursor cursor = null;
 		bancoDados = conexaoBanco.abrirBanco();
@@ -643,7 +643,7 @@ public class FuncoesSql {
 	 * @param sql
 	 */
 	public void execSQL(String sql){
-		Log.i("SAVARE", sql);
+		//Log.i("SAVARE", sql);
 
 		bancoDados = conexaoBanco.abrirBanco();
 		try {

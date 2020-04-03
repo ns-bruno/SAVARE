@@ -58,7 +58,7 @@ public class UltimaAtualizacaoRotinas extends Rotinas {
             where = "TABELA = '" + tabela + "'";
         }
 
-        Cursor dados = atualizacaoSql.query(where);
+        Cursor dados = atualizacaoSql.query(where, "TABELA");
 
         // Checa se retornou algum dados
         if ((dados != null) && (dados.getCount() > 0)){

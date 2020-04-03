@@ -258,14 +258,19 @@ public class ProdutoListaMDFragment extends Fragment {
                         query = query.replaceAll(" ", "%");
 
                         // Monta a clausula where para buscar no banco de dados
-                        String where = " (( (AEAPRODU.DESCRICAO LIKE '%" + query + "%') OR "
-                                + "(AEAPRODU.CODIGO_ESTRUTURAL LIKE '%" + query + "%') OR "
-                                + "(AEAPRODU.DESCRICAO_AUXILIAR LIKE '%" + query + "%') OR "
-                                + "(AEAPRODU.REFERENCIA LIKE '%" + query + "%') OR "
-                                + "(AEAMARCA.DESCRICAO LIKE '%" + query + "%') ) OR (AEAMARCA.DESCRICAO LIKE '%"+ query +"%')) ";
+                        StringBuilder where = new StringBuilder();
+                        where.append(" (( (AEAPRODU.DESCRICAO LIKE '%" + query + "%') OR ");
+                        // Checa se eh apenas numero
+                        if (query.matches("[-+]?\\d*\\.?\\d+")){
+                            where.append("(AEAPRODU.CODIGO = ").append(query).append(") OR ");
+                        }
+                        where.append("(AEAPRODU.CODIGO_ESTRUTURAL LIKE '%" + query + "%') OR ");
+                        where.append("(AEAPRODU.DESCRICAO_AUXILIAR LIKE '%" + query + "%') OR ");
+                        where.append("(AEAPRODU.REFERENCIA LIKE '%" + query + "%') OR ");
+                        where.append("(AEAMARCA.DESCRICAO LIKE '%" + query + "%') ) OR (AEAMARCA.DESCRICAO LIKE '%"+ query +"%')) ");
 
                         if (pequisarProdutoEstoque){
-                            where += " AND (AEAPLOJA.ESTOQUE_F > 0)";
+                            where.append(" AND (AEAPLOJA.ESTOQUE_F > 0)");
                         }
                         // Limpa o listView
                         listViewProdutos.setAdapter(null);
@@ -273,7 +278,7 @@ public class ProdutoListaMDFragment extends Fragment {
                         if ( (loaderProdutosAsync == null) || (loaderProdutosAsync.getStatus().equals(AsyncTask.Status.FINISHED))) {
                             loaderProdutosAsync = new LoaderProdutos();
                         }
-                        loaderProdutosAsync.where = where;
+                        loaderProdutosAsync.where = where.toString();
                         loaderProdutosAsync.execute();
                         // Tira o foco da searchView e fecha o teclado virtual
                         searchView.clearFocus();
@@ -659,7 +664,6 @@ public class ProdutoListaMDFragment extends Fragment {
                     adapterListaProdutos.setAtacadoVarejo((atacadoVarejo != null) ? atacadoVarejo : atacadoVarejoAuxiliar);
 
                 } else {
-
                     ((Activity) getContext()).runOnUiThread(new Runnable() {
                         public void run() {
                             //tirando o ProgressBar da nossa tela
@@ -703,11 +707,8 @@ public class ProdutoListaMDFragment extends Fragment {
                 // Preenche a listView com os produtos buscados
                 listViewProdutos.setAdapter(adapterListaProdutos);
 
-                // Checa se tem alguma coisa na lista
-                if ((listAeaploja != null) && (listAeaploja.size() > 0)){
-                    loaderCalculaPrecoSP = new LoaderCalculaPrecoSP(getContext());
-                    loaderCalculaPrecoSP.execute();
-                }
+                loaderCalculaPrecoSP = new LoaderCalculaPrecoSP(getContext());
+                loaderCalculaPrecoSP.execute();
             }
             progressBarListaProdutos.setIndeterminate(true);
 

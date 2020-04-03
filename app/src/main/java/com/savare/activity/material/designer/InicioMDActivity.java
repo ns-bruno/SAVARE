@@ -182,6 +182,7 @@ public class InicioMDActivity extends AppCompatActivity {
                 .withToolbar(toolbarInicio)
                 .addDrawerItems(
                         new PrimaryDrawerItem().withName(R.string.clientes).withIcon(R.drawable.ic_action_person),
+                        new PrimaryDrawerItem().withName(R.string.positivacao).withIcon(R.mipmap.ic_account_check),
                         new PrimaryDrawerItem().withName(R.string.orcamentos).withIcon(R.drawable.ic_action_view_as_list),
                         new PrimaryDrawerItem().withName(R.string.produtos).withIcon(R.drawable.ic_action_box_produtct),
                         new PrimaryDrawerItem().withName(R.string.titulos).withIcon(R.drawable.ic_action_coins_pay),
@@ -191,15 +192,19 @@ public class InicioMDActivity extends AppCompatActivity {
                         new PrimaryDrawerItem().withName(R.string.sincronizacao).withIcon(R.drawable.ic_action_cloud),
                         new PrimaryDrawerItem().withName(R.string.configuracoes).withIcon(R.drawable.ic_action_settings),
                         new SectionDrawerItem().withName(R.string.configuracoes),
-                        new PrimaryDrawerItem().withName(R.string.logs).withIcon(R.drawable.ic_sim_alert),
+                        //new PrimaryDrawerItem().withName(R.string.logs).withIcon(R.drawable.ic_sim_alert),
                         new SwitchDrawerItem().withName(R.string.enviar_automatico).withIcon(R.mipmap.ic_upload).withChecked(enviaAutomatico).withOnCheckedChangeListener(mOnCheckedChangeListener).withTag(KEY_ENVIA_AUTOMATICO),
                         switchEnviaInstantaneo,
                         //new SwitchDrawerItem().withName(R.string.receber_automatico).withIcon(R.mipmap.ic_download).withChecked(recebeAutomatico).withOnCheckedChangeListener(mOnCheckedChangeListener).withTag(KEY_RECEBE_AUTOMATICO).withSelectable(false).withSwitchEnabled(false),
                         new SwitchDrawerItem().withName(R.string.imagem_produto).withIcon(R.mipmap.ic_image_dark).withChecked(imagemProduto).withOnCheckedChangeListener(mOnCheckedChangeListener).withTag(KEY_IMAGEM_PRODUTO),
                         new SwitchDrawerItem().withName(R.string.salva_pedido_pdf).withIcon(R.mipmap.ic_file_pdf).withChecked(salvaPedidoPdf).withOnCheckedChangeListener(mOnCheckedChangeListener).withTag(KEY_SALVA_PEDIDO_PDF),
                         new SwitchDrawerItem().withName(R.string.pesquisar_produto_estoque).withIcon(R.mipmap.ic_feature_search).withDescription(R.string.pesquisar_apenas_produto_estoque).withChecked(pequisarProdutoEstoque).withOnCheckedChangeListener(mOnCheckedChangeListener).withTag(KEY_PESQUISAR_PRODUTO_ESTOQUE),
+                        new PrimaryDrawerItem().withName(R.string.ultimas_atualizacoes).withIcon(R.drawable.ic_action_refresh),
                         new PrimaryDrawerItem().withName(getResources().getString(R.string.versao_aplicacao) + " " + funcoes.getNomeVersaoAplicacao()),
-                        new PrimaryDrawerItem().withName(funcoes.getValorXml(funcoes.TAG_UUID_DISPOSITIVO))
+                        new PrimaryDrawerItem().withName(funcoes.getValorXml(funcoes.TAG_UUID_DISPOSITIVO)),
+                        new PrimaryDrawerItem().withName(getResources().getString(R.string.id_empresa) + " " + funcoes.getValorXml(funcoes.TAG_CODIGO_EMPRESA)),
+                        new PrimaryDrawerItem().withName(getResources().getString(R.string.cnpj_cpf) + ": " + funcoes.getValorXml(funcoes.TAG_CNPJ_EMPRESA))
+
 
                 )
             .withDisplayBelowStatusBar(true)
@@ -223,9 +228,14 @@ public class InicioMDActivity extends AppCompatActivity {
                             Intent intent = new Intent(InicioMDActivity.this, ClienteListaMDActivity.class);
                             startActivity(intent);
                             return true;
-                        //break;
 
                         case 2:
+                            // Abre a tela de clientes
+                            Intent intentPositivacao = new Intent(InicioMDActivity.this, ClientePositivacaoMDActivity.class);
+                            startActivity(intentPositivacao);
+                            return true;
+
+                        case 3:
                             // Abre a tela Lista de Orcamento
                             Intent intentListaOrcamentoPedido = new Intent(InicioMDActivity.this, ListaOrcamentoPedidoMDActivity.class);
                             // Salva um valor para transferir para outrao Activity(Tela)
@@ -234,7 +244,7 @@ public class InicioMDActivity extends AppCompatActivity {
                             startActivity(intentListaOrcamentoPedido);
                             return true;
 
-                        case 3:
+                        case 4:
                             // Tela de lista de produtos
                             // Cria um dialog para selecionar atacado ou varejo
                             AlertDialog.Builder mensagemAtacadoVarejo = new AlertDialog.Builder(InicioMDActivity.this);
@@ -260,14 +270,14 @@ public class InicioMDActivity extends AppCompatActivity {
                             mensagemAtacadoVarejo.show();
                             return true;
 
-                        case 4:
+                        case 5:
                             // Tela de Lista de Titulos
                             Intent intentListaTitulos = new Intent(InicioMDActivity.this, ListaTitulosMDActivity.class);
                             // Abre outra tela
                             startActivity(intentListaTitulos);
                             return true;
 
-                        case 5:
+                        case 6:
                             // Tela de Lista de Pedidos nao enviados
                             Intent intentListaPedido = new Intent(InicioMDActivity.this, ListaOrcamentoPedidoMDActivity.class);
                             // Salva um valor para transferir para outrao Activity(Tela)
@@ -276,7 +286,7 @@ public class InicioMDActivity extends AppCompatActivity {
                             startActivity(intentListaPedido);
                             return true;
 
-                        case 6:
+                        case 7:
                             // Tela de Lista de Pedidos nao enviados
                             Intent intentListaPedidoEnviado = new Intent(InicioMDActivity.this, ListaOrcamentoPedidoMDActivity.class);
                             // Salva um valor para transferir para outrao Activity(Tela)
@@ -285,7 +295,7 @@ public class InicioMDActivity extends AppCompatActivity {
                             startActivity(intentListaPedidoEnviado);
                             return true;
 
-                        case 7:
+                        case 8:
                             // Tela de orcamentos excluidos(lixeira)
                             Intent intentListaExcluido = new Intent(InicioMDActivity.this, ListaOrcamentoPedidoMDActivity.class);
                             // Salva um valor para transferir para outrao Activity(Tela)
@@ -294,33 +304,42 @@ public class InicioMDActivity extends AppCompatActivity {
                             startActivity(intentListaExcluido);
                             return true;
 
-                        case 8:
+                        case 9:
                             // Tela de sincronização
                             Intent intentListaSincronizacao = new Intent(InicioMDActivity.this, SincronizacaoMDActivity.class);
                             // Abre outra tela
                             startActivity(intentListaSincronizacao);
                             return true;
 
-                        case 9:
-                            // Tela de sincronização
+                        case 10:
+                            // Tela de configuracoes
                             Intent intentListaConfiguracoes = new Intent(InicioMDActivity.this, ConfiguracoesMDActivity.class);
                             // Abre outra tela
                             startActivity(intentListaConfiguracoes);
                             return true;
 
-                        case 11:
+                        case 12:
                             // Tela de sincronização
                             Intent intentLogs = new Intent(InicioMDActivity.this, LogActivity.class);
                             // Abre outra tela
                             startActivity(intentLogs);
                             return true;
 
-                        case 17: case 18:
+                        case 17:
+                            // Tela de sincronização
+                            Intent intentUltimaSincronizacao = new Intent(InicioMDActivity.this, UltimaAtualizacaoActivity.class);
+                            // Abre outra tela
+                            startActivity(intentUltimaSincronizacao);
+                            return true;
+
+                        case 18: case 19: case 20: case 21:
                             // Tela de sincronização
                             Intent intentSobreSavare = new Intent(InicioMDActivity.this, SobreSavareMDActivity.class);
                             // Abre outra tela
                             startActivity(intentSobreSavare);
                             return true;
+
+
 
                         default:
                             return false;
