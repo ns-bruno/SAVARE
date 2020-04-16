@@ -1300,10 +1300,14 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                             }
 
                         } else {
+                            final StringBuilder mensagemErro = new StringBuilder();
+                            mensagemErro.append("Codigo: " + (statuRetorno != null ? statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO) : "Desconhecido") + "\n");
+                            mensagemErro.append("Mensagem: " + (statuRetorno != null ? statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_MENSAGEM_RETORNO)
+                                    : "Desconhecido, não foi retornado nenhuma informação do servidor para a variavel statuRetorno. " +
+                                      "Com isso não conseguimos registrar este dispositivo no servidor da empresa. "));
+
                             bigTextStyle.bigText(context.getResources().getString(
-                                    R.string.nao_chegou_dados_servidor_empresa) + "\n" +
-                                    "Codigo: " + statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO) + "\n" +
-                                    "Mensagem: " + statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_MENSAGEM_RETORNO))
+                                    R.string.nao_chegou_dados_servidor_empresa) + "\n" + mensagemErro.toString())
                                     .setBigContentTitle(context.getResources().getString(R.string.recebendo_dados_usuario));
                             mBuilder.setStyle(bigTextStyle)
                                     .setProgress(0, 0, false);
@@ -1314,9 +1318,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                 ((Activity) context).runOnUiThread(new Runnable() {
                                     public void run() {
                                         textStatusErro.append("\n*" +
-                                                context.getResources().getString(R.string.nao_conseguimos_registrar_dispositivo) + "\n" +
-                                                "Codigo: " + finalStatuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO) + "\n" +
-                                                "Mensagem: " + finalStatuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_MENSAGEM_RETORNO));
+                                                context.getResources().getString(R.string.nao_conseguimos_registrar_dispositivo) + "\n" + mensagemErro.toString());
                                     }
                                 });
                             }
@@ -1325,19 +1327,21 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                 public void run() {
                                     new MaterialDialog.Builder(context)
                                             .title("ReceberDadosWebserviceAsyncRotinas")
-                                            .content(context.getResources().getString(R.string.nao_conseguimos_registrar_dispositivo) + "\n" +
-                                                    "Codigo: " + finalStatuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO) +
-                                                    "Mensagem: " + finalStatuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_MENSAGEM_RETORNO))
+                                            .content(context.getResources().getString(R.string.nao_conseguimos_registrar_dispositivo) + "\n" + mensagemErro.toString())
                                             .positiveText(R.string.button_ok)
                                             .show();
                                 }
                             });
                         }
                     } else {
+                        final StringBuilder mensagemErro = new StringBuilder();
+                        mensagemErro.append("Codigo: " + (statuRetorno != null ? statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO) : "Desconhecido") + "\n");
+                        mensagemErro.append("Mensagem: " + (statuRetorno != null ? statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_MENSAGEM_RETORNO)
+                                : "Desconhecido, não foi retornado nenhuma informação do servidor para a variavel retornoWebservice e nem da variavel statuRetorno. " +
+                                  "Com isso não conseguimos registrar este dispositivo no servidor da empresa. "));
+
                         // Cria uma notificacao para ser manipulado
-                        bigTextStyle.bigText(context.getResources().getString(R.string.nao_conseguimos_registrar_dispositivo) + "\n" +
-                                "Codigo: " + statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO) + "\n" +
-                                "Mensagem: " + statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_MENSAGEM_RETORNO))
+                        bigTextStyle.bigText(context.getResources().getString(R.string.nao_conseguimos_registrar_dispositivo) + "\n" + mensagemErro.toString())
                                 .setBigContentTitle(context.getResources().getString(R.string.recebendo_dados));
                         mBuilder.setStyle(bigTextStyle)
                                 .setProgress(0, 0, false);
@@ -1347,9 +1351,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                             final JsonObject finalStatuRetorno = statuRetorno;
                             ((Activity) context).runOnUiThread(new Runnable() {
                                 public void run() {
-                                    textStatusErro.append("\n*" + context.getResources().getString(R.string.nao_conseguimos_registrar_dispositivo) + "\n" +
-                                            "Codigo: " + finalStatuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO) +
-                                            "Mensagem: " + finalStatuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_MENSAGEM_RETORNO));
+                                    textStatusErro.append("\n*" + context.getResources().getString(R.string.nao_conseguimos_registrar_dispositivo) + "\n" + mensagemErro.toString());
                                 }
                             });
                         }
@@ -1490,11 +1492,14 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                         }
                         return true;
                     } else {
+                        final StringBuilder mensagemErro = new StringBuilder();
+                        mensagemErro.append("Codigo: " + (statuRetorno != null ? statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO) : "Desconhecido") + "\n");
+                        mensagemErro.append("Mensagem: " + (statuRetorno != null ? statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_MENSAGEM_RETORNO)
+                                : "Desconhecido, não foi retornado nenhuma informação do servidor para a variavel statuRetorno. Com isso não conseguimos registrar este dispositivo no servidor central. "));
+
                         // Cria uma notificacao para ser manipulado
                         bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.msg_error))
-                                .bigText(context.getResources().getString(R.string.nao_chegou_dados_servidor_empresa) + "\n" +
-                                        "Codigo: " + statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO) + "\n" +
-                                        "Mensagem: " + statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_MENSAGEM_RETORNO));
+                                .bigText(context.getResources().getString(R.string.nao_chegou_dados_servidor_empresa) + "\n" + mensagemErro.toString());
                         mBuilder.setStyle(bigTextStyle)
                                 .setProgress(0, 0, false);
                         notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
@@ -1504,9 +1509,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                             ((Activity) context).runOnUiThread(new Runnable() {
                                 public void run() {
                                     textStatusErro.append("\n*" +
-                                            context.getResources().getString(R.string.nao_conseguimos_registrar_dispositivo) + "\n" +
-                                            "Codigo: " + finalStatuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO) + "\n" +
-                                            "Mensagem: " + finalStatuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_MENSAGEM_RETORNO));
+                                            context.getResources().getString(R.string.nao_chegou_dados_servidor_empresa) + "\n" + mensagemErro.toString());
                                 }
                             });
                         }
@@ -1515,31 +1518,29 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                             public void run() {
                                 new MaterialDialog.Builder(context)
                                         .title("ReceberDadosWebserviceAsyncRotinas")
-                                        .content(context.getResources().getString(R.string.nao_conseguimos_registrar_dispositivo) + "\n" +
-                                                "Codigo: " + finalStatuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO) + "\n" +
-                                                "Mensagem: " + finalStatuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_MENSAGEM_RETORNO))
+                                        .content(context.getResources().getString(R.string.nao_conseguimos_registrar_dispositivo) + "\n" + mensagemErro.toString())
                                         .positiveText(R.string.button_ok)
                                         .show();
                             }
                         });
                     }
                 } else {
+                    final StringBuilder mensagemErro = new StringBuilder();
+                    mensagemErro.append("Codigo: " + (statuRetorno != null ? statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO) : "Desconhecido") + "\n");
+                    mensagemErro.append("Mensagem: " + (statuRetorno != null ? statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_MENSAGEM_RETORNO)
+                            : "Desconhecido, não foi retornado nenhuma informação do servidor para a variavel retornoWebservice e nem para variavel statuRetorno. Com isso não conseguimos registrar este dispositivo."));
+
                     // Cria uma notificacao para ser manipulado
                     bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.msg_error))
-                            .bigText(context.getResources().getString(R.string.nao_conseguimos_registrar_dispositivo) + "\n" +
-                                    "Codigo: " + statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO) + "\n" +
-                                    "Mensagem: " + statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_MENSAGEM_RETORNO));
+                            .bigText(context.getResources().getString(R.string.nao_conseguimos_registrar_dispositivo) + "\n" + mensagemErro.toString());
                     mBuilder.setStyle(bigTextStyle)
                             .setProgress(0, 0, false);
                     notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
 
                     if (textStatus != null) {
-                        final JsonObject finalStatuRetorno = statuRetorno;
                         ((Activity) context).runOnUiThread(new Runnable() {
                             public void run() {
-                                textStatusErro.append("\n*" + context.getResources().getString(R.string.nao_conseguimos_registrar_dispositivo) + "\n" +
-                                        "Codigo: " + finalStatuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO) +
-                                        "Mensagem: " + finalStatuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_MENSAGEM_RETORNO));
+                                textStatusErro.append("\n*" + context.getResources().getString(R.string.nao_conseguimos_registrar_dispositivo) + "\n" + mensagemErro.toString());
                             }
                         });
                     }

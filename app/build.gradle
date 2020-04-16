@@ -10,8 +10,8 @@ android {
         //vectorDrawables.useSupportLibrary = true
         minSdkVersion 16
         targetSdkVersion 28
-        versionCode 22000
-        versionName "2.2.0.00"
+        versionCode 22002
+        versionName "2.2.0.02"
         multiDexEnabled true
     }
 
