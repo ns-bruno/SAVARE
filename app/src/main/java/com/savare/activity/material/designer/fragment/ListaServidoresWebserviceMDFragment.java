@@ -1,16 +1,14 @@
 package com.savare.activity.material.designer.fragment;
 
-import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.github.clans.fab.FloatingActionButton;
@@ -18,7 +16,6 @@ import com.github.clans.fab.FloatingActionMenu;
 import com.heinrichreimersoftware.materialintro.app.SlideFragment;
 import com.savare.R;
 import com.savare.activity.material.designer.CadastroServidorMDActivity;
-import com.savare.activity.material.designer.ListaServidoresWebserviceMDActivity;
 import com.savare.adapter.ItemUniversalAdapter;
 import com.savare.beans.ServidoresBeans;
 import com.savare.funcoes.FuncoesPersonalizadas;

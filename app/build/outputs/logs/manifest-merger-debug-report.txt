@@ -1,76 +1,76 @@
 -- Merging decision tree log ---
 manifest
-ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:2:1-279:12
-INJECTED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:2:1-279:12
-INJECTED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:2:1-279:12
-INJECTED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:2:1-279:12
-MERGED from [com.android.support:multidex:1.0.2] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\5a8cd89d192afa40a3f460d7d46570fc\multidex-1.0.2\AndroidManifest.xml:17:1-22:12
-MERGED from [com.mikepenz:materialdrawer:6.0.9] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\005990774923bdc858cb308c1fed6613\materialdrawer-6.0.9\AndroidManifest.xml:2:1-11:12
-MERGED from [com.github.arimorty:floatingsearchview:1.1.2] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\094fc6a8aba4170e51b4fa4316da9d03\floatingsearchview-1.1.2\AndroidManifest.xml:2:1-13:12
-MERGED from [com.android.support:design:28.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\1c4fd9a4c3095b679bed23a46e0bcf6c\design-28.0.0\AndroidManifest.xml:17:1-24:12
-MERGED from [com.github.dexafree:materiallist:3.2.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\838fb4f637c0c59c1c09e9520fdf63de\materiallist-3.2.1\AndroidManifest.xml:2:1-16:12
-MERGED from [com.afollestad.material-dialogs:core:0.9.5.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\a87493fa2be43158522c9322894edc27\core-0.9.5.0\AndroidManifest.xml:2:1-15:12
-MERGED from [com.github.johnpersano:supertoasts:2.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\c053798a6fcef6bb55556ad4882ee005\supertoasts-2.0\AndroidManifest.xml:17:1-30:12
-MERGED from [com.heinrichreimersoftware:material-intro:1.6] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\b3bab15346a2c7e2c3d51cb824a313d9\material-intro-1.6\AndroidManifest.xml:2:1-12:12
-MERGED from [com.mikepenz:iconics-core:3.0.4] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\dbc2af59abb968e077f8ecbbef37f41c\iconics-core-3.0.4\AndroidManifest.xml:2:1-11:12
-MERGED from [com.mikepenz:fastadapter-extensions-expandable:3.2.8] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\e136086cf9713e4869657d5136e24060\fastadapter-extensions-expandable-3.2.8\AndroidManifest.xml:2:1-11:12
-MERGED from [com.mikepenz:fastadapter-commons:3.2.8] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\64434b8d9ef9a4e263463665cb431f6d\fastadapter-commons-3.2.8\AndroidManifest.xml:2:1-11:12
-MERGED from [com.mikepenz:fastadapter:3.2.8] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\5641c7573f74f9717098639ec4fb352b\fastadapter-3.2.8\AndroidManifest.xml:2:1-11:12
-MERGED from [me.zhanghai.android.materialprogressbar:library:1.4.2] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\70dbbdd0e19af0e74034dd17ccb9e6f8\library-1.4.2\AndroidManifest.xml:6:1-16:12
-MERGED from [com.android.support:appcompat-v7:28.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\aaffe2c7f23d715ca045db9d0a51d031\appcompat-v7-28.0.0\AndroidManifest.xml:17:1-22:12
-MERGED from [com.android.support:recyclerview-v7:28.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\7b826c3f5b1c303c68d239e88fd46d1f\recyclerview-v7-28.0.0\AndroidManifest.xml:17:1-22:12
-MERGED from [com.android.support:support-v13:28.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\4f4dd0b3e91a7288db2623513415d29d\support-v13-28.0.0\AndroidManifest.xml:17:1-22:12
-MERGED from [com.bartoszlipinski:viewpropertyobjectanimator:1.2.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\7b746eeaf65796dcd139476cf86b67f3\viewpropertyobjectanimator-1.2.0\AndroidManifest.xml:2:1-11:12
-MERGED from [com.android.support:support-v4:28.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\93ee600e006118fa0b1e3ad8828fce02\support-v4-28.0.0\AndroidManifest.xml:17:1-22:12
-MERGED from [com.android.support:support-fragment:28.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\6e07dd593fd232c7452c3c20dd27a8e1\support-fragment-28.0.0\AndroidManifest.xml:17:1-22:12
-MERGED from [com.android.support:animated-vector-drawable:28.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\dd73b81ee8477d30c51950de1c7d4569\animated-vector-drawable-28.0.0\AndroidManifest.xml:17:1-22:12
-MERGED from [com.android.support:support-core-ui:28.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\4ac8bacc6bdc06da514981c2a3855a4a\support-core-ui-28.0.0\AndroidManifest.xml:17:1-22:12
-MERGED from [com.android.support:support-core-utils:28.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\d5d5e0afb6d849720ba2f95b3e39fcb5\support-core-utils-28.0.0\AndroidManifest.xml:17:1-22:12
-MERGED from [com.android.support:support-vector-drawable:28.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\f70c181cc5010e4998d82bc8bd89fbfc\support-vector-drawable-28.0.0\AndroidManifest.xml:17:1-22:12
-MERGED from [com.android.support:transition:28.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\d7115113d29f3235816be8df15cb4c6d\transition-28.0.0\AndroidManifest.xml:17:1-22:12
-MERGED from [com.android.support:support-media-compat:28.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\95c31ded494307afe99fdddbe88a703e\support-media-compat-28.0.0\AndroidManifest.xml:17:1-22:12
-MERGED from [com.android.support:loader:28.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\1b9d515d8d1965c403de8914ca55cb7e\loader-28.0.0\AndroidManifest.xml:17:1-22:12
-MERGED from [com.android.support:viewpager:28.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\f92ce9c7365574accb4fbe105fd65c21\viewpager-28.0.0\AndroidManifest.xml:17:1-22:12
-MERGED from [com.android.support:coordinatorlayout:28.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\27bfd3d5fa1a19402f7d4ba14fb093b2\coordinatorlayout-28.0.0\AndroidManifest.xml:17:1-22:12
-MERGED from [com.android.support:drawerlayout:28.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\efc59ff1f1e99fe01414b630035d92d4\drawerlayout-28.0.0\AndroidManifest.xml:17:1-22:12
-MERGED from [com.android.support:slidingpanelayout:28.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\6064ab6775e6301e62ccb69ace9dbdbd\slidingpanelayout-28.0.0\AndroidManifest.xml:17:1-22:12
-MERGED from [com.android.support:customview:28.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\3c823cc0e07b899cd90d87fa2096c1f1\customview-28.0.0\AndroidManifest.xml:17:1-22:12
-MERGED from [com.android.support:swiperefreshlayout:28.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\a3a8c8cd8e894f6104aa84c89d48db43\swiperefreshlayout-28.0.0\AndroidManifest.xml:17:1-22:12
-MERGED from [com.android.support:asynclayoutinflater:28.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\65fb01e2ae4e35f2f343847d68c9b98d\asynclayoutinflater-28.0.0\AndroidManifest.xml:17:1-22:12
-MERGED from [com.android.support:support-compat:28.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\4e7b3bbed8e6e29e2ba6d4fc6e8eccff\support-compat-28.0.0\AndroidManifest.xml:17:1-24:12
-MERGED from [com.android.support:versionedparcelable:28.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\d107c5806233895e5be684de327d381f\versionedparcelable-28.0.0\AndroidManifest.xml:17:1-25:12
-MERGED from [com.android.support:cursoradapter:28.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\ad328008f0a36049c16e2e42bbe6ba36\cursoradapter-28.0.0\AndroidManifest.xml:17:1-22:12
-MERGED from [com.android.support:cardview-v7:28.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\bcdc9cd251fcac7ebe27addc2e62b01d\cardview-v7-28.0.0\AndroidManifest.xml:17:1-22:12
-MERGED from [android.arch.lifecycle:runtime:1.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\0160f619c43aa1ecd28ae91ba8993552\runtime-1.1.1\AndroidManifest.xml:17:1-22:12
-MERGED from [com.android.support:documentfile:28.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\1938455035f0a35aa3eefef3aa9fbbc4\documentfile-28.0.0\AndroidManifest.xml:17:1-22:12
-MERGED from [com.android.support:localbroadcastmanager:28.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\1dc9df8e70a38f62679d702ec717a6a9\localbroadcastmanager-28.0.0\AndroidManifest.xml:17:1-22:12
-MERGED from [com.android.support:print:28.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\4fd4a6ed80eb447e76c05986ef3fd6a1\print-28.0.0\AndroidManifest.xml:17:1-22:12
-MERGED from [android.arch.lifecycle:viewmodel:1.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\823f37c489bd02c4a4d0f6ca442a27d7\viewmodel-1.1.1\AndroidManifest.xml:17:1-22:12
-MERGED from [com.android.support:interpolator:28.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\d622bc834304bbaef61946e6b6568c26\interpolator-28.0.0\AndroidManifest.xml:17:1-22:12
-MERGED from [android.arch.lifecycle:livedata:1.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\f33d666ad8cee70ee4e661f9bad8e372\livedata-1.1.1\AndroidManifest.xml:17:1-22:12
-MERGED from [android.arch.lifecycle:livedata-core:1.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\85526c118dcfe3eae0cf402e2cecc572\livedata-core-1.1.1\AndroidManifest.xml:17:1-22:12
-MERGED from [android.arch.core:runtime:1.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\5853616defd81755613306a8befefe63\runtime-1.1.1\AndroidManifest.xml:17:1-22:12
+ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:2:1-280:12
+INJECTED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:2:1-280:12
+INJECTED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:2:1-280:12
+INJECTED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:2:1-280:12
+MERGED from [androidx.multidex:multidex:2.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\b49de40908d20f742852b1e123dcefcf\multidex-2.0.0\AndroidManifest.xml:17:1-22:12
+MERGED from [com.mikepenz:materialdrawer:6.0.9] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\3de9ea02101c61beb749f952b00e8ffc\jetified-materialdrawer-6.0.9\AndroidManifest.xml:2:1-11:12
+MERGED from [com.github.arimorty:floatingsearchview:1.1.2] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\3eeb0c7b957b91b2c2c4d13c93181db8\jetified-floatingsearchview-1.1.2\AndroidManifest.xml:2:1-13:12
+MERGED from [com.google.android.material:material:1.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\01aba6feafaa9666a150e0ccab90f24c\material-1.0.0\AndroidManifest.xml:17:1-24:12
+MERGED from [com.github.dexafree:materiallist:3.2.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\f842b37fad5efc2e108fb7266d46a0da\jetified-materiallist-3.2.1\AndroidManifest.xml:2:1-16:12
+MERGED from [com.afollestad.material-dialogs:core:0.9.5.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\8511c49b7df30fc03ea66fea5769caf1\jetified-core-0.9.5.0\AndroidManifest.xml:2:1-15:12
+MERGED from [com.github.johnpersano:supertoasts:2.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\4d2887b2a46069123d0f0ee2e9950901\jetified-supertoasts-2.0\AndroidManifest.xml:17:1-30:12
+MERGED from [com.heinrichreimersoftware:material-intro:1.6] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\73c1e8f44e9a6671f53a9e46b936aaac\jetified-material-intro-1.6\AndroidManifest.xml:2:1-12:12
+MERGED from [com.mikepenz:iconics-core:3.0.4] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\b2b310dc6d81a9703cc8f17171a2a2ec\jetified-iconics-core-3.0.4\AndroidManifest.xml:2:1-11:12
+MERGED from [com.mikepenz:fastadapter-extensions-expandable:3.2.8] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\dd0308958916da02d6be211a947493de\jetified-fastadapter-extensions-expandable-3.2.8\AndroidManifest.xml:2:1-11:12
+MERGED from [com.mikepenz:fastadapter-commons:3.2.8] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\05ff946d401822936cab897a3760d950\jetified-fastadapter-commons-3.2.8\AndroidManifest.xml:2:1-11:12
+MERGED from [com.mikepenz:fastadapter:3.2.8] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\ac3a1267d6daaf04e346b8dfff439212\jetified-fastadapter-3.2.8\AndroidManifest.xml:2:1-11:12
+MERGED from [me.zhanghai.android.materialprogressbar:library:1.4.2] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\1e7bee5aa4224f913081fa90f246f812\jetified-library-1.4.2\AndroidManifest.xml:6:1-16:12
+MERGED from [androidx.appcompat:appcompat:1.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\24c8333af3f2d43ff2b1c71d3d52d739\appcompat-1.0.0\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.recyclerview:recyclerview:1.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\d5caeb323d2f012734c7fc83bc887a28\recyclerview-1.0.0\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.legacy:legacy-support-v13:1.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\33e0649f383d614f566b2822b9a2c6e0\legacy-support-v13-1.0.0\AndroidManifest.xml:17:1-22:12
+MERGED from [com.bartoszlipinski:viewpropertyobjectanimator:1.2.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\dedd15b5ae3ac7c92ea22b80b9d7a799\jetified-viewpropertyobjectanimator-1.2.0\AndroidManifest.xml:2:1-11:12
+MERGED from [androidx.legacy:legacy-support-v4:1.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\5c75bd7951d359a85775620c0170e49e\legacy-support-v4-1.0.0\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.fragment:fragment:1.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\3c34672520a20385459add6dbdffba42\fragment-1.0.0\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.vectordrawable:vectordrawable-animated:1.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\dc2bcafcb36dae47e49078b9230baea7\vectordrawable-animated-1.0.0\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.legacy:legacy-support-core-ui:1.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\92f8e3eea2413f9234d57f836e040f22\legacy-support-core-ui-1.0.0\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.legacy:legacy-support-core-utils:1.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\18e25bdaeb278667d7aef2960bdb2cf5\legacy-support-core-utils-1.0.0\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.vectordrawable:vectordrawable:1.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\8bfc0a81decb3595ac502582a2aeb0f5\vectordrawable-1.0.0\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.transition:transition:1.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\677aa75f82ea85608bf2d524d4539a5f\transition-1.0.0\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.media:media:1.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\e6db2a8ebafb4101960628e4b20a9462\media-1.0.0\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.loader:loader:1.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\495dc0f2fa247d616fe68db13bf5e07d\loader-1.0.0\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.viewpager:viewpager:1.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\ad12b5d47f95c8d2598703c1b1f7c267\viewpager-1.0.0\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.coordinatorlayout:coordinatorlayout:1.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\10c23e4693f75e7c26502c252f3749d1\coordinatorlayout-1.0.0\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.drawerlayout:drawerlayout:1.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\cb2cdf934d3d3e0441b52d1dc3cb2e6a\drawerlayout-1.0.0\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.slidingpanelayout:slidingpanelayout:1.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\0408bc08863151ad5a41361bace418b5\slidingpanelayout-1.0.0\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.customview:customview:1.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\223ae8e78f23f48ba5d96a1dcabe1834\customview-1.0.0\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.swiperefreshlayout:swiperefreshlayout:1.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\98533a75c963d389d2db7b5a19727bc5\swiperefreshlayout-1.0.0\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.asynclayoutinflater:asynclayoutinflater:1.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\48d198bece9830d2bf28cd51b05742db\asynclayoutinflater-1.0.0\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.core:core:1.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\45ca2b27b5a8d2aecb4ee89b6457658f\core-1.0.0\AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.versionedparcelable:versionedparcelable:1.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\f6ee4caf47f75b1f61a904ebd80d0032\versionedparcelable-1.0.0\AndroidManifest.xml:17:1-25:12
+MERGED from [androidx.cursoradapter:cursoradapter:1.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\aace0d5da73d2c817f12bb96d6698e5c\cursoradapter-1.0.0\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.cardview:cardview:1.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\7d7fd0d2929b90b96150578fa61b2794\cardview-1.0.0\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.lifecycle:lifecycle-runtime:2.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\8dbf56085c74c454281b9c5a225b9c28\lifecycle-runtime-2.0.0\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.documentfile:documentfile:1.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\1d3d300991201f0272c309154f6a5e44\documentfile-1.0.0\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.localbroadcastmanager:localbroadcastmanager:1.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\b483c59108b83b2c001374a9e1131636\localbroadcastmanager-1.0.0\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.print:print:1.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\28efee2bf1e9a77f569846ad27f8a168\print-1.0.0\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.lifecycle:lifecycle-viewmodel:2.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\9f9944fa6494846e4e59ed50f5459a60\lifecycle-viewmodel-2.0.0\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.interpolator:interpolator:1.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\c4e2469658fdd8801a5306110b0915fc\interpolator-1.0.0\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.lifecycle:lifecycle-livedata:2.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\54ec9a60a0f20829d9c5323f1ce0908c\lifecycle-livedata-2.0.0\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.lifecycle:lifecycle-livedata-core:2.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\0571339fd4cb74441b19561f6766bb98\lifecycle-livedata-core-2.0.0\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.arch.core:core-runtime:2.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\0f91f258f9d0abaa0e56c019df47bd85\core-runtime-2.0.0\AndroidManifest.xml:17:1-22:12
 MERGED from [com.github.clans:fab:1.6.2] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\e913af79c91cf7082e47e1ba8c5a280c\fab-1.6.2\AndroidManifest.xml:2:1-14:12
-MERGED from [de.hdodenhof:circleimageview:2.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\b5bb0490e376922db6987dbc8b1fe829\circleimageview-2.0.0\AndroidManifest.xml:2:1-11:12
-MERGED from [com.ogaclejapan.smarttablayout:library:1.6.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\6a34408ae0b5408612d4b78bbba36d1c\library-1.6.0\AndroidManifest.xml:2:1-12:12
-MERGED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\033e883894a54ab007f2aeb4ffa71816\zxing-orient-2.1.1\AndroidManifest.xml:17:1-170:12
+MERGED from [de.hdodenhof:circleimageview:2.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\486c0f6078c56718cb5b80fe12625dac\jetified-circleimageview-2.0.0\AndroidManifest.xml:2:1-11:12
+MERGED from [com.ogaclejapan.smarttablayout:library:1.6.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\34c192869a6333ea4d1373d3dc578a8b\jetified-library-1.6.0\AndroidManifest.xml:2:1-12:12
+MERGED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\cdeaf918fff8961be47ed8e4d8842e98\jetified-zxing-orient-2.1.1\AndroidManifest.xml:17:1-170:12
 MERGED from [com.github.deano2390:MaterialShowcaseView:1.3.4] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\04f705a20c0c43a59434ca91853a792c\MaterialShowcaseView-1.3.4\AndroidManifest.xml:2:1-11:12
-MERGED from [com.mikepenz:materialize:1.1.2] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\83bdb60c0e693b76f9ad81cc71318f67\materialize-1.1.2\AndroidManifest.xml:2:1-12:12
+MERGED from [com.mikepenz:materialize:1.1.2] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\dfb8de2e96746ede72f45b375a3ba3c2\jetified-materialize-1.1.2\AndroidManifest.xml:2:1-12:12
 MERGED from [me.grantland:autofittextview:0.2.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\fd1bef93c7babc72b8c5db2aaab5e14d\autofittextview-0.2.0\AndroidManifest.xml:2:1-13:12
-INJECTED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:2:1-279:12
-INJECTED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:2:1-279:12
-INJECTED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:2:1-279:12
+INJECTED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:2:1-280:12
+INJECTED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:2:1-280:12
+INJECTED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:2:1-280:12
 	package
 		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:3:5-25
 		INJECTED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml
 		INJECTED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml
 	android:versionName
 		INJECTED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml
-		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:2:1-279:12
+		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:2:1-280:12
 		INJECTED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml
 	android:versionCode
 		INJECTED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml
-		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:2:1-279:12
+		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:2:1-280:12
 		INJECTED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml
 	xmlns:android
 		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:2:11-69
@@ -132,8 +132,8 @@ ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\m
 		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:22:22-75
 uses-permission#android.permission.VIBRATE
 ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:23:5-66
-MERGED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\033e883894a54ab007f2aeb4ffa71816\zxing-orient-2.1.1\AndroidManifest.xml:28:5-66
-MERGED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\033e883894a54ab007f2aeb4ffa71816\zxing-orient-2.1.1\AndroidManifest.xml:28:5-66
+MERGED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\cdeaf918fff8961be47ed8e4d8842e98\jetified-zxing-orient-2.1.1\AndroidManifest.xml:28:5-66
+MERGED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\cdeaf918fff8961be47ed8e4d8842e98\jetified-zxing-orient-2.1.1\AndroidManifest.xml:28:5-66
 	android:name
 		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:23:22-63
 uses-permission#android.permission.GET_ACCOUNTS
@@ -149,33 +149,35 @@ ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\m
 	android:name
 		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:26:22-70
 application
-ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:28:5-277:19
-MERGED from [com.github.arimorty:floatingsearchview:1.1.2] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\094fc6a8aba4170e51b4fa4316da9d03\floatingsearchview-1.1.2\AndroidManifest.xml:11:5-20
-MERGED from [com.github.arimorty:floatingsearchview:1.1.2] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\094fc6a8aba4170e51b4fa4316da9d03\floatingsearchview-1.1.2\AndroidManifest.xml:11:5-20
-MERGED from [com.android.support:design:28.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\1c4fd9a4c3095b679bed23a46e0bcf6c\design-28.0.0\AndroidManifest.xml:22:5-20
-MERGED from [com.android.support:design:28.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\1c4fd9a4c3095b679bed23a46e0bcf6c\design-28.0.0\AndroidManifest.xml:22:5-20
-MERGED from [com.github.dexafree:materiallist:3.2.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\838fb4f637c0c59c1c09e9520fdf63de\materiallist-3.2.1\AndroidManifest.xml:11:5-14:19
-MERGED from [com.github.dexafree:materiallist:3.2.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\838fb4f637c0c59c1c09e9520fdf63de\materiallist-3.2.1\AndroidManifest.xml:11:5-14:19
-MERGED from [com.afollestad.material-dialogs:core:0.9.5.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\a87493fa2be43158522c9322894edc27\core-0.9.5.0\AndroidManifest.xml:13:5-20
-MERGED from [com.afollestad.material-dialogs:core:0.9.5.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\a87493fa2be43158522c9322894edc27\core-0.9.5.0\AndroidManifest.xml:13:5-20
-MERGED from [com.github.johnpersano:supertoasts:2.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\c053798a6fcef6bb55556ad4882ee005\supertoasts-2.0\AndroidManifest.xml:26:5-28:38
-MERGED from [com.github.johnpersano:supertoasts:2.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\c053798a6fcef6bb55556ad4882ee005\supertoasts-2.0\AndroidManifest.xml:26:5-28:38
-MERGED from [com.android.support:support-compat:28.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\4e7b3bbed8e6e29e2ba6d4fc6e8eccff\support-compat-28.0.0\AndroidManifest.xml:22:5-94
-MERGED from [com.android.support:support-compat:28.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\4e7b3bbed8e6e29e2ba6d4fc6e8eccff\support-compat-28.0.0\AndroidManifest.xml:22:5-94
-MERGED from [com.android.support:versionedparcelable:28.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\d107c5806233895e5be684de327d381f\versionedparcelable-28.0.0\AndroidManifest.xml:22:5-23:19
-MERGED from [com.android.support:versionedparcelable:28.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\d107c5806233895e5be684de327d381f\versionedparcelable-28.0.0\AndroidManifest.xml:22:5-23:19
+ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:28:5-278:19
+MERGED from [com.github.arimorty:floatingsearchview:1.1.2] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\3eeb0c7b957b91b2c2c4d13c93181db8\jetified-floatingsearchview-1.1.2\AndroidManifest.xml:11:5-20
+MERGED from [com.github.arimorty:floatingsearchview:1.1.2] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\3eeb0c7b957b91b2c2c4d13c93181db8\jetified-floatingsearchview-1.1.2\AndroidManifest.xml:11:5-20
+MERGED from [com.google.android.material:material:1.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\01aba6feafaa9666a150e0ccab90f24c\material-1.0.0\AndroidManifest.xml:22:5-20
+MERGED from [com.google.android.material:material:1.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\01aba6feafaa9666a150e0ccab90f24c\material-1.0.0\AndroidManifest.xml:22:5-20
+MERGED from [com.github.dexafree:materiallist:3.2.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\f842b37fad5efc2e108fb7266d46a0da\jetified-materiallist-3.2.1\AndroidManifest.xml:11:5-14:19
+MERGED from [com.github.dexafree:materiallist:3.2.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\f842b37fad5efc2e108fb7266d46a0da\jetified-materiallist-3.2.1\AndroidManifest.xml:11:5-14:19
+MERGED from [com.afollestad.material-dialogs:core:0.9.5.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\8511c49b7df30fc03ea66fea5769caf1\jetified-core-0.9.5.0\AndroidManifest.xml:13:5-20
+MERGED from [com.afollestad.material-dialogs:core:0.9.5.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\8511c49b7df30fc03ea66fea5769caf1\jetified-core-0.9.5.0\AndroidManifest.xml:13:5-20
+MERGED from [com.github.johnpersano:supertoasts:2.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\4d2887b2a46069123d0f0ee2e9950901\jetified-supertoasts-2.0\AndroidManifest.xml:26:5-28:38
+MERGED from [com.github.johnpersano:supertoasts:2.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\4d2887b2a46069123d0f0ee2e9950901\jetified-supertoasts-2.0\AndroidManifest.xml:26:5-28:38
+MERGED from [androidx.core:core:1.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\45ca2b27b5a8d2aecb4ee89b6457658f\core-1.0.0\AndroidManifest.xml:22:5-89
+MERGED from [androidx.core:core:1.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\45ca2b27b5a8d2aecb4ee89b6457658f\core-1.0.0\AndroidManifest.xml:22:5-89
+MERGED from [androidx.versionedparcelable:versionedparcelable:1.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\f6ee4caf47f75b1f61a904ebd80d0032\versionedparcelable-1.0.0\AndroidManifest.xml:22:5-23:19
+MERGED from [androidx.versionedparcelable:versionedparcelable:1.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\f6ee4caf47f75b1f61a904ebd80d0032\versionedparcelable-1.0.0\AndroidManifest.xml:22:5-23:19
 MERGED from [com.github.clans:fab:1.6.2] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\e913af79c91cf7082e47e1ba8c5a280c\fab-1.6.2\AndroidManifest.xml:12:5-20
 MERGED from [com.github.clans:fab:1.6.2] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\e913af79c91cf7082e47e1ba8c5a280c\fab-1.6.2\AndroidManifest.xml:12:5-20
-MERGED from [de.hdodenhof:circleimageview:2.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\b5bb0490e376922db6987dbc8b1fe829\circleimageview-2.0.0\AndroidManifest.xml:9:5-20
-MERGED from [de.hdodenhof:circleimageview:2.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\b5bb0490e376922db6987dbc8b1fe829\circleimageview-2.0.0\AndroidManifest.xml:9:5-20
-MERGED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\033e883894a54ab007f2aeb4ffa71816\zxing-orient-2.1.1\AndroidManifest.xml:57:5-168:19
-MERGED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\033e883894a54ab007f2aeb4ffa71816\zxing-orient-2.1.1\AndroidManifest.xml:57:5-168:19
+MERGED from [de.hdodenhof:circleimageview:2.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\486c0f6078c56718cb5b80fe12625dac\jetified-circleimageview-2.0.0\AndroidManifest.xml:9:5-20
+MERGED from [de.hdodenhof:circleimageview:2.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\486c0f6078c56718cb5b80fe12625dac\jetified-circleimageview-2.0.0\AndroidManifest.xml:9:5-20
+MERGED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\cdeaf918fff8961be47ed8e4d8842e98\jetified-zxing-orient-2.1.1\AndroidManifest.xml:57:5-168:19
+MERGED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\cdeaf918fff8961be47ed8e4d8842e98\jetified-zxing-orient-2.1.1\AndroidManifest.xml:57:5-168:19
 MERGED from [me.grantland:autofittextview:0.2.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\fd1bef93c7babc72b8c5db2aaab5e14d\autofittextview-0.2.0\AndroidManifest.xml:11:5-47
 MERGED from [me.grantland:autofittextview:0.2.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\fd1bef93c7babc72b8c5db2aaab5e14d\autofittextview-0.2.0\AndroidManifest.xml:11:5-47
+	android:requestLegacyExternalStorage
+		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:36:9-52
 	android:appComponentFactory
-		ADDED from [com.android.support:support-compat:28.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\4e7b3bbed8e6e29e2ba6d4fc6e8eccff\support-compat-28.0.0\AndroidManifest.xml:22:18-91
+		ADDED from [androidx.core:core:1.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\45ca2b27b5a8d2aecb4ee89b6457658f\core-1.0.0\AndroidManifest.xml:22:18-86
 	android:supportsRtl
-		ADDED from [com.github.johnpersano:supertoasts:2.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\c053798a6fcef6bb55556ad4882ee005\supertoasts-2.0\AndroidManifest.xml:28:9-35
+		ADDED from [com.github.johnpersano:supertoasts:2.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\4d2887b2a46069123d0f0ee2e9950901\jetified-supertoasts-2.0\AndroidManifest.xml:28:9-35
 	android:label
 		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:32:9-41
 	android:hardwareAccelerated
@@ -191,439 +193,439 @@ MERGED from [me.grantland:autofittextview:0.2.0] C:\Users\Nogueira\.gradle\cache
 	android:usesCleartextTraffic
 		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:35:9-44
 meta-data#com.google.android.gms.analytics.globalConfigResource
-ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:38:9-40:54
+ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:39:9-41:54
 	android:resource
-		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:40:13-51
+		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:41:13-51
 	android:name
-		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:39:13-81
+		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:40:13-81
 activity#com.savare.activity.material.designer.LoginMDActivity
-ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:42:9-51:20
+ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:43:9-52:20
 	android:label
-		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:45:13-45
+		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:46:13-45
 	android:theme
-		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:44:13-48
+		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:45:13-48
 	android:name
-		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:43:13-71
+		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:44:13-71
 intent-filter#action:name:android.intent.action.MAIN+category:name:android.intent.category.LAUNCHER
-ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:46:13-50:29
+ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:47:13-51:29
 action#android.intent.action.MAIN
-ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:47:17-69
+ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:48:17-69
 	android:name
-		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:47:25-66
+		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:48:25-66
 category#android.intent.category.LAUNCHER
-ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:49:17-77
+ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:50:17-77
 	android:name
-		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:49:27-74
+		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:50:27-74
 activity#com.savare.activity.CadastroUsuarioActivity
-ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:52:9-70
+ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:53:9-70
 	android:name
-		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:52:19-67
+		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:53:19-67
 activity#com.savare.activity.LogActivity
-ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:53:9-58
+ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:54:9-58
 	android:name
-		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:53:19-55
+		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:54:19-55
 activity#com.savare.activity.material.designer.InicioMDActivity
-ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:54:9-55:56
+ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:55:9-56:56
 	android:theme
-		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:55:19-54
+		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:56:19-54
 	android:name
-		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:54:19-78
+		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:55:19-78
 activity#com.savare.activity.material.designer.ProdutoDetalhesMDActivity
-ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:56:9-57:50
+ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:57:9-58:50
 	android:theme
-		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:57:13-48
+		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:58:13-48
 	android:name
-		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:56:19-87
+		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:57:19-87
 activity#com.savare.activity.material.designer.ListaTitulosMDActivity
-ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:58:9-63:20
+ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:59:9-64:20
 	android:theme
-		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:59:13-48
+		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:60:13-48
 	android:name
-		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:58:19-84
+		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:59:19-84
 meta-data#android.app.searchable
-ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:60:13-62:54
+ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:61:13-63:54
 	android:resource
-		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:62:17-51
+		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:63:17-51
 	android:name
-		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:61:17-54
+		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:62:17-54
 activity#com.savare.activity.material.designer.ProdutoListaMDActivity
-ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:65:9-71:20
+ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:66:9-72:20
 	android:theme
-		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:67:13-48
+		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:68:13-48
 	android:name
-		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:66:13-78
+		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:67:13-78
 activity#com.savare.activity.SearchableActivity
-ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:73:9-86:20
+ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:74:9-87:20
 	android:label
-		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:76:13-45
+		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:77:13-45
 	android:launchMode
-		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:77:13-43
+		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:78:13-43
 	android:windowSoftInputMode
-		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:74:13-66
-	android:theme
-		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:78:13-48
-	android:name
 		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:75:13-66
+	android:theme
+		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:79:13-48
+	android:name
+		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:76:13-66
 intent-filter#action:name:android.intent.action.SEARCH
-ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:79:13-81:29
+ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:80:13-82:29
 action#android.intent.action.SEARCH
-ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:80:17-70
+ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:81:17-70
 	android:name
-		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:80:25-68
+		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:81:25-68
 activity#com.savare.activity.material.designer.ClienteDetalhesMDActivity
-ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:88:9-90:50
+ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:89:9-91:50
 	android:windowSoftInputMode
-		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:89:13-54
+		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:90:13-54
 	android:theme
-		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:90:13-48
+		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:91:13-48
 	android:name
-		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:88:19-87
+		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:89:19-87
 activity#com.savare.activity.material.designer.ClienteListaMDActivity
-ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:91:9-96:20
+ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:92:9-97:20
 	android:theme
-		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:92:13-48
+		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:93:13-48
 	android:name
-		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:91:19-84
+		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:92:19-84
 activity#com.savare.activity.material.designer.OrcamentoTabFragmentMDActivity
-ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:98:9-101:20
+ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:99:9-102:20
 	android:theme
-		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:100:13-48
+		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:101:13-48
 	android:name
-		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:99:13-86
+		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:100:13-86
 activity#com.savare.activity.material.designer.ListaOrcamentoPedidoMDActivity
-ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:103:9-106:20
+ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:104:9-107:20
 	android:theme
-		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:105:13-48
+		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:106:13-48
 	android:name
-		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:104:13-86
+		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:105:13-86
 activity#com.savare.activity.material.designer.SincronizacaoMDActivity
-ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:108:9-111:20
+ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:109:9-112:20
 	android:theme
-		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:110:13-48
+		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:111:13-48
 	android:name
-		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:109:13-79
+		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:110:13-79
 activity#com.savare.activity.material.designer.ConfiguracoesMDActivity
-ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:113:9-116:20
+ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:114:9-117:20
 	android:theme
-		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:115:13-48
+		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:116:13-48
 	android:name
-		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:114:13-79
+		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:115:13-79
 activity#com.savare.activity.material.designer.OrcamentoProdutoDetalhesTabFragmentMDActivity
-ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:118:9-120:20
+ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:119:9-121:20
 	android:theme
-		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:119:13-48
+		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:120:13-48
 	android:name
-		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:118:19-107
+		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:119:19-107
 activity#com.savare.activity.material.designer.RegistroChaveUsuarioMDActivity
-ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:122:9-125:20
+ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:123:9-126:20
 	android:theme
-		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:124:13-48
+		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:125:13-48
 	android:name
-		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:123:13-86
+		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:124:13-86
 activity#com.savare.activity.material.designer.OrcamentoCriticaMDActivity
-ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:127:9-130:20
+ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:128:9-131:20
 	android:theme
-		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:129:13-48
+		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:130:13-48
 	android:name
-		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:128:13-82
+		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:129:13-82
 activity#com.savare.activity.material.designer.CadastroServidorMDActivity
-ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:132:9-135:20
+ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:133:9-136:20
 	android:theme
-		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:134:13-48
+		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:135:13-48
 	android:name
-		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:133:13-82
+		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:134:13-82
 activity#com.savare.activity.material.designer.ListaServidoresWebserviceMDActivity
-ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:137:9-140:20
+ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:138:9-141:20
 	android:theme
-		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:139:13-48
+		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:140:13-48
 	android:name
-		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:138:13-91
+		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:139:13-91
 activity#com.savare.activity.material.designer.LegendaProdutoListaMDActivity
-ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:142:9-145:20
+ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:143:9-146:20
 	android:theme
-		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:144:13-48
+		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:145:13-48
 	android:name
-		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:143:13-85
+		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:144:13-85
 activity#com.savare.activity.material.designer.ClienteCadastroTabFragmentMDActivity
-ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:147:9-150:20
+ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:148:9-151:20
 	android:theme
-		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:149:13-48
+		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:150:13-48
 	android:name
-		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:148:13-92
+		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:149:13-92
 activity#com.savare.activity.material.designer.SobreSavareMDActivity
-ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:152:9-155:20
+ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:153:9-156:20
 	android:theme
-		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:154:13-48
+		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:155:13-48
 	android:name
-		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:153:13-77
+		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:154:13-77
 activity#com.savare.activity.material.designer.ClientePositivacaoMDActivity
-ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:157:9-160:20
+ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:158:9-161:20
 	android:theme
-		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:159:13-48
+		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:160:13-48
 	android:name
-		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:158:13-84
+		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:159:13-84
 activity#com.savare.activity.material.designer.UltimaAtualizacaoActivity
-ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:162:9-165:20
+ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:163:9-166:20
 	android:theme
-		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:164:13-48
+		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:165:13-48
 	android:name
-		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:163:13-81
+		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:164:13-81
 provider#com.savare.sincronizacao.EnviarProvider
-ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:168:9-172:38
+ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:169:9-173:38
 	android:authorities
-		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:170:13-60
+		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:171:13-60
 	android:syncable
-		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:172:13-36
+		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:173:13-36
 	android:exported
-		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:171:13-37
+		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:172:13-37
 	android:name
-		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:169:13-57
+		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:170:13-57
 provider#com.savare.provider.SearchableProvider
-ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:174:9-176:69
+ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:175:9-177:69
 	android:authorities
-		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:175:13-73
+		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:176:13-73
 	android:name
-		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:176:13-66
-provider#android.support.v4.content.FileProvider
-ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:178:9-186:20
+		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:177:13-66
+provider#androidx.core.content.FileProvider
+ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:179:9-187:20
 	android:grantUriPermissions
-		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:181:13-47
+		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:182:13-47
 	android:authorities
-		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:180:13-58
+		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:181:13-58
 	android:exported
-		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:182:13-37
+		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:183:13-37
 	android:name
-		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:179:13-67
+		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:180:13-62
 meta-data#android.support.FILE_PROVIDER_PATHS
-ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:183:13-185:53
+ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:184:13-186:53
 	android:resource
-		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:185:17-50
+		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:186:17-50
 	android:name
-		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:184:17-67
+		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:185:17-67
 service#com.savare.sincronizacao.SavareSyncService
-ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:189:9-205:19
+ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:190:9-206:19
 	android:process
-		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:192:13-36
+		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:193:13-36
 	android:exported
-		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:191:13-36
+		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:192:13-36
 	android:name
-		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:190:13-60
+		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:191:13-60
 intent-filter#action:name:android.content.SavareSyncAdapter
-ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:198:13-200:29
+ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:199:13-201:29
 action#android.content.SavareSyncAdapter
-ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:199:17-76
+ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:200:17-76
 	android:name
-		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:199:25-73
+		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:200:25-73
 meta-data#android.content.SavareSyncAdapter
-ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:202:13-204:55
+ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:203:13-205:55
 	android:resource
-		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:204:17-52
+		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:205:17-52
 	android:name
-		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:203:17-65
+		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:204:17-65
 service#com.savare.sincronizacao.SavareAutenticadorService
-ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:208:9-218:19
+ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:209:9-219:19
 	android:name
-		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:208:18-73
+		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:209:18-73
 intent-filter#action:name:android.accounts.AccountAuthenticator
-ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:211:13-213:29
+ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:212:13-214:29
 action#android.accounts.AccountAuthenticator
-ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:212:17-80
+ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:213:17-80
 	android:name
-		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:212:25-77
+		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:213:25-77
 meta-data#android.accounts.AccountAuthenticator
-ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:215:13-217:57
+ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:216:13-218:57
 	android:resource
-		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:217:17-54
+		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:218:17-54
 	android:name
-		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:216:17-69
+		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:217:17-69
 receiver#com.savare.funcoes.rotinas.receptor.ReceptorAlarmeEnviarOrcamentoBroadcastRotinas
-ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:220:9-227:20
+ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:221:9-228:20
 	android:label
-		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:222:13-74
+		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:223:13-74
 	android:name
-		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:221:13-99
+		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:222:13-99
 intent-filter#action:name:ENVIAR_ORCAMENTO_SAVARE+category:name:android.intent.category.DEFAULT
-ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:223:13-226:29
+ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:224:13-227:29
 action#ENVIAR_ORCAMENTO_SAVARE
-ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:224:17-66
+ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:225:17-66
 	android:name
-		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:224:25-63
+		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:225:25-63
 category#android.intent.category.DEFAULT
-ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:225:17-76
+ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:226:17-76
 	android:name
-		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:225:27-73
+		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:226:27-73
 receiver#com.savare.funcoes.rotinas.receptor.ReceptorNotificarAparelhoRotinas
-ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:229:9-237:20
+ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:230:9-238:20
 	android:label
-		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:231:13-61
+		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:232:13-61
 	android:name
-		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:230:13-86
+		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:231:13-86
 intent-filter#action:name:NOTIFICACAO_SAVARE+category:name:android.intent.category.DEFAULT
-ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:232:13-236:29
+ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:233:13-237:29
 action#NOTIFICACAO_SAVARE
-ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:235:17-61
+ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:236:17-61
 	android:name
-		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:235:25-58
+		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:236:25-58
 receiver#com.savare.funcoes.rotinas.receptor.ReceptorCriarAlarmeRebootRotinas
-ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:239:9-249:20
+ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:240:9-250:20
 	android:label
-		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:241:13-61
+		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:242:13-61
 	android:name
-		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:240:13-86
+		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:241:13-86
 intent-filter#action:name:android.intent.action.BOOT_COMPLETED+action:name:android.intent.action.REBOOT+category:name:android.intent.category.DEFAULT
-ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:242:13-248:29
+ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:243:13-249:29
 action#android.intent.action.BOOT_COMPLETED
-ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:243:17-79
+ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:244:17-79
 	android:name
-		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:243:25-76
+		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:244:25-76
 action#android.intent.action.REBOOT
-ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:247:17-71
+ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:248:17-71
 	android:name
-		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:247:25-68
+		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:248:25-68
 receiver#com.savare.funcoes.rotinas.receptor.ReceptorAlarmeReceberDadosBroadcastRotinas
-ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:251:9-259:20
+ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:252:9-260:20
 	android:label
-		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:253:13-71
+		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:254:13-71
 	android:name
-		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:252:13-96
+		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:253:13-96
 intent-filter#action:name:RECEBER_DADOS_SAVARE+category:name:android.intent.category.DEFAULT
-ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:254:13-258:29
+ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:255:13-259:29
 action#RECEBER_DADOS_SAVARE
-ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:257:17-63
+ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:258:17-63
 	android:name
-		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:257:25-60
+		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:258:25-60
 receiver#com.savare.funcoes.rotinas.receptor.ReceptorAlarmeEnviarCadastroPessoaBroadcastRotinas
-ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:261:9-269:20
+ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:262:9-270:20
 	android:label
-		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:263:13-79
+		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:264:13-79
 	android:name
-		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:262:13-104
+		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:263:13-104
 intent-filter#action:name:ENVIAR_OUTROS_DADOS_SAVARE+category:name:android.intent.category.DEFAULT
-ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:264:13-268:29
+ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:265:13-269:29
 action#ENVIAR_OUTROS_DADOS_SAVARE
-ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:265:17-69
+ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:266:17-69
 	android:name
-		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:265:25-66
+		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:266:25-66
 meta-data#com.google.android.gms.version
-ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:273:9-275:69
+ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:274:9-276:69
 	android:value
-		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:275:13-66
+		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:276:13-66
 	android:name
-		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:274:13-58
+		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:275:13-58
 uses-sdk
 INJECTED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml reason: use-sdk injection requested
 INJECTED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml
 INJECTED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml
-MERGED from [com.android.support:multidex:1.0.2] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\5a8cd89d192afa40a3f460d7d46570fc\multidex-1.0.2\AndroidManifest.xml:20:5-43
-MERGED from [com.android.support:multidex:1.0.2] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\5a8cd89d192afa40a3f460d7d46570fc\multidex-1.0.2\AndroidManifest.xml:20:5-43
-MERGED from [com.mikepenz:materialdrawer:6.0.9] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\005990774923bdc858cb308c1fed6613\materialdrawer-6.0.9\AndroidManifest.xml:7:5-9:41
-MERGED from [com.mikepenz:materialdrawer:6.0.9] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\005990774923bdc858cb308c1fed6613\materialdrawer-6.0.9\AndroidManifest.xml:7:5-9:41
-MERGED from [com.github.arimorty:floatingsearchview:1.1.2] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\094fc6a8aba4170e51b4fa4316da9d03\floatingsearchview-1.1.2\AndroidManifest.xml:7:5-9:41
-MERGED from [com.github.arimorty:floatingsearchview:1.1.2] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\094fc6a8aba4170e51b4fa4316da9d03\floatingsearchview-1.1.2\AndroidManifest.xml:7:5-9:41
-MERGED from [com.android.support:design:28.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\1c4fd9a4c3095b679bed23a46e0bcf6c\design-28.0.0\AndroidManifest.xml:20:5-44
-MERGED from [com.android.support:design:28.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\1c4fd9a4c3095b679bed23a46e0bcf6c\design-28.0.0\AndroidManifest.xml:20:5-44
-MERGED from [com.github.dexafree:materiallist:3.2.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\838fb4f637c0c59c1c09e9520fdf63de\materiallist-3.2.1\AndroidManifest.xml:7:5-9:41
-MERGED from [com.github.dexafree:materiallist:3.2.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\838fb4f637c0c59c1c09e9520fdf63de\materiallist-3.2.1\AndroidManifest.xml:7:5-9:41
-MERGED from [com.afollestad.material-dialogs:core:0.9.5.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\a87493fa2be43158522c9322894edc27\core-0.9.5.0\AndroidManifest.xml:8:5-11:75
-MERGED from [com.afollestad.material-dialogs:core:0.9.5.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\a87493fa2be43158522c9322894edc27\core-0.9.5.0\AndroidManifest.xml:8:5-11:75
-MERGED from [com.github.johnpersano:supertoasts:2.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\c053798a6fcef6bb55556ad4882ee005\supertoasts-2.0\AndroidManifest.xml:22:5-24:41
-MERGED from [com.github.johnpersano:supertoasts:2.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\c053798a6fcef6bb55556ad4882ee005\supertoasts-2.0\AndroidManifest.xml:22:5-24:41
-MERGED from [com.heinrichreimersoftware:material-intro:1.6] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\b3bab15346a2c7e2c3d51cb824a313d9\material-intro-1.6\AndroidManifest.xml:8:5-10:41
-MERGED from [com.heinrichreimersoftware:material-intro:1.6] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\b3bab15346a2c7e2c3d51cb824a313d9\material-intro-1.6\AndroidManifest.xml:8:5-10:41
-MERGED from [com.mikepenz:iconics-core:3.0.4] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\dbc2af59abb968e077f8ecbbef37f41c\iconics-core-3.0.4\AndroidManifest.xml:7:5-9:41
-MERGED from [com.mikepenz:iconics-core:3.0.4] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\dbc2af59abb968e077f8ecbbef37f41c\iconics-core-3.0.4\AndroidManifest.xml:7:5-9:41
-MERGED from [com.mikepenz:fastadapter-extensions-expandable:3.2.8] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\e136086cf9713e4869657d5136e24060\fastadapter-extensions-expandable-3.2.8\AndroidManifest.xml:7:5-9:41
-MERGED from [com.mikepenz:fastadapter-extensions-expandable:3.2.8] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\e136086cf9713e4869657d5136e24060\fastadapter-extensions-expandable-3.2.8\AndroidManifest.xml:7:5-9:41
-MERGED from [com.mikepenz:fastadapter-commons:3.2.8] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\64434b8d9ef9a4e263463665cb431f6d\fastadapter-commons-3.2.8\AndroidManifest.xml:7:5-9:41
-MERGED from [com.mikepenz:fastadapter-commons:3.2.8] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\64434b8d9ef9a4e263463665cb431f6d\fastadapter-commons-3.2.8\AndroidManifest.xml:7:5-9:41
-MERGED from [com.mikepenz:fastadapter:3.2.8] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\5641c7573f74f9717098639ec4fb352b\fastadapter-3.2.8\AndroidManifest.xml:7:5-9:41
-MERGED from [com.mikepenz:fastadapter:3.2.8] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\5641c7573f74f9717098639ec4fb352b\fastadapter-3.2.8\AndroidManifest.xml:7:5-9:41
-MERGED from [me.zhanghai.android.materialprogressbar:library:1.4.2] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\70dbbdd0e19af0e74034dd17ccb9e6f8\library-1.4.2\AndroidManifest.xml:12:5-14:41
-MERGED from [me.zhanghai.android.materialprogressbar:library:1.4.2] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\70dbbdd0e19af0e74034dd17ccb9e6f8\library-1.4.2\AndroidManifest.xml:12:5-14:41
-MERGED from [com.android.support:appcompat-v7:28.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\aaffe2c7f23d715ca045db9d0a51d031\appcompat-v7-28.0.0\AndroidManifest.xml:20:5-44
-MERGED from [com.android.support:appcompat-v7:28.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\aaffe2c7f23d715ca045db9d0a51d031\appcompat-v7-28.0.0\AndroidManifest.xml:20:5-44
-MERGED from [com.android.support:recyclerview-v7:28.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\7b826c3f5b1c303c68d239e88fd46d1f\recyclerview-v7-28.0.0\AndroidManifest.xml:20:5-44
-MERGED from [com.android.support:recyclerview-v7:28.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\7b826c3f5b1c303c68d239e88fd46d1f\recyclerview-v7-28.0.0\AndroidManifest.xml:20:5-44
-MERGED from [com.android.support:support-v13:28.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\4f4dd0b3e91a7288db2623513415d29d\support-v13-28.0.0\AndroidManifest.xml:20:5-44
-MERGED from [com.android.support:support-v13:28.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\4f4dd0b3e91a7288db2623513415d29d\support-v13-28.0.0\AndroidManifest.xml:20:5-44
-MERGED from [com.bartoszlipinski:viewpropertyobjectanimator:1.2.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\7b746eeaf65796dcd139476cf86b67f3\viewpropertyobjectanimator-1.2.0\AndroidManifest.xml:7:5-9:41
-MERGED from [com.bartoszlipinski:viewpropertyobjectanimator:1.2.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\7b746eeaf65796dcd139476cf86b67f3\viewpropertyobjectanimator-1.2.0\AndroidManifest.xml:7:5-9:41
-MERGED from [com.android.support:support-v4:28.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\93ee600e006118fa0b1e3ad8828fce02\support-v4-28.0.0\AndroidManifest.xml:20:5-44
-MERGED from [com.android.support:support-v4:28.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\93ee600e006118fa0b1e3ad8828fce02\support-v4-28.0.0\AndroidManifest.xml:20:5-44
-MERGED from [com.android.support:support-fragment:28.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\6e07dd593fd232c7452c3c20dd27a8e1\support-fragment-28.0.0\AndroidManifest.xml:20:5-44
-MERGED from [com.android.support:support-fragment:28.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\6e07dd593fd232c7452c3c20dd27a8e1\support-fragment-28.0.0\AndroidManifest.xml:20:5-44
-MERGED from [com.android.support:animated-vector-drawable:28.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\dd73b81ee8477d30c51950de1c7d4569\animated-vector-drawable-28.0.0\AndroidManifest.xml:20:5-44
-MERGED from [com.android.support:animated-vector-drawable:28.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\dd73b81ee8477d30c51950de1c7d4569\animated-vector-drawable-28.0.0\AndroidManifest.xml:20:5-44
-MERGED from [com.android.support:support-core-ui:28.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\4ac8bacc6bdc06da514981c2a3855a4a\support-core-ui-28.0.0\AndroidManifest.xml:20:5-44
-MERGED from [com.android.support:support-core-ui:28.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\4ac8bacc6bdc06da514981c2a3855a4a\support-core-ui-28.0.0\AndroidManifest.xml:20:5-44
-MERGED from [com.android.support:support-core-utils:28.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\d5d5e0afb6d849720ba2f95b3e39fcb5\support-core-utils-28.0.0\AndroidManifest.xml:20:5-44
-MERGED from [com.android.support:support-core-utils:28.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\d5d5e0afb6d849720ba2f95b3e39fcb5\support-core-utils-28.0.0\AndroidManifest.xml:20:5-44
-MERGED from [com.android.support:support-vector-drawable:28.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\f70c181cc5010e4998d82bc8bd89fbfc\support-vector-drawable-28.0.0\AndroidManifest.xml:20:5-44
-MERGED from [com.android.support:support-vector-drawable:28.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\f70c181cc5010e4998d82bc8bd89fbfc\support-vector-drawable-28.0.0\AndroidManifest.xml:20:5-44
-MERGED from [com.android.support:transition:28.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\d7115113d29f3235816be8df15cb4c6d\transition-28.0.0\AndroidManifest.xml:20:5-44
-MERGED from [com.android.support:transition:28.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\d7115113d29f3235816be8df15cb4c6d\transition-28.0.0\AndroidManifest.xml:20:5-44
-MERGED from [com.android.support:support-media-compat:28.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\95c31ded494307afe99fdddbe88a703e\support-media-compat-28.0.0\AndroidManifest.xml:20:5-44
-MERGED from [com.android.support:support-media-compat:28.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\95c31ded494307afe99fdddbe88a703e\support-media-compat-28.0.0\AndroidManifest.xml:20:5-44
-MERGED from [com.android.support:loader:28.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\1b9d515d8d1965c403de8914ca55cb7e\loader-28.0.0\AndroidManifest.xml:20:5-44
-MERGED from [com.android.support:loader:28.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\1b9d515d8d1965c403de8914ca55cb7e\loader-28.0.0\AndroidManifest.xml:20:5-44
-MERGED from [com.android.support:viewpager:28.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\f92ce9c7365574accb4fbe105fd65c21\viewpager-28.0.0\AndroidManifest.xml:20:5-44
-MERGED from [com.android.support:viewpager:28.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\f92ce9c7365574accb4fbe105fd65c21\viewpager-28.0.0\AndroidManifest.xml:20:5-44
-MERGED from [com.android.support:coordinatorlayout:28.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\27bfd3d5fa1a19402f7d4ba14fb093b2\coordinatorlayout-28.0.0\AndroidManifest.xml:20:5-44
-MERGED from [com.android.support:coordinatorlayout:28.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\27bfd3d5fa1a19402f7d4ba14fb093b2\coordinatorlayout-28.0.0\AndroidManifest.xml:20:5-44
-MERGED from [com.android.support:drawerlayout:28.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\efc59ff1f1e99fe01414b630035d92d4\drawerlayout-28.0.0\AndroidManifest.xml:20:5-44
-MERGED from [com.android.support:drawerlayout:28.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\efc59ff1f1e99fe01414b630035d92d4\drawerlayout-28.0.0\AndroidManifest.xml:20:5-44
-MERGED from [com.android.support:slidingpanelayout:28.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\6064ab6775e6301e62ccb69ace9dbdbd\slidingpanelayout-28.0.0\AndroidManifest.xml:20:5-44
-MERGED from [com.android.support:slidingpanelayout:28.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\6064ab6775e6301e62ccb69ace9dbdbd\slidingpanelayout-28.0.0\AndroidManifest.xml:20:5-44
-MERGED from [com.android.support:customview:28.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\3c823cc0e07b899cd90d87fa2096c1f1\customview-28.0.0\AndroidManifest.xml:20:5-44
-MERGED from [com.android.support:customview:28.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\3c823cc0e07b899cd90d87fa2096c1f1\customview-28.0.0\AndroidManifest.xml:20:5-44
-MERGED from [com.android.support:swiperefreshlayout:28.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\a3a8c8cd8e894f6104aa84c89d48db43\swiperefreshlayout-28.0.0\AndroidManifest.xml:20:5-44
-MERGED from [com.android.support:swiperefreshlayout:28.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\a3a8c8cd8e894f6104aa84c89d48db43\swiperefreshlayout-28.0.0\AndroidManifest.xml:20:5-44
-MERGED from [com.android.support:asynclayoutinflater:28.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\65fb01e2ae4e35f2f343847d68c9b98d\asynclayoutinflater-28.0.0\AndroidManifest.xml:20:5-44
-MERGED from [com.android.support:asynclayoutinflater:28.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\65fb01e2ae4e35f2f343847d68c9b98d\asynclayoutinflater-28.0.0\AndroidManifest.xml:20:5-44
-MERGED from [com.android.support:support-compat:28.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\4e7b3bbed8e6e29e2ba6d4fc6e8eccff\support-compat-28.0.0\AndroidManifest.xml:20:5-44
-MERGED from [com.android.support:support-compat:28.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\4e7b3bbed8e6e29e2ba6d4fc6e8eccff\support-compat-28.0.0\AndroidManifest.xml:20:5-44
-MERGED from [com.android.support:versionedparcelable:28.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\d107c5806233895e5be684de327d381f\versionedparcelable-28.0.0\AndroidManifest.xml:20:5-44
-MERGED from [com.android.support:versionedparcelable:28.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\d107c5806233895e5be684de327d381f\versionedparcelable-28.0.0\AndroidManifest.xml:20:5-44
-MERGED from [com.android.support:cursoradapter:28.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\ad328008f0a36049c16e2e42bbe6ba36\cursoradapter-28.0.0\AndroidManifest.xml:20:5-44
-MERGED from [com.android.support:cursoradapter:28.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\ad328008f0a36049c16e2e42bbe6ba36\cursoradapter-28.0.0\AndroidManifest.xml:20:5-44
-MERGED from [com.android.support:cardview-v7:28.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\bcdc9cd251fcac7ebe27addc2e62b01d\cardview-v7-28.0.0\AndroidManifest.xml:20:5-44
-MERGED from [com.android.support:cardview-v7:28.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\bcdc9cd251fcac7ebe27addc2e62b01d\cardview-v7-28.0.0\AndroidManifest.xml:20:5-44
-MERGED from [android.arch.lifecycle:runtime:1.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\0160f619c43aa1ecd28ae91ba8993552\runtime-1.1.1\AndroidManifest.xml:20:5-44
-MERGED from [android.arch.lifecycle:runtime:1.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\0160f619c43aa1ecd28ae91ba8993552\runtime-1.1.1\AndroidManifest.xml:20:5-44
-MERGED from [com.android.support:documentfile:28.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\1938455035f0a35aa3eefef3aa9fbbc4\documentfile-28.0.0\AndroidManifest.xml:20:5-44
-MERGED from [com.android.support:documentfile:28.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\1938455035f0a35aa3eefef3aa9fbbc4\documentfile-28.0.0\AndroidManifest.xml:20:5-44
-MERGED from [com.android.support:localbroadcastmanager:28.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\1dc9df8e70a38f62679d702ec717a6a9\localbroadcastmanager-28.0.0\AndroidManifest.xml:20:5-44
-MERGED from [com.android.support:localbroadcastmanager:28.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\1dc9df8e70a38f62679d702ec717a6a9\localbroadcastmanager-28.0.0\AndroidManifest.xml:20:5-44
-MERGED from [com.android.support:print:28.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\4fd4a6ed80eb447e76c05986ef3fd6a1\print-28.0.0\AndroidManifest.xml:20:5-44
-MERGED from [com.android.support:print:28.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\4fd4a6ed80eb447e76c05986ef3fd6a1\print-28.0.0\AndroidManifest.xml:20:5-44
-MERGED from [android.arch.lifecycle:viewmodel:1.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\823f37c489bd02c4a4d0f6ca442a27d7\viewmodel-1.1.1\AndroidManifest.xml:20:5-44
-MERGED from [android.arch.lifecycle:viewmodel:1.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\823f37c489bd02c4a4d0f6ca442a27d7\viewmodel-1.1.1\AndroidManifest.xml:20:5-44
-MERGED from [com.android.support:interpolator:28.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\d622bc834304bbaef61946e6b6568c26\interpolator-28.0.0\AndroidManifest.xml:20:5-44
-MERGED from [com.android.support:interpolator:28.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\d622bc834304bbaef61946e6b6568c26\interpolator-28.0.0\AndroidManifest.xml:20:5-44
-MERGED from [android.arch.lifecycle:livedata:1.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\f33d666ad8cee70ee4e661f9bad8e372\livedata-1.1.1\AndroidManifest.xml:20:5-44
-MERGED from [android.arch.lifecycle:livedata:1.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\f33d666ad8cee70ee4e661f9bad8e372\livedata-1.1.1\AndroidManifest.xml:20:5-44
-MERGED from [android.arch.lifecycle:livedata-core:1.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\85526c118dcfe3eae0cf402e2cecc572\livedata-core-1.1.1\AndroidManifest.xml:20:5-44
-MERGED from [android.arch.lifecycle:livedata-core:1.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\85526c118dcfe3eae0cf402e2cecc572\livedata-core-1.1.1\AndroidManifest.xml:20:5-44
-MERGED from [android.arch.core:runtime:1.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\5853616defd81755613306a8befefe63\runtime-1.1.1\AndroidManifest.xml:20:5-44
-MERGED from [android.arch.core:runtime:1.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\5853616defd81755613306a8befefe63\runtime-1.1.1\AndroidManifest.xml:20:5-44
+MERGED from [androidx.multidex:multidex:2.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\b49de40908d20f742852b1e123dcefcf\multidex-2.0.0\AndroidManifest.xml:20:5-43
+MERGED from [androidx.multidex:multidex:2.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\b49de40908d20f742852b1e123dcefcf\multidex-2.0.0\AndroidManifest.xml:20:5-43
+MERGED from [com.mikepenz:materialdrawer:6.0.9] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\3de9ea02101c61beb749f952b00e8ffc\jetified-materialdrawer-6.0.9\AndroidManifest.xml:7:5-9:41
+MERGED from [com.mikepenz:materialdrawer:6.0.9] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\3de9ea02101c61beb749f952b00e8ffc\jetified-materialdrawer-6.0.9\AndroidManifest.xml:7:5-9:41
+MERGED from [com.github.arimorty:floatingsearchview:1.1.2] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\3eeb0c7b957b91b2c2c4d13c93181db8\jetified-floatingsearchview-1.1.2\AndroidManifest.xml:7:5-9:41
+MERGED from [com.github.arimorty:floatingsearchview:1.1.2] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\3eeb0c7b957b91b2c2c4d13c93181db8\jetified-floatingsearchview-1.1.2\AndroidManifest.xml:7:5-9:41
+MERGED from [com.google.android.material:material:1.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\01aba6feafaa9666a150e0ccab90f24c\material-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [com.google.android.material:material:1.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\01aba6feafaa9666a150e0ccab90f24c\material-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [com.github.dexafree:materiallist:3.2.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\f842b37fad5efc2e108fb7266d46a0da\jetified-materiallist-3.2.1\AndroidManifest.xml:7:5-9:41
+MERGED from [com.github.dexafree:materiallist:3.2.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\f842b37fad5efc2e108fb7266d46a0da\jetified-materiallist-3.2.1\AndroidManifest.xml:7:5-9:41
+MERGED from [com.afollestad.material-dialogs:core:0.9.5.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\8511c49b7df30fc03ea66fea5769caf1\jetified-core-0.9.5.0\AndroidManifest.xml:8:5-11:75
+MERGED from [com.afollestad.material-dialogs:core:0.9.5.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\8511c49b7df30fc03ea66fea5769caf1\jetified-core-0.9.5.0\AndroidManifest.xml:8:5-11:75
+MERGED from [com.github.johnpersano:supertoasts:2.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\4d2887b2a46069123d0f0ee2e9950901\jetified-supertoasts-2.0\AndroidManifest.xml:22:5-24:41
+MERGED from [com.github.johnpersano:supertoasts:2.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\4d2887b2a46069123d0f0ee2e9950901\jetified-supertoasts-2.0\AndroidManifest.xml:22:5-24:41
+MERGED from [com.heinrichreimersoftware:material-intro:1.6] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\73c1e8f44e9a6671f53a9e46b936aaac\jetified-material-intro-1.6\AndroidManifest.xml:8:5-10:41
+MERGED from [com.heinrichreimersoftware:material-intro:1.6] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\73c1e8f44e9a6671f53a9e46b936aaac\jetified-material-intro-1.6\AndroidManifest.xml:8:5-10:41
+MERGED from [com.mikepenz:iconics-core:3.0.4] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\b2b310dc6d81a9703cc8f17171a2a2ec\jetified-iconics-core-3.0.4\AndroidManifest.xml:7:5-9:41
+MERGED from [com.mikepenz:iconics-core:3.0.4] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\b2b310dc6d81a9703cc8f17171a2a2ec\jetified-iconics-core-3.0.4\AndroidManifest.xml:7:5-9:41
+MERGED from [com.mikepenz:fastadapter-extensions-expandable:3.2.8] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\dd0308958916da02d6be211a947493de\jetified-fastadapter-extensions-expandable-3.2.8\AndroidManifest.xml:7:5-9:41
+MERGED from [com.mikepenz:fastadapter-extensions-expandable:3.2.8] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\dd0308958916da02d6be211a947493de\jetified-fastadapter-extensions-expandable-3.2.8\AndroidManifest.xml:7:5-9:41
+MERGED from [com.mikepenz:fastadapter-commons:3.2.8] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\05ff946d401822936cab897a3760d950\jetified-fastadapter-commons-3.2.8\AndroidManifest.xml:7:5-9:41
+MERGED from [com.mikepenz:fastadapter-commons:3.2.8] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\05ff946d401822936cab897a3760d950\jetified-fastadapter-commons-3.2.8\AndroidManifest.xml:7:5-9:41
+MERGED from [com.mikepenz:fastadapter:3.2.8] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\ac3a1267d6daaf04e346b8dfff439212\jetified-fastadapter-3.2.8\AndroidManifest.xml:7:5-9:41
+MERGED from [com.mikepenz:fastadapter:3.2.8] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\ac3a1267d6daaf04e346b8dfff439212\jetified-fastadapter-3.2.8\AndroidManifest.xml:7:5-9:41
+MERGED from [me.zhanghai.android.materialprogressbar:library:1.4.2] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\1e7bee5aa4224f913081fa90f246f812\jetified-library-1.4.2\AndroidManifest.xml:12:5-14:41
+MERGED from [me.zhanghai.android.materialprogressbar:library:1.4.2] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\1e7bee5aa4224f913081fa90f246f812\jetified-library-1.4.2\AndroidManifest.xml:12:5-14:41
+MERGED from [androidx.appcompat:appcompat:1.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\24c8333af3f2d43ff2b1c71d3d52d739\appcompat-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.appcompat:appcompat:1.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\24c8333af3f2d43ff2b1c71d3d52d739\appcompat-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.recyclerview:recyclerview:1.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\d5caeb323d2f012734c7fc83bc887a28\recyclerview-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.recyclerview:recyclerview:1.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\d5caeb323d2f012734c7fc83bc887a28\recyclerview-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.legacy:legacy-support-v13:1.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\33e0649f383d614f566b2822b9a2c6e0\legacy-support-v13-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.legacy:legacy-support-v13:1.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\33e0649f383d614f566b2822b9a2c6e0\legacy-support-v13-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [com.bartoszlipinski:viewpropertyobjectanimator:1.2.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\dedd15b5ae3ac7c92ea22b80b9d7a799\jetified-viewpropertyobjectanimator-1.2.0\AndroidManifest.xml:7:5-9:41
+MERGED from [com.bartoszlipinski:viewpropertyobjectanimator:1.2.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\dedd15b5ae3ac7c92ea22b80b9d7a799\jetified-viewpropertyobjectanimator-1.2.0\AndroidManifest.xml:7:5-9:41
+MERGED from [androidx.legacy:legacy-support-v4:1.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\5c75bd7951d359a85775620c0170e49e\legacy-support-v4-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.legacy:legacy-support-v4:1.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\5c75bd7951d359a85775620c0170e49e\legacy-support-v4-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.fragment:fragment:1.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\3c34672520a20385459add6dbdffba42\fragment-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.fragment:fragment:1.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\3c34672520a20385459add6dbdffba42\fragment-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.vectordrawable:vectordrawable-animated:1.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\dc2bcafcb36dae47e49078b9230baea7\vectordrawable-animated-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.vectordrawable:vectordrawable-animated:1.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\dc2bcafcb36dae47e49078b9230baea7\vectordrawable-animated-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.legacy:legacy-support-core-ui:1.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\92f8e3eea2413f9234d57f836e040f22\legacy-support-core-ui-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.legacy:legacy-support-core-ui:1.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\92f8e3eea2413f9234d57f836e040f22\legacy-support-core-ui-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.legacy:legacy-support-core-utils:1.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\18e25bdaeb278667d7aef2960bdb2cf5\legacy-support-core-utils-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.legacy:legacy-support-core-utils:1.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\18e25bdaeb278667d7aef2960bdb2cf5\legacy-support-core-utils-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.vectordrawable:vectordrawable:1.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\8bfc0a81decb3595ac502582a2aeb0f5\vectordrawable-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.vectordrawable:vectordrawable:1.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\8bfc0a81decb3595ac502582a2aeb0f5\vectordrawable-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.transition:transition:1.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\677aa75f82ea85608bf2d524d4539a5f\transition-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.transition:transition:1.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\677aa75f82ea85608bf2d524d4539a5f\transition-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.media:media:1.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\e6db2a8ebafb4101960628e4b20a9462\media-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.media:media:1.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\e6db2a8ebafb4101960628e4b20a9462\media-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.loader:loader:1.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\495dc0f2fa247d616fe68db13bf5e07d\loader-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.loader:loader:1.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\495dc0f2fa247d616fe68db13bf5e07d\loader-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.viewpager:viewpager:1.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\ad12b5d47f95c8d2598703c1b1f7c267\viewpager-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.viewpager:viewpager:1.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\ad12b5d47f95c8d2598703c1b1f7c267\viewpager-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.coordinatorlayout:coordinatorlayout:1.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\10c23e4693f75e7c26502c252f3749d1\coordinatorlayout-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.coordinatorlayout:coordinatorlayout:1.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\10c23e4693f75e7c26502c252f3749d1\coordinatorlayout-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.drawerlayout:drawerlayout:1.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\cb2cdf934d3d3e0441b52d1dc3cb2e6a\drawerlayout-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.drawerlayout:drawerlayout:1.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\cb2cdf934d3d3e0441b52d1dc3cb2e6a\drawerlayout-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.slidingpanelayout:slidingpanelayout:1.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\0408bc08863151ad5a41361bace418b5\slidingpanelayout-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.slidingpanelayout:slidingpanelayout:1.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\0408bc08863151ad5a41361bace418b5\slidingpanelayout-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.customview:customview:1.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\223ae8e78f23f48ba5d96a1dcabe1834\customview-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.customview:customview:1.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\223ae8e78f23f48ba5d96a1dcabe1834\customview-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.swiperefreshlayout:swiperefreshlayout:1.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\98533a75c963d389d2db7b5a19727bc5\swiperefreshlayout-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.swiperefreshlayout:swiperefreshlayout:1.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\98533a75c963d389d2db7b5a19727bc5\swiperefreshlayout-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.asynclayoutinflater:asynclayoutinflater:1.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\48d198bece9830d2bf28cd51b05742db\asynclayoutinflater-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.asynclayoutinflater:asynclayoutinflater:1.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\48d198bece9830d2bf28cd51b05742db\asynclayoutinflater-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.core:core:1.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\45ca2b27b5a8d2aecb4ee89b6457658f\core-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.core:core:1.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\45ca2b27b5a8d2aecb4ee89b6457658f\core-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.versionedparcelable:versionedparcelable:1.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\f6ee4caf47f75b1f61a904ebd80d0032\versionedparcelable-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.versionedparcelable:versionedparcelable:1.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\f6ee4caf47f75b1f61a904ebd80d0032\versionedparcelable-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.cursoradapter:cursoradapter:1.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\aace0d5da73d2c817f12bb96d6698e5c\cursoradapter-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.cursoradapter:cursoradapter:1.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\aace0d5da73d2c817f12bb96d6698e5c\cursoradapter-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.cardview:cardview:1.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\7d7fd0d2929b90b96150578fa61b2794\cardview-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.cardview:cardview:1.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\7d7fd0d2929b90b96150578fa61b2794\cardview-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-runtime:2.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\8dbf56085c74c454281b9c5a225b9c28\lifecycle-runtime-2.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-runtime:2.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\8dbf56085c74c454281b9c5a225b9c28\lifecycle-runtime-2.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.documentfile:documentfile:1.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\1d3d300991201f0272c309154f6a5e44\documentfile-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.documentfile:documentfile:1.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\1d3d300991201f0272c309154f6a5e44\documentfile-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.localbroadcastmanager:localbroadcastmanager:1.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\b483c59108b83b2c001374a9e1131636\localbroadcastmanager-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.localbroadcastmanager:localbroadcastmanager:1.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\b483c59108b83b2c001374a9e1131636\localbroadcastmanager-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.print:print:1.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\28efee2bf1e9a77f569846ad27f8a168\print-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.print:print:1.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\28efee2bf1e9a77f569846ad27f8a168\print-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-viewmodel:2.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\9f9944fa6494846e4e59ed50f5459a60\lifecycle-viewmodel-2.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-viewmodel:2.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\9f9944fa6494846e4e59ed50f5459a60\lifecycle-viewmodel-2.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.interpolator:interpolator:1.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\c4e2469658fdd8801a5306110b0915fc\interpolator-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.interpolator:interpolator:1.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\c4e2469658fdd8801a5306110b0915fc\interpolator-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-livedata:2.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\54ec9a60a0f20829d9c5323f1ce0908c\lifecycle-livedata-2.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-livedata:2.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\54ec9a60a0f20829d9c5323f1ce0908c\lifecycle-livedata-2.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-livedata-core:2.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\0571339fd4cb74441b19561f6766bb98\lifecycle-livedata-core-2.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-livedata-core:2.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\0571339fd4cb74441b19561f6766bb98\lifecycle-livedata-core-2.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.arch.core:core-runtime:2.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\0f91f258f9d0abaa0e56c019df47bd85\core-runtime-2.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.arch.core:core-runtime:2.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\0f91f258f9d0abaa0e56c019df47bd85\core-runtime-2.0.0\AndroidManifest.xml:20:5-44
 MERGED from [com.github.clans:fab:1.6.2] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\e913af79c91cf7082e47e1ba8c5a280c\fab-1.6.2\AndroidManifest.xml:8:5-10:41
 MERGED from [com.github.clans:fab:1.6.2] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\e913af79c91cf7082e47e1ba8c5a280c\fab-1.6.2\AndroidManifest.xml:8:5-10:41
-MERGED from [de.hdodenhof:circleimageview:2.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\b5bb0490e376922db6987dbc8b1fe829\circleimageview-2.0.0\AndroidManifest.xml:5:5-7:41
-MERGED from [de.hdodenhof:circleimageview:2.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\b5bb0490e376922db6987dbc8b1fe829\circleimageview-2.0.0\AndroidManifest.xml:5:5-7:41
-MERGED from [com.ogaclejapan.smarttablayout:library:1.6.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\6a34408ae0b5408612d4b78bbba36d1c\library-1.6.0\AndroidManifest.xml:8:5-10:41
-MERGED from [com.ogaclejapan.smarttablayout:library:1.6.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\6a34408ae0b5408612d4b78bbba36d1c\library-1.6.0\AndroidManifest.xml:8:5-10:41
-MERGED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\033e883894a54ab007f2aeb4ffa71816\zxing-orient-2.1.1\AndroidManifest.xml:23:5-25:41
-MERGED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\033e883894a54ab007f2aeb4ffa71816\zxing-orient-2.1.1\AndroidManifest.xml:23:5-25:41
+MERGED from [de.hdodenhof:circleimageview:2.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\486c0f6078c56718cb5b80fe12625dac\jetified-circleimageview-2.0.0\AndroidManifest.xml:5:5-7:41
+MERGED from [de.hdodenhof:circleimageview:2.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\486c0f6078c56718cb5b80fe12625dac\jetified-circleimageview-2.0.0\AndroidManifest.xml:5:5-7:41
+MERGED from [com.ogaclejapan.smarttablayout:library:1.6.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\34c192869a6333ea4d1373d3dc578a8b\jetified-library-1.6.0\AndroidManifest.xml:8:5-10:41
+MERGED from [com.ogaclejapan.smarttablayout:library:1.6.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\34c192869a6333ea4d1373d3dc578a8b\jetified-library-1.6.0\AndroidManifest.xml:8:5-10:41
+MERGED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\cdeaf918fff8961be47ed8e4d8842e98\jetified-zxing-orient-2.1.1\AndroidManifest.xml:23:5-25:41
+MERGED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\cdeaf918fff8961be47ed8e4d8842e98\jetified-zxing-orient-2.1.1\AndroidManifest.xml:23:5-25:41
 MERGED from [com.github.deano2390:MaterialShowcaseView:1.3.4] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\04f705a20c0c43a59434ca91853a792c\MaterialShowcaseView-1.3.4\AndroidManifest.xml:7:5-9:41
 MERGED from [com.github.deano2390:MaterialShowcaseView:1.3.4] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\04f705a20c0c43a59434ca91853a792c\MaterialShowcaseView-1.3.4\AndroidManifest.xml:7:5-9:41
-MERGED from [com.mikepenz:materialize:1.1.2] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\83bdb60c0e693b76f9ad81cc71318f67\materialize-1.1.2\AndroidManifest.xml:8:5-10:41
-MERGED from [com.mikepenz:materialize:1.1.2] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\83bdb60c0e693b76f9ad81cc71318f67\materialize-1.1.2\AndroidManifest.xml:8:5-10:41
+MERGED from [com.mikepenz:materialize:1.1.2] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\dfb8de2e96746ede72f45b375a3ba3c2\jetified-materialize-1.1.2\AndroidManifest.xml:8:5-10:41
+MERGED from [com.mikepenz:materialize:1.1.2] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\dfb8de2e96746ede72f45b375a3ba3c2\jetified-materialize-1.1.2\AndroidManifest.xml:8:5-10:41
 MERGED from [me.grantland:autofittextview:0.2.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\fd1bef93c7babc72b8c5db2aaab5e14d\autofittextview-0.2.0\AndroidManifest.xml:7:5-9:41
 MERGED from [me.grantland:autofittextview:0.2.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\fd1bef93c7babc72b8c5db2aaab5e14d\autofittextview-0.2.0\AndroidManifest.xml:7:5-9:41
 INJECTED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml
 INJECTED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml
 	tools:overrideLibrary
-		ADDED from [com.afollestad.material-dialogs:core:0.9.5.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\a87493fa2be43158522c9322894edc27\core-0.9.5.0\AndroidManifest.xml:11:9-72
+		ADDED from [com.afollestad.material-dialogs:core:0.9.5.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\8511c49b7df30fc03ea66fea5769caf1\jetified-core-0.9.5.0\AndroidManifest.xml:11:9-72
 	android:targetSdkVersion
 		INJECTED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml
 		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml
@@ -633,128 +635,128 @@ INJECTED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\sr
 		ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml
 		INJECTED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml
 uses-permission#android.permission.CAMERA
-ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\033e883894a54ab007f2aeb4ffa71816\zxing-orient-2.1.1\AndroidManifest.xml:27:5-65
+ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\cdeaf918fff8961be47ed8e4d8842e98\jetified-zxing-orient-2.1.1\AndroidManifest.xml:27:5-65
 	android:name
-		ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\033e883894a54ab007f2aeb4ffa71816\zxing-orient-2.1.1\AndroidManifest.xml:27:22-62
+		ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\cdeaf918fff8961be47ed8e4d8842e98\jetified-zxing-orient-2.1.1\AndroidManifest.xml:27:22-62
 uses-permission#android.permission.FLASHLIGHT
-ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\033e883894a54ab007f2aeb4ffa71816\zxing-orient-2.1.1\AndroidManifest.xml:29:5-69
+ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\cdeaf918fff8961be47ed8e4d8842e98\jetified-zxing-orient-2.1.1\AndroidManifest.xml:29:5-69
 	android:name
-		ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\033e883894a54ab007f2aeb4ffa71816\zxing-orient-2.1.1\AndroidManifest.xml:29:22-66
+		ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\cdeaf918fff8961be47ed8e4d8842e98\jetified-zxing-orient-2.1.1\AndroidManifest.xml:29:22-66
 uses-feature#android.hardware.camera
-ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\033e883894a54ab007f2aeb4ffa71816\zxing-orient-2.1.1\AndroidManifest.xml:32:5-34:36
+ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\cdeaf918fff8961be47ed8e4d8842e98\jetified-zxing-orient-2.1.1\AndroidManifest.xml:32:5-34:36
 	android:required
-		ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\033e883894a54ab007f2aeb4ffa71816\zxing-orient-2.1.1\AndroidManifest.xml:34:9-33
+		ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\cdeaf918fff8961be47ed8e4d8842e98\jetified-zxing-orient-2.1.1\AndroidManifest.xml:34:9-33
 	android:name
-		ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\033e883894a54ab007f2aeb4ffa71816\zxing-orient-2.1.1\AndroidManifest.xml:33:9-47
+		ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\cdeaf918fff8961be47ed8e4d8842e98\jetified-zxing-orient-2.1.1\AndroidManifest.xml:33:9-47
 uses-feature#android.hardware.camera.front
-ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\033e883894a54ab007f2aeb4ffa71816\zxing-orient-2.1.1\AndroidManifest.xml:35:5-37:36
+ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\cdeaf918fff8961be47ed8e4d8842e98\jetified-zxing-orient-2.1.1\AndroidManifest.xml:35:5-37:36
 	android:required
-		ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\033e883894a54ab007f2aeb4ffa71816\zxing-orient-2.1.1\AndroidManifest.xml:37:9-33
+		ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\cdeaf918fff8961be47ed8e4d8842e98\jetified-zxing-orient-2.1.1\AndroidManifest.xml:37:9-33
 	android:name
-		ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\033e883894a54ab007f2aeb4ffa71816\zxing-orient-2.1.1\AndroidManifest.xml:36:9-53
+		ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\cdeaf918fff8961be47ed8e4d8842e98\jetified-zxing-orient-2.1.1\AndroidManifest.xml:36:9-53
 uses-feature#android.hardware.camera.autofocus
-ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\033e883894a54ab007f2aeb4ffa71816\zxing-orient-2.1.1\AndroidManifest.xml:40:5-42:36
+ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\cdeaf918fff8961be47ed8e4d8842e98\jetified-zxing-orient-2.1.1\AndroidManifest.xml:40:5-42:36
 	android:required
-		ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\033e883894a54ab007f2aeb4ffa71816\zxing-orient-2.1.1\AndroidManifest.xml:42:9-33
+		ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\cdeaf918fff8961be47ed8e4d8842e98\jetified-zxing-orient-2.1.1\AndroidManifest.xml:42:9-33
 	android:name
-		ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\033e883894a54ab007f2aeb4ffa71816\zxing-orient-2.1.1\AndroidManifest.xml:41:9-57
+		ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\cdeaf918fff8961be47ed8e4d8842e98\jetified-zxing-orient-2.1.1\AndroidManifest.xml:41:9-57
 uses-feature#android.hardware.camera.flash
-ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\033e883894a54ab007f2aeb4ffa71816\zxing-orient-2.1.1\AndroidManifest.xml:43:5-45:36
+ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\cdeaf918fff8961be47ed8e4d8842e98\jetified-zxing-orient-2.1.1\AndroidManifest.xml:43:5-45:36
 	android:required
-		ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\033e883894a54ab007f2aeb4ffa71816\zxing-orient-2.1.1\AndroidManifest.xml:45:9-33
+		ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\cdeaf918fff8961be47ed8e4d8842e98\jetified-zxing-orient-2.1.1\AndroidManifest.xml:45:9-33
 	android:name
-		ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\033e883894a54ab007f2aeb4ffa71816\zxing-orient-2.1.1\AndroidManifest.xml:44:9-53
+		ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\cdeaf918fff8961be47ed8e4d8842e98\jetified-zxing-orient-2.1.1\AndroidManifest.xml:44:9-53
 uses-feature#android.hardware.touchscreen
-ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\033e883894a54ab007f2aeb4ffa71816\zxing-orient-2.1.1\AndroidManifest.xml:47:5-65
+ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\cdeaf918fff8961be47ed8e4d8842e98\jetified-zxing-orient-2.1.1\AndroidManifest.xml:47:5-65
 	android:name
-		ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\033e883894a54ab007f2aeb4ffa71816\zxing-orient-2.1.1\AndroidManifest.xml:47:19-62
+		ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\cdeaf918fff8961be47ed8e4d8842e98\jetified-zxing-orient-2.1.1\AndroidManifest.xml:47:19-62
 supports-screens
-ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\033e883894a54ab007f2aeb4ffa71816\zxing-orient-2.1.1\AndroidManifest.xml:50:5-55:40
+ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\cdeaf918fff8961be47ed8e4d8842e98\jetified-zxing-orient-2.1.1\AndroidManifest.xml:50:5-55:40
 	android:largeScreens
-		ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\033e883894a54ab007f2aeb4ffa71816\zxing-orient-2.1.1\AndroidManifest.xml:52:9-36
+		ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\cdeaf918fff8961be47ed8e4d8842e98\jetified-zxing-orient-2.1.1\AndroidManifest.xml:52:9-36
 	android:smallScreens
-		ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\033e883894a54ab007f2aeb4ffa71816\zxing-orient-2.1.1\AndroidManifest.xml:54:9-36
+		ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\cdeaf918fff8961be47ed8e4d8842e98\jetified-zxing-orient-2.1.1\AndroidManifest.xml:54:9-36
 	android:normalScreens
-		ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\033e883894a54ab007f2aeb4ffa71816\zxing-orient-2.1.1\AndroidManifest.xml:53:9-37
+		ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\cdeaf918fff8961be47ed8e4d8842e98\jetified-zxing-orient-2.1.1\AndroidManifest.xml:53:9-37
 	android:xlargeScreens
-		ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\033e883894a54ab007f2aeb4ffa71816\zxing-orient-2.1.1\AndroidManifest.xml:55:9-37
+		ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\cdeaf918fff8961be47ed8e4d8842e98\jetified-zxing-orient-2.1.1\AndroidManifest.xml:55:9-37
 	android:anyDensity
-		ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\033e883894a54ab007f2aeb4ffa71816\zxing-orient-2.1.1\AndroidManifest.xml:51:9-34
+		ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\cdeaf918fff8961be47ed8e4d8842e98\jetified-zxing-orient-2.1.1\AndroidManifest.xml:51:9-34
 activity#com.google.zxing.client.android.CaptureActivity
-ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\033e883894a54ab007f2aeb4ffa71816\zxing-orient-2.1.1\AndroidManifest.xml:60:9-137:20
+ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\cdeaf918fff8961be47ed8e4d8842e98\jetified-zxing-orient-2.1.1\AndroidManifest.xml:60:9-137:20
 	android:clearTaskOnLaunch
-		ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\033e883894a54ab007f2aeb4ffa71816\zxing-orient-2.1.1\AndroidManifest.xml:62:13-45
+		ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\cdeaf918fff8961be47ed8e4d8842e98\jetified-zxing-orient-2.1.1\AndroidManifest.xml:62:13-45
 	android:stateNotNeeded
-		ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\033e883894a54ab007f2aeb4ffa71816\zxing-orient-2.1.1\AndroidManifest.xml:64:13-42
+		ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\cdeaf918fff8961be47ed8e4d8842e98\jetified-zxing-orient-2.1.1\AndroidManifest.xml:64:13-42
 	android:windowSoftInputMode
-		ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\033e883894a54ab007f2aeb4ffa71816\zxing-orient-2.1.1\AndroidManifest.xml:66:13-60
+		ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\cdeaf918fff8961be47ed8e4d8842e98\jetified-zxing-orient-2.1.1\AndroidManifest.xml:66:13-60
 	android:configChanges
-		ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\033e883894a54ab007f2aeb4ffa71816\zxing-orient-2.1.1\AndroidManifest.xml:63:13-51
+		ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\cdeaf918fff8961be47ed8e4d8842e98\jetified-zxing-orient-2.1.1\AndroidManifest.xml:63:13-51
 	android:theme
-		ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\033e883894a54ab007f2aeb4ffa71816\zxing-orient-2.1.1\AndroidManifest.xml:65:13-48
+		ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\cdeaf918fff8961be47ed8e4d8842e98\jetified-zxing-orient-2.1.1\AndroidManifest.xml:65:13-48
 	android:name
-		ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\033e883894a54ab007f2aeb4ffa71816\zxing-orient-2.1.1\AndroidManifest.xml:61:13-75
+		ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\cdeaf918fff8961be47ed8e4d8842e98\jetified-zxing-orient-2.1.1\AndroidManifest.xml:61:13-75
 intent-filter#action:name:me.sudar.zxing.SCAN+category:name:android.intent.category.DEFAULT
-ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\033e883894a54ab007f2aeb4ffa71816\zxing-orient-2.1.1\AndroidManifest.xml:67:13-71:29
+ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\cdeaf918fff8961be47ed8e4d8842e98\jetified-zxing-orient-2.1.1\AndroidManifest.xml:67:13-71:29
 action#me.sudar.zxing.SCAN
-ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\033e883894a54ab007f2aeb4ffa71816\zxing-orient-2.1.1\AndroidManifest.xml:68:17-62
+ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\cdeaf918fff8961be47ed8e4d8842e98\jetified-zxing-orient-2.1.1\AndroidManifest.xml:68:17-62
 	android:name
-		ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\033e883894a54ab007f2aeb4ffa71816\zxing-orient-2.1.1\AndroidManifest.xml:68:25-59
+		ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\cdeaf918fff8961be47ed8e4d8842e98\jetified-zxing-orient-2.1.1\AndroidManifest.xml:68:25-59
 intent-filter#action:name:com.google.zxing.client.android.SCAN+category:name:android.intent.category.DEFAULT
-ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\033e883894a54ab007f2aeb4ffa71816\zxing-orient-2.1.1\AndroidManifest.xml:72:13-76:29
+ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\cdeaf918fff8961be47ed8e4d8842e98\jetified-zxing-orient-2.1.1\AndroidManifest.xml:72:13-76:29
 action#com.google.zxing.client.android.SCAN
-ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\033e883894a54ab007f2aeb4ffa71816\zxing-orient-2.1.1\AndroidManifest.xml:73:17-79
+ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\cdeaf918fff8961be47ed8e4d8842e98\jetified-zxing-orient-2.1.1\AndroidManifest.xml:73:17-79
 	android:name
-		ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\033e883894a54ab007f2aeb4ffa71816\zxing-orient-2.1.1\AndroidManifest.xml:73:25-76
+		ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\cdeaf918fff8961be47ed8e4d8842e98\jetified-zxing-orient-2.1.1\AndroidManifest.xml:73:25-76
 intent-filter#action:name:android.intent.action.VIEW+category:name:android.intent.category.BROWSABLE+category:name:android.intent.category.DEFAULT+data:host:www.sudar.me+data:path:/projects/zxing-orient/scan+data:scheme:http
-ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\033e883894a54ab007f2aeb4ffa71816\zxing-orient-2.1.1\AndroidManifest.xml:78:13-88:29
+ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\cdeaf918fff8961be47ed8e4d8842e98\jetified-zxing-orient-2.1.1\AndroidManifest.xml:78:13-88:29
 action#android.intent.action.VIEW
-ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\033e883894a54ab007f2aeb4ffa71816\zxing-orient-2.1.1\AndroidManifest.xml:79:17-69
+ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\cdeaf918fff8961be47ed8e4d8842e98\jetified-zxing-orient-2.1.1\AndroidManifest.xml:79:17-69
 	android:name
-		ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\033e883894a54ab007f2aeb4ffa71816\zxing-orient-2.1.1\AndroidManifest.xml:79:25-66
+		ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\cdeaf918fff8961be47ed8e4d8842e98\jetified-zxing-orient-2.1.1\AndroidManifest.xml:79:25-66
 category#android.intent.category.BROWSABLE
-ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\033e883894a54ab007f2aeb4ffa71816\zxing-orient-2.1.1\AndroidManifest.xml:82:17-78
+ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\cdeaf918fff8961be47ed8e4d8842e98\jetified-zxing-orient-2.1.1\AndroidManifest.xml:82:17-78
 	android:name
-		ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\033e883894a54ab007f2aeb4ffa71816\zxing-orient-2.1.1\AndroidManifest.xml:82:27-75
+		ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\cdeaf918fff8961be47ed8e4d8842e98\jetified-zxing-orient-2.1.1\AndroidManifest.xml:82:27-75
 data
-ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\033e883894a54ab007f2aeb4ffa71816\zxing-orient-2.1.1\AndroidManifest.xml:84:17-87:45
+ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\cdeaf918fff8961be47ed8e4d8842e98\jetified-zxing-orient-2.1.1\AndroidManifest.xml:84:17-87:45
 	android:path
-		ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\033e883894a54ab007f2aeb4ffa71816\zxing-orient-2.1.1\AndroidManifest.xml:86:21-63
+		ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\cdeaf918fff8961be47ed8e4d8842e98\jetified-zxing-orient-2.1.1\AndroidManifest.xml:86:21-63
 	android:host
-		ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\033e883894a54ab007f2aeb4ffa71816\zxing-orient-2.1.1\AndroidManifest.xml:85:21-48
+		ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\cdeaf918fff8961be47ed8e4d8842e98\jetified-zxing-orient-2.1.1\AndroidManifest.xml:85:21-48
 	android:scheme
-		ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\033e883894a54ab007f2aeb4ffa71816\zxing-orient-2.1.1\AndroidManifest.xml:87:21-42
+		ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\cdeaf918fff8961be47ed8e4d8842e98\jetified-zxing-orient-2.1.1\AndroidManifest.xml:87:21-42
 intent-filter#action:name:android.intent.action.VIEW+category:name:android.intent.category.BROWSABLE+category:name:android.intent.category.DEFAULT+data:host:zxing.appspot.com+data:path:/scan+data:scheme:http
-ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\033e883894a54ab007f2aeb4ffa71816\zxing-orient-2.1.1\AndroidManifest.xml:90:13-100:29
+ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\cdeaf918fff8961be47ed8e4d8842e98\jetified-zxing-orient-2.1.1\AndroidManifest.xml:90:13-100:29
 intent-filter#action:name:android.intent.action.VIEW+category:name:android.intent.category.BROWSABLE+category:name:android.intent.category.DEFAULT+data:host:www.google.com+data:path:/m/products/scan+data:scheme:http
-ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\033e883894a54ab007f2aeb4ffa71816\zxing-orient-2.1.1\AndroidManifest.xml:102:13-112:29
+ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\cdeaf918fff8961be47ed8e4d8842e98\jetified-zxing-orient-2.1.1\AndroidManifest.xml:102:13-112:29
 intent-filter#action:name:android.intent.action.VIEW+category:name:android.intent.category.BROWSABLE+category:name:android.intent.category.DEFAULT+data:host:www.google.co.uk+data:path:/m/products/scan+data:scheme:http
-ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\033e883894a54ab007f2aeb4ffa71816\zxing-orient-2.1.1\AndroidManifest.xml:114:13-124:29
+ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\cdeaf918fff8961be47ed8e4d8842e98\jetified-zxing-orient-2.1.1\AndroidManifest.xml:114:13-124:29
 intent-filter#action:name:android.intent.action.VIEW+category:name:android.intent.category.BROWSABLE+category:name:android.intent.category.DEFAULT+data:host:scan+data:path:/+data:scheme:zxing
-ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\033e883894a54ab007f2aeb4ffa71816\zxing-orient-2.1.1\AndroidManifest.xml:126:13-136:29
+ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\cdeaf918fff8961be47ed8e4d8842e98\jetified-zxing-orient-2.1.1\AndroidManifest.xml:126:13-136:29
 activity#com.google.zxing.client.android.encode.EncodeActivity
-ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\033e883894a54ab007f2aeb4ffa71816\zxing-orient-2.1.1\AndroidManifest.xml:138:9-167:20
+ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\cdeaf918fff8961be47ed8e4d8842e98\jetified-zxing-orient-2.1.1\AndroidManifest.xml:138:9-167:20
 	android:stateNotNeeded
-		ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\033e883894a54ab007f2aeb4ffa71816\zxing-orient-2.1.1\AndroidManifest.xml:140:13-42
+		ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\cdeaf918fff8961be47ed8e4d8842e98\jetified-zxing-orient-2.1.1\AndroidManifest.xml:140:13-42
 	android:name
-		ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\033e883894a54ab007f2aeb4ffa71816\zxing-orient-2.1.1\AndroidManifest.xml:139:13-81
+		ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\cdeaf918fff8961be47ed8e4d8842e98\jetified-zxing-orient-2.1.1\AndroidManifest.xml:139:13-81
 intent-filter#action:name:com.google.zxing.client.android.ENCODE+category:name:android.intent.category.DEFAULT
-ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\033e883894a54ab007f2aeb4ffa71816\zxing-orient-2.1.1\AndroidManifest.xml:141:13-145:29
+ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\cdeaf918fff8961be47ed8e4d8842e98\jetified-zxing-orient-2.1.1\AndroidManifest.xml:141:13-145:29
 action#com.google.zxing.client.android.ENCODE
-ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\033e883894a54ab007f2aeb4ffa71816\zxing-orient-2.1.1\AndroidManifest.xml:142:17-81
+ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\cdeaf918fff8961be47ed8e4d8842e98\jetified-zxing-orient-2.1.1\AndroidManifest.xml:142:17-81
 	android:name
-		ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\033e883894a54ab007f2aeb4ffa71816\zxing-orient-2.1.1\AndroidManifest.xml:142:25-78
+		ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\cdeaf918fff8961be47ed8e4d8842e98\jetified-zxing-orient-2.1.1\AndroidManifest.xml:142:25-78
 intent-filter#action:name:me.sudar.zxing.ENCODE+category:name:android.intent.category.DEFAULT
-ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\033e883894a54ab007f2aeb4ffa71816\zxing-orient-2.1.1\AndroidManifest.xml:146:13-150:29
+ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\cdeaf918fff8961be47ed8e4d8842e98\jetified-zxing-orient-2.1.1\AndroidManifest.xml:146:13-150:29
 action#me.sudar.zxing.ENCODE
-ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\033e883894a54ab007f2aeb4ffa71816\zxing-orient-2.1.1\AndroidManifest.xml:147:17-64
+ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\cdeaf918fff8961be47ed8e4d8842e98\jetified-zxing-orient-2.1.1\AndroidManifest.xml:147:17-64
 	android:name
-		ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\033e883894a54ab007f2aeb4ffa71816\zxing-orient-2.1.1\AndroidManifest.xml:147:25-61
+		ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\cdeaf918fff8961be47ed8e4d8842e98\jetified-zxing-orient-2.1.1\AndroidManifest.xml:147:25-61
 intent-filter#action:name:android.intent.action.SEND+category:name:android.intent.category.DEFAULT+data:mimeType:text/x-vcard
-ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\033e883894a54ab007f2aeb4ffa71816\zxing-orient-2.1.1\AndroidManifest.xml:152:13-158:29
+ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\cdeaf918fff8961be47ed8e4d8842e98\jetified-zxing-orient-2.1.1\AndroidManifest.xml:152:13-158:29
 action#android.intent.action.SEND
-ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\033e883894a54ab007f2aeb4ffa71816\zxing-orient-2.1.1\AndroidManifest.xml:153:17-69
+ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\cdeaf918fff8961be47ed8e4d8842e98\jetified-zxing-orient-2.1.1\AndroidManifest.xml:153:17-69
 	android:name
-		ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\033e883894a54ab007f2aeb4ffa71816\zxing-orient-2.1.1\AndroidManifest.xml:153:25-66
+		ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\cdeaf918fff8961be47ed8e4d8842e98\jetified-zxing-orient-2.1.1\AndroidManifest.xml:153:25-66
 intent-filter#action:name:android.intent.action.SEND+category:name:android.intent.category.DEFAULT+data:mimeType:text/plain
-ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\033e883894a54ab007f2aeb4ffa71816\zxing-orient-2.1.1\AndroidManifest.xml:160:13-166:29
+ADDED from [me.sudar:zxing-orient:2.1.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\cdeaf918fff8961be47ed8e4d8842e98\jetified-zxing-orient-2.1.1\AndroidManifest.xml:160:13-166:29

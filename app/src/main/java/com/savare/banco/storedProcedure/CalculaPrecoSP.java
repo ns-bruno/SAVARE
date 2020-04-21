@@ -9,8 +9,8 @@ import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.os.Build;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.content.ContextCompat;
+import androidx.core.app.NotificationCompat;
+import androidx.core.content.ContextCompat;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -19,10 +19,6 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import com.savare.R;
 import com.savare.configuracao.ConfiguracoesInternas;
 import com.savare.funcoes.FuncoesPersonalizadas;
-
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.util.Random;
 
 /**
  * Created by Bruno Nogueira Silva on 06/09/2016.

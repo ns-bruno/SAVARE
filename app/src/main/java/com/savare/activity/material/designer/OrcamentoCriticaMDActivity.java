@@ -1,9 +1,9 @@
 package com.savare.activity.material.designer;
 
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import android.view.MenuItem;
 import android.widget.TextView;
 import com.savare.R;
@@ -11,8 +11,6 @@ import com.savare.beans.CriticaOrcamentoBeans;
 import com.savare.funcoes.FuncoesPersonalizadas;
 import com.savare.funcoes.rotinas.CriticaOrcamentoRotina;
 import com.savare.funcoes.rotinas.OrcamentoRotinas;
-
-import java.util.List;
 
 /**
  * Created by Bruno on 07/03/2017.

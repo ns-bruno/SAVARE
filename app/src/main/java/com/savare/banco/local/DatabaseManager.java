@@ -5,11 +5,13 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.os.Environment;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.savare.R;
 import com.savare.funcoes.VersionUtils;
 
+import java.io.File;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class DatabaseManager {
@@ -29,7 +31,8 @@ public class DatabaseManager {
     public static synchronized DatabaseManager getInstance(final Context context) {
         if (instance == null) {
             try {
-                initializeInstance(new ConexaoBancoDeDados(context, VersionUtils.getVersionCode(context)));
+                ConexaoBancoDeDados conexaoBancoDeDados = new ConexaoBancoDeDados(context, VersionUtils.getVersionCode(context));
+                initializeInstance(conexaoBancoDeDados);
             } catch (final Exception e) {
                 ((Activity) context).runOnUiThread(new Runnable() {
                     public void run() {

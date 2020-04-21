@@ -1,19 +1,16 @@
 package com.savare.activity.material.designer;
 
 import android.Manifest;
-import android.content.ContentValues;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.database.sqlite.SQLiteDatabase;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.provider.Settings;
-import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
+
+import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -25,13 +22,11 @@ import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.savare.R;
-import com.savare.activity.CadastroUsuarioActivity;
 import com.savare.banco.local.ConexaoBancoDeDados;
 import com.savare.beans.ParametrosLocalBeans;
 import com.savare.funcoes.FuncoesPersonalizadas;
 import com.savare.funcoes.VersionUtils;
 import com.savare.funcoes.rotinas.ParametrosLocalRotina;
-import com.savare.funcoes.rotinas.async.UpgradeBancoDadosAsyncRotinas;
 
 import java.util.List;
 

@@ -78,7 +78,7 @@
         android:orientation="horizontal"
         android:padding="10dp">
 
-        <android.support.v7.widget.Toolbar
+        <androidx.appcompat.widget.Toolbar
             android:id="@+id/fragment_orcamento_critica_md_toolbar_rodape"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
@@ -88,7 +88,7 @@
             android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
             app:popupTheme="@style/MaterialDrawerTheme.Light.DarkToolbar">
 
-        </android.support.v7.widget.Toolbar>
+        </androidx.appcompat.widget.Toolbar>
     </LinearLayout>
 
 </LinearLayout>

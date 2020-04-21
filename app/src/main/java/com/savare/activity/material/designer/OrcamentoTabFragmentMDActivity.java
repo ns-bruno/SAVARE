@@ -1,21 +1,17 @@
 package com.savare.activity.material.designer;
 
-import android.content.ContentValues;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.view.ViewPager;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
+import androidx.viewpager.widget.ViewPager;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import android.view.MenuItem;
 
 import com.ogaclejapan.smarttablayout.SmartTabLayout;
 import com.savare.R;
 import com.savare.adapter.OrcamentoTabFragmentMDAdapter;
-import com.savare.funcoes.FuncoesPersonalizadas;
 import com.savare.funcoes.rotinas.OrcamentoRotinas;
 import com.savare.funcoes.rotinas.ParcelaRotinas;
-
-import static java.security.AccessController.getContext;
 
 /**
  * Created by Bruno Nogueira Silva on 11/04/2016.

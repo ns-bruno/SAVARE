@@ -1,13 +1,13 @@
 package com.savare.activity.material.designer;
 
 import android.os.Bundle;
-import android.support.design.widget.CollapsingToolbarLayout;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentStatePagerAdapter;
-import android.support.v4.view.ViewPager;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
+import com.google.android.material.appbar.CollapsingToolbarLayout;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentStatePagerAdapter;
+import androidx.viewpager.widget.ViewPager;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import android.view.MenuItem;
 
 import com.dexafree.materialList.card.Card;
@@ -19,7 +19,6 @@ import com.savare.activity.material.designer.fragment.ProdutoDetalhesMDFragment;
 import com.savare.beans.AeaproduBeans;
 import com.savare.beans.DescricaoDublaBeans;
 import com.savare.beans.CfafotosBeans;
-import com.savare.beans.ProdutoBeans;
 import com.savare.funcoes.FuncoesPersonalizadas;
 import com.savare.funcoes.rotinas.FotoRotinas;
 import com.savare.funcoes.rotinas.ProdutoRotinas;

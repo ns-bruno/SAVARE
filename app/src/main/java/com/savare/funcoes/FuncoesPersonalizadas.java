@@ -3,6 +3,7 @@ package com.savare.funcoes;
 import android.Manifest;
 import android.accounts.Account;
 import android.accounts.AccountManager;
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlarmManager;
@@ -22,19 +23,22 @@ import android.content.pm.ActivityInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
+import android.media.AudioManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.provider.ContactsContract;
-import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.content.ContextCompat;
+
+import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
+import androidx.core.app.NotificationCompat;
+import androidx.core.content.ContextCompat;
+
+import android.telephony.SubscriptionInfo;
+import android.telephony.SubscriptionManager;
 import android.telephony.TelephonyManager;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -84,7 +88,6 @@ import java.util.Locale;
 import java.util.Random;
 import java.util.Scanner;
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
 import static android.content.Context.ACCOUNT_SERVICE;
@@ -614,6 +617,7 @@ public class FuncoesPersonalizadas {
     }
 	
 	
+	@SuppressLint("SourceLockedOrientationActivity")
 	public void bloqueiaOrientacaoTela() {
 		// Pega a orientacao atual da tela
 		orientacaoTela = context.getResources().getConfiguration().orientation;
@@ -1251,7 +1255,7 @@ public class FuncoesPersonalizadas {
                 .setStyle(bigTextStyle)
                 .setDefaults(Notification.DEFAULT_LIGHTS)
                 .setPriority(NotificationManager.IMPORTANCE_MIN)
-                .setSound(null, 0)
+                .setSound(null, AudioManager.STREAM_VOICE_CALL)
                 .setVibrate(new long[0])
                 .setOnlyAlertOnce(true);
 		try {
@@ -1338,10 +1342,26 @@ public class FuncoesPersonalizadas {
             	ActivityCompat.requestPermissions((Activity) context, new String[] {  Manifest.permission.READ_PHONE_STATE, Manifest.permission.GET_ACCOUNTS, Manifest.permission.READ_CONTACTS, Manifest.permission.WRITE_CONTACTS  }, PackageManager.PERMISSION_GRANTED );
 			}
         }
-		TelephonyManager tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
-		String androidId = "" + android.provider.Settings.Secure.getString(context.getContentResolver(), android.provider.Settings.Secure.ANDROID_ID);
+		UUID deviceUuid = null;
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
 
-		UUID deviceUuid = new UUID(androidId.hashCode(), ((long) tm.getDeviceId().hashCode() << 32) | tm.getSimSerialNumber().hashCode());
+			SubscriptionManager subsManager = (SubscriptionManager) context.getSystemService(Context.TELEPHONY_SUBSCRIPTION_SERVICE);
+
+			List<SubscriptionInfo> subsList = subsManager.getActiveSubscriptionInfoList();
+
+			if (subsList!=null) {
+				for (SubscriptionInfo subsInfo : subsList) {
+					if (subsInfo != null) {
+						String simSerialNo  = subsInfo.getIccId();
+					}
+				}
+			}
+		} else {
+			TelephonyManager tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
+			String androidId = "" + android.provider.Settings.Secure.getString(context.getContentResolver(), android.provider.Settings.Secure.ANDROID_ID);
+
+			deviceUuid = new UUID(androidId.hashCode(), ((long) tm.getDeviceId().hashCode() << 32) | tm.getSimSerialNumber().hashCode());
+		}
 
 		String nameAccount = null;
 

@@ -1,17 +1,16 @@
 package com.savare.activity.material.designer;
 
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v4.view.ViewPager;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
+import androidx.annotation.Nullable;
+import androidx.viewpager.widget.ViewPager;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import android.view.MenuItem;
 
 import com.ogaclejapan.smarttablayout.SmartTabLayout;
 import com.savare.R;
 import com.savare.activity.material.designer.fragment.ClienteCadastroTelefoneMDFragment;
 import com.savare.adapter.ClienteCadastroFragmentAdapter;
-import com.savare.funcoes.rotinas.AuxiliarRotinas;
 
 import java.util.Random;
 

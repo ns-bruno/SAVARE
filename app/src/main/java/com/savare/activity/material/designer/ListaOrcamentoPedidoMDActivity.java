@@ -1,7 +1,5 @@
 package com.savare.activity.material.designer;
 
-import android.app.ActionBar;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
@@ -13,8 +11,8 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import android.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -29,7 +27,6 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.github.clans.fab.FloatingActionButton;
@@ -47,7 +44,6 @@ import com.savare.funcoes.rotinas.GerarPdfRotinas;
 import com.savare.funcoes.rotinas.OrcamentoRotinas;
 import com.savare.funcoes.rotinas.PessoaRotinas;
 import com.savare.funcoes.rotinas.async.EnviarDadosWebserviceAsyncRotinas;
-import com.savare.funcoes.rotinas.async.EnviarOrcamentoFtpAsyncRotinas;
 import com.savare.funcoes.rotinas.async.GerarPdfAsyncRotinas;
 import com.savare.funcoes.rotinas.async.ReceberDadosWebserviceAsyncRotinas;
 import com.savare.webservice.WSSisinfoWebservice;

@@ -1,8 +1,8 @@
 <component name="libraryTable">
   <library name="Gradle: com.mikepenz:materialize:1.1.2@aar">
     <CLASSES>
-      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/83bdb60c0e693b76f9ad81cc71318f67/materialize-1.1.2/jars/classes.jar!/" />
-      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/83bdb60c0e693b76f9ad81cc71318f67/materialize-1.1.2/res" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/dfb8de2e96746ede72f45b375a3ba3c2/jetified-materialize-1.1.2/jars/classes.jar!/" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/dfb8de2e96746ede72f45b375a3ba3c2/jetified-materialize-1.1.2/res" />
     </CLASSES>
     <JAVADOC>
       <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.mikepenz/materialize/1.1.2/79e75cf64cf1e5928ef045f70905058eb44baae2/materialize-1.1.2-javadoc.jar!/" />

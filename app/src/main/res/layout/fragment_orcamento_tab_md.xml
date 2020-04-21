@@ -16,7 +16,7 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <android.support.v7.widget.Toolbar
+            <androidx.appcompat.widget.Toolbar
                 android:id="@+id/fragment_orcamento_tab_md_toolbar_cabecalho"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
@@ -27,7 +27,7 @@
                 app:popupTheme="@style/MaterialDrawerTheme.Light.DarkToolbar"
                 android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
 
-            </android.support.v7.widget.Toolbar>
+            </androidx.appcompat.widget.Toolbar>
         </LinearLayout>
 
     <LinearLayout
@@ -67,7 +67,7 @@
             app:stl_titleOffset="24dp"
             app:stl_drawDecorationAfterTab="false" />
 
-        <android.support.v4.view.ViewPager
+        <androidx.viewpager.widget.ViewPager
             android:id="@+id/fragment_orcamento_tab_md_pager"
             android:layout_width="match_parent"
             android:layout_height="match_parent"

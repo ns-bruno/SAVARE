@@ -1,7 +1,7 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion 29
     compileOptions.encoding = 'UTF-8'
     useLibrary 'org.apache.http.legacy'
 
@@ -9,7 +9,7 @@ android {
         applicationId "com.savare"
         //vectorDrawables.useSupportLibrary = true
         minSdkVersion 16
-        targetSdkVersion 28
+        targetSdkVersion 29
         versionCode 22002
         versionName "2.2.0.02"
         multiDexEnabled true
@@ -50,14 +50,14 @@ ext {
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation "com.android.support:appcompat-v7:${supportLib}"
-    implementation "com.android.support:recyclerview-v7:${supportLib}"
-    implementation "com.android.support:support-annotations:${supportLib}"
-    implementation "com.android.support:design:${supportLib}"
-    implementation "com.android.support:support-v4:${supportLib}"
-    implementation "com.android.support:support-compat:${supportLib}"
-    implementation "com.android.support:design:${supportLib}"
-    implementation "com.android.support:support-v13:${supportLib}"
+    implementation 'androidx.appcompat:appcompat:1.0.0'
+    implementation 'androidx.recyclerview:recyclerview:1.0.0'
+    implementation 'androidx.annotation:annotation:1.0.0'
+    implementation 'com.google.android.material:material:1.0.0'
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    implementation 'androidx.core:core:1.0.0'
+    implementation 'com.google.android.material:material:1.0.0'
+    implementation 'androidx.legacy:legacy-support-v13:1.0.0'
     implementation 'com.google.code.gson:gson:2.8.0'
     implementation('com.mikepenz:materialdrawer:6.0.9@aar') { transitive = true }
     implementation 'org.apache.httpcomponents:httpclient-android:4.3.5.1'

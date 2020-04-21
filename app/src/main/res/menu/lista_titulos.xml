@@ -38,6 +38,6 @@
         android:icon="@mipmap/ic_magnify_dark"
         android:title="@string/pesquisar"
         app:showAsAction="ifRoom|collapseActionView"
-        app:actionViewClass="android.support.v7.widget.SearchView" />
+        app:actionViewClass="androidx.appcompat.widget.SearchView" />
      
 </menu>

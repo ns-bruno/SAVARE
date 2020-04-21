@@ -1,11 +1,11 @@
 <component name="libraryTable">
   <library name="Gradle: com.heinrichreimersoftware:material-intro:1.6@aar">
     <ANNOTATIONS>
-      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/b3bab15346a2c7e2c3d51cb824a313d9/material-intro-1.6/annotations.zip!/" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/73c1e8f44e9a6671f53a9e46b936aaac/jetified-material-intro-1.6/annotations.zip!/" />
     </ANNOTATIONS>
     <CLASSES>
-      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/b3bab15346a2c7e2c3d51cb824a313d9/material-intro-1.6/jars/classes.jar!/" />
-      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/b3bab15346a2c7e2c3d51cb824a313d9/material-intro-1.6/res" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/73c1e8f44e9a6671f53a9e46b936aaac/jetified-material-intro-1.6/jars/classes.jar!/" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/73c1e8f44e9a6671f53a9e46b936aaac/jetified-material-intro-1.6/res" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />
