@@ -258,7 +258,7 @@ public class InicioMDActivity extends AppCompatActivity {
                                     // Cria uma intent para abrir uma nova activity
                                     //Intent intentOrcamento = new Intent(InicioMDActivity.this, ProdutoListaActivity.class);
                                     Intent intentOrcamento = new Intent(InicioMDActivity.this, ProdutoListaMDActivity.class);
-                                    intentOrcamento.putExtra(ProdutoListaMDActivity.KEY_ATACADO_VAREJO, String.valueOf(which).toString());
+                                    intentOrcamento.putExtra(ProdutoListaMDActivity.KEY_ATACADO_VAREJO, String.valueOf(which));
                                     // Abre outra tela
                                     startActivity(intentOrcamento);
 
@@ -484,6 +484,10 @@ public class InicioMDActivity extends AppCompatActivity {
                             bundle.putString(OrcamentoTabFragmentMDActivity.KEY_NOME_RAZAO, dadosRetornado.getStringExtra("NOME_CLIENTE"));
                             bundle.putString(OrcamentoTabFragmentMDActivity.KEY_ID_PESSOA, dadosRetornado.getStringExtra("ID_CFACLIFO"));
                             bundle.putString(OrcamentoTabFragmentMDActivity.KEY_ATACADO_VAREJO, String.valueOf(which));
+                            bundle.putString(OrcamentoTabFragmentMDActivity.KEY_CPF_CNPJ, dadosRetornado.getStringExtra("CPF_CGC_CLIENTE"));
+                            bundle.putString(OrcamentoTabFragmentMDActivity.KEY_ENDERECO, dadosRetornado.getStringExtra("ENDERECO_CLIENTE"));
+                            bundle.putString(OrcamentoTabFragmentMDActivity.KEY_BAIRRO, dadosRetornado.getStringExtra("BAIRRO_CLIENTE"));
+
                             bundle.putString("AV", "0");
 
                             Intent i = new Intent(InicioMDActivity.this, OrcamentoTabFragmentMDActivity.class);

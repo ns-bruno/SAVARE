@@ -1343,7 +1343,8 @@ public class FuncoesPersonalizadas {
 			}
         }
 		UUID deviceUuid = null;
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
+		String androidId = "" + android.provider.Settings.Secure.getString(context.getContentResolver(), android.provider.Settings.Secure.ANDROID_ID);
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
 
 			SubscriptionManager subsManager = (SubscriptionManager) context.getSystemService(Context.TELEPHONY_SUBSCRIPTION_SERVICE);
 
@@ -1353,13 +1354,12 @@ public class FuncoesPersonalizadas {
 				for (SubscriptionInfo subsInfo : subsList) {
 					if (subsInfo != null) {
 						String simSerialNo  = subsInfo.getIccId();
+						deviceUuid = new UUID(androidId.hashCode(), ((long) subsInfo.getIccId().hashCode() << 32) | subsInfo.getCardId());
 					}
 				}
 			}
 		} else {
 			TelephonyManager tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
-			String androidId = "" + android.provider.Settings.Secure.getString(context.getContentResolver(), android.provider.Settings.Secure.ANDROID_ID);
-
 			deviceUuid = new UUID(androidId.hashCode(), ((long) tm.getDeviceId().hashCode() << 32) | tm.getSimSerialNumber().hashCode());
 		}
 

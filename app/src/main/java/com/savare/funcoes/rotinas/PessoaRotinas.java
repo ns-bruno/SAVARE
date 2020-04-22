@@ -4,10 +4,13 @@ import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.view.View;
 import android.widget.ProgressBar;
 
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.github.johnpersano.supertoasts.library.Style;
+import com.github.johnpersano.supertoasts.library.SuperActivityToast;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -320,17 +323,21 @@ public class PessoaRotinas extends Rotinas {
 
                 } // Fim do for
             } else {
-                final FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
+                //final FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
                 // Cria uma variavem para inserir as propriedades da mensagem
-                final ContentValues mensagem = new ContentValues();
-                mensagem.put("comando", 2);
-                mensagem.put("tela", "PessoaRotinas");
-                mensagem.put("mensagem", "Não existe registros cadastrados");
+                //final ContentValues mensagem = new ContentValues();
+                //mensagem.put("comando", 2);
+                //mensagem.put("tela", "PessoaRotinas");
+                //mensagem.put("mensagem", "Não existe registros cadastrados no banco de dados deste dispositivo.");
 
                 // Executa a mensagem passando por parametro as propriedades
                 ((Activity) context).runOnUiThread(new Runnable() {
                     public void run() {
-                        funcoes.menssagem(mensagem);
+                        SuperActivityToast.create(context, "Não existe registros cadastrados no banco de dados deste dispositivo.", Style.DURATION_LONG)
+                                .setTextColor(Color.WHITE)
+                                .setColor(Color.GRAY)
+                                .setAnimations(Style.ANIMATIONS_POP)
+                                .show();
                     }
                 });
 
@@ -338,6 +345,7 @@ public class PessoaRotinas extends Rotinas {
         } catch (Exception e) {
             ((Activity) context).runOnUiThread(new Runnable() {
                 public void run() {
+
                     new MaterialDialog.Builder(context)
                             .title("PessoaRotinas")
                             .content(context.getResources().getString(R.string.msg_error) + "\n Não existe registros cadastrados")

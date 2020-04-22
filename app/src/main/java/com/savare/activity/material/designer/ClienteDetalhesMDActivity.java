@@ -23,6 +23,9 @@ import com.ogaclejapan.smarttablayout.SmartTabLayout;
 import com.savare.R;
 import com.savare.adapter.ClienteDetalhesFragmentAdapter;
 import com.savare.banco.funcoesSql.PositivacaoSql;
+import com.savare.beans.CidadeBeans;
+import com.savare.beans.EnderecoBeans;
+import com.savare.beans.EstadoBeans;
 import com.savare.beans.PessoaBeans;
 import com.savare.funcoes.FuncoesPersonalizadas;
 import com.savare.funcoes.rotinas.OrcamentoRotinas;
@@ -47,7 +50,18 @@ public class ClienteDetalhesMDActivity extends AppCompatActivity{
             codigoFun,
             codigoUsu,
             codigoTra,
-            idCliente;
+            idCliente,
+            idEstado,
+            idCidade,
+            idEmpresa,
+            tipoPessoa,
+            nomePessoa,
+            ieRgPessoa,
+            cpfCnpjPessoa,
+            enderecoPessoa,
+            numeroEnderecoPessoa,
+            bairroPessoa,
+            cepPessoa;
     private String clienteNovo;
 
     @Override
@@ -69,7 +83,17 @@ public class ClienteDetalhesMDActivity extends AppCompatActivity{
             // Pega o id do cliente
             idCliente = intentParametro.getString("ID_CFACLIFO");
             clienteNovo = intentParametro.getString("CADASTRO_NOVO");
-
+            idEstado = intentParametro.getString("ID_CFAESTAD");
+            idCidade = intentParametro.getString("ID_CFACIDAD");
+            idEmpresa = intentParametro.getString("ID_SMAEMPRE");
+            tipoPessoa = intentParametro.getString("PESSOA_CLIENTE");
+            nomePessoa = intentParametro.getString("NOME_CLIENTE");
+            ieRgPessoa = intentParametro.getString("IE_RG_CLIENTE");
+            cpfCnpjPessoa = intentParametro.getString("CPF_CGC_CLIENTE");
+            enderecoPessoa = intentParametro.getString("ENDERECO_CLIENTE");
+            numeroEnderecoPessoa = intentParametro.getString("NUMERO_ENDERECO_CLIENTE");
+            bairroPessoa = intentParametro.getString("BAIRRO_CLIENTE");
+            cepPessoa = intentParametro.getString("CEP_CLIENTE");
             if ((idCliente != null) && (Integer.parseInt(idCliente) > 0)){
                 itemMenuEnviarDados.setVisibility(View.GONE);
             }
@@ -107,12 +131,36 @@ public class ClienteDetalhesMDActivity extends AppCompatActivity{
             @Override
             public void onClick(View v) {
                 // Instancia a classe de funcoes sql para pessoa
-                PessoaRotinas pessoaRotinas = new PessoaRotinas(getApplicationContext());
+                PessoaRotinas pessoaRotinas = new PessoaRotinas(ClienteDetalhesMDActivity.this);
 
                 PessoaBeans pessoa = null;
                 String where = "CODIGO_CLI = " + codigoCli;
-                // Pega os dados de uma pessoa especifica
-                pessoa = pessoaRotinas.listaPessoaResumido(where, PessoaRotinas.KEY_TIPO_CLIENTE, null).get(0);
+
+                List<PessoaBeans> listPessoa = pessoaRotinas.listaPessoaResumido(where, PessoaRotinas.KEY_TIPO_CLIENTE, null);
+                // Verifica se o cliente esta salvo no banco de dados local
+                if ((listPessoa != null) && (listPessoa.size() > 0)) {
+                    // Pega os dados de uma pessoa especifica
+                    pessoa = listPessoa.get(0);
+                } else {
+                    pessoa = new PessoaBeans();
+                    pessoa.setIdPessoa(Integer.parseInt(idCliente));
+                    EstadoBeans estado = new EstadoBeans();
+                    estado.setCodigoEstado(Integer.parseInt(idEstado));
+                    pessoa.setEstadoPessoa(estado);
+                    CidadeBeans cidade = new CidadeBeans();
+                    cidade.setIdCidade(Integer.parseInt(idCidade));
+                    pessoa.setCidadePessoa(cidade);
+                    pessoa.setPessoa(tipoPessoa);
+                    pessoa.setNomeRazao(nomePessoa);
+                    pessoa.setIeRg(ieRgPessoa);
+                    pessoa.setCpfCnpj(cpfCnpjPessoa);
+                    EnderecoBeans endereco = new EnderecoBeans();
+                    endereco.setLogradouro(enderecoPessoa);
+                    endereco.setNumero(numeroEnderecoPessoa);
+                    endereco.setBairro(bairroPessoa);
+                    endereco.setCep(cepPessoa);
+                    pessoa.setEnderecoPessoa(endereco);
+                }
 
                 // Cria um dialog para selecionar atacado ou varejo
                 AlertDialog.Builder mensagemAtacadoVarejo = new AlertDialog.Builder(v.getContext());
@@ -157,6 +205,10 @@ public class ClienteDetalhesMDActivity extends AppCompatActivity{
                                     bundle.putString(OrcamentoTabFragmentMDActivity.KEY_NOME_RAZAO, finalPessoa.getNomeRazao());
                                     bundle.putString(OrcamentoTabFragmentMDActivity.KEY_ID_PESSOA, String.valueOf(finalPessoa.getIdPessoa()));
                                     bundle.putString(OrcamentoTabFragmentMDActivity.KEY_ATACADO_VAREJO, String.valueOf(which));
+                                    bundle.putString(OrcamentoTabFragmentMDActivity.KEY_CPF_CNPJ, finalPessoa.getCpfCnpj());
+                                    bundle.putString(OrcamentoTabFragmentMDActivity.KEY_ENDERECO, finalPessoa.getEnderecoPessoa().getLogradouro() + ", " + finalPessoa.getEnderecoPessoa().getNumero());
+                                    bundle.putString(OrcamentoTabFragmentMDActivity.KEY_NUMERO_ENDERECO, finalPessoa.getEnderecoPessoa().getNumero());
+                                    bundle.putString(OrcamentoTabFragmentMDActivity.KEY_BAIRRO, finalPessoa.getEnderecoPessoa().getBairro());
                                     bundle.putString("AV", "0");
 
                                     Intent i = new Intent(getApplicationContext(), OrcamentoTabFragmentMDActivity.class);

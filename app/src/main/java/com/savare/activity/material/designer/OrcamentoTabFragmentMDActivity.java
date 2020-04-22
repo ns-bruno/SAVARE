@@ -23,12 +23,20 @@ public class OrcamentoTabFragmentMDActivity extends AppCompatActivity {
                     atacadoVarejo = "0",
                     idPessoa,
                     razaoSocial,
-                    tipoOrcamentoPedido;
+                    tipoOrcamentoPedido,
+                    cpfCnpj,
+                    enderecoPessoa,
+                    numeroEnderecoPessoa,
+                    bairroPessoa;
     private boolean abertoTitulosPriveiraVez = false;
     public static final String  KEY_ID_ORCAMENTO = "ID_ORCAMENTO",
                                 KEY_ATACADO_VAREJO = "AEACADO_VAREJO",
                                 KEY_NOME_RAZAO = "NOME_RAZAO",
-                                KEY_ID_PESSOA = "ID_PESSOA";
+                                KEY_ID_PESSOA = "ID_PESSOA",
+                                KEY_CPF_CNPJ = "CPF_CNPJ",
+                                KEY_ENDERECO = "ENDERECO_PESSOA",
+                                KEY_NUMERO_ENDERECO = "NUMERO_ENDERECO_PESSOA",
+                                KEY_BAIRRO = "BAIRRO_PESSOA";
     public static final int SOLICITA_CLIENTE = 2,
                             RETORNA_CLIENTE = 100,
                             ERRO_RETORNA_CLIENTE = 101;
@@ -53,6 +61,10 @@ public class OrcamentoTabFragmentMDActivity extends AppCompatActivity {
             idPessoa = intentParametro.getString(KEY_ID_PESSOA);
             razaoSocial = intentParametro.getString(KEY_NOME_RAZAO);
             atacadoVarejo = intentParametro.getString(KEY_ATACADO_VAREJO);
+            cpfCnpj = intentParametro.getString(KEY_CPF_CNPJ);
+            enderecoPessoa = intentParametro.getString(KEY_ENDERECO);
+            numeroEnderecoPessoa = intentParametro.getString(KEY_NUMERO_ENDERECO);
+            bairroPessoa = intentParametro.getString(KEY_BAIRRO);
 
             // Seta o titulo da action bar com a razao do cliente
             toolbarCabecalho.setTitle(intentParametro.getString(KEY_ID_PESSOA) + " - " + intentParametro.getString(KEY_NOME_RAZAO));
@@ -71,6 +83,10 @@ public class OrcamentoTabFragmentMDActivity extends AppCompatActivity {
         parametros.putString(KEY_ATACADO_VAREJO, atacadoVarejo);
         parametros.putString(KEY_ID_PESSOA, idPessoa);
         parametros.putString(KEY_NOME_RAZAO, razaoSocial);
+        parametros.putString(KEY_CPF_CNPJ, cpfCnpj);
+        parametros.putString(KEY_ENDERECO, enderecoPessoa);
+        parametros.putString(KEY_NUMERO_ENDERECO, numeroEnderecoPessoa);
+        parametros.putString(KEY_BAIRRO, bairroPessoa);
 
         OrcamentoTabFragmentMDAdapter orcamentoTabMDAdapter = new OrcamentoTabFragmentMDAdapter(getApplicationContext(), getSupportFragmentManager(), parametros);
 

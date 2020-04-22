@@ -261,8 +261,11 @@ public class GerarPdfRotinas {
 			// Percentagem da largura da pagina
 			tabela.setWidthPercentage(100);
 			PessoaRotinas pessoaRotinas = new PessoaRotinas(context);
-			PessoaBeans pessoa = pessoaRotinas.listaPessoaResumido("CFACLIFO.ID_CFACLIFO = " + orcamento.getIdPessoa(), PessoaRotinas.KEY_TIPO_CLIENTE, null).get(0);
-
+			List<PessoaBeans> listPessoa = pessoaRotinas.listaPessoaResumido("CFACLIFO.ID_CFACLIFO = " + orcamento.getIdPessoa(), PessoaRotinas.KEY_TIPO_CLIENTE, null);
+			PessoaBeans pessoa = null;
+			if ( (listPessoa != null) && (listPessoa.size() > 0) ){
+				pessoa = listPessoa.get(0);
+			}
             TipoDocumentoBeans documentoVenda = null;
             PlanoPagamentoBeans planoPagamento = null;
 
@@ -283,15 +286,15 @@ public class GerarPdfRotinas {
 			// Preenche as celulas em asequencia
 			tabela.addCell("Orçamento/Pedido N.: " + orcamento.getIdOrcamento());
 			tabela.addCell("Data Cadastro: " + funcoes.formataDataHora(orcamento.getDataCadastro()));
-			tabela.addCell("Razão Social: " + pessoa.getNomeRazao());
-			tabela.addCell("Fantasia: " + (pessoa.getNomeFantasia() != null ? pessoa.getNomeFantasia() : "") );
-			tabela.addCell("CPF/CNPJ: " + pessoa.getCpfCnpj());
-			tabela.addCell("I.E.: " + pessoa.getIeRg() != null ? pessoa.getIeRg() : "");
-			tabela.addCell("Endereço: " + pessoa.getEnderecoPessoa().getLogradouro() != null ? pessoa.getEnderecoPessoa().getLogradouro() : "" +
-							", Nº " + pessoa.getEnderecoPessoa().getNumero() != null ? pessoa.getEnderecoPessoa().getNumero() : "");
-			tabela.addCell("Bairro: " + pessoa.getEnderecoPessoa().getBairro() != null ? pessoa.getEnderecoPessoa().getBairro() : "");
-			tabela.addCell("Cidade: " + pessoa.getCidadePessoa().getDescricao() != null ? pessoa.getCidadePessoa().getDescricao() : "");
-			tabela.addCell("Estado: " + pessoa.getEstadoPessoa().getSiglaEstado() != null ? pessoa.getEstadoPessoa().getSiglaEstado() : "");
+			tabela.addCell("Razão Social: " + (pessoa != null && pessoa.getNomeRazao() != null ? pessoa.getNomeRazao() : orcamento.getNomeRazao()) );
+			tabela.addCell("Fantasia: " + (pessoa != null && pessoa.getNomeFantasia() != null ? pessoa.getNomeFantasia() : "") );
+			tabela.addCell("CPF/CNPJ: " + (pessoa != null && pessoa.getCpfCnpj() != null ? pessoa.getCpfCnpj() : orcamento.getCpfCnpj()) );
+			tabela.addCell("I.E.: " + (pessoa != null && pessoa.getIeRg() != null ? pessoa.getIeRg() : "") );
+			tabela.addCell("Endereço: " + (pessoa != null && pessoa.getEnderecoPessoa().getLogradouro() != null ? pessoa.getEnderecoPessoa().getLogradouro() : orcamento.getEnderecoCliente() +
+							", Nº " + (pessoa != null && pessoa.getEnderecoPessoa() != null && pessoa.getEnderecoPessoa().getNumero() != null ? pessoa.getEnderecoPessoa().getNumero() : orcamento.getNumero()) ) );
+			tabela.addCell("Bairro: " + (pessoa != null && pessoa.getEnderecoPessoa() != null && pessoa.getEnderecoPessoa().getBairro() != null ? pessoa.getEnderecoPessoa().getBairro() : orcamento.getBairroCliente()) );
+			tabela.addCell("Cidade: " + (pessoa != null && pessoa.getCidadePessoa().getDescricao() != null ? pessoa.getCidadePessoa().getDescricao() : "") );
+			tabela.addCell("Estado: " + (pessoa != null && pessoa.getEstadoPessoa().getSiglaEstado() != null ? pessoa.getEstadoPessoa().getSiglaEstado() : "") );
 			tabela.addCell("Documento: " + (documentoVenda != null ? documentoVenda.getDescricaoTipoDocumento() : context.getResources().getString(R.string.selecione_tipo_documento)));
 			tabela.addCell("Plano Pagamento: " + (planoPagamento != null ? planoPagamento.getDescricaoPlanoPagamento() : context.getResources().getString(R.string.plano_pagamento)));
 

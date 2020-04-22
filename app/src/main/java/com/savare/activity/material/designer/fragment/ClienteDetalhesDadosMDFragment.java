@@ -87,7 +87,18 @@ public class ClienteDetalhesDadosMDFragment extends Fragment {
             codigoFun,
             codigoUsu,
             codigoTra,
-            idCliente;
+            idCliente,
+            idEstado,
+            idCidade,
+            idEmpresa,
+            tipoPessoa,
+            nomePessoa,
+            ieRgPessoa,
+            cpfCnpjPessoa,
+            enderecoPessoa,
+            numeroEnderecoPessoa,
+            bairroPessoa,
+            cepPessoa;
     private boolean clienteNovo = false;
     private boolean abertoTitulosPriveiraVez = false;
 
@@ -113,6 +124,17 @@ public class ClienteDetalhesDadosMDFragment extends Fragment {
             codigoUsu = intentParametro.getString("CODIGO_USU");
             // Pega o id do cliente
             idCliente = intentParametro.getString("ID_CFACLIFO");
+            idEstado = intentParametro.getString("ID_CFAESTAD");
+            idCidade = intentParametro.getString("ID_CFACIDAD");
+            idEmpresa = intentParametro.getString("ID_SMAEMPRE");
+            tipoPessoa = intentParametro.getString("PESSOA_CLIENTE");
+            nomePessoa = intentParametro.getString("NOME_CLIENTE");
+            ieRgPessoa = intentParametro.getString("IE_RG_CLIENTE");
+            cpfCnpjPessoa = intentParametro.getString("CPF_CGC_CLIENTE");
+            enderecoPessoa = intentParametro.getString("ENDERECO_CLIENTE");
+            numeroEnderecoPessoa = intentParametro.getString("NUMERO_ENDERECO_CLIENTE");
+            bairroPessoa = intentParametro.getString("BAIRRO_CLIENTE");
+            cepPessoa = intentParametro.getString("CEP_CLIENTE");
 
             if ((intentParametro.getString("CADASTRO_NOVO") != null) && (intentParametro.getString("CADASTRO_NOVO").equalsIgnoreCase("S"))){
                 clienteNovo = true;
@@ -327,6 +349,10 @@ public class ClienteDetalhesDadosMDFragment extends Fragment {
                 // Muda a cor da View
                 textStatus.setTextColor(getResources().getColor(R.color.amarelo));
             }
+        } else {
+            textRazaoSocial.setText(nomePessoa);
+            ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(nomePessoa);
+            textCnpjCpf.setText(cpfCnpjPessoa);
         }
     } // Fim da funcao carregarDadosPessoa
 

@@ -206,6 +206,9 @@ public class ListaOrcamentoPedidoMDActivity extends AppCompatActivity{
                     bundle.putString(OrcamentoTabFragmentMDActivity.KEY_NOME_RAZAO, orcamento.getNomeRazao());
                     bundle.putString(OrcamentoTabFragmentMDActivity.KEY_ID_PESSOA, String.valueOf(orcamento.getIdPessoa()));
                     bundle.putString(OrcamentoTabFragmentMDActivity.KEY_ATACADO_VAREJO, String.valueOf(orcamento.getTipoVenda()));
+                    bundle.putString(OrcamentoTabFragmentMDActivity.KEY_CPF_CNPJ, orcamento.getCpfCnpj());
+                    bundle.putString(OrcamentoTabFragmentMDActivity.KEY_ENDERECO, orcamento.getEnderecoCliente());
+                    bundle.putString(OrcamentoTabFragmentMDActivity.KEY_BAIRRO, orcamento.getBairroCliente());
 
                     Intent i = new Intent(ListaOrcamentoPedidoMDActivity.this, OrcamentoTabFragmentMDActivity.class);
 
@@ -1018,6 +1021,9 @@ public class ListaOrcamentoPedidoMDActivity extends AppCompatActivity{
                             bundle.putString(OrcamentoTabFragmentMDActivity.KEY_NOME_RAZAO, dadosRetornado.getStringExtra("NOME_CLIENTE"));
                             bundle.putString(OrcamentoTabFragmentMDActivity.KEY_ID_PESSOA, dadosRetornado.getStringExtra("ID_CFACLIFO"));
                             bundle.putString(OrcamentoTabFragmentMDActivity.KEY_ATACADO_VAREJO, String.valueOf(which));
+                            bundle.putString(OrcamentoTabFragmentMDActivity.KEY_CPF_CNPJ, dadosRetornado.getStringExtra("CPF_CGC_CLIENTE"));
+                            bundle.putString(OrcamentoTabFragmentMDActivity.KEY_ENDERECO, dadosRetornado.getStringExtra("ENDERECO_CLIENTE"));
+                            bundle.putString(OrcamentoTabFragmentMDActivity.KEY_BAIRRO, dadosRetornado.getStringExtra("BAIRRO_CLIENTE"));
                             bundle.putString("AV", "0");
 
                             Intent i = new Intent(ListaOrcamentoPedidoMDActivity.this, OrcamentoTabFragmentMDActivity.class);

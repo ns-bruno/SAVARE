@@ -73,7 +73,11 @@ public class OrcamentoProdutoMDFragment extends Fragment {
                     idPessoa = null,
                     idOrcamento = null,
                     razaoSocial = null,
-                    tipoOrcamentoPedido;
+                    tipoOrcamentoPedido,
+                    cpfCnpj = null,
+                    enderecoPessoa = null,
+                    numeroEnderecoPessoa = null,
+                    bairroPessoa = null;
     private ItemUniversalAdapter adapterItemOrcamento;
     private List<ItemOrcamentoBeans> listaItemOrcamentoSelecionado = new ArrayList<ItemOrcamentoBeans>();
     private Toolbar toolbarRodape;
@@ -107,6 +111,10 @@ public class OrcamentoProdutoMDFragment extends Fragment {
             idPessoa = parametro.getString(""+OrcamentoTabFragmentMDActivity.KEY_ID_PESSOA);
             idOrcamento = parametro.getString(""+OrcamentoTabFragmentMDActivity.KEY_ID_ORCAMENTO);
             razaoSocial = parametro.getString(""+OrcamentoTabFragmentMDActivity.KEY_NOME_RAZAO);
+            cpfCnpj = parametro.getString(OrcamentoTabFragmentMDActivity.KEY_CPF_CNPJ);
+            enderecoPessoa = parametro.getString(OrcamentoTabFragmentMDActivity.KEY_ENDERECO);
+            numeroEnderecoPessoa = parametro.getString(OrcamentoTabFragmentMDActivity.KEY_NUMERO_ENDERECO);
+            bairroPessoa = parametro.getString(OrcamentoTabFragmentMDActivity.KEY_BAIRRO);
         }
         // Torna o listView em multiplas selecao
         listViewListaProdutoOrcamento.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
@@ -783,6 +791,10 @@ public class OrcamentoProdutoMDFragment extends Fragment {
         orcamento.setIdEmpresa(Integer.valueOf(funcoes.getValorXml("CodigoEmpresa")));
         orcamento.setIdPessoa(Integer.valueOf(idPessoa));
         orcamento.setNomeRazao(razaoSocial);
+        orcamento.setCpfCnpj(cpfCnpj);
+        orcamento.setEnderecoCliente(enderecoPessoa);
+        orcamento.setNumero(numeroEnderecoPessoa.matches("[0-9]+") ? Integer.parseInt(numeroEnderecoPessoa) : 0);
+        orcamento.setBairroCliente(bairroPessoa);
         // Instancia a classe de rotinas do orcamento para manipular os dados com o banco
         OrcamentoRotinas orcamentoRotinas = new OrcamentoRotinas(getActivity());
 

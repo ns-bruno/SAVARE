@@ -120,13 +120,12 @@ public class ClienteListaMDActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
+                FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(ClienteListaMDActivity.this);
+
                 if ((telaChamou != null) && (telaChamou.equals(ListaOrcamentoPedidoMDActivity.KEY_TELA_LISTA_ORCAMENTO_PEDIDO))) {
 
                     PessoaBeans pessoa = new PessoaBeans();
                     pessoa = (PessoaBeans) listViewPessoa.getAdapter().getItem(position);
-
-                    FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(ClienteListaMDActivity.this);
-
                     // Cria uma intent para returnar um valor para activity ProdutoLista
                     Intent returnIntent = new Intent();
                     returnIntent.putExtra("ID_CFACLIFO", String.valueOf(pessoa.getIdPessoa()));
@@ -141,7 +140,8 @@ public class ClienteListaMDActivity extends AppCompatActivity {
                     returnIntent.putExtra("CODIGO_USU", String.valueOf(pessoa.getCodigoUsuario()));
                     returnIntent.putExtra("CODIGO_TRA", String.valueOf(pessoa.getCodigoTransportadora()));
                     returnIntent.putExtra("CODIGO_FUN", String.valueOf(pessoa.getCodigoFuncionario()));
-                    returnIntent.putExtra("ENDERECO_CLIENTE", pessoa.getEnderecoPessoa().getLogradouro() + ", " + pessoa.getEnderecoPessoa().getNumero());
+                    returnIntent.putExtra("ENDERECO_CLIENTE", pessoa.getEnderecoPessoa().getLogradouro());
+                    returnIntent.putExtra("NUMERO_ENDERECO_CLIENTE", pessoa.getEnderecoPessoa().getNumero());
                     returnIntent.putExtra("BAIRRO_CLIENTE", pessoa.getEnderecoPessoa().getBairro());
                     returnIntent.putExtra("CEP_CLIENTE", pessoa.getEnderecoPessoa().getCep());
                     if (pessoa.isCadastroNovo()) {
@@ -156,7 +156,6 @@ public class ClienteListaMDActivity extends AppCompatActivity {
                     PessoaBeans pessoa = new PessoaBeans();
                     pessoa = (PessoaBeans) listViewPessoa.getAdapter().getItem(position);
 
-                    FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(ClienteListaMDActivity.this);
                     // Preenche o ContentValues com os dados da pessoa
                     ContentValues dadosCliente = new ContentValues();
                     dadosCliente.put("ID_CFACLIFO", pessoa.getIdPessoa());
@@ -181,12 +180,22 @@ public class ClienteListaMDActivity extends AppCompatActivity {
                     if (qtdAlterado > 0) {
 
                         Intent returnIntent = new Intent();
-                        returnIntent.putExtra("NOME_CLIENTE", pessoa.getNomeRazao());
                         returnIntent.putExtra("ID_CFACLIFO", String.valueOf(pessoa.getIdPessoa()));
+                        returnIntent.putExtra("ID_CFAESTAD", String.valueOf(pessoa.getEstadoPessoa().getCodigoEstado()));
+                        returnIntent.putExtra("ID_CFACIDAD", String.valueOf(pessoa.getCidadePessoa().getIdCidade()));
+                        returnIntent.putExtra("ID_SMAEMPRE", funcoes.getValorXml("CodigoEmpresa"));
+                        returnIntent.putExtra("PESSOA_CLIENTE", String.valueOf(pessoa.getPessoa()));
+                        returnIntent.putExtra("NOME_CLIENTE", pessoa.getNomeRazao());
+                        returnIntent.putExtra("IE_RG_CLIENTE", pessoa.getIeRg());
+                        returnIntent.putExtra("CPF_CGC_CLIENTE", pessoa.getCpfCnpj());
                         returnIntent.putExtra("CODIGO_CLI", String.valueOf(pessoa.getCodigoCliente()));
                         returnIntent.putExtra("CODIGO_USU", String.valueOf(pessoa.getCodigoUsuario()));
                         returnIntent.putExtra("CODIGO_TRA", String.valueOf(pessoa.getCodigoTransportadora()));
                         returnIntent.putExtra("CODIGO_FUN", String.valueOf(pessoa.getCodigoFuncionario()));
+                        returnIntent.putExtra("ENDERECO_CLIENTE", pessoa.getEnderecoPessoa().getLogradouro());
+                        returnIntent.putExtra("NUMERO_ENDERECO_CLIENTE", pessoa.getEnderecoPessoa().getNumero());
+                        returnIntent.putExtra("BAIRRO_CLIENTE", pessoa.getEnderecoPessoa().getBairro());
+                        returnIntent.putExtra("CEP_CLIENTE", pessoa.getEnderecoPessoa().getCep());
 
                         setResult(OrcamentoTabFragmentMDActivity.RETORNA_CLIENTE, returnIntent);
                         // Fecha a tela de detalhes de produto
@@ -205,10 +214,21 @@ public class ClienteListaMDActivity extends AppCompatActivity {
                     // Abre a tela inicial do sistema
                     Intent intent = new Intent(ClienteListaMDActivity.this, ClienteDetalhesMDActivity.class);
                     intent.putExtra("ID_CFACLIFO", String.valueOf(pessoa.getIdPessoa()));
+                    intent.putExtra("ID_CFAESTAD", String.valueOf(pessoa.getEstadoPessoa().getCodigoEstado()));
+                    intent.putExtra("ID_CFACIDAD", String.valueOf(pessoa.getCidadePessoa().getIdCidade()));
+                    intent.putExtra("ID_SMAEMPRE", funcoes.getValorXml("CodigoEmpresa"));
+                    intent.putExtra("PESSOA_CLIENTE", String.valueOf(pessoa.getPessoa()));
+                    intent.putExtra("NOME_CLIENTE", pessoa.getNomeRazao());
+                    intent.putExtra("IE_RG_CLIENTE", pessoa.getIeRg());
+                    intent.putExtra("CPF_CGC_CLIENTE", pessoa.getCpfCnpj());
                     intent.putExtra("CODIGO_CLI", String.valueOf(pessoa.getCodigoCliente()));
                     intent.putExtra("CODIGO_USU", String.valueOf(pessoa.getCodigoUsuario()));
                     intent.putExtra("CODIGO_TRA", String.valueOf(pessoa.getCodigoTransportadora()));
                     intent.putExtra("CODIGO_FUN", String.valueOf(pessoa.getCodigoFuncionario()));
+                    intent.putExtra("ENDERECO_CLIENTE", pessoa.getEnderecoPessoa().getLogradouro());
+                    intent.putExtra("NUMERO_ENDERECO_CLIENTE", pessoa.getEnderecoPessoa().getNumero());
+                    intent.putExtra("BAIRRO_CLIENTE", pessoa.getEnderecoPessoa().getBairro());
+                    intent.putExtra("CEP_CLIENTE", pessoa.getEnderecoPessoa().getCep());
                     if (pessoa.isCadastroNovo()) {
                         intent.putExtra("CADASTRO_NOVO", "S");
                     }
@@ -431,7 +451,6 @@ public class ClienteListaMDActivity extends AppCompatActivity {
 
                     // Cria a lista com as pessoas de acordo com a cidade selecionada
                     listaPessoas = pessoaRotinas.listaPessoaResumido(whereAux, PessoaRotinas.KEY_TIPO_CLIENTE, progressBarStatus);
-
                 } else if (cidade.getDescricao().equalsIgnoreCase(getResources().getString(R.string.sem_cidade))) {
                     whereAux = "( (CFACIDAD.DESCRICAO IS NULL) OR (CFACIDAD.DESCRICAO = '') ) ";
 
