@@ -74,12 +74,12 @@ public class RegistroChaveUsuarioMDActivity extends IntroActivity {
                 .build();
         addSlide(chaveSlide);
 
-        Slide servidoresSlide = new FragmentSlide.Builder()
+        /*Slide servidoresSlide = new FragmentSlide.Builder()
                 .background(R.color.md_indigo_500)
                 .backgroundDark(R.color.md_indigo_500)
                 .fragment(ListaServidoresWebserviceMDFragment.newInstance())
                 .build();
-        addSlide(servidoresSlide);
+        addSlide(servidoresSlide);*/
 
 
         Slide loginSlide = new FragmentSlide.Builder()
@@ -89,11 +89,6 @@ public class RegistroChaveUsuarioMDActivity extends IntroActivity {
                 .build();
         addSlide(loginSlide);
 
-        /*addSlide(new FragmentSlide.Builder()
-                .background(R.color.color_custom_fragment_2)
-                .backgroundDark(R.color.color_dark_custom_fragment_2)
-                .fragment(R.layout.fragment_custom, R.style.AppThemeDark)
-                .build()); */
 
         addSlide(new SimpleSlide.Builder()
                 .title(R.string.terminamos_primeiros_passos)

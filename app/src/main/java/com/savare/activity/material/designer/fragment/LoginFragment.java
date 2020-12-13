@@ -78,8 +78,8 @@ public class LoginFragment extends SlideFragment {
                     funcoes.setValorXml(funcoes.TAG_USUARIO, username.getText().toString());
                     funcoes.setValorXml(funcoes.TAG_SENHA_USUARIO, funcoes.criptografaSenha(password.getText().toString()));
 
-                    // Verifica se o CNPJ/CPF foi salvo
-                    if (!funcoes.getValorXml(funcoes.TAG_CNPJ_EMPRESA).equalsIgnoreCase(funcoes.NAO_ENCONTRADO)){
+                    // Verifica se a chave foi salva
+                    if (!funcoes.getValorXml(funcoes.TAG_UUID_DISPOSITIVO).equalsIgnoreCase(funcoes.NAO_ENCONTRADO)){
                         // Verifica se o usuario e a senha foi salvo
                         if ( (!funcoes.getValorXml(funcoes.TAG_USUARIO).equalsIgnoreCase(funcoes.NAO_ENCONTRADO)) &&
                              (!funcoes.getValorXml(funcoes.TAG_SENHA_USUARIO).equalsIgnoreCase(funcoes.NAO_ENCONTRADO)) ){
@@ -91,8 +91,8 @@ public class LoginFragment extends SlideFragment {
                             ParametrosLocalSql parametrosLocalSql = new ParametrosLocalSql(getContext());
                             if (parametrosLocalSql.insert(parametros) > 0) {
 
-                                parametros.put("NOME_PARAM", funcoes.TAG_CNPJ_EMPRESA);
-                                parametros.put("VALOR_PARAM", funcoes.getValorXml(funcoes.TAG_CNPJ_EMPRESA));
+                                parametros.put("NOME_PARAM", funcoes.TAG_UUID_DISPOSITIVO);
+                                parametros.put("VALOR_PARAM", funcoes.getValorXml(funcoes.TAG_UUID_DISPOSITIVO));
                                 // Adiciona os parametros no banco de dados
                                 // Checa se inserio no banco com sucesso pra poder proseguir
                                 if (parametrosLocalSql.insert(parametros) > 0) {
@@ -191,7 +191,7 @@ public class LoginFragment extends SlideFragment {
 
                         new MaterialDialog.Builder(getContext())
                                 .title(R.string.registrar_voce_como_usuario)
-                                .content(R.string.nao_achamos_cnpj)
+                                .content(R.string.nao_achamos_chave)
                                 .positiveText(R.string.button_ok)
                                 .show();
                     }

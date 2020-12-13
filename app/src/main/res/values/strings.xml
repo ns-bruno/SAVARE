@@ -262,6 +262,7 @@
     <string name="senha_login">Senha do Login</string>
     <string name="proximo">Próximo</string>
     <string name="digitar_cpj">Digitar CNPJ</string>
+    <string name="digitar_chave">Digitar Chave</string>
     <string name="nao_tenho_chave">Não tenho nenhuma chave de licença</string>
     <string name="primeiro_passo">Antes de iniciar a aplicação precisamos configurar algumas coisas.</string>
     <string name="produto_promocao">Produto em Promoção/Oferta</string>
@@ -279,12 +280,12 @@
     <string name="finalizar">Finalizar</string>
     <string name="primeiros_passos_iniciar_savare">Primeiros passos para iniciar o SAVARE</string>
     <string name="registrar_voce_como_usuario">Precisamos registrar você como usuário</string>
-    <string name="orientacao_registrar_usuario">Se você adquiriu uma licença para usar o SAVARE clique no botão \"DIGITAR CNPJ\".</string>
+    <string name="orientacao_registrar_usuario">Se você adquiriu uma licença para usar o SAVARE clique no campo \"DIGITAR CHAVE\".</string>
     <string name="terminamos_primeiros_passos">Terminamos os primeiros passos</string>
     <string name="terminamos">Terminamos</string>
     <string name="demorar_baixar_fotos">O recebimento de foto pode demorar bastante, pois depende do tamanho das imagens e a quantidade.</string>
     <string name="terminamos_enviar_dados">Terminamos de enviar os dados. Pode atualizar a tela, por favor.</string>
-    <string name="pronto_para_iniciar_savare">Pronto, agora vamos iniciar o SAVARE e aguardar a empresa associar o seu dispositivo a um funcionário para que você possa receber os dados. Verifique com o responvável da sua empresa para providênciar essa ligação do seu dispositivo com o funcionário cadastrado.</string>
+    <string name="pronto_para_iniciar_savare">Pronto, agora poder abrir o App SAVARE e faça a sincronização dos dados para poder usar todas as funcionalidades.</string>
     <string name="escanear_codigo_barras">Escanear código de barras</string>
     <string name="cancelado">Cancelado</string>
     <string name="digite_minimo_letras">Digite pelo menos 4 letras para fazer a pesquisa</string>
@@ -303,6 +304,7 @@
     <string name="nao_conseguimos_atualizar_usuario">Não conseguimos atualizar o usuário, tente novamente, se persistir entre em contato com o suporte SAVARE.</string>
     <string name="nome_login_invalido">Nome de login inválido, tente outro sem espaço e sem caracteres especiais.</string>
     <string name="tamanho_cnpj_cpf_nao_permitido">Tamanho da CNPJ/CPF não é permitida</string>
+    <string name="tamanho_chave">Tamanho da chave tem que ser maior que 11 digitos</string>
     <string name="recebendo_dados">Aguarde, Recebendo os dados ...</string>
     <string name="recebendo_dados_licenca">Aguarde, Recebendo os dados de licença ...</string>
     <string name="recebendo_dados_usuario">Aguarde, Recebendo os dados do Usuário ...</string>
@@ -365,6 +367,7 @@
     <string name="sincroniza_webservice">Sincronizar com Servidor Web</string>
     <string name="receber_dados_pedido_servidor_web">Receber Dados Servidor Web</string>
     <string name="cnpj_salva_sucesso">CNPJ salvo com sucesso.</string>
+    <string name="chave_salva_sucesso">Chave salva com sucesso.</string>
     <string name="digite_cnpj">Digite o seu CNPJ</string>
     <string name="atacado">Atacado</string>
     <string name="varejo">Varejo</string>
@@ -399,8 +402,9 @@
     <string name="critica_orcamento">Crítica de Orçamento</string>
     <string name="sem_razao_social">Sem razão social.</string>
     <string name="nao_achamos_cnpj">Não achamaos o CNPJ, volter e tente inserir novamente o CNPJ da empresa.</string>
+    <string name="nao_achamos_chave">Não achamaos a chave, volter e tente inserir novamentea chave de usuário.</string>
     <string name="nao_salvou_parametros_banco">Não conseguimos salvar os parâmetros no banco de dados. Tente novamente.</string>
-    <string name="dispositivo_registrado">Dispositivo registrado com sucesso. Entre em contato com a sua empresa para associar o dispositivo ao seu cadastro.</string>
+    <string name="dispositivo_registrado">Dispositivo registrado com sucesso.</string>
     <string name="nao_achamos_chave_dispositivo">Não achamdo a chave desse dispositivo, favor, limpar os dados e as datas de sincronização e refazer o cadastro desse dispositivo.</string>
     <string name="zerado_sucesso">Apagado com sucesso.</string>
     <string name="nao_autorizado">Não autorizado</string>

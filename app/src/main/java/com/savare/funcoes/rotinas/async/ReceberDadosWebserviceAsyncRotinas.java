@@ -8,6 +8,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Color;
+import android.media.AudioManager;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Environment;
@@ -107,8 +108,9 @@ import java.util.Vector;
  */
 public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Void> {
 
-    public static final String KEY_ORIGEM_CFACLIFO = "CFACLIFO",
-            KEY_ORIGEM_SMAEMRPE = "SMAEMRPE";
+    public static final String  KEY_ORIGEM_CFACLIFO = "CFACLIFO",
+                                KEY_ORIGEM_SMAEMRPE = "SMAEMRPE",
+                                KEY_ORIGEM_SMADISPO = "SMADISPO";
     private Context context;
     private String[] tabelaRecebeDados = null;
     private ProgressBar progressBarStatus = null;
@@ -180,7 +182,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 .setStyle(bigTextStyle)
                 .setDefaults(Notification.DEFAULT_LIGHTS)
                 .setPriority(NotificationManager.IMPORTANCE_MIN)
-                .setSound(null, 0)
+                .setSound(null, AudioManager.STREAM_SYSTEM)
                 .setVibrate(new long[0])
                 .setOnlyAlertOnce(true)
                 .setProgress(0, 0, true);
@@ -311,13 +313,16 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                         (funcoes.getValorXml(funcoes.TAG_ABRIU_PRIMEIRA_VEZ).equalsIgnoreCase(funcoes.NAO_ENCONTRADO))) {
                     // Checa se tem internet
                     if (funcoes.existeConexaoInternet()) {
+
+                        cadastrarDispositivoWebserviceCentral();
+
                         // Cadastra o dispositivo no Webservice central (admin)
-                        if (cadastrarDispositivoWebserviceCentral()) {
+                        /*if (cadastrarDispositivoWebserviceCentral()) {
                             // Cadastro o dispositivo no Webservice local da empresa
                             cadastrarDispositivo();
                         } else {
                             return null;
-                        }
+                        }*/
                     } else {
                         if (textStatusErro != null) {
                             ((Activity) context).runOnUiThread(new Runnable() {
@@ -885,6 +890,11 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 parametros.put("NOME_PARAM", funcoes.TAG_CHAVE_FUNCIONARIO);
                 parametros.put("VALOR_PARAM", funcoes.getValorXml(funcoes.TAG_CHAVE_FUNCIONARIO));
             }
+            if (usuario.containsKey("ID_SMAEMPRE")) {
+                funcoes.setValorXml(funcoes.TAG_CODIGO_EMPRESA, usuario.getAsString("ID_SMAEMPRE"));
+                parametros.put("NOME_PARAM", funcoes.TAG_CODIGO_EMPRESA);
+                parametros.put("VALOR_PARAM", funcoes.getValorXml(funcoes.TAG_CODIGO_EMPRESA));
+            }
         }
         if (origem.equalsIgnoreCase(KEY_ORIGEM_SMAEMRPE)) {
             if (usuario.containsKey("ID_SMAEMPRE")) {
@@ -896,6 +906,14 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 funcoes.setValorXml(funcoes.TAG_ID_CFACLIFO_VISTA, usuario.getAsString("ID_CFACLIFO_VISTA"));
                 parametros.put("NOME_PARAM", funcoes.TAG_ID_CFACLIFO_VISTA);
                 parametros.put("VALOR_PARAM", funcoes.getValorXml(funcoes.TAG_ID_CFACLIFO_VISTA));
+            }
+        }
+        if (origem.equalsIgnoreCase(KEY_ORIGEM_SMADISPO)) {
+
+            if (usuario.containsKey("TAG_DESCRICAO_DISPOSITIVO")) {
+                funcoes.setValorXml(FuncoesPersonalizadas.TAG_DESCRICAO_DISPOSITIVO, usuario.getAsString("TAG_DESCRICAO_DISPOSITIVO"));
+                parametros.put("NOME_PARAM", funcoes.TAG_DESCRICAO_DISPOSITIVO);
+                parametros.put("VALOR_PARAM", usuario.getAsString("TAG_DESCRICAO_DISPOSITIVO"));
             }
         }
         if (usuario.containsKey("EMAIL")) {
@@ -1443,52 +1461,85 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
         }
         final FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(context);
         try {
-            String cnpjEmpresa = funcoes.getValorXml(funcoes.TAG_CNPJ_EMPRESA);
-            String parametrosWebservice = "";
+            String chaveUsuario = funcoes.getValorXml(funcoes.TAG_UUID_DISPOSITIVO);
+            String parametrosUrl = "";
             JsonObject statuRetorno = null;
 
-            if ((cnpjEmpresa != null) && (!cnpjEmpresa.equalsIgnoreCase(funcoes.NAO_ENCONTRADO))) {
+            if ((chaveUsuario != null) && (!chaveUsuario.equalsIgnoreCase(funcoes.NAO_ENCONTRADO))) {
                 //String abriuAppPrimeiraVez = funcoes.getValorXml("AbriuAppPriveiraVez");
 
-                parametrosWebservice += "&cnpjUrl=" + cnpjEmpresa;
+                parametrosUrl += "&where=IDENTIFICACAO = '" + chaveUsuario + "'";
                 WSSisinfoWebservice webserviceSisInfo = new WSSisinfoWebservice(context);
 
-                JsonObject retornoWebservice = new Gson().fromJson(webserviceSisInfo.executarWebserviceJson(servidorAtivo, null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_SMADISPO, WSSisinfoWebservice.METODO_POST, null, parametrosWebservice), JsonObject.class);
+                JsonObject retornoWebservice = new Gson().fromJson(webserviceSisInfo.executarWebserviceJson(servidorAtivo, null, WSSisinfoWebservice.FUNCTION_SISINFOWEB_JSON_SELECT_SMADISPO, WSSisinfoWebservice.METODO_GET, null, parametrosUrl), JsonObject.class);
 
                 if ((retornoWebservice != null) && (retornoWebservice.has(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO))) {
                     statuRetorno = retornoWebservice.getAsJsonObject(WSSisinfoWebservice.KEY_OBJECT_STATUS_RETORNO);
                     // Verifica se retornou com sucesso
                     if (statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO).getAsInt() == HttpURLConnection.HTTP_OK) {
 
-                        // Atualiza a notificacao
-                        bigTextStyle.bigText(context.getResources().getString(R.string.dispositivo_registrado));
-                        mBuilder.setStyle(bigTextStyle);
-                        notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
+                        // Checa se retornou alguma coisa
+                        if ((retornoWebservice.has(WSSisinfoWebservice.KEY_OBJECT_OBJECT_RETORNO))) {
+                            final JsonArray listaDispositivoRetorno = retornoWebservice.getAsJsonArray(WSSisinfoWebservice.KEY_OBJECT_OBJECT_RETORNO);
 
-                        // Checo se o texto de status foi passado pro parametro
+                            if (listaDispositivoRetorno.size() > 0) {
+                                for (int i = 0; i < listaDispositivoRetorno.size(); i++) {
+
+                                    JsonObject dispositivoRetorno = listaDispositivoRetorno.get(i).getAsJsonObject();
+                                    ContentValues dadosDispositivo = new ContentValues();
+
+                                    if (dispositivoRetorno.has("descricao")) {
+                                        dadosDispositivo.put("TAG_DESCRICAO_DISPOSITIVO", dispositivoRetorno.get("descricao").getAsString());
+                                    }
+                                    salvarDadosXml(dadosDispositivo, KEY_ORIGEM_SMADISPO);
+                                }
+                                // Atualiza a notificacao
+                                bigTextStyle.bigText(context.getResources().getString(R.string.dispositivo_registrado));
+                                mBuilder.setStyle(bigTextStyle);
+                                notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR, mBuilder.build());
+
+                                // Checo se o texto de status foi passado pro parametro
+                                if (textStatus != null) {
+                                    ((Activity) context).runOnUiThread(new Runnable() {
+                                        public void run() {
+                                            textStatus.setText(context.getResources().getString(R.string.dispositivo_registrado));
+                                        }
+                                    });
+                                }
+                                if (textStatusErro != null) {
+                                    ((Activity) context).runOnUiThread(new Runnable() {
+                                        public void run() {
+                                            textStatusErro.append("\n*" + context.getResources().getString(R.string.dispositivo_registrado));
+                                        }
+                                    });
+                                }
+                                if (progressBarStatus != null) {
+                                    ((Activity) context).runOnUiThread(new Runnable() {
+                                        public void run() {
+                                            progressBarStatus.setIndeterminate(true);
+                                            progressBarStatus.setVisibility(View.INVISIBLE);
+                                        }
+                                    });
+                                }
+                                funcoes.setValorXml(funcoes.TAG_ABRIU_PRIMEIRA_VEZ, "N");
+                                return true;
+                            }
+                        }
+                        // Só checa aqui se não retornar os dados do dispositivo
                         if (textStatus != null) {
                             ((Activity) context).runOnUiThread(new Runnable() {
                                 public void run() {
-                                    textStatus.setText(context.getResources().getString(R.string.dispositivo_registrado));
+                                    textStatus.setText(context.getResources().getString(R.string.nao_achamos_chave_dispositivo));
                                 }
                             });
                         }
                         if (textStatusErro != null) {
                             ((Activity) context).runOnUiThread(new Runnable() {
                                 public void run() {
-                                    textStatusErro.append("\n*" + context.getResources().getString(R.string.dispositivo_registrado));
+                                    textStatusErro.append("\n*" + context.getResources().getString(R.string.nao_achamos_chave_dispositivo));
                                 }
                             });
                         }
-                        if (progressBarStatus != null) {
-                            ((Activity) context).runOnUiThread(new Runnable() {
-                                public void run() {
-                                    progressBarStatus.setIndeterminate(true);
-                                    progressBarStatus.setVisibility(View.INVISIBLE);
-                                }
-                            });
-                        }
-                        return true;
                     } else {
                         final StringBuilder mensagemErro = new StringBuilder();
                         mensagemErro.append("Codigo: " + (statuRetorno != null ? statuRetorno.get(WSSisinfoWebservice.KEY_ELEMENT_CODIGO_RETORNO) : "Desconhecido") + "\n");
@@ -1547,7 +1598,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
             } else {
                 // Cria uma notificacao para ser manipulado
                 bigTextStyle.setBigContentTitle(context.getResources().getString(R.string.msg_error))
-                        .bigText(context.getResources().getString(R.string.nao_achamos_cnpj));
+                        .bigText(context.getResources().getString(R.string.nao_achamos_chave));
                 mBuilder.setStyle(bigTextStyle)
                         .setProgress(0, 0, false);
                 notificationManager.notify(ConfiguracoesInternas.IDENTIFICACAO_NOTIFICACAO_SINCRONIZAR + new Random().nextInt(100), mBuilder.build());
@@ -1555,7 +1606,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 if (textStatus != null) {
                     ((Activity) context).runOnUiThread(new Runnable() {
                         public void run() {
-                            textStatus.append(context.getResources().getString(R.string.nao_achamos_cnpj));
+                            textStatus.append(context.getResources().getString(R.string.nao_achamos_chave));
                         }
                     });
                 }
@@ -1563,7 +1614,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                 if (textStatusErro != null) {
                     ((Activity) context).runOnUiThread(new Runnable() {
                         public void run() {
-                            textStatusErro.append("\n*" + context.getResources().getString(R.string.nao_achamos_cnpj));
+                            textStatusErro.append("\n*" + context.getResources().getString(R.string.nao_achamos_chave));
                         }
                     });
                 }
@@ -1737,6 +1788,8 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                             }
                                         });
                                     }
+                                    funcoes.setValorXml(FuncoesPersonalizadas.TAG_CNPJ_EMPRESA, usuarioRetorno.get("cpfCgc").getAsString());
+
                                     // Checa se o usuario esta ativo
                                     if (usuarioRetorno.get("ativo").toString().equalsIgnoreCase("0")) {
                                         // Marca que a empresa esta inativa
@@ -1753,7 +1806,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                         });
                                         return false;
                                     } else {
-                                        funcoes.setValorXml("EmpresaAtiva", "1");
+                                        funcoes.setValorXml(FuncoesPersonalizadas.TAG_EMPRESA_ATIVA, "1");
                                     }
                                 }
                             }
@@ -2141,7 +2194,7 @@ public class ReceberDadosWebserviceAsyncRotinas extends AsyncTask<Void, Void, Vo
                                                 if ((empresaRetorno.has("percMulta"))) {
                                                     dadosEmpresa.put("PERC_MULTA", empresaRetorno.get("percMulta").getAsDouble());
                                                 }
-                                                ;
+
                                                 dadosEmpresa.put("VL_MIN_PRAZO_VAREJO", empresaRetorno.get("vlMinPrazoVarejo").getAsDouble());
                                                 dadosEmpresa.put("VL_MIN_PRAZO_ATACADO", empresaRetorno.get("vlMinPrazoAtacado").getAsDouble());
                                                 dadosEmpresa.put("VL_MIN_VISTA_VAREJO", empresaRetorno.get("vlMinVistaVarejo").getAsDouble());

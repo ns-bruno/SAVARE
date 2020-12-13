@@ -35,29 +35,28 @@
         android:ems="10"
         android:digits="0123456789"
         android:inputType="numberDecimal"
-        android:hint="@string/digite_cnpj"
+        android:hint="@string/digitar_chave"
         android:textColor="@color/branco"
-        android:id="@+id/fragment_chave_usuario_editText_digitar_cnpj"
-        android:visibility="gone"
+        android:id="@+id/fragment_chave_usuario_editText_digitar_chave"
         android:imeOptions="actionDone"
         android:maxLines="1"
         android:textColorHint="@color/branco"/>
 
     <Button
-        android:text="@string/tenho_cnpj"
+        android:text="@string/salvar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/fragment_chave_usuario_buttonTenhoCnpj"
+        android:id="@+id/fragment_chave_usuario_buttonTenhoChave"
         android:background="@color/branco"
         android:textAppearance="@style/TextAppearance.AppCompat.Large"
         android:textColor="@color/md_red_A400"
         android:padding="15dp"/>
 
-    <Button
-        android:text="@string/digitar_cpj"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/fragment_chave_usuario_buttonDigitarCnpj"
-        android:background="@color/transparent"
-        android:textColor="@color/branco"/>
+<!--    <Button-->
+<!--        android:text="@string/digitar_cpj"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:id="@+id/fragment_chave_usuario_buttonDigitarCnpj"-->
+<!--        android:background="@color/transparent"-->
+<!--        android:textColor="@color/branco"/>-->
 </LinearLayout>

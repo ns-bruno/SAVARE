@@ -4,7 +4,7 @@ ADDED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\m
 INJECTED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:2:1-280:12
 INJECTED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:2:1-280:12
 INJECTED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml:2:1-280:12
-MERGED from [androidx.multidex:multidex:2.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\b49de40908d20f742852b1e123dcefcf\multidex-2.0.0\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.multidex:multidex:2.0.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\02f3fbd5a53680fdf87fdbed75c04a3e\multidex-2.0.1\AndroidManifest.xml:17:1-22:12
 MERGED from [com.mikepenz:materialdrawer:6.0.9] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\3de9ea02101c61beb749f952b00e8ffc\jetified-materialdrawer-6.0.9\AndroidManifest.xml:2:1-11:12
 MERGED from [com.github.arimorty:floatingsearchview:1.1.2] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\3eeb0c7b957b91b2c2c4d13c93181db8\jetified-floatingsearchview-1.1.2\AndroidManifest.xml:2:1-13:12
 MERGED from [com.google.android.material:material:1.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\01aba6feafaa9666a150e0ccab90f24c\material-1.0.0\AndroidManifest.xml:17:1-24:12
@@ -516,8 +516,8 @@ uses-sdk
 INJECTED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml reason: use-sdk injection requested
 INJECTED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml
 INJECTED from D:\Nuvem\Dropbox\Forca de Venda Movel\Codigo Fonte\SAVARE_2\app\src\main\AndroidManifest.xml
-MERGED from [androidx.multidex:multidex:2.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\b49de40908d20f742852b1e123dcefcf\multidex-2.0.0\AndroidManifest.xml:20:5-43
-MERGED from [androidx.multidex:multidex:2.0.0] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\b49de40908d20f742852b1e123dcefcf\multidex-2.0.0\AndroidManifest.xml:20:5-43
+MERGED from [androidx.multidex:multidex:2.0.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\02f3fbd5a53680fdf87fdbed75c04a3e\multidex-2.0.1\AndroidManifest.xml:20:5-43
+MERGED from [androidx.multidex:multidex:2.0.1] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\02f3fbd5a53680fdf87fdbed75c04a3e\multidex-2.0.1\AndroidManifest.xml:20:5-43
 MERGED from [com.mikepenz:materialdrawer:6.0.9] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\3de9ea02101c61beb749f952b00e8ffc\jetified-materialdrawer-6.0.9\AndroidManifest.xml:7:5-9:41
 MERGED from [com.mikepenz:materialdrawer:6.0.9] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\3de9ea02101c61beb749f952b00e8ffc\jetified-materialdrawer-6.0.9\AndroidManifest.xml:7:5-9:41
 MERGED from [com.github.arimorty:floatingsearchview:1.1.2] C:\Users\Nogueira\.gradle\caches\transforms-2\files-2.1\3eeb0c7b957b91b2c2c4d13c93181db8\jetified-floatingsearchview-1.1.2\AndroidManifest.xml:7:5-9:41

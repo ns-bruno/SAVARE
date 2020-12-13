@@ -791,10 +791,10 @@ public class OrcamentoProdutoMDFragment extends Fragment {
         orcamento.setIdEmpresa(Integer.valueOf(funcoes.getValorXml("CodigoEmpresa")));
         orcamento.setIdPessoa(Integer.valueOf(idPessoa));
         orcamento.setNomeRazao(razaoSocial);
-        orcamento.setCpfCnpj(cpfCnpj);
-        orcamento.setEnderecoCliente(enderecoPessoa);
-        orcamento.setNumero(numeroEnderecoPessoa.matches("[0-9]+") ? Integer.parseInt(numeroEnderecoPessoa) : 0);
-        orcamento.setBairroCliente(bairroPessoa);
+        orcamento.setCpfCnpj( cpfCnpj != null ? cpfCnpj : "");
+        orcamento.setEnderecoCliente( enderecoPessoa != null ? enderecoPessoa : "");
+        orcamento.setNumero(numeroEnderecoPessoa != null && numeroEnderecoPessoa.matches("[0-9]+") ? Integer.parseInt(numeroEnderecoPessoa) : 0);
+        orcamento.setBairroCliente( bairroPessoa != null ? bairroPessoa : "");
         // Instancia a classe de rotinas do orcamento para manipular os dados com o banco
         OrcamentoRotinas orcamentoRotinas = new OrcamentoRotinas(getActivity());
 

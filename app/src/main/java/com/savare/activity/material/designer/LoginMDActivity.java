@@ -97,13 +97,6 @@ public class LoginMDActivity extends AppCompatActivity {
             // Instancia a classe de funcoes personalizadas
             FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(LoginMDActivity.this);
 
-            // Verifica se os dados do dispositivo estao salvos
-            if (    (ContextCompat.checkSelfPermission( LoginMDActivity.this, Manifest.permission.READ_PHONE_STATE ) == PackageManager.PERMISSION_GRANTED) &&
-                    ((funcoes.getValorXml(funcoes.TAG_UUID_DISPOSITIVO).equalsIgnoreCase(funcoes.NAO_ENCONTRADO)) ||
-                    (funcoes.getValorXml(funcoes.TAG_DESCRICAO_DISPOSITIVO).equalsIgnoreCase(funcoes.NAO_ENCONTRADO))) ){
-                funcoes.setUuidDispositivo();
-            }
-
             if (!camposObrigatorioPreenchido()) {
                 // Abre a tela inicial do sistema
                 Intent intent = new Intent(LoginMDActivity.this, RegistroChaveUsuarioMDActivity.class);
@@ -115,7 +108,14 @@ public class LoginMDActivity extends AppCompatActivity {
                         ActivityCompat.requestPermissions(LoginMDActivity.this, REQUIRED_PERMISSIONS, REQUEST_APP_SETTINGS);
                     }
                 }
-                textCodigoUsuario.setText(funcoes.getValorXml(funcoes.TAG_CNPJ_EMPRESA));
+                if ( funcoes.getValorXml(funcoes.TAG_CNPJ_EMPRESA).equalsIgnoreCase(funcoes.NAO_ENCONTRADO) ){
+
+                    textCodigoUsuario.setText(funcoes.getValorXml(funcoes.TAG_UUID_DISPOSITIVO));
+
+                } else {
+
+                    textCodigoUsuario.setText(funcoes.getValorXml(funcoes.TAG_CNPJ_EMPRESA));
+                }
                 textUsuario.setText(funcoes.getValorXml(funcoes.TAG_USUARIO));
             }
 
@@ -203,7 +203,7 @@ public class LoginMDActivity extends AppCompatActivity {
             FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(LoginMDActivity.this);
             // Checa se tem algum campo obrigatorio vazio
             if ((funcoes.getValorXml(funcoes.TAG_USUARIO).equalsIgnoreCase(funcoes.NAO_ENCONTRADO)) ||
-                    (funcoes.getValorXml(funcoes.TAG_CNPJ_EMPRESA).equalsIgnoreCase(funcoes.NAO_ENCONTRADO))) {
+                    (funcoes.getValorXml(funcoes.TAG_UUID_DISPOSITIVO).equalsIgnoreCase(funcoes.NAO_ENCONTRADO))) {
 
                 retorno = false;
 
@@ -219,12 +219,12 @@ public class LoginMDActivity extends AppCompatActivity {
                             if ((param.getNomeParam().equalsIgnoreCase(funcoes.TAG_USUARIO))) {
                                 funcoes.setValorXml(funcoes.TAG_USUARIO, param.getValorParam());
                             }
-                            if (param.getNomeParam().equalsIgnoreCase(funcoes.TAG_CNPJ_EMPRESA)) {
-                                funcoes.setValorXml(funcoes.TAG_CNPJ_EMPRESA, param.getValorParam());
+                            if (param.getNomeParam().equalsIgnoreCase(funcoes.TAG_UUID_DISPOSITIVO)) {
+                                funcoes.setValorXml(funcoes.TAG_UUID_DISPOSITIVO, param.getValorParam());
                             }
                         }
                         if ((funcoes.getValorXml(funcoes.TAG_USUARIO).equalsIgnoreCase(funcoes.NAO_ENCONTRADO)) ||
-                                (funcoes.getValorXml(funcoes.TAG_CNPJ_EMPRESA).equalsIgnoreCase(funcoes.NAO_ENCONTRADO))) {
+                                (funcoes.getValorXml(funcoes.TAG_UUID_DISPOSITIVO).equalsIgnoreCase(funcoes.NAO_ENCONTRADO))) {
                             retorno = false;
                         } else {
                             retorno = true;
@@ -249,21 +249,14 @@ public class LoginMDActivity extends AppCompatActivity {
         FuncoesPersonalizadas funcoes = new FuncoesPersonalizadas(getApplicationContext());
 
         // Checa se existe o codigo do usuario e o nome do usuario
-        if ( (funcoes.getValorXml("Usuario").equalsIgnoreCase(textUsuario.getText().toString())) ){
+        if ( (funcoes.getValorXml(funcoes.TAG_USUARIO).equalsIgnoreCase(textUsuario.getText().toString())) ){
 
-            if ( (editSenha.getText().toString().equalsIgnoreCase(funcoes.descriptografaSenha(funcoes.getValorXml("SenhaUsuario")))) ){
+            if ( (editSenha.getText().toString().equalsIgnoreCase(funcoes.descriptografaSenha(funcoes.getValorXml(funcoes.TAG_SENHA_USUARIO)))) ){
                 Intent intent = new Intent(LoginMDActivity.this, InicioMDActivity.class);
                 // Tira a acitivity da pilha e inicia uma nova
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 startActivity(intent);
             } else {
-                /*ContentValues mensagem = new ContentValues();
-                mensagem.put("comando", 1);
-                mensagem.put("tela", "LoginActivitys");
-                mensagem.put("mensagem", "Senha incorreta");
-
-                funcoes.menssagem(mensagem);*/
-
                 new MaterialDialog.Builder(LoginMDActivity.this)
                         .title("LoginMDActivity")
                         .content("Senha incorreta")
@@ -271,14 +264,6 @@ public class LoginMDActivity extends AppCompatActivity {
                         .show();
             }
         } else {
-            /*ContentValues mensagem = new ContentValues();
-            mensagem.put("comando", 1);
-            mensagem.put("tela", "LoginActivitys");
-            mensagem.put("mensagem", "Usuário não existe");
-            mensagem.put("dados", textCodigoUsuario.getText().toString() + textUsuario.getText().toString());
-
-            funcoes.menssagem(mensagem);*/
-
             new MaterialDialog.Builder(LoginMDActivity.this)
                     .title("LoginMDActivity")
                     .content("Usuário não existe")
