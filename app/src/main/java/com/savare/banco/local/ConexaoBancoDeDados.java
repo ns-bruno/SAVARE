@@ -177,20 +177,8 @@ public class ConexaoBancoDeDados extends SQLiteOpenHelper {
 
 		TelephonyManager telephonyManager = (TelephonyManager) context.getSystemService(context.TELEPHONY_SERVICE);
 
-		if (telephonyManager != null) {
-			if (ActivityCompat.checkSelfPermission(context, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
-				// TODO: Consider calling
-				//    ActivityCompat#requestPermissions
-				// here to request the missing permissions, and then overriding
-				//   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-				//                                          int[] grantResults)
-				// to handle the case where the user grants the permission. See the documentation
-				// for ActivityCompat#requestPermissions for more details.
-				return;
-			}
-			listaInsertPadrao.add("INSERT OR REPLACE INTO ULTIMA_ATUALIZACAO_DISPOSITIVO (ID_DISPOSITIVO, TABELA, DATA_ULTIMA_ATUALIZACAO) VALUES ('" + telephonyManager.getDeviceId() + "', " + "'AEAORCAM', (DATETIME('NOW', 'localtime')));");
-			listaInsertPadrao.add("INSERT OR REPLACE INTO ULTIMA_ATUALIZACAO_DISPOSITIVO (ID_DISPOSITIVO, TABELA, DATA_ULTIMA_ATUALIZACAO) VALUES ('" + telephonyManager.getDeviceId() + "', " + "'AEAITORC', (DATETIME('NOW', 'localtime')));");
-			listaInsertPadrao.add("INSERT OR REPLACE INTO ULTIMA_ATUALIZACAO_DISPOSITIVO (ID_DISPOSITIVO, TABELA, DATA_ULTIMA_ATUALIZACAO) VALUES ('" + telephonyManager.getDeviceId() + "', " + "'RPAPARCE_BAIXA', (DATE('NOW', 'localtime')));");
-		}
+			listaInsertPadrao.add("INSERT OR REPLACE INTO ULTIMA_ATUALIZACAO_DISPOSITIVO (TABELA, DATA_ULTIMA_ATUALIZACAO) VALUES ('RPAPARCE_BAIXA', (DATE('NOW', 'localtime')));");
+			listaInsertPadrao.add("INSERT OR REPLACE INTO ULTIMA_ATUALIZACAO_DISPOSITIVO (TABELA, DATA_ULTIMA_ATUALIZACAO) VALUES ('AEAORCAM', (DATETIME('NOW', 'localtime')));");
+			listaInsertPadrao.add("INSERT OR REPLACE INTO ULTIMA_ATUALIZACAO_DISPOSITIVO (TABELA, DATA_ULTIMA_ATUALIZACAO) VALUES ('AEAITORC', (DATETIME('NOW', 'localtime')));");
 	}
 }

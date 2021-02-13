@@ -1,8 +1,9 @@
 <component name="libraryTable">
   <library name="Gradle: com.github.clans:fab:1.6.2@aar">
     <CLASSES>
-      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/e913af79c91cf7082e47e1ba8c5a280c/fab-1.6.2/jars/classes.jar!/" />
-      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/e913af79c91cf7082e47e1ba8c5a280c/fab-1.6.2/res" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/9ce07ed1e1e1b6b06a76441b94a6a9d9/jetified-fab-1.6.2/jars/classes.jar!/" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/9ce07ed1e1e1b6b06a76441b94a6a9d9/jetified-fab-1.6.2/res" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/9ce07ed1e1e1b6b06a76441b94a6a9d9/jetified-fab-1.6.2/AndroidManifest.xml" />
     </CLASSES>
     <JAVADOC>
       <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.github.clans/fab/1.6.2/c0ba301f07b3e5e4afccdbc3b45d9cf89d01bd57/fab-1.6.2-javadoc.jar!/" />

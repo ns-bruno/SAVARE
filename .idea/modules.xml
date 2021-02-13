@@ -2,8 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/SAVARE_2.iml" filepath="$PROJECT_DIR$/SAVARE_2.iml" group="SAVARE_2" />
-      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" group="SAVARE_2/app" />
+      <module fileurl="file://$PROJECT_DIR$/SAVARE_2.iml" filepath="$PROJECT_DIR$/SAVARE_2.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/SAVARE_2.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/SAVARE_2.app.iml" />
     </modules>
   </component>
 </project>

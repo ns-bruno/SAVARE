@@ -1,8 +1,9 @@
 <component name="libraryTable">
   <library name="Gradle: com.mikepenz:materialdrawer:6.0.9@aar">
     <CLASSES>
-      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/3de9ea02101c61beb749f952b00e8ffc/jetified-materialdrawer-6.0.9/jars/classes.jar!/" />
-      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/3de9ea02101c61beb749f952b00e8ffc/jetified-materialdrawer-6.0.9/res" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/b219c091a8655c48e9c08bc045808076/jetified-materialdrawer-6.0.9/jars/classes.jar!/" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/b219c091a8655c48e9c08bc045808076/jetified-materialdrawer-6.0.9/res" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/b219c091a8655c48e9c08bc045808076/jetified-materialdrawer-6.0.9/AndroidManifest.xml" />
     </CLASSES>
     <JAVADOC>
       <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.mikepenz/materialdrawer/6.0.9/a8d8bbbaa6e9666769ae4f303fdc22263c2c3455/materialdrawer-6.0.9-javadoc.jar!/" />

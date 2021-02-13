@@ -1,8 +1,9 @@
 <component name="libraryTable">
   <library name="Gradle: com.mikepenz:fastadapter-extensions-expandable:3.2.8@aar">
     <CLASSES>
-      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/dd0308958916da02d6be211a947493de/jetified-fastadapter-extensions-expandable-3.2.8/jars/classes.jar!/" />
-      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/dd0308958916da02d6be211a947493de/jetified-fastadapter-extensions-expandable-3.2.8/res" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/f8669c66320ec74ab24b1a40e9cfaae9/jetified-fastadapter-extensions-expandable-3.2.8/jars/classes.jar!/" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/f8669c66320ec74ab24b1a40e9cfaae9/jetified-fastadapter-extensions-expandable-3.2.8/res" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/f8669c66320ec74ab24b1a40e9cfaae9/jetified-fastadapter-extensions-expandable-3.2.8/AndroidManifest.xml" />
     </CLASSES>
     <JAVADOC>
       <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.mikepenz/fastadapter-extensions-expandable/3.2.8/90c2198786c7ab81780ff194bb4e4a04ce193d7c/fastadapter-extensions-expandable-3.2.8-javadoc.jar!/" />

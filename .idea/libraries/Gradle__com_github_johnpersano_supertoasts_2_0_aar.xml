@@ -1,11 +1,12 @@
 <component name="libraryTable">
   <library name="Gradle: com.github.johnpersano:supertoasts:2.0@aar">
     <ANNOTATIONS>
-      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/4d2887b2a46069123d0f0ee2e9950901/jetified-supertoasts-2.0/annotations.zip!/" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/8a5bd2fd6e9729b54b21c5eeafdc65cd/jetified-supertoasts-2.0/annotations.zip!/" />
     </ANNOTATIONS>
     <CLASSES>
-      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/4d2887b2a46069123d0f0ee2e9950901/jetified-supertoasts-2.0/jars/classes.jar!/" />
-      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/4d2887b2a46069123d0f0ee2e9950901/jetified-supertoasts-2.0/res" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/8a5bd2fd6e9729b54b21c5eeafdc65cd/jetified-supertoasts-2.0/jars/classes.jar!/" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/8a5bd2fd6e9729b54b21c5eeafdc65cd/jetified-supertoasts-2.0/res" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/8a5bd2fd6e9729b54b21c5eeafdc65cd/jetified-supertoasts-2.0/AndroidManifest.xml" />
     </CLASSES>
     <JAVADOC>
       <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.github.johnpersano/supertoasts/2.0/e061078539e3de6c106c33c217e3433078ca68cb/supertoasts-2.0-javadoc.jar!/" />

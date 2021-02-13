@@ -447,6 +447,7 @@
     <string name="clientes_nao_positivados">Clientes Não Positivados</string>
     <string name="apenas_clientes_positivados">Apenas Clientes Positivados</string>
     <string name="falta_marcar_plano_pagamento">Não foi possível pegar os dados de plano de pagamento, possivelmente é porque o plano de pagamento não foi marcado como é para \"Enviar Palm\" no sistema interno.</string>
+    <string name="savare">SAVARE</string>
 
     <string-array name="tab_produto_md">
         <item>Produtos</item>
